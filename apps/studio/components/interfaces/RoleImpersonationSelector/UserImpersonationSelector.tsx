@@ -1,11 +1,12 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { ChevronDown, ExternalLink, User as IconUser, Loader2, Search, X } from 'lucide-react'
+import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -13,13 +14,18 @@ import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-stat
 import { ResponseError } from 'types'
 import {
   Button,
+  cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  DropdownMenuSeparator,
   Input,
-  Switch,
   ScrollArea,
-  cn,
+  Switch,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
@@ -33,13 +39,13 @@ const UserImpersonationSelector = () => {
   const [additionalClaims, setAdditionalClaims] = useState('')
 
   const { id: tableId } = useParams()
+  const [selectedTab, setSelectedTab] = useState<'user' | 'external'>('user')
 
   const [previousSearches, setPreviousSearches] = useLocalStorage<User[]>(
     LOCAL_STORAGE_KEYS.USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES(tableId!),
     []
   )
 
-  const [showExternalAuth, setShowExternalAuth] = useState(false)
   const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
 
@@ -146,7 +152,6 @@ const UserImpersonationSelector = () => {
 
   function stopImpersonating() {
     state.setRole(undefined)
-    setShowExternalAuth(false) // Reset external auth impersonation when stopping impersonation
   }
 
   function toggleAalState() {
@@ -167,251 +172,246 @@ const UserImpersonationSelector = () => {
     setPreviousSearches([])
   }
 
-  // Select a previous search
-  function selectPreviousSearch(prevUser: User) {
-    setSearchText(prevUser.email ?? prevUser.phone ?? prevUser.id ?? '')
-  }
-
   return (
-    <div className="flex flex-col gap-1">
-      <h2 className="text-foreground text-sm">
-        {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
-      </h2>
-      <p className="text-sm text-foreground-light">
-        {!impersonatingUser && !isExternalAuthImpersonating
-          ? "Select a user to respect your database's Row-Level Security policies for that particular user."
-          : "Results will respect your database's Row-Level Security policies for this user."}
-      </p>
+    <>
+      <div className="px-5 py-3">
+        <h2 className="text-foreground text-sm">
+          {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
+        </h2>
+        <p className="text-sm text-foreground-light">
+          {!impersonatingUser && !isExternalAuthImpersonating
+            ? "Select a user to respect your database's Row-Level Security policies for that particular user."
+            : "Results will respect your database's Row-Level Security policies for this user."}
+        </p>
+
+        {impersonatingUser && (
+          <UserImpersonatingRow
+            user={impersonatingUser}
+            onClick={stopImpersonating}
+            isImpersonating={true}
+            aal={aal}
+            isLoading={isImpersonateLoading}
+          />
+        )}
+        {isExternalAuthImpersonating && (
+          <ExternalAuthImpersonatingRow
+            sub={state.role.externalAuth.sub}
+            onClick={stopImpersonating}
+            aal={aal}
+            isLoading={isImpersonateLoading}
+          />
+        )}
+
+        {!impersonatingUser && !isExternalAuthImpersonating && (
+          <Tabs_Shadcn_ value={selectedTab} onValueChange={(value: any) => setSelectedTab(value)}>
+            <TabsList_Shadcn_ className="gap-x-3">
+              <TabsTrigger_Shadcn_ value="user">Project user</TabsTrigger_Shadcn_>
+              <TabsTrigger_Shadcn_ value="external" className="gap-x-1.5">
+                External user
+                <InfoTooltip side="bottom" className="flex flex-col gap-1 max-w-96">
+                  Test RLS policies with external auth providers like Clerk or Auth0 by providing a
+                  user ID and optional claims.
+                </InfoTooltip>
+              </TabsTrigger_Shadcn_>
+            </TabsList_Shadcn_>
+
+            <TabsContent_Shadcn_ value="user">
+              <div className="flex flex-col gap-y-2">
+                <Input
+                  size="tiny"
+                  className="table-editor-search border-none"
+                  icon={
+                    isSearching ? (
+                      <Loader2
+                        className="animate-spin text-foreground-lighter"
+                        size={16}
+                        strokeWidth={1.5}
+                      />
+                    ) : (
+                      <Search className="text-foreground-lighter" size={16} strokeWidth={1.5} />
+                    )
+                  }
+                  placeholder="Search by id, email, phone, or name..."
+                  onChange={(e) => setSearchText(e.target.value)}
+                  value={searchText}
+                  actions={
+                    searchText && (
+                      <Button
+                        size="tiny"
+                        type="text"
+                        className="px-1"
+                        onClick={() => setSearchText('')}
+                      >
+                        <X size={12} strokeWidth={2} />
+                      </Button>
+                    )
+                  }
+                />
+                {isLoading && (
+                  <div className="flex flex-col gap-2 items-center justify-center h-24">
+                    <Loader2 className="animate-spin" size={24} />
+                    <span className="text-foreground-light">Loading users...</span>
+                  </div>
+                )}
+
+                {isError && <AlertError error={error} subject="Failed to retrieve users" />}
+
+                {isSuccess &&
+                  (users.length > 0 ? (
+                    <div>
+                      <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
+                        {users.map((user) => (
+                          <li key={user.id} role="listitem">
+                            <UserRow
+                              user={user}
+                              onClick={impersonateUser}
+                              isLoading={isImpersonateLoading}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2 items-center justify-center h-24">
+                      <p className="text-foreground-light text-xs" role="status">
+                        No users found
+                      </p>
+                    </div>
+                  ))}
+
+                <>
+                  {previousSearches.length > 0 && (
+                    <div>
+                      {previousSearches.length > 0 ? (
+                        <>
+                          <Collapsible_Shadcn_ className="relative">
+                            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+                              <div className="flex items-center gap-x-1 w-full">
+                                <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                                  Recents
+                                </p>
+                                <ChevronDown
+                                  className="transition-transform duration-200"
+                                  strokeWidth={1.5}
+                                  size={14}
+                                />
+                              </div>
+                            </CollapsibleTrigger_Shadcn_>
+
+                            <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
+                              <Button
+                                size="tiny"
+                                type="text"
+                                className="absolute right-0 top-0 py-2 hover:bg-muted flex items-center text"
+                                onClick={clearSearchHistory}
+                              >
+                                <span className="flex items-center">Clear</span>
+                              </Button>
+                              <ScrollArea
+                                className={cn(previousSearches.length > 3 ? 'h-36' : 'h-auto')}
+                              >
+                                <ul className="grid gap-2 ">
+                                  {previousSearches.map((search) => (
+                                    <li key={search.id}>
+                                      <UserRow user={search} onClick={impersonateUser} />
+                                    </li>
+                                  ))}
+                                </ul>
+                              </ScrollArea>
+                            </CollapsibleContent_Shadcn_>
+                          </Collapsible_Shadcn_>
+                        </>
+                      ) : (
+                        <div className="p-4 text-center text-muted-foreground">
+                          No recent searches
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              </div>
+            </TabsContent_Shadcn_>
+
+            <TabsContent_Shadcn_ value="external">
+              <div className="flex flex-col gap-y-4">
+                <Input
+                  size="small"
+                  layout="horizontal"
+                  label="External User ID"
+                  descriptionText="The user ID from your external auth provider"
+                  placeholder="e.g. user_abc123"
+                  value={externalUserId}
+                  onChange={(e) => setExternalUserId(e.target.value)}
+                />
+                <Input
+                  size="small"
+                  layout="horizontal"
+                  label="Additional Claims (JSON)"
+                  descriptionText="Optional: Add custom claims like org_id or roles"
+                  placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
+                  value={additionalClaims}
+                  onChange={(e) => setAdditionalClaims(e.target.value)}
+                />
+                <div className="flex items-center justify-end">
+                  <Button
+                    type="default"
+                    disabled={!externalUserId}
+                    onClick={impersonateExternalUser}
+                  >
+                    Impersonate
+                  </Button>
+                </div>
+              </div>
+            </TabsContent_Shadcn_>
+          </Tabs_Shadcn_>
+        )}
+      </div>
 
       {/* Check for both regular user and external auth impersonation since they use different data structures but both need to be handled for displaying impersonation UI */}
       {!impersonatingUser && !isExternalAuthImpersonating ? (
-        <div className="flex flex-col gap-2 mt-2 relative">
-          <Input
-            className="table-editor-search border-none"
-            icon={
-              isSearching ? (
-                <Loader2
-                  className="animate-spin text-foreground-lighter"
-                  size={16}
-                  strokeWidth={1.5}
-                />
-              ) : (
-                <Search className="text-foreground-lighter" size={16} strokeWidth={1.5} />
-              )
-            }
-            placeholder="Search by id, email, phone, or name..."
-            onChange={(e) => setSearchText(e.target.value)}
-            value={searchText}
-            size="small"
-            actions={
-              searchText && (
-                <Button size="tiny" type="text" className="px-1" onClick={() => setSearchText('')}>
-                  <X size={12} strokeWidth={2} />
-                </Button>
-              )
-            }
-          />
-
-          <Collapsible_Shadcn_>
-            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
-              <div className="flex items-center gap-x-1 w-full">
-                <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                  Advanced options
-                </p>
-                <ChevronDown
-                  className="transition-transform duration-200"
-                  strokeWidth={1.5}
-                  size={14}
-                />
-              </div>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
-              <div className="flex flex-row items-center gap-x-4 text-sm text-foreground-light">
-                <div className="flex items-center gap-x-1">
-                  <h3>MFA assurance level</h3>
-                  <InfoTooltip side="top" className="flex flex-col gap-1 max-w-96">
-                    <p>
-                      AAL1 verifies users via standard login methods, while AAL2 adds a second
-                      authentication factor.
-                      <br />
-                      If you're not using MFA, you can leave this on AAL1.
-                    </p>
-                    <a
-                      href="/docs/guides/auth/auth-mfa"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-x-1 opacity-50 hover:opacity-100 transition"
-                    >
-                      Learn more about MFA <ExternalLink size={14} strokeWidth={2} />
-                    </a>
-                  </InfoTooltip>
-                </div>
-
-                <div className="flex flex-row items-center gap-x-2 text-xs font-bold">
-                  <p className={aal === 'aal1' ? undefined : 'text-foreground-lighter'}>AAL1</p>
-                  <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
-                  <p className={aal === 'aal2' ? undefined : 'text-foreground-lighter'}>AAL2</p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-y-2">
-                <div className="flex items-center gap-x-1">
-                  <h3 className="text-sm text-foreground-light">External Auth Impersonation</h3>
-                  <InfoTooltip side="top" className="flex flex-col gap-1 max-w-96">
-                    <p>
-                      Test RLS policies with external auth providers like Clerk or Auth0 by
-                      providing a user ID and optional claims.
-                    </p>
-                  </InfoTooltip>
-                </div>
-
-                <div className="flex flex-row items-center gap-x-2">
-                  <Switch checked={showExternalAuth} onCheckedChange={setShowExternalAuth} />
-                  <p className="text-xs text-foreground-light">
-                    Enable external auth impersonation
-                  </p>
-                </div>
-
-                {showExternalAuth && (
-                  <div className="flex flex-col gap-y-4 mt-2 border rounded-md p-4 bg-surface-100">
-                    <Input
-                      className="border-strong"
-                      label="External User ID"
-                      descriptionText="The user ID from your external auth provider"
-                      placeholder="e.g. user_abc123"
-                      value={externalUserId}
-                      onChange={(e) => setExternalUserId(e.target.value)}
-                      size="small"
-                    />
-                    <Input
-                      className="border-strong"
-                      label="Additional Claims (JSON)"
-                      descriptionText="Optional: Add custom claims like org_id or roles"
-                      placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
-                      value={additionalClaims}
-                      onChange={(e) => setAdditionalClaims(e.target.value)}
-                      size="small"
-                    />
-                    <div className="flex items-center justify-between">
-                      <div />
-                      <Button
-                        type="default"
-                        disabled={!externalUserId}
-                        onClick={impersonateExternalUser}
-                      >
-                        Impersonate
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
-
-          {!showExternalAuth && (
-            <>
-              {isLoading && (
-                <div className="flex flex-col gap-2 items-center justify-center h-24">
-                  <Loader2 className="animate-spin" size={24} />
-                  <span className="text-foreground-light">Loading users...</span>
-                </div>
-              )}
-
-              {isError && <AlertError error={error} subject="Failed to retrieve users" />}
-
-              {isSuccess &&
-                (users.length > 0 ? (
-                  <div>
-                    <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
-                      {users.map((user) => (
-                        <li key={user.id} role="listitem">
-                          <UserRow
-                            user={user}
-                            onClick={impersonateUser}
-                            isLoading={isImpersonateLoading}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2 items-center justify-center h-24">
-                    <p className="text-foreground-light text-xs" role="status">
-                      No users found
-                    </p>
-                  </div>
-                ))}
-              {previousSearches.length > 0 && (
-                <div className="border-t">
-                  {previousSearches.length > 0 ? (
-                    <>
-                      <Collapsible_Shadcn_ className="mt-2 relative">
-                        <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
-                          <div className="flex items-center gap-x-1 w-full">
-                            <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                              Recents
-                            </p>
-                            <ChevronDown
-                              className="transition-transform duration-200"
-                              strokeWidth={1.5}
-                              size={14}
-                            />
-                          </div>
-                        </CollapsibleTrigger_Shadcn_>
-
-                        <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
-                          <Button
-                            size="tiny"
-                            type="text"
-                            className="absolute right-0 top-0 py-2 hover:bg-muted flex items-center text"
-                            onClick={clearSearchHistory}
-                          >
-                            <span className="flex items-center">Clear</span>
-                          </Button>
-                          <ScrollArea
-                            className={cn(previousSearches.length > 3 ? 'h-36' : 'h-auto')}
-                          >
-                            <ul className="grid gap-2 ">
-                              {previousSearches.map((search) => (
-                                <li key={search.id}>
-                                  <UserRow user={search} onClick={impersonateUser} />
-                                </li>
-                              ))}
-                            </ul>
-                          </ScrollArea>
-                        </CollapsibleContent_Shadcn_>
-                      </Collapsible_Shadcn_>
-                    </>
-                  ) : (
-                    <div className="p-4 text-center text-muted-foreground">No recent searches</div>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      ) : (
         <>
-          {impersonatingUser && (
-            <UserImpersonatingRow
-              user={impersonatingUser}
-              onClick={stopImpersonating}
-              isImpersonating={true}
-              aal={aal}
-              isLoading={isImpersonateLoading}
-            />
-          )}
-          {isExternalAuthImpersonating && (
-            <ExternalAuthImpersonatingRow
-              sub={state.role.externalAuth.sub}
-              onClick={stopImpersonating}
-              aal={aal}
-              isLoading={isImpersonateLoading}
-            />
-          )}
+          <DropdownMenuSeparator className="m-0" />
+          <div className="px-5 py-2 flex flex-col gap-2 relative">
+            <Collapsible_Shadcn_>
+              <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+                <div className="flex items-center gap-x-1 w-full">
+                  <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                    Advanced options
+                  </p>
+                  <ChevronDown
+                    className="transition-transform duration-200"
+                    strokeWidth={1.5}
+                    size={14}
+                  />
+                </div>
+              </CollapsibleTrigger_Shadcn_>
+              <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
+                <div className="flex flex-row items-center gap-x-4 text-sm text-foreground-light">
+                  <div className="flex items-center gap-x-1">
+                    <h3>MFA assurance level</h3>
+                    <InfoTooltip side="top" className="max-w-96">
+                      AAL1 verifies users via standard login methods, while AAL2 adds a second
+                      authentication factor. If you're not using MFA, you can leave this on AAL1.
+                      Learn more about MFA{' '}
+                      <InlineLink href="https://supabase.com/docs/guides/auth/auth-mfa">
+                        here
+                      </InlineLink>
+                      .
+                    </InfoTooltip>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-x-2 text-xs font-bold">
+                    <p className={aal === 'aal1' ? undefined : 'text-foreground-lighter'}>AAL1</p>
+                    <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
+                    <p className={aal === 'aal2' ? undefined : 'text-foreground-lighter'}>AAL2</p>
+                  </div>
+                </div>
+              </CollapsibleContent_Shadcn_>
+            </Collapsible_Shadcn_>
+          </div>
         </>
-      )}
-    </div>
+      ) : null}
+    </>
   )
 }
 

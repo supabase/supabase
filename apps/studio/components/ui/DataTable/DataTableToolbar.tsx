@@ -2,7 +2,7 @@ import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { ReactNode, useMemo } from 'react'
 
 import { useHotKey } from 'hooks/ui/useHotKey'
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { formatCompactNumber } from './DataTable.utils'
 import { DataTableFilterControlsDrawer } from './DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableResetButton } from './DataTableResetButton'
@@ -33,30 +33,28 @@ export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="outline"
-                icon={open ? <PanelLeftClose /> : <PanelLeftOpen />}
-                onClick={() => setOpen((prev) => !prev)}
-                className="hidden sm:flex"
-              >
-                <span className="hidden md:block">{open ? 'Hide' : 'Show'} Controls</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <p>
-                Toggle controls with{' '}
-                <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
-                  <span className="mr-1">⌘</span>
-                  <span>B</span>
-                </Kbd>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="tiny"
+              type="outline"
+              icon={open ? <PanelLeftClose /> : <PanelLeftOpen />}
+              onClick={() => setOpen((prev) => !prev)}
+              className="hidden sm:flex"
+            >
+              <span className="hidden md:block">{open ? 'Hide' : 'Show'} Controls</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>
+              Toggle controls with{' '}
+              <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
+                <span className="mr-1">⌘</span>
+                <span>B</span>
+              </Kbd>
+            </p>
+          </TooltipContent>
+        </Tooltip>
         <div className="block sm:hidden">
           <DataTableFilterControlsDrawer />
         </div>

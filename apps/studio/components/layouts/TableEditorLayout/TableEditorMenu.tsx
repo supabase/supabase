@@ -1,29 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { ExportDialog } from 'components/grid/components/header/ExportDialog'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
@@ -43,15 +39,15 @@ import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
-const TableEditorMenu = () => {
+export const TableEditorMenu = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isMobile = useBreakpoint()
 
-  const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [tableToExport, setTableToExport] = useState<{ name: string; schema: string }>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -87,19 +83,9 @@ const TableEditorMenu = () => {
     [data?.pages]
   )
 
-  const { data: schemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const [protectedSchemas] = partition(
-    (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
-    (schema) => PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -136,7 +122,7 @@ const TableEditorMenu = () => {
           />
 
           <div className="grid gap-3 mx-4">
-            {!isLocked ? (
+            {!isSchemaLocked ? (
               <ButtonTooltip
                 block
                 title="Create a new table"
@@ -159,19 +145,7 @@ const TableEditorMenu = () => {
                 New table
               </ButtonTooltip>
             ) : (
-              <Alert_Shadcn_>
-                <AlertTitle_Shadcn_ className="text-sm">
-                  Viewing protected schema
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="text-xs">
-                  <p className="mb-2">
-                    This schema is managed by Supabase and is read-only through the table editor
-                  </p>
-                  <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                    Learn more
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+              <ProtectedSchemaWarning size="sm" schema={selectedSchema} entity="table" />
             )}
           </div>
         </div>
@@ -280,7 +254,12 @@ const TableEditorMenu = () => {
                     itemProps={{
                       projectRef: project?.ref!,
                       id: Number(id),
-                      isLocked,
+                      isSchemaLocked,
+                      onExportCLI: () => {
+                        const entity = entityTypes?.find((x) => x.id === id)
+                        if (!entity) return
+                        setTableToExport({ name: entity.name, schema: entity.schema })
+                      },
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -294,7 +273,13 @@ const TableEditorMenu = () => {
         </div>
       </div>
 
-      <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
+      <ExportDialog
+        table={tableToExport}
+        open={!!tableToExport}
+        onOpenChange={(open) => {
+          if (!open) setTableToExport(undefined)
+        }}
+      />
     </>
   )
 }
