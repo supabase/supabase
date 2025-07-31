@@ -1,21 +1,21 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Toggle } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Toggle } from 'ui'
 
 import { useConsentState } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 
 export const TermsUpdateBanner = () => {
-  const [termsUpdateAcknowledged, setTermsUpdateAcknowledged] = useLocalStorageQuery(
+  const [termsUpdateAcknowledged, setTermsUpdateAcknowledged, { isSuccess }] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_ACKNOWLEDGED,
     false
   )
 
-  if (termsUpdateAcknowledged) return null
+  if (!isSuccess || termsUpdateAcknowledged) return null
 
   return (
     <Alert_Shadcn_ className="mb-4 relative">
