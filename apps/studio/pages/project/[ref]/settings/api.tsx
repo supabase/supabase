@@ -1,6 +1,6 @@
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
@@ -21,7 +21,7 @@ const ApiSettings: NextPageWithLayout = () => {
 
 ApiSettings.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <SettingsLayout title="API Settings">{page}</SettingsLayout>
   </DefaultLayout>
 )
 export default ApiSettings
