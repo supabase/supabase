@@ -236,7 +236,7 @@ Common examples of check constraints that can result in such failures are:
 
 #### Views that reference themselves
 
-Views that directly or indirectly reference themselves can cause **cyclic dependency errors** during a logical backup restore. These views are also **invalid and unusable** , any query against them will result in an error at runtime.
+Views that directly or indirectly reference themselves will cause logical restores to fail due to cyclic dependency errors. These views are also invalid and unusable in Postgres, and any query against them will result in a runtime error.
 
 **Example:**
 
