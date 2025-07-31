@@ -37,6 +37,9 @@ interface CronJobCardProps {
   onDeleteCronJob: (job: CronJob) => void
 }
 
+/**
+ * @deprecated To delete when cleaning up
+ */
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
   const { ref } = useParams()
   const org = useSelectedOrganization()

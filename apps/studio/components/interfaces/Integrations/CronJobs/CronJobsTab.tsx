@@ -1,17 +1,21 @@
-import { Search } from 'lucide-react'
+import { Loader2, Search } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 
+import { useParams } from 'common'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { Button, Input, Sheet, SheetContent } from 'ui'
-import { CronJobCard } from './CronJobCard'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Button, cn, Input, Sheet, SheetContent } from 'ui'
+import { formatCronJobColumns } from './CronJobs.utils'
 import { DeleteCronJob } from './DeleteCronJob'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const EMPTY_CRON_JOB = {
   jobname: '',
@@ -21,8 +25,11 @@ const EMPTY_CRON_JOB = {
 }
 
 export const CronjobsTab = () => {
+  const router = useRouter()
+  const { ref } = useParams()
   const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
+  const gridRef = useRef<DataGridHandle>(null)
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
@@ -37,34 +44,52 @@ export const CronjobsTab = () => {
   >()
   const [cronJobForDeletion, setCronJobForDeletion] = useState<CronJob | undefined>()
 
-  const { data: cronJobs, isLoading } = useCronJobsQuery({
+  const { data: cronJobs = [], isLoading } = useCronJobsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const { data: extensions } = useDatabaseExtensionsQuery({
+  const { data: count, isLoading: isLoadingCount } = useCronJobsCountQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const { data: extensions = [] } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const columns = useMemo(() => {
+    return formatCronJobColumns({
+      onSelectEdit: (job: any) => {
+        sendEvent({
+          action: 'cron_job_update_clicked',
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
+        setCreateCronJobSheetShown(true)
+        setCronJobForEditing(job)
+      },
+      onSelectDelete: (job: CronJob) => {
+        sendEvent({
+          action: 'cron_job_delete_clicked',
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
+        setCronJobForDeletion(job)
+      },
+    })
+  }, [org?.slug, ref, sendEvent, setCreateCronJobSheetShown])
+
   // check pg_cron version to see if it supports seconds
-  const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
+  const pgCronExtension = extensions.find((ext) => ext.name === 'pg_cron')
   const installedVersion = pgCronExtension?.installed_version
   const supportsSeconds = installedVersion ? parseFloat(installedVersion) >= 1.5 : false
 
-  if (isLoading)
-    return (
-      <div className="p-10">
-        <GenericSkeletonLoader />
-      </div>
-    )
-
   const filteredCronJobs =
     searchQuery.length > 0
-      ? (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
-      : cronJobs ?? []
+      ? cronJobs.filter((cj) => cj?.jobname?.includes(searchQuery || ''))
+      : cronJobs
 
   const onOpenCreateJobSheet = () => {
     sendEvent({
@@ -74,56 +99,89 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(true)
   }
 
+  if (isLoading)
+    return (
+      <div className="p-10">
+        <GenericSkeletonLoader />
+      </div>
+    )
+
   return (
     <>
-      <div className="w-full space-y-4 p-4 md:p-10">
-        {(cronJobs ?? []).length == 0 ? (
-          <div className="border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
+      <div className="h-full w-full space-y-4">
+        {cronJobs.length == 0 ? (
+          <div className="m-4 md:m-10 border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
             <p className="text-sm text-foreground">No cron jobs created yet</p>
             <Button onClick={onOpenCreateJobSheet}>Create job</Button>
           </div>
         ) : (
-          <div className="w-full space-y-4">
-            <div className="flex items-center justify-between flex-wrap">
+          <div className="h-full w-full flex flex-col">
+            <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap border-b">
               <Input
                 placeholder="Search for a job"
-                size="small"
+                size="tiny"
                 icon={<Search size={14} />}
                 value={searchQuery || ''}
-                className="w-64"
+                className="w-52"
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
 
               <Button onClick={onOpenCreateJobSheet}>Create job</Button>
             </div>
-            {filteredCronJobs.length === 0 ? (
-              <div
-                className={
-                  'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed'
-                }
-              >
-                <p className="text-sm text-foreground">No results found</p>
-                <p className="text-sm text-foreground-light">
-                  Your search for "{searchQuery}" did not return any results
-                </p>
-              </div>
-            ) : isLoading ? (
-              <div className="p-10">
-                <GenericSkeletonLoader />
-              </div>
-            ) : (
-              filteredCronJobs.map((job) => (
-                <CronJobCard
-                  key={job.jobid}
-                  job={job}
-                  onEditCronJob={(job) => {
-                    setCronJobForEditing(job)
-                    setCreateCronJobSheetShown(true)
-                  }}
-                  onDeleteCronJob={(job) => setCronJobForDeletion(job)}
-                />
-              ))
-            )}
+
+            <DataGrid
+              ref={gridRef}
+              className="flex-grow border-t-0"
+              rowHeight={44}
+              headerRowHeight={36}
+              columns={columns}
+              rows={cronJobs}
+              rowKeyGetter={(row) => row.id}
+              rowClass={() => {
+                return cn(
+                  'cursor-pointer',
+                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                  '[&>.rdg-cell:first-child>div]:ml-8'
+                )
+              }}
+              renderers={{
+                renderRow(_, props) {
+                  return (
+                    <Row
+                      {...props}
+                      onClick={(e) => {
+                        const { jobid, jobname } = props.row
+                        const url = `/project/${ref}/integrations/cron/jobs/${jobid}?child-label=${encodeURIComponent(jobname || `Job #${jobid}`)}`
+
+                        sendEvent({
+                          action: 'cron_job_history_clicked',
+                          groups: {
+                            project: ref ?? 'Unknown',
+                            organization: org?.slug ?? 'Unknown',
+                          },
+                        })
+
+                        if (e.metaKey) {
+                          window.open(url, '_blank')
+                        } else {
+                          router.push(url)
+                        }
+                      }}
+                    />
+                  )
+                },
+              }}
+            />
+
+            <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 size={14} className="animate-spin" /> Loading...
+                </span>
+              ) : (
+                `Total: ${count} jobs`
+              )}
+            </div>
           </div>
         )}
       </div>

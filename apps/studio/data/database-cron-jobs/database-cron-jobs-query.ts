@@ -3,6 +3,8 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
+const PAGE_LIMIT = 20
+
 export type DatabaseCronJobsVariables = {
   projectRef?: string
   connectionString?: string | null
@@ -10,17 +12,36 @@ export type DatabaseCronJobsVariables = {
 
 export type CronJob = {
   jobid: number
-  schedule: string
-  command: string
-  nodename: string
-  nodeport: number
-  database: string
-  username: string
-  active: boolean
   jobname: string | null
+  active: boolean
+  command: string
+  latest_run: string
+  schedule: string
+  status: string
 }
 
-const cronJobSqlQuery = `select * from cron.job order by jobid;`
+const cronJobSqlQueryV2 = `
+WITH latest_runs AS (
+  SELECT 
+    jobid,
+    status,
+    MAX(start_time) AS latest_run
+  FROM cron.job_run_details
+  GROUP BY jobid, status
+)
+SELECT 
+  job.jobid,
+  job.jobname,
+  job.schedule,
+  job.command,
+  job.active,
+  lr.latest_run,
+  lr.status
+FROM 
+  cron.job job
+LEFT JOIN latest_runs lr ON job.jobid = lr.jobid
+ORDER BY job.jobid;
+`.trim()
 
 export async function getDatabaseCronJobs({
   projectRef,
@@ -31,7 +52,8 @@ export async function getDatabaseCronJobs({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: cronJobSqlQuery,
+    sql: cronJobSqlQueryV2,
+    queryKey: ['cron-jobs'],
   })
   return result
 }
