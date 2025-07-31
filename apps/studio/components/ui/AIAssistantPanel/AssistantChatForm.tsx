@@ -99,7 +99,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             <div className="flex items-center gap-2 text-sm text-foreground-light">
               <span>Editing message:</span>
               <span className="text-foreground truncate max-w-[200px]">
-                "{editingMessageContent}"
+                {editingMessageContent}
               </span>
             </div>
             {onCancelEdit && (
