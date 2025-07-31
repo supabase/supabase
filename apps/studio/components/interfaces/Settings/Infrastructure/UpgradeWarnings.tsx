@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import Link from 'next/link'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
@@ -75,12 +76,12 @@ export const UnsupportedExtensionsWarning = ({
           <ul className="pl-4">
             {unsupportedExtensions.map((obj: string) => (
               <li className="list-disc" key={obj}>
-                <a
+                <Link
                   href={`/project/${ref}/database/extensions?filter=${obj}`}
                   className="hover:text-foreground transition"
                 >
                   {obj}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
