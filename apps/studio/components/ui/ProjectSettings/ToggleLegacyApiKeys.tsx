@@ -52,7 +52,7 @@ export const ToggleLegacyApiKeysPanel = () => {
     <section>
       <Panel>
         <Panel.Content>
-          <div className="flex justify-between">
+          <div className="flex justify-between" id="disable-legacy-api-keys">
             <div className="flex flex-col gap-2">
               <p className="text-sm">
                 {isLegacyKeysEnabled ? 'Disable legacy API keys' : 'Re-enabling legacy API keys'}
