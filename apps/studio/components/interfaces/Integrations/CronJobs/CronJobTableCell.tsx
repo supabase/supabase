@@ -25,6 +25,9 @@ import {
   DialogTitle,
   DialogTrigger,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { getNextRun } from './CronJobs.utils'
@@ -167,12 +170,23 @@ export const CronJobTableCell = ({
 
         <ContextMenuItem_Shadcn_
           disabled={!jobname}
-          className="gap-x-2"
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectEdit(row)}
         >
-          <Edit size={12} />
-          <span>Edit job</span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-x-2 w-full">
+                <Edit size={12} />
+                <span>Edit job</span>
+              </div>
+            </TooltipTrigger>
+            {!jobname && (
+              <TooltipContent side="right" className="w-56">
+                This cron job doesn’t have a name and can’t be edited. Create a new one and delete
+                this job.
+              </TooltipContent>
+            )}
+          </Tooltip>
         </ContextMenuItem_Shadcn_>
 
         <ContextMenuSeparator_Shadcn_ />
