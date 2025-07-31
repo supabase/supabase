@@ -104,7 +104,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
       if (selectedHook !== undefined) {
         setEvents(selectedHook.events)
 
-        const [_, __, headers, parameters] = selectedHook.function_args
+        const [_, __, ___, parameters] = selectedHook.function_args
 
         let parsedParameters: Record<string, string> = {}
 
@@ -116,20 +116,6 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
           parsedParameters = {}
         }
 
-        let parsedHeaders: Record<string, string> = {}
-        try {
-          parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
-        } catch (e) {
-          // If parsing still fails, fallback to an empty object
-          parsedHeaders = {}
-        }
-
-        setHttpHeaders(
-          Object.keys(parsedHeaders).map((key) => {
-            return { id: uuidv4(), name: key, value: parsedHeaders[key] }
-          })
-        )
-
         setHttpParameters(
           Object.keys(parsedParameters).map((key) => {
             return { id: uuidv4(), name: key, value: parsedParameters[key] }
@@ -137,7 +123,6 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
         )
       } else {
         setEvents([])
-        setHttpHeaders([{ id: uuidv4(), name: 'Content-type', value: 'application/json' }])
         setHttpParameters([{ id: uuidv4(), name: '', value: '' }])
       }
     }

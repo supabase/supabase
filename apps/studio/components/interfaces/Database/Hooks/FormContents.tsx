@@ -81,6 +81,26 @@ export const FormContents = ({
   }, [values.function_type])
 
   useEffect(() => {
+    let mappedHeaders = httpHeaders
+
+    if (selectedHook !== undefined) {
+      const [_, __, headers] = selectedHook.function_args
+
+      let parsedHeaders: Record<string, string> = {}
+      try {
+        parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
+      } catch (e) {
+        // If parsing still fails, fallback to an empty object
+        parsedHeaders = {}
+      }
+
+      mappedHeaders = Object.keys(parsedHeaders).map((key) => {
+        return { id: uuidv4(), name: key, value: parsedHeaders[key] }
+      })
+    } else {
+      mappedHeaders = [{ id: uuidv4(), name: 'Content-type', value: 'application/json' }]
+    }
+
     const isEdgeFunctionSelected = isEdgeFunction({ ref, restUrlTld, url: values.http_url })
 
     if (values.http_url && isEdgeFunctionSelected) {
@@ -88,24 +108,24 @@ export const FormContents = ({
       const fn = functions.find((x) => x.slug === fnSlug)
 
       if (fn?.verify_jwt) {
-        if (!httpHeaders.some((x) => x.name === 'Authorization')) {
+        if (!mappedHeaders.some((x) => x.name === 'Authorization')) {
           const authorizationHeader = {
             id: uuidv4(),
             name: 'Authorization',
             value: `Bearer ${legacyServiceRole}`,
           }
-          setHttpHeaders([...httpHeaders, authorizationHeader])
+          setHttpHeaders([...mappedHeaders, authorizationHeader])
         }
       } else {
-        const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
+        const updatedHttpHeaders = mappedHeaders.filter((x) => x.name !== 'Authorization')
         setHttpHeaders(updatedHttpHeaders)
       }
     } else {
-      const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
+      const updatedHttpHeaders = mappedHeaders.filter((x) => x.name !== 'Authorization')
       setHttpHeaders(updatedHttpHeaders)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values.http_url])
+  }, [values.http_url, selectedHook])
 
   return (
     <div>
