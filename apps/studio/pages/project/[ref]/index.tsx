@@ -143,7 +143,7 @@ const Home: NextPageWithLayout = () => {
                     </Link>
                     <p className="text-2xl tabular-nums">
                       {isLoadingTables ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                        <ShimmeringLoader className="h-[32px] w-6 p-0" />
                       ) : (
                         tablesCount
                       )}
@@ -160,7 +160,7 @@ const Home: NextPageWithLayout = () => {
                       </Link>
                       <p className="text-2xl tabular-nums">
                         {isLoadingFunctions ? (
-                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                          <ShimmeringLoader className="h-[32px] w-6 p-0" />
                         ) : (
                           functionsCount
                         )}

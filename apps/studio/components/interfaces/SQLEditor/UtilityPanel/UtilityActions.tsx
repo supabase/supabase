@@ -6,7 +6,6 @@ import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonatio
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -27,7 +26,6 @@ export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
 }
@@ -36,11 +34,9 @@ const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
-  hasSelection,
   prettifyQuery,
   executeQuery,
 }: UtilityActionsProps) => {
-  const os = detectOS()
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
@@ -94,23 +90,27 @@ const UtilityActions = ({
             </span>
             {intellisenseEnabled && <Check className="text-brand" size={16} />}
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => {
-              if (isFavorite) removeFavorite()
-              else addFavorite()
-            }}
-          >
-            <Heart
-              size={14}
-              strokeWidth={2}
-              className={
-                isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
-              }
-            />
-            {isFavorite ? 'Remove from' : 'Add to'} favorites
-          </DropdownMenuItem>
+          {IS_PLATFORM && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => {
+                  if (isFavorite) removeFavorite()
+                  else addFavorite()
+                }}
+              >
+                <Heart
+                  size={14}
+                  strokeWidth={2}
+                  className={
+                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                  }
+                />
+                {isFavorite ? 'Remove from' : 'Add to'} favorites
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuItem className="gap-x-2" onClick={prettifyQuery}>
             <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
             Prettify SQL
