@@ -154,6 +154,7 @@ export const generateSettingsMenu = (
           key: 'subscription',
           url: `/org/${organization?.slug}/billing`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
 
         {
@@ -161,6 +162,7 @@ export const generateSettingsMenu = (
           key: 'usage',
           url: `/org/${organization?.slug}/usage?projectRef=${ref}`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
       ],
     },
