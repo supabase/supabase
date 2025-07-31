@@ -102,9 +102,11 @@ To start API locally, run:
 
     // If we're redirected somewhere else, try to navigate back to sign-in
     console.log('\n 🔄 Attempting to navigate back to sign-in page')
-    await page.goto(signInUrl, { waitUntil: 'networkidle' })
+    await page.goto(signInUrl, { waitUntil: 'networkidle', timeout: 30000 })
     await page.waitForLoadState('domcontentloaded')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('networkidle', {
+      timeout: 30000,
+    })
 
     // Check URL again after second attempt
     const secondAttemptUrl = page.url()
@@ -141,9 +143,9 @@ To start API locally, run:
   console.log(`Password input exists: ${(await passwordInput.count()) > 0}`)
   console.log(`Sign in button exists: ${(await signInButton.count()) > 0}`)
 
-  await emailInput.waitFor({ state: 'visible', timeout: 15000 })
-  await passwordInput.waitFor({ state: 'visible', timeout: 15000 })
-  await signInButton.waitFor({ state: 'visible', timeout: 15000 })
+  await emailInput.waitFor({ state: 'visible' })
+  await passwordInput.waitFor({ state: 'visible' })
+  await signInButton.waitFor({ state: 'visible' })
 
   await emailInput.fill(auth.email ?? '')
   await passwordInput.fill(auth.password ?? '')
