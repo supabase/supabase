@@ -13,9 +13,7 @@ export type SSOConfigCreateVariables = {
 
 export async function createSSOConfig({ slug, config }: SSOConfigCreateVariables) {
   const { data, error } = await post('/platform/organizations/{slug}/sso', {
-    params: {
-      path: { slug },
-    },
+    params: { path: { slug } },
     body: config,
   })
 

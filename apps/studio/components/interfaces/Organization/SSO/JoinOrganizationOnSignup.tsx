@@ -28,10 +28,9 @@ export const JoinOrganizationOnSignup = ({
         name="joinOrgOnSignup"
         render={({ field }) => (
           <FormItemLayout
-            label="Join Organization on Signup"
-            description="Automatically join users to the organization when they sign up"
+            label="Join organization on sign up"
+            description="Automatically add users to the organization when they sign up"
             layout="flex-row-reverse"
-            className=""
           >
             <FormControl_Shadcn_ className="flex items-center gap-2">
               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -45,28 +44,26 @@ export const JoinOrganizationOnSignup = ({
           name="roleOnJoin"
           render={({ field }) => (
             <FormItemLayout
-              label="Default Role on Join"
-              description="Choose a role for the user when they join the organization"
+              label="Default role on join"
+              description="Select a role for the user when they join the organization"
               layout="flex-row-reverse"
               className="justify-between"
             >
-              <div className="w-96">
-                <FormControl_Shadcn_>
-                  <Select_Shadcn_ value={field.value} onValueChange={(val) => field.onChange(val)}>
-                    <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select a role" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="Owner">Owner</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="Administrator">Administrator</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="Developer">Developer</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="Read-only">Read-only</SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
-                </FormControl_Shadcn_>
-              </div>
+              <FormControl_Shadcn_>
+                <Select_Shadcn_ value={field.value} onValueChange={(val) => field.onChange(val)}>
+                  <SelectTrigger_Shadcn_ className="w-52">
+                    <SelectValue_Shadcn_ placeholder="Select a role" />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      <SelectItem_Shadcn_ value="Owner">Owner</SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="Administrator">Administrator</SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="Developer">Developer</SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="Read-only">Read-only</SelectItem_Shadcn_>
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />

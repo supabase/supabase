@@ -17,7 +17,17 @@ export async function getOrgSSOConfig({ orgSlug }: OrgSSOConfigVariables, signal
     signal,
   })
 
-  if (error) handleError(error)
+  if (error) {
+    const ssoNotSetUp =
+      (error as any)?.code === 404 &&
+      (error as any)?.message?.includes('Failed to get the SSO Provider')
+
+    if (ssoNotSetUp) {
+      return null
+    } else {
+      handleError(error)
+    }
+  }
   return data
 }
 

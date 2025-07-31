@@ -5,10 +5,11 @@ import z from 'zod'
 
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
-import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
 import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
+import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
@@ -57,9 +58,9 @@ const FormSchema = z
 
 export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 
-const FORM_ID = 'sso-config-form'
-
 export const SSOConfig = () => {
+  const FORM_ID = 'sso-config-form'
+
   const { data: organization } = useSelectedOrganizationQuery()
 
   const {
@@ -70,7 +71,7 @@ export const SSOConfig = () => {
     error: configError,
   } = useOrgSSOConfigQuery({ orgSlug: organization?.slug }, { enabled: !!organization })
 
-  const isSSOProviderNotFound = configError?.code === 404
+  const isSSOProviderNotFound = ssoConfig === null
 
   const form = useForm<SSOConfigFormSchema>({
     resolver: zodResolver(FormSchema),
@@ -88,39 +89,14 @@ export const SSOConfig = () => {
     },
   })
 
-  useEffect(() => {
-    if (ssoConfig) {
-      form.reset({
-        enabled: ssoConfig.enabled,
-        domains: ssoConfig.domains.map((domain) => ({ value: domain })),
-        metadataXmlUrl: ssoConfig.metadata_xml_url,
-        metadataXmlFile: ssoConfig.metadata_xml_file,
-        emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),
-        userNameMapping: ssoConfig.user_name_mapping.map((userName) => ({ value: userName })),
-        firstNameMapping: ssoConfig.first_name_mapping.map((firstName) => ({ value: firstName })),
-        lastNameMapping: ssoConfig.last_name_mapping.map((lastName) => ({ value: lastName })),
-        joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
-        roleOnJoin: ssoConfig.join_org_on_signup_role,
-      })
-    }
-  }, [ssoConfig, form])
+  const isSSOEnabled = form.watch('enabled')
 
-  const { mutate: createSSOConfig } = useSSOConfigCreateMutation({
-    onError: (error) => {
-      form.setError('root', { type: 'manual', message: error.message })
-    },
-    onSuccess: () => {
-      form.reset()
-    },
+  const { mutate: createSSOConfig, isLoading: isCreating } = useSSOConfigCreateMutation({
+    onSuccess: () => form.reset(),
   })
 
-  const { mutate: updateSSOConfig } = useSSOConfigUpdateMutation({
-    onError: (error) => {
-      form.setError('root', { type: 'manual', message: error.message })
-    },
-    onSuccess: () => {
-      form.reset()
-    },
+  const { mutate: updateSSOConfig, isLoading: isUpdating } = useSSOConfigUpdateMutation({
+    onSuccess: () => form.reset(),
   })
 
   const onSubmit: SubmitHandler<SSOConfigFormSchema> = (values) => {
@@ -146,14 +122,30 @@ export const SSOConfig = () => {
         join_org_on_signup_role: roleOnJoin,
       },
     }
-    if (ssoConfig) {
+
+    if (!!ssoConfig) {
       updateSSOConfig(payload)
     } else {
       createSSOConfig(payload)
     }
   }
 
-  const isSSOEnabled = form.watch('enabled')
+  useEffect(() => {
+    if (ssoConfig) {
+      form.reset({
+        enabled: ssoConfig.enabled,
+        domains: ssoConfig.domains.map((domain) => ({ value: domain })),
+        metadataXmlUrl: ssoConfig.metadata_xml_url,
+        metadataXmlFile: ssoConfig.metadata_xml_file,
+        emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),
+        userNameMapping: ssoConfig.user_name_mapping.map((userName) => ({ value: userName })),
+        firstNameMapping: ssoConfig.first_name_mapping.map((firstName) => ({ value: firstName })),
+        lastNameMapping: ssoConfig.last_name_mapping.map((lastName) => ({ value: lastName })),
+        joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
+        roleOnJoin: ssoConfig.join_org_on_signup_role,
+      })
+    }
+  }, [ssoConfig, form])
 
   return (
     <ScaffoldContainer>
@@ -165,9 +157,11 @@ export const SSOConfig = () => {
             </CardContent>
           </Card>
         )}
+
         {isError && !isSSOProviderNotFound && (
           <AlertError error={configError} subject="Failed to retrieve SSO configuration" />
         )}
+
         {(isSuccess || isSSOProviderNotFound) && (
           <Form_Shadcn_ {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
@@ -178,9 +172,20 @@ export const SSOConfig = () => {
                     name="enabled"
                     render={({ field }) => (
                       <FormItemLayout
-                        label="Enable Single Sign-On"
-                        description="Enable and configure SSO for your application."
                         layout="flex"
+                        label="Enable Single Sign-On"
+                        description={
+                          <>
+                            Enable and configure SSO for your organization. Learn more about SSO{' '}
+                            <InlineLink
+                              className="text-foreground-lighter hover:text-foreground"
+                              href="https://supabase.com/docs/guides/platform/sso"
+                            >
+                              here
+                            </InlineLink>
+                            .
+                          </>
+                        }
                       >
                         <FormControl_Shadcn_>
                           <Switch
@@ -222,14 +227,19 @@ export const SSOConfig = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
+                    <Button
+                      type="default"
+                      disabled={isCreating || isUpdating}
+                      onClick={() => form.reset()}
+                    >
                       Cancel
                     </Button>
                   )}
                   <Button
                     type="primary"
                     htmlType="submit"
-                    disabled={!form.formState.isDirty || form.formState.isSubmitting}
+                    loading={isCreating || isUpdating}
+                    disabled={!form.formState.isDirty || isCreating || isUpdating}
                   >
                     Save changes
                   </Button>

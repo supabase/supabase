@@ -112,14 +112,14 @@ export const AttributeMapping = ({
 
   return (
     <FormItemLayout
-      label="Attribute Mapping"
+      label="Attribute mapping"
       layout="flex-row-reverse"
       description={
         <div>
-          <p>Map SSO attributes to user fields. Email is required.</p>
-          <div className="grid gap-2 my-2 mt-24">
-            <p className="text-sm">Select a provider to populate the field mapping (optional):</p>
-            <div className="grid grid-cols-3 gap-2">
+          <p>Map SSO attributes to user fields</p>
+          <div className="flex flex-col gap-y-2 my-2 mt-4">
+            <p>Presets for supported identity providers:</p>
+            <div className="flex items-center gap-x-2">
               {PROVIDER_PRESETS.map((preset) => (
                 <Button key={preset.name} type="outline" onClick={() => applyPreset(preset)}>
                   {preset.name}
@@ -132,33 +132,24 @@ export const AttributeMapping = ({
       className="gap-1"
     >
       <div className="grid gap-2 justify-start">
-        <MappingFieldArray
-          form={form}
-          fieldName={emailField}
-          label="email"
-          required
-          placeholder="email attribute name"
-        />
+        <MappingFieldArray form={form} fieldName={emailField} label="email" required />
         <MappingFieldArray
           form={form}
           fieldName={userNameField}
           label="user_name"
           required={false}
-          placeholder="user_name attribute"
         />
         <MappingFieldArray
           form={form}
           fieldName={firstNameField}
           label="first_name"
           required={false}
-          placeholder="first_name attribute"
         />
         <MappingFieldArray
           form={form}
           fieldName={lastNameField}
           label="last_name"
           required={false}
-          placeholder="last_name attribute"
         />
       </div>
     </FormItemLayout>
@@ -176,7 +167,7 @@ const MappingFieldArray = ({
   fieldName: ProviderAttribute
   label: string
   required: boolean
-  placeholder: string
+  placeholder?: string
 }) => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,

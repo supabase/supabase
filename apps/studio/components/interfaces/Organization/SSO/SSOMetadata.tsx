@@ -61,7 +61,7 @@ export const SSOMetadata = ({
     <FormItemLayout
       label="Metadata"
       layout="flex-row-reverse"
-      description="Provide a link to your metadata .xml file or upload one."
+      description="Provide a link to your metadata .xml file or upload one"
       className="gap-1"
     >
       <div className=" w-96">
@@ -98,7 +98,7 @@ export const SSOMetadata = ({
           <TabsContent_Shadcn_ value="file">
             <FormField_Shadcn_
               name="metadataXmlUrl"
-              render={({ fieldState }) => (
+              render={() => (
                 <div className="flex flex-col gap-2 max-w-md">
                   <div className="flex items-center gap-2">
                     <input

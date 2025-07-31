@@ -23,7 +23,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
       <FormItemLayout
         label="Domains"
         layout="flex-row-reverse"
-        description="Add one or more domains"
+        description="Provide one or more domains"
       >
         <div className="grid gap-2 w-96">
           {fields.map((field, idx) => (
@@ -33,7 +33,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="example.com" autoComplete="off" />
+                      <Input_Shadcn_ {...field} autoComplete="off" placeholder="example.com" />
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>

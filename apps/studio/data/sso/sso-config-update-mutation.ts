@@ -13,9 +13,7 @@ export type SSOConfigUpdateVariables = {
 
 export async function updateSSOConfig({ slug, config }: SSOConfigUpdateVariables) {
   const { data, error } = await put('/platform/organizations/{slug}/sso', {
-    params: {
-      path: { slug },
-    },
+    params: { path: { slug } },
     body: config as components['schemas']['UpdateSSOProviderBody'],
   })
 
