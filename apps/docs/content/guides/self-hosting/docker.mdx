@@ -469,6 +469,24 @@ docker rm supabase-analytics
 
 ---
 
+### Troubleshooting: Docker fails after password changes
+
+If you’ve updated passwords (e.g. `POSTGRES_PASSWORD`) in your `.env` file, the containers may fail to restart or connect properly. This can happen due to persistent volumes or stale configs.
+
+To reset your setup cleanly:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+- `-v` removes volumes (like the Postgres data volume)
+- `--build` ensures services use the updated `.env` settings
+
+> ⚠️ **Warning:** This will delete local database volumes unless you’re using a persistent mount. Backup your data first!
+
+---
+
 ## Demo
 
 A minimal setup working on Ubuntu, hosted on DigitalOcean.
