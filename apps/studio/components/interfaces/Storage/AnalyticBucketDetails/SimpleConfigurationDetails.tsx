@@ -20,20 +20,16 @@ const wrapperMeta = {
 
 export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string }) => {
   const { project } = useProjectContext()
-
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
-
   const { serviceKey } = getKeys(apiKeys)
   const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
 
   const values: Record<string, string> = {
     vault_token: serviceApiKey,
     warehouse: bucketName,
-    's3.endpoint': getConnectionURL(project?.ref ?? '', protocol, endpoint),
-    catalog_uri: getCatalogURI(project?.ref ?? '', protocol, endpoint),
+    's3.endpoint': getConnectionURL(project?.ref ?? '', settings),
+    catalog_uri: getCatalogURI(project?.ref ?? '', settings),
   }
 
   return (

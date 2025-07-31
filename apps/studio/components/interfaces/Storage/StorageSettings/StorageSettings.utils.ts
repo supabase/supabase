@@ -1,3 +1,4 @@
+import { ProjectSettings } from 'data/config/project-settings-v2-query'
 import { StorageSizeUnits } from './StorageSettings.constants'
 
 const k = 1024
@@ -25,7 +26,9 @@ export const convertToBytes = (size: number, unit: StorageSizeUnits = StorageSiz
   return size * Math.pow(k, i)
 }
 
-function getStorageURL(projectRef: string, protocol: string, endpoint?: string) {
+function getStorageURL(projectRef: string, settings?: ProjectSettings) {
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
   const projUrl = endpoint
     ? `${protocol}://${endpoint}`
     : `https://${projectRef}.storage.supabase.co`
@@ -33,14 +36,14 @@ function getStorageURL(projectRef: string, protocol: string, endpoint?: string) 
   return url
 }
 
-export function getConnectionURL(projectRef: string, protocol: string, endpoint?: string) {
-  const url = getStorageURL(projectRef, protocol, endpoint)
+export function getConnectionURL(projectRef: string, settings?: ProjectSettings) {
+  const url = getStorageURL(projectRef, settings)
   url.pathname = '/storage/v1/s3'
   return url.toString()
 }
 
-export function getCatalogURI(projectRef: string, protocol: string, endpoint?: string) {
-  const url = getStorageURL(projectRef, protocol, endpoint)
+export function getCatalogURI(projectRef: string, settings?: ProjectSettings) {
+  const url = getStorageURL(projectRef, settings)
   url.pathname = '/storage/v1/iceberg'
   return url.toString()
 }
