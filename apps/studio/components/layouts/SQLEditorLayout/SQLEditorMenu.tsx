@@ -157,8 +157,8 @@ export const SQLEditorMenu = () => {
           <SearchList search={debouncedSearch} />
         ) : (
           <>
-            <SqlEditorMenuStaticLinks />
             <SQLEditorNav sort={sort} />
+            <SqlEditorMenuStaticLinks />
           </>
         )}
       </div>

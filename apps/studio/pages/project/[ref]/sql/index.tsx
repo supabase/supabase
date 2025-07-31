@@ -26,6 +26,8 @@ const TableEditorPage: NextPageWithLayout = () => {
     } else if (lastTabId) {
       const lastTab = store.tabsMap[lastTabId]
       if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+    } else {
+      router.push(`/project/${projectRef}/sql/new`)
     }
   }, [])
 
