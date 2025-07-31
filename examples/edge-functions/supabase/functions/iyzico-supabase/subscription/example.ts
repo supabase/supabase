@@ -68,7 +68,10 @@ export async function createSubscriptionExample() {
     // Display checkout form content on the page
     const checkoutContainer = document.getElementById('checkout-form')
     if (checkoutContainer && result.data.checkoutFormContent) {
-      checkoutContainer.innerHTML = result.data.checkoutFormContent
+      // Use textContent instead of innerHTML to prevent XSS
+      // Note: This will display the HTML as text. For proper HTML rendering,
+      // consider using a sanitization library like DOMPurify in your frontend
+      checkoutContainer.textContent = result.data.checkoutFormContent
     }
 
     console.log('Subscription created:', result.data)

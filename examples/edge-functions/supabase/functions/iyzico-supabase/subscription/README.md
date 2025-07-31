@@ -334,6 +334,7 @@ The edge function handles the following error conditions:
 - Supabase Auth integration
 - Row Level Security (RLS) policies
 - CORS protection
+- XSS protection: Use `textContent` instead of `innerHTML` for dynamic content
 
 ## Notes
 
