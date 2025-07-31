@@ -209,9 +209,9 @@ export const Message = function Message({
             )}
           </div>
 
-          {/* Action buttons - only show for user messages on hover and when not read-only */}
-          {onEdit && !isLoading && (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
+          {/* Action button - only show for user messages on hover */}
+          {!isLoading && (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
               {onEdit && message.role === 'user' && (
                 <button
                   onClick={() => onEdit(id)}
