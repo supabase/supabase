@@ -111,6 +111,11 @@ const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval) => string> = {
         count(*) as count
       from auth_logs
       where json_value(event_message, "$.auth_event.action") = 'user_signedup'
+        and not (
+          -- Exclude SMS OTP events where shouldCreateUser: true is used
+          json_value(event_message, "$.auth_event.traits.provider") in ('phone', 'sms')
+          and json_value(event_message, "$.auth_event.traits.grant_type") = 'otp'
+        )
       group by timestamp
       order by timestamp desc
     `
@@ -150,6 +155,11 @@ const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval) => string> = {
       from auth_logs
       where json_value(event_message, "$.auth_event.action") = 'user_signedup'
         and json_value(event_message, "$.status") = '200'
+        and not (
+          -- Exclude SMS OTP events where shouldCreateUser: true is used
+          json_value(event_message, "$.auth_event.traits.provider") in ('phone', 'sms')
+          and json_value(event_message, "$.auth_event.traits.grant_type") = 'otp'
+        )
       group by timestamp, provider
       order by timestamp desc, provider
     `
