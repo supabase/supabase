@@ -237,6 +237,8 @@ export const CreateCronJobSheet = ({
   })
 
   const isEdited = form.formState.isDirty
+  // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
+  if (!isEdited && isClosing) onClose()
 
   const onClosePanel = () => {
     if (isEdited) {
@@ -270,11 +272,6 @@ export const CreateCronJobSheet = ({
       'values.functionName',
     ],
   })
-
-  useEffect(() => {
-    // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
-    if (isClosing && !isEdited) onClose()
-  }, [isClosing, isEdited, onClose])
 
   // update the snippet field when the user changes the any values in the form
   useEffect(() => {
