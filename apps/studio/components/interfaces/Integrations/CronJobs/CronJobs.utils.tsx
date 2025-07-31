@@ -279,7 +279,7 @@ export const formatCronJobColumns = ({
     const res: Column<any> = {
       key: col.id,
       name: col.name,
-      minWidth: col.minWidth ?? 120,
+      minWidth: col.minWidth ?? 100,
       maxWidth: col.maxWidth,
       width: col.width,
       resizable: false,
