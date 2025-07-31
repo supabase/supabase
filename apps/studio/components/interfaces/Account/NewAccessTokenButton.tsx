@@ -24,6 +24,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -159,6 +160,10 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                           placeholder="Provide a name for your token"
                         />
                       </FormControl_Shadcn_>
+
+                      <div>Project access</div>
+
+                      <div>Permissions</div>
                     </FormItemLayout>
                   )}
                 />
