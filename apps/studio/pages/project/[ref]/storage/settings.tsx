@@ -1,5 +1,5 @@
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -16,7 +16,7 @@ const PageLayout: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldHeader>
           <ScaffoldTitle>Storage Settings</ScaffoldTitle>
-          <ScaffoldDescription>Configure your project's storage settings</ScaffoldDescription>
+          <ScaffoldDescription>Configure your project’s storage settings</ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
@@ -29,7 +29,7 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout title="Settings">{page}</SettingsLayout>
+    <StorageLayout title="Settings">{page}</StorageLayout>
   </DefaultLayout>
 )
 export default PageLayout

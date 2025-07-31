@@ -119,8 +119,9 @@ export const generateSettingsMenu = (
               {
                 name: 'Storage',
                 key: 'storage',
-                url: `/project/${ref}/settings/storage`,
+                url: `/project/${ref}/storage/settings`,
                 items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),
