@@ -40,6 +40,7 @@ const MemoizedMessage = memo(
     message,
     isLoading,
     onResults,
+    onEdit,
   }: {
     message: MessageType
     isLoading: boolean
@@ -52,6 +53,7 @@ const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
+    onEdit?: (id: string) => void
   }) => {
     return (
       <Message
@@ -61,6 +63,7 @@ const MemoizedMessage = memo(
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
+        onEdit={onEdit}
       />
     )
   }
@@ -103,6 +106,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
+  const [originalMessageContent, setOriginalMessageContent] = useState<string>('')
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -221,6 +226,64 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
+  const editMessage = useCallback(
+    (messageId: string) => {
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      // Get the message content to edit
+      const messageToEdit = chatMessages[messageIndex]
+
+      // Activate editing mode
+      setEditingMessageId(messageId)
+      setOriginalMessageContent(messageToEdit.content ?? '')
+      setValue(messageToEdit.content ?? '')
+
+      if (inputRef.current) {
+        inputRef.current.focus()
+      }
+    },
+    [chatMessages, setValue]
+  )
+
+  const cancelEdit = useCallback(() => {
+    setEditingMessageId(null)
+    setOriginalMessageContent('')
+    setValue('')
+  }, [setValue])
+
+  const confirmEdit = useCallback(
+    (newContent: string) => {
+      if (!editingMessageId) return
+
+      // Find the target message
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
+      if (messageIndex === -1) return
+
+      // Delete this message and all messages after it
+      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+
+      // Deactivate editing state
+      setEditingMessageId(null)
+      setOriginalMessageContent('')
+
+      const payload = {
+        role: 'user',
+        createdAt: new Date(),
+        content: newContent,
+        id: uuidv4(),
+      } as MessageType
+
+      snap.clearSqlSnippets()
+      lastUserMessageRef.current = payload
+      append(payload)
+      setValue('')
+    },
+    [editingMessageId, chatMessages, snap, setMessages, append, setValue]
+  )
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message) => {
@@ -230,16 +293,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
+            onEdit={!isChatLoading && !editingMessageId ? editMessage : undefined}
           />
         )
       }),
-    [chatMessages, isChatLoading]
+    [chatMessages, isChatLoading, updateMessage, editMessage, editingMessageId]
   )
 
   const hasMessages = chatMessages.length > 0
   const isShowingOnboarding = !hasMessages && isApiKeySet
 
   const sendMessageToAssistant = (finalContent: string) => {
+    if (editingMessageId) {
+      confirmEdit(finalContent)
+      return
+    }
+
     const payload = {
       role: 'user',
       createdAt: new Date(),
@@ -275,6 +344,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     snap.clearMessages()
     setMessages([])
     lastUserMessageRef.current = null
+    // Clear editing state when clearing messages
+    setEditingMessageId(null)
+    setOriginalMessageContent('')
   }
 
   // Update scroll behavior for new messages
@@ -581,6 +653,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 snap.setSqlSnippets(newSnippets)
               }}
               includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+              isEditing={!!editingMessageId}
+              editingMessageContent={originalMessageContent}
+              onCancelEdit={cancelEdit}
             />
           </div>
         )}

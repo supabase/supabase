@@ -1,5 +1,5 @@
 import { Message as VercelMessage } from 'ai/react'
-import { Loader2, User } from 'lucide-react'
+import { ChevronDown, Loader2, Pencil, Trash2, User } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
@@ -50,6 +50,7 @@ interface MessageProps {
     resultId?: string
     results: any[]
   }) => void
+  onEdit?: (id: string) => void
 }
 
 export const Message = function Message({
@@ -60,6 +61,7 @@ export const Message = function Message({
   action = null,
   variant = 'default',
   onResults,
+  onEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
   const allMarkdownComponents: Partial<Components> = useMemo(
@@ -206,6 +208,22 @@ export const Message = function Message({
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
           </div>
+
+          {/* Action buttons - only show for user messages on hover and when not read-only */}
+          {onEdit && !isLoading && (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
+              {onEdit && message.role === 'user' && (
+                <button
+                  onClick={() => onEdit(id)}
+                  className="text-foreground-light hover:text-foreground p-1 rounded"
+                  title="Edit message"
+                  aria-label="Edit message"
+                >
+                  <Pencil size={14} />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </MessageContext.Provider>
