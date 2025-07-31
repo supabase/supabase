@@ -95,8 +95,9 @@ export const generateSettingsMenu = (
         {
           name: 'Database',
           key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/database/settings`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
         {
           name: 'Data API',
