@@ -107,7 +107,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
-  const [originalMessageContent, setOriginalMessageContent] = useState<string>('')
+  const [originalMessageContent, setOriginalMessageContent] = useState('')
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -231,7 +231,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
       if (messageIndex === -1) return
 
-      // Get the message content to edit
+      // Target message
       const messageToEdit = chatMessages[messageIndex]
 
       // Activate editing mode
@@ -344,7 +344,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     snap.clearMessages()
     setMessages([])
     lastUserMessageRef.current = null
-    // Clear editing state when clearing messages
     setEditingMessageId(null)
     setOriginalMessageContent('')
   }
