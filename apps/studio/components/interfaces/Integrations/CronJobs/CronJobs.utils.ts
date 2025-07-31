@@ -73,7 +73,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       }
     } else {
       const headersStringMatch = command.match(/headers:='([^']*)'/i)
-      const headersString = headersStringMatch?.[1] || ''
+      const headersString = headersStringMatch?.[1] || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
@@ -112,22 +112,25 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       }
     }
 
-    return {
-      type: 'http_request',
-      method: method === 'http_get' ? 'GET' : 'POST',
-      endpoint: url,
-      httpHeaders: headersObjs,
-      httpBody: body,
-      timeoutMs: Number(timeout ?? 1000),
-      snippet: originalCommand,
+    if (url !== '') {
+      return {
+        type: 'http_request',
+        method: method === 'http_get' ? 'GET' : 'POST',
+        endpoint: url,
+        httpHeaders: headersObjs,
+        httpBody: body,
+        timeoutMs: Number(timeout ?? 1000),
+        snippet: originalCommand,
+      }
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(.+/g
+  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
       .replace('SELECT ', '')
-      .replace(/\(.*\)/, '')
+      .replace(/\(.*\);*/, '')
+
       .trim()
       .split('.')
 
