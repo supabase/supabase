@@ -250,6 +250,6 @@ CREATE VIEW v1 AS SELECT * FROM v2;
 CREATE VIEW v2 AS SELECT * FROM v1;
 ```
 
--- Drop the offending view.
+-- Drop the offending view from your database, or delete them from the logical backup to make it restorable.
 
 Postgres documentation [views](https://www.postgresql.org/docs/current/sql-createview.html)
