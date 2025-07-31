@@ -1,5 +1,5 @@
 import { Message as VercelMessage } from 'ai/react'
-import { Loader2, User } from 'lucide-react'
+import { ChevronDown, Loader2, Trash2, User } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
@@ -50,6 +50,8 @@ interface MessageProps {
     resultId?: string
     results: any[]
   }) => void
+  onDelete?: (id: string) => void
+  onDeleteAfter?: (id: string) => void
 }
 
 export const Message = function Message({
@@ -60,6 +62,8 @@ export const Message = function Message({
   action = null,
   variant = 'default',
   onResults,
+  onDelete,
+  onDeleteAfter,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
   const allMarkdownComponents: Partial<Components> = useMemo(
@@ -100,7 +104,7 @@ export const Message = function Message({
 
         {action}
 
-        <div className="flex gap-4 w-auto overflow-hidden">
+        <div className="flex gap-4 w-auto overflow-hidden group">
           {isUser && (
             <ProfileImage
               alt={profile?.username}
@@ -141,7 +145,7 @@ export const Message = function Message({
                           return (
                             <div
                               key={`${id}-tool-loading-${toolName}`}
-                              className="rounded-lg border bg-surface-75 text-xs font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                              className="rounded-lg border bg-surface-75 text-xs font-mono text-foreground-lighter py-2 px-3 flex items-center gap-2"
                             >
                               <Loader2 className="w-4 h-4 animate-spin" />
                               {`Calling ${toolName}...`}
@@ -206,6 +210,33 @@ export const Message = function Message({
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
           </div>
+
+          {/* Delete buttons - only show for user messages on hover and when not read-only */}
+          {(onDelete || onDeleteAfter) && !isLoading && (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
+              {onDelete && (
+                <button
+                  onClick={() => onDelete(id)}
+                  className="text-foreground-light hover:text-foreground p-1 rounded"
+                  title="Delete messages up to here"
+                  aria-label="Delete messages up to here"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+              {/* {onDeleteAfter && (
+                <button
+                  onClick={() => onDeleteAfter(id)}
+                  className="text-foreground-light hover:text-foreground p-1 rounded flex items-center gap-1"
+                  title="Delete this and all messages after"
+                  aria-label="Delete this and all messages after"
+                >
+                  <ChevronDown size={14} />
+                  <Trash2 size={14} className="" />
+                </button>
+              )} */}
+            </div>
+          )}
         </div>
       </div>
     </MessageContext.Provider>

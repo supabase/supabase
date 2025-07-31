@@ -40,6 +40,8 @@ const MemoizedMessage = memo(
     message,
     isLoading,
     onResults,
+    onDelete,
+    onDeleteAfter,
   }: {
     message: MessageType
     isLoading: boolean
@@ -52,6 +54,8 @@ const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
+    onDelete?: (id: string) => void
+    onDeleteAfter?: (id: string) => void
   }) => {
     return (
       <Message
@@ -61,6 +65,8 @@ const MemoizedMessage = memo(
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
+        onDelete={onDelete}
+        onDeleteAfter={onDeleteAfter}
       />
     )
   }
@@ -221,6 +227,38 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
+  const deleteUpTo = useCallback(
+    (messageId: string) => {
+      // Find the message index in current chatMessages
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      // Update both valtio state and useChat state
+      snap.deleteMessagesBefore(messageId, { includeSelf: true })
+
+      // Directly update chatMessages by removing from start to messageIndex+1
+      const updatedMessages = chatMessages.slice(messageIndex + 1)
+      setMessages(updatedMessages)
+    },
+    [snap, setMessages, chatMessages]
+  )
+
+  const deleteFromHere = useCallback(
+    (messageId: string) => {
+      // Find the message index in current chatMessages
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      // Update both valtio state and useChat state
+      snap.deleteMessagesAfter(messageId, { includeSelf: true })
+
+      // Directly update chatMessages by keeping only messages before messageIndex
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+    },
+    [snap, setMessages, chatMessages]
+  )
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message) => {
@@ -230,10 +268,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
+            onDelete={!isChatLoading ? deleteUpTo : undefined}
+            onDeleteAfter={!isChatLoading ? deleteFromHere : undefined}
           />
         )
       }),
-    [chatMessages, isChatLoading]
+    [chatMessages, isChatLoading, updateMessage, deleteUpTo, deleteFromHere]
   )
 
   const hasMessages = chatMessages.length > 0
