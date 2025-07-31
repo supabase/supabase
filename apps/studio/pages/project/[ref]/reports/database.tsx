@@ -278,6 +278,7 @@ const DatabaseUsage = () => {
                         ? true
                         : chart.showMaxValue
                     }
+                    syncId={chart.syncId}
                   />
                 ) : (
                   <ReportChart
