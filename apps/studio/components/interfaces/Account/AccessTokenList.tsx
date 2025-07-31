@@ -1,6 +1,6 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { Trash, MoreVertical } from 'lucide-react'
+import { Trash, MoreVertical, View } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import Table from 'components/to-be-cleaned/Table'
@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { UpdateTokensPanel } from './UpdateTokensPanel/UpdateTokensPanel'
+import { ViewTokenPermissionsPanel } from './ViewTokenPermissionsPanel'
 
 const AccessTokenList = () => {
   const { data: tokens, isLoading } = useAccessTokensQuery()
@@ -66,13 +66,13 @@ const AccessTokenList = () => {
                         <div className="flex items-center justify-end gap-x-2">
                           <Button
                             type="default"
-                            title="Manage access"
+                            title="View access"
                             onClick={() => {
                               setIsPanelOpen(true)
                               setToken(x)
                             }}
                           >
-                            Manage access
+                            View access
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -109,7 +109,7 @@ const AccessTokenList = () => {
         />
       </div>
 
-      <UpdateTokensPanel
+      <ViewTokenPermissionsPanel
         visible={isPanelOpen}
         token={token}
         onClose={() => {
