@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
@@ -59,6 +60,8 @@ export const UnsupportedExtensionsWarning = ({
 }: {
   unsupportedExtensions: string[]
 }) => {
+  const { ref } = useParams()
+
   return (
     <Alert_Shadcn_
       variant="warning"
@@ -72,7 +75,12 @@ export const UnsupportedExtensionsWarning = ({
           <ul className="pl-4">
             {unsupportedExtensions.map((obj: string) => (
               <li className="list-disc" key={obj}>
-                {obj}
+                <a
+                  href={`/project/${ref}/database/extensions?filter=${obj}`}
+                  className="hover:text-foreground transition"
+                >
+                  {obj}
+                </a>
               </li>
             ))}
           </ul>
