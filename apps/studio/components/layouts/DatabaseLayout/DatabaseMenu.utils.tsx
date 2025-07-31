@@ -88,6 +88,12 @@ export const generateDatabaseMenu = (
       title: 'Configuration',
       items: [
         { name: 'Settings', key: 'settings', url: `/project/${ref}/database/settings`, items: [] },
+        {
+          name: 'Data API',
+          key: 'api',
+          url: `/project/${ref}/database/api`,
+          items: [],
+        },
       ],
     },
     {

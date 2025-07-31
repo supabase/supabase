@@ -155,6 +155,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/settings/api',
+        destination: '/project/:ref/database/api',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/settings',
         destination: '/project/:ref/settings/general',
         permanent: true,

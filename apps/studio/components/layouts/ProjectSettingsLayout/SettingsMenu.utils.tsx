@@ -104,6 +104,7 @@ export const generateSettingsMenu = (
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
         ...(IS_PLATFORM && authEnabled
           ? [
