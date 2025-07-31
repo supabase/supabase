@@ -404,7 +404,7 @@ export default function ComposedChart({
                   attributes={attributes}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
-                  isActiveHoveredChart={isActiveHoveredChart || (syncId && syncState.isHovering)}
+                  isActiveHoveredChart={isActiveHoveredChart || (!!syncId && syncState.isHovering)}
                 />
               ) : null
             }
