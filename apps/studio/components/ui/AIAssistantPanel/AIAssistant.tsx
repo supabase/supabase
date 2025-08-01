@@ -293,7 +293,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
-            onEdit={!isChatLoading ? editMessage : undefined}
+            onEdit={editMessage}
           />
         )
       }),
