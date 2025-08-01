@@ -157,6 +157,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages,
     error,
     reload,
+    stop,
   } = useChat({
     id: snap.activeChatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v4`,
@@ -235,6 +236,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
       if (messageIndex === -1) return
 
+      if (isChatLoading) stop()
+
       // Update both valtio state and useChat state
       snap.deleteMessagesAfter(messageId, { includeSelf: true })
 
@@ -242,7 +245,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       const updatedMessages = chatMessages.slice(0, messageIndex)
       setMessages(updatedMessages)
     },
-    [snap, setMessages, chatMessages]
+    [snap, setMessages, chatMessages, isChatLoading, stop]
   )
 
   const editMessage = useCallback(
