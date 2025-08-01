@@ -17,6 +17,83 @@ In the Supabase Dashboard:
 6. Configure the other options as needed to automate your GitHub connection.
 7. Click **Enable integration**.
 
+## Preparing your Git repository
+
+You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a local `./supabase` directory:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="existing"
+  queryGroup="platform"
+>
+<TabPanel id="existing" label="Existing project">
+
+<StepHikeCompact>
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Initialize Supabase locally" fullWidth>
+
+            If you don't have a `./supabase` directory, you can create one:
+
+            ```markdown
+            supabase init
+            ```
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Pull your database migration" fullWidth>
+
+            Pull your database changes using `supabase db pull`. To get your database connection string, go to your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true) and look for the Session pooler connection string.
+
+            ```markdown
+            supabase db pull --db-url <db_connection_string>
+
+            # Your Database connection string will look like this:
+            # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+            ```
+        <Admonition type="note">
+
+          If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
+        </Admonition>
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3}>
+        <StepHikeCompact.Details title="Commit the `supabase` directory to Git" fullWidth>
+
+            Commit the `supabase` directory to Git, and push your changes to your remote repository.
+
+            ```bash
+            git add supabase
+            git commit -m "Initial migration"
+            git push
+            ```
+
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+</TabPanel>
+<TabPanel id="new" label="New Project">
+
+Use the Next.js example template to try out branching. This template includes sample migration and seed files to get you started. Run the following command in your terminal to clone the example:
+
+```bash
+npx create-next-app -e with-supabase
+```
+
+Push your new project to a GitHub repo. For more information, see the GitHub guides on [creating](https://docs.github.com/en/get-started/quickstart/create-a-repo) and [pushing code](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) to a new repository.
+
+</TabPanel>
+</Tabs>
+
 ## Syncing GitHub branches
 
 Enable the **Automatic branching** option in your GitHub Integration configuration to automatically sync GitHub branches with Supabase branches.
