@@ -1,7 +1,7 @@
 'use client'
 
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2 } from 'lucide-react'
+import { ArrowUp, Loader2, X, Pencil } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
 import { Button, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
@@ -37,6 +37,10 @@ export interface FormProps {
   snippetsClassName?: string
   /* Additional class name for the form wrapper */
   className?: string
+  /* Editing mode props */
+  isEditing?: boolean
+  editingMessageContent?: string
+  onCancelEdit?: () => void
 }
 
 const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
@@ -54,6 +58,9 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       snippetsClassName,
       includeSnippetsInMessage = false,
       className,
+      isEditing = false,
+      editingMessageContent = '',
+      onCancelEdit,
       ...props
     },
     ref
@@ -86,7 +93,26 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
     const canSubmit = !loading && !!value
 
     return (
-      <div className="w-full">
+      <div className="w-full relative z-30">
+        {isEditing && (
+          <div className="border rounded-md px-3 py-2 flex items-center justify-between shadow absolute top-[-50px] left-0 right-0 bg-background">
+            <div className="flex items-center gap-x-2 text-sm text-foreground-light">
+              <Pencil size={14} />
+              <span>Editing message</span>
+            </div>
+            {onCancelEdit && (
+              <Button
+                type="text"
+                size="tiny"
+                icon={<X size={14} />}
+                onClick={onCancelEdit}
+                className="h-6 w-6 p-0"
+                title="Cancel editing"
+                aria-label="Cancel editing"
+              />
+            )}
+          </div>
+        )}
         <form
           id="assistant-chat"
           ref={formRef}
@@ -122,7 +148,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             )}
             <Button
               htmlType="submit"
-              aria-label="Send message"
+              aria-label={isEditing ? 'Update message' : 'Send message'}
               icon={<ArrowUp />}
               disabled={!canSubmit}
               className={cn(
