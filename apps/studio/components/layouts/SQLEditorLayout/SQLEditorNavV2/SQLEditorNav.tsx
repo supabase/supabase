@@ -545,6 +545,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   return (
     <>
+      <InnerSideMenuSeparator />
+
       <InnerSideMenuCollapsible
         className="px-0"
         open={showSharedSnippets}
