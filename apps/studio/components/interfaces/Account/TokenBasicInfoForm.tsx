@@ -1,33 +1,17 @@
-
-import { type Control } from 'react-hook-form'
-
-import {
-  FormField_Shadcn_,
-  FormControl_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-} from 'ui'
+import { Control } from 'react-hook-form'
+import { FormField_Shadcn_, FormControl_Shadcn_, Input_Shadcn_, Select_Shadcn_, SelectTrigger_Shadcn_, SelectValue_Shadcn_, SelectContent_Shadcn_, SelectItem_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { getExpirationDateText } from './AccessToken.utils'
+import { ACCESS_TOKEN_EXPIRY } from './AccessToken.constants'
 
-import { ACCESS_TOKEN_EXPIRY } from '../AccessToken.constants'
-
-interface Step1BasicInfoProps {
+interface TokenBasicInfoFormProps {
   control: Control<any>
-  getExpirationDateText: (expiryOption: string) => string
   expirationDate: string
 }
 
-const Step1BasicInfo = ({
-  control,
-  getExpirationDateText,
-  expirationDate,
-}: Step1BasicInfoProps) => {
+export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFormProps) => {
   return (
-    <>
+    <div className="space-y-4">
       <FormField_Shadcn_
         key="tokenName"
         name="tokenName"
@@ -72,10 +56,6 @@ const Step1BasicInfo = ({
           </FormItemLayout>
         )}
       />
-
-
-    </>
+    </div>
   )
-}
-
-export default Step1BasicInfo 
+} 
