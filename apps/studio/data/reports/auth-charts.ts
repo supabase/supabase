@@ -76,6 +76,26 @@ export const getAuthReportAttributes = () => [
     ],
   },
   {
+    id: 'otp-signins',
+    label: 'OTP Sign Ins',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of existing users signing in via OTP.',
+    attributes: [
+      {
+        attribute: 'OTPSignIns',
+        provider: 'logs',
+        label: 'OTP Sign Ins',
+        enabled: true,
+      },
+    ],
+  },
+  {
     id: 'signins',
     label: 'Sign Ins',
     valuePrecision: 0,

@@ -15,6 +15,7 @@ const METRIC_KEYS = [
   'SignInAttempts',
   'PasswordResetRequests',
   'TotalSignUps',
+  'OTPSignIns',
   'SignInLatency',
   'SignUpLatency',
   'ErrorsByStatus',
@@ -116,6 +117,22 @@ const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval) => string> = {
           json_value(event_message, "$.auth_event.traits.provider") in ('phone', 'sms')
           and json_value(event_message, "$.auth_event.traits.grant_type") = 'otp'
         )
+      group by timestamp
+      order by timestamp desc
+    `
+  },
+  OTPSignIns: (interval) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    return `
+      --otp-signins
+      select 
+        timestamp_trunc(timestamp, ${granularity}) as timestamp,
+        count(*) as count
+      from auth_logs f
+      where json_value(f.event_message, "$.auth_event.action") = 'login'
+        and json_value(f.event_message, "$.provider") is not null
+        and json_value(f.event_message, "$.provider") != ''
+        and json_value(f.event_message, "$.login_method") = 'otp'
       group by timestamp
       order by timestamp desc
     `
@@ -246,6 +263,7 @@ const METRIC_FORMATTER: Record<
   },
   PasswordResetRequests: (rawData, attributes) => defaultFormatter(rawData, attributes),
   TotalSignUps: (rawData, attributes) => defaultFormatter(rawData, attributes),
+  OTPSignIns: (rawData, attributes) => defaultFormatter(rawData, attributes),
   SignInLatency: (rawData, attributes) => defaultFormatter(rawData, attributes),
   SignUpLatency: (rawData, attributes) => defaultFormatter(rawData, attributes),
   ErrorsByStatus: (rawData, attributes) => {
