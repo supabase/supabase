@@ -312,7 +312,7 @@ export const CreateCronJobSheet = ({
     })
     const nameExists = !!checkExistingJob
 
-    if (nameExists) {
+    if (!isEditing && nameExists) {
       return form.setError('name', {
         type: 'manual',
         message: 'A cron job with this name already exists',
