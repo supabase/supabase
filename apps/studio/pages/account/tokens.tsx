@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -15,21 +15,23 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
   ScaffoldHeader,
-  ScaffoldTitle,
+  ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
+  const [searchString, setSearchString] = useState('')
 
   return (
     <>
       <ScaffoldContainer>
         <ScaffoldHeader className="pt-0 mb-6">
-          <ScaffoldTitle>Access Tokens</ScaffoldTitle>
+          <ScaffoldSectionTitle>Access Tokens</ScaffoldSectionTitle>
           <ScaffoldDescription>
             Personal access tokens can be used to control your whole account and use features added
             in the future. Be careful when sharing them!
@@ -39,8 +41,18 @@ const UserAccessTokens: NextPageWithLayout = () => {
       <ScaffoldContainer bottomPadding>
         <div className="space-y-4">
           {/* {newToken && <NewTokenBanner token={newToken} />} */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-between gap-x-2 mb-3">
+            <Input
+              size="tiny"
+              autoComplete="off"
+              icon={<Search size={12} />}
+              value={searchString}
+              onChange={(e: any) => setSearchString(e.target.value)}
+              name="search"
+              id="search"
+              placeholder="Filter tokens"
+            />
+            <div className="flex items-center gap-x-2">
               <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link
                   href="https://supabase.com/docs/reference/api/introduction"
@@ -59,10 +71,11 @@ const UserAccessTokens: NextPageWithLayout = () => {
                   CLI docs
                 </Link>
               </Button>
+
+              <NewAccessTokenButton onCreateToken={setNewToken} />
             </div>
-            <NewAccessTokenButton onCreateToken={setNewToken} />
           </div>
-          <AccessTokenList />
+          <AccessTokenList searchString={searchString} />
         </div>
       </ScaffoldContainer>
     </>
