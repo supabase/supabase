@@ -305,18 +305,20 @@ export const CreateCronJobSheet = ({
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
     if (!project) return console.error('Project is required')
 
-    const checkExistingJob = await getDatabaseCronJob({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      name,
-    })
-    const nameExists = !!checkExistingJob
-
-    if (nameExists) {
-      return form.setError('name', {
-        type: 'manual',
-        message: 'A cron job with this name already exists',
+    if (!isEditing) {
+      const checkExistingJob = await getDatabaseCronJob({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        name,
       })
+      const nameExists = !!checkExistingJob
+
+      if (nameExists) {
+        return form.setError('name', {
+          type: 'manual',
+          message: 'A cron job with this name already exists',
+        })
+      }
     }
 
     const command = `$$${values.snippet}$$`
