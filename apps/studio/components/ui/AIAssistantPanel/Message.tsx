@@ -214,22 +214,38 @@ export const Message = function Message({
             )}
 
             {/* Action button - only show for user messages on hover */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              {onEdit && message.role === 'user' && (
-                <ButtonTooltip
-                  type="text"
-                  icon={<Pencil size={14} />}
-                  onClick={() => onEdit(id)}
-                  className="text-foreground-light hover:text-foreground p-1 rounded"
-                  aria-label="Edit message"
-                  tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
-                />
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+              {message.role === 'user' && (
+                <>
+                  {onEdit && (
+                    <ButtonTooltip
+                      type="text"
+                      icon={<Pencil size={14} />}
+                      onClick={() => onEdit(id)}
+                      className="text-foreground-light hover:text-foreground p-1 rounded"
+                      aria-label="Edit message"
+                      tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
+                    />
+                  )}
+
+                  {onDelete && (
+                    <ButtonTooltip
+                      type="text"
+                      icon={<Trash2 size={14} />}
+                      tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
+                      onClick={() => onDelete(id)}
+                      className="text-foreground-light hover:text-foreground p-1 rounded"
+                      title="Delete messages up to here"
+                      aria-label="Delete messages up to here"
+                    />
+                  )}
+                </>
               )}
             </div>
           </div>
 
           {/* Delete buttons - only show for user messages on hover and when not read-only */}
-          {(onDelete || onDeleteAfter) && !isLoading && (
+          {/* {(onDelete || onDeleteAfter) && !isLoading && (
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
               {onDelete && (
                 <button
@@ -241,7 +257,7 @@ export const Message = function Message({
                   <Trash2 size={14} />
                 </button>
               )}
-              {/* {onDeleteAfter && (
+               {onDeleteAfter && (
                 <button
                   onClick={() => onDeleteAfter(id)}
                   className="text-foreground-light hover:text-foreground p-1 rounded flex items-center gap-1"
@@ -251,9 +267,9 @@ export const Message = function Message({
                   <ChevronDown size={14} />
                   <Trash2 size={14} className="" />
                 </button>
-              )} */}
+              )} 
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </MessageContext.Provider>
