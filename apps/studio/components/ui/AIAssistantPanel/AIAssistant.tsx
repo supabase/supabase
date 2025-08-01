@@ -293,11 +293,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
-            onEdit={!isChatLoading && !editingMessageId ? editMessage : undefined}
+            onEdit={!isChatLoading ? editMessage : undefined}
           />
         )
       }),
-    [chatMessages, isChatLoading, updateMessage, editMessage, editingMessageId]
+    [chatMessages, isChatLoading, updateMessage, editMessage]
   )
 
   const hasMessages = chatMessages.length > 0
