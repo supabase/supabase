@@ -139,7 +139,12 @@ const TriggerList = ({
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1" icon={<MoreVertical />} />
+                      <Button
+                        aria-label="More options"
+                        type="default"
+                        className="px-1"
+                        icon={<MoreVertical />}
+                      />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem

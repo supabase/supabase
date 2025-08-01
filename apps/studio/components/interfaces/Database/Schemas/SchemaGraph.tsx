@@ -229,6 +229,7 @@ export const SchemaGraph = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <ButtonTooltip
+                    aria-label="Download Schema"
                     type="default"
                     loading={isDownloading}
                     className="px-1.5"

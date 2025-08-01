@@ -112,7 +112,12 @@ const FunctionList = ({
                   {canUpdateFunctions ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="default" className="px-1" icon={<MoreVertical />} />
+                        <Button
+                          aria-label="More options"
+                          type="default"
+                          className="px-1"
+                          icon={<MoreVertical />}
+                        />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
