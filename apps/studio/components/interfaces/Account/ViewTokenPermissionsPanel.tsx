@@ -90,7 +90,7 @@ export function ViewTokenPermissionsPanel({
       <SheetContent showClose={false} size="default" className={cn('!min-w-[600px]')}>
         <div className={cn('flex flex-col grow w-full')}>
           <SheetHeader
-            className={cn('py-3 flex flex-row justify-between gap-x-4 items-center border-b')}
+            className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}
           >
             <p className="truncate" title={`Manage access for ${token?.name}`}>
               View access for {token?.name}

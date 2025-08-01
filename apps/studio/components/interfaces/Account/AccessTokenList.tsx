@@ -64,9 +64,6 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
         <Skeleton className="max-w-60 h-4 rounded-full" />
       </TableCell>
       <TableCell>
-        <Skeleton className="max-w-32 h-4 rounded-full" />
-      </TableCell>
-      <TableCell>
         <Skeleton className="max-w-40 h-4 rounded-full" />
       </TableCell>
       <TableCell>
@@ -89,9 +86,6 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
               </TableHead>
               <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
                 Token
-              </TableHead>
-              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                Created
               </TableHead>
               <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
                 Expiry
@@ -135,30 +129,11 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
 
             return (
               <TableRow key={x.token_alias}>
-                <TableCell>
-                  <p className="truncate max-w-[16ch]">{x.name}</p>
+                <TableCell className="w-48">
+                  <p className="truncate">{x.name}</p>
                 </TableCell>
                 <TableCell>
                   <span className="font-mono text-foreground-light">{x.token_alias}</span>
-                </TableCell>
-                <TableCell>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="text-foreground-light">
-                        {createdDate.toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        Created on {createdDate.toLocaleDateString('en-GB')},{' '}
-                        {createdDate.toLocaleTimeString('en-GB')}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
                 </TableCell>
                 <TableCell>
                   <Tooltip>
