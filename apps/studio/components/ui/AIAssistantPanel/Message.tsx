@@ -1,5 +1,5 @@
 import { Message as VercelMessage } from 'ai/react'
-import { ChevronDown, Loader2, Pencil, Trash2, User } from 'lucide-react'
+import { Loader2, Pencil, Trash2 } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
@@ -243,33 +243,6 @@ export const Message = function Message({
               )}
             </div>
           </div>
-
-          {/* Delete buttons - only show for user messages on hover and when not read-only */}
-          {/* {(onDelete || onDeleteAfter) && !isLoading && (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
-              {onDelete && (
-                <button
-                  onClick={() => onDelete(id)}
-                  className="text-foreground-light hover:text-foreground p-1 rounded"
-                  title="Delete messages up to here"
-                  aria-label="Delete messages up to here"
-                >
-                  <Trash2 size={14} />
-                </button>
-              )}
-               {onDeleteAfter && (
-                <button
-                  onClick={() => onDeleteAfter(id)}
-                  className="text-foreground-light hover:text-foreground p-1 rounded flex items-center gap-1"
-                  title="Delete this and all messages after"
-                  aria-label="Delete this and all messages after"
-                >
-                  <ChevronDown size={14} />
-                  <Trash2 size={14} className="" />
-                </button>
-              )} 
-            </div>
-          )} */}
         </div>
       </div>
     </MessageContext.Provider>
