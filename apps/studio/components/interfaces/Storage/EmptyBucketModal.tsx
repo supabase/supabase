@@ -4,15 +4,24 @@ import { toast } from 'sonner'
 import { useBucketEmptyMutation } from 'data/storage/bucket-empty-mutation'
 import type { Bucket } from 'data/storage/buckets-query'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogContent,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogFooter,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export interface EmptyBucketModalProps {
-  visible: boolean
   bucket?: Bucket
   onClose: () => void
 }
 
-export const EmptyBucketModal = ({ visible = false, bucket, onClose }: EmptyBucketModalProps) => {
+export const EmptyBucketModal = ({ bucket, onClose }: EmptyBucketModalProps) => {
   const { ref: projectRef } = useParams()
   const { fetchFolderContents } = useStorageExplorerStateSnapshot()
 
@@ -37,21 +46,38 @@ export const EmptyBucketModal = ({ visible = false, bucket, onClose }: EmptyBuck
   }
 
   return (
-    <ConfirmationModal
-      variant={'destructive'}
-      size="small"
-      title={`Confirm to delete all contents from ${bucket?.name}`}
-      confirmLabel="Empty bucket"
-      visible={visible}
-      loading={isLoading}
-      onCancel={() => onClose()}
-      onConfirm={onEmptyBucket}
-      alert={{
-        title: 'This action cannot be undone',
-        description: 'The contents of your bucket cannot be recovered once deleted',
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose()
+        }
       }}
     >
-      <p className="text-sm">Are you sure you want to empty the bucket "{bucket?.name}"?</p>
-    </ConfirmationModal>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{`Confirm to delete all contents from ${bucket?.name}`}</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-4">
+          <Admonition
+            type="destructive"
+            title="This action cannot be undone"
+            description="The contents of your bucket cannot be recovered once deleted."
+          />
+          <p className="text-sm">Are you sure you want to empty the bucket "{bucket?.name}"?</p>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" disabled={isLoading} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="danger" loading={isLoading} onClick={onEmptyBucket}>
+            Empty Bucket
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
+
+export default EmptyBucketModal
