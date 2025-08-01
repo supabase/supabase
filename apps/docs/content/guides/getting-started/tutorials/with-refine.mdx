@@ -73,7 +73,7 @@ We'll update it with environment variables managed by Vite:
 import { createClient } from '@refinedev/supabase'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
   db: {
@@ -91,7 +91,7 @@ And then, we want to save the environment variables in a `.env.local` file. All 
 
 ```bash .env.local
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
 The `supabaseClient` will be used in fetch calls to Supabase endpoints from our app. As we'll see below, the client is instrumental in implementing authentication using Refine's auth provider methods and CRUD actions with appropriate data provider methods.

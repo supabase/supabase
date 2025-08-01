@@ -124,7 +124,7 @@ If you wish to use the new domain in client code, change the URL used in your Su
 import { createClient } from '@supabase/supabase-js'
 
 // Use a custom domain as the supabase URL
-const supabase = createClient('https://api.example.com', 'public-anon-key')
+const supabase = createClient('https://api.example.com', 'publishable-or-anon-key')
 ```
 
 Similarly, your Edge Functions will now be available at `https://api.example.com/functions/v1/your_function_name`, and your Storage objects at `https://api.example.com/storage/v1/object/public/your_file_path.ext`.
@@ -202,7 +202,7 @@ If you wish to use the new domain in client code, you can set it up like so:
 import { createClient } from '@supabase/supabase-js'
 
 // Use a custom domain as the supabase URL
-const supabase = createClient('https://my-example-brand.supabase.co', 'public-anon-key')
+const supabase = createClient('https://my-example-brand.supabase.co', 'publishable-or-anon-key')
 ```
 
 When using [Sign in with Twitter](/docs/guides/auth/social-login/auth-twitter) make sure your frontend code is using the subdomain only.
