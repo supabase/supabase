@@ -4,9 +4,9 @@ import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { tryParseJson } from 'lib/helpers'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
@@ -43,6 +43,7 @@ export async function getGraphDataFromTables(
       data: {
         ref,
         id: table.id,
+        schema: table.schema,
         name: table.name,
         isForeign: false,
         columns,
@@ -72,6 +73,7 @@ export async function getGraphDataFromTables(
         data: {
           ref,
           name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
+          schema: rel.target_table_schema,
           isForeign: true,
           columns: [],
         } as TableNodeData,

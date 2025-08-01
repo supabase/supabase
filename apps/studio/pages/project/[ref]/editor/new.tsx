@@ -13,8 +13,8 @@ const EditorNewPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
 
-  const onTableCreated = (table: { id: number }) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
+  const onTableCreated = (table: { id: number; schema: string }) => {
+    router.push(`/project/${projectRef}/editor/${table.id}?schema=${table.schema}`)
   }
 
   return (
