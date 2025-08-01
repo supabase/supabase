@@ -38,7 +38,7 @@ import { UpgradingState } from './UpgradingState'
 const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
   '/project/[ref]/database/settings',
-  '/project/[ref]/settings/storage',
+  '/project/[ref]/storage/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]

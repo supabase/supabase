@@ -971,7 +971,7 @@ function createStorageExplorerState({
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
-              <InlineLink href={`/project/${state.projectRef}/settings/storage`}>
+              <InlineLink href={`/project/${state.projectRef}/storage/settings`}>
                 Storage settings
               </InlineLink>
               .

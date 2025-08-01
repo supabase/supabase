@@ -49,81 +49,81 @@ const nextConfig = {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
         ? [
-            {
-              source: '/',
-              has: [
-                {
-                  type: 'query',
-                  key: 'next',
-                  value: 'new-project',
-                },
-              ],
-              destination: '/new/new-project',
-              permanent: false,
-            },
-            {
-              source: '/',
-              destination: '/org',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/sign-up',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/sign-up',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/sign-in',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/sign-in',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/sign-in',
-              permanent: false,
-            },
-          ]
+          {
+            source: '/',
+            has: [
+              {
+                type: 'query',
+                key: 'next',
+                value: 'new-project',
+              },
+            ],
+            destination: '/new/new-project',
+            permanent: false,
+          },
+          {
+            source: '/',
+            destination: '/org',
+            permanent: false,
+          },
+          {
+            source: '/register',
+            destination: '/sign-up',
+            permanent: false,
+          },
+          {
+            source: '/signup',
+            destination: '/sign-up',
+            permanent: false,
+          },
+          {
+            source: '/signin',
+            destination: '/sign-in',
+            permanent: false,
+          },
+          {
+            source: '/login',
+            destination: '/sign-in',
+            permanent: false,
+          },
+          {
+            source: '/log-in',
+            destination: '/sign-in',
+            permanent: false,
+          },
+        ]
         : [
-            {
-              source: '/',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/project/default',
-              permanent: false,
-            },
-          ]),
+          {
+            source: '/',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/register',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/signup',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/signin',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/login',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/log-in',
+            destination: '/project/default',
+            permanent: false,
+          },
+        ]),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
@@ -145,7 +145,7 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/settings/storage',
+        source: '/project/:ref/storage/settings',
         destination: '/project/:ref/storage/settings',
         permanent: true,
       },
@@ -390,13 +390,13 @@ const nextConfig = {
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
-            {
-              source: '/',
-              destination: process.env.NEXT_PUBLIC_BASE_PATH,
-              basePath: false,
-              permanent: false,
-            },
-          ]
+          {
+            source: '/',
+            destination: process.env.NEXT_PUBLIC_BASE_PATH,
+            basePath: false,
+            permanent: false,
+          },
+        ]
         : []),
     ]
   },
@@ -542,29 +542,29 @@ const nextConfig = {
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(withBundleAnalyzer(nextConfig), {
-        silent: true,
+      silent: true,
 
-        // For all available options, see:
-        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-        // Upload a larger set of source maps for prettier stack traces (increases build time)
-        widenClientFileUpload: true,
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
 
-        // Automatically annotate React components to show their full name in breadcrumbs and session replay
-        reactComponentAnnotation: {
-          enabled: true,
-        },
+      // Automatically annotate React components to show their full name in breadcrumbs and session replay
+      reactComponentAnnotation: {
+        enabled: true,
+      },
 
-        // Hides source maps from generated client bundles
-        hideSourceMaps: true,
+      // Hides source maps from generated client bundles
+      hideSourceMaps: true,
 
-        // Automatically tree-shake Sentry logger statements to reduce bundle size
-        disableLogger: true,
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
 
-        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-        // See the following for more information:
-        // https://docs.sentry.io/product/crons/
-        // https://vercel.com/docs/cron-jobs
-        automaticVercelMonitors: true,
-      })
+      // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+      // See the following for more information:
+      // https://docs.sentry.io/product/crons/
+      // https://vercel.com/docs/cron-jobs
+      automaticVercelMonitors: true,
+    })
     : nextConfig

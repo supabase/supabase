@@ -37,7 +37,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-storage',
         name: 'Storage Settings',
-        route: `/project/${ref}/settings/storage`,
+        route: `/project/${ref}/storage/settings`,
         defaultHidden: true,
       },
       {
