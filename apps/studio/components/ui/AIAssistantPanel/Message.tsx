@@ -10,6 +10,7 @@ import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
+import { ButtonTooltip } from '../ButtonTooltip'
 import {
   Heading3,
   Hyperlink,
@@ -212,14 +213,14 @@ export const Message = function Message({
             {!isLoading && (
               <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                 {onEdit && message.role === 'user' && (
-                  <button
+                  <ButtonTooltip
+                    type="text"
+                    icon={<Pencil size={14} />}
                     onClick={() => onEdit(id)}
                     className="text-foreground-light hover:text-foreground p-1 rounded"
-                    title="Edit message"
                     aria-label="Edit message"
-                  >
-                    <Pencil size={14} />
-                  </button>
+                    tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
+                  />
                 )}
               </div>
             )}
