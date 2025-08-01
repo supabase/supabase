@@ -150,7 +150,7 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/settings/database',
+        source: '/project/:ref/database/settings',
         destination: '/project/:ref/database/settings',
         permanent: true,
       },

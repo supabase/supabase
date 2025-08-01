@@ -37,7 +37,7 @@ import { UpgradingState } from './UpgradingState'
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
+  '/project/[ref]/database/settings',
   '/project/[ref]/settings/storage',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
@@ -53,7 +53,7 @@ const routesToIgnoreDBConnection = [
 const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
+  '/project/[ref]/database/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]
