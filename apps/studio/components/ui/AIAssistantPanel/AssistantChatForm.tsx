@@ -1,7 +1,7 @@
 'use client'
 
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2, X } from 'lucide-react'
+import { ArrowUp, Loader2, X, Pencil } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
 import { Button, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
@@ -96,11 +96,9 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       <div className="w-full">
         {isEditing && (
           <div className="border rounded-md px-3 py-2 flex items-center justify-between mb-2 shadow">
-            <div className="flex items-center gap-2 text-sm text-foreground-light">
-              <span>Editing message:</span>
-              <span className="text-foreground truncate max-w-[200px]">
-                {editingMessageContent}
-              </span>
+            <div className="flex items-center gap-x-2 text-sm text-foreground-light">
+              <Pencil size={14} />
+              <span>Editing message</span>
             </div>
             {onCancelEdit && (
               <Button
