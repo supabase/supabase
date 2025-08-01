@@ -207,23 +207,23 @@ export const Message = function Message({
             ) : (
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
-          </div>
 
-          {/* Action button - only show for user messages on hover */}
-          {!isLoading && (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              {onEdit && message.role === 'user' && (
-                <button
-                  onClick={() => onEdit(id)}
-                  className="text-foreground-light hover:text-foreground p-1 rounded"
-                  title="Edit message"
-                  aria-label="Edit message"
-                >
-                  <Pencil size={14} />
-                </button>
-              )}
-            </div>
-          )}
+            {/* Action button - only show for user messages on hover */}
+            {!isLoading && (
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                {onEdit && message.role === 'user' && (
+                  <button
+                    onClick={() => onEdit(id)}
+                    className="text-foreground-light hover:text-foreground p-1 rounded"
+                    title="Edit message"
+                    aria-label="Edit message"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </MessageContext.Provider>
