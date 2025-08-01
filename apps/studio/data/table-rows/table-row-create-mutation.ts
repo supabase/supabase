@@ -24,10 +24,30 @@ export function getTableRowCreateSql({
   returning = false,
   enumArrayColumns,
 }: Pick<TableRowCreateVariables, 'table' | 'payload' | 'enumArrayColumns' | 'returning'>) {
-  return new Query()
-    .from(table.name, table.schema ?? undefined)
-    .insert([payload], { returning, enumArrayColumns })
-    .toSql()
+  // Always use custom SQL generation to ensure proper quoting
+  const quotedSchema = table.schema ? `"${table.schema}"` : undefined
+  const quotedTable = `"${table.name}"`
+
+  const columns = Object.keys(payload)
+  const values = Object.values(payload)
+
+  // Handle enum array columns - convert them to proper PostgreSQL array format
+  const processedValues = values.map((val, index) => {
+    const columnName = columns[index]
+    if (enumArrayColumns.includes(columnName) && Array.isArray(val)) {
+      // Convert array to PostgreSQL array format
+      return `ARRAY[${val.map((v) => `'${v}'`).join(', ')}]`
+    }
+    return val === null ? 'NULL' : typeof val === 'string' ? `'${val.replace(/'/g, "''")}'` : val
+  })
+
+  const quotedColumns = columns.map((col) => `"${col}"`).join(', ')
+  const quotedValues = processedValues.join(', ')
+
+  const returningClause = returning ? ' RETURNING *' : ''
+  const tableRef = quotedSchema ? `${quotedSchema}.${quotedTable}` : quotedTable
+
+  return `INSERT INTO ${tableRef} (${quotedColumns}) VALUES (${quotedValues})${returningClause};`
 }
 
 export async function createTableRow({

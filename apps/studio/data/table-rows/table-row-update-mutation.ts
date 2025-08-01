@@ -29,11 +29,38 @@ export function getTableRowUpdateSql({
   TableRowUpdateVariables,
   'table' | 'payload' | 'configuration' | 'enumArrayColumns' | 'returning'
 >) {
-  return new Query()
-    .from(table.name, table.schema ?? undefined)
-    .update(payload, { returning, enumArrayColumns })
-    .match(configuration.identifiers)
-    .toSql()
+  // Always quote schema and table names to handle reserved keywords and special characters
+  const quotedSchema = table.schema ? `"${table.schema}"` : undefined
+  const quotedTable = `"${table.name}"`
+
+  const columns = Object.keys(payload)
+  const values = Object.values(payload)
+
+  // Handle enum array columns - convert them to proper PostgreSQL array format
+  const processedValues = values.map((val, index) => {
+    const columnName = columns[index]
+    if (enumArrayColumns.includes(columnName) && Array.isArray(val)) {
+      // Convert array to PostgreSQL array format
+      return `ARRAY[${val.map((v) => `'${v}'`).join(', ')}]`
+    }
+    return val === null ? 'NULL' : typeof val === 'string' ? `'${val.replace(/'/g, "''")}'` : val
+  })
+
+  // Build the SET clause with quoted column names
+  const setClause = columns.map((col, index) => `"${col}" = ${processedValues[index]}`).join(', ')
+
+  // Build WHERE clause from identifiers (primary key conditions)
+  const whereConditions = Object.entries(configuration.identifiers)
+    .map(
+      ([key, value]) =>
+        `"${key}" = ${value === null ? 'NULL' : typeof value === 'string' ? `'${value.replace(/'/g, "''")}'` : value}`
+    )
+    .join(' AND ')
+
+  const returningClause = returning ? ' RETURNING *' : ''
+  const tableRef = quotedSchema ? `${quotedSchema}.${quotedTable}` : quotedTable
+
+  return `UPDATE ${tableRef} SET ${setClause} WHERE ${whereConditions}${returningClause};`
 }
 
 export async function updateTableRow({
