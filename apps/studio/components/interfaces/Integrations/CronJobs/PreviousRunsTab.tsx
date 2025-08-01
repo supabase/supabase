@@ -11,6 +11,7 @@ import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import {
   Button,
   cn,
@@ -21,7 +22,12 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { calculateDuration, formatDate, isSecondsFormat } from './CronJobs.utils'
+import {
+  calculateDuration,
+  formatDate,
+  isSecondsFormat,
+  parseCronJobCommand,
+} from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
 
 const cronJobColumns = [
@@ -158,14 +164,15 @@ export const PreviousRunsTab = () => {
     { enabled: !!jobId, staleTime: 30 }
   )
 
-  useEffect(() => {
-    // Refetch only the first page
-    const timerId = setInterval(() => {
-      refetch({ refetchPage: (_page, index) => index === 0 })
-    }, 30000)
+  const { data: edgeFunctions = [] } = useEdgeFunctionsQuery({ projectRef: project?.ref })
 
-    return () => clearInterval(timerId)
-  }, [refetch])
+  const currentJobState = cronJobs?.find((job) => job.jobid === jobId)
+  const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
+  const cronJobValues = parseCronJobCommand(currentJobState?.command || '', project?.ref!)
+  const edgeFunction =
+    cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
+  const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
+  const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
   const handleScroll = useCallback(
     (event: UIEvent<HTMLDivElement>) => {
@@ -177,8 +184,14 @@ export const PreviousRunsTab = () => {
     [fetchNextPage, isLoadingCronJobRuns]
   )
 
-  const currentJobState = cronJobs?.find((job) => job.jobid === jobId)
-  const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
+  useEffect(() => {
+    // Refetch only the first page
+    const timerId = setInterval(() => {
+      refetch({ refetchPage: (_page, index) => index === 0 })
+    }, 30000)
+
+    return () => clearInterval(timerId)
+  }, [refetch])
 
   return (
     <div className="h-full flex flex-col">
@@ -267,12 +280,29 @@ export const PreviousRunsTab = () => {
 
             <div className="grid gap-y-2">
               <h3 className="text-sm">Explore</h3>
-              <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
-                {/* [Terry] need to link to the exact jobid, but not currently supported */}
-                <Link target="_blank" href={`/project/${project?.ref}/logs/pgcron-logs/`}>
-                  View logs
-                </Link>
-              </Button>
+              <div className="flex items-center gap-x-2">
+                <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
+                  {/* [Terry] need to link to the exact jobid, but not currently supported */}
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`/project/${project?.ref}/logs/pgcron-logs/`}
+                  >
+                    View Cron logs
+                  </Link>
+                </Button>
+                {isValidEdgeFunction && (
+                  <Button asChild type="outline">
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
+                    >
+                      View Edge Function logs
+                    </Link>
+                  </Button>
+                )}
+              </div>
             </div>
           </>
         )}

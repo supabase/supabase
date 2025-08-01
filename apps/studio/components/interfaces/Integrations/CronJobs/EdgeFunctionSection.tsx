@@ -34,8 +34,8 @@ const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) =>
 }
 
 export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
-  const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
+  const { project: selectedProject } = useProjectContext()
   const { data: functions, isSuccess, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = useMemo(() => functions ?? [], [functions])
@@ -52,6 +52,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
       form.setValue('values.edgeFunctionName', functionUrl)
     }
   }, [edgeFunctions, form, isSuccess, selectedProject?.ref, selectedProject?.restUrl])
+
   return (
     <SheetSection className="flex flex-col gap-6">
       <FormField_Shadcn_
