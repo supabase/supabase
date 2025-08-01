@@ -1,21 +1,20 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
-import { IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { Header } from 'components/layouts/Integrations/header'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
+import AlertError from 'components/ui/AlertError'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useScroll } from 'framer-motion'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProject, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import { IntegrationTabs } from './tabs'
 import { Menu, Separator } from 'ui'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import AlertError from 'components/ui/AlertError'
+import { IntegrationTabs } from './tabs'
 
 /**
  * Layout component for the Integrations section
@@ -156,7 +155,7 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
 const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     installedIntegrations: integrations,
