@@ -213,7 +213,7 @@ export const Message = function Message({
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
 
-            {/* Action button - only show for user messages on hover */}
+            {/* Action buttons - only show for user messages on hover */}
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
               {message.role === 'user' && (
                 <>
