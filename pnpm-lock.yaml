@@ -31616,6 +31616,12 @@ snapshots:
 
   graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3):
     dependencies:
+      graphql: 16.10.0
+    optionalDependencies:
+      ws: 8.18.3
+
+  graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3):
+    dependencies:
       graphql: 16.11.0
     optionalDependencies:
       ws: 8.18.3

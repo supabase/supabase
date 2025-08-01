@@ -7,13 +7,13 @@ import type { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
-import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import CustomExpiryModal from './CustomExpiryModal'
 import FileExplorer from './FileExplorer'
 import FileExplorerHeader from './FileExplorerHeader'
 import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
 import MoveItemsModal from './MoveItemsModal'
 import PreviewPane from './PreviewPane'
+import ConfirmDeleteModal from './ConfirmDeleteModal'
 
 interface StorageExplorerProps {
   bucket: Bucket
@@ -26,25 +26,17 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     view,
     columns,
     selectedItems,
-    selectedItemsToDelete,
     openedFolders,
-    selectedItemsToMove,
-    selectedBucket,
     openBucket,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
-    deleteFolder,
     uploadFiles,
-    deleteFiles,
-    moveFiles,
     popColumnAtIndex,
     popOpenedFoldersAtIndex,
     setSelectedItems,
     clearSelectedItems,
     setSelectedFilePreview,
-    setSelectedItemsToMove,
-    setSelectedItemsToDelete,
   } = useStorageExplorerStateSnapshot()
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
@@ -134,28 +126,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     event.target.value = ''
   }
 
-  const onMoveSelectedFiles = async (newPath: string) => {
-    await moveFiles(newPath)
-  }
-
-  const onDeleteSelectedFiles = async () => {
-    if (selectedItemsToDelete.length === 1) {
-      const [itemToDelete] = selectedItemsToDelete
-      if (!itemToDelete) return
-
-      switch (itemToDelete.type) {
-        case STORAGE_ROW_TYPES.FOLDER:
-          await deleteFolder(itemToDelete)
-          break
-        case STORAGE_ROW_TYPES.FILE:
-          await deleteFiles({ files: [itemToDelete] })
-          break
-      }
-    } else {
-      await deleteFiles({ files: selectedItemsToDelete })
-    }
-  }
-
   /** Misc UI methods */
   const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
@@ -193,19 +163,9 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         />
         <PreviewPane />
       </div>
-      <ConfirmDeleteModal
-        visible={selectedItemsToDelete.length > 0}
-        selectedItemsToDelete={selectedItemsToDelete}
-        onSelectCancel={() => setSelectedItemsToDelete([])}
-        onSelectDelete={onDeleteSelectedFiles}
-      />
-      <MoveItemsModal
-        bucketName={selectedBucket.name}
-        visible={selectedItemsToMove.length > 0}
-        selectedItemsToMove={selectedItemsToMove}
-        onSelectCancel={() => setSelectedItemsToMove([])}
-        onSelectMove={onMoveSelectedFiles}
-      />
+
+      <ConfirmDeleteModal />
+      <MoveItemsModal />
       <CustomExpiryModal />
     </div>
   )
