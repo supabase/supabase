@@ -234,7 +234,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           />
         )
       }),
-    [chatMessages, isChatLoading]
+    [chatMessages, isChatLoading, updateMessage]
   )
 
   const hasMessages = chatMessages.length > 0
