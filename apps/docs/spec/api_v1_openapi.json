@@ -367,6 +367,13 @@
             "in": "query",
             "description": "Organization slug",
             "schema": { "pattern": "^[\\w-]+$", "type": "string" }
+          },
+          {
+            "name": "resource",
+            "required": false,
+            "in": "query",
+            "description": "Resource indicator for MCP (Model Context Protocol) clients",
+            "schema": { "enum": ["https://api.supabase.io/mcp"], "type": "string" }
           }
         ],
         "responses": { "204": { "description": "" } },
@@ -4395,7 +4402,12 @@
           "code": { "type": "string" },
           "code_verifier": { "type": "string" },
           "redirect_uri": { "type": "string" },
-          "refresh_token": { "type": "string" }
+          "refresh_token": { "type": "string" },
+          "resource": {
+            "type": "string",
+            "enum": ["https://api.supabase.io/mcp"],
+            "description": "Resource indicator for MCP (Model Context Protocol) clients"
+          }
         },
         "additionalProperties": false
       },
@@ -4532,12 +4544,7 @@
           "name": { "type": "string" },
           "description": { "type": "string", "nullable": true },
           "hash": { "type": "string", "nullable": true },
-          "secret_jwt_template": {
-            "type": "object",
-            "properties": { "role": { "type": "string", "minLength": 1 } },
-            "required": ["role"],
-            "nullable": true
-          },
+          "secret_jwt_template": { "type": "object", "additionalProperties": {}, "nullable": true },
           "inserted_at": { "type": "string", "format": "date-time", "nullable": true },
           "updated_at": { "type": "string", "format": "date-time", "nullable": true }
         },
@@ -4559,12 +4566,7 @@
             "pattern": "^[a-z_][a-z0-9_]+$"
           },
           "description": { "type": "string", "nullable": true },
-          "secret_jwt_template": {
-            "type": "object",
-            "properties": { "role": { "type": "string", "minLength": 1 } },
-            "required": ["role"],
-            "nullable": true
-          }
+          "secret_jwt_template": { "type": "object", "additionalProperties": {}, "nullable": true }
         },
         "required": ["type", "name"]
       },
@@ -4578,12 +4580,7 @@
             "pattern": "^[a-z_][a-z0-9_]+$"
           },
           "description": { "type": "string", "nullable": true },
-          "secret_jwt_template": {
-            "type": "object",
-            "properties": { "role": { "type": "string", "minLength": 1 } },
-            "required": ["role"],
-            "nullable": true
-          }
+          "secret_jwt_template": { "type": "object", "additionalProperties": {}, "nullable": true }
         }
       },
       "CreateBranchBody": {
