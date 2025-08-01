@@ -10,8 +10,10 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
-import { useCronJobsInfiniteQuery } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import {
+  CronJob,
+  useCronJobsInfiniteQuery,
+} from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'

@@ -1,9 +1,9 @@
 import parser from 'cron-parser'
 import { toString as CronToString } from 'cronstrue'
 import dayjs from 'dayjs'
-
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { Column } from 'react-data-grid'
+
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { cn } from 'ui'
 import { CronJobType } from './CreateCronJobSheet'
 import { CRON_TABLE_COLUMNS, HTTPHeader } from './CronJobs.constants'

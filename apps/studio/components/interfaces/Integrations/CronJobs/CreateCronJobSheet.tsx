@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toString as CronToString } from 'cronstrue'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -201,8 +202,9 @@ export const CreateCronJobSheet = ({
 }: CreateCronJobSheetProps) => {
   const { project } = useProjectContext()
   const { data: org } = useSelectedOrganizationQuery()
-  const isEditing = !!selectedCronJob?.jobname
+  const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
+  const isEditing = !!selectedCronJob?.jobname
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
 
   const { data } = useDatabaseExtensionsQuery({
@@ -325,6 +327,7 @@ export const CreateCronJobSheet = ({
         projectRef: project!.ref,
         connectionString: project?.connectionString,
         query,
+        searchTerm: searchQuery,
       },
       {
         onSuccess: () => {

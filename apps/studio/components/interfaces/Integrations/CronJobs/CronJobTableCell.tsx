@@ -1,15 +1,17 @@
 import dayjs from 'dayjs'
 import { Clipboard, Edit, Trash } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   Button,
   cn,
+  CodeBlock,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
@@ -24,6 +26,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   Switch,
   Tooltip,
   TooltipContent,
@@ -46,6 +51,7 @@ export const CronJobTableCell = ({
   onSelectDelete,
 }: CronJobTableCellProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showToggleModal, setShowToggleModal] = useState(false)
 
@@ -78,6 +84,7 @@ export const CronJobTableCell = ({
       connectionString: project?.connectionString,
       jobId: jobid,
       active: !active,
+      searchTerm: searchQuery,
     })
   }
 
@@ -138,6 +145,31 @@ export const CronJobTableCell = ({
                 className="font-sans text-xs"
               />
             )
+          ) : col.id === 'command' ? (
+            <HoverCard openDelay={0} closeDelay={0}>
+              <HoverCardTrigger asChild>
+                <div className="text-xs font-mono w-full h-full flex items-center">
+                  {formattedValue}
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent
+                align="end"
+                className="p-0 w-[400px]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className="text-xs font-mono px-2 py-1 border-b">Command</p>
+                <CodeBlock
+                  hideLineNumbers
+                  language="sql"
+                  value={formattedValue.trim()}
+                  className={cn(
+                    'py-0 px-3.5 max-w-full prose dark:prose-dark border-0 rounded-t-none',
+                    '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11',
+                    '[&>code]:text-xs'
+                  )}
+                />
+              </HoverCardContent>
+            </HoverCard>
           ) : (
             <p
               className={cn(
