@@ -149,6 +149,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages,
     error,
     reload,
+    stop,
   } = useChat({
     id: snap.activeChatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v4`,
@@ -574,6 +575,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 sendMessageToAssistant(finalMessage)
                 scrollToEnd()
               }}
+              onStop={stop}
               sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
               onRemoveSnippet={(index) => {
                 const newSnippets = [...(snap.sqlSnippets ?? [])]
