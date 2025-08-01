@@ -216,9 +216,8 @@ export const CreateCronJobSheet = ({
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: upsertCronJob, isLoading: isLoadingUpsertCronjob } =
-    useDatabaseCronJobCreateMutation()
-  const isLoading = isLoadingGetCronJob || isLoadingUpsertCronjob
+  const { mutate: upsertCronJob, isLoading: isUpserting } = useDatabaseCronJobCreateMutation()
+  const isLoading = isLoadingGetCronJob || isUpserting
 
   const canToggleExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -309,20 +308,25 @@ export const CreateCronJobSheet = ({
     if (!project) return console.error('Project is required')
 
     if (!isEditing) {
-      setIsLoadingGetCronJob(true)
-      const checkExistingJob = await getDatabaseCronJob({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        name,
-      })
-      const nameExists = !!checkExistingJob
-
-      if (nameExists) {
-        setIsLoadingGetCronJob(false)
-        return form.setError('name', {
-          type: 'manual',
-          message: 'A cron job with this name already exists',
+      try {
+        setIsLoadingGetCronJob(true)
+        const checkExistingJob = await getDatabaseCronJob({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          name,
         })
+        const nameExists = !!checkExistingJob
+
+        if (nameExists) {
+          return form.setError('name', {
+            type: 'manual',
+            message: 'A cron job with this name already exists',
+          })
+        }
+      } catch (error: any) {
+        toast.error(`Failed to validate cron job name: ${error.message}`)
+      } finally {
+        setIsLoadingGetCronJob(false)
       }
     }
 
