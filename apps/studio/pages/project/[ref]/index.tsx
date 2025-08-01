@@ -14,6 +14,7 @@ import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectL
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -34,7 +35,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useBranchesQuery } from 'data/branches/branches-query'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
