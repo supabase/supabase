@@ -94,7 +94,7 @@ export const Message = function Message({
       <div
         className={cn(
           'text-foreground-light text-sm',
-          isUser && 'text-foreground',
+          isUser ? 'text-foreground first:mt-0 mt-6' : 'first:mt-0 mt-2',
           variant === 'warning' && 'bg-warning-200'
         )}
       >

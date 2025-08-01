@@ -489,7 +489,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
           </div>
           {hasMessages ? (
-            <div className="w-full px-7 py-8 space-y-6">
+            <div className="w-full px-7 py-8">
               {renderedMessages}
               {error && (
                 <div className="border rounded-md pl-2 pr-1 py-1 flex items-center justify-between">
