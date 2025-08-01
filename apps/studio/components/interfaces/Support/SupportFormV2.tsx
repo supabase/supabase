@@ -532,7 +532,7 @@ export const SupportFormV2 = ({
           {docsResults.length > 0 && hasResults && (
             <>
               <div className="flex items-center gap-2">
-                <h5 className="text-sm text-foreground-lighter">AI Suggested resources</h5>
+                <h5 className="text-foreground-lighter">AI Suggested resources</h5>
                 {searchState.status === 'loading' && (
                   <div className="flex items-center gap-2 text-xs text-foreground-light">
                     <Loader2 className="animate-spin" size={12} />

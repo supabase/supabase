@@ -6,8 +6,8 @@ import { Project, invalidateProjectDetailsQuery } from 'data/projects/project-de
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Circle, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Loader, Circle } from 'lucide-react'
 
 export interface PausingStateProps {
   project: Project

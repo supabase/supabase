@@ -271,7 +271,7 @@ export const LogsPreviewer = ({
               }}
               EmptyState={
                 <div className="flex flex-col items-center justify-center h-[67px]">
-                  <h2 className="text-foreground-light text-xs">No data</h2>
+                  <p className="text-foreground-light text-xs">No data</p>
                   <p className="text-foreground-lighter text-xs">
                     It may take up to 24 hours for data to refresh
                   </p>

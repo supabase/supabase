@@ -110,11 +110,11 @@ const ReportChart = ({
   if (!isAvailable && !isLoading) {
     return (
       <Panel
-        title={<h2 className="text-sm">{chart.label}</h2>}
+        title={<p className="text-sm">{chart.label}</p>}
         className={cn('h-[260px] relative', className)}
       >
         <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
-          <h2 className="">{chart.label}</h2>
+          <h2>{chart.label}</h2>
           <p className="text-sm text-foreground-light">
             This chart is available from{' '}
             <span className="capitalize">

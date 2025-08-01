@@ -124,7 +124,7 @@ const ResetDbPassword = ({ disabled = false }) => {
       </Panel>
       <Modal
         hideFooter
-        header={<h5 className="text-sm text-foreground">Reset database password</h5>}
+        header={<h5 className="text-foreground">Reset database password</h5>}
         confirmText="Reset password"
         size="medium"
         visible={showResetDbPass}

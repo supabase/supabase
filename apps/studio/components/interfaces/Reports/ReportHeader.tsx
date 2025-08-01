@@ -15,7 +15,7 @@ const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
 
   return (
     <div className="flex flex-row justify-between gap-4 items-center">
-      <h1 className="text-2xl text-foreground">{title}</h1>
+      <h1>{title}</h1>
       {showDatabaseSelector && (
         <DatabaseSelector
           onSelectId={(db) => {

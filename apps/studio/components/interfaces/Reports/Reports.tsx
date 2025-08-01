@@ -364,7 +364,7 @@ const Reports = () => {
     <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl text-foreground">{currentReport?.name || 'Reports'}</h1>
+          <h1>{currentReport?.name || 'Reports'}</h1>
           <p className="text-foreground-light">{currentReport?.description}</p>
         </div>
         {hasEdits && (

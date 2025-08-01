@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 
+import { DocsButton } from 'components/ui/DocsButton'
 import {
   Button,
   Form_Shadcn_,
@@ -38,7 +39,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { urlRegex } from '../Auth/Auth.constants'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
-import { DocsButton } from 'components/ui/DocsButton'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -456,7 +456,7 @@ export function LogDrainDestinationSheetForm({
             <>
               <div className="border-t mt-4">
                 <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
-                  <h2 className="text-sm text-foreground">Custom Headers</h2>
+                  <h2 className="text-sm">Custom Headers</h2>
                   <p className="text-xs text-foreground-lighter">
                     {getHeadersSectionDescription()}
                   </p>

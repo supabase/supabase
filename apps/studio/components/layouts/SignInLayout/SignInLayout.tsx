@@ -116,7 +116,7 @@ const SignInLayout = ({
           <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">
-                <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">{heading}</h1>
+                <h1 className="mt-8 mb-2 lg:text-3xl">{heading}</h1>
                 <h2 className="text-sm text-foreground-light">{subheading}</h2>
               </div>
 

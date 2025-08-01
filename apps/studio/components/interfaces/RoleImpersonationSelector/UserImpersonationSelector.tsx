@@ -175,9 +175,9 @@ const UserImpersonationSelector = () => {
   return (
     <>
       <div className="px-5 py-3">
-        <h2 className="text-foreground text-sm">
+        <p className="text-foreground text-sm">
           {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
-        </h2>
+        </p>
         <p className="text-sm text-foreground-light">
           {!impersonatingUser && !isExternalAuthImpersonating
             ? "Select a user to respect your database's Row-Level Security policies for that particular user."
