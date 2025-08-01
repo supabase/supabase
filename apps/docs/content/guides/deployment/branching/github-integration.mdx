@@ -19,16 +19,7 @@ In the Supabase Dashboard:
 
 ## Preparing your Git repository
 
-You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a local `./supabase` directory:
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="existing"
-  queryGroup="platform"
->
-<TabPanel id="existing" label="Existing project">
+You will be using the [Supabase CLI](/docs/guides/cli) to initialise your local `./supabase` directory:
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
@@ -52,7 +43,7 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
             supabase db pull --db-url <db_connection_string>
 
             # Your Database connection string will look like this:
-            # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+            # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
             ```
         <Admonition type="note">
 
@@ -79,20 +70,6 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
     </StepHikeCompact.Step>
 
 </StepHikeCompact>
-
-</TabPanel>
-<TabPanel id="new" label="New Project">
-
-Use the Next.js example template to try out branching. This template includes sample migration and seed files to get you started. Run the following command in your terminal to clone the example:
-
-```bash
-npx create-next-app -e with-supabase
-```
-
-Push your new project to a GitHub repo. For more information, see the GitHub guides on [creating](https://docs.github.com/en/get-started/quickstart/create-a-repo) and [pushing code](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) to a new repository.
-
-</TabPanel>
-</Tabs>
 
 ## Syncing GitHub branches
 
