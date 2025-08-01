@@ -1,7 +1,7 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { Trash, MoreVertical, View } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -29,7 +29,11 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ViewTokenPermissionsPanel } from './ViewTokenPermissionsPanel'
 
-const AccessTokenList = () => {
+export interface AccessTokenListProps {
+  searchString?: string
+}
+
+const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
   const { data: tokens, isLoading } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
@@ -44,7 +48,15 @@ const AccessTokenList = () => {
 
   const onDeleteToken = async (tokenId: number) => deleteToken({ id: tokenId })
 
-  const empty = tokens?.length === 0 && !isLoading
+  const filteredTokens = useMemo(() => {
+    return !searchString
+      ? tokens
+      : tokens?.filter((token) => {
+          return token.name.toLowerCase().includes(searchString.toLowerCase())
+        })
+  }, [tokens, searchString])
+
+  const empty = filteredTokens?.length === 0 && !isLoading
 
   const RowLoading = () => (
     <TableRow>
@@ -117,7 +129,7 @@ const AccessTokenList = () => {
     <>
       <TooltipProvider>
         <TableContainer>
-          {tokens?.map((x) => {
+          {filteredTokens?.map((x) => {
             const createdDate = new Date(x.created_at)
             const expiryDate = new Date('2025-07-31T17:16:36')
 
