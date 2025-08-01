@@ -82,7 +82,7 @@ If you believe a connection should be killed, you can do so by running the follo
 
 The Supavisor Pooler is an intermediary between your clients (application servers) and the database. In transaction mode (port 6543), it can enable Postgres to share single connections with many clients, only allowing access when a query is pending. This prevents idle clients from hogging a direct connection and allows for more throughput.
 
-In cases where you see significantly more pooler connections than direct connections, if you can, you should consider increasing how many direct connections the pooler is allowed to manage in the [Dashboard's Database Settings](/dashboard/project/_/settings/database):
+In cases where you see significantly more pooler connections than direct connections, if you can, you should consider increasing how many direct connections the pooler is allowed to manage in the [Dashboard's Database Settings](/dashboard/project/_/database/settings):
 
 ![image](https://github.com/supabase/supabase/assets/91111415/8e0cc80a-4d46-44b5-915b-8d7549f352d3).
 

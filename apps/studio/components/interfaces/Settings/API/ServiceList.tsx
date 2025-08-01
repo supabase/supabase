@@ -15,7 +15,6 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Badge, Input } from 'ui'
-import { ApiKeysMoved } from './ApiKeysMoved'
 import { PostgrestConfig } from './PostgrestConfig'
 
 const ServiceList = () => {
@@ -104,10 +103,6 @@ const ServiceList = () => {
                 )}
               </Panel.Content>
             </Panel>
-          </section>
-
-          <section className="mb-8">
-            <ApiKeysMoved />
           </section>
 
           <section id="postgrest-config">

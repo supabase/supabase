@@ -1,4 +1,3 @@
-import { ApiKeysMoved } from 'components/interfaces/Settings/API/ApiKeysMoved'
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'

@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useLocalStorage } from '@uidotdev/usehooks'
-import { ArrowUpRight, Edit } from 'lucide-react'
+import { Edit } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -193,12 +193,9 @@ const StorageMenu = () => {
                 <p className="truncate">Policies</p>
               </Menu.Item>
             </Link>
-            <Link href={`/project/${ref}/settings/storage`}>
-              <Menu.Item rounded>
-                <div className="flex items-center justify-between">
-                  <p className="truncate">Settings</p>
-                  <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
-                </div>
+            <Link href={`/project/${ref}/storage/settings`}>
+              <Menu.Item rounded active={page === 'settings'}>
+                <p className="truncate">Settings</p>
               </Menu.Item>
             </Link>
           </div>

@@ -27,7 +27,7 @@ select pg_create_logical_replication_slot('example_slot', 'pgoutput');
 
 <Admonition type="note">
 
-This will need a **direct** connection (not a Connection Pooler) to your database and you can find the connection info in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database).
+This will need a **direct** connection (not a Connection Pooler) to your database and you can find the connection info in the [Dashboard](https://supabase.com/dashboard/project/_/database/settings).
 
 You will also need to ensure that IPv6 is supported by your replication destination (or you can enable the [IPv4 add-on](/docs/guides/platform/ipv4-address))
 

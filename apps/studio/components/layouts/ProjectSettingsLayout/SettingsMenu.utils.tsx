@@ -33,6 +33,12 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
+        {
+          name: 'Data API',
+          key: 'api',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+          items: [],
+        },
         ...(IS_PLATFORM
           ? [
               {
@@ -55,6 +61,12 @@ export const generateSettingsMenu = (
                 name: 'Integrations',
                 key: 'integrations',
                 url: `/project/${ref}/settings/integrations`,
+                items: [],
+              },
+              {
+                name: `Log Drains`,
+                key: `log-drains`,
+                url: `/project/${ref}/settings/log-drains`,
                 items: [],
               },
               {
@@ -90,65 +102,6 @@ export const generateSettingsMenu = (
       ],
     },
     {
-      title: 'Configuration',
-      items: [
-        {
-          name: 'Database',
-          key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
-          items: [],
-        },
-        {
-          name: 'Data API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
-        ...(IS_PLATFORM && authEnabled
-          ? [
-              {
-                name: 'Authentication',
-                key: 'auth',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && storageEnabled
-          ? [
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/settings/storage`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && edgeFunctionsEnabled
-          ? [
-              {
-                name: 'Edge Functions',
-                key: 'functions',
-                url: `/project/${ref}/functions/secrets`,
-                items: [],
-                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: `Log Drains`,
-                key: `log-drains`,
-                url: `/project/${ref}/settings/log-drains`,
-                items: [],
-              },
-            ]
-          : []),
-      ],
-    },
-
-    {
       title: 'Billing',
       items: [
         {
@@ -156,6 +109,7 @@ export const generateSettingsMenu = (
           key: 'subscription',
           url: `/org/${organization?.slug}/billing`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
 
         {
@@ -163,6 +117,7 @@ export const generateSettingsMenu = (
           key: 'usage',
           url: `/org/${organization?.slug}/usage?projectRef=${ref}`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
       ],
     },

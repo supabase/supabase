@@ -8,7 +8,7 @@ import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskS
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
@@ -53,7 +53,7 @@ const ProjectSettings: NextPageWithLayout = () => {
 
 ProjectSettings.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout title="Database">{page}</SettingsLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
