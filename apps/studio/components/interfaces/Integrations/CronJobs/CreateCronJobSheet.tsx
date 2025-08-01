@@ -203,6 +203,7 @@ export const CreateCronJobSheet = ({
   const { project } = useProjectContext()
   const { data: org } = useSelectedOrganizationQuery()
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
+  const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
 
   const isEditing = !!selectedCronJob?.jobname
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -215,7 +216,9 @@ export const CreateCronJobSheet = ({
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
+  const { mutate: upsertCronJob, isLoading: isLoadingUpsertCronjob } =
+    useDatabaseCronJobCreateMutation()
+  const isLoading = isLoadingGetCronJob || isLoadingUpsertCronjob
 
   const canToggleExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -306,6 +309,7 @@ export const CreateCronJobSheet = ({
     if (!project) return console.error('Project is required')
 
     if (!isEditing) {
+      setIsLoadingGetCronJob(true)
       const checkExistingJob = await getDatabaseCronJob({
         projectRef: project.ref,
         connectionString: project.connectionString,
@@ -314,6 +318,7 @@ export const CreateCronJobSheet = ({
       const nameExists = !!checkExistingJob
 
       if (nameExists) {
+        setIsLoadingGetCronJob(false)
         return form.setError('name', {
           type: 'manual',
           message: 'A cron job with this name already exists',
@@ -369,6 +374,7 @@ export const CreateCronJobSheet = ({
         },
       }
     )
+    setIsLoadingGetCronJob(false)
   }
 
   return (
