@@ -105,7 +105,7 @@ export const CronJobTableCell = ({
               onClick={(e) => e.stopPropagation()}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-42">
+          <DropdownMenuContent align="end" className="w-42">
             <DropdownMenuItem
               className="gap-x-2"
               onClick={(e) => {
