@@ -4,7 +4,6 @@ import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 
-
 export const AnalyticsSettings = () => {
   const { hasAccepted, acceptAll, denyAll, categories } = useConsentState()
   const hasLoaded = categories !== null
