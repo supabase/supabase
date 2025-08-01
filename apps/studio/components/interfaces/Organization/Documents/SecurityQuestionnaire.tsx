@@ -11,12 +11,14 @@ import {
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const SecurityQuestionnaire = () => {
   const organization = useSelectedOrganization()
   const slug = organization?.slug
+  const { mutate: sendEvent } = useSendEventMutation()
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -65,6 +67,11 @@ const SecurityQuestionnaire = () => {
                     type="default"
                     icon={<Download />}
                     onClick={() => {
+                      sendEvent({
+                        action: 'document_view_button_clicked',
+                        properties: { documentName: 'Standard Security Questionnaire' },
+                        groups: { organization: organization?.slug ?? 'Unknown' },
+                      })
                       if (slug) fetchQuestionnaire(slug)
                     }}
                   >

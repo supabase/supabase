@@ -3,10 +3,15 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 
 const TIA = () => {
+  const organization = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
+
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail className="sticky space-y-6 top-12">
@@ -24,6 +29,13 @@ const TIA = () => {
           target="_blank"
           rel="noreferrer noopener"
           download={true}
+          onClick={() =>
+            sendEvent({
+              action: 'document_view_button_clicked',
+              properties: { documentName: 'TIA' },
+              groups: { organization: organization?.slug ?? 'Unknown' },
+            })
+          }
         >
           <Button type="default" iconRight={<ExternalLink />}>
             View TIA
