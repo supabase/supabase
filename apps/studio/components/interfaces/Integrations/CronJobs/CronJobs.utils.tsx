@@ -288,12 +288,7 @@ export const formatCronJobColumns = ({
       headerCellClass: undefined,
       renderHeaderCell: () => {
         return (
-          <div
-            className={cn(
-              'flex items-center justify-between font-normal text-xs w-full',
-              col.id === 'jobname' && 'ml-8'
-            )}
-          >
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
             <p className="!text-foreground">{col.name}</p>
           </div>
         )

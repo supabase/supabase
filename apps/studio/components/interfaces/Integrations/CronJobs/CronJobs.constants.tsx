@@ -41,6 +41,7 @@ export type HTTPHeader = { name: string; value: string }
 export type HTTPParameter = { name: string; value: string }
 
 export const CRON_TABLE_COLUMNS = [
+  { id: 'actions', name: '', minWidth: 75, width: 75 },
   { id: 'jobname', name: 'Name', minWidth: 0, width: 200 },
   { id: 'schedule', name: 'Schedule', width: 100 },
   { id: 'latest_run', name: 'Last run', width: 265 },

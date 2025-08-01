@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Clipboard, Edit, Trash } from 'lucide-react'
+import { Clipboard, Edit, MoreVertical, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -26,6 +26,11 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -86,6 +91,46 @@ export const CronJobTableCell = ({
       active: !active,
       searchTerm: searchQuery,
     })
+  }
+
+  if (col.id === 'actions') {
+    return (
+      <div className="flex items-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="text"
+              className="h-6 w-6"
+              icon={<MoreVertical />}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-42">
+            <DropdownMenuItem
+              className="gap-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectEdit(row)
+              }}
+            >
+              <Edit size={12} />
+              Edit job
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="gap-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectDelete(row)
+              }}
+            >
+              <Trash size={12} />
+              Delete job
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    )
   }
 
   if (col.id === 'active') {
