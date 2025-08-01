@@ -28,9 +28,9 @@ export const JoinOrganizationOnSignup = ({
         name="joinOrgOnSignup"
         render={({ field }) => (
           <FormItemLayout
-            label="Join organization on sign up"
-            description="Automatically add users to the organization when they sign up"
             layout="flex-row-reverse"
+            label="Automatically add users to organization on sign up"
+            description="If disabled, users will need to be invited to the organization after signing up"
           >
             <FormControl_Shadcn_ className="flex items-center gap-2">
               <Switch checked={field.value} onCheckedChange={field.onChange} />
