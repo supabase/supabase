@@ -93,9 +93,9 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
     const canSubmit = !loading && !!value
 
     return (
-      <div className="w-full">
+      <div className="w-full relative z-30">
         {isEditing && (
-          <div className="border rounded-md px-3 py-2 flex items-center justify-between mb-2 shadow">
+          <div className="border rounded-md px-3 py-2 flex items-center justify-between shadow absolute top-[-50px] left-0 right-0 bg-background">
             <div className="flex items-center gap-x-2 text-sm text-foreground-light">
               <Pencil size={14} />
               <span>Editing message</span>
