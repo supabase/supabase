@@ -52,7 +52,6 @@ interface MessageProps {
     results: any[]
   }) => void
   onDelete?: (id: string) => void
-  onDeleteAfter?: (id: string) => void
   onEdit?: (id: string) => void
 }
 
@@ -65,7 +64,6 @@ export const Message = function Message({
   variant = 'default',
   onResults,
   onDelete,
-  onDeleteAfter,
   onEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
@@ -235,8 +233,8 @@ export const Message = function Message({
                       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
                       onClick={() => onDelete(id)}
                       className="text-foreground-light hover:text-foreground p-1 rounded"
-                      title="Delete messages up to here"
-                      aria-label="Delete messages up to here"
+                      title="Delete message"
+                      aria-label="Delete message"
                     />
                   )}
                 </>

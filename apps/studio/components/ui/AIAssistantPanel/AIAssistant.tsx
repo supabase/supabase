@@ -41,7 +41,6 @@ const MemoizedMessage = memo(
     isLoading,
     onResults,
     onDelete,
-    onDeleteAfter,
     onEdit,
   }: {
     message: MessageType
@@ -56,7 +55,6 @@ const MemoizedMessage = memo(
       results: any[]
     }) => void
     onDelete?: (id: string) => void
-    onDeleteAfter?: (id: string) => void
     onEdit?: (id: string) => void
   }) => {
     return (
@@ -68,7 +66,6 @@ const MemoizedMessage = memo(
         isLoading={isLoading}
         onResults={onResults}
         onDelete={onDelete}
-        onDeleteAfter={onDeleteAfter}
         onEdit={onEdit}
       />
     )
@@ -232,23 +229,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
-  const deleteUpTo = useCallback(
-    (messageId: string) => {
-      // Find the message index in current chatMessages
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
-      if (messageIndex === -1) return
-
-      // Update both valtio state and useChat state
-      snap.deleteMessagesBefore(messageId, { includeSelf: true })
-
-      // Directly update chatMessages by removing from start to messageIndex+1
-      const updatedMessages = chatMessages.slice(messageIndex + 1)
-      setMessages(updatedMessages)
-    },
-    [snap, setMessages, chatMessages]
-  )
-
-  const deleteFromHere = useCallback(
+  const deleteMessageFromHere = useCallback(
     (messageId: string) => {
       // Find the message index in current chatMessages
       const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
@@ -331,13 +312,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
-            onDelete={!isChatLoading ? deleteUpTo : undefined}
-            onDeleteAfter={!isChatLoading ? deleteFromHere : undefined}
+            onDelete={deleteMessageFromHere}
             onEdit={editMessage}
           />
         )
       }),
-    [chatMessages, isChatLoading, updateMessage, deleteUpTo, deleteFromHere, editMessage]
+    [chatMessages, isChatLoading, updateMessage, deleteMessageFromHere, editMessage]
   )
 
   const hasMessages = chatMessages.length > 0
