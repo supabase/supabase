@@ -22,6 +22,7 @@ export type CronJob = {
   status: string
 }
 
+// [Joshen] Just to call out that I had AI help me with this, so please let me know if this can be optimized
 const getCronJobSql = ({ searchTerm, page }: { searchTerm?: string; page: number }) =>
   `
 WITH latest_runs AS (
@@ -31,6 +32,17 @@ WITH latest_runs AS (
     MAX(start_time) AS latest_run
   FROM cron.job_run_details
   GROUP BY jobid, status
+), most_recent_runs AS (
+  SELECT 
+    jobid, 
+    status, 
+    latest_run
+  FROM latest_runs lr1
+  WHERE latest_run = (
+    SELECT MAX(latest_run) 
+    FROM latest_runs lr2 
+    WHERE lr2.jobid = lr1.jobid
+  )
 )
 SELECT 
   job.jobid,
@@ -38,13 +50,13 @@ SELECT
   job.schedule,
   job.command,
   job.active,
-  lr.latest_run,
-  lr.status
+  mr.latest_run,
+  mr.status
 FROM 
   cron.job job
-LEFT JOIN latest_runs lr ON job.jobid = lr.jobid
-${!!searchTerm ? `WHERE job.jobname ILIKE '%${searchTerm}%'` : ''}
+LEFT JOIN most_recent_runs mr ON job.jobid = mr.jobid
 ORDER BY job.jobid
+${!!searchTerm ? `WHERE job.jobname ILIKE '%${searchTerm}%'` : ''}
 LIMIT ${CRON_JOBS_PAGE_LIMIT}
 OFFSET ${page * CRON_JOBS_PAGE_LIMIT};
 `.trim()
