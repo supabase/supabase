@@ -92,10 +92,10 @@ export const GraphiQLTab = () => {
         <div className="w-full max-w-md">
           <div className="mb-6">
             <h1 className="mt-8 mb-2">Enable the GraphQL Extension</h1>
-            <h2 className="text-sm text-foreground-light">
+            <p className="text-sm text-foreground-light">
               Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
               API with your Supabase Database.
-            </h2>
+            </p>
           </div>
 
           <ExtensionCard extension={pgGraphqlExtension} />
