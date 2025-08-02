@@ -149,6 +149,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages,
     error,
     reload,
+    stop,
   } = useChat({
     id: snap.activeChatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v4`,
@@ -233,7 +234,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           />
         )
       }),
-    [chatMessages, isChatLoading]
+    [chatMessages, isChatLoading, updateMessage]
   )
 
   const hasMessages = chatMessages.length > 0
@@ -573,6 +574,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               onSubmit={(finalMessage) => {
                 sendMessageToAssistant(finalMessage)
                 scrollToEnd()
+              }}
+              onStop={() => {
+                stop()
+                const lastMessage = chatMessages[chatMessages.length - 1]
+                if (lastMessage && lastMessage.role === 'assistant') {
+                  handleChatFinish(lastMessage, { finishReason: 'stop' })
+                }
               }}
               sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
               onRemoveSnippet={(index) => {

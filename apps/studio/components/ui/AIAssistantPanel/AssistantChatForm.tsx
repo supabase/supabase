@@ -1,7 +1,7 @@
 'use client'
 
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2 } from 'lucide-react'
+import { ArrowUp, Square } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
 import { Button, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
@@ -27,6 +27,10 @@ export interface FormProps {
    * The function to handle the form submission
    */
   onSubmit: (message: string) => void
+  /**
+   * The function to handle stopping the stream
+   */
+  onStop?: () => void
   /* The placeholder of the textarea */
   placeholder?: string
   /* SQL snippets to display above the form - can be strings or objects with label and content */
@@ -48,6 +52,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       textAreaRef,
       onValueChange,
       onSubmit,
+      onStop,
       placeholder,
       sqlSnippets,
       onRemoveSnippet,
@@ -117,20 +122,26 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             onKeyDown={handleKeyDown}
           />
           <div className="absolute right-1.5 bottom-1.5 flex gap-3 items-center">
-            {loading && (
-              <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
+            {loading ? (
+              <Button
+                type="outline"
+                aria-label="Stop generating"
+                icon={<Square fill="currentColor" />}
+                onClick={onStop}
+                className="size-7 rounded-full p-0 text-center flex items-center justify-center"
+              />
+            ) : (
+              <Button
+                htmlType="submit"
+                aria-label="Send message"
+                icon={<ArrowUp />}
+                disabled={!canSubmit}
+                className={cn(
+                  'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
+                  !canSubmit ? 'text-muted opacity-50' : 'text-default opacity-100'
+                )}
+              />
             )}
-            <Button
-              htmlType="submit"
-              aria-label="Send message"
-              icon={<ArrowUp />}
-              disabled={!canSubmit}
-              className={cn(
-                'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
-                !canSubmit ? 'text-muted opacity-50' : 'text-default opacity-100',
-                loading && 'hidden'
-              )}
-            />
           </div>
         </form>
       </div>

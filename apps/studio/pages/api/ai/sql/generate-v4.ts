@@ -415,11 +415,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...convertToCoreMessages(messages),
     ]
 
+    const abortController = new AbortController()
+    req.on('close', () => abortController.abort())
+    req.on('aborted', () => abortController.abort())
+
     const result = streamText({
       model,
       maxSteps: 5,
       messages: coreMessages,
       tools,
+      abortSignal: abortController.signal,
     })
 
     result.pipeDataStreamToResponse(res, {
