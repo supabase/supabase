@@ -9,58 +9,118 @@ import { z } from 'zod'
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  ScrollArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { TokenBasicInfoForm } from './TokenBasicInfoForm'
+import { TokenResourceAccessForm } from './TokenResourceAccessForm'
+import { TokenPermissionsForm } from './TokenPermissionsForm'
+import { TokenDisplay } from './TokenDisplay'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
 }
 
-const TokenSchema = z.object({
-  tokenName: z.string().min(1, 'Please enter a name for the token'),
+const PermissionRowSchema = z.object({
+  resource: z.string().min(1, 'Please select a resource'),
+  action: z.string().min(1, 'Please select an action'),
 })
 
-const formId = 'new-access-token-form'
+const TokenSchema = z.object({
+  tokenName: z.string().min(1, 'Please enter a name for the token'),
+  expirationDate: z.enum(['No expiry', '7 days', '30 days', '90 days', '180 days']),
+  resourceAccess: z.enum(['all-orgs', 'selected-orgs', 'selected-projects']),
+  selectedOrganizations: z.array(z.string()).optional(),
+  selectedProjects: z.array(z.string()).optional(),
+  organizationPermissions: z.record(z.string(), z.string()).optional(),
+  projectPermissions: z.record(z.string(), z.string()).optional(),
+  permissionRows: z.array(PermissionRowSchema).optional(),
+})
+
+
 
 const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [visible, setVisible] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
+  const [generatedToken, setGeneratedToken] = useState<any>(null)
+  const [resourceSearchOpen, setResourceSearchOpen] = useState(false)
 
   const form = useForm<z.infer<typeof TokenSchema>>({
     resolver: zodResolver(TokenSchema),
-    defaultValues: { tokenName: '' },
+    defaultValues: {
+      tokenName: '',
+      expirationDate: 'No expiry',
+      resourceAccess: 'all-orgs',
+      selectedOrganizations: [],
+      selectedProjects: [],
+      organizationPermissions: {},
+      projectPermissions: {},
+      permissionRows: [],
+    },
     mode: 'onSubmit',
   })
   const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
 
+  const resourceAccess = form.watch('resourceAccess')
+  const expirationDate = form.watch('expirationDate')
+  const permissionRows = form.watch('permissionRows') || []
+
+
+
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
+    // Validate that at least one permission is configured
+    if (!permissionRows || permissionRows.length === 0) {
+      toast.error('Please configure at least one permission.')
+      return
+    }
+
+    // Validate that all permission rows have both resource and action
+    const hasValidPermissions = permissionRows.every((row) => row.resource && row.action)
+    if (!hasValidPermissions) {
+      toast.error('Please ensure all permissions have both resource and action selected.')
+      return
+    }
+
     createAccessToken(
       { name: values.tokenName, scope: tokenScope },
       {
         onSuccess: (data) => {
-          toast.success(`Your access token "${data.name}" is ready.`)
-          form.reset()
+          console.log('Generated token data:', data)
+          setGeneratedToken(data)
           onCreateToken(data)
-          setVisible(false)
         },
       }
     )
+  }
+
+  const handleClose = () => {
+    form.reset({
+      tokenName: '',
+      expirationDate: 'No expiry',
+      resourceAccess: 'all-orgs',
+      selectedOrganizations: [],
+      selectedProjects: [],
+      organizationPermissions: {},
+      projectPermissions: {},
+      permissionRows: [],
+    })
+    setVisible(false)
+    setGeneratedToken(null)
+  }
+
+  const handleDismiss = () => {
+    handleClose()
   }
 
   return (
@@ -100,88 +160,103 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
         </DropdownMenu>
       </div>
 
-      <Dialog
+      <Sheet
         open={visible}
         onOpenChange={(open) => {
-          if (!open) form.reset()
+          if (!open) handleClose()
           setVisible(open)
         }}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
-            </DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection className="flex flex-col gap-4">
-            {tokenScope === 'V0' && (
-              <Admonition
-                type="warning"
-                title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
-                description={
-                  <>
-                    <p>
-                      These include deleting organizations and projects which cannot be undone. As
-                      such, be very careful when using this API.
-                    </p>
-                    <div className="mt-4">
-                      <Button asChild type="default" icon={<ExternalLink />}>
-                        <Link
-                          href="https://api.supabase.com/api/v0"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Experimental API documentation
-                        </Link>
-                      </Button>
-                    </div>
-                  </>
-                }
-              />
-            )}
-            <Form_Shadcn_ {...form}>
-              <form
-                id={formId}
-                className="flex flex-col gap-4"
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
-                <FormField_Shadcn_
-                  key="tokenName"
-                  name="tokenName"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout name="tokenName" label="Name">
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          id="tokenName"
-                          {...field}
-                          placeholder="Provide a name for your token"
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
+        <SheetContent
+          showClose={false}
+          size="default"
+          className="!min-w-[600px] flex flex-col h-full gap-0"
+        >
+          <SheetHeader>
+            <SheetTitle>
+              {generatedToken
+                ? 'Token Generated Successfully'
+                : tokenScope === 'V0'
+                  ? 'Generate token for experimental API'
+                  : 'Generate New Token'}
+            </SheetTitle>
+          </SheetHeader>
+          <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
+            <div className="flex flex-col gap-4 overflow-visible p-4">
+              {tokenScope === 'V0' && (
+                <Admonition
+                  type="warning"
+                  title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
+                  description={
+                    <>
+                      <p>
+                        These include deleting organizations and projects which cannot be undone. As
+                        such, be very careful when using this API.
+                      </p>
+                      <div className="mt-4">
+                        <Button asChild type="default" icon={<ExternalLink />}>
+                          <Link
+                            href="https://api.supabase.com/api/v0"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Experimental API documentation
+                          </Link>
+                        </Button>
+                      </div>
+                    </>
+                  }
                 />
-              </form>
-            </Form_Shadcn_>
-          </DialogSection>
-          <DialogFooter>
-            <Button
-              type="default"
-              disabled={isLoading}
-              onClick={() => {
-                form.reset()
-                setVisible(false)
-              }}
-            >
-              Cancel
-            </Button>
-            <Button form={formId} htmlType="submit" loading={isLoading}>
-              Generate token
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              )}
+
+              {!generatedToken ? (
+                <Form_Shadcn_ {...form}>
+                  <div className="flex flex-col gap-6 overflow-visible">
+                    {/* Basic Information Section */}
+                    <TokenBasicInfoForm 
+                      control={form.control} 
+                      expirationDate={expirationDate} 
+                    />
+
+                    {/* Resource Access Section */}
+                    <TokenResourceAccessForm 
+                      control={form.control} 
+                      resourceAccess={resourceAccess} 
+                    />
+
+                    {/* Permissions Section */}
+                    <TokenPermissionsForm 
+                      control={form.control}
+                      setValue={form.setValue}
+                      watch={form.watch}
+                      resourceSearchOpen={resourceSearchOpen}
+                      setResourceSearchOpen={setResourceSearchOpen}
+                    />
+                  </div>
+                </Form_Shadcn_>
+              ) : (
+                <TokenDisplay generatedToken={generatedToken} />
+              )}
+            </div>
+          </ScrollArea>
+          <SheetFooter className="!justify-end w-full mt-auto pt-4 border-t">
+            {!generatedToken ? (
+              <div className="flex gap-2">
+                <Button type="default" disabled={isLoading} onClick={handleClose}>
+                  Cancel
+                </Button>
+                <Button onClick={form.handleSubmit(onSubmit)} loading={isLoading}>
+                  Generate token
+                </Button>
+              </div>
+            ) : (
+              <Button type="default" onClick={handleClose}>
+                Done
+              </Button>
+            )}
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </>
   )
 }
