@@ -1,5 +1,15 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import {
+  Clipboard,
+  ClipboardList,
+  Copy,
+  Download,
+  Edit,
+  Lock,
+  MoreHorizontal,
+  Trash,
+  Unlock,
+} from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -45,6 +55,8 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { getTableDefinition } from 'data/database/table-definition-query'
+import { formatSql } from 'lib/formatSql'
 
 export interface EntityListItemProps {
   id: number | string
@@ -220,6 +232,24 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
+  const copyTableDefinition = async () => {
+    if (IS_PLATFORM && !project?.connectionString) {
+      return console.error('Connection string is required')
+    }
+    try {
+      const definition = await getTableDefinition({
+        id: entity.id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+      const formattedDefinition = formatSql(definition)
+      copyToClipboard(formattedDefinition || '')
+      toast.success('Definition copied to clipboard')
+    } catch (error: any) {
+      toast.error(`Failed to copy table definition: ${error.message}`)
+    }
+  }
+
   return (
     <EditorTablePageLink
       title={entity.name}
@@ -360,6 +390,17 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                       <Lock size={12} />
                       <span>View policies</span>
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    key="copy-definition"
+                    className="space-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      copyTableDefinition()
+                    }}
+                  >
+                    <ClipboardList size={12} />
+                    <span>Copy Definition</span>
                   </DropdownMenuItem>
 
                   <DropdownMenuSub>
