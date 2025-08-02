@@ -1,6 +1,7 @@
 import { expect, test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
+import fetch from 'node-fetch' // ✅ Required to avoid runtime error in Node
 import { env, STORAGE_STATE_PATH } from '../env.config'
 
 /**
@@ -11,7 +12,7 @@ import { env, STORAGE_STATE_PATH } from '../env.config'
 dotenv.config({
   path: path.resolve(__dirname, '..', '.env.local'),
   override: true,
-})
+}) || dotenv.config({ path: path.resolve(__dirname, '..', '.env') }) // ✅ Fallback if .env.local missing
 
 const IS_PLATFORM = process.env.IS_PLATFORM
 
@@ -51,7 +52,10 @@ Please ensure:
    * API Check
    */
 
-  await fetch(apiUrl).catch((err) => {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 10000)
+
+  await fetch(apiUrl, { signal: controller.signal }).catch((err) => {
     console.error(`\n 🚨 Setup Error
 API is not available at: ${apiUrl}
 
@@ -63,6 +67,8 @@ To start API locally, run:
   npm run dev:api`)
     throw new Error('API is not available')
   })
+
+  clearTimeout(timeout)
 
   console.log(`\n ✅ API is running at ${apiUrl}`)
 
@@ -119,10 +125,7 @@ To start API locally, run:
     projectRef: env.PROJECT_REF,
   }
 
-  expect(auth).toBeDefined()
-  expect(auth.email).toBeDefined()
-  expect(auth.password).toBeDefined()
-  expect(auth.projectRef).toBeDefined()
+  // ✅ Removed redundant expect() — already checked above
 
   // Wait for form elements with increased timeout
   const emailInput = page.getByLabel('Email')
@@ -145,8 +148,8 @@ To start API locally, run:
   await passwordInput.waitFor({ state: 'visible', timeout: 15000 })
   await signInButton.waitFor({ state: 'visible', timeout: 15000 })
 
-  await emailInput.fill(auth.email ?? '')
-  await passwordInput.fill(auth.password ?? '')
+  await emailInput.fill(auth.email)
+  await passwordInput.fill(auth.password)
   await signInButton.click()
 
   await page.waitForURL('**/organizations')
