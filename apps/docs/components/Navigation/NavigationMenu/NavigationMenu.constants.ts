@@ -2182,6 +2182,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/project-transfer',
         },
         {
+          name: 'Duplicate Project',
+          url: '/guides/platform/clone-project',
+        },
+        {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
           items: [
