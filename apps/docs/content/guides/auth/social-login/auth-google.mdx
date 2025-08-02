@@ -712,7 +712,7 @@ val supabaseClient = createSupabaseClient(
 **Use the Compose Auth plugin in your Auth Screen**
 
 ```kotlin
-val authState = supabaseClient.composeAuth.rememberLoginWithGoogle(
+val authState = supabaseClient.composeAuth.rememberSignInWithGoogle(
     onResult = {
         when(it) { //handle errors
             NativeSignInResult.ClosedByUser -> TODO()
