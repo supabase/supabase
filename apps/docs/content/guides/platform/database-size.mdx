@@ -8,7 +8,7 @@ Disk metrics refer to the storage usage reported by Postgres. These metrics are 
 
 - _Database size_: Displays the actual size of the data within your Postgres database. This can be found on the [Database Reports page](https://supabase.com/dashboard/project/_/reports/database).
 
-- _Disk size_: Shows the overall disk space usage, which includes both the database size and additional files required for Postgres to function like the Write Ahead Log (WAL) and other system log files. You can view this on the [Database Settings page](https://supabase.com/dashboard/project/_/settings/database).
+- _Disk size_: Shows the overall disk space usage, which includes both the database size and additional files required for Postgres to function like the Write Ahead Log (WAL) and other system log files. You can view this on the [Database Settings page](https://supabase.com/dashboard/project/_/database/settings).
 
 ## Database size
 
@@ -94,11 +94,11 @@ The automatic resize operation will add an additional 50% capped to a maximum of
 
 </Admonition>
 
-Disk size can also be manually expanded on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database). The maximum disk size for the Pro/Team Plan is 60 TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise Plan.
+Disk size can also be manually expanded on the [Database Settings page](https://supabase.com/dashboard/project/_/database/settings). The maximum disk size for the Pro/Team Plan is 60 TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise Plan.
 
 <Admonition type="note">
 
-You may want to import a lot of data into your database which requires multiple disk expansions. for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the disk size manually on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database).
+You may want to import a lot of data into your database which requires multiple disk expansions. for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the disk size manually on the [Database Settings page](https://supabase.com/dashboard/project/_/database/settings).
 
 Due to restrictions on the underlying cloud provider, disk expansions can occur only once every six hours. During the six hour cool down window, the disk cannot be resized again.
 

@@ -189,7 +189,7 @@ Since we're managing users and authentication outside of Supabase, we have two o
 
 #### Direct Postgres connection
 
-You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project's database settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
+You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/database/settings) on your project's Database Settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
 
 ```sql
 -- enable row level security
