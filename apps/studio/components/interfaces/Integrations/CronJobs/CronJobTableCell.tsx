@@ -1,9 +1,10 @@
 import dayjs from 'dayjs'
-import { Clipboard, Edit, MoreVertical, Trash } from 'lucide-react'
+import { Clipboard, Edit, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useDatabaseCronJobRunCommandMutation } from 'data/database-cron-jobs/database-cron-job-run-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -74,14 +75,28 @@ export const CronJobTableCell = ({
           ? getNextRun(schedule, latest_run)
           : value
 
+  const { mutate: runCronJob, isLoading: isRunning } = useDatabaseCronJobRunCommandMutation({
+    onSuccess: () => {
+      toast.success(`Command from "${jobname}" ran successfully`)
+    },
+  })
+
   const { mutate: toggleDatabaseCronJob, isLoading: isToggling } = useDatabaseCronJobToggleMutation(
     {
-      onSuccess: () => {
-        toast.success('Successfully asdasd')
+      onSuccess: (_, vars) => {
+        toast.success(`Successfully ${vars.active ? 'enabled' : 'disabled'} "${jobname}"`)
         setShowToggleModal(false)
       },
     }
   )
+
+  const onRunCronJob = () => {
+    runCronJob({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      jobId: jobid,
+    })
+  }
 
   const onConfirmToggle = () => {
     toggleDatabaseCronJob({
@@ -100,12 +115,23 @@ export const CronJobTableCell = ({
           <DropdownMenuTrigger asChild>
             <Button
               type="text"
+              loading={isRunning}
               className="h-6 w-6"
               icon={<MoreVertical />}
               onClick={(e) => e.stopPropagation()}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-42">
+            <DropdownMenuItem
+              className="gap-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                onRunCronJob()
+              }}
+            >
+              <Play size={12} />
+              Run command
+            </DropdownMenuItem>
             <DropdownMenuItem
               className="gap-x-2"
               onClick={(e) => {
