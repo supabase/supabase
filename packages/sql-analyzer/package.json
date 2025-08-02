@@ -1,0 +1,54 @@
+{
+  "name": "@supabase/sql-analyzer",
+  "version": "0.1.0",
+  "description": "Advanced SQL analysis engine for security, classification, and AI assistance",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "benchmark": "node dist/benchmark/index.js",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "sql",
+    "parser",
+    "security",
+    "analysis",
+    "postgresql",
+    "supabase",
+    "ai-assistant"
+  ],
+  "author": "Supabase",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "benchmark": "^2.1.4",
+    "@types/benchmark": "^2.1.2",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supabase/supabase.git",
+    "directory": "packages/sql-analyzer"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
