@@ -914,7 +914,43 @@ export const insertTableRows = async (
     return () => {
       return Promise.race([
         new Promise(async (resolve, reject) => {
-          const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
+          // Always quote schema and table names to handle reserved keywords and special characters
+          const quotedSchema = table.schema ? `"${table.schema}"` : undefined
+          const quotedTable = `"${table.name}"`
+
+          let insertQuery: string
+
+          if (batch.length === 0) {
+            insertQuery = ''
+          } else {
+            // Get column names from the first row and quote them
+            const columns = Object.keys(batch[0])
+            const quotedColumns = columns.map((col) => `"${col}"`).join(', ')
+
+            // Build the VALUES clause for all rows in the batch
+            const valuesList = batch
+              .map((row: any) => {
+                // For each row, build the values for each column
+                const values = columns
+                  .map((col) => {
+                    const val = row[col]
+                    // Handle different data types properly
+                    return val === null
+                      ? 'NULL'
+                      : typeof val === 'string'
+                        ? `'${val.replace(/'/g, "''")}'` // Escape single quotes in strings
+                        : val
+                  })
+                  .join(', ')
+                return `(${values})` // Wrap each row's values in parentheses
+              })
+              .join(', ') // Join all rows with commas
+
+            // Build the full table reference (schema.table or just table)
+            const tableRef = quotedSchema ? `${quotedSchema}.${quotedTable}` : quotedTable
+            insertQuery = `INSERT INTO ${tableRef} (${quotedColumns}) VALUES ${valuesList};`
+          }
+
           try {
             await executeSql({ projectRef, connectionString, sql: insertQuery })
           } catch (error) {
