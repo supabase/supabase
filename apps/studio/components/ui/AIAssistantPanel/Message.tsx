@@ -1,5 +1,5 @@
 import { Message as VercelMessage } from 'ai/react'
-import { Loader2, User } from 'lucide-react'
+import { ChevronDown, Loader2, Pencil, Trash2, User } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
@@ -10,6 +10,7 @@ import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
+import { ButtonTooltip } from '../ButtonTooltip'
 import {
   Heading3,
   Hyperlink,
@@ -50,6 +51,7 @@ interface MessageProps {
     resultId?: string
     results: any[]
   }) => void
+  onEdit?: (id: string) => void
 }
 
 export const Message = function Message({
@@ -60,6 +62,7 @@ export const Message = function Message({
   action = null,
   variant = 'default',
   onResults,
+  onEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
   const allMarkdownComponents: Partial<Components> = useMemo(
@@ -92,7 +95,7 @@ export const Message = function Message({
       <div
         className={cn(
           'text-foreground-light text-sm',
-          isUser && 'text-foreground',
+          isUser ? 'text-foreground first:mt-0 mt-6' : 'first:mt-0 mt-2',
           variant === 'warning' && 'bg-warning-200'
         )}
       >
@@ -100,7 +103,7 @@ export const Message = function Message({
 
         {action}
 
-        <div className="flex gap-4 w-auto overflow-hidden">
+        <div className="flex gap-4 w-auto overflow-hidden group">
           {isUser && (
             <ProfileImage
               alt={profile?.username}
@@ -141,7 +144,7 @@ export const Message = function Message({
                           return (
                             <div
                               key={`${id}-tool-loading-${toolName}`}
-                              className="rounded-lg border bg-surface-75 text-xs font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                              className="rounded-lg border bg-surface-75 text-xs font-mono text-foreground-lighter py-2 px-3 flex items-center gap-2"
                             >
                               <Loader2 className="w-4 h-4 animate-spin" />
                               {`Calling ${toolName}...`}
@@ -205,6 +208,20 @@ export const Message = function Message({
             ) : (
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
+
+            {/* Action button - only show for user messages on hover */}
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              {onEdit && message.role === 'user' && (
+                <ButtonTooltip
+                  type="text"
+                  icon={<Pencil size={14} />}
+                  onClick={() => onEdit(id)}
+                  className="text-foreground-light hover:text-foreground p-1 rounded"
+                  aria-label="Edit message"
+                  tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
