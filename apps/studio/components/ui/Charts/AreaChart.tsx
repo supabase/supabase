@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
+import { useChartSync } from './useChartSync'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
@@ -14,6 +15,7 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   format?: string
   customDateFormat?: string
   displayDateInUtc?: boolean
+  syncId?: string
 }
 
 const AreaChart = ({
@@ -30,8 +32,14 @@ const AreaChart = ({
   className = '',
   valuePrecision,
   size = 'normal',
+  syncId,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
+  const {
+    state: syncState,
+    updateState: updateSyncState,
+    clearState: clearSyncState,
+  } = useChartSync(syncId)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
@@ -70,6 +78,14 @@ const AreaChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
+        syncId={syncId}
+        data={data}
+        xAxisKey={xAxisKey}
+        yAxisKey={yAxisKey}
+        xAxisIsDate={true}
+        displayDateInUtc={displayDateInUtc}
+        valuePrecision={valuePrecision}
+        attributes={[]}
       />
       <Container>
         <RechartAreaChart
@@ -81,13 +97,27 @@ const AreaChart = ({
             bottom: 0,
           }}
           className="overflow-visible"
-          //   mouse hover focusing logic
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+
+            if (syncId) {
+              updateSyncState({
+                activeIndex: e.activeTooltipIndex,
+                activePayload: e.activePayload,
+                activeLabel: e.activeLabel,
+                isHovering: true,
+              })
+            }
           }}
-          onMouseLeave={() => setFocusDataIndex(null)}
+          onMouseLeave={() => {
+            setFocusDataIndex(null)
+
+            if (syncId) {
+              clearSyncState()
+            }
+          }}
         >
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -105,7 +135,24 @@ const AreaChart = ({
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
-          <Tooltip content={() => null} />
+          <Tooltip
+            content={(props) =>
+              syncId && syncState.isHovering && syncState.activeIndex !== null ? (
+                <div className="bg-black/90 text-white p-2 rounded text-xs">
+                  <div className="font-medium">
+                    {dayjs(data[syncState.activeIndex]?.[xAxisKey]).format(customDateFormat)}
+                  </div>
+                  <div>
+                    {numberFormatter(
+                      Number(data[syncState.activeIndex]?.[yAxisKey]) || 0,
+                      valuePrecision
+                    )}
+                    {format}
+                  </div>
+                </div>
+              ) : null
+            }
+          />
           <Area
             type="monotone"
             dataKey={yAxisKey}
