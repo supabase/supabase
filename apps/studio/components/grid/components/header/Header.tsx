@@ -504,11 +504,9 @@ const RowHeader = () => {
               Export
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className={snap.allRowsSelected ? 'w-52' : 'w-40'}>
+          <DropdownMenuContent align="start" className={snap.allRowsSelected ? 'w-52' : 'w-40'}>
             <DropdownMenuItem onClick={onRowsExportCSV}>Export as CSV</DropdownMenuItem>
             <DropdownMenuItem onClick={onRowsExportSQL}>Export as SQL</DropdownMenuItem>
-            {/* [Joshen] Should make this available for all cases, but that'll involve updating
-            the Dialog's SQL output to be dynamic based on any filters applied */}
             {snap.allRowsSelected ? (
               <DropdownMenuItem className="group" onClick={() => setShowExportModal(true)}>
                 <div>
@@ -535,7 +533,9 @@ const RowHeader = () => {
       </div>
 
       <ExportDialog
-        table={{ name: snap.table.name, schema: snap.table.schema ?? '' }}
+        table={snap.table}
+        filters={filters}
+        sorts={sorts}
         open={showExportModal}
         onOpenChange={() => setShowExportModal(false)}
       />
