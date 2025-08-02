@@ -15,6 +15,12 @@ const registryItemAppend = (item: Registry['items'][number], items: Registry['it
     registryDependencies: uniq(neededRegDependencies),
     dependencies: uniq(neededDependencies),
     files: uniqBy(neededFiles, (file) => file?.path),
+    docs: (item.docs, items.flatMap((i) => i.docs)).filter(Boolean).join('\n\n'),
+    // merge all environment variables
+    envVars: {
+      ...item.envVars,
+      ...items.reduce((acc, i) => ({ ...acc, ...i.envVars }), {}),
+    },
   }
 
   return registryBlock
