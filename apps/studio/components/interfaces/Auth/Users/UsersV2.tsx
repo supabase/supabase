@@ -18,6 +18,7 @@ import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { isAtBottom } from 'lib/helpers'
 import {
   Button,
   cn,
@@ -51,7 +52,7 @@ import {
   PROVIDER_FILTER_OPTIONS,
   USERS_TABLE_COLUMNS,
 } from './Users.constants'
-import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
+import { formatUserColumns, formatUsersData } from './Users.utils'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 

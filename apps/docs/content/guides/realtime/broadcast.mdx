@@ -92,7 +92,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 
 ### Receiving Broadcast messages
 
-You can provide a callback for the `broadcast` channel to receive message. This example will receive any `broadcast` messages that are sent to `test-channel`:
+You can provide a callback for the `broadcast` channel to receive messages. This example will receive any `broadcast` messages that are sent to `test-channel`:
 
 <Tabs
   scrollable
@@ -469,7 +469,7 @@ You can pass configuration options while initializing the Supabase Client.
 
     myChannel.subscribe((status) => {
       if (status !== 'SUBSCRIBED') { return }
-      channelC.send({
+      myChannel.send({
         type: 'broadcast',
         event: 'test-my-messages',
         payload: { message: 'talking to myself' },

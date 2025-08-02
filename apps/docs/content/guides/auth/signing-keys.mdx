@@ -171,7 +171,7 @@ If you wish to make your own JWTs or have access to the private key or shared se
 Use the [Supabase CLI](/docs/reference/cli/introduction) to quickly and securely generate a private key ready for import:
 
 ```sh
-supabase gen generate-key ES256
+supabase gen signing-key --algorithm ES256
 ```
 
 Make sure you store this private key in a secure location, as it will not be extractable from Supabase.

@@ -2,6 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { configKeys } from 'data/config/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
@@ -56,7 +57,10 @@ export const useDatabaseExtensionDisableMutation = ({
   >((vars) => disableDatabaseExtension(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef))
+      await Promise.all([
+        queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef)),
+        queryClient.invalidateQueries(configKeys.upgradeEligibility(projectRef)),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

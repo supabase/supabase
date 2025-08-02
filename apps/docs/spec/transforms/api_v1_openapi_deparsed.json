@@ -1039,6 +1039,16 @@
               "pattern": "^[\\w-]+$",
               "type": "string"
             }
+          },
+          {
+            "name": "resource",
+            "required": false,
+            "in": "query",
+            "description": "Resource indicator for MCP (Model Context Protocol) clients",
+            "schema": {
+              "enum": ["https://api.supabase.io/mcp"],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1088,6 +1098,11 @@
                   },
                   "refresh_token": {
                     "type": "string"
+                  },
+                  "resource": {
+                    "type": "string",
+                    "enum": ["https://api.supabase.io/mcp"],
+                    "description": "Resource indicator for MCP (Model Context Protocol) clients"
                   }
                 },
                 "additionalProperties": false
@@ -1624,13 +1639,7 @@
                       },
                       "secret_jwt_template": {
                         "type": "object",
-                        "properties": {
-                          "role": {
-                            "type": "string",
-                            "minLength": 1
-                          }
-                        },
-                        "required": ["role"],
+                        "additionalProperties": {},
                         "nullable": true
                       },
                       "inserted_at": {
@@ -1710,13 +1719,7 @@
                   },
                   "secret_jwt_template": {
                     "type": "object",
-                    "properties": {
-                      "role": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": ["role"],
+                    "additionalProperties": {},
                     "nullable": true
                   }
                 },
@@ -1763,13 +1766,7 @@
                     },
                     "secret_jwt_template": {
                       "type": "object",
-                      "properties": {
-                        "role": {
-                          "type": "string",
-                          "minLength": 1
-                        }
-                      },
-                      "required": ["role"],
+                      "additionalProperties": {},
                       "nullable": true
                     },
                     "inserted_at": {
@@ -1956,13 +1953,7 @@
                   },
                   "secret_jwt_template": {
                     "type": "object",
-                    "properties": {
-                      "role": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": ["role"],
+                    "additionalProperties": {},
                     "nullable": true
                   }
                 }
@@ -2008,13 +1999,7 @@
                     },
                     "secret_jwt_template": {
                       "type": "object",
-                      "properties": {
-                        "role": {
-                          "type": "string",
-                          "minLength": 1
-                        }
-                      },
-                      "required": ["role"],
+                      "additionalProperties": {},
                       "nullable": true
                     },
                     "inserted_at": {
@@ -2117,13 +2102,7 @@
                     },
                     "secret_jwt_template": {
                       "type": "object",
-                      "properties": {
-                        "role": {
-                          "type": "string",
-                          "minLength": 1
-                        }
-                      },
-                      "required": ["role"],
+                      "additionalProperties": {},
                       "nullable": true
                     },
                     "inserted_at": {
@@ -2243,13 +2222,7 @@
                     },
                     "secret_jwt_template": {
                       "type": "object",
-                      "properties": {
-                        "role": {
-                          "type": "string",
-                          "minLength": 1
-                        }
-                      },
-                      "required": ["role"],
+                      "additionalProperties": {},
                       "nullable": true
                     },
                     "inserted_at": {
@@ -14663,6 +14636,11 @@
           },
           "refresh_token": {
             "type": "string"
+          },
+          "resource": {
+            "type": "string",
+            "enum": ["https://api.supabase.io/mcp"],
+            "description": "Resource indicator for MCP (Model Context Protocol) clients"
           }
         },
         "additionalProperties": false
@@ -14919,13 +14897,7 @@
           },
           "secret_jwt_template": {
             "type": "object",
-            "properties": {
-              "role": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "required": ["role"],
+            "additionalProperties": {},
             "nullable": true
           },
           "inserted_at": {
@@ -14969,13 +14941,7 @@
           },
           "secret_jwt_template": {
             "type": "object",
-            "properties": {
-              "role": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "required": ["role"],
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -14996,13 +14962,7 @@
           },
           "secret_jwt_template": {
             "type": "object",
-            "properties": {
-              "role": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "required": ["role"],
+            "additionalProperties": {},
             "nullable": true
           }
         }

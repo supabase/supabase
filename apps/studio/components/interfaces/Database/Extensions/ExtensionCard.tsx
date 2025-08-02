@@ -111,7 +111,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
 
         <div className={cn('flex h-full flex-col gap-y-3 py-3', X_PADDING)}>
           <p className="text-sm text-foreground-light capitalize-sentence">{extension.comment}</p>
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {extensionMeta?.github_url && (
               <Button asChild type="default" icon={<Github />} className="rounded-full">
                 <a

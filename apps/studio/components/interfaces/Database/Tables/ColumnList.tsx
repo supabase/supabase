@@ -14,7 +14,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   DropdownMenu,
@@ -26,7 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
   onAddColumn: () => void
@@ -63,7 +63,7 @@ const ColumnList = ({
       ? selectedTable?.columns ?? []
       : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
@@ -81,7 +81,7 @@ const ColumnList = ({
             icon={<Search size={12} />}
           />
         </div>
-        {!isLocked && isTableEntity && (
+        {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
             disabled={!canUpdateColumns}
@@ -100,7 +100,9 @@ const ColumnList = ({
         )}
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />}
+      {isSchemaLocked && (
+        <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />
+      )}
 
       {isLoading && <GenericSkeletonLoader />}
 
@@ -156,7 +158,7 @@ const ColumnList = ({
                       )}
                     </Table.td>
                     <Table.td className="text-right">
-                      {!isLocked && isTableEntity && (
+                      {!isSchemaLocked && isTableEntity && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="default" className="px-1" icon={<MoreVertical />} />
@@ -183,7 +185,7 @@ const ColumnList = ({
                             <Tooltip>
                               <TooltipTrigger>
                                 <DropdownMenuItem
-                                  disabled={!canUpdateColumns || isLocked}
+                                  disabled={!canUpdateColumns || isSchemaLocked}
                                   onClick={() => onDeleteColumn(x)}
                                   className="space-x-2"
                                 >

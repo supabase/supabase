@@ -718,6 +718,13 @@ export const SQLEditor = () => {
                   <div key={id} className="w-full h-full relative">
                     <MonacoEditor
                       autoFocus
+                      placeholder={
+                        !promptState.isOpen && !editorRef.current?.getValue()
+                          ? 'Hit ' +
+                            (os === 'macos' ? 'CMD+K' : `CTRL+K`) +
+                            ' to generate query or just start typing'
+                          : ''
+                      }
                       id={id}
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
@@ -763,19 +770,6 @@ export const SQLEditor = () => {
                         endLineNumber={promptState.endLineNumber}
                       />
                     )}
-                    <AnimatePresence>
-                      {!promptState.isOpen && !editorRef.current?.getValue() && (
-                        <motion.p
-                          initial={{ y: 5, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          exit={{ y: 5, opacity: 0 }}
-                          className="text-foreground-lighter absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
-                        >
-                          Hit {os === 'macos' ? <Command size={12} /> : `CTRL+`}K to edit with the
-                          Assistant
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
                   </div>
                 </>
               )}

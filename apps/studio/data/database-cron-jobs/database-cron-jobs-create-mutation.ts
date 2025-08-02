@@ -9,6 +9,7 @@ export type DatabaseCronJobCreateVariables = {
   projectRef: string
   connectionString?: string | null
   query: string
+  searchTerm?: string
 }
 
 export async function createDatabaseCronJob({
@@ -42,8 +43,10 @@ export const useDatabaseCronJobCreateMutation = ({
     (vars) => createDatabaseCronJob(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseCronJobsKeys.list(projectRef))
+        const { projectRef, searchTerm } = variables
+        await queryClient.invalidateQueries(
+          databaseCronJobsKeys.listInfinite(projectRef, searchTerm)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

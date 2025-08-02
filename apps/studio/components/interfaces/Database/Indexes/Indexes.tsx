@@ -1,4 +1,4 @@
-import { partition, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,10 +14,10 @@ import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-dele
 import { DatabaseIndex, useIndexesQuery } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
 const Indexes = () => {
@@ -58,11 +58,7 @@ const Indexes = () => {
     },
   })
 
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes =
@@ -122,7 +118,7 @@ const Indexes = () => {
               icon={<Search size={14} />}
             />
 
-            {!isLocked && (
+            {!isSchemaLocked && (
               <Button
                 className="ml-auto flex-grow lg:flex-grow-0"
                 type="primary"
@@ -134,7 +130,7 @@ const Indexes = () => {
             )}
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="indexes" />}
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="indexes" />}
 
           {isLoadingIndexes && <GenericSkeletonLoader />}
 
@@ -190,7 +186,7 @@ const Indexes = () => {
                               <Button type="default" onClick={() => setSelectedIndex(index)}>
                                 View definition
                               </Button>
-                              {!isLocked && (
+                              {!isSchemaLocked && (
                                 <Button
                                   type="text"
                                   className="px-1"

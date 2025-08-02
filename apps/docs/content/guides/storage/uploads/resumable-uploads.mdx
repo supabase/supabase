@@ -57,6 +57,9 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
                     objectName: fileName,
                     contentType: 'image/png',
                     cacheControl: 3600,
+                    metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
+                       yourCustomMetadata: true,
+                    }),
                 },
                 chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB (for now) do not change it
                 onError: function (error) {
@@ -159,6 +162,7 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
                         "objectName",
                         "contentType",
                         "cacheControl",
+                        "metadata",
                     ], // Metadata fields allowed for the upload
                     onError: (error) => console.error("Upload error:", error), // Error handling for uploads
                 }).on("file-added", (file) => {
@@ -168,6 +172,9 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
                         bucketName, // Bucket specified by the user of the hook
                         objectName: file.name, // Use file name as object name
                         contentType: file.type, // Set content type based on file MIME type
+                        metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
+                            yourCustomMetadata: true,
+                        }),
                     };
                 });
             };
