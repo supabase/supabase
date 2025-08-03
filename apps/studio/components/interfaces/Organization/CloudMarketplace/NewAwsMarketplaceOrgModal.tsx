@@ -19,13 +19,12 @@ import { SubmitHandler } from 'react-hook-form'
 
 interface Props {
   buyerId: string
-  tier: string
   visible: boolean
   onSuccess: () => void
   onClose: () => void
 }
 
-const NewAwsMarketplaceOrg = ({ buyerId, tier, visible, onSuccess, onClose }: Props) => {
+const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose }: Props) => {
   const { mutate: createOrganization, isLoading: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
       onSuccess: (_) => {
@@ -79,4 +78,4 @@ const NewAwsMarketplaceOrg = ({ buyerId, tier, visible, onSuccess, onClose }: Pr
   )
 }
 
-export default NewAwsMarketplaceOrg
+export default NewAwsMarketplaceOrgModal
