@@ -126,10 +126,7 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
             <span className="font-bold">Managed and billed through AWS Marketplace</span>
             <br />
             Supabase will no longer invoice you directly. Instead, AWS will handle billing for your
-            Supabase subscription and charge the payment method saved in your AWS account. The fixed
-            subscription fee will be charged by AWS on the same calendar day each month that you
-            originally subscribed via the AWS Marketplace. Usage based fees will be charged at the
-            beginning of each month for usage in the previous month. {''}
+            Supabase subscription and charge the payment method saved in your AWS account. {''}
             <Link
               href="https://supabase.com/docs/guides/platform"
               target="_blank"
