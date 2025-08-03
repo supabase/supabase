@@ -49,18 +49,10 @@ VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
 Now you have the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's fine since you have [Row Level Security](/docs/guides/auth#row-level-security) enabled on the Database.
 
-<$CodeTabs>
-
-```js name=src/supabaseClient.ts
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-```
-
-</$CodeTabs>
+<$CodeSample
+path="user-management/svelte-user-management/src/supabaseClient.ts"
+meta="name=src/supabaseClient.ts"
+/>
 
 ### App styling (optional)
 
@@ -71,67 +63,17 @@ You can find the full contents of this file [on GitHub](https://raw.githubuserco
 
 Set up a Svelte component to manage logins and sign ups. It uses Magic Links, so users can sign in with their email without using passwords.
 
-<$CodeTabs>
-
-```html name=src/lib/Auth.svelte
-<script lang="ts">
-  import { supabase } from "../supabaseClient";
-
-  let loading = $state(false);
-  let email = $state("");
-
-  const handleLogin = async () => {
-    try {
-      loading = true;
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) throw error;
-      alert("Check your email for login link!");
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
-    } finally {
-      loading = false;
-    }
-  };
-</script>
-
-<div class="row flex-center flex">
-  <div class="col-6 form-widget" aria-live="polite">
-    <h1 class="header">Supabase + Svelte</h1>
-    <p class="description">Sign in via magic link with your email below</p>
-    <form class="form-widget" onsubmit={(e) => { e.preventDefault(); handleLogin(); }}>
-      <div>
-        <label for="email">Email</label>
-        <input
-          id="email"
-          class="inputField"
-          type="email"
-          placeholder="Your email"
-          bind:value={email}
-        />
-      </div>
-      <div>
-        <button
-          type="submit"
-          class="button block"
-          aria-live="polite"
-          disabled={loading}
-        >
-          <span>{loading ? "Loading" : "Send magic link"}</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-```
-
-</$CodeTabs>
+<$CodeSample
+path="user-management/svelte-user-management/src/lib/Auth.svelte"
+meta="name=src/lib/Auth.svelte"
+/>
 
 ### Account page
 
 After a user is signed in, allow them to edit their profile details and manage their account.
 Create a new component for that called `Account.svelte`.
+
+{/* TODO: How to transclude? */}
 
 <$CodeTabs>
 
@@ -239,38 +181,10 @@ Create a new component for that called `Account.svelte`.
 
 Now that you have all the components in place, update `App.svelte`:
 
-<$CodeTabs>
-
-```html name=src/App.svelte
-<script lang="ts">
-  import { onMount } from 'svelte'
-  import { supabase } from './supabaseClient'
-  import type { AuthSession } from '@supabase/supabase-js'
-  import Account from './lib/Account.svelte'
-  import Auth from './lib/Auth.svelte'
-
-  let session = $state<AuthSession | null>(null)
-
-  onMount(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      session = data.session
-    })
-
-    supabase.auth.onAuthStateChange((_event, _session) => {
-      session = _session
-    })
-  })
-</script>
-
-<div class="container" style="padding: 50px 0 100px 0">
-  {#if !session}
-  <Auth />
-  {:else}
-  <Account {session} />
-  {/if}
-</div>
-```
-</$CodeTabs>
+<$CodeSample
+path="user-management/svelte-user-management/src/App.svelte"
+meta="name=src/App.svelte"
+/>
 
 Once that's done, run this in a terminal window:
 
@@ -296,113 +210,16 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Create an avatar for the user so that they can upload a profile photo. Start by creating a new component:
 
-<$CodeTabs>
-
-```html name=src/lib/Avatar.svelte
-<script lang="ts">
-  import { supabase } from "../supabaseClient";
-
-  interface Props {
-    size: number;
-    url?: string | null;
-    onupload?: () => void;
-  }
-
-  let { size, url = $bindable(null), onupload }: Props = $props();
-
-  let avatarUrl = $state<string | null>(null);
-  let uploading = $state(false);
-  let files = $state<FileList>();
-
-  const downloadImage = async (path: string) => {
-    try {
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .download(path);
-
-      if (error) {
-        throw error;
-      }
-
-      const url = URL.createObjectURL(data);
-      avatarUrl = url;
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log("Error downloading image: ", error.message);
-      }
-    }
-  };
-
-  const uploadAvatar = async () => {
-    try {
-      uploading = true;
-
-      if (!files || files.length === 0) {
-        throw new Error("You must select an image to upload.");
-      }
-
-      const file = files[0];
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${Math.random()}.${fileExt}`;
-
-      const { error } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file);
-
-      if (error) {
-        throw error;
-      }
-
-      url = filePath;
-      onupload?.();
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
-    } finally {
-      uploading = false;
-    }
-  };
-
-  $effect(() => {
-    if (url) downloadImage(url);
-  });
-</script>
-
-<div style="width: {size}px" aria-live="polite">
-  {#if avatarUrl}
-    <img
-      src={avatarUrl}
-      alt={avatarUrl ? "Avatar" : "No image"}
-      class="avatar image"
-      style="height: {size}px, width: {size}px"
-    />
-  {:else}
-    <div class="avatar no-image" style="height: {size}px, width: {size}px"></div>
-  {/if}
-  <div style="width: {size}px">
-    <label class="button primary block" for="single">
-      {uploading ? "Uploading ..." : "Upload avatar"}
-    </label>
-    <span style="display:none">
-      <input
-        type="file"
-        id="single"
-        accept="image/*"
-        bind:files
-        onchange={uploadAvatar}
-        disabled={uploading}
-      />
-    </span>
-  </div>
-</div>
-```
-
-</$CodeTabs>
+<$CodeSample
+path="user-management/svelte-user-management/src/lib/Avatar.svelte"
+meta="name=src/lib/Avatar.svelte"
+/>
 
 ### Add the new widget
 
 And then you can add the widget to the Account page:
+
+{/* TODO: How to transclude */}
 
 <$CodeTabs>
 
