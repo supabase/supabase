@@ -56,7 +56,7 @@ const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose }: Pro
         <DialogHeader>
           <DialogTitle>Create a new organization</DialogTitle>
           <DialogDescription>
-            A new organization will be created and linked to your AWS Marketplace contract
+            A new organization will be created and linked to your AWS Marketplace subscription
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />

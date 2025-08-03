@@ -48,23 +48,24 @@ const AwsMarketplaceCreateNewOrg = () => {
       <ScaffoldSection>
         <ScaffoldSectionDetail>
           <p className="mb-6 text-base">
-            You don’t have any organizations yet. To continue, you’ll need to create one. Once
-            created, it will be automatically linked to the AWS Marketplace contract you just
-            accepted. This organization will be managed and billed through AWS Marketplace.
+            You’ve subscribed to our product on the AWS Marketplace. As a final step, please create
+            a Supabase organization. That organization will be managed and billed through AWS
+            Marketplace.
           </p>
           <p className="text-xs">
             <span className="font-bold">Managed and billed through AWS Marketplace</span>
             <br />
-            This means any subscription plan changes are managed through AWS Marketplace, not the
-            Supabase Dashboard. Supabase will no longer invoice you directly. Instead, AWS will
-            issue invoices for your Supabase subscription and charge the payment method saved in
-            your AWS account.{' '}
+            Supabase will no longer invoice you directly. Instead, AWS will handle billing for your
+            Supabase subscription and charge the payment method saved in your AWS account. The fixed
+            subscription fee will be charged by AWS on the same calendar day each month that you
+            originally subscribed via the AWS Marketplace. Usage based fees will be charged at the
+            beginning of each month for usage in the previous month. {''}
             <Link
               href="https://supabase.com/docs/guides/platform"
               target="_blank"
               className="underline"
             >
-              Read more in our docs.
+              Read more.
             </Link>
           </p>
         </ScaffoldSectionDetail>
@@ -79,7 +80,7 @@ const AwsMarketplaceCreateNewOrg = () => {
                 loading={isCreatingOrganization}
                 size="medium"
               >
-                Create and link organization
+                Create organization
               </Button>
             </div>
           </div>

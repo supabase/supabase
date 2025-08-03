@@ -11,7 +11,7 @@ import AwsMarketplaceLinkExistingOrg from '../components/interfaces/Organization
 import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
 
 const LinkAwsMarketplace: NextPageWithLayout = () => {
-  const existingOrgs = true
+  const existingOrgs = false
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
   return (

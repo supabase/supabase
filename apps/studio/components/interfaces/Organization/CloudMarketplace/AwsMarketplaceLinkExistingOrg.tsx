@@ -28,9 +28,9 @@ import { useProjectsQuery } from '../../../../data/projects/projects-query'
 import { useOrganizationLinkAwsMarketplaceMutation } from '../../../../data/organizations/organization-link-aws-marketplace-mutation'
 import { toast } from 'sonner'
 import AwsMarketplaceLinkingSuccess from './AwsMarketplaceLinkingSuccess'
-import Link from 'next/link'
 import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 interface Props {
   organizations?: Organization[] | undefined
@@ -115,22 +115,24 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
       <ScaffoldSection>
         <ScaffoldSectionDetail>
           <p className="mb-6 text-base">
-            Select an organization and link it to the AWS Marketplace contract you just accepted.
-            This organization will be managed and billed through AWS Marketplace.
+            You’ve subscribed to our product on the AWS Marketplace. As a final step, please link a
+            Supabase organization to your AWS Marketplace subscription. Choose the organization you
+            want to be managed and billed through AWS.
           </p>
           <p className="text-xs">
             <span className="font-bold">Managed and billed through AWS Marketplace</span>
             <br />
-            This means any subscription plan changes are managed through AWS Marketplace, not the
-            Supabase Dashboard. Supabase will no longer invoice you directly. Instead, AWS will
-            issue invoices for your Supabase subscription and charge the payment method saved in
-            your AWS account.{' '}
+            Supabase will no longer invoice you directly. Instead, AWS will handle billing for your
+            Supabase subscription and charge the payment method saved in your AWS account. The fixed
+            subscription fee will be charged by AWS on the same calendar day each month that you
+            originally subscribed via the AWS Marketplace. Usage based fees will be charged at the
+            beginning of each month for usage in the previous month. {''}
             <Link
               href="https://supabase.com/docs/guides/platform"
               target="_blank"
               className="underline"
             >
-              Read more in our docs.
+              Read more.
             </Link>
           </p>
           <p className="mt-14 text-base">
