@@ -3,7 +3,6 @@ import { getConnectionStrings } from 'components/interfaces/Connect/DatabaseSett
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { pluckObjectFields } from 'lib/helpers'
 import { useState } from 'react'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
@@ -23,13 +22,14 @@ import {
 import { Admonition } from 'ui-patterns'
 
 interface ExportDialogProps {
+  table?: { name: string; schema: string }
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
+export const ExportDialog = ({ table, open, onOpenChange }: ExportDialogProps) => {
   const { ref: projectRef } = useParams()
-  const snap = useTableEditorTableStateSnapshot()
+
   const [selectedTab, setSelectedTab] = useState<string>('csv')
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
@@ -47,14 +47,14 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
     poolingInfo: { connectionString: '', db_host: '', db_name: '', db_port: 0, db_user: '' },
   })
 
-  const outputName = `${snap.table.name}_rows`
+  const outputName = `${table?.name}_rows`
 
   const csvExportCommand = `
-${connectionStrings.direct.psql} -c "COPY (SELECT * FROM "${snap.table.schema}"."${snap.table.name}") TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv
+${connectionStrings.direct.psql} -c "COPY (SELECT * FROM "${table?.schema}"."${table?.name}") TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv
 `.trim()
 
   const sqlExportCommand = `
-pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.table.schema}.${snap.table.name}" --data-only --column-inserts > ${outputName}.sql
+pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
   `.trim()
 
   return (

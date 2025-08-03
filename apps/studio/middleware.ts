@@ -16,6 +16,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/feedback/classify',
   '/get-ip-address',
   '/get-utc-time',
+  '/get-deployment-commit',
   '/check-cname',
   '/edge-functions/test',
   '/edge-functions/body',

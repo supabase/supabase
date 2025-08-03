@@ -17,7 +17,7 @@ import {
 } from '../data/organizations/organizations-query'
 import { NextPageWithLayout, Organization } from '../types'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -30,19 +30,21 @@ import {
 import { z } from 'zod'
 import { ButtonTooltip } from '../components/ui/ButtonTooltip'
 import { Boxes, ChevronRight } from 'lucide-react'
-import NewOrgAwsMarketplace from '../components/interfaces/Organization/CloudMarketplace/NewOrgAwsMarketplace'
+import NewAwsMarketplaceOrg from '../components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrg'
 import { useMemo, useState } from 'react'
-import AwsConnectLayout from '../components/layouts/AwsConnectLayout'
 import { ActionCard } from '../components/ui/ActionCard'
 import { useProjectsQuery } from '../data/projects/projects-query'
 import { useOrganizationLinkAwsMarketplaceMutation } from '../data/organizations/organization-link-aws-marketplace-mutation'
 import AwsMarketplaceLinkingSuccess from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkingSuccess'
 import { zodResolver } from '@hookform/resolvers/zod'
-import NewOrgAwsMarketplaceForm, {
+import NewAwsMarketplaceOrgForm, {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
-} from '../components/interfaces/Organization/CloudMarketplace/NewOrgAwsMarketplaceForm'
+  NewMarketplaceOrgForm,
+} from '../components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgForm'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
+import { useAwsManagedOrganizationCreateMutation } from '../data/organizations/organization-create-mutation'
 
 const LinkAwsMarketplace: NextPageWithLayout = () => {
   const orgsExisting = true
@@ -85,29 +87,44 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
   const [orgLinkedSuccessfully, setOrgLinkedSuccessfully] = useState(false)
   const [isNotLinkableOrgListOpen, setIsNotLinkableOrgListOpen] = useState(false)
 
-  const {
-    mutate: linkOrg,
-    error: linkOrgError,
-    isLoading: isLinkingOrganization,
-  } = useOrganizationLinkAwsMarketplaceMutation({
-    onSuccess: (res) => {
-      //TODO(thomas): send tracking event
-      setOrgLinkedSuccessfully(true)
-      setTimeout(() => form.reset(), 0)
-    },
-    onError: (res) => {
-      toast.error(res.message, {
-        duration: 7_000,
-      })
-    },
-  })
+  const { mutate: linkOrganization, isLoading: isLinkingOrganization } =
+    useOrganizationLinkAwsMarketplaceMutation({
+      onSuccess: (_) => {
+        //TODO(thomas): send tracking event
+        setOrgLinkedSuccessfully(true)
+        setTimeout(() => linkOrgForm.reset(), 0)
+      },
+      onError: (res) => {
+        toast.error(res.message, {
+          duration: 7_000,
+        })
+      },
+    })
 
-  const formSchema = z.object({
+  const { mutate: createOrganization, isLoading: isCreatingOrganization } =
+    useAwsManagedOrganizationCreateMutation({
+      onSuccess: (_) => {
+        //TODO(thomas): send tracking event
+        setOrgLinkedSuccessfully(true)
+        setTimeout(() => linkOrgForm.reset(), 0)
+      },
+      onError: (res) => {
+        toast.error(res.message, {
+          duration: 7_000,
+        })
+      },
+    })
+
+  const onSubmitNewOrg: SubmitHandler<NewMarketplaceOrgForm> = async (values) => {
+    createOrganization({ ...values, buyerId: buyerId as string })
+  }
+
+  const LinkOrgFormSchema = z.object({
     orgSlug: z.string(),
   })
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const linkOrgForm = useForm<z.infer<typeof LinkOrgFormSchema>>({
+    resolver: zodResolver(LinkOrgFormSchema),
     defaultValues: {
       orgSlug: undefined,
     },
@@ -115,10 +132,10 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
     reValidateMode: 'onChange',
   })
 
-  const isDirty = !!Object.keys(form.formState.dirtyFields).length
+  const isDirty = !!Object.keys(linkOrgForm.formState.dirtyFields).length
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    linkOrg({ slug: values.orgSlug, buyerId: buyerId as string })
+  const onSubmitLinking = async (values: z.infer<typeof LinkOrgFormSchema>) => {
+    linkOrganization({ slug: values.orgSlug, buyerId: buyerId as string })
   }
 
   return (
@@ -169,18 +186,25 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
               </>
             ) : (
               <>
-                <h1 className="font-bold text-xl mb-0">Create and link a Supabase organization</h1>
-                <p className="mb-8">
+                <p className="mb-6 text-base">
                   You don’t have any organizations yet. To continue, you’ll need to create one. Once
                   created, it will be automatically linked to the AWS Marketplace contract you just
-                  accepted so we can route billing through AWS.
+                  accepted. This organization will be managed and billed through AWS Marketplace.
                 </p>
-                <p>
-                  <span className="font-bold">Billing through AWS</span>
-                  <br /> That means that Supabase no longer invoices you directly. Instead, AWS
-                  issues a monthly bill for your Supabase subscription and charges the payment
-                  method you’ve saved in your AWS account. Any plan upgrades or downgrades are
-                  managed through the AWS Marketplace.
+                <p className="text-xs">
+                  <span className="font-bold">Managed and billed through AWS Marketplace</span>
+                  <br />
+                  This means any subscription plan changes are managed through AWS Marketplace, not
+                  the Supabase Dashboard. Supabase will no longer invoice you directly. Instead, AWS
+                  will issue invoices for your Supabase subscription and charge the payment method
+                  saved in your AWS account.{' '}
+                  <Link
+                    href="https://supabase.com/docs/guides/platform"
+                    target="_blank"
+                    className="underline"
+                  >
+                    Read more in our docs.
+                  </Link>
                 </p>
               </>
             )}
@@ -188,17 +212,17 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
           <ScaffoldSectionContent className="lg:ml-10">
             {orgsExisting ? (
               <>
-                <Form_Shadcn_ {...form}>
+                <Form_Shadcn_ {...linkOrgForm}>
                   <form className="flex flex-col">
                     <FormField_Shadcn_
                       name="orgSlug"
-                      control={form.control}
+                      control={linkOrgForm.control}
                       render={({ field }) => (
                         <RadioGroupCard
                           {...field}
                           defaultValue={field.value}
                           onValueChange={(value: string) => {
-                            form.setValue('orgSlug', value, {
+                            linkOrgForm.setValue('orgSlug', value, {
                               shouldDirty: true,
                               shouldValidate: false,
                             })
@@ -239,7 +263,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
                                               />
                                             }
                                             title={org.name}
-                                            description={`${org.plan.name} Plan${numProjects > 0 ? `  •  ${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
+                                            description={`${org.plan.name} Plan • ${numProjects > 0 ? `${numProjects} Project${numProjects > 1 ? 's' : ''}` : '0 Projects'}`}
                                           />
                                         }
                                       />
@@ -295,7 +319,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
                               key={org.id}
                               icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
                               title={org.name}
-                              description={`${org.plan.name} Plan${numProjects > 0 ? `  •  ${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
+                              description={`${org.plan.name} Plan • ${numProjects > 0 ? `${numProjects} Project${numProjects > 1 ? 's' : ''}` : '0 Projects'}`}
                             />
                           )
                         })}
@@ -312,7 +336,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
                         htmlType="submit"
                         type="primary"
                         onClick={async () => {
-                          await onSubmit(form.getValues())
+                          await onSubmitLinking(linkOrgForm.getValues())
                         }}
                         loading={isLinkingOrganization}
                         disabled={!isDirty || isLinkingOrganization || isLoadingOrganizations}
@@ -331,18 +355,13 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
               </>
             ) : (
               <div className="border-l px-10 pt-10">
-                <NewOrgAwsMarketplaceForm
-                  tier={tier as string}
-                  onSuccess={() => {
-                    setOrgLinkedSuccessfully(true)
-                  }}
-                />
+                <NewAwsMarketplaceOrgForm onSubmit={onSubmitNewOrg} />
 
                 <div className="flex justify-end mt-10">
                   <Button
                     form={CREATE_AWS_MANAGED_ORG_FORM_ID}
                     htmlType="submit"
-                    loading={false}
+                    loading={isCreatingOrganization}
                     size="medium"
                   >
                     Create and link organization
@@ -354,10 +373,11 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <NewOrgAwsMarketplace
+      <NewAwsMarketplaceOrg
         visible={showOrgCreationDialog}
         onClose={() => setShowOrgCreationDialog(false)}
         tier={tier as string}
+        buyerId={buyerId as string}
         onSuccess={() => {
           setShowOrgCreationDialog(false)
           setOrgLinkedSuccessfully(true)
@@ -367,13 +387,13 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
       <AwsMarketplaceLinkingSuccess
         visible={orgLinkedSuccessfully}
         onClose={() => {
-          router.push(`/org/${form.getValues('orgSlug')}`)
+          router.push(`/org/${linkOrgForm.getValues('orgSlug')}`)
         }}
       />
     </>
   )
 }
 
-LinkAwsMarketplace.getLayout = (page) => <AwsConnectLayout>{page}</AwsConnectLayout>
+LinkAwsMarketplace.getLayout = (page) => <LinkAwsMarketplaceLayout>{page}</LinkAwsMarketplaceLayout>
 
 export default LinkAwsMarketplace
