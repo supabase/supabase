@@ -1,4 +1,7 @@
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -135,6 +138,22 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
               Read more.
             </Link>
           </p>
+          <div className="mt-10">
+            <Alert_Shadcn_ variant="warning" title={'fdasfdsafdsa'}>
+              <AlertTitle_Shadcn_ className="text-foreground font-bold text-orange-1000">
+                “Auto Renewal” is currently turned OFF for your AWS Marketplace subscription
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
+                <div>
+                  As a result, your Supabase organization will be downgraded to the Free Plan at the
+                  end of your current billing cycle. If you have more than 2 projects running, all
+                  your projects will be paused. To ensure uninterrupted service, please enable “Auto
+                  Renewal” in your AWS Marketplace subscription settings.
+                </div>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          </div>
+
           <p className="mt-14 text-base">
             <span className="font-bold">Want to start fresh?</span> Create a new organization and it
             will be linked automatically.
