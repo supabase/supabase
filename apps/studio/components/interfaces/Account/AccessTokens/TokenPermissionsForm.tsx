@@ -76,10 +76,7 @@ export const TokenPermissionsForm = ({
                         <div className="flex items-center gap-3">
                           <Key size={12} />
                           <div className="flex flex-col text-left">
-                            <span className="font-medium text-foreground">Add all permissions</span>
-                            <span className="text-xs text-foreground-light">
-                              Add all available permissions with read-write access
-                            </span>
+                            <span className="font-medium text-foreground">All permissions</span>
                           </div>
                         </div>
                       </CommandItem_Shadcn_>
@@ -103,10 +100,7 @@ export const TokenPermissionsForm = ({
                           <Key size={12} />
                           <div className="flex flex-col text-left">
                             <span className="font-medium text-foreground">
-                              Add all project permissions
-                            </span>
-                            <span className="text-xs text-foreground-light">
-                              Add all project-related permissions
+                              All project permissions
                             </span>
                           </div>
                         </div>
@@ -131,43 +125,43 @@ export const TokenPermissionsForm = ({
                           <Key size={12} />
                           <div className="flex flex-col text-left">
                             <span className="font-medium text-foreground">
-                              Add all organization permissions
-                            </span>
-                            <span className="text-xs text-foreground-light">
-                              Add all organization-related permissions
+                              All organization permissions
                             </span>
                           </div>
                         </div>
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>
 
-                    <CommandGroup_Shadcn_ heading="Individual permissions" className="[&>div]:text-left">
-                      {ALL_RESOURCES.map((resource) => (
-                        <CommandItem_Shadcn_
-                          key={resource.resource}
-                          value={`${resource.resource} ${resource.title} ${resource.group}`}
-                          onSelect={() => {
-                            const newRows = [
-                              ...permissionRows,
-                              { resource: resource.resource, action: '' },
-                            ]
-                            setValue('permissionRows', newRows)
-                            setResourceSearchOpen(false)
-                          }}
-                          className="text-white"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Key size={12} />
-                            <div className="flex flex-col text-left">
-                              <span className="font-medium text-foreground">{resource.title}</span>
-                              <span className="text-xs text-foreground-light">
-                                {resource.group}
-                              </span>
+                    {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
+                      <CommandGroup_Shadcn_
+                        key={permissionGroup.name}
+                        heading={permissionGroup.name}
+                        className="[&>div]:text-left"
+                      >
+                        {permissionGroup.resources.map((resource) => (
+                          <CommandItem_Shadcn_
+                            key={resource.resource}
+                            value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
+                            onSelect={() => {
+                              const newRows = [
+                                ...permissionRows,
+                                { resource: resource.resource, action: '' },
+                              ]
+                              setValue('permissionRows', newRows)
+                              setResourceSearchOpen(false)
+                            }}
+                            className="text-white"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Key size={12} />
+                              <div className="flex flex-col text-left">
+                                <span className="font-medium text-foreground">{resource.title}</span>
+                              </div>
                             </div>
-                          </div>
-                        </CommandItem_Shadcn_>
-                      ))}
-                    </CommandGroup_Shadcn_>
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </CommandGroup_Shadcn_>
+                    ))}
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
               </PopoverContent_Shadcn_>
@@ -209,9 +203,6 @@ export const TokenPermissionsForm = ({
                           <Key size={12} />
                           <div className="flex flex-col text-left">
                             <span className="font-medium text-foreground">Add all permissions</span>
-                            <span className="text-xs text-foreground-light">
-                              Add all available permissions with read-write access
-                            </span>
                           </div>
                         </div>
                       </CommandItem_Shadcn_>
@@ -236,9 +227,6 @@ export const TokenPermissionsForm = ({
                           <div className="flex flex-col text-left">
                             <span className="font-medium text-foreground">
                               Add all project permissions
-                            </span>
-                            <span className="text-xs text-foreground-light">
-                              Add all project-related permissions
                             </span>
                           </div>
                         </div>
@@ -265,41 +253,41 @@ export const TokenPermissionsForm = ({
                             <span className="font-medium text-foreground">
                               Add all organization permissions
                             </span>
-                            <span className="text-xs text-foreground-light">
-                              Add all organization-related permissions
-                            </span>
                           </div>
                         </div>
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>
 
-                    <CommandGroup_Shadcn_ heading="Individual permissions" className="[&>div]:text-left">
-                      {ALL_RESOURCES.map((resource) => (
-                        <CommandItem_Shadcn_
-                          key={resource.resource}
-                          value={`${resource.resource} ${resource.title} ${resource.group}`}
-                          onSelect={() => {
-                            const newRows = [
-                              ...permissionRows,
-                              { resource: resource.resource, action: '' },
-                            ]
-                            setValue('permissionRows', newRows)
-                            setResourceSearchOpen(false)
-                          }}
-                          className="text-white"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Key size={12} />
-                            <div className="flex flex-col text-left">
-                              <span className="font-medium">{resource.title}</span>
-                              <span className="text-xs text-foreground-light">
-                                {resource.group}
-                              </span>
+                    {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
+                      <CommandGroup_Shadcn_
+                        key={permissionGroup.name}
+                        heading={permissionGroup.name}
+                        className="[&>div]:text-left"
+                      >
+                        {permissionGroup.resources.map((resource) => (
+                          <CommandItem_Shadcn_
+                            key={resource.resource}
+                            value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
+                            onSelect={() => {
+                              const newRows = [
+                                ...permissionRows,
+                                { resource: resource.resource, action: '' },
+                              ]
+                              setValue('permissionRows', newRows)
+                              setResourceSearchOpen(false)
+                            }}
+                            className="text-white"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Key size={12} />
+                              <div className="flex flex-col text-left">
+                                <span className="font-medium">{resource.title}</span>
+                              </div>
                             </div>
-                          </div>
-                        </CommandItem_Shadcn_>
-                      ))}
-                    </CommandGroup_Shadcn_>
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </CommandGroup_Shadcn_>
+                    ))}
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
               </PopoverContent_Shadcn_>
