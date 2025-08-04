@@ -6,7 +6,7 @@ import {
   AccessTokenList,
   NewAccessTokenButton,
   NewTokenBanner,
-} from 'components/interfaces/Account'
+} from 'components/interfaces/Account/AccessTokens'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
