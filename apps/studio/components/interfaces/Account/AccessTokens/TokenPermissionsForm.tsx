@@ -40,7 +40,7 @@ export const TokenPermissionsForm = ({
   const ALL_RESOURCES = createAllResources(ACCESS_TOKEN_PERMISSIONS)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4">
       {permissionRows.length === 0 ? (
         <div className="space-y-3">
           <span className="text-sm">Configure permissions</span>
