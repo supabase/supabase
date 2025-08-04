@@ -42,7 +42,7 @@ If you use special symbols in your Postgres password, you must remember to [perc
 
 ### Changing your project password
 
-When you created your project you were also asked to enter a password. This is the password for the `postgres` role in your database. You can update this from the Dashboard under the [database settings](https://supabase.com/dashboard/project/_/settings/database) page. You should _never_ give this to third-party service unless you absolutely trust them. Instead, we recommend that you create a new user for every service that you want to give access too. This will also help you with debugging - you can see every query that each role is executing in your database within `pg_stat_statements`.
+When you created your project you were also asked to enter a password. This is the password for the `postgres` role in your database. You can update this from the Dashboard under the [Database Settings](https://supabase.com/dashboard/project/_/database/settings) page. You should _never_ give this to third-party service unless you absolutely trust them. Instead, we recommend that you create a new user for every service that you want to give access too. This will also help you with debugging - you can see every query that each role is executing in your database within `pg_stat_statements`.
 
 Changing the password does not result in any downtime. All connected services, such as PostgREST, PgBouncer, and other Supabase managed services, are automatically updated to use the latest password to ensure availability. However, if you have any external services connecting to the Supabase database using hardcoded username/password credentials, a manual update will be required.
 
