@@ -1,5 +1,22 @@
 import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Command_Shadcn_, CommandEmpty_Shadcn_, CommandGroup_Shadcn_, CommandInput_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, Select_Shadcn_, SelectTrigger_Shadcn_, SelectValue_Shadcn_, SelectContent_Shadcn_, SelectItem_Shadcn_, WarningIcon } from 'ui'
+import {
+  Button,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Select_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  WarningIcon,
+} from 'ui'
 import { Plus, Key, X } from 'lucide-react'
 import { createAllResources } from './AccessToken.utils'
 import { ACCESS_TOKEN_PERMISSIONS } from './AccessToken.constants'
@@ -12,12 +29,12 @@ interface TokenPermissionsFormProps {
   setResourceSearchOpen: (open: boolean) => void
 }
 
-export const TokenPermissionsForm = ({ 
-  control, 
-  setValue, 
-  watch, 
-  resourceSearchOpen, 
-  setResourceSearchOpen 
+export const TokenPermissionsForm = ({
+  control,
+  setValue,
+  watch,
+  resourceSearchOpen,
+  setResourceSearchOpen,
 }: TokenPermissionsFormProps) => {
   const permissionRows = watch('permissionRows') || []
   const ALL_RESOURCES = createAllResources(ACCESS_TOKEN_PERMISSIONS)
@@ -28,13 +45,8 @@ export const TokenPermissionsForm = ({
         <div className="space-y-3">
           <span className="text-sm">Configure permissions</span>
           <div className="text-center py-8 border border-dashed border-border rounded-lg">
-            <p className="text-sm text-foreground-light mb-4">
-              No permissions configured yet.
-            </p>
-            <Popover_Shadcn_
-              open={resourceSearchOpen}
-              onOpenChange={setResourceSearchOpen}
-            >
+            <p className="text-sm text-foreground-light mb-4">No permissions configured yet.</p>
+            <Popover_Shadcn_ open={resourceSearchOpen} onOpenChange={setResourceSearchOpen}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="default" icon={<Plus className="h-4 w-4" />}>
                   Add permission
@@ -64,9 +76,7 @@ export const TokenPermissionsForm = ({
                         <div className="flex items-center gap-3">
                           <Key size={12} />
                           <div className="flex flex-col text-left">
-                            <span className="font-medium text-foreground">
-                              Add all permissions
-                            </span>
+                            <span className="font-medium text-foreground">Add all permissions</span>
                             <span className="text-xs text-foreground-light">
                               Add all available permissions with read-write access
                             </span>
@@ -106,8 +116,7 @@ export const TokenPermissionsForm = ({
                         value="add-all-organization-permissions"
                         onSelect={() => {
                           const orgPermissions = ALL_RESOURCES.filter(
-                            (resource) =>
-                              resource.group === 'Organization permissions'
+                            (resource) => resource.group === 'Organization permissions'
                           ).map((resource) => ({
                             resource: resource.resource,
                             action: resource.actions.includes('read-write')
@@ -149,9 +158,7 @@ export const TokenPermissionsForm = ({
                           <div className="flex items-center gap-3">
                             <Key size={12} />
                             <div className="flex flex-col text-left">
-                              <span className="font-medium text-foreground">
-                                {resource.title}
-                              </span>
+                              <span className="font-medium text-foreground">{resource.title}</span>
                               <span className="text-xs text-foreground-light">
                                 {resource.group}
                               </span>
@@ -170,16 +177,9 @@ export const TokenPermissionsForm = ({
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-sm">Configure permissions</span>
-            <Popover_Shadcn_
-              open={resourceSearchOpen}
-              onOpenChange={setResourceSearchOpen}
-            >
+            <Popover_Shadcn_ open={resourceSearchOpen} onOpenChange={setResourceSearchOpen}>
               <PopoverTrigger_Shadcn_ asChild>
-                <Button
-                  type="default"
-                  size="tiny"
-                  icon={<Plus className="h-4 w-4" />}
-                >
+                <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
                   Add permission
                 </Button>
               </PopoverTrigger_Shadcn_>
@@ -207,9 +207,7 @@ export const TokenPermissionsForm = ({
                         <div className="flex items-center gap-3">
                           <Key size={12} />
                           <div className="flex flex-col text-left">
-                            <span className="font-medium text-foreground">
-                              Add all permissions
-                            </span>
+                            <span className="font-medium text-foreground">Add all permissions</span>
                             <span className="text-xs text-foreground-light">
                               Add all available permissions with read-write access
                             </span>
@@ -249,8 +247,7 @@ export const TokenPermissionsForm = ({
                         value="add-all-organization-permissions"
                         onSelect={() => {
                           const orgPermissions = ALL_RESOURCES.filter(
-                            (resource) =>
-                              resource.group === 'Organization permissions'
+                            (resource) => resource.group === 'Organization permissions'
                           ).map((resource) => ({
                             resource: resource.resource,
                             action: resource.actions.includes('read-write')
@@ -309,9 +306,7 @@ export const TokenPermissionsForm = ({
 
           <div className="border border-border rounded-lg">
             {permissionRows.map((row: any, index: number) => {
-              const selectedResource = ALL_RESOURCES.find(
-                (r) => r.resource === row.resource
-              )
+              const selectedResource = ALL_RESOURCES.find((r) => r.resource === row.resource)
               return (
                 <div key={index}>
                   <div className="flex items-center gap-3 p-3">
@@ -354,18 +349,14 @@ export const TokenPermissionsForm = ({
                         size="tiny"
                         className="p-1"
                         onClick={() => {
-                          const newRows = permissionRows.filter(
-                            (_: any, i: number) => i !== index
-                          )
+                          const newRows = permissionRows.filter((_: any, i: number) => i !== index)
                           setValue('permissionRows', newRows)
                         }}
                         icon={<X size={16} />}
                       />
                     </div>
                   </div>
-                  {index < permissionRows.length - 1 && (
-                    <div className="border-t border-border" />
-                  )}
+                  {index < permissionRows.length - 1 && <div className="border-t border-border" />}
                 </div>
               )
             })}
@@ -381,4 +372,4 @@ export const TokenPermissionsForm = ({
       </div>
     </div>
   )
-} 
+}

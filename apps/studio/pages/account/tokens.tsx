@@ -5,7 +5,7 @@ import { useState } from 'react'
 import {
   AccessTokenList,
   NewAccessTokenButton,
-  // NewTokenBanner,
+  NewTokenBanner,
 } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
@@ -40,7 +40,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer bottomPadding>
         <div className="space-y-4">
-          {/* {newToken && <NewTokenBanner token={newToken} />} */}
+          {newToken && <NewTokenBanner token={newToken} />}
           <div className="flex items-center justify-between gap-x-2 mb-3">
             <Input
               size="tiny"
