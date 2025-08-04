@@ -52,8 +52,14 @@ describe(`NewAccessTokenButton`, () => {
     await userEvent.click(experimentalMenuItem)
 
     await waitFor(() => {
-      expect(screen.getByRole(`heading`, { name: `Generate token for experimental API` })).toBeInTheDocument()
-      expect(screen.getByText(`The experimental API provides additional endpoints which allows you to manage your organizations and projects.`)).toBeInTheDocument()
+      expect(
+        screen.getByRole(`heading`, { name: `Generate token for experimental API` })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          `The experimental API provides additional endpoints which allows you to manage your organizations and projects.`
+        )
+      ).toBeInTheDocument()
     })
 
     // Fill in the token name
@@ -117,7 +123,7 @@ describe(`NewAccessTokenButton`, () => {
     // The form should not submit and onCreateToken should not be called
     // because validation prevents submission when no permissions are configured
     expect(onCreateToken).not.toHaveBeenCalled()
-    
+
     // The form should still be open and the button should still be enabled
     expect(screen.getByRole(`button`, { name: `Generate token` })).toBeInTheDocument()
   })

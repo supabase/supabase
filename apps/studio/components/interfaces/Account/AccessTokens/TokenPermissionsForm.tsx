@@ -155,7 +155,9 @@ export const TokenPermissionsForm = ({
                             <div className="flex items-center gap-3">
                               <Key size={12} />
                               <div className="flex flex-col text-left">
-                                <span className="font-medium text-foreground">{resource.title}</span>
+                                <span className="font-medium text-foreground">
+                                  {resource.title}
+                                </span>
                               </div>
                             </div>
                           </CommandItem_Shadcn_>

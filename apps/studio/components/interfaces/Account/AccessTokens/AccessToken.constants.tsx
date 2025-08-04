@@ -1,6 +1,13 @@
 // A set of constants for the initial prototype of scoped PAT's.
 
-export const ACCESS_TOKEN_EXPIRY = ['No expiry', '7 days', '30 days', '90 days', '180 days', 'Custom']
+export const ACCESS_TOKEN_EXPIRY = [
+  'No expiry',
+  '7 days',
+  '30 days',
+  '90 days',
+  '180 days',
+  'Custom',
+]
 
 export const ACCESS_TOKEN_PERMISSIONS = [
   {
