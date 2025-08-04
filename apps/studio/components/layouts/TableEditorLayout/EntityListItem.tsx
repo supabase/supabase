@@ -465,7 +465,7 @@ const EntityTooltipTrigger = ({
       break
     case ENTITY_TYPE.FOREIGN_TABLE:
       if (foreignTableHasLints) {
-        tooltipContent = `${accessWarning} as RLS via is not enforced on foreign tables`
+        tooltipContent = `${accessWarning} as RLS is not enforced on foreign tables`
       }
       break
     default:
