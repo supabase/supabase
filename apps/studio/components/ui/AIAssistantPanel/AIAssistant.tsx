@@ -251,7 +251,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const hasMessages = chatMessages.length > 0
   const isShowingOnboarding = !hasMessages && isApiKeySet
 
-  const sendMessageToAssistant = async (finalContent: string) => {
+  const sendMessageToAssistant = (finalContent: string) => {
     const payload = {
       role: 'user',
       createdAt: new Date(),
