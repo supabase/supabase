@@ -30,7 +30,7 @@ export interface FormProps {
   /**
    * The function to handle stopping the stream
    */
-  onStop?: () => void
+  onStop: () => void
   /* The placeholder of the textarea */
   placeholder?: string
   /* SQL snippets to display above the form - can be strings or objects with label and content */
