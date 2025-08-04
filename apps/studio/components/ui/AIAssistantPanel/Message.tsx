@@ -214,7 +214,7 @@ export const Message = function Message({
               {onEdit && message.role === 'user' && (
                 <ButtonTooltip
                   type="text"
-                  icon={<Pencil size={14} />}
+                  icon={<Pencil size={14} strokeWidth={1.5} />}
                   onClick={() => onEdit(id)}
                   className="text-foreground-light hover:text-foreground p-1 rounded"
                   aria-label="Edit message"
