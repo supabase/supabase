@@ -236,7 +236,7 @@ export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
 
   const folderPath = folder ? path.join(SNIPPETS_DIR, folder.name) : SNIPPETS_DIR
   const filePath = path.join(folderPath, `${snippetName}.sql`)
-  await fs.writeFile(filePath, JSON.stringify(content, null, 2))
+  await fs.writeFile(filePath, content || '', 'utf-8')
 
   const result = buildSnippet(snippetName, content, snippet.folder_id)
   return result

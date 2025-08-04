@@ -415,7 +415,8 @@ describe('snippets.utils', () => {
 
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'test-snippet.sql'),
-        JSON.stringify('SELECT * FROM test;', null, 2)
+        'SELECT * FROM test;',
+        'utf-8'
       )
       expect(result.name).toBe('test-snippet')
       expect(result.content.sql).toBe('SELECT * FROM test;')
@@ -452,7 +453,8 @@ describe('snippets.utils', () => {
 
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'empty-snippet.sql'),
-        JSON.stringify('', null, 2)
+        '',
+        'utf-8'
       )
       expect(result.content.sql).toBe('')
     })
@@ -525,7 +527,8 @@ describe('snippets.utils', () => {
 
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'test-folder', 'folder-snippet.sql'),
-        JSON.stringify('SELECT * FROM folder_table;', null, 2)
+        'SELECT * FROM folder_table;',
+        'utf-8'
       )
       expect(result.folder_id).toBe(generateDeterministicUuid('test-folder'))
     })
@@ -679,7 +682,8 @@ describe('snippets.utils', () => {
       )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'updated-snippet.sql'),
-        JSON.stringify('SELECT * FROM new;', null, 2)
+        'SELECT * FROM new;',
+        'utf-8'
       )
       expect(result.name).toBe('updated-snippet')
       expect(result.content.sql).toBe('SELECT * FROM new;')
@@ -753,7 +757,8 @@ describe('snippets.utils', () => {
       // Should write to the folder path
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'existing-snippet.sql'),
-        JSON.stringify('SELECT * FROM old;', null, 2)
+        'SELECT * FROM old;',
+        'utf-8'
       )
       // Should delete the old file from root
       expect(mockedFS.unlink).toHaveBeenCalledWith(
@@ -794,7 +799,8 @@ describe('snippets.utils', () => {
       // Should write to the root path
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql'),
-        JSON.stringify('SELECT * FROM folder;', null, 2)
+        'SELECT * FROM folder;',
+        'utf-8'
       )
       // Should delete the old file from folder
       expect(mockedFS.unlink).toHaveBeenCalledWith(
@@ -858,7 +864,8 @@ describe('snippets.utils', () => {
       // Should write to the folder path with new name
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'renamed-snippet.sql'),
-        JSON.stringify('SELECT * FROM new;', null, 2)
+        'SELECT * FROM new;',
+        'utf-8'
       )
       // Should delete the old file from root with old name
       expect(mockedFS.unlink).toHaveBeenCalledWith(
@@ -887,7 +894,8 @@ describe('snippets.utils', () => {
       expect(result.content.sql).toBe('')
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql'),
-        JSON.stringify('', null, 2)
+        '',
+        'utf-8'
       )
     })
 
