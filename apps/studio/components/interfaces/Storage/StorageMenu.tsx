@@ -180,7 +180,7 @@ const StorageMenu = () => {
             )}
           </div>
 
-          <div className="w-full px-3 py-6 sticky bottom-0 bg-background border-t border-border">
+          <div className="w-full px-3 py-6 sticky bottom-0 border-t border-border">
             <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`}>
               <Menu.Item rounded active={page === 'policies'}>
