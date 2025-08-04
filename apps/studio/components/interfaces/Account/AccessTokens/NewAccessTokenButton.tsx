@@ -28,7 +28,6 @@ import { TokenBasicInfoForm } from './TokenBasicInfoForm'
 import { TokenResourceAccessForm } from './TokenResourceAccessForm'
 import { TokenPermissionsForm } from './TokenPermissionsForm'
 
-
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
 }
@@ -48,8 +47,6 @@ const TokenSchema = z.object({
   projectPermissions: z.record(z.string(), z.string()).optional(),
   permissionRows: z.array(PermissionRowSchema).optional(),
 })
-
-
 
 const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [visible, setVisible] = useState(false)
@@ -75,8 +72,6 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const resourceAccess = form.watch('resourceAccess')
   const expirationDate = form.watch('expirationDate')
   const permissionRows = form.watch('permissionRows') || []
-
-
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
     // Validate that at least one permission is configured
@@ -116,7 +111,6 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       permissionRows: [],
     })
     setVisible(false)
-
   }
 
   const handleDismiss = () => {
@@ -174,9 +168,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
         >
           <SheetHeader>
             <SheetTitle>
-              {tokenScope === 'V0'
-                ? 'Generate token for experimental API'
-                : 'Generate New Token'}
+              {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
             </SheetTitle>
           </SheetHeader>
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
@@ -210,23 +202,17 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
               <Form_Shadcn_ {...form}>
                 <div className="flex flex-col gap-0 overflow-visible">
                   {/* Basic Information Section */}
-                  <TokenBasicInfoForm 
-                    control={form.control} 
-                    expirationDate={expirationDate} 
-                  />
+                  <TokenBasicInfoForm control={form.control} expirationDate={expirationDate} />
 
                   <Separator />
 
                   {/* Resource Access Section */}
-                  <TokenResourceAccessForm 
-                    control={form.control} 
-                    resourceAccess={resourceAccess} 
-                  />
+                  <TokenResourceAccessForm control={form.control} resourceAccess={resourceAccess} />
 
                   <Separator />
 
                   {/* Permissions Section */}
-                  <TokenPermissionsForm 
+                  <TokenPermissionsForm
                     control={form.control}
                     setValue={form.setValue}
                     watch={form.watch}

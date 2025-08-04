@@ -39,4 +39,4 @@ export const createAllResources = (ACCESS_TOKEN_PERMISSIONS: any[]) => {
       group: group.name,
     }))
   )
-} 
+}
