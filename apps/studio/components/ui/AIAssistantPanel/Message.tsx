@@ -52,7 +52,10 @@ interface MessageProps {
     results: any[]
   }) => void
   onDelete?: (id: string) => void
-  onEdit?: (id: string) => void
+  onEdit: (id: string) => void
+  isAfterEditedMessage: boolean
+  isBeingEdited: boolean
+  onCancelEdit: () => void
 }
 
 export const Message = function Message({
@@ -65,6 +68,9 @@ export const Message = function Message({
   onResults,
   onDelete,
   onEdit,
+  isAfterEditedMessage = false,
+  isBeingEdited = false,
+  onCancelEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
   const allMarkdownComponents: Partial<Components> = useMemo(
@@ -98,8 +104,10 @@ export const Message = function Message({
         className={cn(
           'text-foreground-light text-sm',
           isUser ? 'text-foreground first:mt-0 mt-6' : 'first:mt-0 mt-2',
-          variant === 'warning' && 'bg-warning-200'
+          variant === 'warning' && 'bg-warning-200',
+          isAfterEditedMessage && 'opacity-50 cursor-pointer transition-opacity'
         )}
+        onClick={isAfterEditedMessage ? onCancelEdit : undefined}
       >
         {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
 
@@ -127,7 +135,8 @@ export const Message = function Message({
                             key={`${id}-part-${index}`}
                             className={cn(
                               'prose prose-sm [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
-                              isUser && 'text-foreground [&>p]:font-medium'
+                              isUser && 'text-foreground [&>p]:font-medium',
+                              isBeingEdited && 'animate-pulse'
                             )}
                             remarkPlugins={[remarkGfm]}
                             components={allMarkdownComponents}
@@ -218,7 +227,7 @@ export const Message = function Message({
                   {onEdit && (
                     <ButtonTooltip
                       type="text"
-                      icon={<Pencil size={14} />}
+                      icon={<Pencil size={14} strokeWidth={1.5} />}
                       onClick={() => onEdit(id)}
                       className="text-foreground-light hover:text-foreground p-1 rounded"
                       aria-label="Edit message"

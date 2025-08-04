@@ -1,7 +1,7 @@
 import type { Message as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, Info, RefreshCw, Settings, X } from 'lucide-react'
+import { ArrowDown, Info, Pencil, RefreshCw, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -42,6 +42,9 @@ const MemoizedMessage = memo(
     onResults,
     onDelete,
     onEdit,
+    isAfterEditedMessage,
+    isBeingEdited,
+    onCancelEdit,
   }: {
     message: MessageType
     isLoading: boolean
@@ -55,11 +58,13 @@ const MemoizedMessage = memo(
       results: any[]
     }) => void
     onDelete?: (id: string) => void
-    onEdit?: (id: string) => void
+    onEdit: (id: string) => void
+    isAfterEditedMessage: boolean
+    isBeingEdited: boolean
+    onCancelEdit: () => void
   }) => {
     return (
       <Message
-        key={message.id}
         id={message.id}
         message={message}
         readOnly={message.role === 'user'}
@@ -67,6 +72,9 @@ const MemoizedMessage = memo(
         onResults={onResults}
         onDelete={onDelete}
         onEdit={onEdit}
+        isAfterEditedMessage={isAfterEditedMessage}
+        isBeingEdited={isBeingEdited}
+        onCancelEdit={onCancelEdit}
       />
     )
   }
@@ -110,7 +118,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
-  const [originalMessageContent, setOriginalMessageContent] = useState('')
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -258,7 +265,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       // Activate editing mode
       setEditingMessageId(messageId)
-      setOriginalMessageContent(messageToEdit.content ?? '')
       setValue(messageToEdit.content ?? '')
 
       if (inputRef.current) {
@@ -270,45 +276,17 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const cancelEdit = useCallback(() => {
     setEditingMessageId(null)
-    setOriginalMessageContent('')
     setValue('')
   }, [setValue])
 
-  const confirmEdit = useCallback(
-    (newContent: string) => {
-      if (!editingMessageId) return
-
-      // Find the target message
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
-      if (messageIndex === -1) return
-
-      // Delete this message and all messages after it
-      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
-      const updatedMessages = chatMessages.slice(0, messageIndex)
-      setMessages(updatedMessages)
-
-      // Deactivate editing state
-      setEditingMessageId(null)
-      setOriginalMessageContent('')
-
-      const payload = {
-        role: 'user',
-        createdAt: new Date(),
-        content: newContent,
-        id: uuidv4(),
-      } as MessageType
-
-      snap.clearSqlSnippets()
-      lastUserMessageRef.current = payload
-      append(payload)
-      setValue('')
-    },
-    [editingMessageId, chatMessages, snap, setMessages, append, setValue]
-  )
-
   const renderedMessages = useMemo(
     () =>
-      chatMessages.map((message) => {
+      chatMessages.map((message, index) => {
+        const isBeingEdited = editingMessageId === message.id
+        const isAfterEditedMessage = editingMessageId
+          ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
+          : false
+
         return (
           <MemoizedMessage
             key={message.id}
@@ -317,10 +295,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             onResults={updateMessage}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
+            isAfterEditedMessage={isAfterEditedMessage}
+            isBeingEdited={isBeingEdited}
+            onCancelEdit={cancelEdit}
           />
         )
       }),
-    [chatMessages, isChatLoading, updateMessage, deleteMessageFromHere, editMessage]
+    [
+      chatMessages,
+      isChatLoading,
+      updateMessage,
+      deleteMessageFromHere,
+      editMessage,
+      cancelEdit,
+      editingMessageId,
+    ]
   )
 
   const hasMessages = chatMessages.length > 0
@@ -328,8 +317,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
-      confirmEdit(finalContent)
-      return
+      // Handling when the user is in edit mode
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
+      if (messageIndex === -1) return
+
+      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+      setEditingMessageId(null)
     }
 
     const payload = {
@@ -368,7 +363,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages([])
     lastUserMessageRef.current = null
     setEditingMessageId(null)
-    setOriginalMessageContent('')
   }
 
   // Update scroll behavior for new messages
@@ -512,7 +506,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
           </div>
           {hasMessages ? (
-            <div className="w-full px-7 py-8">
+            <div className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               {error && (
                 <div className="border rounded-md pl-2 pr-1 py-1 flex items-center justify-between">
@@ -586,40 +580,76 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         </div>
 
         <AnimatePresence>
-          {!isSticky && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="pointer-events-none z-10 -mt-24"
-              >
-                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
-                  <motion.div
-                    className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
-                    variants={{
-                      hidden: { y: 5, opacity: 0 },
-                      show: { y: 0, opacity: 1 },
-                    }}
-                    transition={{ duration: 0.1 }}
-                    initial="hidden"
-                    animate="show"
-                    exit="hidden"
-                  >
+          {editingMessageId && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                <motion.div
+                  className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
+                  variants={{
+                    hidden: { y: 5, opacity: 0 },
+                    show: { y: 0, opacity: 1 },
+                  }}
+                  transition={{ duration: 0.1 }}
+                  initial="hidden"
+                  animate="show"
+                  exit="hidden"
+                >
+                  <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
+                    <div className="flex items-center gap-x-2 text-sm text-foreground">
+                      <Pencil size={14} />
+                      <span>Editing message</span>
+                    </div>
                     <Button
-                      type="default"
-                      className="rounded-full w-8 h-8 p-1.5"
-                      onClick={() => {
-                        scrollToEnd()
-                        if (inputRef.current) inputRef.current.focus()
-                      }}
-                    >
-                      <ArrowDown size={16} />
-                    </Button>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </>
+                      type="outline"
+                      size="tiny"
+                      icon={<X size={14} />}
+                      onClick={cancelEdit}
+                      className="w-6 h-6 p-0"
+                      title="Cancel editing"
+                      aria-label="Cancel editing"
+                    />
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+          {!isSticky && !editingMessageId && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                <motion.div
+                  className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
+                  variants={{
+                    hidden: { y: 5, opacity: 0 },
+                    show: { y: 0, opacity: 1 },
+                  }}
+                  transition={{ duration: 0.1 }}
+                  initial="hidden"
+                  animate="show"
+                  exit="hidden"
+                >
+                  <Button
+                    type="default"
+                    className="rounded-full w-8 h-8 p-1.5"
+                    onClick={() => {
+                      scrollToEnd()
+                      if (inputRef.current) inputRef.current.focus()
+                    }}
+                  >
+                    <ArrowDown size={16} />
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
 
@@ -675,9 +705,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 snap.setSqlSnippets(newSnippets)
               }}
               includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
-              isEditing={!!editingMessageId}
-              editingMessageContent={originalMessageContent}
-              onCancelEdit={cancelEdit}
             />
           </div>
         )}
