@@ -221,7 +221,7 @@ export const Message = function Message({
                 remarkPlugins={[remarkGfm]}
                 components={allMarkdownComponents}
               >
-                {textContent}
+                {content}
               </ReactMarkdown>
             ) : (
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
