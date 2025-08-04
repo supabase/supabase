@@ -115,7 +115,11 @@ export function ViewTokenPermissionsPanel({
   return (
     <>
       <Sheet open={visible} onOpenChange={() => onClose()}>
-        <SheetContent showClose={false} size="default" className="!min-w-[600px] flex flex-col h-full gap-0">
+        <SheetContent
+          showClose={false}
+          size="default"
+          className="!min-w-[600px] flex flex-col h-full gap-0"
+        >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}
           >
@@ -125,47 +129,44 @@ export function ViewTokenPermissionsPanel({
             <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
           </SheetHeader>
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
-            <div className="space-y-8 p-4">
+            <div className="space-y-8 px-5 sm:px-6 py-6">
               {/* Expiry Section */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-medium text-foreground">Token Expiry</h3>
-                    </div>
-                    <Badge variant="success">Dec 31, 2024</Badge>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-foreground">Token Details</h3>
+                <div className="space-y-2 text-sm text-foreground-light">
+                  <div>Created on Dec 1, 2024</div>
+                  <div>Expires on Dec 31, 2024</div>
+                </div>
+              </div>
 
               {/* Permissions Groups */}
               {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => {
                 const groupedResources = groupResourcesByAccess(permissionGroup.resources)
-                
+
                 return (
-                  <div className="space-y-4 flex flex-col" key={permissionGroup.name}>
-                    <h3 className="text-base font-medium text-foreground">
-                      {permissionGroup.name}
-                    </h3>
-                    <Card className="overflow-hidden">
-                      <CardContent className="p-4 space-y-4">
+                  <Card key={permissionGroup.name}>
+                    <CardContent className="p-4 space-y-4">
+                      <h3 className="text-base font-medium text-foreground">
+                        {permissionGroup.name}
+                      </h3>
+                      <div className="space-y-4">
                         {Object.entries(groupedResources).map(([accessLevel, resources]) => {
                           if (resources.length === 0) return null
-                          
+
                           return (
                             <div key={accessLevel} className="space-y-2">
                               <h4 className="text-sm font-medium text-foreground-light">
                                 {accessLevel}
                               </h4>
-                              <div className="text-sm text-foreground">
+                              <div className="text-sm text-foreground prose">
                                 {resources.join(', ')}
                               </div>
                             </div>
                           )
                         })}
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )
               })}
             </div>
@@ -175,10 +176,7 @@ export function ViewTokenPermissionsPanel({
               <Button type="default" onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button 
-                type="danger" 
-                onClick={handleDeleteClick}
-              >
+              <Button type="danger" onClick={handleDeleteClick}>
                 Delete token
               </Button>
             </div>
