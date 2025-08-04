@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -155,12 +155,11 @@ export const CreateBranchModal = () => {
           })
           // valid – no issues added
         } catch (error) {
-          ctx.issues.push({
-                        code: z.ZodIssueCode.custom,
-                        message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
-                        path: ['gitBranchName'],
-                          input: ''
-                    })
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
+            path: ['gitBranchName'],
+          })
         }
       }
     })

@@ -19,7 +19,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'

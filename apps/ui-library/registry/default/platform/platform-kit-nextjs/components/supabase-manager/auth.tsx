@@ -15,7 +15,7 @@ import {
 } from '../../lib/schemas/auth'
 import { AlertTriangle, ChevronRight, Mail, Phone, User } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
 import { Skeleton } from '@/registry/default/components/ui/skeleton'
 import { Button } from '@/registry/default/components/ui/button'

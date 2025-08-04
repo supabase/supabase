@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { coalesceRowsToArray, filterByList } from './helpers'
 import { TABLES_SQL } from './sql/tables'
 import { COLUMNS_SQL } from './sql/columns'

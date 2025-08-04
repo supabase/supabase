@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { type DocumentNode, graphql, GraphQLError, parse, specifiedRules, validate } from 'graphql'
 import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { ApiError, convertZodToInvalidRequestError, InvalidRequestError } from '~/app/api/utils'
 import { BASE_PATH, IS_DEV } from '~/lib/constants'
 import { sendToLogflare, LOGGING_CODES } from '~/lib/logger'
@@ -85,7 +85,7 @@ function isDevGraphiQL(request: Request) {
 
 const graphQLRequestSchema = z.object({
   query: z.string(),
-  variables: z.record(z.string(), z.any()).optional(),
+  variables: z.record(z.any()).optional(),
   operationName: z.string().optional(),
 })
 

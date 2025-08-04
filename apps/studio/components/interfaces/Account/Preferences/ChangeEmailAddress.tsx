@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 import { InlineLink } from 'components/ui/InlineLink'
 import { useEmailUpdateMutation } from 'data/profile/profile-update-email-mutation'

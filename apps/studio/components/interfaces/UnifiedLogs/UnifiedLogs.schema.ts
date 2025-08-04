@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import {
   ARRAY_DELIMITER,
@@ -72,7 +72,7 @@ export const timelineChartSchema = z.object({
   ...LEVELS.reduce(
     (acc, level) => ({
       ...acc,
-      [level]: z.number().prefault(0),
+      [level]: z.number().default(0),
     }),
     {} as Record<(typeof LEVELS)[number], z.ZodNumber>
   ),

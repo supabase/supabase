@@ -1,5 +1,5 @@
 import { ident, literal } from './pg-format'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { TRIGGERS_SQL } from './sql/triggers'
@@ -91,9 +91,9 @@ export function retrieve(params: TriggerIdentifier): TriggersRetrieveReturn {
 
 export const pgTriggerCreateZod = z.object({
   name: z.string(),
-  schema: z.string().optional().prefault('public'),
+  schema: z.string().optional().default('public'),
   table: z.string(),
-  function_schema: z.string().optional().prefault('public'),
+  function_schema: z.string().optional().default('public'),
   function_name: z.string(),
   function_args: z.array(z.string()).optional(),
   activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),

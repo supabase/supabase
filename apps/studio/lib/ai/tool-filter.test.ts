@@ -1,6 +1,6 @@
 import { Tool, ToolSet, ToolExecutionOptions } from 'ai'
 import { describe, expect, it, vitest } from 'vitest'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import {
   TOOL_CATEGORIES,

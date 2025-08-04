@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod/v4'
+import z from 'zod'
 
 import { useParams } from 'common'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
@@ -60,14 +60,14 @@ const FormSchema = z.object({
       (value) => value !== 'public',
       '"public" is a reserved name. Please choose another name'
     ),
-  type: z.enum(['STANDARD', 'ANALYTICS']).prefault('STANDARD'),
-  public: z.boolean().prefault(false),
-  has_file_size_limit: z.boolean().prefault(false),
+  type: z.enum(['STANDARD', 'ANALYTICS']).default('STANDARD'),
+  public: z.boolean().default(false),
+  has_file_size_limit: z.boolean().default(false),
   formatted_size_limit: z.coerce
     .number()
     .min(0, 'File size upload limit has to be at least 0')
-    .prefault(0),
-  allowed_mime_types: z.string().trim().prefault(''),
+    .default(0),
+  allowed_mime_types: z.string().trim().default(''),
 })
 
 export type CreateBucketForm = z.infer<typeof FormSchema>

@@ -1,7 +1,7 @@
 import { ident, literal } from './pg-format'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { SCHEMAS_SQL } from './sql/schemas'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const pgSchemaZod = z.object({
   id: z.number(),

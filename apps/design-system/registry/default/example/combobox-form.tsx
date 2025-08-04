@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { cn } from '@/lib/utils'
 import {
@@ -43,8 +43,8 @@ const languages = [
 
 const FormSchema = z.object({
   language: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select a language.' : undefined
-}),
+    required_error: 'Please select a language.',
+  }),
 })
 
 export default function ComboboxForm() {

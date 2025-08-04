@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import {
   Button,
@@ -46,8 +46,8 @@ const items = [
 
 const FormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
-      error: 'You have to select at least one item.'
-}),
+    message: 'You have to select at least one item.',
+  }),
 })
 
 export default function CheckboxReactHookFormMultiple() {

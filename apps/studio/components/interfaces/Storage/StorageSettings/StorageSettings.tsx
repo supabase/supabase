@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -114,12 +114,11 @@ const StorageSettings = () => {
       const { value: formattedMaxLimit } = convertFromBytes(maxBytes, unit)
 
       if (fileSizeLimit > formattedMaxLimit) {
-        ctx.issues.push({
-                    code: z.ZodIssueCode.custom,
-                    message: `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${unit}.`,
-                    path: ['fileSizeLimit'],
-                      input: ''
-                  })
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${unit}.`,
+          path: ['fileSizeLimit'],
+        })
       }
     })
 

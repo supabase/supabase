@@ -1,6 +1,6 @@
 import { ident, literal } from './pg-format'
 import { EXTENSIONS_SQL } from './sql/extensions'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const pgExtensionZod = z.object({
   name: z.string(),

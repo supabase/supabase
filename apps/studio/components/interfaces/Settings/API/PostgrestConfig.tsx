@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -72,8 +72,8 @@ const formSchema = z
       return true
     },
     {
+      message: 'Must have at least one schema if Data API is enabled',
       path: ['dbSchema'],
-        error: 'Must have at least one schema if Data API is enabled'
     }
   )
 

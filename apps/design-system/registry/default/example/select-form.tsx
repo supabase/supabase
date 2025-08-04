@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import {
   Button,
@@ -23,9 +23,11 @@ import {
 } from 'ui'
 
 const FormSchema = z.object({
-  email: z.email({
-            error: (issue) => issue.input === undefined ? 'Please select an email to display.' : undefined
-        }),
+  email: z
+    .string({
+      required_error: 'Please select an email to display.',
+    })
+    .email(),
 })
 
 export default function SelectForm() {

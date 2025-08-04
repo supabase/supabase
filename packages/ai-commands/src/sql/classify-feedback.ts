@@ -1,6 +1,6 @@
 import { generateObject } from 'ai'
 import { openai as openaiProvider } from '@ai-sdk/openai'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { ContextLengthError } from '../errors'
 
 // Given a prompt from the feedback widget, classify it as support, feedback, or unknown.

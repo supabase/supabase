@@ -1,6 +1,6 @@
 import { ident, literal } from './pg-format'
 import { PUBLICATIONS_SQL } from './sql/publications'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const pgPublicationTableZod = z.object({
   id: z.number().optional(),

@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { cn } from '@/lib/utils'
 import {
@@ -25,8 +25,8 @@ import {
 
 const FormSchema = z.object({
   dob: z.date({
-      error: (issue) => issue.input === undefined ? 'A date of birth is required.' : undefined
-}),
+    required_error: 'A date of birth is required.',
+  }),
 })
 
 export default function DatePickerForm() {

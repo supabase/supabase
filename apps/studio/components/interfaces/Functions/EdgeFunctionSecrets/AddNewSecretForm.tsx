@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod/v4'
+import z from 'zod'
 
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
@@ -33,7 +33,7 @@ const FormSchema = z.object({
         .string()
         .min(1, 'Please provide a name for your secret')
         .refine((value) => !value.match(/^(SUPABASE_).*/), {
-            error: 'Name must not start with the SUPABASE_ prefix'
+          message: 'Name must not start with the SUPABASE_ prefix',
         }),
       value: z.string().min(1, 'Please provide a value for your secret'),
     })

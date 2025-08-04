@@ -1,6 +1,6 @@
 import { tool } from 'ai'
 import { stripIndent } from 'common-tags'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 // import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
 import { IS_PLATFORM } from 'common'

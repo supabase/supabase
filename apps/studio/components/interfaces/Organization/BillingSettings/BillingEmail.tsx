@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { Form, FormControl, FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
@@ -35,8 +35,8 @@ import {
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
-  billingEmail: z.email().optional(),
-  additionalBillingEmails: z.email().array().prefault([]),
+  billingEmail: z.string().email('Please provide a valid email address').optional(),
+  additionalBillingEmails: z.string().email({ message: 'invalid_email' }).array().default([]),
 })
 
 const BillingEmail = () => {

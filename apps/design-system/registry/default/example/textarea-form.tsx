@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import {
   Button,
@@ -21,10 +21,10 @@ const FormSchema = z.object({
   bio: z
     .string()
     .min(10, {
-        error: 'Bio must be at least 10 characters.'
+      message: 'Bio must be at least 10 characters.',
     })
     .max(160, {
-        error: 'Bio must not be longer than 30 characters.'
+      message: 'Bio must not be longer than 30 characters.',
     }),
 })
 

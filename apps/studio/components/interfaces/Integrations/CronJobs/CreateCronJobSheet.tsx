@@ -5,7 +5,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod/v4'
+import z from 'zod'
 
 import { useWatch } from '@ui/components/shadcn/ui/form'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
@@ -65,7 +65,7 @@ const edgeFunctionSchema = z.object({
   type: z.literal('edge_function'),
   method: z.enum(['GET', 'POST']),
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
-  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).prefault(1000),
+  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
   httpBody: z
     .string()
@@ -93,7 +93,7 @@ const httpRequestSchema = z.object({
     .min(1, 'Please provide a URL')
     .regex(urlRegex(), 'Please provide a valid URL')
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
-  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).prefault(1000),
+  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
   httpBody: z
     .string()
@@ -155,12 +155,11 @@ const FormSchema = z
   .superRefine((data, ctx) => {
     if (!cronPattern.test(data.schedule)) {
       if (!(data.supportsSeconds && secondsPattern.test(data.schedule))) {
-        ctx.issues.push({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Seconds are supported only in pg_cron v1.5.0+. Please use a valid Cron format.',
-                    path: ['schedule'],
-                      input: ''
-                  })
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Seconds are supported only in pg_cron v1.5.0+. Please use a valid Cron format.',
+          path: ['schedule'],
+        })
       }
     }
   })

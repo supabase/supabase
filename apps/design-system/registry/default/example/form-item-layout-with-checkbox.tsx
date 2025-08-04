@@ -9,10 +9,10 @@ import {
   FormField_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const FormSchema = z.object({
-  consistent_settings: z.boolean().prefault(false).optional(),
+  consistent_settings: z.boolean().default(false).optional(),
 })
 
 export default function FormItemLayoutDemo() {

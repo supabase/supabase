@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { IS_PLATFORM } from '~/lib/constants'

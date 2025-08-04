@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
 import { Badge, Button, buttonVariants, cn, Separator } from 'ui'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import Styles from '~/styles/career.module.css'
 
 import Globe from '~/components/Globe'

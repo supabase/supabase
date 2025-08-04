@@ -35,7 +35,7 @@ import {
   WarningIcon,
   Label_Shadcn_ as Label,
 } from 'ui'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
 import NewPublicationPanel from './NewPublicationPanel'
 import { useState, useMemo, useEffect } from 'react'

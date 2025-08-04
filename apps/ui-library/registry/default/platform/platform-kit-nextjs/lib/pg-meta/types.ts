@@ -1,14 +1,14 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 export const postgresPrimaryKeySchema = z.object({
   schema: z.string(),
   table_name: z.string(),
   name: z.string(),
-  table_id: z.int(),
+  table_id: z.number().int(),
 })
 
 export const postgresRelationshipSchema = z.object({
-  id: z.int(),
+  id: z.number().int(),
   constraint_name: z.string(),
   source_schema: z.string(),
   source_table_name: z.string(),
@@ -19,11 +19,11 @@ export const postgresRelationshipSchema = z.object({
 })
 
 export const postgresColumnSchema = z.object({
-  table_id: z.int(),
+  table_id: z.number().int(),
   schema: z.string(),
   table: z.string(),
   id: z.string().regex(/^(\d+)\.(\d+)$/),
-  ordinal_position: z.int(),
+  ordinal_position: z.number().int(),
   name: z.string(),
   default_value: z.any(),
   data_type: z.string(),
@@ -40,7 +40,7 @@ export const postgresColumnSchema = z.object({
 })
 
 export const postgresTableSchema = z.object({
-  id: z.int(),
+  id: z.number().int(),
   schema: z.string(),
   name: z.string(),
   rls_enabled: z.boolean(),
@@ -51,10 +51,10 @@ export const postgresTableSchema = z.object({
     z.literal('FULL'),
     z.literal('NOTHING'),
   ]),
-  bytes: z.int(),
+  bytes: z.number().int(),
   size: z.string(),
-  live_rows_estimate: z.int(),
-  dead_rows_estimate: z.int(),
+  live_rows_estimate: z.number().int(),
+  dead_rows_estimate: z.number().int(),
   comment: z.string().nullable(),
   columns: z.array(postgresColumnSchema).optional(),
   primary_keys: z.array(postgresPrimaryKeySchema),

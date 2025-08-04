@@ -2,7 +2,7 @@ import { literal } from './pg-format'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { INDEXES_SQL } from './sql/indexes'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const pgIndexZod = z.object({
   id: z.number(),

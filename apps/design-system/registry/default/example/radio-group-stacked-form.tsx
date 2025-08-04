@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import {
   Button,
@@ -19,8 +19,8 @@ import {
 
 const FormSchema = z.object({
   type: z.enum(['all', 'mentions', 'none'], {
-      error: (issue) => issue.input === undefined ? 'You need to select a notification type.' : undefined
-}),
+    required_error: 'You need to select a notification type.',
+  }),
 })
 
 export default function RadioGroupForm() {

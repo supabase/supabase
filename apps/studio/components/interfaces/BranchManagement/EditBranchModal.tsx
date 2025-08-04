@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -120,12 +120,11 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
           setIsGitBranchValid(true)
         } catch (error) {
           setIsGitBranchValid(false)
-          ctx.issues.push({
-                        code: z.ZodIssueCode.custom,
-                        message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
-                        path: ['gitBranchName'],
-                          input: ''
-                    })
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
+            path: ['gitBranchName'],
+          })
         }
       } else {
         // If git branch is empty or removed, it's valid for gitless branching

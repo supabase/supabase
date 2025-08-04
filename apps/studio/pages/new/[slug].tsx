@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
@@ -107,8 +107,8 @@ const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'sm
 
 const FormSchema = z.object({
   organization: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select an organization' : undefined
-}),
+    required_error: 'Please select an organization',
+  }),
   projectName: z
     .string()
     .trim()
@@ -116,19 +116,17 @@ const FormSchema = z.object({
     .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
     .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
   postgresVersion: z.string({
-      error: (issue) => issue.input === undefined ? 'Please enter a Postgres version.' : undefined
-}),
+    required_error: 'Please enter a Postgres version.',
+  }),
   dbRegion: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select a region.' : undefined
-}),
+    required_error: 'Please select a region.',
+  }),
   cloudProvider: z.string({
-      error: (issue) => issue.input === undefined ? 'Please select a cloud provider.' : undefined
-}),
+    required_error: 'Please select a cloud provider.',
+  }),
   dbPassStrength: z.number(),
   dbPass: z
-    .string({
-        error: (issue) => issue.input === undefined ? 'Please enter a database password.' : undefined
-    })
+    .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
   dataApi: z.boolean(),
@@ -281,12 +279,11 @@ const Wizard: NextPageWithLayout = () => {
 
   FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
     if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-      refinementContext.issues.push({
-                code: z.ZodIssueCode.custom,
-                path: ['dbPass'],
-                message: passwordStrengthWarning || 'Password not secure enough',
-                  input: ''
-            })
+      refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['dbPass'],
+        message: passwordStrengthWarning || 'Password not secure enough',
+      })
     }
   })
 

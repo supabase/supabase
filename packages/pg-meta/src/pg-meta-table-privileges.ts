@@ -1,7 +1,7 @@
 import { ident, literal } from './pg-format'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { filterByList } from './helpers'
 
 const pgTablePrivilegesZod = z.object({

@@ -2,12 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button, Checkbox_Shadcn_, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const FormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
-      error: 'You have to select at least one item.'
-}),
+    message: 'You have to select at least one item.',
+  }),
 })
 
 const items = [

@@ -1,5 +1,5 @@
 import { literal, ident } from './pg-format'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList, coalesceRowsToArray } from './helpers'
 import { FOREIGN_TABLES_SQL } from './sql/foreign-tables'

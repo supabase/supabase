@@ -1,5 +1,5 @@
 import { ident, literal } from './pg-format'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { COLUMN_PRIVILEGES_SQL } from './sql/column-privileges'
 import { filterByList } from './helpers'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
