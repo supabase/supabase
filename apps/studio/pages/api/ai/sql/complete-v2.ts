@@ -1,8 +1,7 @@
 import pgMeta from '@supabase/pg-meta'
-import { streamText } from 'ai'
+import { streamText, stepCountIs } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { getModel } from 'lib/ai/model'
@@ -60,7 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const result = streamText({
       model,
-      maxSteps: 5,
+      stopWhen: stepCountIs(2),
       tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
       system: source`
         VERY IMPORTANT RULES:
@@ -133,14 +132,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         REMEMBER: ONLY OUTPUT THE SQL MODIFICATION.
       `,
-      messages: [
-        {
-          role: 'user',
-
-          parts: [{
-            type: 'text',
-
-            text: source`
+      prompt: source`
               You are helping me edit some pgsql code.
               Here is the context:
               ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
@@ -158,13 +150,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               7. If there is no surrounding context (before or after), make sure your response is a complete valid SQL statement that can be run and resolves the prompt.
               
               Modify the selected text now:
-            `
-          }]
-        },
-      ],
+            `,
     })
 
-    return result.pipeUIMessageStreamToResponse(res);
+    return result.pipeUIMessageStreamToResponse(res)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({
