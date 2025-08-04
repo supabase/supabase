@@ -13,7 +13,9 @@ import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { sqlEditorState, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -32,6 +34,7 @@ const RenameQueryModal = ({
   onComplete,
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
+  const router = useRouter()
   const organization = useSelectedOrganization()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -97,7 +100,7 @@ const RenameQueryModal = ({
         snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
       }
 
-      await upsertContent({
+      const changedSnippet = await upsertContent({
         projectRef: ref,
         payload: {
           ...localSnippet,
@@ -106,10 +109,29 @@ const RenameQueryModal = ({
         } as UpsertContentPayload,
       })
 
-      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+      if (IS_PLATFORM) {
+        snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
 
-      const tabId = createTabId('sql', { id })
-      tabsSnap.updateTab(tabId, { label: nameInput })
+        const tabId = createTabId('sql', { id })
+        tabsSnap.updateTab(tabId, { label: nameInput })
+      } else if (changedSnippet) {
+        // In self-hosted, the snippet also updates the id when renaming it. This code is to ensure the previous snippet
+        // is removed, new one is added, tab state is updated and the router is updated.
+        const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
+        sqlEditorState.snippets = otherSnippets
+
+        const { [id]: result, ...otherResults } = sqlEditorState.results
+        sqlEditorState.results = otherResults
+
+        snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
+
+        // remove the tab for the old snippet
+        const tabId = createTabId('sql', { id })
+        tabsSnap.removeTab(tabId)
+
+        console.log(`/project/${ref}/sql/${changedSnippet.id}`)
+        await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
+      }
 
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()

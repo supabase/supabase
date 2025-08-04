@@ -1,14 +1,13 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCompletion } from 'ai/react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronUp, Command, Loader2 } from 'lucide-react'
+import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -52,6 +51,7 @@ import {
   cn,
 } from 'ui'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
+import { NewSqlTab } from './NewSqlTab'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
   ROWS_PER_PAGE_OPTIONS,
@@ -637,6 +637,8 @@ export const SQLEditor = () => {
     }
   }, [isDiffOpen, isDiffEditorMounted])
 
+  const isNewSnippetOnSelfhosted = urlId === 'new' && !IS_PLATFORM
+
   return (
     <>
       <RunQueryWarningModal
@@ -667,6 +669,8 @@ export const SQLEditor = () => {
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />
                 </div>
+              ) : isNewSnippetOnSelfhosted ? (
+                <NewSqlTab />
               ) : (
                 <>
                   {isDiffOpen && (
@@ -776,9 +780,9 @@ export const SQLEditor = () => {
             </div>
           </ResizablePanel>
 
-          <ResizableHandle withHandle />
+          <ResizableHandle withHandle className={cn({ hidden: isNewSnippetOnSelfhosted })} />
 
-          <ResizablePanel maxSize={70}>
+          <ResizablePanel maxSize={70} className={cn({ hidden: isNewSnippetOnSelfhosted })}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
