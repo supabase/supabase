@@ -24,7 +24,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
+  const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
 
   const { serviceKey } = getKeys(apiKeys)
   const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
@@ -50,7 +50,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
       <Card className="flex flex-col gap-6 p-6 pb-0">
         <p className="text-sm text-foreground-light mb-4">
           To get AWS credentials, you can create them using the{' '}
-          <Link href={`/project/${project?.ref}/settings/storage`}>
+          <Link href={`/project/${project?.ref}/storage/settings`}>
             <a className="underline ">S3 Access Keys</a>
           </Link>{' '}
           feature.

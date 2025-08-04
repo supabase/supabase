@@ -95,6 +95,15 @@ async function saveAiState(state: StoredAiAssistantState): Promise<void> {
   }
 }
 
+async function clearStorage(): Promise<void> {
+  try {
+    const db = await openAiDb()
+    await db.clear(STORE_NAME)
+  } catch (error) {
+    console.error('Failed to clear AI state from IndexedDB:', error)
+  }
+}
+
 // Helper function to load state from IndexedDB
 async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantState | null> {
   try {
@@ -387,6 +396,10 @@ export const createAiAssistantState = (): AiAssistantState => {
         }
       }
     },
+
+    clearStorage: async () => {
+      await clearStorage()
+    },
   })
 
   return state
@@ -413,6 +426,7 @@ export type AiAssistantState = AiAssistantData & {
   clearSqlSnippets: () => void
   getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
+  clearStorage: () => Promise<void>
 }
 
 export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())

@@ -144,16 +144,16 @@ export const CreateWrapperSheet = ({
     }
 
     setFormErrors(errors)
-    if (!isEmpty(errors)) {
-      return
-    }
+    if (!isEmpty(errors)) return
 
     try {
-      await createSchema({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        name: values.target_schema,
-      })
+      if (selectedMode === 'schema') {
+        await createSchema({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: values.target_schema,
+        })
+      }
 
       await createFDW({
         projectRef: project?.ref,
@@ -440,7 +440,7 @@ export const CreateWrapperSheet = ({
                           />
                           <p className="text-foreground-lighter text-sm">
                             A new schema will be created. For security purposes, the wrapper tables
-                            from the foreign schema cannot be created within an existing schema
+                            from the foreign schema cannot be created within an existing schema.
                           </p>
                         </div>
                       </FormSectionContent>

@@ -25,7 +25,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -60,7 +60,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isMaterializedView = isTableLikeMaterializedView(table)
 
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  const isLocked = PROTECTED_SCHEMAS.includes(table.schema)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
@@ -200,10 +200,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </TooltipContent>
             </Tooltip>
           )}
-          {isTable && !isLocked ? (
+          {isTable && !isSchemaLocked ? (
             table.rls_enabled ? (
               <>
-                {policies.length < 1 && !isLocked ? (
+                {policies.length < 1 && !isSchemaLocked ? (
                   <ButtonTooltip
                     asChild
                     type="default"
@@ -227,10 +227,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 ) : (
                   <Button
                     asChild
-                    type={policies.length < 1 && !isLocked ? 'warning' : 'default'}
+                    type={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
                     className="group"
                     icon={
-                      isLocked || policies.length > 0 ? (
+                      isSchemaLocked || policies.length > 0 ? (
                         <div
                           className={cn(
                             'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
@@ -281,7 +281,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       With RLS enabled, anonymous users will not be able to read/write data in the
                       table.
                     </p>
-                    {!isLocked && (
+                    {!isSchemaLocked && (
                       <div className="mt-2">
                         <Button
                           type="default"

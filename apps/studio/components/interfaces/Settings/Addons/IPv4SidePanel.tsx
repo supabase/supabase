@@ -136,7 +136,7 @@ const IPv4SidePanel = () => {
             <p className="text-sm">
               If you are connecting via the Shared connection pooler, you do not need this add-on as
               our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-              <InlineLink href={`/project/${projectRef}/settings/database#connection-pooler`}>
+              <InlineLink href={`/project/${projectRef}/database/settings#connection-pooler`}>
                 project database settings
               </InlineLink>
               .
