@@ -1,6 +1,6 @@
 import { Message as VercelMessage } from 'ai/react'
 import { Loader2, Pencil, Trash2 } from 'lucide-react'
-import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
+import { createContext, PropsWithChildren, ReactNode, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
@@ -11,6 +11,7 @@ import { cn, markdownComponents, WarningIcon } from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import {
   Heading3,
   Hyperlink,
@@ -73,6 +74,7 @@ export const Message = function Message({
   onCancelEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
   const allMarkdownComponents: Partial<Components> = useMemo(
     () => ({
       ...markdownComponents,
@@ -224,34 +226,39 @@ export const Message = function Message({
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
               {message.role === 'user' && (
                 <>
-                  {onEdit && (
-                    <ButtonTooltip
-                      type="text"
-                      icon={<Pencil size={14} strokeWidth={1.5} />}
-                      onClick={() => onEdit(id)}
-                      className="text-foreground-light hover:text-foreground p-1 rounded"
-                      aria-label="Edit message"
-                      tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
-                    />
-                  )}
+                  <ButtonTooltip
+                    type="text"
+                    icon={<Pencil size={14} strokeWidth={1.5} />}
+                    onClick={() => onEdit(id)}
+                    className="text-foreground-light hover:text-foreground p-1 rounded"
+                    aria-label="Edit message"
+                    tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
+                  />
 
-                  {onDelete && (
-                    <ButtonTooltip
-                      type="text"
-                      icon={<Trash2 size={14} strokeWidth={1.5} />}
-                      tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
-                      onClick={() => onDelete(id)}
-                      className="text-foreground-light hover:text-foreground p-1 rounded"
-                      title="Delete message"
-                      aria-label="Delete message"
-                    />
-                  )}
+                  <ButtonTooltip
+                    type="text"
+                    icon={<Trash2 size={14} strokeWidth={1.5} />}
+                    tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
+                    onClick={() => setShowDeleteConfirmModal(true)}
+                    className="text-foreground-light hover:text-foreground p-1 rounded"
+                    title="Delete message"
+                    aria-label="Delete message"
+                  />
                 </>
               )}
             </div>
           </div>
         </div>
       </div>
+
+      <DeleteMessageConfirmModal
+        visible={showDeleteConfirmModal}
+        onConfirm={() => {
+          onDelete(id)
+          setShowDeleteConfirmModal(false)
+        }}
+        onCancel={() => setShowDeleteConfirmModal(false)}
+      />
     </MessageContext.Provider>
   )
 }
