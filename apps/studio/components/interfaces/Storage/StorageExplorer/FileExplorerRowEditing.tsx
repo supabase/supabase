@@ -33,7 +33,13 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
       addNewFolder({
         folderName: name,
         columnIndex,
-        onError: () => inputRef.current.select(),
+        onError: () => {
+          if (event.type === 'blur') {
+            addNewFolder({ folderName: '', columnIndex })
+          } else {
+            inputRef.current.select()
+          }
+        },
       })
     }
   }
