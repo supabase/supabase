@@ -9,6 +9,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
+  STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
@@ -63,6 +64,7 @@ const DEFAULT_PREFERENCES = {
   view: STORAGE_VIEWS.COLUMNS,
   sortBy: STORAGE_SORT_BY.NAME,
   sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
+  sortBucket: STORAGE_BUCKET_SORT.CREATED_AT,
 }
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
@@ -83,7 +85,7 @@ function createStorageExplorerState({
   supabaseClient?: SupabaseClient<any, 'public', any>
 }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
-  const { view, sortBy, sortByOrder } =
+  const { view, sortBy, sortByOrder, sortBucket } =
     (typeof window !== 'undefined' && tryParseJson(localStorage?.getItem(localStorageKey))) ||
     DEFAULT_PREFERENCES
 
@@ -177,6 +179,12 @@ function createStorageExplorerState({
       state.updateExplorerPreference()
     },
 
+    sortBucket,
+    setSortBucket: async (value: STORAGE_BUCKET_SORT) => {
+      state.sortBucket = value
+      state.updateExplorerPreference()
+    },
+
     sortBy,
     setSortBy: async (value: STORAGE_SORT_BY) => {
       state.sortBy = value
@@ -204,8 +212,11 @@ function createStorageExplorerState({
 
     updateExplorerPreference: () => {
       const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
-      const { view, sortBy, sortByOrder } = state
-      localStorage.setItem(localStorageKey, JSON.stringify({ view, sortBy, sortByOrder }))
+      const { view, sortBy, sortByOrder, sortBucket } = state
+      localStorage.setItem(
+        localStorageKey,
+        JSON.stringify({ view, sortBy, sortByOrder, sortBucket })
+      )
     },
 
     // Functions that manage the UI of the Storage Explorer
@@ -971,7 +982,7 @@ function createStorageExplorerState({
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
-              <InlineLink href={`/project/${state.projectRef}/settings/storage`}>
+              <InlineLink href={`/project/${state.projectRef}/storage/settings`}>
                 Storage settings
               </InlineLink>
               .
