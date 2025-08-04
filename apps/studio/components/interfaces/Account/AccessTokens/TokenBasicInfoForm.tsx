@@ -5,7 +5,7 @@ import { Calendar as CalendarIcon } from 'lucide-react'
 import {
   FormField_Shadcn_,
   FormControl_Shadcn_,
-  Input_Shadcn_,
+  // Input_Shadcn_,
   Select_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
@@ -16,7 +16,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Button,
-  cn,
+  // cn,
   Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -38,7 +38,7 @@ export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFo
   }, [expirationDate])
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 px-4 sm:px-6 py-6">
       <FormField_Shadcn_
         key="tokenName"
         name="tokenName"
