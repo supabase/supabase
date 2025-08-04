@@ -42,6 +42,7 @@ const MemoizedMessage = memo(
     onResults,
     onEdit,
     isAfterEditedMessage,
+    isBeingEdited,
     onCancelEdit,
   }: {
     message: MessageType
@@ -57,6 +58,7 @@ const MemoizedMessage = memo(
     }) => void
     onEdit: (id: string) => void
     isAfterEditedMessage: boolean
+    isBeingEdited: boolean
     onCancelEdit: () => void
   }) => {
     return (
@@ -68,6 +70,7 @@ const MemoizedMessage = memo(
         onResults={onResults}
         onEdit={onEdit}
         isAfterEditedMessage={isAfterEditedMessage}
+        isBeingEdited={isBeingEdited}
         onCancelEdit={onCancelEdit}
       />
     )
@@ -257,6 +260,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
+        const isBeingEdited = editingMessageId === message.id
         const isAfterEditedMessage = editingMessageId
           ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
           : false
@@ -269,6 +273,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             onResults={updateMessage}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
+            isBeingEdited={isBeingEdited}
             onCancelEdit={cancelEdit}
           />
         )
