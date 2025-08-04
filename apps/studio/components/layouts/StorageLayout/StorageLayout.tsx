@@ -1,10 +1,8 @@
 import { ReactNode } from 'react'
-import dynamic from 'next/dynamic'
 
+import StorageMenu from 'components/interfaces/Storage/StorageMenu'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-
-const StorageMenu = dynamic(() => import('../../interfaces/Storage/StorageMenu'), { ssr: false })
 
 export interface StorageLayoutProps {
   title: string
