@@ -1,10 +1,11 @@
-import { useParams } from 'common'
-import Link from 'next/link'
-import { Button, Badge, Menu } from 'ui'
 import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+
+import { useParams } from 'common'
+import { Sidebar } from 'components/interfaces/Sidebar'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { Sidebar } from 'components/interfaces/Sidebar'
+import { Button } from 'ui'
 
 export const ApiKeysMoved = () => {
   const { ref: projectRef } = useParams()

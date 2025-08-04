@@ -24,7 +24,7 @@ const ProductMenuBar = ({ title, children, className }: PropsWithChildren<Produc
       >
         <h4 className="text-lg">{title}</h4>
       </div>
-      <div className="flex-grow overflow-y-auto">{children}</div>
+      <div className={cn('flex-grow overflow-y-auto', className)}>{children}</div>
     </div>
   )
 }
