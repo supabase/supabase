@@ -220,14 +220,22 @@ export const Message = function Message({
 
             {/* Action button - only show for user messages on hover */}
             <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              {onEdit && message.role === 'user' && (
+              {message.role === 'user' && (
                 <ButtonTooltip
                   type="text"
                   icon={<Pencil size={14} strokeWidth={1.5} />}
-                  onClick={() => onEdit(id)}
+                  onClick={isBeingEdited || isAfterEditedMessage ? onCancelEdit : () => onEdit(id)}
                   className="text-foreground-light hover:text-foreground p-1 rounded"
-                  aria-label="Edit message"
-                  tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
+                  aria-label={
+                    isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message'
+                  }
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text:
+                        isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message',
+                    },
+                  }}
                 />
               )}
             </div>
