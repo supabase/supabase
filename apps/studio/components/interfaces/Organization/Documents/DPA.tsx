@@ -42,7 +42,7 @@ const DPA = () => {
       toast.error('Organization not found.')
       return
     }
-    requestDpa({ recipientEmail: values.email, slug: slug })
+    requestDpa({ recipient_email: values.email, slug: slug })
   }
 
   return (

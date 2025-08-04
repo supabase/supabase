@@ -5,14 +5,14 @@ import { post, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type DpaRequestVariables = {
-  recipientEmail: string
+  recipient_email: string
   slug: string
 }
 
-export async function requestDpa({ recipientEmail, slug }: DpaRequestVariables) {
+export async function requestDpa({ recipient_email, slug }: DpaRequestVariables) {
   const { data, error } = await post(`/platform/organizations/${slug}/documents/dpa` as any, {
     // Fix type later
-    body: { recipientEmail },
+    body: { recipient_email },
   })
   if (error) handleError(error)
   return data

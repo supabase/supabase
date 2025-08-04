@@ -1114,6 +1114,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/cloud-marketplace/link': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Makes an existing organization being billed by AWS Marketplace */
+    put: operations['ClazarController_link']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/customer': {
     parameters: {
       query?: never
@@ -1160,6 +1177,23 @@ export interface paths {
     get: operations['OrgDailyStatsController_getDailyStatsCompute']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/documents/dpa': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create DPA document using PandaDoc */
+    post: operations['OrgDocumentsController_createDpaDocument']
     delete?: never
     options?: never
     head?: never
@@ -1533,6 +1567,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/sso': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the organization's SSO Provider */
+    get: operations['SSOProvidersController_getSSOProvider']
+    /** Update the organization's SSO Provider */
+    put: operations['SSOProvidersController_updateSSOProvider']
+    /** Create the organization's SSO Provider */
+    post: operations['SSOProvidersController_createSSOProvider']
+    /** Delete the organization's SSO Provider */
+    delete: operations['SSOProvidersController_deleteSSOProvider']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/tax-ids': {
     parameters: {
       query?: never
@@ -1561,6 +1615,40 @@ export interface paths {
     }
     /** Gets usage stats */
     get: operations['OrgUsageController_getOrgUsage']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/cloud-marketplace': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates organization billed by AWS Marketplace */
+    post: operations['OrganizationsController_createAwsBilledOrganization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/cloud-marketplace/check-eligibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether given organizations are eligible for AWS billing */
+    get: operations['OrganizationsController_checkCloudMarketplaceEligibility']
     put?: never
     post?: never
     delete?: never
@@ -4315,6 +4403,11 @@ export interface components {
     ChangeMFAEnforcementStateRequest: {
       enforced: boolean
     }
+    CheckCloudMarketplaceEligibilityResponse: {
+      is_eligible: boolean
+      reasons: string[]
+      slug: string
+    }[]
     CloneBackupsResponse: {
       backups: {
         id: number
@@ -4372,6 +4465,12 @@ export interface components {
       scope?: 'V0'
       token: string
       token_alias: string
+    }
+    CreateAwsBilledOrganizationBody: {
+      buyer_id: string
+      kind?: string
+      name: string
+      size?: string
     }
     CreateBackendParamsOpenapi: {
       config:
@@ -4473,6 +4572,17 @@ export interface components {
     CreateDestinationResponse: {
       /** @description Destination id */
       id: number
+    }
+    CreateDpaDocumentRequest: {
+      /** Format: email */
+      recipient_email: string
+    }
+    CreateDpaDocumentResponse: {
+      date_created: string
+      document_id: string
+      download_url?: string
+      name: string
+      status: string
     }
     CreateExtensionBody: {
       cascade: boolean
@@ -4908,6 +5018,62 @@ export interface components {
       /** @description Source id */
       id: number
     }
+    CreateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    CreateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     CreateStorageBucketBody: {
       allowed_mime_types?: string[]
       file_size_limit?: number
@@ -5552,6 +5718,34 @@ export interface components {
       }
       path: string[]
     }
+    GetSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     GetStorageCredentialsResponse: {
       data: {
         created_at: string
@@ -5781,6 +5975,7 @@ export interface components {
     }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
+      AUDIT_LOG_DISABLE_POSTGRES: boolean | null
       DB_MAX_POOL_SIZE: number | null
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
@@ -6095,6 +6290,9 @@ export interface components {
       }
       phone: string | null
       token: string
+    }
+    LinkClazarBuyerBody: {
+      buyer_id: string
     }
     ListGitHubConnectionsResponse: {
       connections: {
@@ -7225,6 +7423,7 @@ export interface components {
       app_config?: {
         db_schema: string
         endpoint: string
+        storage_endpoint: string
       }
       cloud_provider: string
       db_dns_name: string
@@ -7739,6 +7938,14 @@ export interface components {
       updated_at: string
     }
     StorageConfigResponse: {
+      capabilities: {
+        iceberg_catalog: boolean
+        list_v2: boolean
+      }
+      external: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features: {
         icebergCatalog?: {
           enabled: boolean
@@ -7846,6 +8053,10 @@ export interface components {
     TelemetryPageBodyV2: {
       feature_flags?: {
         [key: string]: unknown
+      }
+      groups?: {
+        organization?: string
+        project?: string
       }
       page_title: string
       page_url: string
@@ -8174,6 +8385,7 @@ export interface components {
     }
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
+      AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
       DB_MAX_POOL_SIZE?: number | null
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
@@ -8628,12 +8840,72 @@ export interface components {
     UpdateSecretsResponse: {
       message: string
     }
+    UpdateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    UpdateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     UpdateStorageBucketBody: {
       allowed_mime_types?: string[] | null
       file_size_limit?: number | null
       public: boolean
     }
     UpdateStorageConfigBody: {
+      external?: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features?: {
         icebergCatalog?: {
           enabled: boolean
@@ -11366,6 +11638,43 @@ export interface operations {
       }
     }
   }
+  ClazarController_link: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkClazarBuyerBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to make organization being billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   CustomerController_getCustomer: {
     parameters: {
       query?: never
@@ -11555,6 +11864,29 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  OrgDocumentsController_createDpaDocument: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDpaDocumentRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateDpaDocumentResponse']
+        }
       }
     }
   }
@@ -11805,12 +12137,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12523,6 +12849,124 @@ export interface operations {
       }
     }
   }
+  SSOProvidersController_getSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_updateSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSSOProviderBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_createSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSSOProviderBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_deleteSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   TaxIdsController_getTaxId: {
     parameters: {
       query?: never
@@ -12662,6 +13106,62 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get usage stats */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_createAwsBilledOrganization: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAwsBilledOrganizationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      /** @description Failed to create organization billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_checkCloudMarketplaceEligibility: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CheckCloudMarketplaceEligibilityResponse']
+        }
+      }
+      /** @description Failed to check whether organizations are eligible for AWS billing */
       500: {
         headers: {
           [name: string]: unknown
