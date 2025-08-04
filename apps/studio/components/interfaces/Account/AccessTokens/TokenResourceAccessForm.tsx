@@ -30,7 +30,7 @@ export const TokenResourceAccessForm = ({
   resourceAccess,
 }: TokenResourceAccessFormProps) => {
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 px-5 sm:px-6 py-6">
       <FormField_Shadcn_
         key="resourceAccess"
         name="resourceAccess"
