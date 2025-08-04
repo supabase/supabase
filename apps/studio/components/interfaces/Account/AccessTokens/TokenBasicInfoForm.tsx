@@ -15,6 +15,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Button,
+  Input_Shadcn_,
   Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -41,16 +42,16 @@ export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFo
         key="tokenName"
         name="tokenName"
         control={control}
-        render={({ field, fieldState }) => (
-          <Input
-            layout="vertical"
-            size="small"
-            label="Name"
-            placeholder="Provide a name for your token"
-            value={field.value}
-            onChange={(e) => field.onChange(e.target.value)}
-            error={fieldState.error?.message}
-          />
+        render={({ field }) => (
+          <FormItemLayout name="tokenName" label="Name">
+            <FormControl_Shadcn_>
+              <Input_Shadcn_
+                id="tokenName"
+                {...field}
+                placeholder="Provide a name for your token"
+              />
+            </FormControl_Shadcn_>
+          </FormItemLayout>
         )}
       />
 
@@ -64,7 +65,7 @@ export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFo
             label="Expiration date"
             labelOptional={
               isCustomSelected && customDate
-                ? `Token expires ${format(customDate, 'd MMMM yyyy')}`
+                ? `Token expires ${format(customDate, 'd MMM yyyy')}`
                 : getExpirationDateText(expirationDate)
             }
           >
@@ -102,7 +103,7 @@ export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFo
               layout="vertical"
               size="small"
               label="Custom expiration date"
-              value={customDate ? format(customDate, 'd MMMM yyyy') : ''}
+              value={customDate ? format(customDate, 'd MMM yyyy') : ''}
               placeholder="Pick a date"
               actions={
                 <Popover_Shadcn_>
