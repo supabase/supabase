@@ -3,6 +3,10 @@ import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import {
   billingPartnerLabel,
   getPlanChangeType,
@@ -11,25 +15,19 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 import { ProjectInfo } from 'data/projects/projects-query'
+import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { useTheme } from 'next-themes'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import PaymentMethodSelection from './PaymentMethodSelection'
-import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
-import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
-import { useTheme } from 'next-themes'
-import { PaymentIntentResult } from '@stripe/stripe-js'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
 import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
-import { useParams } from 'common'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import PaymentMethodSelection from './PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -347,7 +345,7 @@ export const SubscriptionPlanUpdateDialog = ({
                         <span>Monthly invoice estimate</span>
                         <InfoTooltip side="right">
                           <div className="w-[520px] p-6">
-                            <h3 className="text-base font-medium mb-2">Your new monthly invoice</h3>
+                            <h3 className="font-medium mb-2">Your new monthly invoice</h3>
                             <p className="prose text-xs mb-2">
                               Paid projects run 24/7 without pausing. First project uses Compute
                               Credits; additional projects start at <span translate="no">$10</span>
@@ -616,7 +614,7 @@ export const SubscriptionPlanUpdateDialog = ({
 
           {/* Right Column */}
           <div className="bg-surface-100 p-8 flex flex-col border-l xl:col-span-2">
-            <h3 className="text-base mb-8">
+            <h3 className="mb-8">
               {changeType === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
               <span className="font-bold">{selectedOrganization?.name}</span> to{' '}
               {changeType === 'downgrade'

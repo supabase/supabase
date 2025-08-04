@@ -98,13 +98,13 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                   <div className="grid grid-cols-12 gap-2 mt-12 items-start">
                     <div className="col-span-4 grid grid-cols-2 gap-x-12 gap-y-4 items-start">
                       <div className="grid gap-2 col-span-1">
-                        <h5 className="text-sm">Space used</h5>
+                        <h5>Space used</h5>
                         <span className="text-lg">
                           {formatBytes(databaseSizeBytesUsed, 2, 'GB')}
                         </span>
                       </div>
                       <div className="grid gap-2 col-span-1">
-                        <h5 className="text-sm">Total size</h5>
+                        <h5>Total size</h5>
                         <span className="text-lg">{currentDiskSize} GB</span>
                       </div>
 

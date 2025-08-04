@@ -22,7 +22,7 @@ const GitHubIntegrationAuthorize = () => {
 
   return (
     <div className="h-screen flex flex-col justify-center items-center gap-4">
-      <h2 className="text-xl">Completing GitHub Authorization...</h2>
+      <h2>Completing GitHub Authorization...</h2>
 
       {isSuccess && <p>You can now close this window.</p>}
       {isLoading && <p>Authorizing...</p>}
