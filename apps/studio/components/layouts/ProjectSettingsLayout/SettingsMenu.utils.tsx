@@ -33,12 +33,6 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        {
-          name: 'Data API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
         ...(IS_PLATFORM
           ? [
               {
@@ -67,6 +61,12 @@ export const generateSettingsMenu = (
                 name: `Log Drains`,
                 key: `log-drains`,
                 url: `/project/${ref}/settings/log-drains`,
+                items: [],
+              },
+              {
+                name: 'Data API',
+                key: 'api',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
                 items: [],
               },
               {
