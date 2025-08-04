@@ -258,7 +258,7 @@ export default function JWTSecretKeysTable() {
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <h2 className="text-xl">Previously used keys</h2>
+              <h2>Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
                 These JWT signing keys are still used to{' '}
                 <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
@@ -326,7 +326,7 @@ export default function JWTSecretKeysTable() {
       {revokedKeys.length > 0 && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl">Revoked keys</h2>
+            <h2>Revoked keys</h2>
             <p className="text-sm text-foreground-lighter">
               These keys are no longer used to verify or sign JWTs.
             </p>

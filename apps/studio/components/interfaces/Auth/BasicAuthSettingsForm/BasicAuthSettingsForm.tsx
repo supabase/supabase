@@ -64,7 +64,8 @@ const BasicAuthSettingsForm = () => {
         DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
         EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED,
         SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED,
-        MAILER_AUTOCONFIRM: authConfig.MAILER_AUTOCONFIRM,
+        // The backend uses false to represent that email confirmation is required
+        MAILER_AUTOCONFIRM: !authConfig.MAILER_AUTOCONFIRM,
         SITE_URL: authConfig.SITE_URL,
       })
     }
@@ -77,6 +78,9 @@ const BasicAuthSettingsForm = () => {
     if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
+
+    // The backend uses false to represent that email confirmation is required
+    payload.MAILER_AUTOCONFIRM = !values.MAILER_AUTOCONFIRM
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },

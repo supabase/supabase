@@ -32,6 +32,7 @@ export type MonacoEditorProps = {
     startLineNumber: number
     endLineNumber: number
   }) => void
+  placeholder?: string
 }
 
 const MonacoEditor = ({
@@ -39,6 +40,7 @@ const MonacoEditor = ({
   editorRef,
   monacoRef,
   autoFocus = true,
+  placeholder = '',
   className,
   executeQuery,
   onHasSelection,
@@ -204,6 +206,7 @@ const MonacoEditor = ({
         options={{
           tabSize: 2,
           fontSize: 13,
+          placeholder,
           lineDecorationsWidth: 0,
           readOnly: disableEdit,
           minimap: { enabled: false },
