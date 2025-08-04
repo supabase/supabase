@@ -245,10 +245,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       if (isChatLoading) stop()
 
-      // Update both valtio state and useChat state
       snap.deleteMessagesAfter(messageId, { includeSelf: true })
 
-      // Directly update chatMessages by keeping only messages before messageIndex
       const updatedMessages = chatMessages.slice(0, messageIndex)
       setMessages(updatedMessages)
     },
@@ -318,12 +316,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
       // Handling when the user is in edit mode
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
-      if (messageIndex === -1) return
-
-      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
-      const updatedMessages = chatMessages.slice(0, messageIndex)
-      setMessages(updatedMessages)
+      // delete the message(s) from the chat just like the delete button
+      deleteMessageFromHere(editingMessageId)
       setEditingMessageId(null)
     }
 
