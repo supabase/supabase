@@ -9,7 +9,7 @@ export const McpTabContent = () => {
   const { ref: projectRef } = useParams()
 
   return (
-    <Panel className="border-none shadow-none">
+    <Panel className="bg-inherit border-none shadow-none">
       {projectRef ? (
         <McpTabContentInnerLoaded projectRef={projectRef} />
       ) : (

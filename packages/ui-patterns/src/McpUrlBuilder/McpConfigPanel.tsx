@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react'
 import { cn, Separator } from 'ui'
+
 import { McpAddToClientButton } from './components/AddToClientButton'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import { FEATURE_GROUPS, MCP_CLIENTS } from './constants'
-import { useMcpUrl } from './hooks/useMcpUrl'
+import { getMcpUrl } from './utils/getMcpUrl'
 import type { McpClient } from './types'
 
 export interface McpConfigPanelProps {
@@ -33,7 +34,7 @@ export function McpConfigPanel({
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
 
-  const { clientConfig } = useMcpUrl({
+  const { clientConfig } = getMcpUrl({
     baseUrl,
     projectRef,
     readonly,
