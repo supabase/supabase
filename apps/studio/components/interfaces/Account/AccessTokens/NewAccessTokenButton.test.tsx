@@ -30,8 +30,25 @@ describe(`NewAccessTokenButton`, () => {
     const dialogTrigger = screen.getByRole(`button`, { name: `Generate new token` })
     await userEvent.click(dialogTrigger)
 
+    // Fill in the token name
     const nameInput = screen.getByLabelText(`Name`)
-    await userEvent.type(nameInput, `test{enter}`)
+    await userEvent.type(nameInput, `test`)
+
+    // Add at least one permission (required for form submission)
+    const addPermissionButton = screen.getByRole(`button`, { name: `Add permission` })
+    await userEvent.click(addPermissionButton)
+
+    // Select "Add all project permissions" from the dropdown
+    const addAllProjectPermissions = await screen.findByText(`Add all project permissions`)
+    await userEvent.click(addAllProjectPermissions)
+
+    // Wait for permissions to be added and then submit
+    await waitFor(() => {
+      expect(screen.getByText(`Configure permissions`)).toBeInTheDocument()
+    })
+
+    const generateButton = screen.getByRole(`button`, { name: `Generate token` })
+    await userEvent.click(generateButton)
 
     await waitFor(() => expect(onCreateToken).toHaveBeenCalledTimes(1))
   })
@@ -52,11 +69,28 @@ describe(`NewAccessTokenButton`, () => {
       await expect(
         screen.findByRole(`heading`, { name: `Generate token for experimental API` })
       ).resolves.toBeInTheDocument()
-      await expect(screen.findByRole(`alert`)).resolves.toBeInTheDocument()
+      await expect(screen.getByText(`The experimental API provides additional endpoints`)).resolves.toBeInTheDocument()
     })
 
+    // Fill in the token name
     const nameInput = screen.getByLabelText(`Name`)
-    await userEvent.type(nameInput, `test{enter}`)
+    await userEvent.type(nameInput, `test`)
+
+    // Add at least one permission (required for form submission)
+    const addPermissionButton = screen.getByRole(`button`, { name: `Add permission` })
+    await userEvent.click(addPermissionButton)
+
+    // Select "Add all project permissions" from the dropdown
+    const addAllProjectPermissions = await screen.findByText(`Add all project permissions`)
+    await userEvent.click(addAllProjectPermissions)
+
+    // Wait for permissions to be added and then submit
+    await waitFor(() => {
+      expect(screen.getByText(`Configure permissions`)).toBeInTheDocument()
+    })
+
+    const generateButton = screen.getByRole(`button`, { name: `Generate token` })
+    await userEvent.click(generateButton)
 
     await waitFor(() => expect(onCreateToken).toHaveBeenCalledTimes(1))
   })
@@ -88,10 +122,34 @@ describe(`NewAccessTokenButton`, () => {
     // reset the form by closing the dialog
     await userEvent.keyboard(`{Escape}`)
 
-    // pass 3: check that the form has been rest again
+    // pass 3: check that the form has been reset again
     await userEvent.click(dialogTrigger)
 
     nameInput = screen.getByLabelText(`Name`)
     expect(nameInput).not.toHaveValue(`close modal test`)
+  })
+
+  it(`shows validation error when no permissions are configured`, async () => {
+    const onCreateToken = vi.fn()
+    render(<NewAccessTokenButton onCreateToken={onCreateToken} />)
+
+    const dialogTrigger = screen.getByRole(`button`, { name: `Generate new token` })
+    await userEvent.click(dialogTrigger)
+
+    // Fill in the token name
+    const nameInput = screen.getByLabelText(`Name`)
+    await userEvent.type(nameInput, `test`)
+
+    // Try to submit without adding permissions
+    const generateButton = screen.getByRole(`button`, { name: `Generate token` })
+    await userEvent.click(generateButton)
+
+    // Should show validation error
+    await waitFor(() => {
+      expect(screen.getByText(`Please configure at least one permission.`)).toBeInTheDocument()
+    })
+
+    // onCreateToken should not be called
+    expect(onCreateToken).not.toHaveBeenCalled()
   })
 })
