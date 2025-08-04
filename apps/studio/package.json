@@ -25,8 +25,10 @@
     "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch"
   },
   "dependencies": {
-    "@ai-sdk/amazon-bedrock": "^2.2.10",
+    "@ai-sdk/amazon-bedrock": "^3.0.0",
     "@ai-sdk/openai": "^2.0.0",
+    "@ai-sdk/provider": "^2.0.0",
+    "@ai-sdk/provider-utils": "^3.0.0",
     "@ai-sdk/react": "^2.0.0",
     "@aws-sdk/credential-providers": "^3.804.0",
     "@dagrejs/dagre": "^1.0.4",
@@ -141,7 +143,7 @@
     "valtio": "catalog:",
     "yup": "^1.4.0",
     "yup-password": "^0.3.0",
-    "zod": "^3.25.0",
+    "zod": "^4.0.14",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
