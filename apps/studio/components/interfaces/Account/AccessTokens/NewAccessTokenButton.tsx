@@ -173,29 +173,31 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
             <div className="flex flex-col overflow-visible">
               {tokenScope === 'V0' && (
-                <Admonition
-                  type="warning"
-                  title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
-                  description={
-                    <>
-                      <p>
-                        These include deleting organizations and projects which cannot be undone. As
-                        such, be very careful when using this API.
-                      </p>
-                      <div className="mt-4">
-                        <Button asChild type="default" icon={<ExternalLink />}>
-                          <Link
-                            href="https://api.supabase.com/api/v0"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Experimental API documentation
-                          </Link>
-                        </Button>
-                      </div>
-                    </>
-                  }
-                />
+                <div className="px-4 sm:px-5 py-4 pb-4">
+                  <Admonition
+                    type="warning"
+                    title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
+                    description={
+                      <>
+                        <p>
+                          These include deleting organizations and projects which cannot be undone.
+                          As such, be very careful when using this API.
+                        </p>
+                        <div className="mt-4">
+                          <Button asChild type="default" icon={<ExternalLink />}>
+                            <Link
+                              href="https://api.supabase.com/api/v0"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Experimental API documentation
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    }
+                  />
+                </div>
               )}
 
               <Form_Shadcn_ {...form}>
