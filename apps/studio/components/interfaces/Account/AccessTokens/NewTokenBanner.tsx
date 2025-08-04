@@ -12,6 +12,7 @@ const NewTokenBanner = ({ token }: NewTokenBannerProps) => {
     <Admonition
       type="default"
       title="Successfully generated a new token!"
+      className="mb-6"
       description={
         <>
           <div className="w-full space-y-2">

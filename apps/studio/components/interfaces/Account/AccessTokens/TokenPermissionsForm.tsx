@@ -59,7 +59,7 @@ export const TokenPermissionsForm = ({
                     <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
                     {/* Preset Options */}
-                    <CommandGroup_Shadcn_ heading="Preset options">
+                    <CommandGroup_Shadcn_ heading="Preset options" className="[&>div]:text-left">
                       <CommandItem_Shadcn_
                         value="add-all-permissions"
                         onSelect={() => {
@@ -141,11 +141,11 @@ export const TokenPermissionsForm = ({
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>
 
-                    <CommandGroup_Shadcn_ heading="Individual permissions">
+                    <CommandGroup_Shadcn_ heading="Individual permissions" className="[&>div]:text-left">
                       {ALL_RESOURCES.map((resource) => (
                         <CommandItem_Shadcn_
                           key={resource.resource}
-                          value={resource.resource}
+                          value={`${resource.resource} ${resource.title} ${resource.group}`}
                           onSelect={() => {
                             const newRows = [
                               ...permissionRows,
@@ -154,6 +154,7 @@ export const TokenPermissionsForm = ({
                             setValue('permissionRows', newRows)
                             setResourceSearchOpen(false)
                           }}
+                          className="text-white"
                         >
                           <div className="flex items-center gap-3">
                             <Key size={12} />
@@ -190,7 +191,7 @@ export const TokenPermissionsForm = ({
                     <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
                     {/* Preset Options */}
-                    <CommandGroup_Shadcn_ heading="Preset options">
+                    <CommandGroup_Shadcn_ heading="Preset options" className="[&>div]:text-left">
                       <CommandItem_Shadcn_
                         value="add-all-permissions"
                         onSelect={() => {
@@ -272,11 +273,11 @@ export const TokenPermissionsForm = ({
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>
 
-                    <CommandGroup_Shadcn_ heading="Individual permissions">
+                    <CommandGroup_Shadcn_ heading="Individual permissions" className="[&>div]:text-left">
                       {ALL_RESOURCES.map((resource) => (
                         <CommandItem_Shadcn_
                           key={resource.resource}
-                          value={resource.resource}
+                          value={`${resource.resource} ${resource.title} ${resource.group}`}
                           onSelect={() => {
                             const newRows = [
                               ...permissionRows,
@@ -285,6 +286,7 @@ export const TokenPermissionsForm = ({
                             setValue('permissionRows', newRows)
                             setResourceSearchOpen(false)
                           }}
+                          className="text-white"
                         >
                           <div className="flex items-center gap-3">
                             <Key size={12} />
@@ -313,7 +315,7 @@ export const TokenPermissionsForm = ({
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium truncate max-w-[24ch]">
+                          <span className="text-sm font-medium truncate max-w-[36ch]">
                             {selectedResource?.title}
                           </span>
                           <span className="text-xs text-foreground-light">
