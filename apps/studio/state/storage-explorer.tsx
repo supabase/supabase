@@ -279,6 +279,7 @@ function createStorageExplorerState({
       folderName,
       columnIndex,
       onError,
+      onSuccess,
     }: {
       folderName: string
       columnIndex: number
@@ -329,6 +330,9 @@ function createStorageExplorerState({
           paths: [`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
         })
       }
+
+      const newFolder = state.columns[columnIndex].items.find((x) => x.name === formattedName)
+      if (newFolder) state.openFolder(columnIndex, newFolder)
     },
 
     fetchFolderContents: async ({
@@ -739,6 +743,19 @@ function createStorageExplorerState({
         return column
       })
       state.columns = updatedColumns
+    },
+
+    openFolder: async (columnIndex: number, folder: StorageItem) => {
+      state.setSelectedFilePreview(undefined)
+      state.clearSelectedItems(columnIndex + 1)
+      state.popOpenedFoldersAtIndex(columnIndex - 1)
+      state.pushOpenedFolderAtIndex(folder, columnIndex)
+      await state.fetchFolderContents({
+        bucketId: state.selectedBucket.id,
+        folderId: folder.id,
+        folderName: folder.name,
+        index: columnIndex,
+      })
     },
 
     downloadFolder: async (folder: StorageItemWithColumn) => {
