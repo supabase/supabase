@@ -1,8 +1,10 @@
 import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+import apiWrapper from 'lib/api/apiWrapper'
+import { getFolders, getSnippets } from 'lib/api/snippets.utils'
+
+const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -22,7 +24,12 @@ type GetResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  return res.status(200).json({ data: { folders: [], contents: [] } })
+  const folderId = req.query.id as string
+
+  const folders = await getFolders(folderId)
+  const snippets = await getSnippets(folderId)
+
+  return res.status(200).json({ data: { folders: folders, contents: snippets } })
 }
 
 type PatchResponseData =
@@ -32,3 +39,5 @@ const handlePatch = async (req: NextApiRequest, res: NextApiResponse<PatchRespon
   // Platform specific endpoint
   return res.status(200).json({} as never)
 }
+
+export default wrappedHandler
