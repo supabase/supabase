@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.31.4
+  version: 2.33.9
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -74,7 +74,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -2250,6 +2250,7 @@ commands:
     links: []
     subcommands:
       - supabase-gen-keys
+      - supabase-gen-signing-key
       - supabase-gen-types
     flags: []
   - id: supabase-gen-types
@@ -2310,6 +2311,35 @@ commands:
           - id: public
             name: public
             type: '[ internal | public ]'
+  - id: supabase-gen-signing-key
+    title: supabase gen signing-key
+    summary: Generate a JWT signing key
+    description: |
+      Securely generate a private JWT signing key for use in the CLI or to import in the dashboard.
+
+      Supported algorithms:
+          ES256 - ECDSA with P-256 curve and SHA-256 (recommended)
+          RS256 - RSA with SHA-256
+    tags: []
+    links: []
+    usage: supabase gen signing-key [flags]
+    subcommands: []
+    flags:
+      - id: algorithm
+        name: --algorithm <[ RS256 | ES256 ]>
+        description: Algorithm for signing key generation.
+        default_value: ES256
+        accepted_values:
+          - id: RS256
+            name: RS256
+            type: '[ RS256 | ES256 ]'
+          - id: ES256
+            name: ES256
+            type: '[ RS256 | ES256 ]'
+      - id: append
+        name: --append
+        description: Append new key to existing keys file instead of overwriting.
+        default_value: 'false'
   - id: supabase-gen-keys
     title: supabase gen keys
     summary: Generate keys for preview branch
@@ -3572,6 +3602,10 @@ commands:
           - id: xlarge
             name: xlarge
             type: string
+      - id: with-data
+        name: --with-data
+        description: Whether to clone production data to the branch database.
+        default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features

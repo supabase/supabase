@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toString as CronToString } from 'cronstrue'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,8 +12,9 @@ import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { getDatabaseCronJob } from 'data/database-cron-jobs/database-cron-job-query'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
-import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -200,14 +202,11 @@ export const CreateCronJobSheet = ({
 }: CreateCronJobSheetProps) => {
   const { project } = useProjectContext()
   const { data: org } = useSelectedOrganizationQuery()
+  const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
+  const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
+
   const isEditing = !!selectedCronJob?.jobname
-
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
-
-  const { data: cronJobs } = useCronJobsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const { data } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -217,7 +216,8 @@ export const CreateCronJobSheet = ({
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
+  const { mutate: upsertCronJob, isLoading: isUpserting } = useDatabaseCronJobCreateMutation()
+  const isLoading = isLoadingGetCronJob || isUpserting
 
   const canToggleExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -305,20 +305,32 @@ export const CreateCronJobSheet = ({
   ])
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
-    // job names should be unique
-    const nameExists = cronJobs?.some(
-      (job) => job.jobname === name && job.jobname !== selectedCronJob?.jobname
-    )
-    if (nameExists) {
-      form.setError('name', {
-        type: 'manual',
-        message: 'A cron job with this name already exists',
-      })
-      return
+    if (!project) return console.error('Project is required')
+
+    if (!isEditing) {
+      try {
+        setIsLoadingGetCronJob(true)
+        const checkExistingJob = await getDatabaseCronJob({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          name,
+        })
+        const nameExists = !!checkExistingJob
+
+        if (nameExists) {
+          return form.setError('name', {
+            type: 'manual',
+            message: 'A cron job with this name already exists',
+          })
+        }
+      } catch (error: any) {
+        toast.error(`Failed to validate cron job name: ${error.message}`)
+      } finally {
+        setIsLoadingGetCronJob(false)
+      }
     }
 
-    let command = `$$${values.snippet}$$`
-
+    const command = `$$${values.snippet}$$`
     const query = buildCronQuery(name, schedule, command)
 
     upsertCronJob(
@@ -326,6 +338,7 @@ export const CreateCronJobSheet = ({
         projectRef: project!.ref,
         connectionString: project?.connectionString,
         query,
+        searchTerm: searchQuery,
       },
       {
         onSuccess: () => {
@@ -365,6 +378,7 @@ export const CreateCronJobSheet = ({
         },
       }
     )
+    setIsLoadingGetCronJob(false)
   }
 
   return (
