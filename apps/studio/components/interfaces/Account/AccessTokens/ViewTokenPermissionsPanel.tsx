@@ -10,6 +10,12 @@ import {
   Badge,
   Button,
   Separator,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 import { AccessToken } from 'data/access-tokens/access-tokens-query'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -17,6 +23,7 @@ import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_PERMISSIONS } from './AccessToken.constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useState } from 'react'
+import { Info } from 'lucide-react'
 
 interface ViewTokenPermissionsPanelProps {
   visible: boolean
@@ -132,40 +139,58 @@ export function ViewTokenPermissionsPanel({
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
             <div className="space-y-8 px-5 sm:px-6 py-6">
               {/* Token Details Section */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">Token Details</h3>
-                <div className="space-y-2 text-sm text-foreground-light">
-                  <div className="flex items-center gap-2">
-                    <span>Created on</span>
-                    <Badge variant="default">Dec 1, 2024</Badge>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>Expires on</span>
-                    <Badge variant="default">Dec 31, 2024</Badge>
-                  </div>
-                </div>
+              <div className="flex items-center gap-2 text-base text-foreground-light">
+                <Info className="h-4 w-4 text-foreground-light" />
+                <span>
+                  This token was created on{' '}
+                  <span className="text-foreground">
+                    {token?.created_at
+                      ? new Date(token.created_at).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      : 'Unknown'}
+                  </span>{' '}
+                  and expires on <span className="text-foreground">4 Aug 2025</span>.
+                </span>
               </div>
 
               {/* Resource Access Section */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-foreground">Resource Access</h3>
-                <Card>
-                  <CardContent className="space-y-4 p-0">
-                    <div className="space-y-4 p-4">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-foreground-light">Organizations</h4>
-                        <div className="text-sm text-foreground prose">
-                          Acme Corp, Tech Solutions Inc
-                        </div>
-                      </div>
-                      <Separator className="mt-4" />
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-foreground-light">Projects</h4>
-                        <div className="text-sm text-foreground prose">
-                          ecommerce-app, analytics-dashboard, api-gateway
-                        </div>
-                      </div>
-                    </div>
+                <Card className="w-full overflow-hidden bg-surface-100">
+                  <CardContent className="p-0">
+                    <Table className="p-5 table-auto">
+                      <TableHeader>
+                        <TableRow className="bg-200">
+                          <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[60%]">
+                            Resource
+                          </TableHead>
+                          <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                            Type
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>
+                            <p className="truncate text-foreground">Acme Corp</p>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-foreground-light">Organization</span>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <p className="truncate text-foreground">api-gateway</p>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-foreground-light">Project</span>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
                   </CardContent>
                 </Card>
               </div>
@@ -177,33 +202,36 @@ export function ViewTokenPermissionsPanel({
                 return (
                   <div key={permissionGroup.name} className="space-y-3">
                     <h3 className="text-sm font-medium text-foreground">{permissionGroup.name}</h3>
-                    <Card>
-                      <CardContent className="space-y-4 p-0">
-                        <div className="space-y-4 p-4">
-                          {Object.entries(groupedResources).map(
-                            ([accessLevel, resources], index) => {
+                    <Card className="w-full overflow-hidden bg-surface-100">
+                      <CardContent className="p-0">
+                        <Table className="p-5 table-auto">
+                          <TableHeader>
+                            <TableRow className="bg-200">
+                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[60%]">
+                                Permission
+                              </TableHead>
+                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                                Access
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {Object.entries(groupedResources).map(([accessLevel, resources]) => {
                               if (resources.length === 0) return null
 
-                              return (
-                                <div key={accessLevel}>
-                                  <div className="space-y-2">
-                                    <h4 className="text-sm font-medium text-foreground-light">
-                                      {accessLevel}
-                                    </h4>
-                                    <div className="text-sm text-foreground prose">
-                                      {resources.join(', ')}
-                                    </div>
-                                  </div>
-                                  {index <
-                                    Object.entries(groupedResources).filter(
-                                      ([_, resources]) => resources.length > 0
-                                    ).length -
-                                      1 && <Separator className="mt-4" />}
-                                </div>
-                              )
-                            }
-                          )}
-                        </div>
+                              return resources.map((resource) => (
+                                <TableRow key={`${accessLevel}-${resource}`}>
+                                  <TableCell>
+                                    <p className="truncate text-foreground">{resource}</p>
+                                  </TableCell>
+                                  <TableCell>
+                                    <span className="text-foreground-light">{accessLevel}</span>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            })}
+                          </TableBody>
+                        </Table>
                       </CardContent>
                     </Card>
                   </div>
