@@ -8,6 +8,7 @@ import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTabsStateSnapshot, type Tab } from 'state/tabs'
 import { cn, TabsTrigger_Shadcn_ } from 'ui'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 
 /**
  * Individual draggable tab component that handles:
@@ -28,8 +29,9 @@ export const SortableTab = ({
   openTabs: Tab[]
   onClose: (id: string) => void
 }) => {
-  const { selectedSchema: currentSchema } = useQuerySchemaState()
+  const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
+  const { selectedSchema: currentSchema } = useQuerySchemaState()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
   })
@@ -44,8 +46,8 @@ export const SortableTab = ({
   const shouldShowSchema = useMemo(() => {
     // For both table and schema tabs, show schema if:
     // Any tab has a different schema than the current schema parameter
-    return openTabs.some((t) => t.metadata?.schema !== currentSchema)
-  }, [openTabs, currentSchema])
+    return openTabs.some((t) => editor === 'table' && t.metadata?.schema !== currentSchema)
+  }, [openTabs, currentSchema, editor])
 
   // Create a motion version of TabsTrigger while preserving all functionality
   // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)

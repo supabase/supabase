@@ -1,3 +1,5 @@
+import { useParams } from 'common'
+import Link from 'next/link'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
@@ -73,7 +75,7 @@ export const ObjectsToBeDroppedWarning = ({
       <AlertTitle_Shadcn_>A new version of Postgres is available</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
         <div>
-          <p className="mb-1">You'll need to remove the following objects before upgrading:</p>
+          <p className="mb-1">The following objects have to be removed before upgrading:</p>
 
           <ul className="pl-4">
             {objectsToBeDropped.map((obj) => (
@@ -105,6 +107,8 @@ export const UnsupportedExtensionsWarning = ({
 }: {
   unsupportedExtensions: string[]
 }) => {
+  const { ref } = useParams()
+
   return (
     <Alert_Shadcn_
       variant="warning"
@@ -113,12 +117,17 @@ export const UnsupportedExtensionsWarning = ({
       <AlertTitle_Shadcn_>A new version of Postgres is available</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
         <div>
-          <p className="mb-1">You'll need to remove the following extensions before upgrading:</p>
+          <p className="mb-1">The following extensions have to be removed before upgrading:</p>
 
           <ul className="pl-4">
             {unsupportedExtensions.map((obj: string) => (
               <li className="list-disc" key={obj}>
-                {obj}
+                <Link
+                  href={`/project/${ref}/database/extensions?filter=${obj}`}
+                  className="hover:text-foreground transition"
+                >
+                  {obj}
+                </Link>
               </li>
             ))}
           </ul>
