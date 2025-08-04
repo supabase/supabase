@@ -4685,7 +4685,8 @@ export interface components {
     }
     CreateProjectBody: {
       auth_site_url?: string
-      cloud_provider: string
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
       custom_supabase_internal_requests?: {
         ami: {
           search_tags?: {
@@ -5060,7 +5061,7 @@ export interface components {
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
       /** @default null */
       connection_string_read_only?: string | null
       /** @default null */
@@ -5263,10 +5264,6 @@ export interface components {
       archive_empty: boolean
       file_url: string
       fileUrl: string
-    }
-    GetAvailableRegionsBody: {
-      cloud_provider: string
-      organization_slug: string
     }
     GetContentCountResponse: {
       count: number
@@ -6359,7 +6356,8 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
-      provider: string
+      /** @enum {string} */
+      provider: 'AWS' | 'FLY' | 'AWS_K8S'
       region: string
     }
     OrganizationSlugAvailableVersionsResponse: {
@@ -7195,6 +7193,7 @@ export interface components {
       app_config?: {
         db_schema: string
         endpoint: string
+        storage_endpoint: string
       }
       cloud_provider: string
       db_dns_name: string
@@ -7258,7 +7257,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -7277,7 +7276,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -11677,6 +11676,12 @@ export interface operations {
           'application/json': components['schemas']['InvitationResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get organization invitations */
       500: {
         headers: {
@@ -11703,6 +11708,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -17920,6 +17931,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project's status */
       500: {
         headers: {
@@ -17993,16 +18010,15 @@ export interface operations {
   }
   ProjectsController_getRegions: {
     parameters: {
-      query?: never
+      query: {
+        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+        organization_slug: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetAvailableRegionsBody']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
@@ -18032,6 +18048,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

@@ -26,6 +26,7 @@ Chris Caruso
 Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
 Chris Stockton
 Craig Cannon
 Danny White
@@ -38,6 +39,7 @@ Divit D
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Emmett Folger
 Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
@@ -77,6 +79,7 @@ Luca Forstner
 Margarita Sandomirskaia
 Mark Burggraf
 Monica Khoury
+Mykhailo Mischa Lieibenson
 Nyannyacha
 Oli R
 Pamela Chia
@@ -100,6 +103,7 @@ Stanislav M
 Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taryn King
 Terry Sutton

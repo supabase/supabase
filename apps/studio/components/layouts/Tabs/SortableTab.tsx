@@ -2,10 +2,10 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTabsStateSnapshot, type Tab } from 'state/tabs'
 import { cn, TabsTrigger_Shadcn_ } from 'ui'
 
@@ -28,8 +28,7 @@ export const SortableTab = ({
   openTabs: Tab[]
   onClose: (id: string) => void
 }) => {
-  const router = useRouter()
-  const currentSchema = (router.query.schema as string) || 'public'
+  const { selectedSchema: currentSchema } = useQuerySchemaState()
   const tabs = useTabsStateSnapshot()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
@@ -45,16 +44,8 @@ export const SortableTab = ({
   const shouldShowSchema = useMemo(() => {
     // For both table and schema tabs, show schema if:
     // Any tab has a different schema than the current schema parameter
-    if (tab.type === 'r') {
-      const anyTabHasDifferentSchema = openTabs
-        .filter((t) => t.type === 'r')
-        .some((t) => t.metadata?.schema !== currentSchema)
-
-      return anyTabHasDifferentSchema
-    }
-
-    return false
-  }, [openTabs, currentSchema, tab.type])
+    return openTabs.some((t) => t.metadata?.schema !== currentSchema)
+  }, [openTabs, currentSchema])
 
   // Create a motion version of TabsTrigger while preserving all functionality
   // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)

@@ -25,6 +25,14 @@ This is all the information you need to connect to Supabase Storage using any S3
 
 <img alt="Storage S3 Access keys" src="/docs/img/storage/s3-credentials.png" width="100%" />
 
+<Admonition type="note">
+
+For optimal performance when uploading large files you should always use the direct storage hostname. This provides several performance enhancements that will greatly improve performance when uploading large files.
+
+Instead of `https://project-id.supabase.co` use `https://project-id.storage.supabase.co`
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
@@ -39,7 +47,7 @@ This is all the information you need to connect to Supabase Storage using any S3
         const client = new S3Client({
           forcePathStyle: true,
           region: 'project_region',
-          endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
+          endpoint: 'https://project_ref.storage.supabase.co/storage/v1/s3',
           credentials: {
             accessKeyId: 'your_access_key_id',
             secretAccessKey: 'your_secret_access_key',
@@ -55,7 +63,7 @@ This is all the information you need to connect to Supabase Storage using any S3
         [supabase]
         aws_access_key_id = your_access_key_id
         aws_secret_access_key = your_secret_access_key
-        endpoint_url = https://project_ref.supabase.co/storage/v1/s3
+        endpoint_url = https://project_ref.storage.supabase.co/storage/v1/s3
         region = project_region
         ```
     </TabPanel>
@@ -86,7 +94,7 @@ const {
 const client = new S3Client({
   forcePathStyle: true,
   region: 'project_region',
-  endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
+  endpoint: 'https://project_ref.storage.supabase.co/storage/v1/s3',
   credentials: {
     accessKeyId: 'project_ref',
     secretAccessKey: 'anonKey',
