@@ -17,7 +17,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
@@ -106,8 +105,6 @@ const NewFunctionPage = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
 
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
-
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([
@@ -171,10 +168,22 @@ const NewFunctionPage = () => {
         title:
           'I can help you understand and improve your edge function. Here are a few example prompts to get you started:',
         prompts: [
-          'Explain what this function does...',
-          'Help me optimize this function...',
-          'Show me how to add more features...',
-          'Help me handle errors better...',
+          {
+            label: 'Explain Function',
+            description: 'Explain what this function does...',
+          },
+          {
+            label: 'Optimize Function',
+            description: 'Help me optimize this function...',
+          },
+          {
+            label: 'Add Features',
+            description: 'Show me how to add more features...',
+          },
+          {
+            label: 'Error Handling',
+            description: 'Help me handle errors better...',
+          },
         ],
       },
     })
@@ -326,11 +335,7 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={
-          useBedrockAssistant
-            ? `${BASE_PATH}/api/ai/edge-function/complete-v2`
-            : `${BASE_PATH}/api/ai/edge-function/complete`
-        }
+        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,

@@ -1,12 +1,14 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useState } from 'react'
 import {
   Area,
   Bar,
   CartesianGrid,
+  Label,
   Line,
   ComposedChart as RechartComposedChart,
   ReferenceArea,
@@ -14,7 +16,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Label,
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
@@ -28,11 +29,14 @@ import {
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import { calculateTotalChartAggregate, CustomLabel, CustomTooltip } from './ComposedChart.utils'
+import {
+  calculateTotalChartAggregate,
+  CustomLabel,
+  CustomTooltip,
+  MultiAttribute,
+} from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { MultiAttribute } from './ComposedChart.utils'
 import { ChartHighlight } from './useChartHighlight'
-import { formatBytes } from 'lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -163,33 +167,6 @@ export default function ComposedChart({
     color: CHART_COLORS.REFERENCE_LINE,
   }
 
-  const chartData =
-    data && !!data[0]
-      ? Object.entries(data[0])
-          ?.map(([key, value]) => ({
-            name: key,
-            value: value,
-          }))
-          .filter(
-            (att) =>
-              att.name !== 'timestamp' &&
-              att.name !== 'period_start' &&
-              att.name !== maxAttribute?.attribute &&
-              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
-          )
-          .map((att, index) => {
-            const attribute = attributes.find((attr) => attr.attribute === att.name)
-            return {
-              ...att,
-              color: attribute?.color
-                ? resolvedTheme?.includes('dark')
-                  ? attribute.color.dark
-                  : attribute.color.light
-                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
-            }
-          })
-      : []
-
   const lastDataPoint = !!data[data.length - 1]
     ? Object.entries(data[data.length - 1])
         .map(([key, value]) => ({
@@ -230,9 +207,42 @@ export default function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
+  const chartData =
+    data && !!data[0]
+      ? Object.entries(data[0])
+          ?.map(([key, value]) => ({
+            name: key,
+            value: value,
+          }))
+          .filter(
+            (att) =>
+              att.name !== 'timestamp' &&
+              att.name !== 'period_start' &&
+              att.name !== maxAttribute?.attribute &&
+              !referenceLines.map((a) => a.attribute).includes(att.name) &&
+              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
+          )
+          .map((att, index) => {
+            const attribute = attributes.find((attr) => attr.attribute === att.name)
+            return {
+              ...att,
+              color: attribute?.color
+                ? resolvedTheme?.includes('dark')
+                  ? attribute.color.dark
+                  : attribute.color.light
+                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+            }
+          })
+      : []
+
+  const stackedAttributes = chartData.filter((att) => {
+    const attribute = attributes.find((attr) => attr.attribute === att.name)
+    return !attribute?.isMaxValue
+  })
   const isPercentage = format === '%'
-  const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
+  const isRamChart =
+    !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
+    chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
   const isDiskSpaceChart = chartData?.some((att: any) =>
     att.name.toLowerCase().includes('disk_space_')
   )
@@ -346,6 +356,7 @@ export default function ComposedChart({
               showTooltip ? (
                 <CustomTooltip
                   {...props}
+                  format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}
                   attributes={attributes}

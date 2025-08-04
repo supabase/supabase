@@ -514,6 +514,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/branches/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a database branch
+     * @description Fetches the specified database branch by its name.
+     */
+    get: operations['v1-get-a-branch']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/claim-token': {
     parameters: {
       query?: never
@@ -1583,7 +1603,7 @@ export interface components {
         role: string
       } | null
       /** @enum {string|null} */
-      type?: 'publishable' | 'secret' | 'legacy' | null
+      type?: 'legacy' | 'publishable' | 'secret' | null
       /** Format: date-time */
       updated_at?: string | null
     }
@@ -1799,6 +1819,7 @@ export interface components {
       sms_vonage_api_key: string | null
       sms_vonage_api_secret: string | null
       sms_vonage_from: string | null
+      /** Format: email */
       smtp_admin_email: string | null
       smtp_host: string | null
       smtp_max_frequency: number | null
@@ -1844,8 +1865,10 @@ export interface components {
         | 'RESIZING'
     }
     BranchResponse: {
+      /** Format: date-time */
       created_at: string
       git_branch?: string
+      /** Format: uuid */
       id: string
       is_default: boolean
       /**
@@ -1859,6 +1882,8 @@ export interface components {
       /** Format: int32 */
       pr_number?: number
       project_ref: string
+      /** Format: date-time */
+      review_requested_at?: string
       /** @enum {string} */
       status:
         | 'CREATING_PROJECT'
@@ -1867,6 +1892,7 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+      /** Format: date-time */
       updated_at: string
     }
     BranchUpdateResponse: {
@@ -1958,6 +1984,7 @@ export interface components {
       secrets?: {
         [key: string]: string
       }
+      with_data?: boolean
     }
     CreateOrganizationV1: {
       name: string
@@ -2135,6 +2162,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2422,6 +2450,11 @@ export interface components {
       grant_type?: 'authorization_code' | 'refresh_token'
       redirect_uri?: string
       refresh_token?: string
+      /**
+       * @description Resource indicator for MCP (Model Context Protocol) clients
+       * @enum {string}
+       */
+      resource?: 'http://localhost:8080/mcp'
     }
     OAuthTokenResponse: {
       access_token: string
@@ -2679,6 +2712,9 @@ export interface components {
     }
     StorageConfigResponse: {
       features: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -2908,6 +2944,7 @@ export interface components {
       sms_vonage_api_key?: string | null
       sms_vonage_api_secret?: string | null
       sms_vonage_from?: string | null
+      /** Format: email */
       smtp_admin_email?: string | null
       smtp_host?: string | null
       smtp_max_frequency?: number | null
@@ -2921,6 +2958,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       persistent?: boolean
+      request_review?: boolean
       /**
        * @deprecated
        * @description This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.
@@ -3053,6 +3091,9 @@ export interface components {
     }
     UpdateStorageConfigBody: {
       features?: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -3205,6 +3246,10 @@ export interface components {
       max_client_conn?: number
       /** @enum {string} */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     V1PostgrestConfigResponse: {
       db_extra_search_path: string
@@ -3657,7 +3702,11 @@ export interface operations {
         client_id: string
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
+        /** @description Organization slug */
+        organization_slug?: string
         redirect_uri: string
+        /** @description Resource indicator for MCP (Model Context Protocol) clients */
+        resource?: 'http://localhost:8080/mcp'
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
@@ -4610,6 +4659,42 @@ export interface operations {
         content?: never
       }
       /** @description Failed to disable preview branching */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch database branch */
       500: {
         headers: {
           [name: string]: unknown

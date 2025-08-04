@@ -223,9 +223,6 @@ const ProjectLinks = () => {
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
 
-  const showWarehouse = useFlag('warehouse')
-  const showUnifiedLogs = useFlag('unifiedLogs')
-
   const activeRoute = router.pathname.split('/')[3]
 
   const {
@@ -247,7 +244,7 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project, { unifiedLogs: showUnifiedLogs })
+  const otherRoutes = generateOtherRoutes(ref, project)
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
@@ -311,14 +308,11 @@ const ProjectLinks = () => {
               </div>
             )
           } else if (route.key === 'logs') {
-            // TODO: Undo this when warehouse flag is removed
-            const label = showWarehouse ? 'Logs & Analytics' : route.label
-            const newRoute = { ...route, label }
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={newRoute}
-                active={activeRoute === newRoute.key}
+                route={route}
+                active={activeRoute === route.key}
               />
             )
           } else {

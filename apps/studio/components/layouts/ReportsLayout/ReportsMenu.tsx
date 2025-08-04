@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -29,6 +29,7 @@ const ReportsMenu = () => {
   const edgeFnEnabled = useFlag('edgefunctionreport')
   const realtimeEnabled = useFlag('realtimeReport')
   const storageReportEnabled = useFlag('storagereport')
+  const postgrestReportEnabled = useFlag('postgrestreport')
 
   // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
@@ -38,6 +39,20 @@ const ReportsMenu = () => {
     resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+
+  // Preserve date range query parameters when navigating
+  const preservedQueryParams = useMemo(() => {
+    const { its, ite, isHelper, helperText } = router.query
+    const params = new URLSearchParams()
+
+    if (its && typeof its === 'string') params.set('its', its)
+    if (ite && typeof ite === 'string') params.set('ite', ite)
+    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
+    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
+
+    const queryString = params.toString()
+    return queryString ? `?${queryString}` : ''
+  }, [router.query])
 
   const { data: content, isLoading } = useContentQuery({
     projectRef: ref,
@@ -85,7 +100,7 @@ const ReportsMenu = () => {
       name: r.name,
       description: r.description || '',
       key: r.id || idx + '-report',
-      url: `/project/${ref}/reports/${r.id}`,
+      url: `/project/${ref}/reports/${r.id}${preservedQueryParams}`,
       hasDropdownActions: true,
       report: r,
     }))
@@ -103,46 +118,56 @@ const ReportsMenu = () => {
         {
           name: 'API Gateway',
           key: 'api-overview',
-          url: `/project/${ref}/reports/api-overview`,
+          url: `/project/${ref}/reports/api-overview${preservedQueryParams}`,
         },
         ...(authEnabled
           ? [
               {
                 name: 'Auth',
                 key: 'auth',
-                url: `/project/${ref}/reports/auth`,
+                url: `/project/${ref}/reports/auth${preservedQueryParams}`,
               },
             ]
           : []),
         {
           name: 'Database',
           key: 'database',
-          url: `/project/${ref}/reports/database`,
+          url: `/project/${ref}/reports/database${preservedQueryParams}`,
         },
-        ...(realtimeEnabled
-          ? [
-              {
-                name: 'Realtime',
-                key: 'realtime',
-                url: `/project/${ref}/reports/realtime`,
-              },
-            ]
-          : []),
         ...(edgeFnEnabled
           ? [
               {
                 name: 'Edge Functions',
                 key: 'edge-functions',
-                url: `/project/${ref}/reports/edge-functions`,
+                url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
               },
             ]
           : []),
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'PostgREST',
+                key: 'postgrest',
+                url: `/project/${ref}/reports/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        ...(realtimeEnabled
+          ? [
+              {
+                name: 'Realtime',
+                key: 'realtime',
+                url: `/project/${ref}/reports/realtime${preservedQueryParams}`,
+              },
+            ]
+          : []),
+
         ...(storageEnabled
           ? [
               {
                 name: 'Storage',
                 key: 'storage',
-                url: `/project/${ref}/reports/storage`,
+                url: `/project/${ref}/reports/storage${preservedQueryParams}`,
               },
             ]
           : []),

@@ -1,20 +1,13 @@
 import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
-import {
-  bedrockForRegion,
-  BedrockRegion,
-  checkAwsCredentials,
-  selectBedrockRegion,
-} from './bedrock'
+import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 
-export const modelsByProvider = {
-  bedrock: {
-    us1: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
-    us2: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
-    eu: 'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
-  },
-  openai: 'gpt-4.1-2025-04-14',
-}
+// Default behaviour here is to be throttled (e.g if this env var is not available, IS_THROTTLED should be true, unless specified 'false')
+const IS_THROTTLED = process.env.IS_THROTTLED !== 'false'
+
+const BEDROCK_PRO_MODEL = 'anthropic.claude-3-7-sonnet-20250219-v1:0'
+const BEDROCK_NORMAL_MODEL = 'anthropic.claude-3-5-haiku-20241022-v1:0'
+const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {
   model: LanguageModel
@@ -37,24 +30,25 @@ export const ModelErrorMessage =
  * An optional routing key can be provided to distribute requests across
  * different Bedrock regions.
  */
-export async function getModel(routingKey?: string): Promise<ModelResponse> {
+export async function getModel(routingKey?: string, isLimited?: boolean): Promise<ModelResponse> {
   const hasAwsCredentials = await checkAwsCredentials()
+
+  const hasAwsBedrockRoleArn = !!process.env.AWS_BEDROCK_ROLE_ARN
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
 
-  if (hasAwsCredentials) {
-    // Select the Bedrock region based on the routing key
-    const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
-    const bedrock = bedrockForRegion(bedrockRegion)
-    const modelName = modelsByProvider.bedrock[bedrockRegion]
+  if (hasAwsBedrockRoleArn && hasAwsCredentials) {
+    const bedrockModel = IS_THROTTLED || isLimited ? BEDROCK_NORMAL_MODEL : BEDROCK_PRO_MODEL
+    const bedrock = createRoutedBedrock(routingKey)
 
     return {
-      model: bedrock(modelName),
+      model: await bedrock(bedrockModel),
     }
   }
 
+  // [Joshen] Only for local/self-hosted, hosted should always only use bedrock
   if (hasOpenAIKey) {
     return {
-      model: openai(modelsByProvider.openai),
+      model: openai(OPENAI_MODEL),
     }
   }
 

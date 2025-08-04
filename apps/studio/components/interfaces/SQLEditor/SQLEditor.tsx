@@ -23,7 +23,6 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
 import { detectOS, uuidv4 } from 'lib/helpers'
@@ -81,7 +80,6 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
 
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -209,7 +207,7 @@ export const SQLEditor = () => {
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
-        const { title: name } = await generateSqlTitle({ sql, useBedrockAssistant })
+        const { title: name } = await generateSqlTitle({ sql })
         snapV2.renameSnippet({ id, name })
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
@@ -217,7 +215,7 @@ export const SQLEditor = () => {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
     },
-    [generateSqlTitle, useBedrockAssistant, snapV2]
+    [generateSqlTitle, snapV2]
   )
 
   const prettifyQuery = useCallback(async () => {
@@ -461,9 +459,7 @@ export const SQLEditor = () => {
     completion,
     isLoading: isCompletionLoading,
   } = useCompletion({
-    api: useBedrockAssistant
-      ? `${BASE_PATH}/api/ai/sql/complete-v2`
-      : `${BASE_PATH}/api/ai/sql/complete`,
+    api: `${BASE_PATH}/api/ai/sql/complete-v2`,
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -722,6 +718,13 @@ export const SQLEditor = () => {
                   <div key={id} className="w-full h-full relative">
                     <MonacoEditor
                       autoFocus
+                      placeholder={
+                        !promptState.isOpen && !editorRef.current?.getValue()
+                          ? 'Hit ' +
+                            (os === 'macos' ? 'CMD+K' : `CTRL+K`) +
+                            ' to generate query or just start typing'
+                          : ''
+                      }
                       id={id}
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
@@ -767,19 +770,6 @@ export const SQLEditor = () => {
                         endLineNumber={promptState.endLineNumber}
                       />
                     )}
-                    <AnimatePresence>
-                      {!promptState.isOpen && !editorRef.current?.getValue() && (
-                        <motion.p
-                          initial={{ y: 5, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          exit={{ y: 5, opacity: 0 }}
-                          className="text-foreground-lighter absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
-                        >
-                          Hit {os === 'macos' ? <Command size={12} /> : `CTRL+`}K to edit with the
-                          Assistant
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
                   </div>
                 </>
               )}

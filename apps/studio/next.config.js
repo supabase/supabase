@@ -145,6 +145,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/settings/storage',
+        destination: '/project/:ref/storage/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/database',
+        destination: '/project/:ref/database/settings',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/settings',
         destination: '/project/:ref/settings/general',
         permanent: true,
@@ -446,7 +456,7 @@ const nextConfig = {
   },
   images: {
     // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns: [
       {
         protocol: 'https',

@@ -5,7 +5,6 @@ import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState
 
 import { useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
-import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
@@ -38,8 +37,8 @@ import { UpgradingState } from './UpgradingState'
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
-  '/project/[ref]/settings/storage',
+  '/project/[ref]/database/settings',
+  '/project/[ref]/storage/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]
@@ -54,7 +53,7 @@ const routesToIgnoreDBConnection = [
 const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
+  '/project/[ref]/database/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]
@@ -87,7 +86,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const projectRefForGitHubLinker = selectedProject?.parent_project_ref ?? selectedProject?.ref
+
     const {
       editorPanel,
       mobileMenuOpen,
@@ -109,7 +108,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const showProductMenu = selectedProject
       ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
         (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings'))
+          router.pathname.includes('/project/[ref]/settings')) ||
+        router.pathname.includes('/project/[ref]/branches')
       : true
 
     const ignorePausedState =
@@ -259,7 +259,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           </ResizablePanelGroup>
         </div>
         <CreateBranchModal />
-        <SidePanelGitHubRepoLinker projectRef={projectRefForGitHubLinker} />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
@@ -326,6 +325,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
+  const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
@@ -389,7 +389,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding) {
+  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
     return <BuildingState />
   }
 

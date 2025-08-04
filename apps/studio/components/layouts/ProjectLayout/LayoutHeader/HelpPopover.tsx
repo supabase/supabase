@@ -77,9 +77,18 @@ export const HelpPopover = () => {
                       title:
                         'I can help you with your project, here are some example prompts to get you started:',
                       prompts: [
-                        'Summarise my database health and performance',
-                        'View and debug my edge function logs',
-                        'Implement row level security for my tables',
+                        {
+                          label: 'Database Health',
+                          description: 'Summarise my database health and performance',
+                        },
+                        {
+                          label: 'Debug Logs',
+                          description: 'View and debug my edge function logs',
+                        },
+                        {
+                          label: 'RLS Setup',
+                          description: 'Implement row level security for my tables',
+                        },
                       ],
                     },
                   })
@@ -115,7 +124,7 @@ export const HelpPopover = () => {
         <Popover.Separator />
         <div className="mb-4 space-y-2">
           <div className="mb-4 px-5">
-            <h5 className={'mb-2'}>Reach out to the community</h5>
+            <h5 className="mb-2">Reach out to the community</h5>
 
             <p className="text-sm text-foreground-lighter">
               For other support, including questions on our client libraries, advice, or best

@@ -4,7 +4,10 @@ import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useFeaturePreviewModal,
+  useIsColumnLevelPrivilegesEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   getDefaultColumnCheckedStates,
   getDefaultTableCheckedStates,
@@ -13,7 +16,7 @@ import {
 } from 'components/interfaces/Database/Privileges/Privileges.utils'
 import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
-import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -27,8 +30,7 @@ import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
@@ -37,7 +39,7 @@ const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 const PrivilegesPage: NextPageWithLayout = () => {
   const { ref, table: paramTable } = useParams()
   const { project } = useProjectContext()
-  const snap = useAppStateSnapshot()
+  const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const isEnabled = useIsColumnLevelPrivilegesEnabled()
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -130,7 +132,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const table = tableList?.find(
     (table) => table.schema === selectedSchema && table.name === selectedTable
   )
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const {
     tableCheckedStates,
@@ -284,7 +286,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
               )}
 
               <PrivilegesHead
-                disabled={isLocked}
+                disabled={isSchemaLocked}
                 selectedSchema={selectedSchema}
                 selectedRole={selectedRole}
                 selectedTable={table}
@@ -298,7 +300,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 hasChanges={hasChanges}
                 isApplyingChanges={isApplyingChanges}
               />
-              {isLocked && (
+              {isSchemaLocked && (
                 <ProtectedSchemaWarning schema={selectedSchema} entity="column privileges" />
               )}
               {isLoading ? (
@@ -308,7 +310,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
               ) : table && tablePrivilege ? (
                 <div>
                   <PrivilegesTable
-                    disabled={isLocked}
+                    disabled={isSchemaLocked}
                     columnPrivileges={columnPrivileges}
                     tableCheckedStates={tableCheckedStates}
                     columnCheckedStates={columnCheckedStates}
@@ -345,7 +347,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 You may access this feature by enabling it under dashboard feature previews.
               </AlertDescription_Shadcn_>
               <div className="mt-4">
-                <Button type="default" onClick={() => snap.setShowFeaturePreviewModal(true)}>
+                <Button type="default" onClick={openFeaturePreviewModal}>
                   View feature previews
                 </Button>
               </div>

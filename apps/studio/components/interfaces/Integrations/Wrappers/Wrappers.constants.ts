@@ -1,5 +1,6 @@
 import { BASE_PATH } from 'lib/constants'
-import type { WrapperMeta } from './Wrappers.types'
+import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
+import type { ServerOption, WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',
@@ -24,6 +25,16 @@ export const WRAPPER_HANDLERS = {
   CLOUDFLARE_D1: 'wasm_fdw_handler',
   HUBSPOT: 'wasm_fdw_handler',
   ORB: 'wasm_fdw_handler',
+}
+
+const SUPABASE_TARGET_SCHEMA_OPTION: ServerOption = {
+  name: 'supabase_target_schema',
+  label: 'Target Schema',
+  required: false,
+  encrypted: false,
+  secureEntry: false,
+  readOnly: true,
+  hidden: true,
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -54,6 +65,7 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     tables: [
@@ -1774,6 +1786,7 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     canTargetSchema: true,
@@ -2162,19 +2175,22 @@ export const WRAPPERS: WrapperMeta[] = [
     label: 'Iceberg',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/iceberg',
     minimumExtensionVersion: '0.5.3',
+    createComponent: CreateIcebergWrapperSheet,
     server: {
+      // The fields are intentionally not required. The required flag is enforced in the create iceberg wrapper sheet.
+      // In the edit wrapper sheet, all fields are shown and not required.
       options: [
         {
           name: 'vault_aws_access_key_id',
           label: 'AWS Access Key ID',
-          required: true,
+          required: false,
           encrypted: true,
           secureEntry: true,
         },
         {
           name: 'vault_aws_secret_access_key',
           label: 'AWS Secret Access Key',
-          required: true,
+          required: false,
           encrypted: true,
           secureEntry: true,
         },
@@ -2202,30 +2218,31 @@ export const WRAPPERS: WrapperMeta[] = [
         {
           name: 'warehouse',
           label: 'Warehouse',
-          required: true,
+          required: false,
           encrypted: false,
           secureEntry: false,
         },
         {
           name: 's3.endpoint',
           label: 'S3 Endpoint',
-          required: true,
+          required: false,
           encrypted: false,
           secureEntry: false,
         },
         {
           name: 'catalog_uri',
           label: 'Catalog URI',
-          required: true,
+          required: false,
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     canTargetSchema: true,
     sourceSchemaOption: {
       name: 'source_schema',
-      label: 'Source Schema',
+      label: 'Namespace',
       description: 'It should match the namespace of the Iceberg catalog.',
       required: true,
       encrypted: false,

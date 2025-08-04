@@ -18,6 +18,7 @@ import {
   removeCommentsFromSql,
   removeJSONTrailingComma,
   snakeToCamel,
+  tablesToSQL,
   timeout,
   tryParseInt,
   tryParseJson,
@@ -348,5 +349,148 @@ describe('formatCurrency', () => {
     const result = formatCurrency(undefined)
 
     expect(result).toEqual(null)
+  })
+})
+
+describe('tablesToSQL', () => {
+  it('should return warning message for empty array', () => {
+    const result = tablesToSQL([])
+
+    expect(result).toContain('-- WARNING: This schema is for context only')
+  })
+
+  it('should return empty string for non-array input', () => {
+    const result = tablesToSQL(null as any)
+
+    expect(result).toBe('')
+  })
+
+  it('should generate SQL for a simple table', () => {
+    const mockTables = [
+      {
+        name: 'users',
+        schema: 'public',
+        columns: [
+          {
+            name: 'id',
+            data_type: 'integer',
+            is_nullable: false,
+            is_identity: true,
+            default_value: null,
+            is_unique: false,
+            check: null,
+          },
+          {
+            name: 'name',
+            data_type: 'text',
+            is_nullable: false,
+            is_identity: false,
+            default_value: null,
+            is_unique: false,
+            check: null,
+          },
+        ],
+        primary_keys: [{ name: 'id' }],
+        relationships: [],
+      },
+    ] as any
+
+    const result = tablesToSQL(mockTables)
+
+    expect(result).toContain('-- WARNING: This schema is for context only')
+    expect(result).toContain('CREATE TABLE public.users (')
+    expect(result).toContain('id integer GENERATED ALWAYS AS IDENTITY NOT NULL')
+    expect(result).toContain('name text NOT NULL')
+    expect(result).toContain('CONSTRAINT users_pkey PRIMARY KEY (id)')
+  })
+
+  it('should handle tables with various column properties', () => {
+    const mockTables = [
+      {
+        name: 'products',
+        schema: 'public',
+        columns: [
+          {
+            name: 'id',
+            data_type: 'uuid',
+            is_nullable: false,
+            is_identity: false,
+            default_value: 'gen_random_uuid()',
+            is_unique: true,
+            check: null,
+          },
+          {
+            name: 'price',
+            data_type: 'numeric',
+            is_nullable: true,
+            is_identity: false,
+            default_value: '0.00',
+            is_unique: false,
+            check: 'price >= 0',
+          },
+        ],
+        primary_keys: [],
+        relationships: [],
+      },
+    ] as any
+
+    const result = tablesToSQL(mockTables)
+
+    expect(result).toContain('id uuid NOT NULL DEFAULT gen_random_uuid() UNIQUE')
+    expect(result).toContain('price numeric DEFAULT 0.00 CHECK (price >= 0)')
+  })
+
+  it('should handle foreign key relationships', () => {
+    const mockTables = [
+      {
+        name: 'orders',
+        schema: 'public',
+        columns: [
+          {
+            name: 'user_id',
+            data_type: 'integer',
+            is_nullable: false,
+            is_identity: false,
+            default_value: null,
+            is_unique: false,
+            check: null,
+          },
+        ],
+        primary_keys: [],
+        relationships: [
+          {
+            constraint_name: 'fk_orders_user_id',
+            source_table_name: 'orders',
+            source_column_name: 'user_id',
+            target_table_schema: 'public',
+            target_table_name: 'users',
+            target_column_name: 'id',
+          },
+        ],
+      },
+    ] as any
+
+    const result = tablesToSQL(mockTables)
+
+    expect(result).toContain(
+      'CONSTRAINT fk_orders_user_id FOREIGN KEY (user_id) REFERENCES public.users(id)'
+    )
+  })
+
+  it('should handle tables with no columns', () => {
+    const mockTables = [
+      {
+        name: 'empty_table',
+        schema: 'public',
+        columns: null,
+        primary_keys: [],
+        relationships: [],
+      },
+    ] as any
+
+    const result = tablesToSQL(mockTables)
+
+    expect(result).toContain('-- WARNING: This schema is for context only')
+    expect(result).not.toContain('CREATE TABLE')
   })
 })

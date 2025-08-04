@@ -19,21 +19,21 @@ export const InputWithAddons = forwardRef<HTMLInputElement, InputWithAddonsProps
         )}
       >
         {leading ? (
-          <div className="border-input bg-muted/50 border-r px-2.5 py-2 flex items-center justify-center">
-            {leading}
-          </div>
+          <div className="border-input px-2 flex items-center justify-center">{leading}</div>
         ) : null}
         <input
           className={cn(
-            'bg-background w-full px-3 py-2 focus:outline-none border-0 placeholder:text-muted-foreground ',
-            'disabled:cursor-not-allowed disabled:opacity-50 text-sm',
+            'bg-transparent w-full px-0 py-2 focus:outline-none border-0 placeholder:text-foreground-lighter ',
+            'disabled:cursor-not-allowed disabled:opacity-50 text-[0.75rem]',
             className
           )}
           ref={ref}
           {...props}
         />
         {trailing ? (
-          <div className="border-input bg-muted/50 border-l px-3 py-2">{trailing}</div>
+          <div className="border-input bg-muted/50 border-l px-3 py-2 flex items-center justify-center">
+            {trailing}
+          </div>
         ) : null}
       </div>
     )

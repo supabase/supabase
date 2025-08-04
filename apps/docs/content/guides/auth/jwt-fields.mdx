@@ -1,10 +1,10 @@
 ---
 id: 'jwt-fields'
-title: 'JWT Fields Reference'
-subtitle: 'Complete reference for JWT fields in Supabase'
+title: 'JWT Claims Reference'
+subtitle: 'Complete reference for claims appearing in JWTs created by Supabase Auth'
 ---
 
-This page provides a comprehensive reference for all JWT fields used in Supabase authentication tokens. This information is essential for server-side JWT validation and serialization, especially when implementing authentication in languages like Rust where field names like `ref` are reserved keywords.
+This page provides a comprehensive reference for all JWT claims used in Supabase authentication tokens. This information is essential for server-side JWT validation and serialization, especially when implementing authentication in languages like Rust where field names like `ref` are reserved keywords.
 
 ## JWT structure overview
 
@@ -46,7 +46,7 @@ These claims may be present depending on the authentication context:
 | `user_metadata` | `object` | **User Metadata** - User-specific data                                     | `{"name": "John Doe"}`                              |
 | `amr`           | `array`  | **Authentication Methods Reference** - List of authentication methods used | `[{"method": "password", "timestamp": 1640991600}]` |
 
-## Special fields
+## Special claims
 
 | Field | Type     | Description                                         | Example                  | Context                       |
 | ----- | -------- | --------------------------------------------------- | ------------------------ | ----------------------------- |
@@ -167,7 +167,7 @@ struct JwtClaims {
     role: String,
     iat: i64,
     exp: i64,
-    // ... other fields
+    // ... other claims
 }
 ```
 

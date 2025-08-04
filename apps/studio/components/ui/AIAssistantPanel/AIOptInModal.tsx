@@ -4,9 +4,9 @@ import { useEffect } from 'react'
 import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -23,7 +23,6 @@ interface AIOptInModalProps {
 }
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
-  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -53,23 +52,33 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
             <DialogSection className="space-y-4 pb-0" padding="small">
               <AIOptInLevelSelector
                 control={form.control}
-                disabled={!canUpdateOrganization || !newOrgAiOptIn || isUpdating}
+                disabled={!canUpdateOrganization || isUpdating}
               />
             </DialogSection>
 
-            <DialogFooter padding="small">
-              <Button type="default" disabled={isUpdating} onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                form="ai-opt-in-form"
-                loading={isUpdating}
-                disabled={isUpdating || !canUpdateOrganization || !form.formState.isDirty}
-              >
-                Confirm
-              </Button>
+            <DialogFooter
+              padding="small"
+              className={cn(!canUpdateOrganization && '!justify-between')}
+            >
+              {!canUpdateOrganization && (
+                <p className="text-sm text-foreground-lighter">
+                  You need additional permissions to update the opt-in level
+                </p>
+              )}
+              <div className="flex items-center gap-x-2">
+                <Button type="default" disabled={isUpdating} onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  form="ai-opt-in-form"
+                  loading={isUpdating}
+                  disabled={isUpdating || !canUpdateOrganization || !form.formState.isDirty}
+                >
+                  Confirm
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </Form_Shadcn_>

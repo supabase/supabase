@@ -295,7 +295,7 @@ const Column = ({
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ align="end" className="w-96 p-0">
               <div className="flex items-center justify-center bg-surface-200 space-y-1 py-1.5 px-3 border-b border-overlay">
-                <h5 className="text-sm text-foreground">Extra options</h5>
+                <h5 className="text-foreground">Extra options</h5>
               </div>
 
               <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>

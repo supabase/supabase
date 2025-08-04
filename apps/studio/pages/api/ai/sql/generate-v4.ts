@@ -1,7 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
-import { streamText, tool, ToolSet } from 'ai'
+import { convertToCoreMessages, CoreMessage, streamText, tool, ToolSet } from 'ai'
 import { source } from 'common-tags'
-import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
@@ -9,16 +8,12 @@ import { IS_PLATFORM } from 'common'
 import { getOrganizations } from 'data/organizations/organizations-query'
 import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { AiOptInLevel, getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
+import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
+import { filterToolsByOptInLevel, toolSetValidationSchema } from 'lib/ai/tool-filter'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-import {
-  createSupabaseMCPClient,
-  expectedToolsSchema,
-  filterToolsByOptInLevel,
-  transformToolResult,
-} from './supabase-mcp'
 import { getTools } from './tools'
 
 export const maxDuration = 120
@@ -50,6 +45,7 @@ const requestBodySchema = z.object({
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  chatName: z.string().optional(),
   orgSlug: z.string().optional(),
 })
 
@@ -68,35 +64,55 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, orgSlug } = data
+  const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  // Get organizations and compute opt in level server-side
-  const [organizations, projects] = await Promise.all([
-    getOrganizations({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
-    getProjects({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
-  ])
+  // Server-side safety: limit to last 5 messages and remove `results` property to prevent accidental leakage.
+  // Results property is used to cache results client-side after queries are run
+  // Tool results will still be included in history sent to model
+  const messages = (rawMessages || []).slice(-5).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    return msg
+  })
 
-  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const selectedProject = projects.find((project) => project.ref === projectRef)
+  let aiOptInLevel: AiOptInLevel = 'schema'
+  let isLimited = false
 
-  // If the project is not in the organization specific by the org slug, return an error
-  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
-    return res.status(400).json({ error: 'Project and organization do not match' })
+  if (IS_PLATFORM) {
+    // Get organizations and compute opt in level server-side
+    const [organizations, projects] = await Promise.all([
+      getOrganizations({
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+      }),
+      getProjects({
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+      }),
+    ])
+
+    const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+    const selectedProject = projects.find(
+      (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
+    )
+
+    // If the project is not in the organization specific by the org slug, return an error
+    if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+      return res.status(400).json({ error: 'Project and organization do not match' })
+    }
+
+    aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+    isLimited = selectedOrg?.plan.id === 'free'
   }
 
-  const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
-
-  const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
+  const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -156,6 +172,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           return { status: 'Tool call sent to client for rendering.' }
         },
       }),
+      rename_chat: tool({
+        description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
+        parameters: z.object({
+          newName: z.string().describe('The new name for the chat session. Five words or less.'),
+        }),
+        execute: async () => {
+          return { status: 'Chat request sent to client' }
+        },
+      }),
     }
 
     // Get a list of all schemas to add to context
@@ -202,10 +227,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
 
       const availableMcpTools = await mcpClient.tools()
+      // Filter tools based on the (potentially modified) AI opt-in level
+      const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
 
-      // Validate that the expected tools are available
+      // Validate that only known tools are provided
       const { data: validatedTools, error: validationError } =
-        expectedToolsSchema.safeParse(availableMcpTools)
+        toolSetValidationSchema.safeParse(allowedMcpTools)
 
       if (validationError) {
         console.error('MCP tools validation error:', validationError)
@@ -215,36 +242,20 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         })
       }
 
-      // Modify the execute_sql tool to add manualToolCallId
-      const modifiedMcpTools = {
-        ...availableMcpTools,
-        execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
-          const manualToolCallId = `manual_${crypto.randomUUID()}`
-
-          if (typeof result === 'object') {
-            return { ...result, manualToolCallId }
-          } else {
-            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
-            return {
-              error: 'Internal error: Unexpected tool result format',
-              manualToolCallId,
-            }
-          }
-        }),
-      }
-
-      // Filter tools based on the AI opt-in level
-      mcpTools = filterToolsByOptInLevel(modifiedMcpTools, aiOptInLevel)
+      mcpTools = { ...validatedTools }
     }
 
-    // Combine MCP tools with custom tools
+    // Filter local tools based on the (potentially modified) AI opt-in level
+    const filteredLocalTools = filterToolsByOptInLevel(localTools, aiOptInLevel)
+
+    // Combine MCP tools with filtered local tools
     const tools: ToolSet = {
       ...mcpTools,
-      ...localTools,
+      ...filteredLocalTools,
     }
 
+    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
-      The current project is ${projectRef}.
       You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
 
       # Response Style:
@@ -258,6 +269,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # Core Principles:
       - **Tool Usage Strategy**:
+          - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**. 
           - **Always attempt to use MCP tools** like \`list_tables\` and \`list_extensions\` to gather schema information if available. If these tools are not available or return a privacy message, state that you cannot access schema information and will proceed based on general Postgres/Supabase knowledge.
           - For **READ ONLY** queries:
               - Explain your plan.
@@ -281,14 +293,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - **If \`execute_sql\` is available**: Provide the corrected SQL to \`execute_sql\`, then call \`display_query\` with the \`manualToolCallId\`, \`sql\`, \`label\`, and appropriate \`view\`, \`xAxis\`, \`yAxis\` for the new results.
           - **If \`execute_sql\` is NOT available**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\`, \`label\`, and \`runQuery: true\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
       - **If debugging a WRITE/DDL query**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\`, \`label\`, and \`runQuery: false\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
-
-      # Supabase Health & Debugging
-      - **General Status**:
-          - **If \`get_logs\`, \`list_tables\`, \`list_extensions\` are available**: Use them to provide a summary overview of the project's health (check recent errors/activity for relevant services like 'postgres', 'api', 'auth').
-          - **If tools are NOT available**: Ask the user to check their Supabase dashboard or logs for project health information.
-      - **Service Errors**:
-          - **If \`get_logs\` is available**: If facing specific errors related to the database, Edge Functions, or other Supabase services, explain the problem and use the \`get_logs\` tool, specifying the relevant service type (e.g., 'postgres', 'edge functions', 'api') to retrieve logs and diagnose the issue. Briefly summarize the relevant log information in your text response before suggesting a fix.
-          - **If \`get_logs\` is NOT available**: Ask the user to provide relevant logs for the service experiencing errors.
 
       # SQL Style:
           - Generated SQL must be valid Postgres SQL.
@@ -325,6 +329,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                   - UPDATE: \`USING (condition) WITH CHECK (condition)\` (often the same or related conditions)
                   - DELETE: \`USING (condition)\`
               - Prefer \`PERMISSIVE\` policies unless \`RESTRICTIVE\` is explicitly needed.
+              - Avoid recursion errors when writing RLS policies that reference the same table. Use security definer functions to avoid this when needed.
               - Leverage Supabase helper functions: \`auth.uid()\` for the user's ID, \`auth.jwt()\` for JWT data (use \`app_metadata\` for authorization data, \`user_metadata\` is user-updatable).
               - **Performance**: Add indexes on columns used in RLS policies. Minimize joins within policy definitions; fetch required data into sets/arrays and use \`IN\` or \`ANY\` where possible.
       - **Functions**:
@@ -386,15 +391,34 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           \`\`\`
 
       # General Instructions:
-      - **Available Schemas**: ${schemasString}
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
+
+    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
+    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
+    const coreMessages: CoreMessage[] = [
+      {
+        role: 'system',
+        content: system,
+        providerOptions: {
+          bedrock: {
+            // Always cache the system prompt (must not contain dynamic content)
+            cachePoint: { type: 'default' },
+          },
+        },
+      },
+      {
+        role: 'assistant',
+        // Add any dynamic context here
+        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
+      },
+      ...convertToCoreMessages(messages),
+    ]
 
     const result = streamText({
       model,
       maxSteps: 5,
-      system,
-      messages,
+      messages: coreMessages,
       tools,
     })
 

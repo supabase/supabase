@@ -1,5 +1,6 @@
 import type { Datum } from 'components/ui/Charts/Charts.types'
 import React from 'react'
+import type { PlanId } from 'data/subscriptions/types'
 
 interface Metadata {
   [key: string]: string | number | Object | Object[] | any
@@ -89,7 +90,6 @@ export type QueryType =
   | 'storage'
   | 'supavisor'
   | 'postgrest'
-  | 'warehouse'
   | 'pg_upgrade'
   | 'pg_cron'
   | 'pgbouncer'
@@ -142,10 +142,5 @@ export interface DatetimeHelper {
   calcFrom: () => string
   default?: boolean
   disabled?: boolean
-}
-
-export interface WarehouseCollection {
-  name: string
-  id: number
-  token: string
+  availableIn?: PlanId[]
 }
