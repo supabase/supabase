@@ -51,7 +51,9 @@ interface MessageProps {
     resultId?: string
     results: any[]
   }) => void
-  onEdit?: (id: string) => void
+  onEdit: (id: string) => void
+  isAfterEditedMessage: boolean
+  onCancelEdit: () => void
 }
 
 export const Message = function Message({
@@ -63,6 +65,8 @@ export const Message = function Message({
   variant = 'default',
   onResults,
   onEdit,
+  isAfterEditedMessage = false,
+  onCancelEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
   const allMarkdownComponents: Partial<Components> = useMemo(
@@ -96,8 +100,10 @@ export const Message = function Message({
         className={cn(
           'text-foreground-light text-sm',
           isUser ? 'text-foreground first:mt-0 mt-6' : 'first:mt-0 mt-2',
-          variant === 'warning' && 'bg-warning-200'
+          variant === 'warning' && 'bg-warning-200',
+          isAfterEditedMessage && 'opacity-50 cursor-pointer transition-opacity'
         )}
+        onClick={isAfterEditedMessage ? onCancelEdit : undefined}
       >
         {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
 

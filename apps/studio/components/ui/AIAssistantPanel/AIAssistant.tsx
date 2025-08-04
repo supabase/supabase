@@ -41,6 +41,8 @@ const MemoizedMessage = memo(
     isLoading,
     onResults,
     onEdit,
+    isAfterEditedMessage,
+    onCancelEdit,
   }: {
     message: MessageType
     isLoading: boolean
@@ -53,17 +55,20 @@ const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
-    onEdit?: (id: string) => void
+    onEdit: (id: string) => void
+    isAfterEditedMessage: boolean
+    onCancelEdit: () => void
   }) => {
     return (
       <Message
-        key={message.id}
         id={message.id}
         message={message}
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
         onEdit={onEdit}
+        isAfterEditedMessage={isAfterEditedMessage}
+        onCancelEdit={onCancelEdit}
       />
     )
   }
@@ -251,7 +256,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const renderedMessages = useMemo(
     () =>
-      chatMessages.map((message) => {
+      chatMessages.map((message, index) => {
+        const isAfterEditedMessage = editingMessageId
+          ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
+          : false
+
         return (
           <MemoizedMessage
             key={message.id}
@@ -259,10 +268,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
             onEdit={editMessage}
+            isAfterEditedMessage={isAfterEditedMessage}
+            onCancelEdit={cancelEdit}
           />
         )
       }),
-    [chatMessages, isChatLoading, updateMessage, editMessage]
+    [chatMessages, isChatLoading, updateMessage, editMessage, editingMessageId, cancelEdit]
   )
 
   const hasMessages = chatMessages.length > 0
