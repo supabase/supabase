@@ -91,7 +91,6 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       { name: values.tokenName, scope: tokenScope },
       {
         onSuccess: (data) => {
-          console.log('Generated token data:', data)
           onCreateToken(data)
           handleClose()
         },
