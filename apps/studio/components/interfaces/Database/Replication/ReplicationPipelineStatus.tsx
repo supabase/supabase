@@ -10,6 +10,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+// import { useRollbackTableMutation } from 'data/replication/rollback-table-mutation'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
@@ -22,8 +23,13 @@ import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { TableState } from './ReplicationPipelineStatus.types'
+import { ErroredTableDetails } from './ErroredTableDetails'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 
+/**
+ * Component for displaying replication pipeline status and table replication details.
+ * Supports both legacy 'error' state and new 'errored' state with retry policies.
+ */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [filterString, setFilterString] = useState<string>('')
@@ -94,17 +100,39 @@ export const ReplicationPipelineStatus = () => {
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
   const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
-    const statusText = `Table: ${tableName}\nStatus: ${state.name}${
-      'message' in state ? `\nError: ${state.message}` : ''
-    }${'lag' in state ? `\nLag: ${state.lag}ms` : ''}`
+    const statusDetails: string[] = [`Table: ${tableName}`, `Status: ${state.name}`]
+    
+    // Add state-specific details
+    if ('message' in state) {
+      statusDetails.push(`Error: ${state.message}`)
+    }
+    if ('reason' in state) {
+      statusDetails.push(`Reason: ${state.reason}`)
+    }
+    if ('solution' in state) {
+      statusDetails.push(`Solution: ${state.solution}`)
+    }
+    if ('lag' in state) {
+      statusDetails.push(`Lag: ${state.lag}ms`)
+    }
+    if ('retry_policy' in state) {
+      statusDetails.push(`Retry Policy: ${state.retry_policy.policy}`)
+      if (state.retry_policy.policy === 'timed_retry') {
+        statusDetails.push(`Next Retry: ${state.retry_policy.next_retry}`)
+      }
+    }
+
+    const statusText = statusDetails.join('\n')
 
     try {
       await copyToClipboard(statusText)
       toast.success('Table status copied to clipboard')
-    } catch {
+    } catch (error) {
+      console.error('Failed to copy table status:', error)
       toast.error(PIPELINE_ERROR_MESSAGES.COPY_TABLE_STATUS)
     }
   }
+
 
   const onTogglePipeline = async () => {
     if (!projectRef) {
@@ -300,6 +328,15 @@ export const ReplicationPipelineStatus = () => {
                             <div className="text-xs text-foreground-light">
                               Lag: {table.state.lag}ms
                             </div>
+                          )}
+                          {table.state.name === 'error' && (
+                            <ErroredTableDetails
+                              state={table.state}
+                              tableName={table.table_name}
+                              tableId={table.table_id}
+                              projectRef={projectRef!}
+                              pipelineId={pipelineId}
+                            />
                           )}
                         </div>
                       )}

@@ -1533,6 +1533,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/sso': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the organization's SSO Provider */
+    get: operations['SSOProvidersController_getSSOProvider']
+    /** Update the organization's SSO Provider */
+    put: operations['SSOProvidersController_updateSSOProvider']
+    /** Create the organization's SSO Provider */
+    post: operations['SSOProvidersController_createSSOProvider']
+    /** Delete the organization's SSO Provider */
+    delete: operations['SSOProvidersController_deleteSSOProvider']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/tax-ids': {
     parameters: {
       query?: never
@@ -3361,10 +3381,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get all replication pipelines. */
+    /** Retrieves all replication pipelines. */
     get: operations['ReplicationPipelinesController_getPipelines']
     put?: never
-    /** Create a replication pipeline. */
+    /** Creates a replication pipeline. */
     post: operations['ReplicationPipelinesController_createPipeline']
     delete?: never
     options?: never
@@ -3379,12 +3399,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get a replication pipeline by ID. */
+    /** Retrieves a replication pipeline by ID. */
     get: operations['ReplicationPipelinesController_getPipeline']
     put?: never
-    /** Update a replication pipeline. */
+    /** Updates a replication pipeline. */
     post: operations['ReplicationPipelinesController_updatePipeline']
-    /** Delete a replication pipeline. */
+    /** Deletes a replication pipeline. */
     delete: operations['ReplicationPipelinesController_deletePipeline']
     options?: never
     head?: never
@@ -3398,10 +3418,27 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the status of a replication pipeline. */
+    /** Retrieves the replication status of a pipeline. */
     get: operations['ReplicationPipelinesController_getPipelineReplicationStatus']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Rolls back the state of a table in the pipeline. */
+    post: operations['ReplicationPipelinesController_rollbackTableState']
     delete?: never
     options?: never
     head?: never
@@ -3417,7 +3454,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Start a replication pipeline. */
+    /** Starts a replication pipeline. */
     post: operations['ReplicationPipelinesController_startPipeline']
     delete?: never
     options?: never
@@ -3432,7 +3469,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the status of a replication pipeline. */
+    /** Retrieves the status of a replication pipeline. */
     get: operations['ReplicationPipelinesController_getPipelineStatus']
     put?: never
     post?: never
@@ -3451,7 +3488,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Stop a replication pipeline. */
+    /** Stops a replication pipeline. */
     post: operations['ReplicationPipelinesController_stopPipeline']
     delete?: never
     options?: never
@@ -4908,6 +4945,62 @@ export interface components {
       /** @description Source id */
       id: number
     }
+    CreateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    CreateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     CreateStorageBucketBody: {
       allowed_mime_types?: string[]
       file_size_limit?: number
@@ -5552,6 +5645,34 @@ export interface components {
       }
       path: string[]
     }
+    GetSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     GetStorageCredentialsResponse: {
       data: {
         created_at: string
@@ -5781,6 +5902,7 @@ export interface components {
     }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
+      AUDIT_LOG_DISABLE_POSTGRES: boolean | null
       DB_MAX_POOL_SIZE: number | null
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
@@ -7225,7 +7347,6 @@ export interface components {
       app_config?: {
         db_schema: string
         endpoint: string
-        storage_endpoint: string
       }
       cloud_provider: string
       db_dns_name: string
@@ -7394,9 +7515,25 @@ export interface components {
               name: 'following_wal'
             }
           | {
-              message: string
               /** @enum {string} */
               name: 'error'
+              reason: string
+              retry_policy:
+                | {
+                    /** @enum {string} */
+                    policy: 'no_retry'
+                  }
+                | {
+                    /** @enum {string} */
+                    policy: 'manual_retry'
+                  }
+                | {
+                    /** @description The time of the next retry (RFC3339 format) */
+                    next_retry: string
+                    /** @enum {string} */
+                    policy: 'timed_retry'
+                  }
+              solution?: string
             }
         /** @description Table id (internal Postgres OID) */
         table_id: number
@@ -7597,6 +7734,61 @@ export interface components {
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
     }[]
+    RollbackTableStateBody: {
+      /**
+       * @description Rollback type
+       * @enum {string}
+       */
+      rollback_type: 'individual' | 'full'
+      /** @description Table id (internal Postgres OID) */
+      table_id: number
+    }
+    RollbackTableStateResponse: {
+      /** @description Table replication state */
+      new_state:
+        | {
+            /** @enum {string} */
+            name: 'queued'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copying_table'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copied_table'
+          }
+        | {
+            lag: number
+            /** @enum {string} */
+            name: 'following_wal'
+          }
+        | {
+            /** @enum {string} */
+            name: 'error'
+            reason: string
+            retry_policy:
+              | {
+                  /** @enum {string} */
+                  policy: 'no_retry'
+                }
+              | {
+                  /** @enum {string} */
+                  policy: 'manual_retry'
+                }
+              | {
+                  /** @description The time of the next retry (RFC3339 format) */
+                  next_retry: string
+                  /** @enum {string} */
+                  policy: 'timed_retry'
+                }
+            solution?: string
+          }
+      /** @description Pipeline id */
+      pipeline_id: number
+      /** @description Table id (internal Postgres OID) */
+      table_id: number
+    }
     RunLintByNameResponse: {
       lints: {
         cache_key: string
@@ -8175,6 +8367,7 @@ export interface components {
     }
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
+      AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
       DB_MAX_POOL_SIZE?: number | null
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
@@ -8629,6 +8822,62 @@ export interface components {
     UpdateSecretsResponse: {
       message: string
     }
+    UpdateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    UpdateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     UpdateStorageBucketBody: {
       allowed_mime_types?: string[] | null
       file_size_limit?: number | null
@@ -12517,6 +12766,124 @@ export interface operations {
       }
       /** @description Failed to retrieve the organization's roles */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_getSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_updateSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSSOProviderBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_createSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSSOProviderBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_deleteSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -18601,7 +18968,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns all pipelines. */
+      /** @description Returns all replication pipelines. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18616,7 +18983,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get replication pipelines. */
+      /** @description Fails to retrieve replication pipelines. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18641,7 +19008,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returns the created replication pipeline ID. */
+      /** @description Returns the ID of the created replication pipeline. */
       201: {
         headers: {
           [name: string]: unknown
@@ -18656,7 +19023,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to create pipeline. */
+      /** @description Fails to create replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18679,7 +19046,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline. */
+      /** @description Returns the details of the specified replication pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18694,7 +19061,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline. */
+      /** @description Fails to retrieve replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18721,7 +19088,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returned when the pipeline is updated. */
+      /** @description Returns when the replication pipeline is successfully updated. */
       201: {
         headers: {
           [name: string]: unknown
@@ -18734,7 +19101,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update pipeline. */
+      /** @description Fails to update replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18757,7 +19124,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is deleted. */
+      /** @description Returns when the replication pipeline is successfully deleted. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18770,7 +19137,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to delete pipeline. */
+      /** @description Fails to delete replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18793,7 +19160,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline replication status. */
+      /** @description Returns the replication status of the pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18808,7 +19175,49 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline replication status. */
+      /** @description Fails to retrieve pipeline replication status. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_rollbackTableState: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RollbackTableStateBody']
+      }
+    }
+    responses: {
+      /** @description Returns the table state after the rollback. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RollbackTableStateResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Fails to roll back table state. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18831,7 +19240,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is started. */
+      /** @description Returns when the replication pipeline is successfully started. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18844,7 +19253,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to start pipeline. */
+      /** @description Fails to start replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18867,7 +19276,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline status. */
+      /** @description Returns the current status of the replication pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18882,7 +19291,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline status. */
+      /** @description Fails to retrieve pipeline status. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18905,7 +19314,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is stopped. */
+      /** @description Returns when the replication pipeline is successfully stopped. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18918,7 +19327,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to stop pipeline. */
+      /** @description Fails to stop replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown

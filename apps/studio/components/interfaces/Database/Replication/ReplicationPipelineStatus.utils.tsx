@@ -3,7 +3,7 @@ import { Activity, Clock, HelpCircle, Loader2, XCircle } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { Badge } from 'ui'
 import { getPipelineStateMessages } from './Pipeline.utils'
-import { TableState } from './ReplicationPipelineStatus.types'
+import { RetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 
 export const getStatusConfig = (state: TableState['state']) => {
   switch (state.name) {
@@ -34,7 +34,7 @@ export const getStatusConfig = (state: TableState['state']) => {
     case 'error':
       return {
         badge: <Badge variant="destructive">Error</Badge>,
-        description: state.message,
+        description: state.reason,
         color: 'text-destructive-600',
       }
     default:
@@ -105,4 +105,51 @@ export const getDisabledStateConfig = ({
           }
 
   return { title, message, badge, icon, colors }
+}
+
+/**
+ * Safely formats a retry timestamp with error handling
+ */
+export const formatRetryTimestamp = (timestamp: string): string => {
+  try {
+    const date = new Date(timestamp)
+    if (isNaN(date.getTime())) {
+      return 'Invalid date'
+    }
+    return date.toLocaleString()
+  } catch {
+    return 'Invalid date'
+  }
+}
+
+/**
+ * Gets the appropriate retry policy display based on the policy type
+ */
+export const getRetryPolicyDisplay = (retryPolicy: RetryPolicy) => {
+  switch (retryPolicy.policy) {
+    case 'manual_retry':
+      return {
+        type: 'manual' as const,
+        message: 'Manual retry available (endpoint pending implementation)',
+        variant: 'warning' as const,
+      }
+    case 'timed_retry':
+      return {
+        type: 'timed' as const,
+        message: `Next retry: ${formatRetryTimestamp('next_retry' in retryPolicy ? retryPolicy.next_retry : '')}`,
+        variant: 'info' as const,
+      }
+    case 'no_retry':
+      return {
+        type: 'none' as const,
+        message: 'Manual intervention required',
+        variant: 'destructive' as const,
+      }
+    default:
+      return {
+        type: 'unknown' as const,
+        message: 'Unknown retry policy',
+        variant: 'warning' as const,
+      }
+  }
 }
