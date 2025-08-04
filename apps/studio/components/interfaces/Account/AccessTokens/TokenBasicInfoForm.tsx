@@ -11,7 +11,7 @@ interface TokenBasicInfoFormProps {
 
 export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFormProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4">
       <FormField_Shadcn_
         key="tokenName"
         name="tokenName"

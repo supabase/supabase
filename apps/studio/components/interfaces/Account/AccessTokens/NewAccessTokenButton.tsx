@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
   Form_Shadcn_,
   ScrollArea,
+  Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -179,7 +180,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
             </SheetTitle>
           </SheetHeader>
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
-            <div className="flex flex-col gap-4 overflow-visible p-4">
+            <div className="flex flex-col overflow-visible">
               {tokenScope === 'V0' && (
                 <Admonition
                   type="warning"
@@ -207,18 +208,22 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
               )}
 
               <Form_Shadcn_ {...form}>
-                <div className="flex flex-col gap-6 overflow-visible">
+                <div className="flex flex-col gap-0 overflow-visible">
                   {/* Basic Information Section */}
                   <TokenBasicInfoForm 
                     control={form.control} 
                     expirationDate={expirationDate} 
                   />
 
+                  <Separator />
+
                   {/* Resource Access Section */}
                   <TokenResourceAccessForm 
                     control={form.control} 
                     resourceAccess={resourceAccess} 
                   />
+
+                  <Separator />
 
                   {/* Permissions Section */}
                   <TokenPermissionsForm 
