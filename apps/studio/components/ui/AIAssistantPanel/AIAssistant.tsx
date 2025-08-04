@@ -249,35 +249,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
   }, [setValue])
 
-  const confirmEdit = useCallback(
-    (newContent: string) => {
-      if (!editingMessageId) return
-
-      // Find the target message
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
-      if (messageIndex === -1) return
-
-      // Delete this message and all messages after it
-      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
-      const updatedMessages = chatMessages.slice(0, messageIndex)
-      setMessages(updatedMessages)
-
-      const payload = {
-        role: 'user',
-        createdAt: new Date(),
-        content: newContent,
-        id: uuidv4(),
-      } as MessageType
-
-      snap.clearSqlSnippets()
-      lastUserMessageRef.current = payload
-      append(payload)
-      setValue('')
-      setEditingMessageId(null)
-    },
-    [editingMessageId, chatMessages, snap, setMessages, append, setValue]
-  )
-
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message) => {
@@ -299,8 +270,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
-      confirmEdit(finalContent)
-      return
+      // Handling when the user is in edit mode
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
+      if (messageIndex === -1) return
+
+      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+      setEditingMessageId(null)
     }
 
     const payload = {
