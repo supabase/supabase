@@ -137,7 +137,8 @@ export const sqlEditorState = proxy({
       snippet.name = name
       snippet.description = description
 
-      sqlEditorState.needsSaving.set(id, true)
+      // The snippet is already saved in the database, so we don't need to set needsSaving
+      // sqlEditorState.needsSaving.set(id, true)
     }
   },
 
