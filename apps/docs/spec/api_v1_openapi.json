@@ -4950,7 +4950,10 @@
             "items": {
               "type": "object",
               "properties": {
-                "postgres_version": { "type": "string", "enum": ["15", "17", "17-oriole"] },
+                "postgres_version": {
+                  "type": "string",
+                  "enum": ["13", "14", "15", "17", "17-oriole"]
+                },
                 "release_channel": {
                   "type": "string",
                   "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
