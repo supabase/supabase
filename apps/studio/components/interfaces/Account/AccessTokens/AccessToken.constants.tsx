@@ -2,10 +2,6 @@
 
 export const ACCESS_TOKEN_EXPIRY = ['No expiry', '7 days', '30 days', '90 days', '180 days', 'Custom']
 
-export const ACCESS_TOKEN_ORGS = ['kemaldotearth', 'supabase', 'test-org']
-
-export const ACCESS_TOKEN_PROJECTS = ["kemaldotearth's Project", 'test-project-2']
-
 export const ACCESS_TOKEN_PERMISSIONS = [
   {
     name: 'Organization permissions',
