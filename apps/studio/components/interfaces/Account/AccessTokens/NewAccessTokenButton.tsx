@@ -68,7 +68,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       projectPermissions: {},
       permissionRows: [],
     },
-    mode: 'onSubmit',
+    mode: 'onChange',
   })
   const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
 
