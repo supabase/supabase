@@ -204,6 +204,9 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
         onClose={() => {
           setIsPanelOpen(false)
         }}
+        onDeleteToken={() => {
+          if (token) onDeleteToken(token.id)
+        }}
       />
 
       <ConfirmationModal
