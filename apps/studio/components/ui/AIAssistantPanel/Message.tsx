@@ -51,7 +51,7 @@ interface MessageProps {
     resultId?: string
     results: any[]
   }) => void
-  onDelete?: (id: string) => void
+  onDelete: (id: string) => void
   onEdit: (id: string) => void
   isAfterEditedMessage: boolean
   isBeingEdited: boolean
