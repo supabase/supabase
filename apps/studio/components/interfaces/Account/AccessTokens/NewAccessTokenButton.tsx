@@ -223,7 +223,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
               </Form_Shadcn_>
             </div>
           </ScrollArea>
-          <SheetFooter className="!justify-end w-full mt-auto pt-4 border-t">
+          <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
             <div className="flex gap-2">
               <Button type="default" disabled={isLoading} onClick={handleClose}>
                 Cancel

@@ -9,6 +9,7 @@ import {
   cn,
   Badge,
   Button,
+  Separator,
 } from 'ui'
 import { AccessToken } from 'data/access-tokens/access-tokens-query'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -130,13 +131,43 @@ export function ViewTokenPermissionsPanel({
           </SheetHeader>
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
             <div className="space-y-8 px-5 sm:px-6 py-6">
-              {/* Expiry Section */}
+              {/* Token Details Section */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-foreground">Token Details</h3>
                 <div className="space-y-2 text-sm text-foreground-light">
-                  <div>Created on Dec 1, 2024</div>
-                  <div>Expires on Dec 31, 2024</div>
+                  <div className="flex items-center gap-2">
+                    <span>Created on</span>
+                    <Badge variant="default">Dec 1, 2024</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Expires on</span>
+                    <Badge variant="default">Dec 31, 2024</Badge>
+                  </div>
                 </div>
+              </div>
+
+              {/* Resource Access Section */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-foreground">Resource Access</h3>
+                <Card>
+                  <CardContent className="space-y-4 p-0">
+                    <div className="space-y-4 p-4">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-foreground-light">Organizations</h4>
+                        <div className="text-sm text-foreground prose">
+                          Acme Corp, Tech Solutions Inc
+                        </div>
+                      </div>
+                      <Separator className="mt-4" />
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-foreground-light">Projects</h4>
+                        <div className="text-sm text-foreground prose">
+                          ecommerce-app, analytics-dashboard, api-gateway
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Permissions Groups */}
@@ -144,34 +175,43 @@ export function ViewTokenPermissionsPanel({
                 const groupedResources = groupResourcesByAccess(permissionGroup.resources)
 
                 return (
-                  <Card key={permissionGroup.name}>
-                    <CardContent className="p-4 space-y-4">
-                      <h3 className="text-base font-medium text-foreground">
-                        {permissionGroup.name}
-                      </h3>
-                      <div className="space-y-4">
-                        {Object.entries(groupedResources).map(([accessLevel, resources]) => {
-                          if (resources.length === 0) return null
+                  <div key={permissionGroup.name} className="space-y-3">
+                    <h3 className="text-sm font-medium text-foreground">{permissionGroup.name}</h3>
+                    <Card>
+                      <CardContent className="space-y-4 p-0">
+                        <div className="space-y-4 p-4">
+                          {Object.entries(groupedResources).map(
+                            ([accessLevel, resources], index) => {
+                              if (resources.length === 0) return null
 
-                          return (
-                            <div key={accessLevel} className="space-y-2">
-                              <h4 className="text-sm font-medium text-foreground-light">
-                                {accessLevel}
-                              </h4>
-                              <div className="text-sm text-foreground prose">
-                                {resources.join(', ')}
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
+                              return (
+                                <div key={accessLevel}>
+                                  <div className="space-y-2">
+                                    <h4 className="text-sm font-medium text-foreground-light">
+                                      {accessLevel}
+                                    </h4>
+                                    <div className="text-sm text-foreground prose">
+                                      {resources.join(', ')}
+                                    </div>
+                                  </div>
+                                  {index <
+                                    Object.entries(groupedResources).filter(
+                                      ([_, resources]) => resources.length > 0
+                                    ).length -
+                                      1 && <Separator className="mt-4" />}
+                                </div>
+                              )
+                            }
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 )
               })}
             </div>
           </ScrollArea>
-          <SheetFooter className="!justify-end w-full mt-auto pt-4 border-t">
+          <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
             <div className="flex gap-2">
               <Button type="default" onClick={() => onClose()}>
                 Cancel
