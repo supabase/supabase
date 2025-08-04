@@ -1,6 +1,4 @@
-import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
-
 import {
   Button,
   Dialog,
@@ -65,4 +63,4 @@ const GeneratedTokenDialog = ({ visible, onClose, generatedToken }: GeneratedTok
   )
 }
 
-export default GeneratedTokenDialog 
+export default GeneratedTokenDialog
