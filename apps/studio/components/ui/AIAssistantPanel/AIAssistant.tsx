@@ -1,7 +1,7 @@
 import type { Message as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, Info, RefreshCw, Settings, X } from 'lucide-react'
+import { ArrowDown, Info, Pencil, RefreshCw, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -549,40 +549,76 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         </div>
 
         <AnimatePresence>
-          {!isSticky && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="pointer-events-none z-10 -mt-24"
-              >
-                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
-                  <motion.div
-                    className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
-                    variants={{
-                      hidden: { y: 5, opacity: 0 },
-                      show: { y: 0, opacity: 1 },
-                    }}
-                    transition={{ duration: 0.1 }}
-                    initial="hidden"
-                    animate="show"
-                    exit="hidden"
-                  >
+          {editingMessageId && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                <motion.div
+                  className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
+                  variants={{
+                    hidden: { y: 5, opacity: 0 },
+                    show: { y: 0, opacity: 1 },
+                  }}
+                  transition={{ duration: 0.1 }}
+                  initial="hidden"
+                  animate="show"
+                  exit="hidden"
+                >
+                  <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
+                    <div className="flex items-center gap-x-2 text-sm text-foreground">
+                      <Pencil size={14} />
+                      <span>Editing message</span>
+                    </div>
                     <Button
-                      type="default"
-                      className="rounded-full w-8 h-8 p-1.5"
-                      onClick={() => {
-                        scrollToEnd()
-                        if (inputRef.current) inputRef.current.focus()
-                      }}
-                    >
-                      <ArrowDown size={16} />
-                    </Button>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </>
+                      type="outline"
+                      size="tiny"
+                      icon={<X size={14} />}
+                      onClick={cancelEdit}
+                      className="w-6 h-6 p-0"
+                      title="Cancel editing"
+                      aria-label="Cancel editing"
+                    />
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+          {!isSticky && !editingMessageId && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                <motion.div
+                  className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
+                  variants={{
+                    hidden: { y: 5, opacity: 0 },
+                    show: { y: 0, opacity: 1 },
+                  }}
+                  transition={{ duration: 0.1 }}
+                  initial="hidden"
+                  animate="show"
+                  exit="hidden"
+                >
+                  <Button
+                    type="default"
+                    className="rounded-full w-8 h-8 p-1.5"
+                    onClick={() => {
+                      scrollToEnd()
+                      if (inputRef.current) inputRef.current.focus()
+                    }}
+                  >
+                    <ArrowDown size={16} />
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
 
@@ -638,8 +674,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 snap.setSqlSnippets(newSnippets)
               }}
               includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
-              isEditing={!!editingMessageId}
-              onCancelEdit={cancelEdit}
             />
           </div>
         )}
