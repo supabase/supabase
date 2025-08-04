@@ -1,20 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useLocalStorage } from '@uidotdev/usehooks'
 import { Edit } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { DeleteBucketModal } from 'components/interfaces/Storage'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import { DeleteBucketModal } from 'components/interfaces/Storage'
 import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -28,8 +28,9 @@ import BucketRow from './BucketRow'
 const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
-  const projectDetails = useSelectedProject()
-  const isBranch = projectDetails?.parent_project_ref !== undefined
+  const { data: project } = useSelectedProjectQuery()
+  const snap = useStorageExplorerStateSnapshot()
+  const isBranch = project?.parent_project_ref !== undefined
 
   const [searchText, setSearchText] = useState<string>('')
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
@@ -37,11 +38,6 @@ const StorageMenu = () => {
   const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<Bucket>()
   const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<Bucket>()
   const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
-    'storage-explorer-sort',
-    'created-at'
-  )
 
   const page = router.pathname.split('/')[4] as
     | undefined
@@ -58,7 +54,7 @@ const StorageMenu = () => {
     isSuccess,
   } = useBucketsQuery({ projectRef: ref })
   const sortedBuckets =
-    sort === 'alphabetical'
+    snap.sortBucket === 'alphabetical'
       ? buckets.sort((a, b) =>
           a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
         )
@@ -103,8 +99,8 @@ const StorageMenu = () => {
               }}
             >
               <InnerSideBarFilterSortDropdown
-                value={sort}
-                onValueChange={(value: any) => setSort(value)}
+                value={snap.sortBucket}
+                onValueChange={(value: any) => snap.setSortBucket(value)}
               >
                 <InnerSideBarFilterSortDropdownItem
                   key="alphabetical"
