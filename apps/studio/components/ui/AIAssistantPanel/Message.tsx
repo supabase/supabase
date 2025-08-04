@@ -229,10 +229,20 @@ export const Message = function Message({
                   <ButtonTooltip
                     type="text"
                     icon={<Pencil size={14} strokeWidth={1.5} />}
-                    onClick={() => onEdit(id)}
+                    onClick={
+                      isBeingEdited || isAfterEditedMessage ? onCancelEdit : () => onEdit(id)
+                    }
                     className="text-foreground-light hover:text-foreground p-1 rounded"
-                    aria-label="Edit message"
-                    tooltip={{ content: { side: 'bottom', text: 'Edit message' } }}
+                    aria-label={
+                      isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message'
+                    }
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text:
+                          isBeingEdited || isAfterEditedMessage ? 'Cancel editing' : 'Edit message',
+                      },
+                    }}
                   />
 
                   <ButtonTooltip
