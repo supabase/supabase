@@ -107,7 +107,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
-  const [originalMessageContent, setOriginalMessageContent] = useState('')
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -236,7 +235,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       // Activate editing mode
       setEditingMessageId(messageId)
-      setOriginalMessageContent(messageToEdit.content ?? '')
       setValue(messageToEdit.content ?? '')
 
       if (inputRef.current) {
@@ -248,7 +246,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const cancelEdit = useCallback(() => {
     setEditingMessageId(null)
-    setOriginalMessageContent('')
     setValue('')
   }, [setValue])
 
@@ -265,10 +262,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       const updatedMessages = chatMessages.slice(0, messageIndex)
       setMessages(updatedMessages)
 
-      // Deactivate editing state
-      setEditingMessageId(null)
-      setOriginalMessageContent('')
-
       const payload = {
         role: 'user',
         createdAt: new Date(),
@@ -280,6 +273,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       lastUserMessageRef.current = payload
       append(payload)
       setValue('')
+      setEditingMessageId(null)
     },
     [editingMessageId, chatMessages, snap, setMessages, append, setValue]
   )
@@ -345,7 +339,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages([])
     lastUserMessageRef.current = null
     setEditingMessageId(null)
-    setOriginalMessageContent('')
   }
 
   // Update scroll behavior for new messages
@@ -653,7 +646,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               }}
               includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
               isEditing={!!editingMessageId}
-              editingMessageContent={originalMessageContent}
               onCancelEdit={cancelEdit}
             />
           </div>

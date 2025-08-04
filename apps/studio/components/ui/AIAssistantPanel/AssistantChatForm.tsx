@@ -39,7 +39,6 @@ export interface FormProps {
   className?: string
   /* Editing mode props */
   isEditing?: boolean
-  editingMessageContent?: string
   onCancelEdit?: () => void
 }
 
@@ -59,7 +58,6 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       includeSnippetsInMessage = false,
       className,
       isEditing = false,
-      editingMessageContent = '',
       onCancelEdit,
       ...props
     },
