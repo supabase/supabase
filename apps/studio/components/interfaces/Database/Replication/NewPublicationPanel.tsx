@@ -23,7 +23,7 @@ import {
 } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 interface NewPublicationPanelProps {
   visible: boolean

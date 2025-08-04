@@ -22,7 +22,7 @@ import {
   AlertTitle_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'

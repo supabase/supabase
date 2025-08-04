@@ -21,7 +21,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 const formSchema = z.object({
   ref: z.string(),

@@ -1,6 +1,6 @@
 import { Check, ChevronsUpDown, X } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { useMemo, useState } from 'react'
 import {
@@ -53,18 +53,18 @@ export const BillingCustomerDataSchema = z
       return !hasAnyField || (!!data.country && !!data.line1)
     },
     {
-      message: 'Country and Address line 1 are required if any other field is provided.',
       path: ['line1'],
+        error: 'Country and Address line 1 are required if any other field is provided.'
     }
   )
   .refine((data) => !(!!data.line1 && !data.country), {
-    message: 'Please select a country',
     path: ['country'],
-  })
+      error: 'Please select a country'
+})
   .refine((data) => !(!!data.country && !data.line1), {
-    message: 'Please provide an address line 1',
     path: ['line1'],
-  })
+      error: 'Please provide an address line 1'
+})
 
 export type BillingCustomerDataFormValues = z.infer<typeof BillingCustomerDataSchema>
 

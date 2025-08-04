@@ -26,7 +26,7 @@ import {
   SidePanel,
   Switch,
 } from 'ui'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Input } from '../DataInputs/Input'
 import { InfoTooltip } from '../info-tooltip'
 import { FormItemLayout } from './FormItemLayout/FormItemLayout'
@@ -61,23 +61,21 @@ const items = [
 export const Page = () => {
   const FormSchema = z.object({
     username: z.string().min(2, {
-      message: 'Username must be at least 2 characters.',
+        error: 'Username must be at least 2 characters.'
     }),
     kevins_input: z.string().min(6, {
-      message: 'Username must be at least 6 characters.',
+        error: 'Username must be at least 6 characters.'
     }),
-    email: z
-      .string({
-        required_error: 'Please select an email to display.',
-      })
-      .email(),
-    consistent_settings: z.boolean().default(false).optional(),
-    switch_option: z.boolean().default(false).optional(),
+    email: z.email({
+              error: (issue) => issue.input === undefined ? 'Please select an email to display.' : undefined
+        }),
+    consistent_settings: z.boolean().prefault(false).optional(),
+    switch_option: z.boolean().prefault(false).optional(),
     items: z.array(z.string()).refine((value) => value.some((item) => item), {
-      message: 'You have to select at least one item.',
+        error: 'You have to select at least one item.'
     }),
     type: z.enum(['all', 'mentions', 'none'], {
-      required_error: 'You need to select a notification type.',
+        error: (issue) => issue.input === undefined ? 'You need to select a notification type.' : undefined
     }),
   })
 

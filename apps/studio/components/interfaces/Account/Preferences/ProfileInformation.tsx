@@ -10,7 +10,7 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import z from 'zod'
+import z from 'zod/v4'
 
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'

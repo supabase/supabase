@@ -3,7 +3,7 @@ import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import { useParams } from 'common'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
@@ -44,13 +44,14 @@ const FormSchema = z
       !val.domain.match(/https:\/\/clerk([.][a-z0-9-]+){2,}\/?/) &&
       !val.domain.match(/https:\/\/[a-z0-9-]+[.]clerk[.]accounts[.]dev\/?$/)
     ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.invalid_string,
-        path: ['domain'],
-        message:
-          'Production Clerk domains use HTTPS and start with the clerk subdomain (https://clerk.example.com). Development Clerk domains use HTTPS and end with .clerk.accounts.dev (https://example.clerk.accounts.dev).',
-        validation: 'regex',
-      })
+      ctx.issues.push({
+                code: z.ZodIssueCode.invalid_string,
+                path: ['domain'],
+                message:
+                  'Production Clerk domains use HTTPS and start with the clerk subdomain (https://clerk.example.com). Development Clerk domains use HTTPS and end with .clerk.accounts.dev (https://example.clerk.accounts.dev).',
+                validation: 'regex',
+                  input: ''
+            })
     }
   })
 

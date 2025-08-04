@@ -2,7 +2,7 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { ident, literal } from './pg-format'
 import { POLICIES_SQL } from './sql/policies'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 const pgPolicyZod = z.object({
   id: z.number(),

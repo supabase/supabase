@@ -22,7 +22,7 @@ import {
   cn,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Admonition } from './../admonition'
 
 export interface TextConfirmModalProps {
@@ -83,7 +83,7 @@ const TextConfirmModal = forwardRef<
       confirmValue: z.preprocess(
         (val) => (typeof val === 'string' ? val.trim() : val),
         z.literal(confirmString.trim(), {
-          required_error: 'Value entered does not match.',
+            error: (issue) => issue.input === undefined ? 'Value entered does not match.' : undefined
         })
       ),
     })

@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import {
   Button,
@@ -21,8 +21,8 @@ import {
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
-    message: 'Your one-time password must be 6 characters.',
-  }),
+      error: 'Your one-time password must be 6 characters.'
+}),
 })
 
 export default function InputOTPForm() {

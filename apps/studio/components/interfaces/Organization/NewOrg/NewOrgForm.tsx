@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'

@@ -37,7 +37,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
-import { z, type SafeParseError } from 'zod'
+import { z, type SafeParseError } from 'zod/v4'
 
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { IS_PLATFORM } from '~/lib/constants'
@@ -49,16 +49,17 @@ const ALLOW_LISTED_GITHUB_ORGS = ['supabase', 'supabase-community'] as [string, 
 const linesSchema = z.array(z.tuple([z.coerce.number(), z.coerce.number()]))
 const linesValidator = z
   .string()
-  .default('[[1, -1]]')
+  .prefault('[[1, -1]]')
   .transform((v, ctx) => {
     try {
       const array = JSON.parse(v)
       return linesSchema.parse(array)
     } catch (e) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Lines should be an array of [number, number] tuples',
-      })
+      ctx.issues.push({
+                code: z.ZodIssueCode.custom,
+                message: 'Lines should be an array of [number, number] tuples',
+                  input: ''
+            })
       return z.NEVER
     }
   })
@@ -72,14 +73,14 @@ type AdditionalMeta = {
 const codeSampleExternalSchema = z.object({
   external: z.coerce.boolean().refine((v) => v === true),
   org: z.enum(ALLOW_LISTED_GITHUB_ORGS, {
-    errorMap: () => ({ message: 'Org must be one of: ' + ALLOW_LISTED_GITHUB_ORGS.join(', ') }),
+    error: () => 'Org must be one of: ' + ALLOW_LISTED_GITHUB_ORGS.join(', '),
   }),
   repo: z.string(),
   commit: z.string(),
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
-  hideElidedLines: z.coerce.boolean().default(false),
+  hideElidedLines: z.coerce.boolean().prefault(false),
 })
 type ICodeSampleExternal = z.infer<typeof codeSampleExternalSchema> & AdditionalMeta
 
@@ -91,7 +92,7 @@ const codeSampleInternalSchema = z.object({
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
-  hideElidedLines: z.coerce.boolean().default(false),
+  hideElidedLines: z.coerce.boolean().prefault(false),
 })
 type ICodeSampleInternal = z.infer<typeof codeSampleInternalSchema> & AdditionalMeta
 

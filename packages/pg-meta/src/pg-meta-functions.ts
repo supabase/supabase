@@ -1,5 +1,5 @@
 import { ident, literal } from './pg-format'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { FUNCTIONS_SQL } from './sql/functions'
@@ -318,7 +318,7 @@ export function update(currentFunc: PGFunction, { name, schema, definition }: PG
 }
 
 export const pgFunctionDeleteZod = z.object({
-  cascade: z.boolean().default(false).optional(),
+  cascade: z.boolean().prefault(false).optional(),
 })
 
 export type PGFunctionDelete = z.infer<typeof pgFunctionDeleteZod>

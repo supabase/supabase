@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import type { z, ZodTypeAny } from 'zod'
+import type { z, ZodTypeAny } from 'zod/v4'
 import { Button } from '@/registry/default/components/ui/button'
 import {
   Form,

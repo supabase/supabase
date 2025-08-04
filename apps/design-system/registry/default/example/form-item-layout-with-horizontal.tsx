@@ -1,14 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Separator } from 'ui'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const formSchema = z.object({
   username: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
-  }),
+      error: 'Username must be at least 2 characters.'
+}),
 })
 
 export default function FormItemLayoutDemo() {

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
@@ -47,7 +47,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
 
   const FormSchema = z.object({
     description: z.string().min(3, {
-      message: 'Description must be at least 3 characters long',
+        error: 'Description must be at least 3 characters long'
     }),
   })
   const form = useForm<z.infer<typeof FormSchema>>({

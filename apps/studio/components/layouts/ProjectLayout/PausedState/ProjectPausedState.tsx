@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { useParams } from 'common'
 import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'

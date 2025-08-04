@@ -4,7 +4,7 @@ import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Switch } 
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 const FormSchema = z.object({
   functionName: z.string(),

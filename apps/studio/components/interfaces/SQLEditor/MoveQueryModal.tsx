@@ -3,7 +3,7 @@ import { Check, Code, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import { useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'

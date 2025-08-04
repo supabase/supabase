@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import { useParams } from 'common'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'

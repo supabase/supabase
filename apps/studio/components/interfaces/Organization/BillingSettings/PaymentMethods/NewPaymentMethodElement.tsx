@@ -32,7 +32,7 @@ import {
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
 import { TAX_IDS, type TaxId } from '../BillingCustomerData/TaxID.constants'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { useForm } from 'react-hook-form'
 import { Form } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -45,8 +45,8 @@ import type { PaymentMethod } from '@stripe/stripe-js'
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
   tax_id_value: z.string().min(2, {
-    message: 'Tax ID needs to be set.',
-  }),
+      error: 'Tax ID needs to be set.'
+}),
   tax_id_name: z.string(),
 })
 

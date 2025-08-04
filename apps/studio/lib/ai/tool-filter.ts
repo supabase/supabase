@@ -1,5 +1,5 @@
 import { Tool, ToolSet, ToolExecutionOptions } from 'ai'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
@@ -16,7 +16,7 @@ const basicToolSchema = z.custom<Tool>((value) => typeof value === 'object')
 /**
  * Schema for validating that a tool set only contains known tools.
  */
-export const toolSetValidationSchema = z.record(
+export const toolSetValidationSchema = z.partialRecord(
   z.enum([
     // MCP tools
     'list_tables',

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
+import z from 'zod/v4'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -25,13 +25,13 @@ interface CreateRolePanelProps {
 }
 
 const FormSchema = z.object({
-  name: z.string().trim().min(1, 'You must provide a name').default(''),
-  isSuperuser: z.boolean().default(false),
-  canLogin: z.boolean().default(false),
-  canCreateRole: z.boolean().default(false),
-  canCreateDb: z.boolean().default(false),
-  isReplicationRole: z.boolean().default(false),
-  canBypassRls: z.boolean().default(false),
+  name: z.string().trim().min(1, 'You must provide a name').prefault(''),
+  isSuperuser: z.boolean().prefault(false),
+  canLogin: z.boolean().prefault(false),
+  canCreateRole: z.boolean().prefault(false),
+  canCreateDb: z.boolean().prefault(false),
+  isReplicationRole: z.boolean().prefault(false),
+  canBypassRls: z.boolean().prefault(false),
 })
 
 const initialValues = {

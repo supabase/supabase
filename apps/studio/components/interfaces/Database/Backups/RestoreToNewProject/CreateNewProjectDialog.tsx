@@ -3,7 +3,7 @@ import { debounce } from 'lodash'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'

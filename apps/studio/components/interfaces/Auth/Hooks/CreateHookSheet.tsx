@@ -5,7 +5,7 @@ import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import { useParams } from 'common'
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
@@ -74,34 +74,38 @@ const FormSchema = z
   .superRefine((data, ctx) => {
     if (data.selectedType === 'https') {
       if (!data.httpsValues.url.startsWith('https://')) {
-        ctx.addIssue({
-          path: ['httpsValues', 'url'],
-          code: z.ZodIssueCode.custom,
-          message: 'The URL must start with https://',
-        })
+        ctx.issues.push({
+                    path: ['httpsValues', 'url'],
+                    code: z.ZodIssueCode.custom,
+                    message: 'The URL must start with https://',
+                      input: ''
+                  })
       }
       if (!data.httpsValues.secret) {
-        ctx.addIssue({
-          path: ['httpsValues', 'secret'],
-          code: z.ZodIssueCode.custom,
-          message: 'Missing secret value',
-        })
+        ctx.issues.push({
+                    path: ['httpsValues', 'secret'],
+                    code: z.ZodIssueCode.custom,
+                    message: 'Missing secret value',
+                      input: ''
+                  })
       }
     }
     if (data.selectedType === 'postgres') {
       if (!data.postgresValues.schema) {
-        ctx.addIssue({
-          path: ['postgresValues', 'schema'],
-          code: z.ZodIssueCode.custom,
-          message: 'You must select a schema',
-        })
+        ctx.issues.push({
+                    path: ['postgresValues', 'schema'],
+                    code: z.ZodIssueCode.custom,
+                    message: 'You must select a schema',
+                      input: ''
+                  })
       }
       if (!data.postgresValues.functionName) {
-        ctx.addIssue({
-          path: ['postgresValues', 'functionName'],
-          code: z.ZodIssueCode.custom,
-          message: 'You must select a Postgres function',
-        })
+        ctx.issues.push({
+                    path: ['postgresValues', 'functionName'],
+                    code: z.ZodIssueCode.custom,
+                    message: 'You must select a Postgres function',
+                      input: ''
+                  })
       }
     }
     return true

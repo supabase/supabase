@@ -3,7 +3,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string

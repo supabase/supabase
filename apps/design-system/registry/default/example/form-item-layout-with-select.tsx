@@ -12,14 +12,12 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 const FormSchema = z.object({
-  email: z
-    .string({
-      required_error: 'Please select an email to display.',
-    })
-    .email(),
+  email: z.email({
+            error: (issue) => issue.input === undefined ? 'Please select an email to display.' : undefined
+        }),
 })
 
 export default function FormItemLayoutDemo() {

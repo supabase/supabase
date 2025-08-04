@@ -3,7 +3,7 @@ import { snakeCase, uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
+import z from 'zod/v4'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -61,7 +61,7 @@ export const ImportForeignSchemaDialog = ({
           return !schemas?.find((s) => s.name === val)
         },
         {
-          message: 'This schema already exists. Please specify a unique schema name.',
+            error: 'This schema already exists. Please specify a unique schema name.'
         }
       ),
   })

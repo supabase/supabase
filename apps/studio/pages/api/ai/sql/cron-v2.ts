@@ -1,7 +1,7 @@
 import { generateObject } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'

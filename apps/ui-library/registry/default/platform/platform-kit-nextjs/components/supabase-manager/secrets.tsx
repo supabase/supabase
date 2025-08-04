@@ -20,7 +20,7 @@ import { secretsSchema } from '../../lib/schemas/secrets'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Minus, PlusIcon, Key } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 
 export function SecretsManager({ projectRef }: { projectRef: string }) {

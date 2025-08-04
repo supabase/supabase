@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
-import { z, type ZodTypeAny } from 'zod'
+import { z, type ZodTypeAny } from 'zod/v4'
 import { useListTables } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-tables'
 import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
 import { SqlEditor } from '@/registry/default/platform/platform-kit-nextjs/components/sql-editor'

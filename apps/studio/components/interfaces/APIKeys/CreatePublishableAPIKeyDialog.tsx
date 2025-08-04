@@ -18,7 +18,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import { useParams } from 'next/navigation'

@@ -1,6 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import { QueryClient, UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { privilegeKeys } from './keys'

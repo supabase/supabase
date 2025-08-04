@@ -4,7 +4,7 @@ import { ChevronDown, Loader2, PlusIcon } from 'lucide-react'
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
@@ -155,11 +155,12 @@ const GitHubIntegrationConnectionForm = ({
             const selectedRepo = githubRepos.find((repo) => repo.id === repositoryId)
             const repoName =
               selectedRepo?.name || connection?.repository.name || 'selected repository'
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Branch "${val.branchName}" not found in ${repoName}`,
-              path: ['branchName'],
-            })
+            ctx.issues.push({
+                            code: z.ZodIssueCode.custom,
+                            message: `Branch "${val.branchName}" not found in ${repoName}`,
+                            path: ['branchName'],
+                              input: ''
+                          })
           }
         }
       }

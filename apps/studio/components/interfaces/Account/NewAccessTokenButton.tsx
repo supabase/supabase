@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import z from 'zod'
+import z from 'zod/v4'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -17,7 +17,7 @@ interface SendMessageModalProps {
 }
 
 const FormSchema = z.object({
-  delay: z.coerce.number().int().gte(0).default(5),
+  delay: z.coerce.number().int().gte(0).prefault(5),
   payload: z.string().refine(
     (val) => {
       try {
@@ -27,7 +27,7 @@ const FormSchema = z.object({
       }
     },
     {
-      message: 'The payload should be a JSON object',
+        error: 'The payload should be a JSON object'
     }
   ),
 })
