@@ -1,4 +1,4 @@
-import { Message } from 'ai/react'
+import { Message } from '@ai-sdk/react'
 
 type MessagePart = NonNullable<Message['parts']>[number]
 
@@ -13,7 +13,7 @@ const extractDataFromSafetyMessage = (text: string): string | null => {
   const closingStart = text.indexOf(closingTagMatch[0])
   const content = text.substring(secondOpeningEnd, closingStart)
 
-  return content.replace(/\\n/g, '').replace(/\\"/g, '"').replace(/\n/g, '').trim()
+  return content.replace(/\\n/g, '').replace(/\\"/g, '"').replace(/\n/g, '').trim();
 }
 
 // Helper function to find result data directly from parts array

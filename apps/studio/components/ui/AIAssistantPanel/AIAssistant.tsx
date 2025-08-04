@@ -144,11 +144,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // and don't run the risk of messages getting mixed up between chats.
   const {
     messages: chatMessages,
-    isLoading: isChatLoading,
-    append,
+    status: chatStatus,
+    sendMessage,
     setMessages,
     error,
-    reload,
+    regenerate,
   } = useChat({
     id: snap.activeChatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v4`,
@@ -166,45 +166,52 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         return 'Failed to rename chat: Invalid chat or name'
       }
     },
-    experimental_prepareRequestBody: ({ messages }) => {
-      // [Joshen] Specifically limiting the chat history that get's sent to reduce the
-      // size of the context that goes into the model. This should always be an odd number
-      // as much as possible so that the first message is always the user's
-      const MAX_CHAT_HISTORY = 5
+    transport: {
+      api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      async prepareSendMessagesRequest({ messages, headers: initHeaders, ...options }) {
+        // [Joshen] Specifically limiting the chat history that get's sent to reduce the
+        // size of the context that goes into the model. This should always be an odd number
+        // as much as possible so that the first message is always the user's
+        const MAX_CHAT_HISTORY = 5
 
-      const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
+        const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
 
-      // Filter out results from messages before sending to the model
-      const cleanedMessages = slicedMessages.map((message) => {
-        const cleanedMessage = { ...message } as AssistantMessageType
-        if (message.role === 'assistant' && (message as AssistantMessageType).results) {
-          delete cleanedMessage.results
+        // Filter out results from messages before sending to the model
+        const cleanedMessages = slicedMessages.map((message: any) => {
+          const cleanedMessage = { ...message } as AssistantMessageType
+          if (message.role === 'assistant' && (message as AssistantMessageType).results) {
+            delete cleanedMessage.results
+          }
+          return cleanedMessage
+        })
+
+        const headers = await constructHeaders()
+        const existingHeaders = new Headers(initHeaders)
+        for (const [key, value] of headers.entries()) {
+          existingHeaders.set(key, value)
         }
-        return cleanedMessage
-      })
 
-      return JSON.stringify({
-        messages: cleanedMessages,
-        aiOptInLevel,
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        schema: currentSchema,
-        table: currentTable?.name,
-        chatName: currentChat,
-        orgSlug: selectedOrganization?.slug,
-      })
-    },
-    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
-      const headers = await constructHeaders()
-      const existingHeaders = new Headers(init?.headers)
-      for (const [key, value] of headers.entries()) {
-        existingHeaders.set(key, value)
-      }
-      return fetch(input, { ...init, headers: existingHeaders })
+        return {
+          ...options,
+          body: {
+            messages: cleanedMessages,
+            aiOptInLevel,
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            schema: currentSchema,
+            table: currentTable?.name,
+            chatName: currentChat,
+            orgSlug: selectedOrganization?.slug,
+          },
+          headers: existingHeaders,
+        }
+      },
     },
     onError: onErrorChat,
     onFinish: handleChatFinish,
   })
+
+  const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
 
   const updateMessage = useCallback(
     ({
@@ -249,7 +256,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
-    append(payload)
+    sendMessage(payload)
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
@@ -426,7 +433,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     <Info size={16} />
                     <p>Sorry, I'm having trouble responding right now</p>
                   </div>
-                  <Button type="text" size="tiny" onClick={() => reload()} className="text-xs">
+                  <Button type="text" size="tiny" onClick={() => regenerate()} className="text-xs">
                     Retry
                   </Button>
                 </div>

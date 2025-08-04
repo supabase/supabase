@@ -1,6 +1,6 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCompletion } from 'ai/react'
+import { useCompletion } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronUp, Command, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'

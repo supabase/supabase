@@ -1,5 +1,5 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
-import { useCompletion } from 'ai/react'
+import { useCompletion } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'

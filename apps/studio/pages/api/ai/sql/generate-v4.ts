@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToCoreMessages, CoreMessage, streamText, tool, ToolSet } from 'ai'
+import { convertToModelMessages, ModelMessage, streamText, tool, ToolSet } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -124,7 +124,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       display_query: tool({
         description:
           'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
-        parameters: z.object({
+        inputSchema: z.object({
           manualToolCallId: z
             .string()
             .optional()
@@ -162,7 +162,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       display_edge_function: tool({
         description:
           'Renders the code for a Supabase Edge Function for the user to deploy manually.',
-        parameters: z.object({
+        inputSchema: z.object({
           name: z
             .string()
             .describe('The URL-friendly name of the Edge Function (e.g., "my-function").'),
@@ -174,7 +174,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       }),
       rename_chat: tool({
         description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
-        parameters: z.object({
+        inputSchema: z.object({
           newName: z.string().describe('The new name for the chat session. Five words or less.'),
         }),
         execute: async () => {
@@ -396,7 +396,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-    const coreMessages: CoreMessage[] = [
+    const coreMessages: ModelMessage[] = [
       {
         role: 'system',
         content: system,
@@ -412,7 +412,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         // Add any dynamic context here
         content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
       },
-      ...convertToCoreMessages(messages),
+      ...convertToModelMessages(messages),
     ]
 
     const result = streamText({
@@ -422,7 +422,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       tools,
     })
 
-    result.pipeDataStreamToResponse(res, {
+    result.pipeUIMessageStreamToResponse(res, {
       getErrorMessage: (error) => {
         if (error == null) {
           return 'unknown error'

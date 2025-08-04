@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Message } from 'ai/react'
+import { Message } from '@ai-sdk/react'
 import { useRouter } from 'next/router'
 import { DragEvent, PropsWithChildren, useMemo, useState } from 'react'
 

@@ -117,7 +117,7 @@
     "uuid": "^9.0.1",
     "valtio": "catalog:",
     "yaml": "^2.4.5",
-    "zod": "^3.22.4"
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@graphiql/toolkit": "^0.9.1",

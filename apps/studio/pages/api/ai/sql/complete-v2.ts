@@ -136,30 +136,35 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       messages: [
         {
           role: 'user',
-          content: source`
-            You are helping me edit some pgsql code.
-            Here is the context:
-            ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
-            
-            Instructions:
-            1. Only modify the selected text based on this prompt: ${prompt}
-            2. Get schema tables information using the getSchemaTables tool
-            3. Get existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool
-            4. Write new policies or update existing policies based on the prompt
-            5. Your response should be ONLY the modified selection text, nothing else. Remove selected text if needed.
-            6. Do not wrap in code blocks or markdown
-            7. You can respond with one word or multiple words
-            8. Ensure the modified text flows naturally within the current line
-            6. Avoid duplicating SQL keywords (SELECT, FROM, WHERE, etc) when considering the full statement
-            7. If there is no surrounding context (before or after), make sure your response is a complete valid SQL statement that can be run and resolves the prompt.
-            
-            Modify the selected text now:
-          `,
+
+          parts: [{
+            type: 'text',
+
+            text: source`
+              You are helping me edit some pgsql code.
+              Here is the context:
+              ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
+              
+              Instructions:
+              1. Only modify the selected text based on this prompt: ${prompt}
+              2. Get schema tables information using the getSchemaTables tool
+              3. Get existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool
+              4. Write new policies or update existing policies based on the prompt
+              5. Your response should be ONLY the modified selection text, nothing else. Remove selected text if needed.
+              6. Do not wrap in code blocks or markdown
+              7. You can respond with one word or multiple words
+              8. Ensure the modified text flows naturally within the current line
+              6. Avoid duplicating SQL keywords (SELECT, FROM, WHERE, etc) when considering the full statement
+              7. If there is no surrounding context (before or after), make sure your response is a complete valid SQL statement that can be run and resolves the prompt.
+              
+              Modify the selected text now:
+            `
+          }]
         },
       ],
     })
 
-    return result.pipeDataStreamToResponse(res)
+    return result.pipeUIMessageStreamToResponse(res);
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({

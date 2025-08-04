@@ -1,4 +1,4 @@
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { useEffect, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
