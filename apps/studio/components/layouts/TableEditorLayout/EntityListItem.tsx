@@ -1,5 +1,5 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -278,7 +278,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         {canEdit && (
           <DropdownMenu>
             <DropdownMenuTrigger className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground">
-              <MoreHorizontal size={14} strokeWidth={2} />
+              <MoreVertical size={14} strokeWidth={2} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start" className="w-44">
               <DropdownMenuItem

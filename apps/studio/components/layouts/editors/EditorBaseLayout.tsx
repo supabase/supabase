@@ -21,6 +21,7 @@ export const EditorBaseLayout = ({
   title,
   product,
   productMenuClassName,
+  productMenu,
 }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
@@ -38,6 +39,7 @@ export const EditorBaseLayout = ({
       title={title}
       product={product}
       productMenuClassName={productMenuClassName}
+      productMenu={productMenu}
     >
       <div className="flex flex-col h-full">
         <div
