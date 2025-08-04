@@ -1,7 +1,6 @@
 export { default as AccessTokenList } from './AccessTokenList'
 export { default as NewAccessTokenButton } from './NewAccessTokenButton'
 export { default as NewTokenBanner } from './NewTokenBanner'
-export { default as GeneratedTokenDialog } from './GeneratedTokenDialog'
 export { ViewTokenPermissionsPanel } from './ViewTokenPermissionsPanel'
 export { TokenBasicInfoForm } from './TokenBasicInfoForm'
 export { TokenResourceAccessForm } from './TokenResourceAccessForm'
