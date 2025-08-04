@@ -1,14 +1,5 @@
 import { Control } from 'react-hook-form'
-import {
-  FormField_Shadcn_,
-  FormControl_Shadcn_,
-  Select_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  cn,
-} from 'ui'
+import { FormField_Shadcn_, FormControl_Shadcn_, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -208,9 +199,13 @@ export const TokenResourceAccessForm = ({
                   <MultiSelectorContent className="z-50">
                     <MultiSelectorList>
                       {isLoadingOrgs ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">Loading organizations...</div>
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          Loading organizations...
+                        </div>
                       ) : organizations.length === 0 ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">No organizations available</div>
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          No organizations available
+                        </div>
                       ) : (
                         organizations.map((org) => (
                           <MultiSelectorItem key={org.slug} value={org.name}>
@@ -246,9 +241,13 @@ export const TokenResourceAccessForm = ({
                   <MultiSelectorContent className="z-50">
                     <MultiSelectorList>
                       {isLoadingProjects ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">Loading projects...</div>
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          Loading projects...
+                        </div>
                       ) : projects.length === 0 ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">No projects available</div>
+                        <div className="px-3 py-2 text-sm text-foreground-light">
+                          No projects available
+                        </div>
                       ) : (
                         projects.map((project) => (
                           <MultiSelectorItem key={project.ref} value={project.name}>
