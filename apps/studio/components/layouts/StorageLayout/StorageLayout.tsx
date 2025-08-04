@@ -9,11 +9,17 @@ const StorageMenu = dynamic(() => import('../../interfaces/Storage/StorageMenu')
 export interface StorageLayoutProps {
   title: string
   children: ReactNode
+  stickySidebarBottom?: boolean
 }
 
-const StorageLayout = ({ title, children }: StorageLayoutProps) => {
+const StorageLayout = ({ title, children, stickySidebarBottom }: StorageLayoutProps) => {
   return (
-    <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
+    <ProjectLayout
+      title={title || 'Storage'}
+      product="Storage"
+      productMenu={<StorageMenu />}
+      stickySidebarBottom={true} // For sticky Configuration menu on Storage
+    >
       {children}
     </ProjectLayout>
   )
