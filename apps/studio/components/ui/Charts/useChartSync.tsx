@@ -15,7 +15,6 @@ export interface ChartSyncHook {
   subscribe: (callback: (state: ChartSyncState) => void) => () => void
 }
 
-// Global state to manage sync across components
 const syncStateMap = new Map<string, ChartSyncState>()
 const subscribersMap = new Map<string, Set<(state: ChartSyncState) => void>>()
 
@@ -112,7 +111,6 @@ export function useChartSync(syncId?: string): ChartSyncHook {
   }
 }
 
-// Cleanup function to remove sync state when no longer needed
 export function cleanupChartSync(syncId: string) {
   syncStateMap.delete(syncId)
   subscribersMap.delete(syncId)
