@@ -3,35 +3,35 @@ import {
   SheetContent,
   SheetHeader,
   SheetSection,
+  SheetFooter,
   ScrollArea,
   ScrollBar,
   cn,
   Badge,
+  Button,
 } from 'ui'
 import { AccessToken } from 'data/access-tokens/access-tokens-query'
 import { DocsButton } from 'components/ui/DocsButton'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui/src/components/shadcn/ui/table' // replace with namespaced import
 import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_PERMISSIONS } from './AccessToken.constants'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useState } from 'react'
 
 interface ViewTokenPermissionsPanelProps {
   visible: boolean
   token: AccessToken | undefined
   onClose: () => void
+  onDeleteToken?: () => void
 }
 
 export function ViewTokenPermissionsPanel({
   visible,
   token,
   onClose,
+  onDeleteToken,
 }: ViewTokenPermissionsPanelProps) {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+
   // Dummy access settings for demonstration
   const getDummyAccess = (resource: string) => {
     // Define realistic access patterns based on resource type
@@ -85,10 +85,37 @@ export function ViewTokenPermissionsPanel({
     }
   }
 
+  // Group resources by access level
+  const groupResourcesByAccess = (resources: any[]) => {
+    const grouped = {
+      'Read only': [] as string[],
+      'Read-write': [] as string[],
+      'No access': [] as string[],
+    }
+
+    resources.forEach((resource) => {
+      const access = getDummyAccess(resource.resource)
+      const formattedAccess = formatAccessText(access)
+      grouped[formattedAccess as keyof typeof grouped].push(resource.title)
+    })
+
+    return grouped
+  }
+
+  const handleDeleteClick = () => {
+    onClose() // Close the sheet when delete dialog appears
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    onDeleteToken?.()
+    setIsDeleteModalOpen(false)
+  }
+
   return (
-    <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent showClose={false} size="default" className={cn('!min-w-[600px]')}>
-        <div className={cn('flex flex-col grow w-full')}>
+    <>
+      <Sheet open={visible} onOpenChange={() => onClose()}>
+        <SheetContent showClose={false} size="default" className="!min-w-[600px] flex flex-col h-full gap-0">
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}
           >
@@ -97,75 +124,81 @@ export function ViewTokenPermissionsPanel({
             </p>
             <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
           </SheetHeader>
-          <SheetSection className="h-full overflow-auto flex flex-col gap-y-4 p-0">
-            <ScrollArea className="h-[calc(100vh-52px)]">
-              <div className="space-y-8 p-4">
-                {/* Expiry Section */}
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-sm font-medium text-foreground">Token Expiry</h3>
-                      </div>
-                      <Badge variant="success">Dec 31, 2024</Badge>
+          <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
+            <div className="space-y-8 p-4">
+              {/* Expiry Section */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-medium text-foreground">Token Expiry</h3>
                     </div>
-                  </CardContent>
-                </Card>
+                    <Badge variant="success">Dec 31, 2024</Badge>
+                  </div>
+                </CardContent>
+              </Card>
 
-                {/* Permissions Tables */}
-                {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
+              {/* Permissions Groups */}
+              {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => {
+                const groupedResources = groupResourcesByAccess(permissionGroup.resources)
+                
+                return (
                   <div className="space-y-4 flex flex-col" key={permissionGroup.name}>
                     <h3 className="text-base font-medium text-foreground">
                       {permissionGroup.name}
                     </h3>
                     <Card className="overflow-hidden">
-                      <CardContent className="p-0 rounded">
-                        <Table>
-                          <TableHeader className="overflow-hidden">
-                            <TableRow className="bg-200">
-                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[60%]">
-                                Scope
-                              </TableHead>
-                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[40%]">
-                                Access
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {permissionGroup.resources.map((resource) => (
-                              <TableRow key={resource.resource}>
-                                <TableCell>
-                                  <div>
-                                    <p className="text-sm text-foreground">{resource.title}</p>
-                                  </div>
-                                </TableCell>
-                                <TableCell>
-                                  <span className="text-sm text-foreground-light">
-                                    {formatAccessText(getDummyAccess(resource.resource))}
-                                  </span>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                      <CardContent className="p-4 space-y-4">
+                        {Object.entries(groupedResources).map(([accessLevel, resources]) => {
+                          if (resources.length === 0) return null
+                          
+                          return (
+                            <div key={accessLevel} className="space-y-2">
+                              <h4 className="text-sm font-medium text-foreground-light">
+                                {accessLevel}
+                              </h4>
+                              <div className="text-sm text-foreground">
+                                {resources.join(', ')}
+                              </div>
+                            </div>
+                          )
+                        })}
                       </CardContent>
                     </Card>
                   </div>
-                ))}
-              </div>
-              <ScrollBar />
-            </ScrollArea>
-          </SheetSection>
-          {/* <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
-            <Button type="default" onClick={() => onClose()}>
-              Cancel
-            </Button>
-            <Button type="primary" onClick={() => onClose()}>
-              Save changes
-            </Button>
-          </SheetFooter> */}
-        </div>
-      </SheetContent>
-    </Sheet>
+                )
+              })}
+            </div>
+          </ScrollArea>
+          <SheetFooter className="!justify-end w-full mt-auto pt-4 border-t">
+            <div className="flex gap-2">
+              <Button type="default" onClick={() => onClose()}>
+                Cancel
+              </Button>
+              <Button 
+                type="danger" 
+                onClick={handleDeleteClick}
+              >
+                Delete token
+              </Button>
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+      <ConfirmationModal
+        visible={isDeleteModalOpen}
+        variant={'destructive'}
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      >
+        <p className="py-4 text-sm text-foreground-light">
+          {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }
