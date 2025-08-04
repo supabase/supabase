@@ -207,8 +207,7 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 
 <TabPanel id="js" label="JavaScript">
 
-Create a `middleware.jslogin
-` file at the project root and another one within the `utils/supabase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
+Create a `middleware.js` file at the project root and another one within the `utils/supabase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
 
 <$CodeTabs>
 
@@ -382,7 +381,7 @@ Read the Next.js docs to learn more about [opting out of data caching](https://n
 
 <TabPanel id="js" label="JavaScript">
 
-Create the `action.js` file in the `app/login` folder, which contains the login and signup functions and the `error/page.jsx` file, which displays an error message if the login or signup fails.
+Create the `action.js` file in the `app/login` folder, which contains the login and signup functions and the `error/page.jsx` file, and displays an error message if the login or signup fails.
 
 <$CodeTabs>
 
@@ -437,7 +436,7 @@ export default function ErrorPage() {
 }
 ```
 
-</$CodeTabs>action.ts
+</$CodeTabs>
 
 </TabPanel>
 
@@ -463,10 +462,6 @@ meta="name=app/error/page.tsx"
 
 </TabPanel>
 
-Run `npm run dev`, navigate to `http://localhost:3000/login`, and you should see the login form.
-
-When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
-
 </Tabs>
 
 ### Email template
@@ -479,7 +474,7 @@ Before proceeding, change the email template to support support a server-side au
 
 <Admonition type="tip">
 
-Did you know? You can also customize other emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+**Did you know?** You can also customize other emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
 
 </Admonition>
 
@@ -489,9 +484,9 @@ As you are working in a server-side rendering (SSR) environment, you need to cre
 
 The code performs the following steps:
 
-- Retrieve the code sent back from the Supabase Auth server using the `token_hash` query parameter.
-- Exchange this code for a session, which you store in your chosen storage mechanism (in this case, cookies).
-- Finally, redirect the user to the `account` page.
+- Retrieves the code sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Exchanges this code for a session, which you store in your chosen storage mechanism (in this case, cookies).
+- Finally, redirects the user to the `account` page.
 
 <Tabs
   scrollable
@@ -507,7 +502,6 @@ The code performs the following steps:
 
 ```js name=app/auth/confirm/route.js
 import { NextResponse } from 'next/server'
-
 import { createClient } from '@/utils/supabase/server'
 
 // Creating a handler to a GET request to route /auth/confirm
@@ -564,9 +558,9 @@ meta="name=app/auth/confirm/route.ts"
 
 ### Account page
 
-After a user is signed in we can allow them to edit their profile details and manage their account.
+After a user signs in, allow them to edit their profile details and manage their account.
 
-Let's create a new component for that called `AccountForm` within the `app/account` folder.
+Create a new component for that called `AccountForm` within the `app/account` folder.
 
 <Tabs
   scrollable
@@ -771,7 +765,7 @@ meta="name=app/account/page.tsx"
 
 ### Sign out
 
-Let's create a route handler to handle the signout from the server side. Make sure to check if the user is logged in first!
+Create a route handler to handle the sign out from the server side, making sure to check if the user is logged in first.
 
 <Tabs
   scrollable
@@ -831,13 +825,15 @@ meta="name=app/auth/signout/route.ts"
 
 ### Launch!
 
-Now that we have all the pages, route handlers and components in place, let's run this in a terminal window:
+Now you have all the pages, route handlers, and components in place, run the following in a terminal window:
 
 ```bash
 npm run dev
 ```
 
-And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
+And then open the browser to [localhost:3000/login](http://localhost:3000/login) and you should see the completed app.
+
+When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
 
 ## Bonus: Profile photos
 
@@ -846,7 +842,7 @@ photos and videos.
 
 ### Create an upload widget
 
-Let's create an avatar widget for the user so that they can upload a profile photo. We can start by creating a new component:
+Create an avatar widget for the user so that they can upload a profile photo. Start by creating a new component:
 
 <Tabs
   scrollable
@@ -972,7 +968,7 @@ meta="name=app/account/avatar.tsx"
 
 ### Add the new widget
 
-And then we can add the widget to the `AccountForm` component:
+Then add the widget to the `AccountForm` component:
 
 <Tabs
   scrollable
