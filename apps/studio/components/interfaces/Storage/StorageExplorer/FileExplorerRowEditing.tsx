@@ -30,7 +30,11 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
       const itemWithColumnIndex = { ...item, columnIndex }
       renameFolder(itemWithColumnIndex, name, columnIndex)
     } else {
-      addNewFolder(name, columnIndex)
+      addNewFolder({
+        folderName: name,
+        columnIndex,
+        onError: () => inputRef.current.select(),
+      })
     }
   }
 
@@ -47,7 +51,7 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         if (item?.id !== undefined) onSaveItemName(item.name)
-        else addNewFolder('', columnIndex)
+        else addNewFolder({ folderName: '', columnIndex })
       }
     }
 

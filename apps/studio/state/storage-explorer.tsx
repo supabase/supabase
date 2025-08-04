@@ -275,7 +275,15 @@ function createStorageExplorerState({
       })
     },
 
-    addNewFolder: async (folderName: string, columnIndex: number) => {
+    addNewFolder: async ({
+      folderName,
+      columnIndex,
+      onError,
+    }: {
+      folderName: string
+      columnIndex: number
+      onError?: () => void
+    }) => {
       if (!state.supabaseClient) return console.error('Supabase Client is missing')
 
       const autofix = false
@@ -287,7 +295,10 @@ function createStorageExplorerState({
       if (formattedName === null) return
 
       if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
-        return toast.error('Folder name contains invalid special characters')
+        onError?.()
+        return toast.error(
+          'Only alphanumeric characters, hyphens, and underscores are allowed for folder names.'
+        )
       }
 
       if (formattedName.length === 0) {
