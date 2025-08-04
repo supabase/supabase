@@ -238,7 +238,7 @@ export const Message = function Message({
                   {onDelete && (
                     <ButtonTooltip
                       type="text"
-                      icon={<Trash2 size={14} />}
+                      icon={<Trash2 size={14} strokeWidth={1.5} />}
                       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
                       onClick={() => onDelete(id)}
                       className="text-foreground-light hover:text-foreground p-1 rounded"
