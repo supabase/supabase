@@ -279,7 +279,6 @@ function createStorageExplorerState({
       folderName,
       columnIndex,
       onError,
-      onSuccess,
     }: {
       folderName: string
       columnIndex: number
@@ -293,7 +292,10 @@ function createStorageExplorerState({
         autofix,
         columnIndex,
       })
-      if (formattedName === null) return
+      if (formattedName === null) {
+        onError?.()
+        return
+      }
 
       if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
         onError?.()
