@@ -10,7 +10,6 @@ import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import type { Organization } from 'types'
 import {
   Button,
@@ -113,7 +112,7 @@ export const ProjectDropdown = () => {
     return <ShimmeringLoader className="w-[90px]" />
   }
 
-  return IS_PLATFORM ? (
+  return (
     <>
       <Link
         href={`/project/${project?.ref}`}
@@ -176,9 +175,5 @@ export const ProjectDropdown = () => {
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
     </>
-  ) : (
-    <Button type="text">
-      <span className="text-sm">{selectedProject?.name}</span>
-    </Button>
   )
 }

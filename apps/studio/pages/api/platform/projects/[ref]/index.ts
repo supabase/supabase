@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
-import { DEFAULT_PROJECT, PROJECT_REST_URL } from 'pages/api/constants'
+import { DEFAULT_PROJECT, DEFAULT_PROJECT_2, PROJECT_REST_URL } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -18,9 +18,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.query.ref === 'default') {
+    // Platform specific endpoint
+    const response = {
+      ...DEFAULT_PROJECT,
+      connectionString: '',
+      restUrl: PROJECT_REST_URL,
+    }
+
+    return res.status(200).json(response)
+  }
+
   // Platform specific endpoint
   const response = {
-    ...DEFAULT_PROJECT,
+    ...DEFAULT_PROJECT_2,
     connectionString: '',
     restUrl: PROJECT_REST_URL,
   }

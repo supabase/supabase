@@ -7,6 +7,7 @@ import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 import type { Project } from './project-detail-query'
+import { DEFAULT_PROJECT, DEFAULT_PROJECT_2 } from '../../pages/api/constants'
 
 export type ProjectsVariables = {
   ref?: string
@@ -21,10 +22,10 @@ export async function getProjects({
   signal?: AbortSignal
   headers?: Record<string, string>
 }) {
-  const { data, error } = await get('/platform/projects', { signal, headers })
+  //FIXME const { data, error } = await get('/platform/projects', { signal, headers })
 
-  if (error) handleError(error)
-  return data as ProjectInfo[]
+  //if (error) handleError(error)
+  return [DEFAULT_PROJECT, DEFAULT_PROJECT_2] as ProjectInfo[]
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>

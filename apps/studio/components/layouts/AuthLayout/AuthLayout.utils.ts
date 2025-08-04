@@ -16,7 +16,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           url: `/project/${ref}/auth/policies`,
           items: [],
         },
-        ...(IS_PLATFORM
+        ...(IS_PLATFORM // FIXME: Move to organization level
           ? [
               {
                 name: 'Sign In / Providers',

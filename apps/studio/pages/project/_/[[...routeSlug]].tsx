@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment, useMemo, useState } from 'react'
 
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -56,7 +56,7 @@ const GenericProjectPage: NextPage = () => {
     isLoading: isLoadingOrganizations,
     isError: isErrorOrganizations,
   } = useOrganizationsQuery({
-    enabled: IS_PLATFORM,
+    enabled: true,
   })
 
   const query = Object.keys(queryParams).length

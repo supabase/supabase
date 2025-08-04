@@ -17,3 +17,14 @@ export const DEFAULT_PROJECT = {
   region: 'local',
   inserted_at: '2021-08-02T06:40:40.646Z',
 }
+
+export const DEFAULT_PROJECT_2 = {
+  id: 2,
+  ref: 'default2',
+  name: 'Second Project',
+  organization_id: 1,
+  cloud_provider: 'localhost',
+  status: 'ACTIVE_HEALTHY',
+  region: 'local',
+  inserted_at: '2021-08-02T06:40:40.646Z',
+}

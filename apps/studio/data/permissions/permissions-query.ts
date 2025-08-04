@@ -30,7 +30,7 @@ export const usePermissionsQuery = <TData = PermissionsData>({
     ({ signal }) => getPermissions(signal),
     {
       ...options,
-      enabled: IS_PLATFORM && enabled && isLoggedIn,
+      enabled: IS_PLATFORM && enabled && isLoggedIn, //FIXME: Needs permissions implementation
       staleTime: 30 * 60 * 1000,
     }
   )

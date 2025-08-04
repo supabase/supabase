@@ -17,7 +17,7 @@ const SignInPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (!IS_PLATFORM) {
       // on selfhosted instance just redirect to projects page
-      router.replace('/project/default')
+      router.replace('/project/default') //FIXME: Enable sign-in
     }
   }, [router])
 

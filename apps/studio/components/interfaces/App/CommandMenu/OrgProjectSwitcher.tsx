@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
-import { IS_PLATFORM } from 'common'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
@@ -13,7 +12,7 @@ const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 export function useProjectSwitchCommand() {
   const setPage = useSetPage()
 
-  const { data: _projects } = useProjectsQuery({ enabled: IS_PLATFORM })
+  const { data: _projects } = useProjectsQuery({ enabled: true })
   const projects = useMemo(
     () => (_projects ?? []).map(({ name, ref }) => ({ name, ref })),
     [_projects]
@@ -58,7 +57,7 @@ export function useProjectSwitchCommand() {
 export function useConfigureOrganizationCommand() {
   const setPage = useSetPage()
 
-  const { data: organizations } = useOrganizationsQuery({ enabled: IS_PLATFORM })
+  const { data: organizations } = useOrganizationsQuery({ enabled: true })
 
   useRegisterPage(
     ORGANIZATION_SWITCHER_PAGE_NAME,

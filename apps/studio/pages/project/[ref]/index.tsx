@@ -203,7 +203,7 @@ const Home: NextPageWithLayout = () => {
         <>
           <div className="py-16 border-b border-muted px-8">
             <div className="mx-auto max-w-7xl space-y-16">
-              {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
+              {project?.status !== PROJECT_STATUS.INACTIVE && (
                 <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
               )}
               {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}

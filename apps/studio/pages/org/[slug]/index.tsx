@@ -8,15 +8,15 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const org = useSelectedOrganization()
+  const { data } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
-  const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
+  const disableAccessMfa = data?.organization_requires_mfa && !isUserMFAEnabled
 
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string[]>([
@@ -29,7 +29,7 @@ const ProjectsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainerLegacy>
       {disableAccessMfa ? (
-        <Admonition type="note" title={`The organization "${org?.name}" has MFA enforced`}>
+        <Admonition type="note" title={`The organization "${data?.name}" has MFA enforced`}>
           <p className="!m-0">
             Set up MFA on your account through your{' '}
             <InlineLink href="/account/security">account preferences</InlineLink> to access this

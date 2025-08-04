@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
-import { DEFAULT_PROJECT } from 'pages/api/constants'
+import { DEFAULT_PROJECT, DEFAULT_PROJECT_2 } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -18,10 +18,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.query.ref === 'default') {
+    // Platform specific endpoint
+    const response = {
+      project: {
+        ...DEFAULT_PROJECT,
+        services: [],
+      },
+    }
+
+    return res.status(200).json(response)
+  }
+
   // Platform specific endpoint
   const response = {
     project: {
-      ...DEFAULT_PROJECT,
+      ...DEFAULT_PROJECT_2,
       services: [],
     },
   }

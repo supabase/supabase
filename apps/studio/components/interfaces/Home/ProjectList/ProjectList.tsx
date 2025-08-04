@@ -9,8 +9,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { makeRandomString } from 'lib/helpers'
 import type { Organization, ResponseError } from 'types'
 import { Button, cn } from 'ui'
@@ -32,8 +31,8 @@ const ProjectList = ({
   filterStatus,
   resetFilterStatus,
 }: ProjectListProps) => {
-  const selectedOrganization = useSelectedOrganization()
-  const organization = organization_ ?? selectedOrganization
+  const { data } = useSelectedOrganizationQuery()
+  const organization = organization_ ?? data
 
   const {
     data: allProjects = [],
@@ -49,8 +48,8 @@ const ProjectList = ({
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
 
-  const orgProjects = allProjects.filter((x) => x.organization_slug === organization?.slug)
-  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
+  const orgProjects = allProjects.filter((x) => x.organization_id === organization?.id)
+  const isLoadingPermissions = _isLoadingPermissions
 
   const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
   const noResultsFromSearch =
@@ -207,7 +206,7 @@ const OrganizationProjects = ({
 
   return (
     <div className="space-y-3" key={organization.slug}>
-      {isLoadingPermissions || isLoadingProjects ? (
+      {/* FIXME after permissions isLoadingPermissions ||*/ isLoadingProjects ? (
         <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           <ShimmeringCard />
           <ShimmeringCard />

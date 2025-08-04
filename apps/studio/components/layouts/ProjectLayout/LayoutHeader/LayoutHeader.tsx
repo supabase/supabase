@@ -105,7 +105,7 @@ const LayoutHeader = ({
         <div className="flex items-center text-sm">
           <HomeIcon />
           <div className="flex items-center md:pl-2">
-            {showOrgSelection && IS_PLATFORM ? (
+            {showOrgSelection ? (
               <>
                 <LayoutHeaderDivider className="hidden md:block" />
                 <OrganizationDropdown />
