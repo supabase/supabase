@@ -143,7 +143,7 @@
     "valtio": "catalog:",
     "yup": "^1.4.0",
     "yup-password": "^0.3.0",
-    "zod": "^4.0.14",
+    "zod": "3.25.75",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

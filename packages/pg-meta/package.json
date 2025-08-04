@@ -16,7 +16,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^4.0.14"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/pg": "^8.11.11",
