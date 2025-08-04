@@ -41,7 +41,7 @@ export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFo
         key="tokenName"
         name="tokenName"
         control={control}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <Input
             layout="vertical"
             size="small"
@@ -49,6 +49,7 @@ export const TokenBasicInfoForm = ({ control, expirationDate }: TokenBasicInfoFo
             placeholder="Provide a name for your token"
             value={field.value}
             onChange={(e) => field.onChange(e.target.value)}
+            error={fieldState.error?.message}
           />
         )}
       />
