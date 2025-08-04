@@ -1,6 +1,7 @@
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import { Input } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { toast } from 'sonner'
 
 interface NewTokenBannerProps {
   token: NewAccessToken
@@ -25,6 +26,7 @@ const NewTokenBanner = ({ token }: NewTokenBannerProps) => {
               className="max-w-xl input-mono"
               value={token.token}
               onChange={() => {}}
+              onCopy={() => toast.success('Token copied to clipboard')}
             />
           </div>
         </>

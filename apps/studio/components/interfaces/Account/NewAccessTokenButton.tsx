@@ -26,7 +26,7 @@ import { Admonition } from 'ui-patterns'
 import { TokenBasicInfoForm } from './TokenBasicInfoForm'
 import { TokenResourceAccessForm } from './TokenResourceAccessForm'
 import { TokenPermissionsForm } from './TokenPermissionsForm'
-import { TokenDisplay } from './TokenDisplay'
+
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
@@ -53,7 +53,6 @@ const TokenSchema = z.object({
 const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [visible, setVisible] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
-  const [generatedToken, setGeneratedToken] = useState<any>(null)
   const [resourceSearchOpen, setResourceSearchOpen] = useState(false)
 
   const form = useForm<z.infer<typeof TokenSchema>>({
@@ -97,8 +96,8 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       {
         onSuccess: (data) => {
           console.log('Generated token data:', data)
-          setGeneratedToken(data)
           onCreateToken(data)
+          handleClose()
         },
       }
     )
@@ -116,7 +115,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       permissionRows: [],
     })
     setVisible(false)
-    setGeneratedToken(null)
+
   }
 
   const handleDismiss = () => {
@@ -174,11 +173,9 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
         >
           <SheetHeader>
             <SheetTitle>
-              {generatedToken
-                ? 'Token Generated Successfully'
-                : tokenScope === 'V0'
-                  ? 'Generate token for experimental API'
-                  : 'Generate New Token'}
+              {tokenScope === 'V0'
+                ? 'Generate token for experimental API'
+                : 'Generate New Token'}
             </SheetTitle>
           </SheetHeader>
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
@@ -209,51 +206,41 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                 />
               )}
 
-              {!generatedToken ? (
-                <Form_Shadcn_ {...form}>
-                  <div className="flex flex-col gap-6 overflow-visible">
-                    {/* Basic Information Section */}
-                    <TokenBasicInfoForm 
-                      control={form.control} 
-                      expirationDate={expirationDate} 
-                    />
+              <Form_Shadcn_ {...form}>
+                <div className="flex flex-col gap-6 overflow-visible">
+                  {/* Basic Information Section */}
+                  <TokenBasicInfoForm 
+                    control={form.control} 
+                    expirationDate={expirationDate} 
+                  />
 
-                    {/* Resource Access Section */}
-                    <TokenResourceAccessForm 
-                      control={form.control} 
-                      resourceAccess={resourceAccess} 
-                    />
+                  {/* Resource Access Section */}
+                  <TokenResourceAccessForm 
+                    control={form.control} 
+                    resourceAccess={resourceAccess} 
+                  />
 
-                    {/* Permissions Section */}
-                    <TokenPermissionsForm 
-                      control={form.control}
-                      setValue={form.setValue}
-                      watch={form.watch}
-                      resourceSearchOpen={resourceSearchOpen}
-                      setResourceSearchOpen={setResourceSearchOpen}
-                    />
-                  </div>
-                </Form_Shadcn_>
-              ) : (
-                <TokenDisplay generatedToken={generatedToken} />
-              )}
+                  {/* Permissions Section */}
+                  <TokenPermissionsForm 
+                    control={form.control}
+                    setValue={form.setValue}
+                    watch={form.watch}
+                    resourceSearchOpen={resourceSearchOpen}
+                    setResourceSearchOpen={setResourceSearchOpen}
+                  />
+                </div>
+              </Form_Shadcn_>
             </div>
           </ScrollArea>
           <SheetFooter className="!justify-end w-full mt-auto pt-4 border-t">
-            {!generatedToken ? (
-              <div className="flex gap-2">
-                <Button type="default" disabled={isLoading} onClick={handleClose}>
-                  Cancel
-                </Button>
-                <Button onClick={form.handleSubmit(onSubmit)} loading={isLoading}>
-                  Generate token
-                </Button>
-              </div>
-            ) : (
-              <Button type="default" onClick={handleClose}>
-                Done
+            <div className="flex gap-2">
+              <Button type="default" disabled={isLoading} onClick={handleClose}>
+                Cancel
               </Button>
-            )}
+              <Button onClick={form.handleSubmit(onSubmit)} loading={isLoading}>
+                Generate token
+              </Button>
+            </div>
           </SheetFooter>
         </SheetContent>
       </Sheet>

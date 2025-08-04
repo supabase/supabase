@@ -17,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'ui/src/components/shadcn/ui/table'
+} from 'ui/src/components/shadcn/ui/table' // replace with namespaced import
 import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_PERMISSIONS } from './AccessToken.constants'
 

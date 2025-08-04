@@ -1,7 +1,22 @@
 import { Control } from 'react-hook-form'
-import { FormField_Shadcn_, FormControl_Shadcn_, Select_Shadcn_, SelectTrigger_Shadcn_, SelectValue_Shadcn_, SelectContent_Shadcn_, SelectItem_Shadcn_, cn } from 'ui'
+import {
+  FormField_Shadcn_,
+  FormControl_Shadcn_,
+  Select_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  cn,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { MultiSelector, MultiSelectorContent, MultiSelectorItem, MultiSelectorList, MultiSelectorTrigger } from 'ui-patterns/multi-select'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { Check, Box } from 'lucide-react'
 import { ACCESS_TOKEN_ORGS, ACCESS_TOKEN_PROJECTS } from './AccessToken.constants'
 
@@ -10,7 +25,10 @@ interface TokenResourceAccessFormProps {
   resourceAccess: string
 }
 
-export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResourceAccessFormProps) => {
+export const TokenResourceAccessForm = ({
+  control,
+  resourceAccess,
+}: TokenResourceAccessFormProps) => {
   return (
     <div className="space-y-4">
       <FormField_Shadcn_
@@ -39,20 +57,14 @@ export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResour
                       <Box size={16} className="text-foreground-light" />
                       {field.value === 'all-orgs' && (
                         <div className="flex items-center justify-center p-0.5 bg-foreground text-background rounded-full">
-                          <Check
-                            size={12}
-                            strokeWidth="4"
-                            className="text-background"
-                          />
+                          <Check size={12} strokeWidth="4" className="text-background" />
                         </div>
                       )}
                     </div>
                     <span
                       className={cn(
                         'text-sm',
-                        field.value === 'all-orgs'
-                          ? 'text-foreground'
-                          : 'text-foreground-light'
+                        field.value === 'all-orgs' ? 'text-foreground' : 'text-foreground-light'
                       )}
                     >
                       Everything
@@ -84,11 +96,7 @@ export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResour
                       <Box size={16} className="text-foreground-light" />
                       {field.value === 'selected-orgs' && (
                         <div className="flex items-center justify-center p-0.5 bg-foreground text-background rounded-full">
-                          <Check
-                            size={12}
-                            strokeWidth="4"
-                            className="text-background"
-                          />
+                          <Check size={12} strokeWidth="4" className="text-background" />
                         </div>
                       )}
                     </div>
@@ -129,11 +137,7 @@ export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResour
                       <Box size={16} className="text-foreground-light" />
                       {field.value === 'selected-projects' && (
                         <div className="flex items-center justify-center p-0.5 bg-foreground text-background rounded-full">
-                          <Check
-                            size={12}
-                            strokeWidth="4"
-                            className="text-background"
-                          />
+                          <Check size={12} strokeWidth="4" className="text-background" />
                         </div>
                       )}
                     </div>
@@ -160,8 +164,7 @@ export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResour
 
                 {field.value === 'all-orgs' && (
                   <p className="text-foreground-light text-sm">
-                    Access to all projects across all organizations you have access
-                    to.
+                    Access to all projects across all organizations you have access to.
                   </p>
                 )}
 
@@ -188,15 +191,9 @@ export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResour
           name="selectedOrganizations"
           control={control}
           render={({ field }) => (
-            <FormItemLayout
-              name="selectedOrganizations"
-              label="Select organizations"
-            >
+            <FormItemLayout name="selectedOrganizations" label="Select organizations">
               <FormControl_Shadcn_ className="overflow-visible">
-                <MultiSelector
-                  values={field.value || []}
-                  onValuesChange={field.onChange}
-                >
+                <MultiSelector values={field.value || []} onValuesChange={field.onChange}>
                   <MultiSelectorTrigger
                     deletableBadge
                     showIcon={false}
@@ -228,10 +225,7 @@ export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResour
           render={({ field }) => (
             <FormItemLayout name="selectedProjects" label="Select projects">
               <FormControl_Shadcn_ className="overflow-visible">
-                <MultiSelector
-                  values={field.value || []}
-                  onValuesChange={field.onChange}
-                >
+                <MultiSelector values={field.value || []} onValuesChange={field.onChange}>
                   <MultiSelectorTrigger
                     deletableBadge
                     showIcon={false}
@@ -256,4 +250,4 @@ export const TokenResourceAccessForm = ({ control, resourceAccess }: TokenResour
       )}
     </div>
   )
-} 
+}
