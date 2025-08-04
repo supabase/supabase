@@ -17,20 +17,20 @@ const getTools = () => {
   return {
     executeSql: tool({
       description: 'Save the generated database schema definition',
-      parameters: z.object({
+      inputSchema: z.object({
         sql: z.string().describe('The SQL schema definition'),
       }),
     }),
 
     reset: tool({
       description: 'Reset the database, services and start over',
-      parameters: z.object({}),
+      inputSchema: z.object({}),
     }),
 
     setServices: tool({
       description:
         'Set the entire list of Supabase services needed for the project. Always include the full list',
-      parameters: z.object({
+      inputSchema: z.object({
         services: z
           .array(ServiceSchema)
           .describe('Array of services with reasons why they are needed'),
@@ -39,11 +39,11 @@ const getTools = () => {
 
     setTitle: tool({
       description: "Set the project title based on the user's description",
-      parameters: z.object({
+      inputSchema: z.object({
         title: z.string().describe('The project title'),
       }),
     }),
-  }
+  };
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -72,7 +72,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages } = req.body
 
-  const result = await streamText({
+  const result = streamText({
     model,
     maxSteps: 7,
     system: source`
@@ -100,5 +100,5 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     tools: getTools(),
   })
 
-  result.pipeDataStreamToResponse(res)
+  result.pipeUIMessageStreamToResponse(res)
 }
