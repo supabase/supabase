@@ -577,6 +577,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               }}
               onStop={() => {
                 stop()
+                // to save partial responses from the AI
                 const lastMessage = chatMessages[chatMessages.length - 1]
                 if (lastMessage && lastMessage.role === 'assistant') {
                   handleChatFinish(lastMessage, { finishReason: 'stop' })
