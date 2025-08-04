@@ -40,7 +40,7 @@ const PermissionRowSchema = z.object({
 
 const TokenSchema = z.object({
   tokenName: z.string().min(1, 'Please enter a name for the token'),
-  expirationDate: z.enum(['No expiry', '7 days', '30 days', '90 days', '180 days']),
+  expirationDate: z.enum(['No expiry', '7 days', '30 days', '90 days', '180 days', 'Custom']),
   resourceAccess: z.enum(['all-orgs', 'selected-orgs', 'selected-projects']),
   selectedOrganizations: z.array(z.string()).optional(),
   selectedProjects: z.array(z.string()).optional(),
