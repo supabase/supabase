@@ -108,6 +108,14 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     selectedSchema
   ).hasLint
 
+  const foreignTableHasLints: boolean = getEntityLintDetails(
+    entity.name,
+    'foreign_table_in_api',
+    ['ERROR', 'WARN'],
+    lints,
+    selectedSchema
+  ).hasLint
+
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
       .find(([, value]) => value === entityType)?.[0]
@@ -270,6 +278,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               tableHasLints={tableHasLints}
               viewHasLints={viewHasLints}
               materializedViewHasLints={materializedViewHasLints}
+              foreignTableHasLints={foreignTableHasLints}
             />
           </div>
         </div>
@@ -427,11 +436,13 @@ const EntityTooltipTrigger = ({
   tableHasLints,
   viewHasLints,
   materializedViewHasLints,
+  foreignTableHasLints,
 }: {
   entity: Entity
   tableHasLints: boolean
   viewHasLints: boolean
   materializedViewHasLints: boolean
+  foreignTableHasLints: boolean
 }) => {
   let tooltipContent = ''
   const accessWarning = 'Data is publicly accessible via API'
@@ -453,7 +464,9 @@ const EntityTooltipTrigger = ({
       }
       break
     case ENTITY_TYPE.FOREIGN_TABLE:
-      tooltipContent = `${accessWarning} as RLS via is not enforced on foreign tables`
+      if (foreignTableHasLints) {
+        tooltipContent = `${accessWarning} as RLS is not enforced on foreign tables`
+      }
       break
     default:
       break
