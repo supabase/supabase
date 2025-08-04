@@ -1,4 +1,5 @@
-import type { Message as MessageType } from '@ai-sdk/react'
+import type { UIMessage as MessageType } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { useChat } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown, Info, RefreshCw, Settings, X } from 'lucide-react'
@@ -14,8 +15,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
@@ -75,8 +76,8 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const project = useSelectedProject()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
 
@@ -128,7 +129,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   // Handle completion of the assistant's response
   const handleChatFinish = useCallback(
-    (message: MessageType, options: { finishReason: string }) => {
+    ({ message }: { message: MessageType }) => {
       if (lastUserMessageRef.current) {
         snap.saveMessage([lastUserMessageRef.current, message])
         lastUserMessageRef.current = null
@@ -147,28 +148,35 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     status: chatStatus,
     sendMessage,
     setMessages,
+    addToolResult,
     error,
     regenerate,
   } = useChat({
     id: snap.activeChatId,
-    api: `${BASE_PATH}/api/ai/sql/generate-v4`,
-    maxSteps: 5,
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
-    initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
+    messages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
     async onToolCall({ toolCall }) {
       if (toolCall.toolName === 'rename_chat') {
-        const { newName } = toolCall.args as { newName: string }
+        const { newName } = toolCall.input as { newName: string }
         if (snap.activeChatId && newName?.trim()) {
           snap.renameChat(snap.activeChatId, newName.trim())
-          return `Chat renamed to "${newName.trim()}"`
+          addToolResult({
+            tool: toolCall.toolName,
+            toolCallId: toolCall.toolCallId,
+            output: 'Chat renamed',
+          })
         }
-        return 'Failed to rename chat: Invalid chat or name'
+        addToolResult({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          output: 'Failed to rename chat: Invalid chat or name',
+        })
       }
     },
-    transport: {
+    transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
-      async prepareSendMessagesRequest({ messages, headers: initHeaders, ...options }) {
+      async prepareSendMessagesRequest({ messages, ...options }) {
         // [Joshen] Specifically limiting the chat history that get's sent to reduce the
         // size of the context that goes into the model. This should always be an odd number
         // as much as possible so that the first message is always the user's
@@ -185,11 +193,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           return cleanedMessage
         })
 
-        const headers = await constructHeaders()
-        const existingHeaders = new Headers(initHeaders)
-        for (const [key, value] of headers.entries()) {
-          existingHeaders.set(key, value)
-        }
+        const headerData = await constructHeaders()
+        const authorizationHeader = headerData.get('Authorization')
 
         return {
           ...options,
@@ -203,10 +208,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             chatName: currentChat,
             orgSlug: selectedOrganization?.slug,
           },
-          headers: existingHeaders,
+          headers: { Authorization: authorizationHeader ?? '' },
         }
       },
-    },
+    }),
     onError: onErrorChat,
     onFinish: handleChatFinish,
   })
@@ -246,11 +251,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const hasMessages = chatMessages.length > 0
   const isShowingOnboarding = !hasMessages && isApiKeySet
 
-  const sendMessageToAssistant = (finalContent: string) => {
+  const sendMessageToAssistant = async (finalContent: string) => {
     const payload = {
       role: 'user',
       createdAt: new Date(),
-      content: finalContent,
+      parts: [{ type: 'text', text: finalContent }],
       id: uuidv4(),
     } as MessageType
 
