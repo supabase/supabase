@@ -1,6 +1,6 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { Trash, MoreVertical, View } from 'lucide-react'
+import { Trash, MoreVertical } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import {
