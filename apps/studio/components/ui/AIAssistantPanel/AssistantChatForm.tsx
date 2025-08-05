@@ -1,7 +1,7 @@
 'use client'
 
 import { useBreakpoint } from 'common'
-import { ArrowUp, Square } from 'lucide-react'
+import { ArrowUp, Loader2, Square } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
 import { Button, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
@@ -131,7 +131,9 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
                   onClick={onStop}
                   className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
                 />
-              ) : null
+              ) : (
+                <Loader2 size={22} className="animate-spin size-7 text-muted" strokeWidth={1} />
+              )
             ) : (
               <Button
                 htmlType="submit"
