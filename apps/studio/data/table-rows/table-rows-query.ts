@@ -67,35 +67,15 @@ export async function executeWithRetry<T>(
   throw new Error('Max retries reached without success')
 }
 
-// TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
-// this is not suitable and will cause crashes on the pg-meta side given big tables
-// (either when the number of rows exceeds Blob size or if the columns in the rows are too large).
-// We should handle those errors gracefully, maybe adding a hint to the user about how to extract
-// the CSV to their machine via a direct command line connection (e.g., pg_dump), which will be much more
-// reliable for large data extraction.
-export const fetchAllTableRows = async ({
-  projectRef,
-  connectionString,
+export const getAllTableRowsSql = ({
   table,
   filters = [],
   sorts = [],
-  roleImpersonationState,
-  progressCallback,
 }: {
-  projectRef: string
-  connectionString?: string | null
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
-  roleImpersonationState?: RoleImpersonationState
-  progressCallback?: (value: number) => void
 }) => {
-  if (IS_PLATFORM && !connectionString) {
-    console.error('Connection string is required')
-    return []
-  }
-
-  const rows: any[] = []
   const query = new Query()
 
   const arrayBasedColumns = table.columns
@@ -128,6 +108,40 @@ export const fetchAllTableRows = async ({
       queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
     })
   }
+
+  return queryChains
+}
+
+// TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
+// this is not suitable and will cause crashes on the pg-meta side given big tables
+// (either when the number of rows exceeds Blob size or if the columns in the rows are too large).
+// We should handle those errors gracefully, maybe adding a hint to the user about how to extract
+// the CSV to their machine via a direct command line connection (e.g., pg_dump), which will be much more
+// reliable for large data extraction.
+export const fetchAllTableRows = async ({
+  projectRef,
+  connectionString,
+  table,
+  filters = [],
+  sorts = [],
+  roleImpersonationState,
+  progressCallback,
+}: {
+  projectRef: string
+  connectionString?: string | null
+  table: SupaTable
+  filters?: Filter[]
+  sorts?: Sort[]
+  roleImpersonationState?: RoleImpersonationState
+  progressCallback?: (value: number) => void
+}) => {
+  if (IS_PLATFORM && !connectionString) {
+    console.error('Connection string is required')
+    return []
+  }
+
+  const rows: any[] = []
+  const queryChains = getAllTableRowsSql({ table, sorts, filters })
 
   const rowsPerPage = 500
   const THROTTLE_DELAY = 500

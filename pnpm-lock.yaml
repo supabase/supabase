@@ -1444,8 +1444,8 @@ importers:
         specifier: ^4.1.3
         version: 4.4.1
       shadcn:
-        specifier: 2.4.0-canary.16
-        version: 2.4.0-canary.16(@types/node@24.2.0)(supports-color@8.1.1)(typescript@5.5.4)
+        specifier: ^2.10.0
+        version: 2.10.0(@types/node@24.2.0)(supports-color@8.1.1)(typescript@5.5.4)
       shiki:
         specifier: ^1.1.7
         version: 1.29.2
@@ -10263,6 +10263,7 @@ packages:
     resolution: {integrity: sha512-X41YRfKkVCooILai2N0aN0Q5O0imu+MbNt894QWU683A82xJJXIR01dEqxwYJ91M6IdExtyFB3GCOJb4eBMBMQ==}
     peerDependencies:
       eslint: '>= 5'
+    bundledDependencies: []
 
   eslint-plugin-import@2.32.0:
     resolution: {integrity: sha512-whOE1HFo/qJDyX4SnXzP4N6zOWn79WhnCUY/iDR0mPfQZO8wcYE4JClzI2oZrhBnnMUCBCHZhO6VQyoBU95mZA==}
@@ -15331,8 +15332,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shadcn@2.4.0-canary.16:
-    resolution: {integrity: sha512-HajpBYMB5P1iFoHrQ+bbfjuBtHfeQ0IVQWJIOsM4NgqymhMT0BpvOkncMf6Y0ttFc/CvhoZle5OJYkgA2oNzdA==}
+  shadcn@2.10.0:
+    resolution: {integrity: sha512-/zxjmHGbaYVFtI6bUridFVV7VFStIv3vU/w1h7xenhz7KRzc9pqHsyFvcExZprG7dlA5kW9knRgv8+Cl/H7w9w==}
     hasBin: true
 
   shallowequal@1.1.0:
@@ -23965,7 +23966,7 @@ snapshots:
 
   '@supabase/realtime-js@2.11.15':
     dependencies:
-      '@supabase/node-fetch': 2.6.15
+      '@supabase/node-fetch': 2.6.13
       '@types/phoenix': 1.6.6
       '@types/ws': 8.18.1
       isows: 1.0.7(ws@8.18.3)
@@ -24571,7 +24572,7 @@ snapshots:
 
   '@types/busboy@1.5.4':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/chai@5.2.2':
     dependencies:
@@ -24593,11 +24594,11 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/cookie@0.6.0': {}
 
@@ -24852,11 +24853,11 @@ snapshots:
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
       form-data: 4.0.4
 
   '@types/node@18.19.121':
@@ -24875,7 +24876,7 @@ snapshots:
 
   '@types/papaparse@5.3.16':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/parse-json@4.0.2': {}
 
@@ -24887,7 +24888,7 @@ snapshots:
 
   '@types/pg@8.10.2':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
       pg-protocol: 1.10.3
       pg-types: 4.1.0
 
@@ -24899,7 +24900,7 @@ snapshots:
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
       pg-protocol: 1.10.3
       pg-types: 2.2.0
 
@@ -24911,7 +24912,7 @@ snapshots:
 
   '@types/randombytes@2.0.3':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/react-beautiful-dnd@13.1.8':
     dependencies:
@@ -25003,7 +25004,7 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/tern@0.23.9':
     dependencies:
@@ -25039,11 +25040,11 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 22.17.0
+      '@types/node': 24.2.0
     optional: true
 
   '@types/zxcvbn@4.4.5': {}
@@ -34206,12 +34207,13 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@2.4.0-canary.16(@types/node@24.2.0)(supports-color@8.1.1)(typescript@5.5.4):
+  shadcn@2.10.0(@types/node@24.2.0)(supports-color@8.1.1)(typescript@5.5.4):
     dependencies:
       '@antfu/ni': 23.3.1
       '@babel/core': 7.28.0(supports-color@8.1.1)
       '@babel/parser': 7.28.0
       '@babel/plugin-transform-typescript': 7.28.0(@babel/core@7.28.0(supports-color@8.1.1))(supports-color@8.1.1)
+      '@modelcontextprotocol/sdk': 1.17.1(supports-color@8.1.1)
       commander: 10.0.1
       cosmiconfig: 8.3.6(typescript@5.5.4)
       deepmerge: 4.3.1
@@ -34231,6 +34233,7 @@ snapshots:
       ts-morph: 18.0.0
       tsconfig-paths: 4.2.0
       zod: 3.25.75
+      zod-to-json-schema: 3.24.6(zod@3.25.75)
     transitivePeerDependencies:
       - '@types/node'
       - supports-color

@@ -423,7 +423,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     className="w-fit mt-4"
                     onClick={() => setIsConfirmOptInModalOpen(true)}
                   >
-                    Update AI settings
+                    Permission settings
                   </Button>
                 )}
               </Admonition>
