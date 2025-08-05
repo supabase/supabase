@@ -24,7 +24,6 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     isInvalid: false,
   })
 
-  // Memoize the target timestamp to avoid parsing on every update
   const targetTimestamp = useMemo(() => {
     try {
       const date = new Date(nextRetryTime)
@@ -53,7 +52,6 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     return { days, hours, minutes, seconds, isExpired: false, isInvalid: false }
   }, [])
 
-  // Return invalid state if parsing failed
   if (targetTimestamp === null) {
     return (
       <div className="flex items-center gap-2" role="status" aria-live="polite">
@@ -70,16 +68,12 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
       setTimeRemaining(calculateTimeRemaining(targetTimestamp))
     }
 
-    // Update immediately
     updateTimer()
-
-    // Update every second
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
   }, [targetTimestamp, calculateTimeRemaining])
 
-  // Memoize expensive calculations
   const { timeDisplay, displayColor, statusMessage } = useMemo(() => {
     const formatTimeUnit = (value: number, unit: string) => {
       if (value === 0) return null
@@ -105,7 +99,6 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
       timeDisplay = parts.length === 0 ? 'Retrying soon...' : parts.join(' ')
       statusMessage = 'Next retry in:'
 
-      // Color based on urgency
       const totalMinutes =
         timeRemaining.days * 24 * 60 + timeRemaining.hours * 60 + timeRemaining.minutes
       if (totalMinutes <= 5) {

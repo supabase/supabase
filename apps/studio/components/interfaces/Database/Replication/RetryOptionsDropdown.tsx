@@ -12,13 +12,12 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-// Define retry options as a constant for better maintainability
 const RETRY_OPTIONS = [
   {
     type: 'individual' as RollbackType,
     icon: <Undo2 className="w-3 h-3" />,
     title: 'Rollback to previous state',
-    description: 'Restart from the last working state',
+    description: 'Restart from the last working state (may not be enough in some cases)',
   },
   {
     type: 'full' as RollbackType,
@@ -53,10 +52,6 @@ export const RetryOptionsDropdown = ({
     try {
       setCurrentAction(rollbackType)
 
-      const actionText =
-        rollbackType === 'full' ? 'reset from scratch' : 'roll back to previous state'
-
-      // First rollback the table
       await rollbackTable({
         projectRef,
         pipelineId,
@@ -66,11 +61,9 @@ export const RetryOptionsDropdown = ({
 
       toast.success(`Table "${tableName}" rolled back successfully`)
 
-      // Then restart the pipeline
       await startPipeline({ projectRef, pipelineId })
       toast.success('Pipeline restarted successfully')
     } catch (error: any) {
-      // More specific error handling
       const errorMessage = error?.message || 'An unexpected error occurred'
       toast.error(
         `Failed to ${rollbackType === 'full' ? 'reset' : 'rollback'} table: ${errorMessage}`
@@ -91,9 +84,9 @@ export const RetryOptionsDropdown = ({
           disabled={isLoading}
           className="h-7 text-xs px-3"
           icon={<ChevronDown className="w-3 h-3" />}
-          aria-label={`Fix table ${tableName}`}
+          aria-label={`Rollback ${tableName}`}
         >
-          Fix Table
+          Rollback
         </Button>
       </DropdownMenuTrigger>
 

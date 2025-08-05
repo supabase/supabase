@@ -193,25 +193,9 @@ export const ReplicationPipelineStatus = () => {
               <h4 className="font-medium text-destructive-900 mb-1">
                 {errorTables.length} table{errorTables.length > 1 ? 's' : ''} failed
               </h4>
-              <p className="text-sm text-destructive-700 mb-3">
-                Some tables encountered replication errors. Check the logs for detailed error
-                information.
+              <p className="text-sm text-destructive-700">
+                Some tables encountered replication errors. See the table below for more details.
               </p>
-              <Button
-                asChild
-                type="outline"
-                size="tiny"
-                icon={<ExternalLink className="w-3 h-3" />}
-                className="text-destructive-600 border-destructive-300 hover:bg-destructive-50"
-              >
-                <Link
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  href={`/project/${projectRef}/logs/postgres-logs`}
-                >
-                  View Logs
-                </Link>
-              </Button>
             </div>
           </div>
         </div>
