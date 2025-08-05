@@ -193,7 +193,7 @@ export const CronjobsTab = () => {
             }}
             onScroll={handleScroll}
             renderers={{
-              renderRow(key, props) {
+              renderRow(_, props) {
                 return (
                   <Row
                     key={props.row.jobid}
