@@ -91,6 +91,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       { name: values.tokenName, scope: tokenScope },
       {
         onSuccess: (data) => {
+          toast.success('Access token created successfully')
           onCreateToken(data)
           handleClose()
         },
