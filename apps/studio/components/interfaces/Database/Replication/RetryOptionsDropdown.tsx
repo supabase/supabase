@@ -73,14 +73,14 @@ export const RetryOptionsDropdown = ({
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          type="warning"
+          type="primary"
           size="tiny"
           loading={isLoading}
           disabled={isLoading}
-          className="h-6 px-2 text-xs"
+          className="h-7 text-xs px-3"
+          icon={<ChevronDown className="w-3 h-3" />}
         >
           Fix Table
-          <ChevronDown className="w-3 h-3 ml-1" />
         </Button>
       </DropdownMenuTrigger>
       

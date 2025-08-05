@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, ChevronLeft, Copy, ExternalLink, Search } from 'lucide-react'
+import { Activity, AlertTriangle, ChevronLeft, ExternalLink, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -17,7 +17,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, cn, copyToClipboard, Input_Shadcn_ } from 'ui'
+import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
@@ -99,39 +99,6 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.DisableRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
-  const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
-    const statusDetails: string[] = [`Table: ${tableName}`, `Status: ${state.name}`]
-    
-    // Add state-specific details
-    if ('message' in state) {
-      statusDetails.push(`Error: ${state.message}`)
-    }
-    if ('reason' in state) {
-      statusDetails.push(`Reason: ${state.reason}`)
-    }
-    if ('solution' in state) {
-      statusDetails.push(`Solution: ${state.solution}`)
-    }
-    if ('lag' in state) {
-      statusDetails.push(`Lag: ${state.lag}ms`)
-    }
-    if ('retry_policy' in state) {
-      statusDetails.push(`Retry Policy: ${state.retry_policy.policy}`)
-      if (state.retry_policy.policy === 'timed_retry') {
-        statusDetails.push(`Next Retry: ${state.retry_policy.next_retry}`)
-      }
-    }
-
-    const statusText = statusDetails.join('\n')
-
-    try {
-      await copyToClipboard(statusText)
-      toast.success('Table status copied to clipboard')
-    } catch (error) {
-      console.error('Failed to copy table status:', error)
-      toast.error(PIPELINE_ERROR_MESSAGES.COPY_TABLE_STATUS)
-    }
-  }
 
 
   const onTogglePipeline = async () => {
@@ -282,9 +249,6 @@ export const ReplicationPipelineStatus = () => {
                 <Table.th key="table">Table</Table.th>,
                 <Table.th key="status">Status</Table.th>,
                 <Table.th key="details">Details</Table.th>,
-                <Table.th key="actions" className="w-16 text-center">
-                  Actions
-                </Table.th>,
               ]}
               body={filteredTableStatuses.map((table: TableState, index: number) => {
                 const statusConfig = getStatusConfig(table.state)
@@ -341,24 +305,6 @@ export const ReplicationPipelineStatus = () => {
                         </div>
                       )}
                     </Table.td>
-                    <Table.td className="text-center">
-                      <ButtonTooltip
-                        type="text"
-                        size="tiny"
-                        icon={<Copy className="w-3 h-3" />}
-                        className="px-1.5"
-                        disabled={showDisabledState}
-                        onClick={() => handleCopyTableStatus(table.table_name, table.state)}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: showDisabledState
-                              ? `Copy unavailable while pipeline is ${config.badge.toLowerCase()}`
-                              : 'Copy status details',
-                          },
-                        }}
-                      />
-                    </Table.td>
                   </Table.tr>
                 )
               })}
@@ -369,7 +315,7 @@ export const ReplicationPipelineStatus = () => {
 
       {filteredTableStatuses.length === 0 && hasTableData && (
         <Table.tr>
-          <Table.td colSpan={4}>
+          <Table.td colSpan={3}>
             <div className="space-y-1">
               <p className="text-sm text-foreground">No results found</p>
               <p className="text-sm text-foreground-light">
