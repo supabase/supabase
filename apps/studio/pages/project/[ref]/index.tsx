@@ -141,13 +141,13 @@ const Home: NextPageWithLayout = () => {
                     >
                       Tables
                     </Link>
-                    <p className="text-2xl tabular-nums">
+                    <span className="text-2xl tabular-nums">
                       {isLoadingTables ? (
                         <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                       ) : (
                         tablesCount
                       )}
-                    </p>
+                    </span>
                   </div>
 
                   {IS_PLATFORM && (
@@ -158,13 +158,13 @@ const Home: NextPageWithLayout = () => {
                       >
                         Functions
                       </Link>
-                      <p className="text-2xl tabular-nums">
+                      <span className="text-2xl tabular-nums">
                         {isLoadingFunctions ? (
                           <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                         ) : (
                           functionsCount
                         )}
-                      </p>
+                      </span>
                     </div>
                   )}
 
@@ -176,13 +176,13 @@ const Home: NextPageWithLayout = () => {
                       >
                         Replicas
                       </Link>
-                      <p className="text-2xl tabular-nums">
+                      <span className="text-2xl tabular-nums">
                         {isLoadingReplicas ? (
                           <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                         ) : (
                           replicasCount
                         )}
-                      </p>
+                      </span>
                     </div>
                   )}
                 </div>
