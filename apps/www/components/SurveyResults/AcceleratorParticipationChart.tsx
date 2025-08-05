@@ -1,5 +1,4 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
-import { CSSBarChart } from './CSSBarChart'
 
 function generateAcceleratorParticipationSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -32,14 +31,7 @@ ORDER BY total DESC;`
 
 export function AcceleratorParticipationChart() {
   return (
-    // <GenericChartWithQuery
-    //   title="If your startup has participated in an accelerator, which one?"
-    //   targetColumn="accelerator_participation_normalized"
-    //   filterColumns={['previous_company', 'headquarters', 'funding_stage']}
-    //   generateSQLQuery={generateAcceleratorParticipationSQL}
-    // />
-
-    <CSSBarChart
+    <GenericChartWithQuery
       title="If your startup has participated in an accelerator, which one?"
       targetColumn="accelerator_participation_normalized"
       filterColumns={['previous_company', 'headquarters', 'funding_stage']}

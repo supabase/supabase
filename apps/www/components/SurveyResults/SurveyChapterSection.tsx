@@ -100,7 +100,10 @@ export function SurveyChapterSection({
   }
 
   return (
-    <div className="flex flex-col divide-y bg-surface-100 border border-default rounded-md overflow-hidden">
+    <div
+      id={title.toLowerCase().replace(/\s+/g, '-')}
+      className="flex flex-col divide-y bg-surface-100 border border-default rounded-md overflow-hidden"
+    >
       <header className="flex flex-col gap-3 px-6 py-8">
         <h3 className="text-brand font-mono uppercase tracking-widest text-sm">
           {number} {title}

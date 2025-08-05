@@ -1,35 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
-
-import {
-  Bar,
-  BarChart,
-  PieChart,
-  Pie,
-  CartesianGrid,
-  LabelList,
-  XAxis,
-  YAxis,
-  Cell,
-} from 'recharts'
-
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import type { LANG } from '~/components/CodeBlock/CodeBlock'
-import { ChartConfig, ChartContainer } from 'ui'
-import { SurveyCodeWindow } from './SurveyCodeWindow'
 import { FilterDropdown } from './FilterDropdown'
-
-const chartConfig = {
-  value: {
-    label: 'Value',
-    color: 'hsl(var(--brand-default))',
-  },
-  label: {
-    color: '#ff0000',
-  },
-} satisfies ChartConfig
 
 // Create a separate Supabase client for your external project
 const externalSupabase = createClient(
@@ -58,8 +31,6 @@ function useFilterOptions(filterColumns: string[]) {
             .from('responses_2025')
             .select(column)
             .not(column, 'is', null)
-          // Remove this line for boolean columns - it excludes false values
-          // .not(column, 'eq', '')
 
           if (fetchError) {
             console.error(`Error fetching ${column} options:`, fetchError)
@@ -134,7 +105,6 @@ function useFilterOptions(filterColumns: string[]) {
 }
 
 // Custom hook to fetch survey data using SQL query via RPC
-// TODO: switch out to use supabase-js instead
 function useSurveyData(sqlQuery: string) {
   const [chartData, setChartData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -186,13 +156,7 @@ function useSurveyData(sqlQuery: string) {
   return { chartData, isLoading, error }
 }
 
-export function GenericChartWithQuery({
-  title,
-  targetColumn,
-  filterColumns,
-  generateSQLQuery,
-  chartType = 'bar', // TODO: Could be 'bar', 'pie', etc.
-}) {
+export function GenericChartWithQuery({ title, targetColumn, filterColumns, generateSQLQuery }) {
   // Get dynamic filter options
   const {
     filters,
@@ -221,15 +185,8 @@ export function GenericChartWithQuery({
   const isLoading = filtersLoading || dataLoading
   const error = filtersError || dataError
 
-  // Two different color arrays
-  // One for gradation (e.g. "Yes", "Maybe", "No")
-  const COLORS = [
-    'hsl(var(--brand-default))',
-    'hsl(var(--brand-500))',
-    'hsl(var(--foreground-light))',
-  ]
-  // One for a clear binary answer (e.g. "Yes", "No")
-  const COLORS_BINARY = ['hsl(var(--brand-default))', 'hsl(var(--foreground-muted))']
+  // Find the maximum value for scaling
+  const maxValue = chartData.length > 0 ? Math.max(...chartData.map((item) => item.value)) : 0
 
   return (
     <Card className="w-full overflow-hidden">
@@ -246,91 +203,55 @@ export function GenericChartWithQuery({
             <div className="text-red-500">Error: {error}</div>
           </div>
         ) : (
-          <ChartContainer config={chartConfig}>
-            {chartType === 'bar' && (
-              <BarChart
-                accessibilityLayer
-                data={chartData}
-                layout="vertical"
-                margin={{
-                  right: 0,
-                }}
-              >
-                <CartesianGrid horizontal={false} />
-                <YAxis
-                  dataKey="label"
-                  type="category"
-                  tickLine={false}
-                  tickMargin={64}
-                  axisLine={false}
-                  hide={false}
-                  width={64}
-                  tick={{
-                    className: 'text-foreground-lighter',
-                    fontSize: 12,
-                    textAnchor: 'start',
-                    dx: 0,
-                  }}
-                />
-                <XAxis dataKey="value" type="number" hide />
-                <Bar dataKey="value" layout="vertical" radius={4}>
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={index === 0 ? COLORS_BINARY[0] : COLORS_BINARY[1]}
-                    />
-                  ))}
-                  <LabelList
-                    dataKey="value"
-                    position="right"
-                    offset={8}
-                    className="fill-foreground"
-                    fontSize={12}
-                    formatter={(value: number) => `${value}%`}
-                  />
-                </Bar>
-              </BarChart>
-            )}
-            {chartType === 'pie' && (
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  dataKey="value"
-                  innerRadius={60}
-                  outerRadius={100}
-                  // startAngle={15}
-                  paddingAngle={2}
-                  // label={renderCustomizedLabel}
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={
-                        chartData.length === 2
-                          ? COLORS_BINARY[index % COLORS_BINARY.length]
-                          : COLORS[index % COLORS.length]
-                      }
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            )}
-          </ChartContainer>
+          <div className="flex flex-col h-full w-full justify-between gap-[1px]">
+            {/* Each bar as a vertical stack: label above, bar below */}
+            <div className="flex flex-col gap-4">
+              {chartData.map((item, index) => (
+                <div key={index} className="flex flex-col">
+                  {/* Label above the bar */}
+                  <div className="mb-2">
+                    <span className="text-fluid-16-20 font-medium">{item.label}</span>
+                  </div>
+
+                  {/* Bar and percentage row */}
+                  <div className="flex items-center gap-3">
+                    {/* Bar container with flex layout */}
+                    <div
+                      className="flex-1 h-[60px] relative flex items-center"
+                      style={{
+                        '--reference': maxValue,
+                        '--bar-value': item.value,
+                        '--index': index,
+                      }}
+                    >
+                      {/* Animated Bar */}
+                      <div
+                        className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
+                        style={{
+                          width: `calc((var(--bar-value) / var(--reference)) * 100%)`,
+                        }}
+                      />
+
+                      {/* Percentage positioned after the bar */}
+                      <div className="tabular-nums text-fluid-14-20 font-medium min-w-[60px] ml-3">
+                        {item.value}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </CardContent>
-      {/* <SurveyCodeWindow
-        code={sqlQuery}
-        lang="sql"
-        className="w-full"
-        filters={filters}
-        activeFilters={activeFilters}
-        setFilterValue={setFilterValue}
-      /> */}
+
+      {/* Filters */}
       <div className="flex flex-col">
         {filters && activeFilters && setFilterValue && (
           <div className="flex flex-wrap gap-4 p-4 border-b border-border">
             {Object.entries(filters).map(([filterKey, filterConfig]) => (
               <FilterDropdown
+                key={filterKey}
                 filterKey={filterKey}
                 filterConfig={filterConfig}
                 selectedValue={activeFilters[filterKey]}
@@ -339,10 +260,6 @@ export function GenericChartWithQuery({
             ))}
           </div>
         )}
-
-        {/* <CodeBlock lang="sql" size="small" showLineNumbers={true} rounded={false}>
-          {sqlQuery}
-        </CodeBlock> */}
       </div>
     </Card>
   )
