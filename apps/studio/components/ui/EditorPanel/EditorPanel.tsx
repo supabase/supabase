@@ -86,15 +86,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
     },
   })
 
-  useEffect(() => {
-    // A bit hacky, but avoids changing app-state
-    if (editorPanel.label?.startsWith('Edit test: ')) {
-      setName(editorPanel.label.substring('Edit test: '.length))
-    } else {
-      setName('New test') // Default for create
-    }
-  }, [editorPanel.label])
-
   const onExecuteSql = (skipValidation = false) => {
     setError(undefined)
     setShowWarning(undefined)
@@ -382,7 +373,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
                 className="flex-1"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Test name"
+                placeholder="Name"
               />
               <Button
                 type="default"
