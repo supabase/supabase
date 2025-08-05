@@ -38,8 +38,8 @@ describe('snippets.utils', () => {
   describe('generateDeterministicUuid', () => {
     it('should generate the same UUID for the same input', () => {
       const input = 'test-string'
-      const uuid1 = generateDeterministicUuid(input)
-      const uuid2 = generateDeterministicUuid(input)
+      const uuid1 = generateDeterministicUuid([input])
+      const uuid2 = generateDeterministicUuid([input])
 
       expect(uuid1).toBe(uuid2)
       expect(uuid1).toMatch(
@@ -48,20 +48,20 @@ describe('snippets.utils', () => {
     })
 
     it('should generate different UUIDs for different inputs', () => {
-      const uuid1 = generateDeterministicUuid('input1')
-      const uuid2 = generateDeterministicUuid('input2')
+      const uuid1 = generateDeterministicUuid(['input1'])
+      const uuid2 = generateDeterministicUuid(['input2'])
 
       expect(uuid1).not.toBe(uuid2)
     })
 
     it('should handle empty string input', () => {
-      const uuid = generateDeterministicUuid('')
+      const uuid = generateDeterministicUuid([''])
       expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
     })
 
     it('should handle special characters and Unicode', () => {
-      const uuid1 = generateDeterministicUuid('test-with-émojis-🚀-and-símb0ls!')
-      const uuid2 = generateDeterministicUuid('test-with-émojis-🚀-and-símb0ls!')
+      const uuid1 = generateDeterministicUuid(['test-with-émojis-🚀-and-símb0ls!'])
+      const uuid2 = generateDeterministicUuid(['test-with-émojis-🚀-and-símb0ls!'])
       expect(uuid1).toBe(uuid2)
       expect(uuid1).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -70,7 +70,7 @@ describe('snippets.utils', () => {
 
     it('should handle very long strings', () => {
       const longString = 'a'.repeat(10000)
-      const uuid = generateDeterministicUuid(longString)
+      const uuid = generateDeterministicUuid([longString])
       expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
     })
   })
@@ -196,7 +196,7 @@ describe('snippets.utils', () => {
       const folderFile = files.find((f) => f.name === 'folder1-snippet')
 
       expect(rootFile?.folderId).toBe(null)
-      expect(folderFile?.folderId).toBe(generateDeterministicUuid('folder1'))
+      expect(folderFile?.folderId).toBe(generateDeterministicUuid(['folder1']))
     })
 
     it('should skip subdirectories inside folders (not supported)', async () => {
@@ -266,7 +266,7 @@ describe('snippets.utils', () => {
   describe('getSnippet', () => {
     it('should get a specific snippet by id', async () => {
       const snippetName = 'test-snippet'
-      const snippetId = generateDeterministicUuid(snippetName)
+      const snippetId = generateDeterministicUuid([snippetName])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -277,15 +277,17 @@ describe('snippets.utils', () => {
       const snippet = await getSnippet(snippetId)
 
       // The snippet ID is generated from the full filename in buildSnippet
-      expect(snippet.id).toBe(generateDeterministicUuid(snippetName))
+      expect(snippet.id).toBe(generateDeterministicUuid([snippetName]))
       expect(snippet.name).toBe(snippetName)
       expect(snippet.content.sql).toBe('SELECT * FROM test;')
       expect(snippet.folder_id).toBe(null)
     })
 
     it('should get a snippet from a folder', async () => {
+      const folderName = 'my-folder'
+      const folderId = generateDeterministicUuid([folderName])
       const snippetName = 'folder-snippet'
-      const snippetId = generateDeterministicUuid(snippetName)
+      const snippetId = generateDeterministicUuid([folderId, snippetName])
 
       const createMockDirent = (name: string, isDirectory: boolean) => ({
         name,
@@ -296,8 +298,8 @@ describe('snippets.utils', () => {
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockImplementation((dirPath: any) => {
         if (dirPath === MOCK_SNIPPETS_DIR) {
-          return Promise.resolve([createMockDirent('my-folder', true)] as any)
-        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, 'my-folder')) {
+          return Promise.resolve([createMockDirent(folderName, true)] as any)
+        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, folderName)) {
           return Promise.resolve([createMockDirent(`${snippetName}.sql`, false)] as any)
         }
         return Promise.resolve([])
@@ -306,10 +308,10 @@ describe('snippets.utils', () => {
 
       const snippet = await getSnippet(snippetId)
 
-      expect(snippet.id).toBe(generateDeterministicUuid(snippetName))
+      expect(snippet.id).toBe(generateDeterministicUuid([folderId, snippetName]))
       expect(snippet.name).toBe(snippetName)
       expect(snippet.content.sql).toBe('SELECT * FROM folder_table;')
-      expect(snippet.folder_id).toBe(generateDeterministicUuid('my-folder'))
+      expect(snippet.folder_id).toBe(generateDeterministicUuid(['my-folder']))
     })
 
     it('should throw error when snippet not found', async () => {
@@ -344,7 +346,7 @@ describe('snippets.utils', () => {
     })
 
     it('should get snippets from a specific folder', async () => {
-      const folderId = generateDeterministicUuid('my-folder')
+      const folderId = generateDeterministicUuid(['my-folder'])
 
       const createMockDirent = (name: string, isDirectory: boolean) => ({
         name,
@@ -371,7 +373,7 @@ describe('snippets.utils', () => {
     })
 
     it('should return empty array when no snippets in folder', async () => {
-      const folderId = generateDeterministicUuid('empty-folder')
+      const folderId = generateDeterministicUuid(['empty-folder'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([])
@@ -461,7 +463,7 @@ describe('snippets.utils', () => {
 
     it('should throw error when snippet already exists', async () => {
       const mockSnippet: Snippet = {
-        id: generateDeterministicUuid('existing-snippet'),
+        id: generateDeterministicUuid(['existing-snippet']),
         inserted_at: '2023-01-01T00:00:00.000Z',
         updated_at: '2023-01-01T00:00:00.000Z',
         type: 'sql',
@@ -511,7 +513,7 @@ describe('snippets.utils', () => {
         },
         visibility: 'user',
         project_id: 1,
-        folder_id: generateDeterministicUuid('test-folder'),
+        folder_id: generateDeterministicUuid(['test-folder']),
         owner_id: 1,
         owner: { id: 1, username: 'testuser' },
         updated_by: { id: 1, username: 'testuser' },
@@ -530,7 +532,7 @@ describe('snippets.utils', () => {
         'SELECT * FROM folder_table;',
         'utf-8'
       )
-      expect(result.folder_id).toBe(generateDeterministicUuid('test-folder'))
+      expect(result.folder_id).toBe(generateDeterministicUuid(['test-folder']))
     })
 
     it('should throw error when folder_id is provided but folder does not exist', async () => {
@@ -567,7 +569,7 @@ describe('snippets.utils', () => {
 
   describe('deleteSnippet', () => {
     it('should delete a snippet file', async () => {
-      const snippetId = generateDeterministicUuid('test-snippet')
+      const snippetId = generateDeterministicUuid(['test-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -584,7 +586,7 @@ describe('snippets.utils', () => {
     })
 
     it('should not throw error when file does not exist', async () => {
-      const snippetId = generateDeterministicUuid('test-snippet')
+      const snippetId = generateDeterministicUuid(['test-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -600,7 +602,7 @@ describe('snippets.utils', () => {
     })
 
     it('should throw error for other filesystem errors', async () => {
-      const snippetId = generateDeterministicUuid('test-snippet')
+      const snippetId = generateDeterministicUuid(['test-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -625,8 +627,10 @@ describe('snippets.utils', () => {
     })
 
     it('should delete a snippet file from a folder', async () => {
+      const folderName = 'my-folder'
+      const folderId = generateDeterministicUuid([folderName])
       const snippetName = 'folder-snippet'
-      const snippetId = generateDeterministicUuid(snippetName)
+      const snippetId = generateDeterministicUuid([folderId, snippetName])
 
       const createMockDirent = (name: string, isDirectory: boolean) => ({
         name,
@@ -637,8 +641,8 @@ describe('snippets.utils', () => {
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockImplementation((dirPath: any) => {
         if (dirPath === MOCK_SNIPPETS_DIR) {
-          return Promise.resolve([createMockDirent('my-folder', true)] as any)
-        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, 'my-folder')) {
+          return Promise.resolve([createMockDirent(folderName, true)] as any)
+        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, folderName)) {
           return Promise.resolve([createMockDirent('folder-snippet.sql', false)] as any)
         }
         return Promise.resolve([])
@@ -661,7 +665,7 @@ describe('snippets.utils', () => {
 
   describe('updateSnippet', () => {
     it('should update an existing snippet', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
+      const id = generateDeterministicUuid(['existing-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
 
@@ -699,7 +703,7 @@ describe('snippets.utils', () => {
     })
 
     it('should update only provided fields', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
+      const id = generateDeterministicUuid(['existing-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
       // // Mock readdir for both getFilesystemEntries calls (initial and final)
@@ -721,8 +725,8 @@ describe('snippets.utils', () => {
     })
 
     it('should move snippet to a folder when folder_id is updated', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
-      const targetFolderId = generateDeterministicUuid('target-folder')
+      const id = generateDeterministicUuid(['existing-snippet'])
+      const targetFolderId = generateDeterministicUuid(['target-folder'])
 
       const createMockDirent = (name: string, isDirectory: boolean) => ({
         name,
@@ -768,7 +772,9 @@ describe('snippets.utils', () => {
     })
 
     it('should move snippet from folder to root when folder_id is set to null', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
+      const folderName = 'source-folder'
+      const folderId = generateDeterministicUuid([folderName])
+      const id = generateDeterministicUuid([folderId, 'existing-snippet'])
 
       const createMockDirent = (name: string, isDirectory: boolean) => ({
         name,
@@ -781,8 +787,8 @@ describe('snippets.utils', () => {
       // Mock existing snippet in a folder - the function expects the snippet to have folder_id set
       mockedFS.readdir.mockImplementation((dirPath: any) => {
         if (dirPath === MOCK_SNIPPETS_DIR) {
-          return Promise.resolve([createMockDirent('source-folder', true)] as any)
-        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, 'source-folder')) {
+          return Promise.resolve([createMockDirent(folderName, true)] as any)
+        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, folderName)) {
           return Promise.resolve([createMockDirent('existing-snippet.sql', false)] as any)
         }
         return Promise.resolve([])
@@ -810,7 +816,7 @@ describe('snippets.utils', () => {
     })
 
     it('should throw error when trying to move to non-existent folder', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
+      const id = generateDeterministicUuid(['existing-snippet'])
       const nonExistentFolderId = 'non-existent-folder-id'
 
       mockedFS.access.mockResolvedValue(undefined)
@@ -827,8 +833,8 @@ describe('snippets.utils', () => {
     })
 
     it('should handle renaming snippet while moving to folder', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
-      const targetFolderId = generateDeterministicUuid('target-folder')
+      const id = generateDeterministicUuid(['existing-snippet'])
+      const targetFolderId = generateDeterministicUuid(['target-folder'])
 
       const createMockDirent = (name: string, isDirectory: boolean) => ({
         name,
@@ -877,7 +883,7 @@ describe('snippets.utils', () => {
     })
 
     it('should update content to empty string', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
+      const id = generateDeterministicUuid(['existing-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -900,7 +906,7 @@ describe('snippets.utils', () => {
     })
 
     it('should handle old file deletion errors other than ENOENT', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
+      const id = generateDeterministicUuid(['existing-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -918,7 +924,7 @@ describe('snippets.utils', () => {
     })
 
     it('should continue when old file deletion fails with ENOENT', async () => {
-      const id = generateDeterministicUuid('existing-snippet')
+      const id = generateDeterministicUuid(['existing-snippet'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -959,8 +965,8 @@ describe('snippets.utils', () => {
       expect(folders).toHaveLength(2)
       expect(folders[0].name).toBe('folder1')
       expect(folders[1].name).toBe('folder2')
-      expect(folders[0].id).toBe(generateDeterministicUuid('folder1'))
-      expect(folders[1].id).toBe(generateDeterministicUuid('folder2'))
+      expect(folders[0].id).toBe(generateDeterministicUuid(['folder1']))
+      expect(folders[1].id).toBe(generateDeterministicUuid(['folder2']))
     })
 
     it('should return empty array when no directories exist', async () => {
@@ -992,7 +998,7 @@ describe('snippets.utils', () => {
 
       const result = await createFolder('New Folder')
 
-      expect(result.id).toBe(generateDeterministicUuid('New Folder'))
+      expect(result.id).toBe(generateDeterministicUuid(['New Folder']))
       expect(result.name).toBe('New Folder')
       expect(result.owner_id).toBe(1)
       expect(mockedFS.mkdir).toHaveBeenCalledWith(path.join(MOCK_SNIPPETS_DIR, 'New Folder'), {
@@ -1007,7 +1013,7 @@ describe('snippets.utils', () => {
 
       const result = await createFolder('Folder with spaces & symbols!')
 
-      expect(result.id).toBe(generateDeterministicUuid('Folder with spaces & symbols!'))
+      expect(result.id).toBe(generateDeterministicUuid(['Folder with spaces & symbols!']))
       expect(result.name).toBe('Folder with spaces & symbols!')
       expect(mockedFS.mkdir).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'Folder with spaces & symbols!'),
@@ -1050,7 +1056,7 @@ describe('snippets.utils', () => {
 
   describe('deleteFolder', () => {
     it('should delete an existing folder directory', async () => {
-      const folderId = generateDeterministicUuid('Delete Me')
+      const folderId = generateDeterministicUuid(['Delete Me'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -1078,7 +1084,7 @@ describe('snippets.utils', () => {
     })
 
     it('should handle directory deletion errors gracefully', async () => {
-      const folderId = generateDeterministicUuid('Test Folder')
+      const folderId = generateDeterministicUuid(['Test Folder'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -1093,7 +1099,7 @@ describe('snippets.utils', () => {
     })
 
     it('should throw original error when directory does not exist during deletion', async () => {
-      const folderId = generateDeterministicUuid('Test Folder')
+      const folderId = generateDeterministicUuid(['Test Folder'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([

@@ -17,7 +17,9 @@ import { SNIPPETS_DIR } from './snippets.constants'
  * @param input - The string to generate a UUID from
  * @returns A deterministic UUID v4 string
  */
-export function generateDeterministicUuid(input: string): string {
+export function generateDeterministicUuid(inputs: (string | null)[]): string {
+  const input = compact(inputs).join('_')
+
   // Create a hash of the input string
   const hash = crypto.createHash('sha256').update(input).digest()
 
@@ -92,7 +94,7 @@ export type FilesystemEntry = {
 
 const buildSnippet = (filename: string, content: string, folderId: string | null) => {
   const snippet: Snippet = {
-    id: generateDeterministicUuid(filename),
+    id: generateDeterministicUuid([folderId, filename]),
     inserted_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     type: 'sql',
@@ -118,7 +120,7 @@ const buildSnippet = (filename: string, content: string, folderId: string | null
 
 const buildFolder = (name: string) => {
   const folder: Folder = {
-    id: generateDeterministicUuid(name),
+    id: generateDeterministicUuid([name]),
     name: name,
     owner_id: 1,
     parent_id: null,
@@ -147,7 +149,7 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
     folderName: string | null
   ): Promise<void> => {
     const items = await fs.readdir(dirPath, { withFileTypes: true })
-    const folderId = folderName ? generateDeterministicUuid(folderName) : null
+    const folderId = folderName ? generateDeterministicUuid([folderName]) : null
 
     for (const item of items) {
       const itemPath = path.join(dirPath, item.name)
@@ -160,7 +162,7 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
 
         // Add folder entry
         entries.push({
-          id: generateDeterministicUuid(item.name),
+          id: generateDeterministicUuid([folderId, item.name]),
           name: item.name,
           type: 'folder',
           // Folders are always at root level in this implementation
@@ -173,7 +175,7 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
         const snippetName = item.name.replace('.sql', '')
 
         entries.push({
-          id: generateDeterministicUuid(snippetName),
+          id: generateDeterministicUuid([folderId, snippetName]),
           name: item.name.replace('.sql', ''),
           type: 'file',
           folderId: folderId,
