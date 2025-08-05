@@ -30,7 +30,7 @@ export interface FormProps {
   /**
    * The function to handle stopping the stream
    */
-  onStop: () => void
+  onStop?: () => void
   /* The placeholder of the textarea */
   placeholder?: string
   /* SQL snippets to display above the form - can be strings or objects with label and content */
@@ -123,13 +123,15 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
           />
           <div className="absolute right-1.5 bottom-1.5 flex gap-3 items-center">
             {loading ? (
-              <Button
-                type="outline"
-                aria-label="Stop generating"
-                icon={<Square fill="currentColor" />}
-                onClick={onStop}
-                className="size-7 rounded-full p-0 text-center flex items-center justify-center"
-              />
+              onStop ? (
+                <Button
+                  type="outline"
+                  aria-label="Stop generating"
+                  icon={<Square fill="currentColor" />}
+                  onClick={onStop}
+                  className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
+                />
+              ) : null
             ) : (
               <Button
                 htmlType="submit"
