@@ -48,7 +48,7 @@ import 'jsr:@std/dotenv/load'
 
 // Set up the configuration for the Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+const supabaseKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? ''
 const options = {
   auth: {
     autoRefreshToken: false,
@@ -146,8 +146,8 @@ To locally test and debug Edge Functions, you can utilize the Supabase CLI. Let'
    touch .env
    # adds the SUPABASE_URL secret
    echo "SUPABASE_URL=http://localhost:54321" >> .env
-   # adds the SUPABASE_ANON_KEY secret
-   echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env
+   # adds the SUPABASE_PUBLISHABLE_KEY secret
+   echo "SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env
    # Alternatively, you can open it in your editor:
    open .env
    ```

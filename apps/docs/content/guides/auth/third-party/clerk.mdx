@@ -54,7 +54,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 await Supabase.initialize(
   url: 'SUPABASE_URL',
-  anonKey: 'SUPABASE_ANON_KEY',
+  anonKey: 'SUPABASE_PUBLISHABLE_KEY',
   accessToken: () async {
     final token = await ClerkAuth.of(context).sessionToken();
     return token.jwt;

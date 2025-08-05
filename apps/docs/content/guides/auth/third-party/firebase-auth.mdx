@@ -25,11 +25,15 @@ Creating a client for the Web is as easy as passing the `accessToken` async func
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    return (await firebase.auth().currentUser?.getIdToken(/* forceRefresh */ false)) ?? null
-  },
-})
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return (await firebase.auth().currentUser?.getIdToken(/* forceRefresh */ false)) ?? null
+    },
+  }
+)
 ```
 
 Make sure the all users in your application have the `role: 'authenticated'` [custom claim](https://firebase.google.com/docs/auth/admin/custom-claims) set. If you're using the `onCreate` Cloud Function to add this custom claim to newly signed up users, you will need to call `getIdToken(/* forceRefresh */ true)` immediately after sign up as the `onCreate` function does not run synchronously.
@@ -66,7 +70,7 @@ struct MissingFirebaseTokenError: Error {}
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
-  supabaseKey: "SUPABASE_ANON_KEY",
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
@@ -93,7 +97,7 @@ import com.google.firebase.ktx.Firebase
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         Firebase.auth.currentUser?.getIdToken(false)?.await()?.token
@@ -113,7 +117,7 @@ import dev.gitlive.firebase.auth.auth
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         Firebase.auth.currentUser?.getIdToken(false)

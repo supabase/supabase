@@ -195,7 +195,7 @@ To initiate a sign-in request from your application's user interface (i.e. the S
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<your-anon-key>')
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
 
 // ---cut---
 supabase.auth.signInWithSSO({
@@ -436,7 +436,7 @@ Yes, also referred to as [cross-origin authentication within the same site](http
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
 
 // ---cut---
 const { data, error } = await supabase.auth.signInWithSSO({

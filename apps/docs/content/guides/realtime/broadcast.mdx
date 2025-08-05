@@ -27,7 +27,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     import { createClient } from '@supabase/supabase-js'
 
     const SUPABASE_URL = 'https://<project>.supabase.co'
-    const SUPABASE_KEY = '<your-anon-key>'
+    const SUPABASE_KEY = '<sb_publishable_... or anon key>'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
     ```
@@ -41,7 +41,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     void main() async {
       Supabase.initialize(
         url: 'https://<project>.supabase.co',
-        anonKey: '<your-anon-key>',
+        anonKey: '<sb_publishable_... or anon key>',
       );
       runApp(MyApp());
     }
@@ -56,7 +56,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     import Supabase
 
     let SUPABASE_URL = "https://<project>.supabase.co"
-    let SUPABASE_KEY = "<your-anon-key>"
+    let SUPABASE_KEY = "<sb_publishable_... or anon key>"
 
     let supabase = SupabaseClient(supabaseURL: URL(string: SUPABASE_URL)!, supabaseKey: SUPABASE_KEY)
     ```
@@ -66,7 +66,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 
     ```kotlin
     val supabaseUrl = "https://<project>.supabase.co"
-    val supabaseKey = "<your-anon-key>"
+    val supabaseKey = "<sb_publishable_... or anon key>"
     val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
         install(Realtime)
     }
@@ -80,7 +80,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     from supabase import acreate_client
 
     URL = "https://<project>.supabase.co"
-    KEY = "<your-anon-key>"
+    KEY = "<sb_publishable_... or anon key>"
 
     async def create_supabase():
       supabase = await acreate_client(URL, KEY)
@@ -107,7 +107,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
     ```js
     // @noImplicitAny: false
     import { createClient } from '@supabase/supabase-js'
-    const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+    const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 
     // ---cut---
     // Join a room/topic. Can be anything except for 'realtime'.

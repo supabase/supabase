@@ -21,7 +21,7 @@ When you initialize your Supabase Realtime client, you define a `topic` that uni
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 
 const roomOne = supabase.channel('room-one') // set your topic here
 ```
@@ -34,7 +34,7 @@ By default, channels are public and you need to set that you want to use a priva
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 const roomOne = supabase.channel('private-room-one', { config: { private: true } })
 ```
 
@@ -44,7 +44,7 @@ Realtime Broadcast follows the [publish-subscribe pattern](https://en.wikipedia.
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 const roomOne = supabase.channel('room-one') // set your topic here
 
 // ---cut---
@@ -67,7 +67,7 @@ Presence can be used to share an individual's state with others within a Channel
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 const roomOne = supabase.channel('room-one') // set your topic here
 
 // ---cut---
