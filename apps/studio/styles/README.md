@@ -8,4 +8,4 @@ Ideally, keep custom styling here to a minimum, use tailwind directly in the pag
 
 ## If you're writing custom styles
 
-Group custom styles into separate stylesheets based on their context. For styles which are generic and global, we can write them in `main.scss`.
+Group custom styles into separate stylesheets based on their context. For styles which are generic and global, we can write them in `global.css`.
