@@ -135,10 +135,16 @@ function useSurveyData(sqlQuery: string) {
         const total = data.reduce((sum, row) => sum + parseInt(row.total), 0)
 
         // Transform the data to match chart format
-        const processedData = data.map((row) => ({
-          label: row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
-          value: total > 0 ? parseFloat(((parseInt(row.total) / total) * 100).toFixed(1)) : 0,
-        }))
+        const processedData = data.map((row) => {
+          const rawPercentage = total > 0 ? (parseInt(row.total) / total) * 100 : 0
+          const roundedPercentage = Math.round(rawPercentage)
+
+          return {
+            label: row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
+            value: roundedPercentage,
+            rawValue: rawPercentage, // Keep the raw value for bar scaling
+          }
+        })
 
         console.log('Processed chart data:', processedData)
         setChartData(processedData)
@@ -205,12 +211,14 @@ export function GenericChartWithQuery({ title, targetColumn, filterColumns, gene
         ) : (
           <div className="flex flex-col h-full w-full justify-between gap-[1px]">
             {/* Each bar as a vertical stack: label above, bar below */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-10">
               {chartData.map((item, index) => (
                 <div key={index} className="flex flex-col">
                   {/* Label above the bar */}
                   <div className="mb-2">
-                    <span className="text-fluid-16-20 font-medium">{item.label}</span>
+                    <span className="text-sm font-mono uppercase tracking-widest">
+                      {item.label}
+                    </span>
                   </div>
 
                   {/* Bar and percentage row */}
@@ -220,7 +228,7 @@ export function GenericChartWithQuery({ title, targetColumn, filterColumns, gene
                       className="flex-1 h-[60px] relative flex items-center"
                       style={{
                         '--reference': maxValue,
-                        '--bar-value': item.value,
+                        '--bar-value': item.rawValue || item.value, // Use rawValue for scaling
                         '--index': index,
                       }}
                     >
@@ -228,13 +236,13 @@ export function GenericChartWithQuery({ title, targetColumn, filterColumns, gene
                       <div
                         className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
                         style={{
-                          width: `calc((var(--bar-value) / var(--reference)) * 100%)`,
+                          width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
                         }}
                       />
 
                       {/* Percentage positioned after the bar */}
                       <div className="tabular-nums text-fluid-14-20 font-medium min-w-[60px] ml-3">
-                        {item.value}%
+                        {item.value < 1 ? '<1%' : `${item.value}%`}
                       </div>
                     </div>
                   </div>
