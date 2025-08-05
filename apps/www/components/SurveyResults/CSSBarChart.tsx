@@ -235,7 +235,7 @@ export function CSSBarChart({ title, targetColumn, filterColumns, generateSQLQue
 
                         {/* Animated Bar */}
                         <div
-                          className="absolute inset-0 bg-foreground rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]"
+                          className={`absolute inset-0 ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
                           style={{
                             clipPath: `inset(0 calc(100% - var(--width)) 0 0)`,
                           }}
