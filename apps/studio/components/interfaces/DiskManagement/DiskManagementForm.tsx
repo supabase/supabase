@@ -417,7 +417,7 @@ export function DiskManagementForm() {
                 onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
               >
                 <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
-                  <div className="flex flex-col items-start">
+                  <div className="flex flex-col items-start" id="advanced-disk-settings">
                     <span className="text-sm text-foreground">Advanced disk settings</span>
                     <span className="text-sm text-foreground-light text-left">
                       Specify additional settings for your disk, including autoscaling

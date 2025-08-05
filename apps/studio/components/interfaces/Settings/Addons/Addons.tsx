@@ -333,7 +333,7 @@ const Addons = () => {
           <ScaffoldContainer>
             <ScaffoldSection>
               <ScaffoldSectionDetail>
-                <div className="space-y-6">
+                <div className="space-y-6" id="dedicated-ipv4">
                   <p className="m-0">Dedicated IPv4 address</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
@@ -408,7 +408,7 @@ const Addons = () => {
           <ScaffoldContainer>
             <ScaffoldSection>
               <ScaffoldSectionDetail>
-                <div className="space-y-6">
+                <div className="space-y-6" id="pitr">
                   <p className="m-0">Point in time recovery</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
