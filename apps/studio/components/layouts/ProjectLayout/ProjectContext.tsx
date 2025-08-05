@@ -1,6 +1,7 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
 import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import { DatabaseSelectorStateContextProvider } from 'state/database-selector'
@@ -62,6 +63,6 @@ export const ProjectContextProvider = ({
 }
 
 export const useIsProjectActive = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   return project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 }
