@@ -653,7 +653,10 @@ export const auth = {
     },
     {
       name: 'Debugging',
-      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
+      items: [
+        { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
+        { name: 'Troubleshooting', url: '/guides/auth/troubleshooting' },
+      ],
     },
     {
       name: 'Third-party auth',
@@ -961,6 +964,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Supavisor',
           url: '/guides/database/supavisor',
+        },
+        {
+          name: 'Troubleshooting',
+          url: '/guides/database/troubleshooting',
         },
       ],
     },
@@ -1630,7 +1637,10 @@ export const realtime: NavMenuConstant = {
     {
       name: 'Debugging',
       url: undefined,
-      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
+      items: [
+        { name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] },
+        { name: 'Troubleshooting', url: '/guides/realtime/troubleshooting' },
+      ],
     },
   ],
 }
@@ -1752,6 +1762,7 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Logs', url: '/guides/storage/debugging/logs' },
         { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+        { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
       ],
     },
     {
