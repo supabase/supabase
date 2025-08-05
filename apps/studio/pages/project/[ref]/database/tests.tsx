@@ -11,7 +11,7 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
@@ -31,7 +31,7 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   const { setEditorPanel } = useAppStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const { profile } = useProfile()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const [showRunAllTestsModal, setShowRunAllTestsModal] = useState(false)
   // Local status map and execution queue
   const [statuses, setStatuses] = useState<Record<string, DatabaseTestStatus>>({})
