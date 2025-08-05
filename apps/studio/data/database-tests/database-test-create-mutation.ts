@@ -3,7 +3,6 @@ import { toast } from 'sonner'
 
 // Content helpers
 import { post } from 'data/fetchers'
-// Folder logic removed
 import { databaseTestsKeys } from './database-tests-key'
 
 type DatabaseTestCreateVariables = {
