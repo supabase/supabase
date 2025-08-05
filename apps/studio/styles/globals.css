@@ -215,6 +215,11 @@ input[type='number'] {
   -moz-appearance: textfield; /* Firefox, Not included in tailwind styles reset */
 }
 
+'input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button': {
+  -webkit-appearance: 'none';
+  margin: '0';
+}
+
 .hide-scrollbar {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
