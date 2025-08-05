@@ -14,13 +14,13 @@
 
   .token.imports,
   .token.property-access {
-    @apply text-foreground-lighter #{!important};
+    @apply !text-foreground-lighter;
   }
 
   .token.keyword.module,
   .token.function {
     font-style: normal !important;
-    @apply text-foreground-lighter #{!important};
+    @apply !text-foreground-lighter;
   }
 
   .token.plain,
@@ -33,32 +33,32 @@
   .token.doc-comment.parameter.punctuation,
   .token.doc-comment.optional-parameter.punctuation {
     font-style: normal !important;
-    @apply text-foreground-light #{!important};
+    @apply !text-foreground-light;
   }
 
   .token.keyword,
   .token.doc-comment.keyword {
     font-style: normal !important;
-    @apply text-blue-900 #{!important};
+    @apply !text-blue-900;
   }
 
   .token.string {
     font-style: normal !important;
-    @apply text-brand #{!important};
+    @apply !text-brand;
   }
 
   .token.constant {
     font-style: normal !important;
-    @apply text-blue-900 #{!important};
+    @apply !text-blue-900;
   }
 
   .token.comment {
     font-style: normal !important;
-    @apply text-foreground-lighter #{!important};
+    @apply !text-foreground-lighter;
   }
 
   .token.number {
-    @apply text-brand #{!important};
+    @apply !text-brand;
   }
 
   .token.boolean,

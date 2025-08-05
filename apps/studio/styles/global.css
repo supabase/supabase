@@ -283,7 +283,7 @@ div[data-radix-portal]:not(.portal--toast) {
 
 /* to do: remove this CSS and do the same thing in a reusable tooltip component */
 [data-radix-popper-content-wrapper] {
-  @apply z-50 #{!important};
+  @apply !z-50;
 }
 
 .settings-container {
@@ -291,7 +291,7 @@ div[data-radix-portal]:not(.portal--toast) {
 }
 
 .react-grid-item.react-grid-placeholder {
-  @apply bg-brand-500 #{!important};
+  @apply !bg-brand-500;
 }
 
 .react-grid-item > .react-resizable-handle::after {
@@ -301,5 +301,5 @@ div[data-radix-portal]:not(.portal--toast) {
   bottom: 3px !important;
   width: 6px !important;
   height: 6px !important;
-  @apply border-strong dark:border-r-2 dark:border-b-2 dark:border-overlay #{!important};
+  @apply !border-strong !dark:border-r-2 !dark:border-b-2 !dark:border-overlay;
 }

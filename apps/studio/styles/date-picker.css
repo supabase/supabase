@@ -7,11 +7,11 @@
 }
 
 .react-datepicker-left {
-  @apply absolute left-0 right-auto top-11 transform-none #{!important};
+  @apply !absolute !left-0 !right-auto !top-11 !transform-none;
 }
 
 .react-datepicker-right {
-  @apply absolute right-0 left-auto top-11 transform-none #{!important};
+  @apply !absolute !right-0 !left-auto !top-11 !transform-none;
 }
 
 .react-datepicker__portal {
