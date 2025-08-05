@@ -32,7 +32,6 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { profile } = useProfile()
   const project = useSelectedProject()
-  // Read permissions currently not used, kept for future enhancements
   const [showRunAllTestsModal, setShowRunAllTestsModal] = useState(false)
   // Local status map and execution queue
   const [statuses, setStatuses] = useState<Record<string, DatabaseTestStatus>>({})
