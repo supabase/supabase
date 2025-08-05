@@ -10,7 +10,7 @@ import {
   PolicyTableRow,
   PolicyTableRowProps,
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
-import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'

@@ -118,8 +118,9 @@ export function getCreateFDWSql({
     .map((option) => `${option.name} ''%s''`)
   const unencryptedOptionsSqlArray = unencryptedOptions
     .filter((option) => formState[option.name])
-    // wrap all options in double quotes, some option names have dots in them
-    .map((option) => `"${option.name}" ''${formState[option.name]}''`)
+    // wrap all option names in double quotes to handle dots
+    // wrap all options values in single quotes, replace single quotes with 4 single quotes to escape them in SQL past the execute format
+    .map((option) => `"${option.name}" ''${formState[option.name].replace(/'/g, `''''`)}''`)
   const optionsSqlArray = [...encryptedOptionsSqlArray, ...unencryptedOptionsSqlArray].join(',')
 
   const createServerSql = /* SQL */ `

@@ -1,17 +1,18 @@
 import { toString as CronToString } from 'cronstrue'
 import { CircleCheck, CircleX, List, Loader } from 'lucide-react'
 import Link from 'next/link'
-import { UIEvent, useCallback, useEffect, useMemo } from 'react'
+import { UIEvent, useCallback, useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import dayjs from 'dayjs'
 import {
   Button,
   cn,
@@ -21,6 +22,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   calculateDuration,
@@ -119,6 +121,19 @@ const columns = cronJobColumns.map((col) => {
     renderCell: (props) => {
       const value = col.value(props.row)
 
+      if (['start_time', 'end_time'].includes(col.id)) {
+        const formattedValue = dayjs((props.row as any)[(col as any).id]).valueOf()
+        return (
+          <div className="flex items-center">
+            <TimestampInfo
+              utcTimestamp={formattedValue}
+              labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+              className="font-mono text-xs"
+            />
+          </div>
+        )
+      }
+
       return (
         <div
           className={cn(
@@ -144,9 +159,10 @@ export const PreviousRunsTab = () => {
 
   const jobId = Number(childId)
 
-  const { data: cronJobs, isLoading: isLoadingCronJobs } = useCronJobsQuery({
+  const { data: job, isLoading: isLoadingCronJobs } = useCronJobQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    id: jobId,
   })
 
   const {
@@ -161,14 +177,13 @@ export const PreviousRunsTab = () => {
       connectionString: project?.connectionString,
       jobId: jobId,
     },
-    { enabled: !!jobId, staleTime: 30 }
+    { enabled: !!jobId, staleTime: 30000 }
   )
 
   const { data: edgeFunctions = [] } = useEdgeFunctionsQuery({ projectRef: project?.ref })
 
-  const currentJobState = cronJobs?.find((job) => job.jobid === jobId)
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
-  const cronJobValues = parseCronJobCommand(currentJobState?.command || '', project?.ref!)
+  const cronJobValues = parseCronJobCommand(job?.command || '', project?.ref!)
   const edgeFunction =
     cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
   const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
@@ -183,15 +198,6 @@ export const PreviousRunsTab = () => {
     },
     [fetchNextPage, isLoadingCronJobRuns]
   )
-
-  useEffect(() => {
-    // Refetch only the first page
-    const timerId = setInterval(() => {
-      refetch({ refetchPage: (_page, index) => index === 0 })
-    }, 30000)
-
-    return () => clearInterval(timerId)
-  }, [refetch])
 
   return (
     <div className="h-full flex flex-col">
@@ -236,15 +242,13 @@ export const PreviousRunsTab = () => {
             <div className="grid gap-2 w-56">
               <h3 className="text-sm">Schedule</h3>
               <p className="text-xs text-foreground-light">
-                {currentJobState?.schedule ? (
+                {job?.schedule ? (
                   <>
-                    <span className="font-mono text-lg">
-                      {currentJobState.schedule.toLocaleLowerCase()}
-                    </span>
+                    <span className="font-mono text-lg">{job.schedule.toLocaleLowerCase()}</span>
                     <p>
-                      {isSecondsFormat(currentJobState.schedule)
+                      {isSecondsFormat(job.schedule)
                         ? ''
-                        : CronToString(currentJobState.schedule.toLowerCase())}
+                        : CronToString(job.schedule.toLowerCase())}
                     </p>
                   </>
                 ) : (
@@ -262,17 +266,22 @@ export const PreviousRunsTab = () => {
                     className="sql"
                     parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
                   >
-                    {currentJobState?.command}
+                    {job?.command}
                   </SimpleCodeBlock>
                   <div className="bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background-200 to-transparent absolute " />
                 </TooltipTrigger>
-                <TooltipContent side="bottom" align="center" className="max-w-[400px] text-wrap">
+                <TooltipContent
+                  side="bottom"
+                  align="center"
+                  className="max-w-[400px] text-wrap p-0"
+                >
+                  <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Command</p>
                   <SimpleCodeBlock
                     showCopy={false}
                     className="sql"
-                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
+                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-3"
                   >
-                    {currentJobState?.command}
+                    {job?.command}
                   </SimpleCodeBlock>
                 </TooltipContent>
               </Tooltip>
