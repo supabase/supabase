@@ -18,8 +18,8 @@ import {
   WarningIcon,
 } from 'ui'
 import { Plus, Key, X } from 'lucide-react'
-import { createAllResources } from './AccessToken.utils'
-import { ACCESS_TOKEN_PERMISSIONS } from './AccessToken.constants'
+import { createAllResources } from './../AccessToken.utils'
+import { ACCESS_TOKEN_PERMISSIONS } from './../AccessToken.constants'
 
 interface TokenPermissionsFormProps {
   control: Control<any>

@@ -24,9 +24,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-import { TokenBasicInfoForm } from './TokenBasicInfoForm'
-import { TokenResourceAccessForm } from './TokenResourceAccessForm'
-import { TokenPermissionsForm } from './TokenPermissionsForm'
+import { TokenBasicInfoForm } from './Form/TokenBasicInfoForm'
+import { TokenResourceAccessForm } from './Form/TokenResourceAccessForm'
+import { TokenPermissionsForm } from './Form/TokenPermissionsForm'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void

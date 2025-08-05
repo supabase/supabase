@@ -19,8 +19,8 @@ import {
   Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { getExpirationDateText } from './AccessToken.utils'
-import { ACCESS_TOKEN_EXPIRY } from './AccessToken.constants'
+import { getExpirationDateText } from './../AccessToken.utils'
+import { ACCESS_TOKEN_EXPIRY } from './../AccessToken.constants'
 
 interface TokenBasicInfoFormProps {
   control: Control<any>
