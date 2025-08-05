@@ -6,8 +6,8 @@ import {
   PopoverTrigger_Shadcn_,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
+  CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Select_Shadcn_,
@@ -17,7 +17,8 @@ import {
   SelectItem_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { Plus, Key, X } from 'lucide-react'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Plus, Key, X, RotateCcw } from 'lucide-react'
 import { createAllResources } from './../AccessToken.utils'
 import { ACCESS_TOKEN_PERMISSIONS } from './../AccessToken.constants'
 
@@ -174,126 +175,147 @@ export const TokenPermissionsForm = ({
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-sm">Configure permissions</span>
-            <Popover_Shadcn_ open={resourceSearchOpen} onOpenChange={setResourceSearchOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
-                  Add permission
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-[400px] p-0" align="end">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Search resources..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
+            <div className="flex items-center gap-2">
+              <Popover_Shadcn_ open={resourceSearchOpen} onOpenChange={setResourceSearchOpen}>
+                <PopoverTrigger_Shadcn_ asChild>
+                  <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
+                    Add permission
+                  </Button>
+                </PopoverTrigger_Shadcn_>
+                <ButtonTooltip
+                  type="default"
+                  size="tiny"
+                  className="p-1"
+                  onClick={() => {
+                    setValue('permissionRows', [])
+                  }}
+                  icon={<RotateCcw size={16} />}
+                  tooltip={{
+                    content: {
+                      side: 'top',
+                      align: 'end',
+                      alignOffset: -10,
+                      text: 'Reset all permissions',
+                    },
+                  }}
+                />
+                <PopoverContent_Shadcn_ className="w-[400px] p-0" align="end">
+                  <Command_Shadcn_>
+                    <CommandInput_Shadcn_ placeholder="Search resources..." />
+                    <CommandList_Shadcn_>
+                      <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
-                    {/* Preset Options */}
-                    <CommandGroup_Shadcn_ heading="Preset options" className="[&>div]:text-left">
-                      <CommandItem_Shadcn_
-                        value="add-all-permissions"
-                        onSelect={() => {
-                          const allPermissions = ALL_RESOURCES.map((resource) => ({
-                            resource: resource.resource,
-                            action: resource.actions.includes('read-write')
-                              ? 'read-write'
-                              : resource.actions[0],
-                          }))
-                          setValue('permissionRows', allPermissions)
-                          setResourceSearchOpen(false)
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Key size={12} />
-                          <div className="flex flex-col text-left">
-                            <span className="font-medium text-foreground">Add all permissions</span>
-                          </div>
-                        </div>
-                      </CommandItem_Shadcn_>
-
-                      <CommandItem_Shadcn_
-                        value="add-all-project-permissions"
-                        onSelect={() => {
-                          const projectPermissions = ALL_RESOURCES.filter(
-                            (resource) => resource.group === 'Project permissions'
-                          ).map((resource) => ({
-                            resource: resource.resource,
-                            action: resource.actions.includes('read-write')
-                              ? 'read-write'
-                              : resource.actions[0],
-                          }))
-                          setValue('permissionRows', projectPermissions)
-                          setResourceSearchOpen(false)
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Key size={12} />
-                          <div className="flex flex-col text-left">
-                            <span className="font-medium text-foreground">
-                              Add all project permissions
-                            </span>
-                          </div>
-                        </div>
-                      </CommandItem_Shadcn_>
-
-                      <CommandItem_Shadcn_
-                        value="add-all-organization-permissions"
-                        onSelect={() => {
-                          const orgPermissions = ALL_RESOURCES.filter(
-                            (resource) => resource.group === 'Organization permissions'
-                          ).map((resource) => ({
-                            resource: resource.resource,
-                            action: resource.actions.includes('read-write')
-                              ? 'read-write'
-                              : resource.actions[0],
-                          }))
-                          setValue('permissionRows', orgPermissions)
-                          setResourceSearchOpen(false)
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Key size={12} />
-                          <div className="flex flex-col text-left">
-                            <span className="font-medium text-foreground">
-                              Add all organization permissions
-                            </span>
-                          </div>
-                        </div>
-                      </CommandItem_Shadcn_>
-                    </CommandGroup_Shadcn_>
-
-                    {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
-                      <CommandGroup_Shadcn_
-                        key={permissionGroup.name}
-                        heading={permissionGroup.name}
-                        className="[&>div]:text-left"
-                      >
-                        {permissionGroup.resources.map((resource) => (
-                          <CommandItem_Shadcn_
-                            key={resource.resource}
-                            value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
-                            onSelect={() => {
-                              const newRows = [
-                                ...permissionRows,
-                                { resource: resource.resource, action: '' },
-                              ]
-                              setValue('permissionRows', newRows)
-                              setResourceSearchOpen(false)
-                            }}
-                            className="text-white"
-                          >
-                            <div className="flex items-center gap-3">
-                              <Key size={12} />
-                              <div className="flex flex-col text-left">
-                                <span className="font-medium">{resource.title}</span>
-                              </div>
+                      {/* Preset Options */}
+                      <CommandGroup_Shadcn_ heading="Preset options" className="[&>div]:text-left">
+                        <CommandItem_Shadcn_
+                          value="add-all-permissions"
+                          onSelect={() => {
+                            const allPermissions = ALL_RESOURCES.map((resource) => ({
+                              resource: resource.resource,
+                              action: resource.actions.includes('read-write')
+                                ? 'read-write'
+                                : resource.actions[0],
+                            }))
+                            setValue('permissionRows', allPermissions)
+                            setResourceSearchOpen(false)
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Key size={12} />
+                            <div className="flex flex-col text-left">
+                              <span className="font-medium text-foreground">
+                                Add all permissions
+                              </span>
                             </div>
-                          </CommandItem_Shadcn_>
-                        ))}
+                          </div>
+                        </CommandItem_Shadcn_>
+
+                        <CommandItem_Shadcn_
+                          value="add-all-project-permissions"
+                          onSelect={() => {
+                            const projectPermissions = ALL_RESOURCES.filter(
+                              (resource) => resource.group === 'Project permissions'
+                            ).map((resource) => ({
+                              resource: resource.resource,
+                              action: resource.actions.includes('read-write')
+                                ? 'read-write'
+                                : resource.actions[0],
+                            }))
+                            setValue('permissionRows', projectPermissions)
+                            setResourceSearchOpen(false)
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Key size={12} />
+                            <div className="flex flex-col text-left">
+                              <span className="font-medium text-foreground">
+                                Add all project permissions
+                              </span>
+                            </div>
+                          </div>
+                        </CommandItem_Shadcn_>
+
+                        <CommandItem_Shadcn_
+                          value="add-all-organization-permissions"
+                          onSelect={() => {
+                            const orgPermissions = ALL_RESOURCES.filter(
+                              (resource) => resource.group === 'Organization permissions'
+                            ).map((resource) => ({
+                              resource: resource.resource,
+                              action: resource.actions.includes('read-write')
+                                ? 'read-write'
+                                : resource.actions[0],
+                            }))
+                            setValue('permissionRows', orgPermissions)
+                            setResourceSearchOpen(false)
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Key size={12} />
+                            <div className="flex flex-col text-left">
+                              <span className="font-medium text-foreground">
+                                Add all organization permissions
+                              </span>
+                            </div>
+                          </div>
+                        </CommandItem_Shadcn_>
                       </CommandGroup_Shadcn_>
-                    ))}
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+
+                      {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => (
+                        <CommandGroup_Shadcn_
+                          key={permissionGroup.name}
+                          heading={permissionGroup.name}
+                          className="[&>div]:text-left"
+                        >
+                          {permissionGroup.resources.map((resource) => (
+                            <CommandItem_Shadcn_
+                              key={resource.resource}
+                              value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
+                              onSelect={() => {
+                                const newRows = [
+                                  ...permissionRows,
+                                  { resource: resource.resource, action: '' },
+                                ]
+                                setValue('permissionRows', newRows)
+                                setResourceSearchOpen(false)
+                              }}
+                              className="text-white"
+                            >
+                              <div className="flex items-center gap-3">
+                                <Key size={12} />
+                                <div className="flex flex-col text-left">
+                                  <span className="font-medium">{resource.title}</span>
+                                </div>
+                              </div>
+                            </CommandItem_Shadcn_>
+                          ))}
+                        </CommandGroup_Shadcn_>
+                      ))}
+                    </CommandList_Shadcn_>
+                  </Command_Shadcn_>
+                </PopoverContent_Shadcn_>
+              </Popover_Shadcn_>
+            </div>
           </div>
 
           <div className="border border-border rounded-lg">
