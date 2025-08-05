@@ -14,8 +14,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
@@ -75,8 +75,8 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const project = useSelectedProject()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
 
