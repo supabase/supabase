@@ -119,6 +119,7 @@ const sqlFunctionSchema = z.object({
   // When editing a cron job, we want to keep the original command as a snippet in case the user wants to manually edit it
   snippet: z.string().trim(),
 })
+
 const sqlSnippetSchema = z.object({
   type: z.literal('sql_snippet'),
   snippet: z.string().trim().min(1),
