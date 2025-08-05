@@ -127,7 +127,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
               disabled={!canSubmit}
               className={cn(
                 'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
-                !canSubmit ? 'text-muted opacity-50' : 'text-default opacity-100',
+                !canSubmit ? 'opacity-50' : 'opacity-100',
                 loading && 'hidden'
               )}
             />
