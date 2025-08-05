@@ -2,7 +2,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Branch } from 'data/branches/branches-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProjectByRefQuery } from 'hooks/misc/useSelectedProject'
 import { tablesToSQL } from 'lib/helpers'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -24,7 +24,7 @@ export const ReviewWithAI = ({
   disabled = false,
 }: ReviewWithAIProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
-  const selectedOrg = useSelectedOrganization()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   // Get parent project for production schema

@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { InstanceSpecs } from 'lib/constants'
@@ -52,10 +52,9 @@ type ComputeSizeFieldProps = {
 
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
-  const org = useSelectedOrganization()
-  const { control, formState, setValue, trigger } = form
-
+  const { data: org } = useSelectedOrganizationQuery()
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+
   const {
     data: addons,
     isLoading: isAddonsLoading,
@@ -63,6 +62,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   } = useProjectAddonsQuery({ projectRef: ref })
 
   const isLoading = isProjectLoading || isAddonsLoading
+
+  const { control, formState, setValue, trigger } = form
 
   const availableAddons = useMemo(() => {
     return addons?.available_addons ?? []

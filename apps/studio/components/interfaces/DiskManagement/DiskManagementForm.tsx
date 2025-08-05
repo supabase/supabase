@@ -26,7 +26,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
@@ -68,7 +68,7 @@ import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 export function DiskManagementForm() {
   // isLoading is used to avoid a useCheckPermissions() race condition
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
 
