@@ -1,5 +1,5 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { Loader2, User } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
@@ -82,7 +82,9 @@ export const Message = function Message({
 
   // For backwards compatibility: some stored messages may have a 'content' property
   const { role, parts } = message
-  const content = 'content' in message ? (message as any).content : undefined
+  const hasContent = (msg: VercelMessage): msg is VercelMessage & { content: string } =>
+    'content' in msg && typeof msg.content === 'string'
+  const content = hasContent(message) ? message.content : undefined
   const isUser = role === 'user'
 
   const shouldUsePartsRendering = parts && parts.length > 0
@@ -150,16 +152,14 @@ export const Message = function Message({
                             </div>
                           )
                         }
-                        // Only render the result UI when state is 'output-available'
                         if (state === 'output-available') {
-                          const typedInput = input as any
                           return (
                             <DisplayBlockRenderer
                               key={`${id}-tool-${toolCallId}`}
                               messageId={id}
                               toolCallId={toolCallId}
-                              manualId={typedInput.manualToolCallId}
-                              initialArgs={typedInput}
+                              manualId={input.manualToolCallId}
+                              initialArgs={input}
                               messageParts={parts}
                               isLoading={false}
                               onResults={onResults}
@@ -185,18 +185,16 @@ export const Message = function Message({
                             </div>
                           )
                         }
-                        // Only render the result UI when state is 'output-available'
                         if (state === 'output-available') {
-                          const typedInput = input as any
                           return (
                             <div
                               key={`${id}-tool-${toolCallId}`}
                               className="w-auto overflow-x-hidden"
                             >
                               <EdgeFunctionBlock
-                                label={typedInput.name || 'Edge Function'}
-                                code={typedInput.code}
-                                functionName={typedInput.name || 'my-function'}
+                                label={input.name || 'Edge Function'}
+                                code={input.code}
+                                functionName={input.name || 'my-function'}
                                 showCode={!readOnly}
                               />
                             </div>
