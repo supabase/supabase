@@ -158,8 +158,8 @@ export const Message = function Message({
                               key={`${id}-tool-${toolCallId}`}
                               messageId={id}
                               toolCallId={toolCallId}
-                              manualId={input.manualToolCallId}
-                              initialArgs={input}
+                              manualId={(input as any).manualToolCallId}
+                              initialArgs={input as any}
                               messageParts={parts}
                               isLoading={false}
                               onResults={onResults}
@@ -192,9 +192,9 @@ export const Message = function Message({
                               className="w-auto overflow-x-hidden"
                             >
                               <EdgeFunctionBlock
-                                label={input.name || 'Edge Function'}
-                                code={input.code}
-                                functionName={input.name || 'my-function'}
+                                label={(input as any).name || 'Edge Function'}
+                                code={(input as any).code}
+                                functionName={(input as any).name || 'my-function'}
                                 showCode={!readOnly}
                               />
                             </div>

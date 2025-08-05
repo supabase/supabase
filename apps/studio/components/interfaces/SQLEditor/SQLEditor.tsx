@@ -465,9 +465,6 @@ export const SQLEditor = () => {
       connectionString: project?.connectionString,
       includeSchemaMetadata,
     },
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
-    },
     onError: (error) => {
       toast.error(`Failed to generate SQL: ${error.message}`)
     },

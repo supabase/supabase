@@ -75,9 +75,6 @@ const AIEditor = ({
   } = useCompletion({
     api: aiEndpoint || '',
     body: aiMetadata,
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
-    },
     onError: (error) => {
       toast.error(`Failed to generate: ${error.message}`)
     },

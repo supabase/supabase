@@ -1,7 +1,3 @@
-import { Message } from '@ai-sdk/react'
-
-type MessagePart = NonNullable<Message['parts']>[number]
-
 const extractDataFromSafetyMessage = (text: string): string | null => {
   const openingTags = [...text.matchAll(/<untrusted-data-[a-z0-9-]+>/gi)]
   if (openingTags.length < 2) return null
@@ -13,18 +9,18 @@ const extractDataFromSafetyMessage = (text: string): string | null => {
   const closingStart = text.indexOf(closingTagMatch[0])
   const content = text.substring(secondOpeningEnd, closingStart)
 
-  return content.replace(/\\n/g, '').replace(/\\"/g, '"').replace(/\n/g, '').trim();
+  return content.replace(/\\n/g, '').replace(/\\"/g, '"').replace(/\n/g, '').trim()
 }
 
 // Helper function to find result data directly from parts array
 export const findResultForManualId = (
-  parts: Readonly<MessagePart[]> | undefined,
+  parts: any[] | undefined,
   manualId: string
 ): any[] | undefined => {
   if (!parts) return undefined
 
   const invocationPart = parts.find(
-    (part: MessagePart) =>
+    (part) =>
       part.type === 'tool-invocation' &&
       'toolInvocation' in part &&
       part.toolInvocation.state === 'result' &&

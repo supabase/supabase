@@ -43,7 +43,7 @@ const getTools = () => {
         title: z.string().describe('The project title'),
       }),
     }),
-  };
+  }
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -74,7 +74,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const result = streamText({
     model,
-    maxSteps: 7,
     system: source`
       You are a Supabase expert who helps people set up their Supabase project. You specializes in database schema design. You are to help the user design a database schema for their application but also suggest Supabase services they should use. 
       
