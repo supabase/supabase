@@ -54,7 +54,7 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
 
   useEffect(() => {
     if (targetTimestamp === null) return
-    
+
     const updateTimer = () => {
       setTimeRemaining(calculateTimeRemaining(targetTimestamp))
     }
