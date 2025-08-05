@@ -2,13 +2,10 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { databaseTestsKeys } from './database-tests-key'
 import { get } from 'data/fetchers'
 
-export type DatabaseTestStatus = 'queued' | 'running' | 'passed' | 'failed' | undefined
-
 export type DatabaseTest = {
   id: string
   name: string
   query: string
-  status?: DatabaseTestStatus
 }
 
 export type DatabaseTestsVariables = {
@@ -17,13 +14,7 @@ export type DatabaseTestsVariables = {
 }
 
 /*
- * Fetches SQL snippets that live inside a folder named "test".
- * These snippets are considered database tests for a project.
- * The function first retrieves (or verifies the existence of) the
- * "test" folder via the `/content/folders` endpoint, then fetches
- * the snippets that belong to that folder, and finally resolves each
- * snippet's SQL text via `getContentById` so that callers receive the
- * full `query` string required to run the tests.
+ * Fetches SQL snippets that are of type "test" and are visible to the project.
  */
 export async function getDatabaseTests(
   { projectRef }: DatabaseTestsVariables,
@@ -31,7 +22,6 @@ export async function getDatabaseTests(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  // Fetch all content items with type "test"
   const { data, error } = await get('/v1/projects/{ref}/snippets', {
     params: {
       path: { ref: projectRef },

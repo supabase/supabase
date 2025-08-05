@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Alert, Card, CardHeader, CardTitle } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { DatabaseTest, DatabaseTestStatus } from 'data/database-tests/database-tests-query'
+import { DatabaseTest } from 'data/database-tests/database-tests-query'
 import TestRow from './TestRow'
+import { DatabaseTestStatus } from './Tests.types'
 import { SETUP_TEST_PREFIX } from './Tests.constants'
 
 interface DatabaseTestsListProps {

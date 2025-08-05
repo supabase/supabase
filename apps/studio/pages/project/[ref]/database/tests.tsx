@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { Alert, Button, AiIconAnimation } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
-import { DatabaseTest, DatabaseTestStatus } from 'data/database-tests/database-tests-query'
+import { DatabaseTest } from 'data/database-tests/database-tests-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { Play } from 'lucide-react'
 import TestsList from 'components/interfaces/Database/Tests/TestsList'
@@ -17,15 +17,15 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
 import { useProfile } from 'lib/profile'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ConfirmDialog from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useDatabaseTestCreateMutation } from 'data/database-tests/database-test-create-mutation'
 import { useDatabaseTestUpdateMutation } from 'data/database-tests/database-test-update-mutation'
 import { useDatabaseTestsQuery } from 'data/database-tests/database-tests-query'
-import { useDatabaseTestQuery, getDatabaseTest } from 'data/database-tests/database-test-query'
+import { getDatabaseTest } from 'data/database-tests/database-test-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQueryClient } from '@tanstack/react-query'
 import { databaseTestsKeys } from 'data/database-tests/database-tests-key'
 import { SETUP_TEST_PREFIX } from 'components/interfaces/Database/Tests/Tests.constants'
+import { DatabaseTestStatus } from 'components/interfaces/Database/Tests/Tests.types'
 
 const DatabaseTestsPage: NextPageWithLayout = () => {
   const { setEditorPanel } = useAppStateSnapshot()
@@ -33,7 +33,7 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const [showRunAllTestsModal, setShowRunAllTestsModal] = useState(false)
-  // Local status map and execution queue
+
   const [statuses, setStatuses] = useState<Record<string, DatabaseTestStatus>>({})
   const [executionQueue, setExecutionQueue] = useState<string[]>([])
   const [confirmRunTestId, setConfirmRunTestId] = useState<string | null>(null)
@@ -41,21 +41,13 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   const queryClient = useQueryClient()
   const { mutateAsync: executeSql } = useExecuteSqlMutation()
 
-  // Fetch initial list of tests
   const { data: tests } = useDatabaseTestsQuery({
     projectRef: project?.ref,
   })
 
-  // Cache IDs of setup tests (begin with 00_setup)
   const setupTestIds = (tests ?? []).filter((t) => t.name.startsWith('00_setup')).map((t) => t.id)
 
   const currentTestId = executionQueue.length > 0 ? executionQueue[0] : undefined
-
-  // Lazy detail hook for the test at the head of the queue
-  const { refetch: refetchCurrentTest } = useDatabaseTestQuery(
-    { projectRef: project?.ref, id: currentTestId },
-    { enabled: false }
-  )
 
   const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -138,18 +130,19 @@ rollback;
 
       const testId = executionQueue[0]
 
-      // Mark running
       setStatuses((prev) => ({ ...prev, [testId]: 'running' }))
 
       try {
-        // Fetch latest SQL using refetch
-        const { data: detail } = await refetchCurrentTest()
+        const detail = await queryClient.fetchQuery(
+          databaseTestsKeys.detail(project?.ref, testId),
+          () => getDatabaseTest({ projectRef: project?.ref, id: testId }),
+          { staleTime: 0 }
+        )
 
         const sql = detail?.query ?? ''
 
         if (sql.length === 0) throw new Error('Empty SQL')
 
-        // Build combined setup SQL
         let combinedSetup = ''
         for (const sid of setupTestIds) {
           const sDetail = await queryClient.fetchQuery(
@@ -162,18 +155,20 @@ rollback;
 
         const sqlToRun = combinedSetup.length > 0 ? combinedSetup + sql : sql
 
-        // Execute
-        await executeSql({
+        const result = await executeSql({
           projectRef: project.ref,
           connectionString: project.connectionString,
           sql: sqlToRun,
         })
 
-        setStatuses((prev) => ({ ...prev, [testId]: 'passed' }))
+        if (JSON.stringify(result).includes('failed')) {
+          setStatuses((prev) => ({ ...prev, [testId]: 'failed' }))
+        } else {
+          setStatuses((prev) => ({ ...prev, [testId]: 'passed' }))
+        }
       } catch (err) {
         setStatuses((prev) => ({ ...prev, [testId]: 'failed' }))
       } finally {
-        // Remove from queue
         setExecutionQueue((prev) => prev.slice(1))
       }
     }
@@ -185,11 +180,9 @@ rollback;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [executionQueue])
 
-  // Single test run (triggered from row)
   const handleRunSingleTest = async (testId: string) => {
     if (statuses[testId] === 'running' || executionQueue.includes(testId)) return
 
-    // Fetch latest SQL for validation
     const detail = await queryClient.fetchQuery(
       databaseTestsKeys.detail(project?.ref, testId),
       () => getDatabaseTest({ projectRef: project?.ref, id: testId }),
@@ -253,7 +246,7 @@ rollback;
   )
 
   const secondaryActions = (
-    <Button type="default" icon={<Play />} onClick={onRunAllTests}>
+    <Button type="default" icon={<Play />} onClick={() => setShowRunAllTestsModal(true)}>
       Run all tests
     </Button>
   )
@@ -305,18 +298,19 @@ rollback;
         }}
       >
         <p className="text-sm text-foreground-light">
-          Are you sure you want to run all the tests? This may take a while.
+          All tests will be run in the order they are listed. Setup tests will be run before each
+          main test.
         </p>
       </ConfirmationModal>
 
-      <ConfirmDialog
+      <ConfirmationModal
         visible={confirmRunTestId !== null}
-        danger
         title="Run test with invalid format?"
         description="Test query should start with BEGIN; and end with ROLLBACK;. Do you want to run it anyway?"
-        buttonLabel="Run anyway"
-        onSelectCancel={cancelRun}
-        onSelectConfirm={confirmRun}
+        confirmLabel="Run anyway"
+        variant="destructive"
+        onCancel={cancelRun}
+        onConfirm={confirmRun}
       />
     </PageLayout>
   )
