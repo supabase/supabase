@@ -4,6 +4,7 @@ import { createContext, PropsWithChildren, ReactNode, useMemo, useState } from '
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
+import { toast } from 'sonner'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useProfile } from 'lib/profile'
@@ -266,6 +267,7 @@ export const Message = function Message({
         onConfirm={() => {
           onDelete(id)
           setShowDeleteConfirmModal(false)
+          toast.success('Message deleted successfully')
         }}
         onCancel={() => setShowDeleteConfirmModal(false)}
       />
