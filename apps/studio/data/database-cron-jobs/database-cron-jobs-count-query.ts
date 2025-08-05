@@ -3,52 +3,41 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
-export type DatabaseCronJobsVariables = {
+type DatabaseCronJobsCountVariables = {
   projectRef?: string
   connectionString?: string | null
 }
 
-export type CronJob = {
-  jobid: number
-  schedule: string
-  command: string
-  nodename: string
-  nodeport: number
-  database: string
-  username: string
-  active: boolean
-  jobname: string | null
-}
+const cronJobCountSql = `select count(jobid) from cron.job;`.trim()
 
-const cronJobSqlQuery = `select * from cron.job order by jobid;`
-
-export async function getDatabaseCronJobs({
+export async function getDatabaseCronJobsCount({
   projectRef,
   connectionString,
-}: DatabaseCronJobsVariables) {
+}: DatabaseCronJobsCountVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: cronJobSqlQuery,
+    sql: cronJobCountSql,
+    queryKey: ['cron-jobs-count'],
   })
-  return result
+  return result[0].count
 }
 
-export type DatabaseCronJobData = CronJob[]
+export type DatabaseCronJobData = number
 export type DatabaseCronJobError = ResponseError
 
-export const useCronJobsQuery = <TData = DatabaseCronJobData>(
-  { projectRef, connectionString }: DatabaseCronJobsVariables,
+export const useCronJobsCountQuery = <TData = DatabaseCronJobData>(
+  { projectRef, connectionString }: DatabaseCronJobsCountVariables,
   {
     enabled = true,
     ...options
   }: UseQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
 ) =>
   useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.list(projectRef),
-    () => getDatabaseCronJobs({ projectRef, connectionString }),
+    databaseCronJobsKeys.count(projectRef),
+    () => getDatabaseCronJobsCount({ projectRef, connectionString }),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,

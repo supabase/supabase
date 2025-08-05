@@ -202,7 +202,7 @@ export const DatabaseConnectionString = () => {
   }
   const poolerSettingsUrl = {
     text: 'Pooler settings',
-    url: `/project/${projectRef}/settings/database#connection-pooling`,
+    url: `/project/${projectRef}/database/settings#connection-pooling`,
   }
   const buttonLinks = !ipv4Addon
     ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
@@ -526,7 +526,7 @@ export const DatabaseConnectionString = () => {
         <p className="text-sm text-foreground-lighter">
           You may reset your database password in your project's{' '}
           <InlineLink
-            href={`/project/${projectRef}/settings/database`}
+            href={`/project/${projectRef}/database/settings`}
             className="text-foreground-lighter hover:text-foreground"
           >
             Database Settings

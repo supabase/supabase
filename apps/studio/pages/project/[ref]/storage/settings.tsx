@@ -1,5 +1,5 @@
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -29,7 +29,7 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout title="Settings">{page}</SettingsLayout>
+    <StorageLayout title="Settings">{page}</StorageLayout>
   </DefaultLayout>
 )
 export default PageLayout

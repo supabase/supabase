@@ -144,16 +144,16 @@ export const CreateWrapperSheet = ({
     }
 
     setFormErrors(errors)
-    if (!isEmpty(errors)) {
-      return
-    }
+    if (!isEmpty(errors)) return
 
     try {
-      await createSchema({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        name: values.target_schema,
-      })
+      if (selectedMode === 'schema') {
+        await createSchema({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: values.target_schema,
+        })
+      }
 
       await createFDW({
         projectRef: project?.ref,

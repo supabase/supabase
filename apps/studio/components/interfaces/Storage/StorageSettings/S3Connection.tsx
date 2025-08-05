@@ -80,7 +80,7 @@ export const S3Connection = () => {
   })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
+  const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
   const s3connectionUrl = getConnectionURL(projectRef ?? '', protocol, endpoint)
 
