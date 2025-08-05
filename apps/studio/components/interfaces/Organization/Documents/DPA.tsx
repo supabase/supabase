@@ -58,7 +58,7 @@ const DPA = () => {
             <p>
               You can review a static PDF version of our latest DPA document{' '}
               <a
-                href="https://supabase.com/downloads/docs/Supabase+DPA+250314.pdf"
+                href="https://supabase.com/downloads/docs/Supabase+DPA+250805.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-brand hover:underline"
