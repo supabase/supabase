@@ -16,11 +16,6 @@ export enum STORAGE_SORT_BY {
   LAST_ACCESSED_AT = 'last_accessed_at',
 }
 
-export enum STORAGE_BUCKET_SORT {
-  ALPHABETICAL = 'alphabetical',
-  CREATED_AT = 'created_at',
-}
-
 export enum STORAGE_SORT_BY_ORDER {
   ASC = 'asc',
   DESC = 'desc',
