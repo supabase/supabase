@@ -2466,11 +2466,12 @@ export const deployment: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/deployment/branching' },
-        { name: 'GitHub integration', url: '/guides/deployment/branching/github-integration' },
+        { name: 'Branching via GitHub', url: '/guides/deployment/branching/github-integration' },
         {
-          name: 'Branching 2.0 (Alpha)',
+          name: 'Branching via dashboard',
           url: '/guides/deployment/branching/branching-2',
         },
+
         {
           name: 'Working with branches',
           url: '/guides/deployment/branching/working-with-branches',
