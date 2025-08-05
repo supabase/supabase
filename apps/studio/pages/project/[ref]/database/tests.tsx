@@ -26,6 +26,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { databaseTestsKeys } from 'data/database-tests/database-tests-key'
 import { SETUP_TEST_PREFIX } from 'components/interfaces/Database/Tests/Tests.constants'
 import { DatabaseTestStatus } from 'components/interfaces/Database/Tests/Tests.types'
+import { isTestSuccessful } from 'components/interfaces/Database/Tests/Tests.utils'
 
 const DatabaseTestsPage: NextPageWithLayout = () => {
   const { setEditorPanel } = useAppStateSnapshot()
@@ -46,8 +47,6 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   })
 
   const setupTestIds = (tests ?? []).filter((t) => t.name.startsWith('00_setup')).map((t) => t.id)
-
-  const currentTestId = executionQueue.length > 0 ? executionQueue[0] : undefined
 
   const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -161,10 +160,12 @@ rollback;
           sql: sqlToRun,
         })
 
-        if (JSON.stringify(result).includes('failed')) {
-          setStatuses((prev) => ({ ...prev, [testId]: 'failed' }))
-        } else {
+        console.log('result', result)
+
+        if (isTestSuccessful(result)) {
           setStatuses((prev) => ({ ...prev, [testId]: 'passed' }))
+        } else {
+          setStatuses((prev) => ({ ...prev, [testId]: 'failed' }))
         }
       } catch (err) {
         setStatuses((prev) => ({ ...prev, [testId]: 'failed' }))
@@ -230,7 +231,7 @@ rollback;
           aiSnap.newChat({
             name: 'Create a new test',
             open: true,
-            initialInput: `Write a pgTAP test to...`,
+            initialInput: `Write a pgTap test to...`,
           })
         }
         tooltip={{
