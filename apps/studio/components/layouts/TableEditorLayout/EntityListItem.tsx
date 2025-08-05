@@ -1,5 +1,5 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash } from 'lucide-react'
+import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -30,6 +30,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Badge,
+  Button,
   cn,
   copyToClipboard,
   DropdownMenu,
@@ -242,7 +243,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           isOpened: isOpened && !isPreview,
           isPreview,
         }),
-        'px-4'
+        'pl-4 pr-1'
       )}
       onDoubleClick={(e) => {
         e.preventDefault()
@@ -285,8 +286,16 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground">
-              <MoreHorizontal size={14} strokeWidth={2} />
+            <DropdownMenuTrigger
+              asChild
+              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground"
+            >
+              <Button
+                type="text"
+                className="w-6 h-6"
+                icon={<MoreVertical size={14} strokeWidth={2} />}
+                onClick={(e) => e.preventDefault()}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start" className="w-44">
               <DropdownMenuItem
