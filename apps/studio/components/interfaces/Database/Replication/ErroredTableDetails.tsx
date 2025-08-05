@@ -65,7 +65,8 @@ export const ErroredTableDetails = ({
         return (
           <div className="space-y-3">
             <div className="text-xs text-brand-600">
-              <span className="font-medium">Manual intervention available:</span> Fix the problem and then rollback.
+              <span className="font-medium">Manual intervention available:</span> Fix the problem
+              and then rollback.
             </div>
 
             <div className="flex items-center space-x-2">

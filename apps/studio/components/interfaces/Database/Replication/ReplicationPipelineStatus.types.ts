@@ -1,11 +1,11 @@
-export type RetryPolicy = 
+export type RetryPolicy =
   | { policy: 'no_retry' }
   | { policy: 'manual_retry' }
   | { policy: 'timed_retry'; next_retry: string }
 
 export const isValidRetryPolicy = (policy: any): policy is RetryPolicy => {
   if (!policy || typeof policy !== 'object' || !policy.policy) return false
-  
+
   switch (policy.policy) {
     case 'no_retry':
     case 'manual_retry':

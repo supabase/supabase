@@ -28,23 +28,26 @@ async function rollbackTableState(
   signal?: AbortSignal
 ): Promise<RollbackTableResponse> {
   if (!projectRef) throw new Error('Project reference is required')
-  if (!pipelineId) throw new Error('Pipeline ID is required') 
+  if (!pipelineId) throw new Error('Pipeline ID is required')
   if (!tableId) throw new Error('Table ID is required')
   if (!rollbackType) throw new Error('Rollback type is required')
 
-  const { data, error } = await post('/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state', {
-    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
-    body: {
-      table_id: tableId,
-      rollback_type: rollbackType,
-    },
-    signal,
-  })
-  
+  const { data, error } = await post(
+    '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state',
+    {
+      params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+      body: {
+        table_id: tableId,
+        rollback_type: rollbackType,
+      },
+      signal,
+    }
+  )
+
   if (error) {
     handleError(error)
   }
-  
+
   return data
 }
 
@@ -66,7 +69,9 @@ export const useRollbackTableMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, pipelineId } = variables
         await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
-        await queryClient.invalidateQueries(replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId))
+        await queryClient.invalidateQueries(
+          replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

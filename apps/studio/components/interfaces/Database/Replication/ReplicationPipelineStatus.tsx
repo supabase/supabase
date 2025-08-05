@@ -99,8 +99,6 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.DisableRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
-
-
   const onTogglePipeline = async () => {
     if (!projectRef) {
       return console.error('Project ref is required')

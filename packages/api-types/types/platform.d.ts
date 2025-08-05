@@ -8807,9 +8807,9 @@ export interface components {
         publication_name: string
       }
       /** @description Destination id */
-      destination_id?: number
+      destination_id: number
       /** @description Source id */
-      source_id?: number
+      source_id: number
     }
     UpdateSchemaBody: {
       name?: string
