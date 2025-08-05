@@ -52,18 +52,9 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     return { days, hours, minutes, seconds, isExpired: false, isInvalid: false }
   }, [])
 
-  if (targetTimestamp === null) {
-    return (
-      <div className="flex items-center gap-2" role="status" aria-live="polite">
-        <Clock className="w-3 h-3 text-warning-600" />
-        <div className="text-xs">
-          <span className="font-medium text-warning-600">Invalid retry time format</span>
-        </div>
-      </div>
-    )
-  }
-
   useEffect(() => {
+    if (targetTimestamp === null) return
+    
     const updateTimer = () => {
       setTimeRemaining(calculateTimeRemaining(targetTimestamp))
     }
@@ -75,6 +66,14 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
   }, [targetTimestamp, calculateTimeRemaining])
 
   const { timeDisplay, displayColor, statusMessage } = useMemo(() => {
+    if (targetTimestamp === null) {
+      return {
+        timeDisplay: 'Invalid retry time format',
+        displayColor: 'text-warning-600',
+        statusMessage: '',
+      }
+    }
+
     const formatTimeUnit = (value: number, unit: string) => {
       if (value === 0) return null
       return `${value}${unit.charAt(0)}`
@@ -111,7 +110,7 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     }
 
     return { timeDisplay, displayColor, statusMessage }
-  }, [timeRemaining])
+  }, [targetTimestamp, timeRemaining])
 
   return (
     <div
