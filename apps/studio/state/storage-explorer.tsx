@@ -47,6 +47,7 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { post } from 'data/fetchers'
 
 type UploadProgress = {
   percentage: number
@@ -82,7 +83,7 @@ function createStorageExplorerState({
   projectRef: string
   resumableUploadUrl: string
   serviceKey: string
-  supabaseClient?: SupabaseClient<any, 'public', any>
+  supabaseClient?: () => Promise<SupabaseClient<any, 'public', any>>
 }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
   const { view, sortBy, sortByOrder, sortBucket } =
@@ -304,7 +305,7 @@ function createStorageExplorerState({
       const formattedPathToEmptyPlaceholderFile =
         pathToFolder.length > 0 ? `${pathToFolder}/${emptyPlaceholderFile}` : emptyPlaceholderFile
 
-      await state.supabaseClient.storage
+      await (await state.supabaseClient()).storage
         .from(state.selectedBucket.name)
         .upload(
           formattedPathToEmptyPlaceholderFile,
@@ -551,7 +552,7 @@ function createStorageExplorerState({
 
         if (data.length === 0) {
           const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
-          await state.supabaseClient?.storage
+          await (await state.supabaseClient!())?.storage
             .from(state.selectedBucket.name)
             .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
         }
@@ -1139,9 +1140,28 @@ function createStorageExplorerState({
               endpoint: state.resumableUploadUrl,
               retryDelays: [0, 200, 500, 1500, 3000, 5000],
               headers: {
-                authorization: `Bearer ${state.serviceKey}`,
                 'x-source': 'supabase-dashboard',
-                ...(state.serviceKey.includes('secret') ? { apikey: state.serviceKey } : {}),
+              },
+              onBeforeRequest: async (req) => {
+                const { data, error } = await post('/platform/projects/{ref}/api-keys/temporary', {
+                  params: {
+                    path: {
+                      ref: state.projectRef,
+                    },
+                    query: {
+                      authorization_exp: '300',
+                      claims: JSON.stringify({
+                        role: 'service_role',
+                      }),
+                    },
+                  },
+                })
+
+                if (error) {
+                  throw error
+                }
+
+                req.setHeader('apikey', data.api_key)
               },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
@@ -1767,26 +1787,44 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const serviceApiKey = serviceKey?.api_key ?? 'unknown'
 
     if (!isPaused && hasDataReady) {
-      const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-      const supabaseClient = createClient(clientEndpoint, serviceApiKey, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          storage: {
-            getItem: (key) => {
-              return null
-            },
-            setItem: (key, value) => {},
-            removeItem: (key) => {},
-          },
-        },
-      })
-
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
-          supabaseClient,
+          supabaseClient: async () => {
+            const { data, error } = await post('/platform/projects/{ref}/api-keys/temporary', {
+              params: {
+                path: {
+                  ref: project?.ref ?? '',
+                },
+                query: {
+                  authorization_exp: '300',
+                  claims: JSON.stringify({
+                    role: 'service_role',
+                  }),
+                },
+              },
+            })
+
+            if (error) {
+              throw error
+            }
+
+            const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
+            return createClient(clientEndpoint, data.api_key, {
+              auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false,
+                storage: {
+                  getItem: (key) => {
+                    return null
+                  },
+                  setItem: (key, value) => {},
+                  removeItem: (key) => {},
+                },
+              },
+            })
+          },
           resumableUploadUrl,
           serviceKey: serviceApiKey,
         })
