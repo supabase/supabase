@@ -7,27 +7,30 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
+import type { EditorPanelState } from 'components/ui/EditorPanel/EditorPanel.types'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
-  const { setEditorPanel } = useAppStateSnapshot()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  
+  // Local editor panel state
+  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
+  const [editorPanelProps, setEditorPanelProps] = useState<EditorPanelState>({})
 
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
   const isPermissionsLoaded = usePermissionsLoaded()
 
   const createFunction = () => {
     if (isInlineEditorEnabled) {
-      setEditorPanel({
-        open: true,
+      setEditorPanelProps({
         initialValue: `create function function_name()
 returns void
 language plpgsql
@@ -40,6 +43,7 @@ $$;`,
         saveLabel: 'Create function',
         initialPrompt: 'Create a new database function that...',
       })
+      setEditorPanelOpen(true)
     } else {
       setSelectedFunction(undefined)
       setShowCreateFunctionForm(true)
@@ -48,13 +52,13 @@ $$;`,
 
   const editFunction = (fn: DatabaseFunction) => {
     if (isInlineEditorEnabled) {
-      setEditorPanel({
-        open: true,
+      setEditorPanelProps({
         initialValue: fn.complete_statement,
         label: `Edit function "${fn.name}"`,
         saveLabel: 'Update function',
         initialPrompt: `Update the database function "${fn.name}" to...`,
       })
+      setEditorPanelOpen(true)
     } else {
       setSelectedFunction(fn)
       setShowCreateFunctionForm(true)
@@ -96,6 +100,12 @@ $$;`,
         func={selectedFunction}
         visible={showDeleteFunctionForm}
         setVisible={setShowDeleteFunctionForm}
+      />
+      
+      <EditorPanel
+        open={editorPanelOpen}
+        onClose={() => setEditorPanelOpen(false)}
+        {...editorPanelProps}
       />
     </>
   )

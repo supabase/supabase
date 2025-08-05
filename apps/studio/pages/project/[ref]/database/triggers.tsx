@@ -10,27 +10,30 @@ import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/T
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
+import type { EditorPanelState } from 'components/ui/EditorPanel/EditorPanel.types'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
-  const { setEditorPanel } = useAppStateSnapshot()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
+  
+  // Local editor panel state
+  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
+  const [editorPanelProps, setEditorPanelProps] = useState<EditorPanelState>({})
 
   const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
   const isPermissionsLoaded = usePermissionsLoaded()
 
   const createTrigger = () => {
     if (isInlineEditorEnabled) {
-      setEditorPanel({
-        open: true,
+      setEditorPanelProps({
         initialValue: `create trigger trigger_name
 after insert or update or delete on table_name
 for each row
@@ -39,6 +42,7 @@ execute function function_name();`,
         saveLabel: 'Create trigger',
         initialPrompt: 'Create a new database trigger that...',
       })
+      setEditorPanelOpen(true)
     } else {
       setSelectedTrigger(undefined)
       setShowCreateTriggerForm(true)
@@ -48,13 +52,13 @@ execute function function_name();`,
   const editTrigger = (trigger: PostgresTrigger) => {
     if (isInlineEditorEnabled) {
       const sql = generateTriggerCreateSQL(trigger)
-      setEditorPanel({
-        open: true,
+      setEditorPanelProps({
         initialValue: sql,
         label: `Edit trigger "${trigger.name}"`,
         saveLabel: 'Update trigger',
         initialPrompt: `Update the database trigger "${trigger.name}" to...`,
       })
+      setEditorPanelOpen(true)
     } else {
       setSelectedTrigger(trigger)
       setShowCreateTriggerForm(true)
@@ -97,6 +101,12 @@ execute function function_name();`,
         trigger={selectedTrigger}
         visible={showDeleteTriggerForm}
         setVisible={setShowDeleteTriggerForm}
+      />
+      
+      <EditorPanel
+        open={editorPanelOpen}
+        onClose={() => setEditorPanelOpen(false)}
+        {...editorPanelProps}
       />
     </>
   )

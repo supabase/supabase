@@ -13,6 +13,8 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
+import type { EditorPanelState } from 'components/ui/EditorPanel/EditorPanel.types'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -21,7 +23,6 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
 
@@ -67,12 +68,15 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
-  const { setEditorPanel } = useAppStateSnapshot()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
+  
+  // Local editor panel state
+  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
+  const [editorPanelProps, setEditorPanelProps] = useState<EditorPanelState>({})
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
 
@@ -143,8 +147,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           isLocked={isSchemaLocked}
           onSelectCreatePolicy={(table: string) => {
             if (isInlineEditorEnabled) {
-              setEditorPanel({
-                open: true,
+              setEditorPanelProps({
                 initialValue: `create policy "replace_with_policy_name"
   on ${schema}.${table}
   for select
@@ -156,6 +159,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 saveLabel: 'Create policy',
                 initialPrompt: `Create and name a entirely new RLS policy for the "${table}" table in the ${schema} schema. The policy should...`,
               })
+              setEditorPanelOpen(true)
             } else {
               setSelectedTable(table)
               setShowPolicyAiEditor(true)
@@ -165,8 +169,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             if (isInlineEditorEnabled) {
               const sql = generatePolicyUpdateSQL(policy)
               const templates = getGeneralPolicyTemplates(policy.schema, policy.table)
-              setEditorPanel({
-                open: true,
+              setEditorPanelProps({
                 initialValue: sql,
                 label: `Edit policy "${policy.name}"`,
                 saveLabel: 'Update policy',
@@ -177,6 +180,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 })),
                 initialPrompt: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
               })
+              setEditorPanelOpen(true)
             } else {
               setSelectedPolicyToEdit(policy)
               setShowPolicyAiEditor(true)
@@ -197,6 +201,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           setSelectedPolicyToEdit(undefined)
         }}
         authContext="database"
+      />
+      
+      <EditorPanel
+        open={editorPanelOpen}
+        onClose={() => setEditorPanelOpen(false)}
+        {...editorPanelProps}
       />
     </div>
   )
