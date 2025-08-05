@@ -48,6 +48,7 @@ const PolicyTableRowHeader = ({
         <EditorTablePageLink
           projectRef={ref}
           id={String(table.id)}
+          schema={table.schema}
           className="flex items-center gap-x-2"
         >
           {table.rls_enabled ? (
