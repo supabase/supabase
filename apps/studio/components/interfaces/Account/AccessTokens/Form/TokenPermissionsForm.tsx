@@ -144,9 +144,14 @@ export const TokenPermissionsForm = ({
                             key={resource.resource}
                             value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
                             onSelect={() => {
+                              const defaultAction = resource.actions.includes('read-write')
+                                ? 'read-write'
+                                : resource.actions.includes('read-only')
+                                ? 'read-only'
+                                : resource.actions[0]
                               const newRows = [
                                 ...permissionRows,
-                                { resource: resource.resource, action: '' },
+                                { resource: resource.resource, action: defaultAction },
                               ]
                               setValue('permissionRows', newRows)
                               setResourceSearchOpen(false)
@@ -292,9 +297,14 @@ export const TokenPermissionsForm = ({
                               key={resource.resource}
                               value={`${resource.resource} ${resource.title} ${permissionGroup.name}`}
                               onSelect={() => {
+                                const defaultAction = resource.actions.includes('read-write')
+                                  ? 'read-write'
+                                  : resource.actions.includes('read-only')
+                                  ? 'read-only'
+                                  : resource.actions[0]
                                 const newRows = [
                                   ...permissionRows,
-                                  { resource: resource.resource, action: '' },
+                                  { resource: resource.resource, action: defaultAction },
                                 ]
                                 setValue('permissionRows', newRows)
                                 setResourceSearchOpen(false)
