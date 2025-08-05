@@ -41,42 +41,44 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
 
   return (
     <div className={`max-w-[50%] flex-1 ${pane === 2 ? 'border-l border-default' : ''}`}>
-      {keysWithChildren.map((key: string) => (
-        <div
-          key={key}
-          className={`
+      <div className="fixed">
+        {keysWithChildren.map((key: string) => (
+          <div
+            key={key}
+            className={`
               ${key === activeKey ? 'bg-surface-300' : ''}
               group flex cursor-pointer items-center transition
               justify-between py-2 px-5 hover:bg-surface-200
             `}
-          onClick={() => onSelectKey(key, pane)}
-        >
-          <p className="font-mono text-xs !text-blue-900">{key}</p>
-          <div
-            className={`${
-              key === activeKey ? 'opacity-100' : 'opacity-50'
-            } group-hover:opacity-100 transition`}
+            onClick={() => onSelectKey(key, pane)}
           >
-            <ChevronRight strokeWidth={2} size={16} />
+            <p className="font-mono text-xs !text-blue-900">{key}</p>
+            <div
+              className={`${
+                key === activeKey ? 'opacity-100' : 'opacity-50'
+              } group-hover:opacity-100 transition`}
+            >
+              <ChevronRight strokeWidth={2} size={16} />
+            </div>
           </div>
-        </div>
-      ))}
-      {keysWithoutChildren.map((key: string) => (
-        <div key={key} className="flex space-x-2 py-2 px-5">
-          <p className="font-mono text-xs !text-blue-900">{key}:</p>
-          <p
-            className={`break-all font-mono text-xs ${
-              typeof jsonData[key] !== 'string' ? '!text-green-900' : '!text-yellow-900'
-            }`}
-          >
-            {isNull(jsonData[key])
-              ? 'null'
-              : typeof jsonData[key] === 'string'
-                ? `"${jsonData[key]}"`
-                : jsonData[key].toString()}
-          </p>
-        </div>
-      ))}
+        ))}
+        {keysWithoutChildren.map((key: string) => (
+          <div key={key} className="flex space-x-2 py-2 px-5">
+            <p className="font-mono text-xs !text-blue-900">{key}:</p>
+            <p
+              className={`break-all font-mono text-xs ${
+                typeof jsonData[key] !== 'string' ? '!text-green-900' : '!text-yellow-900'
+              }`}
+            >
+              {isNull(jsonData[key])
+                ? 'null'
+                : typeof jsonData[key] === 'string'
+                  ? `"${jsonData[key]}"`
+                  : jsonData[key].toString()}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
