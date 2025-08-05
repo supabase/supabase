@@ -73,109 +73,11 @@ meta="name=src/lib/Auth.svelte"
 After a user is signed in, allow them to edit their profile details and manage their account.
 Create a new component for that called `Account.svelte`.
 
-{/* TODO: How to transclude? */}
-
-<$CodeTabs>
-
-```tsx name=src/lib/Account.svelte
-<script lang="ts">
-  import { onMount } from "svelte";
-  import type { AuthSession } from "@supabase/supabase-js";
-  import { supabase } from "../supabaseClient";
-
-  interface Props {
-    session: AuthSession;
-  }
-
-  let { session }: Props = $props();
-
-  let loading = $state(false);
-  let username = $state<string | null>(null);
-  let website = $state<string | null>(null);
-
-  onMount(() => {
-    getProfile();
-  });
-
-  const getProfile = async () => {
-    try {
-      loading = true;
-      const { user } = session;
-
-      const { data, error, status } = await supabase
-        .from("profiles")
-        .select("username, website, avatar_url")
-        .eq("id", user.id)
-        .single();
-
-      if (error && status !== 406) throw error;
-
-      if (data) {
-        username = data.username;
-        website = data.website;
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
-    } finally {
-      loading = false;
-    }
-  };
-
-  const updateProfile = async () => {
-    try {
-      loading = true;
-      const { user } = session;
-
-      const updates = {
-        id: user.id,
-        username,
-        website,
-        updated_at: new Date().toISOString(),
-      };
-
-      const { error } = await supabase.from("profiles").upsert(updates);
-
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
-    } finally {
-      loading = false;
-    }
-  };
-</script>
-
-<form onsubmit={(e) => { e.preventDefault(); updateProfile(); }} class="form-widget">
-  <div>Email: {session.user.email}</div>
-  <div>
-    <label for="username">Name</label>
-    <input id="username" type="text" bind:value={username} />
-  </div>
-  <div>
-    <label for="website">Website</label>
-    <input id="website" type="text" bind:value={website} />
-  </div>
-  <div>
-    <button type="submit" class="button primary block" disabled={loading}>
-      {loading ? "Saving ..." : "Update profile"}
-    </button>
-  </div>
-  <button
-    type="button"
-    class="button block"
-    onclick={() => supabase.auth.signOut()}
-  >
-    Sign Out
-  </button>
-</form>
-```
-
-</$CodeTabs>
+<$CodeSample  
+path="/user-management/svelte-user-management/src/lib/Account.svelte"
+lines={[[1, 4], [7, 11], [14, 33], [34,53], [55,73], [75,-1]]}
+meta="src/lib/Account.svelte"
+/>
 
 ### Launch!
 
@@ -219,24 +121,10 @@ meta="name=src/lib/Avatar.svelte"
 
 And then you can add the widget to the Account page:
 
-{/* TODO: How to transclude */}
-
-<$CodeTabs>
-
-```html name=src/lib/Account.svelte
-<script lang="ts">
-  // Import the new component
-  import Avatar from './Avatar.svelte'
-</script>
-
-<form on:submit|preventDefault="{updateProfile}" class="form-widget">
-  <!-- Add to body -->
-  <Avatar bind:url="{avatarUrl}" size="{150}" on:upload="{updateProfile}" />
-
-  <!-- Other form elements -->
-</form>
-```
-
-</$CodeTabs>
+<$CodeSample  
+path="/user-management/svelte-user-management/src/lib/Account.svelte"
+lines={[[1,1], [5,5], [71,73], [74,74], [92,-1]]}
+meta="src/lib/Account.svelte"
+/>
 
 At this stage you have a fully functional application!
