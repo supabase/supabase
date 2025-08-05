@@ -454,8 +454,8 @@ importers:
         specifier: ^1.19.1
         version: 1.19.1(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))
       openai:
-        specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
+        specifier: ^4.75.1
+        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -534,7 +534,7 @@ importers:
     devDependencies:
       '@graphiql/toolkit':
         specifier: ^0.9.1
-        version: 0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)
+        version: 0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)
       '@graphql-codegen/cli':
         specifier: 5.0.5
         version: 5.0.5(@parcel/watcher@2.5.1)(@types/node@22.13.14)(encoding@0.1.13)(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(supports-color@8.1.1)(typescript@5.5.2)
@@ -606,7 +606,7 @@ importers:
         version: 13.2.2
       graphiql:
         specifier: ^4.0.2
-        version: 4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openapi-types:
         specifier: ^12.1.3
         version: 12.1.3
@@ -875,8 +875,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
-        specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
+        specifier: ^4.75.1
+        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -1582,8 +1582,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
-        specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
+        specifier: ^4.75.1
+        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
       parse-numeric-range:
         specifier: ^1.3.0
         version: 1.3.0
@@ -1731,7 +1731,7 @@ importers:
         version: 2.49.3
       ai:
         specifier: ^3.4.33
-        version: 3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.25.76))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.25.76)
+        version: 3.4.33(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.25.76)
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
@@ -1745,8 +1745,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0
       openai:
-        specifier: ^4.26.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
+        specifier: ^4.75.1
+        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -2298,8 +2298,8 @@ importers:
         specifier: '*'
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
-        specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
+        specifier: ^4.75.1
+        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -14683,12 +14683,15 @@ packages:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
 
-  openai@4.71.1:
-    resolution: {integrity: sha512-C6JNMaQ1eijM0lrjiRUL3MgThVP5RdwNAghpbJFdW0t11LzmyqON8Eh8MuUuEZ+CeD6bgYl2Fkn2BoptVxv9Ug==}
+  openai@4.104.0:
+    resolution: {integrity: sha512-p99EFNsA/yX6UhVO93f5kJsDRLAg+CTA2RBqdHK4RtK8u5IJw32Hyb2dTGKbnnFmnuoBv5r7Z2CURI9sGZpSuA==}
     hasBin: true
     peerDependencies:
+      ws: ^8.18.0
       zod: ^3.23.8
     peerDependenciesMeta:
+      ws:
+        optional: true
       zod:
         optional: true
 
@@ -20838,9 +20841,9 @@ snapshots:
 
   '@gar/promisify@1.1.3': {}
 
-  '@graphiql/plugin-doc-explorer@0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@graphiql/plugin-doc-explorer@0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@headlessui/react': 2.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       graphql: 16.11.0
       react: 18.3.1
@@ -20854,10 +20857,10 @@ snapshots:
       - '@types/react-dom'
       - graphql-ws
 
-  '@graphiql/plugin-history@0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@graphiql/plugin-history@0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)
+      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)
       react: 18.3.1
       react-compiler-runtime: 19.1.0-rc.1(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
@@ -20897,9 +20900,9 @@ snapshots:
       - '@types/react-dom'
       - graphql-ws
 
-  '@graphiql/react@0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@graphiql/react@0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)
+      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)
       '@radix-ui/react-dialog': 1.1.11(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dropdown-menu': 2.1.12(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-tooltip': 1.2.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -20926,13 +20929,13 @@ snapshots:
       - '@types/react-dom'
       - graphql-ws
 
-  '@graphiql/toolkit@0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)':
+  '@graphiql/toolkit@0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)':
     dependencies:
       '@n1ru4l/push-pull-async-iterable-iterator': 3.2.0
       graphql: 16.11.0
       meros: 1.3.0(@types/node@22.13.14)
     optionalDependencies:
-      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.1)
+      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.3)
     transitivePeerDependencies:
       - '@types/node'
 
@@ -20946,13 +20949,13 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@graphiql/toolkit@0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)':
+  '@graphiql/toolkit@0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)':
     dependencies:
       '@n1ru4l/push-pull-async-iterable-iterator': 3.2.0
       graphql: 16.11.0
       meros: 1.3.0(@types/node@22.13.14)
     optionalDependencies:
-      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.1)
+      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.3)
     transitivePeerDependencies:
       - '@types/node'
 
@@ -21378,10 +21381,10 @@ snapshots:
       '@whatwg-node/fetch': 0.10.6
       '@whatwg-node/promise-helpers': 1.3.1
       graphql: 16.11.0
-      isomorphic-ws: 5.0.0(ws@8.18.1)
+      isomorphic-ws: 5.0.0(ws@8.18.3)
       sync-fetch: 0.6.0-2
       tslib: 2.8.1
-      ws: 8.18.1
+      ws: 8.18.3
     transitivePeerDependencies:
       - '@fastify/websocket'
       - '@types/node'
@@ -28416,7 +28419,7 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
-  ai@3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.25.76))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.25.76):
+  ai@3.4.33(openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.25.76):
     dependencies:
       '@ai-sdk/provider': 0.0.26
       '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
@@ -28432,7 +28435,7 @@ snapshots:
       secure-json-parse: 2.7.0
       zod-to-json-schema: 3.23.5(zod@3.25.76)
     optionalDependencies:
-      openai: 4.71.1(encoding@0.1.13)(zod@3.25.76)
+      openai: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
       react: 18.3.1
       sswr: 2.1.0(svelte@4.2.19)
       svelte: 4.2.19
@@ -31513,11 +31516,11 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphiql@4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  graphiql@4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@graphiql/plugin-doc-explorer': 0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@graphiql/plugin-history': 0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/plugin-doc-explorer': 0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/plugin-history': 0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       graphql: 16.11.0
       react: 18.3.1
       react-compiler-runtime: 19.1.0-rc.1(react@18.3.1)
@@ -31603,13 +31606,6 @@ snapshots:
   graphql-ws@5.14.1(graphql@16.11.0):
     dependencies:
       graphql: 16.11.0
-
-  graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1):
-    dependencies:
-      graphql: 16.11.0
-    optionalDependencies:
-      ws: 8.18.1
-    optional: true
 
   graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3):
     dependencies:
@@ -32586,10 +32582,6 @@ snapshots:
       unfetch: 4.2.0
     transitivePeerDependencies:
       - encoding
-
-  isomorphic-ws@5.0.0(ws@8.18.1):
-    dependencies:
-      ws: 8.18.1
 
   isomorphic-ws@5.0.0(ws@8.18.3):
     dependencies:
@@ -35095,7 +35087,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.71.1(encoding@0.1.13)(zod@3.25.76):
+  openai@4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76):
     dependencies:
       '@types/node': 18.18.13
       '@types/node-fetch': 2.6.6
@@ -35105,6 +35097,7 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0(encoding@0.1.13)
     optionalDependencies:
+      ws: 8.18.3
       zod: 3.25.76
     transitivePeerDependencies:
       - encoding

@@ -98,7 +98,7 @@
     "next": "catalog:",
     "next-themes": "^0.3.0",
     "nuqs": "^2.4.1",
-    "openai": "^4.20.1",
+    "openai": "^4.75.1",
     "openapi-fetch": "0.12.4",
     "papaparse": "^5.3.1",
     "path-to-regexp": "^8.0.0",
