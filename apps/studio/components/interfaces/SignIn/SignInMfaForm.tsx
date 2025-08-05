@@ -18,7 +18,11 @@ const signInSchema = object({
   code: string().required('MFA Code is required'),
 })
 
-const SignInMfaForm = () => {
+interface SignInMfaFormProps {
+  context?: 'forgot-password' | 'sign-in'
+}
+
+const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
@@ -38,7 +42,15 @@ const SignInMfaForm = () => {
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {
       await queryClient.resetQueries()
-      router.push(getReturnToPath())
+
+      if (context === 'forgot-password') {
+        router.push({
+          pathname: '/reset-password',
+          query: router.query,
+        })
+      } else {
+        router.push(getReturnToPath())
+      }
     },
   })
 

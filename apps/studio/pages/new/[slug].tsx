@@ -111,6 +111,7 @@ const FormSchema = z.object({
   }),
   projectName: z
     .string()
+    .trim()
     .min(1, 'Please enter a project name.') // Required field check
     .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
     .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
@@ -146,6 +147,15 @@ const Wizard: NextPageWithLayout = () => {
     ''
   )
 
+  // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
+  if (slug === 'last-visited-org') {
+    if (lastVisitedOrganization) {
+      router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+    } else {
+      router.replace(`/new/_`, undefined, { shallow: true })
+    }
+  }
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -156,7 +166,10 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: isFreePlan }
   )
 
-  const { data: approvedOAuthApps } = useAuthorizedAppsQuery({ slug }, { enabled: !isFreePlan })
+  const { data: approvedOAuthApps } = useAuthorizedAppsQuery(
+    { slug },
+    { enabled: !isFreePlan && slug !== '_' }
+  )
 
   const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
 
@@ -627,7 +640,9 @@ const Wizard: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
+                  {isOrganizationsSuccess && !isAdmin && !orgNotFound && (
+                    <NotOrganizationOwnerWarning slug={slug} />
+                  )}
                   {orgNotFound && <OrgNotFound slug={slug} />}
                 </Panel.Content>
 
