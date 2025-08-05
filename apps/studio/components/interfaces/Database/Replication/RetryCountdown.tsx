@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Clock } from 'lucide-react'
 
 interface RetryCountdownProps {
@@ -11,6 +11,7 @@ interface TimeRemaining {
   minutes: number
   seconds: number
   isExpired: boolean
+  isInvalid: boolean
 }
 
 export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
@@ -20,33 +21,53 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     minutes: 0,
     seconds: 0,
     isExpired: false,
+    isInvalid: false,
   })
 
-  const calculateTimeRemaining = (targetTime: string): TimeRemaining => {
+  // Memoize the target timestamp to avoid parsing on every update
+  const targetTimestamp = useMemo(() => {
     try {
-      const now = new Date().getTime()
-      const target = new Date(targetTime).getTime()
-      const difference = target - now
-
-      if (difference <= 0) {
-        return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true }
+      const date = new Date(nextRetryTime)
+      if (isNaN(date.getTime())) {
+        return null
       }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000)
-
-      return { days, hours, minutes, seconds, isExpired: false }
-    } catch (error) {
-      console.error('Invalid date format:', nextRetryTime, error)
-      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true }
+      return date.getTime()
+    } catch {
+      return null
     }
+  }, [nextRetryTime])
+
+  const calculateTimeRemaining = useCallback((targetTime: number): TimeRemaining => {
+    const now = Date.now()
+    const difference = targetTime - now
+
+    if (difference <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true, isInvalid: false }
+    }
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+    return { days, hours, minutes, seconds, isExpired: false, isInvalid: false }
+  }, [])
+
+  // Return invalid state if parsing failed
+  if (targetTimestamp === null) {
+    return (
+      <div className="flex items-center gap-2" role="status" aria-live="polite">
+        <Clock className="w-3 h-3 text-warning-600" />
+        <div className="text-xs">
+          <span className="font-medium text-warning-600">Invalid retry time format</span>
+        </div>
+      </div>
+    )
   }
 
   useEffect(() => {
     const updateTimer = () => {
-      setTimeRemaining(calculateTimeRemaining(nextRetryTime))
+      setTimeRemaining(calculateTimeRemaining(targetTimestamp))
     }
 
     // Update immediately
@@ -56,58 +77,60 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
-  }, [nextRetryTime])
+  }, [targetTimestamp, calculateTimeRemaining])
 
-  const formatTimeUnit = (value: number, unit: string) => {
-    if (value === 0) return null
-    return `${value}${unit.charAt(0)}`
-  }
+  // Memoize expensive calculations
+  const { timeDisplay, displayColor, statusMessage } = useMemo(() => {
+    const formatTimeUnit = (value: number, unit: string) => {
+      if (value === 0) return null
+      return `${value}${unit.charAt(0)}`
+    }
 
-  const getTimeDisplay = () => {
+    let timeDisplay: string
+    let displayColor: string
+    let statusMessage: string
+
     if (timeRemaining.isExpired) {
-      return 'Retry time reached'
-    }
-
-    const parts = [
-      formatTimeUnit(timeRemaining.days, 'day'),
-      formatTimeUnit(timeRemaining.hours, 'hour'),
-      formatTimeUnit(timeRemaining.minutes, 'minute'),
-      formatTimeUnit(timeRemaining.seconds, 'second'),
-    ].filter(Boolean)
-
-    if (parts.length === 0) {
-      return 'Retrying soon...'
-    }
-
-    return parts.join(' ')
-  }
-
-  const getDisplayColor = () => {
-    if (timeRemaining.isExpired) {
-      return 'text-brand-600'
-    }
-    
-    const totalMinutes = timeRemaining.days * 24 * 60 + timeRemaining.hours * 60 + timeRemaining.minutes
-    
-    if (totalMinutes <= 5) {
-      return 'text-warning-600'
-    } else if (totalMinutes <= 60) {
-      return 'text-brand-600'
+      timeDisplay = 'Retry time reached'
+      displayColor = 'text-brand-600'
+      statusMessage = 'Automatic retry'
     } else {
-      return 'text-foreground-light'
+      const parts = [
+        formatTimeUnit(timeRemaining.days, 'day'),
+        formatTimeUnit(timeRemaining.hours, 'hour'),
+        formatTimeUnit(timeRemaining.minutes, 'minute'),
+        formatTimeUnit(timeRemaining.seconds, 'second'),
+      ].filter(Boolean)
+
+      timeDisplay = parts.length === 0 ? 'Retrying soon...' : parts.join(' ')
+      statusMessage = 'Next retry in:'
+
+      // Color based on urgency
+      const totalMinutes =
+        timeRemaining.days * 24 * 60 + timeRemaining.hours * 60 + timeRemaining.minutes
+      if (totalMinutes <= 5) {
+        displayColor = 'text-warning-600'
+      } else if (totalMinutes <= 60) {
+        displayColor = 'text-brand-600'
+      } else {
+        displayColor = 'text-foreground-light'
+      }
     }
-  }
+
+    return { timeDisplay, displayColor, statusMessage }
+  }, [timeRemaining])
 
   return (
-    <div className="flex items-center gap-2">
-      <Clock className={`w-3 h-3 ${getDisplayColor()}`} />
+    <div
+      className="flex items-center gap-2"
+      role="status"
+      aria-live="polite"
+      aria-label={`${statusMessage} ${timeDisplay}`}
+    >
+      <Clock className={`w-3 h-3 ${displayColor}`} />
       <div className="text-xs">
-        <span className="font-medium">
-          {timeRemaining.isExpired ? 'Automatic retry' : 'Next retry in:'}
-        </span>{' '}
-        <span className={`font-mono ${getDisplayColor()}`}>
-          {getTimeDisplay()}
-        </span>
+        <span className="font-medium">{statusMessage}</span>{' '}
+        <span className={`font-mono ${displayColor}`}>{timeDisplay}</span>
       </div>
     </div>
   )
