@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui"
   },
   "keywords": [],
   "author": "",
@@ -11,6 +12,7 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "@playwright/test": "^1.52.0"
+    "@playwright/test": "1.52.0",
+    "playwright-core": "1.52.0"
   }
 }

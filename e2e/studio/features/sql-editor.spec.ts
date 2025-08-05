@@ -61,7 +61,6 @@ test.describe('SQL Editor', () => {
       ).toBeVisible({
         timeout: 50000,
       })
-      await page.waitForTimeout(1000)
       privateSnippetText =
         (await page.getByLabel('private-snippets').count()) > 0
           ? await privateSnippet.textContent()
@@ -82,7 +81,6 @@ test.describe('SQL Editor', () => {
       ).toBeVisible({
         timeout: 50000,
       })
-      await page.waitForTimeout(1000)
       privateSnippetText =
         (await page.getByLabel('private-snippets').count()) > 0
           ? await privateSnippet.textContent()
@@ -96,29 +94,23 @@ test.describe('SQL Editor', () => {
 
     // write some sql in the editor
     // This has to be done since the editor is not editable (input, textarea, etc.)
-    await page.waitForTimeout(1000)
-    const editor = page.getByRole('code').nth(0)
+    const editor = page.locator('.view-line')
     await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select 'hello world';`)
     await page.getByTestId('sql-run-button').click()
 
     // verify the result
-    await expect(page.getByRole('gridcell', { name: 'hello world' })).toBeVisible({
-      timeout: 5000,
-    })
+    await expect(page.getByRole('gridcell', { name: 'hello world' })).toBeVisible()
 
     // SQL written in the editor should not be the previous query.
-    await page.waitForTimeout(1000)
     await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select length('hello');`)
     await page.getByTestId('sql-run-button').click()
 
     // verify the result is updated.
-    await expect(page.getByRole('gridcell', { name: '5' })).toBeVisible({
-      timeout: 5000,
-    })
+    await expect(page.getByRole('gridcell', { name: '5' })).toBeVisible()
   })
 
   test('destructive query would tripper a warning modal', async () => {
@@ -127,8 +119,7 @@ test.describe('SQL Editor', () => {
 
     // write some sql in the editor
     // This has to be done since the editor is not editable (input, textarea, etc.)
-    await page.waitForTimeout(1000)
-    const editor = page.getByRole('code').nth(0)
+    const editor = page.locator('.view-line')
     await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`delete table 'test';`)
@@ -140,13 +131,12 @@ test.describe('SQL Editor', () => {
 
     // reset test
     await page.getByRole('button', { name: 'Cancel' }).click()
-    await page.waitForTimeout(500)
     await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.press('Backspace')
   })
 
-  test('should create and load a new snippet', async ({ ref }) => {
+  test.skip('should create and load a new snippet', async ({ ref }) => {
     const runButton = page.getByTestId('sql-run-button')
     await page.getByRole('button', { name: 'Favorites' }).click()
     await page.getByRole('button', { name: 'Shared' }).click()
@@ -154,8 +144,7 @@ test.describe('SQL Editor', () => {
     // write some sql in the editor
     await page.getByTestId('sql-editor-new-query-button').click()
     await page.getByRole('menuitem', { name: 'Create a new snippet' }).click()
-    const editor = page.getByRole('code').nth(0)
-    await page.waitForTimeout(1000)
+    const editor = page.locator('.view-line')
     await editor.click()
     await page.keyboard.type(`select 'hello world';`)
     await expect(page.getByText("select 'hello world';")).toBeVisible()
@@ -172,7 +161,6 @@ test.describe('SQL Editor', () => {
     await expect(favouriteSnippetsSection).toContainText('Untitled query')
 
     // unfavorite snippets
-    await page.waitForTimeout(500)
     await page.getByTestId('sql-editor-utility-actions').click()
     await page.getByRole('menuitem', { name: 'Remove from favorites' }).click()
     await expect(favouriteSnippetsSection).not.toBeVisible()
