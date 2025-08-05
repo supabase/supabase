@@ -1,5 +1,5 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -29,6 +29,8 @@ import { formatSql } from 'lib/formatSql'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
+  Badge,
+  Button,
   cn,
   copyToClipboard,
   DropdownMenu,
@@ -102,6 +104,14 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const materializedViewHasLints: boolean = getEntityLintDetails(
     entity.name,
     'materialized_view_in_api',
+    ['ERROR', 'WARN'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const foreignTableHasLints: boolean = getEntityLintDetails(
+    entity.name,
+    'foreign_table_in_api',
     ['ERROR', 'WARN'],
     lints,
     selectedSchema
@@ -233,7 +243,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           isOpened: isOpened && !isPreview,
           isPreview,
         }),
-        'px-4'
+        'pl-4 pr-1'
       )}
       onDoubleClick={(e) => {
         e.preventDefault()
@@ -251,34 +261,41 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         </Tooltip>
         <div
           className={cn(
-            'truncate',
-            'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+            'truncate overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
             isActive && 'text-foreground'
           )}
         >
           <span
             className={cn(
               isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
-              'text-sm',
-              'transition',
-              'truncate'
+              'text-sm transition truncate'
             )}
           >
             {entity.name}
           </span>
-          <EntityTooltipTrigger
-            entity={entity}
-            isActive={isActive}
-            tableHasLints={tableHasLints}
-            viewHasLints={viewHasLints}
-            materializedViewHasLints={materializedViewHasLints}
-          />
+          <div>
+            <EntityTooltipTrigger
+              entity={entity}
+              tableHasLints={tableHasLints}
+              viewHasLints={viewHasLints}
+              materializedViewHasLints={materializedViewHasLints}
+              foreignTableHasLints={foreignTableHasLints}
+            />
+          </div>
         </div>
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground">
-              <MoreHorizontal size={14} strokeWidth={2} />
+            <DropdownMenuTrigger
+              asChild
+              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground"
+            >
+              <Button
+                type="text"
+                className="w-6 h-6"
+                icon={<MoreVertical size={14} strokeWidth={2} />}
+                onClick={(e) => e.preventDefault()}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start" className="w-44">
               <DropdownMenuItem
@@ -425,37 +442,40 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
 const EntityTooltipTrigger = ({
   entity,
-  isActive,
   tableHasLints,
   viewHasLints,
   materializedViewHasLints,
+  foreignTableHasLints,
 }: {
   entity: Entity
-  isActive: boolean
   tableHasLints: boolean
   viewHasLints: boolean
   materializedViewHasLints: boolean
+  foreignTableHasLints: boolean
 }) => {
   let tooltipContent = ''
+  const accessWarning = 'Data is publicly accessible via API'
 
   switch (entity.type) {
     case ENTITY_TYPE.TABLE:
       if (tableHasLints) {
-        tooltipContent = 'RLS disabled'
+        tooltipContent = `${accessWarning} as RLS is disabled`
       }
       break
     case ENTITY_TYPE.VIEW:
       if (viewHasLints) {
-        tooltipContent = 'Security definer view'
+        tooltipContent = `${accessWarning} as this is a Security definer view`
       }
       break
     case ENTITY_TYPE.MATERIALIZED_VIEW:
       if (materializedViewHasLints) {
-        tooltipContent = 'Security definer view'
+        tooltipContent = `${accessWarning} Security definer view`
       }
       break
     case ENTITY_TYPE.FOREIGN_TABLE:
-      tooltipContent = 'RLS is not enforced on foreign tables'
+      if (foreignTableHasLints) {
+        tooltipContent = `${accessWarning} as RLS is not enforced on foreign tables`
+      }
       break
     default:
       break
@@ -465,13 +485,9 @@ const EntityTooltipTrigger = ({
     return (
       <Tooltip disableHoverableContent={true}>
         <TooltipTrigger className="min-w-4">
-          <Unlock
-            size={14}
-            strokeWidth={2}
-            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
-          />
+          <Badge variant="destructive">Unrestricted</Badge>
         </TooltipTrigger>
-        <TooltipContent side="bottom">
+        <TooltipContent side="bottom" className="max-w-44 text-center">
           <span>{tooltipContent}</span>
         </TooltipContent>
       </Tooltip>

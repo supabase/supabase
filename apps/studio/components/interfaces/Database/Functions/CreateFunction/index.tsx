@@ -186,7 +186,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       layout="horizontal"
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
+                        <Input_Shadcn_ {...field} placeholder="Name of function" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

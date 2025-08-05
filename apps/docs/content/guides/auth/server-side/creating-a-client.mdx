@@ -78,6 +78,14 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 </TabPanel>
+<TabPanel id="react-router" label="React Router">
+
+```bash .env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
 <TabPanel id="express" label="Express">
 
 ```bash .env
@@ -635,6 +643,105 @@ export async function action({ request }: ActionFunctionArgs) {
 ```ts _index.tsx
 import { type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { createBrowserClient } from "@supabase/ssr";
+
+export async function loader({}: LoaderFunctionArgs) {
+  return {
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    },
+  };
+}
+
+export default function Index() {
+  const { env } = useLoaderData<typeof loader>();
+
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
+  return ...
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+
+<TabPanel id="react-router" label="React Router">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="react-router-loader"
+  queryGroup="environment"
+>
+<TabPanel id="react-router-loader" label="Loader">
+
+```ts _index.tsx
+import { LoaderFunctionArgs } from 'react-router'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const headers = new Headers()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+      },
+    },
+  })
+
+  return new Response('...', {
+    headers,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="react-router-action" label="Action">
+
+```ts _index.tsx
+import { type ActionFunctionArgs } from '@react-router'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+
+export async function action({ request }: ActionFunctionArgs) {
+  const headers = new Headers()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+      },
+    },
+  })
+
+  return new Response('...', {
+    headers,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="react-router-component" label="Component">
+
+```ts _index.tsx
+import { type LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 import { createBrowserClient } from "@supabase/ssr";
 
 export async function loader({}: LoaderFunctionArgs) {

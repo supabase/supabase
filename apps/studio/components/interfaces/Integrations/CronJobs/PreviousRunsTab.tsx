@@ -1,7 +1,7 @@
 import { toString as CronToString } from 'cronstrue'
 import { CircleCheck, CircleX, List, Loader } from 'lucide-react'
 import Link from 'next/link'
-import { UIEvent, useCallback, useEffect, useMemo } from 'react'
+import { UIEvent, useCallback, useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
@@ -11,6 +11,8 @@ import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import dayjs from 'dayjs'
 import {
   Button,
   cn,
@@ -20,8 +22,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { calculateDuration, formatDate, isSecondsFormat } from './CronJobs.utils'
+import {
+  calculateDuration,
+  formatDate,
+  isSecondsFormat,
+  parseCronJobCommand,
+} from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
 
 const cronJobColumns = [
@@ -113,6 +121,19 @@ const columns = cronJobColumns.map((col) => {
     renderCell: (props) => {
       const value = col.value(props.row)
 
+      if (['start_time', 'end_time'].includes(col.id)) {
+        const formattedValue = dayjs((props.row as any)[(col as any).id]).valueOf()
+        return (
+          <div className="flex items-center">
+            <TimestampInfo
+              utcTimestamp={formattedValue}
+              labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+              className="font-mono text-xs"
+            />
+          </div>
+        )
+      }
+
       return (
         <div
           className={cn(
@@ -156,17 +177,17 @@ export const PreviousRunsTab = () => {
       connectionString: project?.connectionString,
       jobId: jobId,
     },
-    { enabled: !!jobId, staleTime: 30 }
+    { enabled: !!jobId, staleTime: 30000 }
   )
 
-  useEffect(() => {
-    // Refetch only the first page
-    const timerId = setInterval(() => {
-      refetch({ refetchPage: (_page, index) => index === 0 })
-    }, 30000)
+  const { data: edgeFunctions = [] } = useEdgeFunctionsQuery({ projectRef: project?.ref })
 
-    return () => clearInterval(timerId)
-  }, [refetch])
+  const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
+  const cronJobValues = parseCronJobCommand(job?.command || '', project?.ref!)
+  const edgeFunction =
+    cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
+  const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
+  const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
   const handleScroll = useCallback(
     (event: UIEvent<HTMLDivElement>) => {
@@ -177,8 +198,6 @@ export const PreviousRunsTab = () => {
     },
     [fetchNextPage, isLoadingCronJobRuns]
   )
-
-  const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
   return (
     <div className="h-full flex flex-col">
@@ -251,11 +270,16 @@ export const PreviousRunsTab = () => {
                   </SimpleCodeBlock>
                   <div className="bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background-200 to-transparent absolute " />
                 </TooltipTrigger>
-                <TooltipContent side="bottom" align="center" className="max-w-[400px] text-wrap">
+                <TooltipContent
+                  side="bottom"
+                  align="center"
+                  className="max-w-[400px] text-wrap p-0"
+                >
+                  <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Command</p>
                   <SimpleCodeBlock
                     showCopy={false}
                     className="sql"
-                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
+                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-3"
                   >
                     {job?.command}
                   </SimpleCodeBlock>
@@ -265,12 +289,29 @@ export const PreviousRunsTab = () => {
 
             <div className="grid gap-y-2">
               <h3 className="text-sm">Explore</h3>
-              <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
-                {/* [Terry] need to link to the exact jobid, but not currently supported */}
-                <Link target="_blank" href={`/project/${project?.ref}/logs/pgcron-logs/`}>
-                  View logs
-                </Link>
-              </Button>
+              <div className="flex items-center gap-x-2">
+                <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
+                  {/* [Terry] need to link to the exact jobid, but not currently supported */}
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`/project/${project?.ref}/logs/pgcron-logs/`}
+                  >
+                    View Cron logs
+                  </Link>
+                </Button>
+                {isValidEdgeFunction && (
+                  <Button asChild type="outline">
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
+                    >
+                      View Edge Function logs
+                    </Link>
+                  </Button>
+                )}
+              </div>
             </div>
           </>
         )}
