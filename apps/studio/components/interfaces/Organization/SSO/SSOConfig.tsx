@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
@@ -12,6 +13,9 @@ import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -20,6 +24,7 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Switch,
+  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AttributeMapping } from './AttributeMapping'
@@ -61,17 +66,20 @@ export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 export const SSOConfig = () => {
   const FORM_ID = 'sso-config-form'
 
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: organization, isLoading: isLoadingOrganization } = useSelectedOrganizationQuery()
+  const plan = organization?.plan.id
+  const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
 
   const {
     data: ssoConfig,
-    isLoading,
+    isLoading: isLoadingSSOConfig,
     isSuccess,
     isError,
     error: configError,
   } = useOrgSSOConfigQuery({ orgSlug: organization?.slug }, { enabled: !!organization })
 
   const isSSOProviderNotFound = ssoConfig === null
+  const isLoading = isLoadingSSOConfig || isLoadingOrganization
 
   const form = useForm<SSOConfigFormSchema>({
     resolver: zodResolver(FormSchema),
@@ -150,6 +158,40 @@ export const SSOConfig = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth className="!pt-8">
+        {!!plan && !canSetupSSOConfig && (
+          <Alert_Shadcn_
+            variant="default"
+            className="mt-8"
+            title="Organization MFA enforcement is not available on Free plan"
+          >
+            <WarningIcon />
+            <div className="flex flex-col md:flex-row pt-1 gap-4">
+              <div className="grow">
+                <AlertTitle_Shadcn_>
+                  Organization Single Sign-on (SSO) is available from Team plan and above
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                  <p className="max-w-3xl">
+                    SSO as a login option provides additional acccount security for your team by
+                    enforcing the use of an identity provider when logging into Supabase. Upgrade to
+                    Team or above to set up SSO for your organization.
+                  </p>
+                </AlertDescription_Shadcn_>
+              </div>
+
+              <div className="flex items-center">
+                <Button type="primary" asChild>
+                  <Link
+                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=sso`}
+                  >
+                    Upgrade to Team
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </Alert_Shadcn_>
+        )}
+
         {isLoading && (
           <Card>
             <CardContent>
