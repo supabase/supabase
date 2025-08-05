@@ -6,7 +6,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
-import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
+import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
@@ -56,7 +56,11 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<TableEditorMenu />} product="Table Editor">
+    <EditorBaseLayout
+      productMenu={<TableEditorMenu />}
+      product="Table Editor"
+      productMenuClassName="overflow-y-hidden"
+    >
       <TableEditorLayout>{page}</TableEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>
