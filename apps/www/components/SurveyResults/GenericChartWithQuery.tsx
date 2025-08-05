@@ -225,7 +225,7 @@ export function GenericChartWithQuery({ title, targetColumn, filterColumns, gene
                   <div className="flex items-center gap-3">
                     {/* Bar container with flex layout */}
                     <div
-                      className="flex-1 h-[60px] relative flex items-center"
+                      className="flex-1 h-[48px] relative flex items-center"
                       style={{
                         '--reference': maxValue,
                         '--bar-value': item.rawValue || item.value, // Use rawValue for scaling
