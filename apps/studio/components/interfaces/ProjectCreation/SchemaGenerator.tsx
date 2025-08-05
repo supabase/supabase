@@ -36,13 +36,7 @@ export const SchemaGenerator = ({
   const [promptIntendSent, setPromptIntendSent] = useState(false)
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const {
-    messages,
-    setMessages,
-    sendMessage,
-    status,
-    addToolResult,
-  } = useChat({
+  const { messages, setMessages, sendMessage, status, addToolResult } = useChat({
     id: 'schema-generator',
     onError: onErrorChat,
     onFinish: () => {
@@ -138,8 +132,10 @@ export const SchemaGenerator = ({
   const getLastAssistantMessage = () => {
     const lastAssistantMessage = messages.filter((m) => m.role === 'assistant').slice(-1)[0]
     if (!lastAssistantMessage?.parts) return ''
-    
-    const textPart = lastAssistantMessage.parts.find((part: any) => part.type === 'text') as { text: string } | undefined
+
+    const textPart = lastAssistantMessage.parts.find((part: any) => part.type === 'text') as
+      | { text: string }
+      | undefined
     return textPart?.text || ''
   }
 
@@ -171,10 +167,7 @@ export const SchemaGenerator = ({
           ((isOneOff && !hasSql) || !isOneOff) && (
             <div className="px-4 py-3 border-b space-y-1">
               <p>
-                <Markdown
-                  className="text-foreground-light"
-                  content={getLastAssistantMessage()}
-                />
+                <Markdown className="text-foreground-light" content={getLastAssistantMessage()} />
               </p>
             </div>
           )}

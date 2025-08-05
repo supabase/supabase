@@ -575,5 +575,5 @@ export const getTools = ({
         `
       },
     }),
-  };
+  }
 }
