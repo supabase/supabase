@@ -1,7 +1,4 @@
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -24,7 +21,6 @@ import { ButtonTooltip } from '../../../ui/ButtonTooltip'
 import { z } from 'zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCloudMarketplaceEligibilityQuery } from '../../../../data/organizations/organizations-query'
 import { useMemo, useState } from 'react'
 import { Organization } from '../../../../types'
 import { useProjectsQuery } from '../../../../data/projects/projects-query'
@@ -33,11 +29,15 @@ import { toast } from 'sonner'
 import AwsMarketplaceLinkingSuccess from './AwsMarketplaceLinkingSuccess'
 import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
 import { useRouter } from 'next/router'
+import AutoRenewalWarning from './AutoRenewalWarning'
+import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
 import Link from 'next/link'
 
 interface Props {
   organizations?: Organization[] | undefined
   isLoadingOrganizations: boolean
+  onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
+  isLoadingOnboardingInfo: boolean
 }
 
 const FormSchema = z.object({
@@ -46,7 +46,12 @@ const FormSchema = z.object({
 
 export type LinkExistingOrgForm = z.infer<typeof FormSchema>
 
-const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }: Props) => {
+const AwsMarketplaceLinkExistingOrg = ({
+  organizations,
+  isLoadingOrganizations,
+  onboardingInfo,
+  isLoadingOnboardingInfo,
+}: Props) => {
   const router = useRouter()
   const {
     query: { buyer_id: buyerId },
@@ -63,8 +68,6 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
 
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
 
-  const { data: eligibilityCheckResult } = useCloudMarketplaceEligibilityQuery()
-
   // Sort organizations by name ascending
   const sortedOrganizations = useMemo(() => {
     return organizations?.slice().sort((a, b) => a.name.localeCompare(b.name))
@@ -72,7 +75,9 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
 
   const { orgsLinkable, orgsNotLinkable } = useMemo(() => {
     const orgQualifiesForLinking = (org: Organization) => {
-      const validationResult = eligibilityCheckResult?.find((result) => result.slug === org.slug)
+      const validationResult = onboardingInfo?.organization_linking_eligibility.find(
+        (result) => result.slug === org.slug
+      )
 
       return validationResult?.is_eligible ?? false
     }
@@ -87,7 +92,7 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
       }
     })
     return { orgsLinkable: linkable, orgsNotLinkable: notLinkable }
-  }, [sortedOrganizations, eligibilityCheckResult])
+  }, [sortedOrganizations, onboardingInfo?.organization_linking_eligibility])
 
   const { data: projects = [] } = useProjectsQuery()
 
@@ -115,58 +120,56 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
 
   return (
     <>
+      {onboardingInfo && !onboardingInfo.aws_contract_auto_renewal && (
+        <AutoRenewalWarning
+          awsContractEndDate={onboardingInfo.aws_contract_end_date}
+          awsContractSetupPageUrl={onboardingInfo.aws_contract_setup_page_url}
+        />
+      )}
       <ScaffoldSection>
         <ScaffoldSectionDetail>
-          <p className="mb-6 text-base">
-            You’ve subscribed to our product on the AWS Marketplace. As a final step, please link a
-            Supabase organization to your AWS Marketplace subscription. Choose the organization you
-            want to be managed and billed through AWS.
-          </p>
-          <p className="text-xs">
-            <span className="font-bold">Managed and billed through AWS Marketplace</span>
-            <br />
-            Supabase will no longer invoice you directly. Instead, AWS will handle billing for your
-            Supabase subscription and charge the payment method saved in your AWS account. {''}
-            <Link
-              href="https://supabase.com/docs/guides/platform"
-              target="_blank"
-              className="underline"
-            >
-              Read more.
-            </Link>
-          </p>
-          <div className="mt-10">
-            <Alert_Shadcn_ variant="warning" title={'fdasfdsafdsa'}>
-              <AlertTitle_Shadcn_ className="text-foreground font-bold text-orange-1000">
-                “Auto Renewal” is currently turned OFF for your AWS Marketplace subscription
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
-                <div>
-                  As a result, your Supabase organization will be downgraded to the Free Plan at the
-                  end of your current billing cycle. If you have more than 2 projects running, all
-                  your projects will be paused. To ensure uninterrupted service, please enable “Auto
-                  Renewal” in your AWS Marketplace subscription settings.
-                </div>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
+          {isLoadingOnboardingInfo ? (
+            Array(1)
+              .fill(0)
+              .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
+          ) : (
+            <>
+              <p className="mb-6 text-base">
+                You’ve subscribed to the Supabase{' '}
+                {onboardingInfo?.plan_name_selected_on_marketplace} Plan via the AWS Marketplace. As
+                a final step, you need to link a Supabase organization to that subscription. Choose
+                the organization you want to be managed and billed through AWS.
+                <br />
+                <br />
+                You can read more on billing through AWS in our {''}
+                <Link
+                  href="https://supabase.com/docs/guides/platform"
+                  target="_blank"
+                  className="underline"
+                >
+                  docs.
+                </Link>
+              </p>
 
-          <p className="mt-14 text-base">
-            <span className="font-bold">Want to start fresh?</span> Create a new organization and it
-            will be linked automatically.
-          </p>
-          <Button
-            size="tiny"
-            htmlType="submit"
-            type="primary"
-            onClick={async (e) => {
-              e.preventDefault()
-              setShowOrgCreationDialog(true)
-            }}
-          >
-            Create organization
-          </Button>
+              <p className="mt-10 text-base">
+                <span className="font-bold text-foreground-light">Want to start fresh?</span> Create
+                a new organization and it will be linked automatically.
+              </p>
+              <Button
+                size="tiny"
+                htmlType="submit"
+                type="primary"
+                onClick={async (e) => {
+                  e.preventDefault()
+                  setShowOrgCreationDialog(true)
+                }}
+              >
+                Create organization
+              </Button>
+            </>
+          )}
         </ScaffoldSectionDetail>
+
         <ScaffoldSectionContent className="lg:ml-10">
           <Form_Shadcn_ {...form}>
             <form className="flex flex-col">
@@ -186,7 +189,7 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
                   >
                     <FormItemLayout id={field.name}>
                       <div className={'grid gap-4 grid-cols-1'}>
-                        {isLoadingOrganizations ? (
+                        {isLoadingOrganizations || isLoadingOnboardingInfo ? (
                           Array(3)
                             .fill(0)
                             .map((_, i) => (
@@ -235,7 +238,7 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
             </form>
           </Form_Shadcn_>
 
-          {orgsNotLinkable.length > 0 && (
+          {orgsNotLinkable.length > 0 && !isLoadingOnboardingInfo && (
             <Collapsible_Shadcn_
               className="-space-y-px"
               open={isNotLinkableOrgListOpen}
@@ -258,11 +261,11 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
                 )}
               >
                 <p className="text-foreground-light text-xs">
-                  The following organizations can’t be linked to AWS Marketplace at the moment. This
-                  may be due to missing permissions, outstanding invoices, or an existing
-                  marketplace link. If you'd like to link one of these organizations, please review
-                  the organization settings. You need to be Owner or Administrator of the
-                  organization to link it.
+                  The following organizations can’t be linked to your AWS Marketplace subscription
+                  at the moment. This may be due to missing permissions, outstanding invoices, or an
+                  existing marketplace link. If you'd like to link one of these organizations,
+                  please review the organization settings. You need to be Owner or Administrator of
+                  the organization to link it.
                 </p>
                 <div className="text-sm text-left flex flex-col gap-4 p-0 [&_label]:w-full group] w-full opacity-60">
                   {orgsNotLinkable.map((org) => {
@@ -283,11 +286,7 @@ const AwsMarketplaceLinkExistingOrg = ({ organizations, isLoadingOrganizations }
               </CollapsibleContent_Shadcn_>
             </Collapsible_Shadcn_>
           )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
 
-      <ScaffoldSection isFullWidth className="pt-0">
-        <ScaffoldSectionContent>
           <div className={cn('flex gap-3 justify-end')}>
             <ButtonTooltip
               size="medium"

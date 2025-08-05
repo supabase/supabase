@@ -15,8 +15,14 @@ import { Button } from 'ui'
 import { useRouter } from 'next/router'
 import AwsMarketplaceOrgCreationSuccess from './AwsMarketplaceOrgCreationSuccess'
 import { useState } from 'react'
+import AutoRenewalWarning from './AutoRenewalWarning'
+import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
 
-const AwsMarketplaceCreateNewOrg = () => {
+interface Props {
+  onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
+}
+
+const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
   const router = useRouter()
   const {
     query: { buyer_id: buyerId },
@@ -45,24 +51,27 @@ const AwsMarketplaceCreateNewOrg = () => {
 
   return (
     <>
+      {onboardingInfo && !onboardingInfo.aws_contract_auto_renewal && (
+        <AutoRenewalWarning
+          awsContractEndDate={onboardingInfo.aws_contract_end_date}
+          awsContractSetupPageUrl={onboardingInfo.aws_contract_setup_page_url}
+        />
+      )}
       <ScaffoldSection>
         <ScaffoldSectionDetail>
           <p className="mb-6 text-base">
-            You’ve subscribed to our product on the AWS Marketplace. As a final step, please create
-            a Supabase organization. That organization will be managed and billed through AWS
-            Marketplace.
-          </p>
-          <p className="text-xs">
-            <span className="font-bold">Managed and billed through AWS Marketplace</span>
+            You’ve subscribed to the Supabase {onboardingInfo?.plan_name_selected_on_marketplace}{' '}
+            Plan via the AWS Marketplace. As a final step, you need to create a Supabase
+            organization. That organization will be managed and billed through AWS Marketplace.
             <br />
-            Supabase will no longer invoice you directly. Instead, AWS will handle billing for your
-            Supabase subscription and charge the payment method saved in your AWS account. {''}
+            <br />
+            You can read more on billing through AWS in our {''}
             <Link
               href="https://supabase.com/docs/guides/platform"
               target="_blank"
               className="underline"
             >
-              Read more.
+              docs.
             </Link>
           </p>
         </ScaffoldSectionDetail>

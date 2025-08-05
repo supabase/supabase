@@ -49,31 +49,6 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   )
 }
 
-export async function validateCloudMarketplaceEligibility(signal?: AbortSignal) {
-  const { data, error } = await get('/platform/organizations/cloud-marketplace/check-eligibility', {
-    signal,
-  })
-
-  if (error) handleError(error)
-
-  return data
-}
-
-export type ValidationResult = Awaited<ReturnType<typeof validateCloudMarketplaceEligibility>>
-export type ValidationError = ResponseError
-
-export const useCloudMarketplaceEligibilityQuery = <TData = ValidationResult>({
-  enabled = true,
-  ...options
-}: UseQueryOptions<ValidationResult, OrganizationsError, TData> = {}) => {
-  const { profile } = useProfile()
-  return useQuery<ValidationResult, ValidationError, TData>(
-    organizationKeys.validateCloudMarketplaceEligibility(),
-    ({ signal }) => validateCloudMarketplaceEligibility(signal),
-    { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
-  )
-}
-
 export function invalidateOrganizationsQuery(client: QueryClient) {
   return client.invalidateQueries(organizationKeys.list())
 }
