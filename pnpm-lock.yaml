@@ -249,8 +249,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       zod:
-        specifier: ^3.22.4
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@shikijs/compat':
         specifier: ^1.1.7
@@ -332,7 +332,7 @@ importers:
         version: 1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^9.15.0
-        version: 9.15.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0)(supports-color@8.1.1))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 9.15.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0)(supports-color@8.1.1))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -452,10 +452,10 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nuqs:
         specifier: ^1.19.1
-        version: 1.19.1(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))
+        version: 1.19.1(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))
       openai:
         specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
+        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -529,12 +529,12 @@ importers:
         specifier: ^2.4.5
         version: 2.4.5
       zod:
-        specifier: ^3.22.4
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@graphiql/toolkit':
         specifier: ^0.9.1
-        version: 0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)
+        version: 0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)
       '@graphql-codegen/cli':
         specifier: 5.0.5
         version: 5.0.5(@parcel/watcher@2.5.1)(@types/node@22.13.14)(encoding@0.1.13)(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(supports-color@8.1.1)(typescript@5.5.2)
@@ -606,7 +606,7 @@ importers:
         version: 13.2.2
       graphiql:
         specifier: ^4.0.2
-        version: 4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openapi-types:
         specifier: ^12.1.3
         version: 12.1.3
@@ -657,13 +657,13 @@ importers:
     dependencies:
       '@ai-sdk/amazon-bedrock':
         specifier: ^2.2.10
-        version: 2.2.10(zod@3.23.8)
+        version: 2.2.10(zod@3.25.76)
       '@ai-sdk/openai':
         specifier: ^1.3.22
-        version: 1.3.22(zod@3.23.8)
+        version: 1.3.22(zod@3.25.76)
       '@ai-sdk/react':
         specifier: ^1.2.12
-        version: 1.2.12(react@18.3.1)(zod@3.23.8)
+        version: 1.2.12(react@18.3.1)(zod@3.25.76)
       '@aws-sdk/credential-providers':
         specifier: ^3.804.0
         version: 3.823.0
@@ -786,7 +786,7 @@ importers:
         version: 2.7.30
       ai:
         specifier: ^4.3.16
-        version: 4.3.16(react@18.3.1)(zod@3.23.8)
+        version: 4.3.16(react@18.3.1)(zod@3.25.76)
       ai-commands:
         specifier: workspace:*
         version: link:../../packages/ai-commands
@@ -876,7 +876,7 @@ importers:
         version: 2.4.1(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
+        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -1004,8 +1004,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       zod:
-        specifier: ^3.22.4
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
       zxcvbn:
         specifier: ^4.4.2
         version: 4.4.2
@@ -1321,7 +1321,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^5.9.0
-        version: 5.9.0(ws@8.18.3)(zod@3.23.8)
+        version: 5.9.0(ws@8.18.3)(zod@3.25.76)
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
@@ -1383,8 +1383,8 @@ importers:
         specifier: ^0.9.6
         version: 0.9.9(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       zod:
-        specifier: ^3.22.4
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@react-router/dev':
         specifier: ^7.1.5
@@ -1583,7 +1583,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
+        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
       parse-numeric-range:
         specifier: ^1.3.0
         version: 1.3.0
@@ -1709,8 +1709,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       zod:
-        specifier: ^3.22.4
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
 
   e2e/studio:
     dependencies:
@@ -1731,7 +1731,7 @@ importers:
         version: 2.49.3
       ai:
         specifier: ^3.4.33
-        version: 3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.23.8))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.23.8)
+        version: 3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.25.76))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.25.76)
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
@@ -1746,14 +1746,14 @@ importers:
         version: 3.5.0
       openai:
         specifier: ^4.26.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
+        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@ai-sdk/openai':
         specifier: ^0.0.72
-        version: 0.0.72(zod@3.23.8)
+        version: 0.0.72(zod@3.25.76)
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
@@ -1965,8 +1965,8 @@ importers:
   packages/pg-meta:
     dependencies:
       zod:
-        specifier: ^3.22.4
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@types/pg':
         specifier: ^8.11.11
@@ -2299,7 +2299,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.20.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
+        version: 4.71.1(encoding@0.1.13)(zod@3.25.76)
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -2364,8 +2364,8 @@ importers:
         specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
       zod:
-        specifier: ^3.22.4
-        version: 3.23.8
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@testing-library/dom':
         specifier: ^10.0.0
@@ -18352,11 +18352,8 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
-
-  zod@3.24.2:
-    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
   zustand@4.4.7:
     resolution: {integrity: sha512-QFJWJMdlETcI69paJwhSMJz7PPWjVP8Sjhclxmxmxv/RYI7ZOvR5BHX+ktH0we9gTWQMxcne8q1OY8xxz604gw==}
@@ -18385,42 +18382,42 @@ snapshots:
 
   '@adobe/css-tools@4.4.0': {}
 
-  '@ai-sdk/amazon-bedrock@2.2.10(zod@3.23.8)':
+  '@ai-sdk/amazon-bedrock@2.2.10(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.23.8)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.76)
       '@smithy/eventstream-codec': 4.0.4
       '@smithy/util-utf8': 4.0.0
       aws4fetch: 1.0.20
-      zod: 3.23.8
+      zod: 3.25.76
 
-  '@ai-sdk/openai@0.0.72(zod@3.23.8)':
+  '@ai-sdk/openai@0.0.72(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 0.0.26
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
-      zod: 3.23.8
+      '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
+      zod: 3.25.76
 
-  '@ai-sdk/openai@1.3.22(zod@3.23.8)':
+  '@ai-sdk/openai@1.3.22(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.23.8)
-      zod: 3.23.8
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.76)
+      zod: 3.25.76
 
-  '@ai-sdk/provider-utils@1.0.22(zod@3.23.8)':
+  '@ai-sdk/provider-utils@1.0.22(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 0.0.26
       eventsource-parser: 1.1.2
       nanoid: 3.3.8
       secure-json-parse: 2.7.0
     optionalDependencies:
-      zod: 3.23.8
+      zod: 3.25.76
 
-  '@ai-sdk/provider-utils@2.2.8(zod@3.23.8)':
+  '@ai-sdk/provider-utils@2.2.8(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
       nanoid: 3.3.8
       secure-json-parse: 2.7.0
-      zod: 3.23.8
+      zod: 3.25.76
 
   '@ai-sdk/provider@0.0.26':
     dependencies:
@@ -18430,64 +18427,64 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@0.0.70(react@18.3.1)(zod@3.23.8)':
+  '@ai-sdk/react@0.0.70(react@18.3.1)(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
+      '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
+      '@ai-sdk/ui-utils': 0.0.50(zod@3.25.76)
       swr: 2.2.5(react@18.3.1)
       throttleit: 2.1.0
     optionalDependencies:
       react: 18.3.1
-      zod: 3.23.8
+      zod: 3.25.76
 
-  '@ai-sdk/react@1.2.12(react@18.3.1)(zod@3.23.8)':
+  '@ai-sdk/react@1.2.12(react@18.3.1)(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.23.8)
-      '@ai-sdk/ui-utils': 1.2.11(zod@3.23.8)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.76)
+      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.76)
       react: 18.3.1
       swr: 2.2.5(react@18.3.1)
       throttleit: 2.1.0
     optionalDependencies:
-      zod: 3.23.8
+      zod: 3.25.76
 
-  '@ai-sdk/solid@0.0.54(zod@3.23.8)':
+  '@ai-sdk/solid@0.0.54(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
+      '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
+      '@ai-sdk/ui-utils': 0.0.50(zod@3.25.76)
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/svelte@0.0.57(svelte@4.2.19)(zod@3.23.8)':
+  '@ai-sdk/svelte@0.0.57(svelte@4.2.19)(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
+      '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
+      '@ai-sdk/ui-utils': 0.0.50(zod@3.25.76)
       sswr: 2.1.0(svelte@4.2.19)
     optionalDependencies:
       svelte: 4.2.19
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/ui-utils@0.0.50(zod@3.23.8)':
+  '@ai-sdk/ui-utils@0.0.50(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 0.0.26
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
+      '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
       json-schema: 0.4.0
       secure-json-parse: 2.7.0
-      zod-to-json-schema: 3.23.5(zod@3.23.8)
+      zod-to-json-schema: 3.23.5(zod@3.25.76)
     optionalDependencies:
-      zod: 3.23.8
+      zod: 3.25.76
 
-  '@ai-sdk/ui-utils@1.2.11(zod@3.23.8)':
+  '@ai-sdk/ui-utils@1.2.11(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.23.8)
-      zod: 3.23.8
-      zod-to-json-schema: 3.24.5(zod@3.23.8)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.76)
+      zod: 3.25.76
+      zod-to-json-schema: 3.24.5(zod@3.25.76)
 
-  '@ai-sdk/vue@0.0.59(vue@3.5.13(typescript@5.5.2))(zod@3.23.8)':
+  '@ai-sdk/vue@0.0.59(vue@3.5.13(typescript@5.5.2))(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
+      '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
+      '@ai-sdk/ui-utils': 0.0.50(zod@3.25.76)
       swrv: 1.0.4(vue@3.5.13(typescript@5.5.2))
     optionalDependencies:
       vue: 3.5.13(typescript@5.5.2)
@@ -20284,7 +20281,7 @@ snapshots:
       ts-pattern: 5.1.1
       unified: 11.0.5
       yaml: 2.4.5
-      zod: 3.23.8
+      zod: 3.25.76
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - esbuild
@@ -20303,7 +20300,7 @@ snapshots:
       ts-pattern: 5.1.1
       unified: 11.0.5
       yaml: 2.4.5
-      zod: 3.23.8
+      zod: 3.25.76
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - esbuild
@@ -20841,9 +20838,9 @@ snapshots:
 
   '@gar/promisify@1.1.3': {}
 
-  '@graphiql/plugin-doc-explorer@0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@graphiql/plugin-doc-explorer@0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@headlessui/react': 2.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       graphql: 16.11.0
       react: 18.3.1
@@ -20857,10 +20854,10 @@ snapshots:
       - '@types/react-dom'
       - graphql-ws
 
-  '@graphiql/plugin-history@0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@graphiql/plugin-history@0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)
+      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)
       react: 18.3.1
       react-compiler-runtime: 19.1.0-rc.1(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
@@ -20900,9 +20897,9 @@ snapshots:
       - '@types/react-dom'
       - graphql-ws
 
-  '@graphiql/react@0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@graphiql/react@0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)
+      '@graphiql/toolkit': 0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)
       '@radix-ui/react-dialog': 1.1.11(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dropdown-menu': 2.1.12(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-tooltip': 1.2.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -20929,13 +20926,13 @@ snapshots:
       - '@types/react-dom'
       - graphql-ws
 
-  '@graphiql/toolkit@0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)':
+  '@graphiql/toolkit@0.11.2(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)':
     dependencies:
       '@n1ru4l/push-pull-async-iterable-iterator': 3.2.0
       graphql: 16.11.0
       meros: 1.3.0(@types/node@22.13.14)
     optionalDependencies:
-      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.3)
+      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.1)
     transitivePeerDependencies:
       - '@types/node'
 
@@ -20949,13 +20946,13 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@graphiql/toolkit@0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)':
+  '@graphiql/toolkit@0.9.1(@types/node@22.13.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)':
     dependencies:
       '@n1ru4l/push-pull-async-iterable-iterator': 3.2.0
       graphql: 16.11.0
       meros: 1.3.0(@types/node@22.13.14)
     optionalDependencies:
-      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.3)
+      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.1)
     transitivePeerDependencies:
       - '@types/node'
 
@@ -22056,8 +22053,8 @@ snapshots:
       express-rate-limit: 7.5.0(express@5.1.0(supports-color@8.1.1))
       pkce-challenge: 5.0.0
       raw-body: 3.0.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.24.5(zod@3.23.8)
+      zod: 3.25.76
+      zod-to-json-schema: 3.24.5(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
 
@@ -25661,7 +25658,7 @@ snapshots:
       - supports-color
       - webpack
 
-  '@sentry/nextjs@9.15.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0)(supports-color@8.1.1))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
+  '@sentry/nextjs@9.15.0(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0)(supports-color@8.1.1))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.32.0
@@ -26489,15 +26486,15 @@ snapshots:
       common-tags: 1.8.2
       graphql: 16.11.0
       openapi-fetch: 0.13.8
-      zod: 3.24.2
+      zod: 3.25.76
     transitivePeerDependencies:
       - supports-color
 
   '@supabase/mcp-utils@0.2.1(supports-color@8.1.1)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.12.1(supports-color@8.1.1)
-      zod: 3.24.2
-      zod-to-json-schema: 3.24.5(zod@3.24.2)
+      zod: 3.25.76
+      zod-to-json-schema: 3.24.5(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
 
@@ -26826,7 +26823,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
       vite: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
-      zod: 3.24.2
+      zod: 3.25.76
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -27057,7 +27054,7 @@ snapshots:
       '@tanstack/virtual-file-routes': 1.114.12
       prettier: 3.5.3
       tsx: 4.19.3
-      zod: 3.24.2
+      zod: 3.25.76
     optionalDependencies:
       '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
@@ -27079,7 +27076,7 @@ snapshots:
       babel-dead-code-elimination: 1.0.9(supports-color@8.1.1)
       chokidar: 3.6.0
       unplugin: 2.2.2
-      zod: 3.24.2
+      zod: 3.25.76
     optionalDependencies:
       '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       vite: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
@@ -28419,40 +28416,40 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
-  ai@3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.23.8))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.23.8):
+  ai@3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.25.76))(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.25.76):
     dependencies:
       '@ai-sdk/provider': 0.0.26
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
-      '@ai-sdk/react': 0.0.70(react@18.3.1)(zod@3.23.8)
-      '@ai-sdk/solid': 0.0.54(zod@3.23.8)
-      '@ai-sdk/svelte': 0.0.57(svelte@4.2.19)(zod@3.23.8)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
-      '@ai-sdk/vue': 0.0.59(vue@3.5.13(typescript@5.5.2))(zod@3.23.8)
+      '@ai-sdk/provider-utils': 1.0.22(zod@3.25.76)
+      '@ai-sdk/react': 0.0.70(react@18.3.1)(zod@3.25.76)
+      '@ai-sdk/solid': 0.0.54(zod@3.25.76)
+      '@ai-sdk/svelte': 0.0.57(svelte@4.2.19)(zod@3.25.76)
+      '@ai-sdk/ui-utils': 0.0.50(zod@3.25.76)
+      '@ai-sdk/vue': 0.0.59(vue@3.5.13(typescript@5.5.2))(zod@3.25.76)
       '@opentelemetry/api': 1.9.0
       eventsource-parser: 1.1.2
       json-schema: 0.4.0
       jsondiffpatch: 0.6.0
       secure-json-parse: 2.7.0
-      zod-to-json-schema: 3.23.5(zod@3.23.8)
+      zod-to-json-schema: 3.23.5(zod@3.25.76)
     optionalDependencies:
-      openai: 4.71.1(encoding@0.1.13)(zod@3.23.8)
+      openai: 4.71.1(encoding@0.1.13)(zod@3.25.76)
       react: 18.3.1
       sswr: 2.1.0(svelte@4.2.19)
       svelte: 4.2.19
-      zod: 3.23.8
+      zod: 3.25.76
     transitivePeerDependencies:
       - solid-js
       - vue
 
-  ai@4.3.16(react@18.3.1)(zod@3.23.8):
+  ai@4.3.16(react@18.3.1)(zod@3.25.76):
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.23.8)
-      '@ai-sdk/react': 1.2.12(react@18.3.1)(zod@3.23.8)
-      '@ai-sdk/ui-utils': 1.2.11(zod@3.23.8)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.76)
+      '@ai-sdk/react': 1.2.12(react@18.3.1)(zod@3.25.76)
+      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.76)
       '@opentelemetry/api': 1.9.0
       jsondiffpatch: 0.6.0
-      zod: 3.23.8
+      zod: 3.25.76
     optionalDependencies:
       react: 18.3.1
 
@@ -31516,11 +31513,11 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphiql@4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  graphiql@4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@graphiql/plugin-doc-explorer': 0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@graphiql/plugin-history': 0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/plugin-doc-explorer': 0.0.1(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/plugin-history': 0.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@graphiql/react': 0.32.0(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.2.1)(@types/node@22.13.14)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       graphql: 16.11.0
       react: 18.3.1
       react-compiler-runtime: 19.1.0-rc.1(react@18.3.1)
@@ -31606,6 +31603,13 @@ snapshots:
   graphql-ws@5.14.1(graphql@16.11.0):
     dependencies:
       graphql: 16.11.0
+
+  graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1):
+    dependencies:
+      graphql: 16.11.0
+    optionalDependencies:
+      ws: 8.18.1
+    optional: true
 
   graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3):
     dependencies:
@@ -34915,7 +34919,7 @@ snapshots:
 
   number-flow@0.3.7: {}
 
-  nuqs@1.19.1(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)):
+  nuqs@1.19.1(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)):
     dependencies:
       mitt: 3.0.1
       next: 15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
@@ -35091,7 +35095,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.71.1(encoding@0.1.13)(zod@3.23.8):
+  openai@4.71.1(encoding@0.1.13)(zod@3.25.76):
     dependencies:
       '@types/node': 18.18.13
       '@types/node-fetch': 2.6.6
@@ -35101,14 +35105,14 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0(encoding@0.1.13)
     optionalDependencies:
-      zod: 3.23.8
+      zod: 3.25.76
     transitivePeerDependencies:
       - encoding
 
-  openai@5.9.0(ws@8.18.3)(zod@3.23.8):
+  openai@5.9.0(ws@8.18.3)(zod@3.25.76):
     optionalDependencies:
       ws: 8.18.3
-      zod: 3.23.8
+      zod: 3.25.76
 
   openapi-fetch@0.12.4:
     dependencies:
@@ -37275,8 +37279,8 @@ snapshots:
       stringify-object: 5.0.0
       ts-morph: 18.0.0
       tsconfig-paths: 4.2.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.24.5(zod@3.23.8)
+      zod: 3.25.76
+      zod-to-json-schema: 3.24.5(zod@3.25.76)
     transitivePeerDependencies:
       - '@types/node'
       - supports-color
@@ -39130,7 +39134,7 @@ snapshots:
       unenv: 1.10.0
       unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1))
       vite: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
-      zod: 3.23.8
+      zod: 3.25.76
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -39714,21 +39718,15 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.6.0
 
-  zod-to-json-schema@3.23.5(zod@3.23.8):
+  zod-to-json-schema@3.23.5(zod@3.25.76):
     dependencies:
-      zod: 3.23.8
+      zod: 3.25.76
 
-  zod-to-json-schema@3.24.5(zod@3.23.8):
+  zod-to-json-schema@3.24.5(zod@3.25.76):
     dependencies:
-      zod: 3.23.8
+      zod: 3.25.76
 
-  zod-to-json-schema@3.24.5(zod@3.24.2):
-    dependencies:
-      zod: 3.24.2
-
-  zod@3.23.8: {}
-
-  zod@3.24.2: {}
+  zod@3.25.76: {}
 
   zustand@4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1):
     dependencies:
