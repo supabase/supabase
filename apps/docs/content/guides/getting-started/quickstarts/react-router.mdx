@@ -1,0 +1,243 @@
+---
+title: 'Use Supabase with React Router'
+subtitle: 'Learn how to create a Supabase project, add some sample data, and query from a React Router app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Create a Supabase project">
+
+      Go to [database.new](https://database.new) and create a new Supabase project.
+
+      When your project is up and running, go to the [Table Editor](https://supabase.com/dashboard/project/_/editor), create a new table and insert some data.
+
+      Alternatively, you can run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `notes` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql SQL_EDITOR
+      -- Create the table
+      create table notes (
+        id bigint primary key generated always as identity,
+        title text not null
+      );
+
+      -- Insert some sample data into the table
+      insert into notes (title)
+      values
+        ('Today I created a Supabase project.'),
+        ('I added some data and queried it from React Router.'),
+        ('It was awesome!');
+
+      alter table notes enable row level security;
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details>
+
+    Make the data in your table publicly readable by adding an RLS policy:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql SQL_EDITOR
+      create policy "public can read notes"
+      on public.notes
+      for select to anon
+      using (true);
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a React Router app">
+
+    Use the `create-React Router` command with our official template, to create a React Router app pre-configured with:
+    - [Cookie-based Auth](https://supabase.com/docs/guides/auth/server-side)
+    - [TypeScript](https://www.typescriptlang.org/)
+    - [Tailwind CSS](https://tailwindcss.com/)
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      !!!!!change this url before going live!!!!!
+      npx create-React Router@latest --template https://github.com/supabase-community???/React Router-quickstart
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+
+    Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="anonKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```text .env.local
+      SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+      SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Query Supabase data from React Router">
+
+    Create a new file at `app/routes/notes.tsx` and populate with the following.
+
+    This will select all the rows from the `notes` table in Supabase and render them on the page.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    <CH.Code className="min-h-[34rem]">
+
+      ```ts app/routes/notes.tsx
+
+import { useFetcher } from 'react-router'
+import { createClient } from '~/lib/supabase.server'
+import { useRef, useEffect } from 'react'
+import type { Route } from './+types/notes'
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const { supabase } = createClient(request)
+
+const { data: notes } = await supabase.from('notes').select()
+
+return {
+notes,
+}
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const { supabase } = createClient(request)
+  const formData = await request.formData()
+  const title = formData.get('title')
+
+if (typeof title !== 'string' || !title) {
+return { error: 'Title is required' }
+}
+
+await supabase.from('notes').insert({ title })
+return { success: true }
+}
+
+type ActionResponse = { success: boolean } | { error: string }
+
+export default function Page({ loaderData }: Route.ComponentProps) {
+  const { notes } = loaderData
+  const fetcher = useFetcher<ActionResponse>()
+  const formRef = useRef<HTMLFormElement>(null)
+
+// Reset form when submission is successful
+useEffect(() => {
+if (fetcher.state === 'idle' && !('error' in (fetcher.data || {}))) {
+formRef.current?.reset()
+}
+}, [fetcher])
+
+return (
+
+<div className="flex-1 w-full flex flex-col gap-12 max-w-5xl mx-auto">
+<div className="w-full max-w-5xl mx-auto mt-12">
+<h1>Notes</h1>
+
+        <fetcher.Form ref={formRef} method="post" className="mb-6">
+          <div className="grid gap-4">
+            <textarea name="title" className="border rounded p-2" placeholder="Write your note..." />
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+              {fetcher.state === 'submitting' ? 'Adding note...' : 'Add Note'}
+            </button>
+          </div>
+        </fetcher.Form>
+        <pre>{JSON.stringify(notes, null, 2)}</pre>
+      </div>
+    </div>
+
+)
+}
+
+````
+
+```ts app/lib/supabase.server.ts
+
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from "@supabase/ssr"
+
+export function createClient(request: Request) {
+    const headers = new Headers()
+
+    const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+        cookies: {
+            getAll() {
+                return parseCookieHeader(request.headers.get('Cookie') ?? '')
+            },
+            setAll(cookiesToSet) {
+                cookiesToSet.forEach(({ name, value, options }) =>
+                    headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+                )
+            },
+        },
+    })
+
+    return { supabase, headers }
+}
+
+````
+
+    </CH.Code>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Run the development server, go to http://localhost:5174/notes in a browser and you should see the list of notes.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)
+
+```
+
+```
