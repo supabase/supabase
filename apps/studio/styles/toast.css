@@ -88,7 +88,6 @@
   background: #3498db;
 }
 .Toastify__toast--success {
-  // background: #07bc0c;
   @apply bg-green-600;
 }
 .Toastify__toast--warning {

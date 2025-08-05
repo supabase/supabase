@@ -18,7 +18,6 @@
   @apply opacity-50;
 }
 
-// This fix should ideally be in the UI library
 .table-editor-search {
   input {
     @apply pr-10;

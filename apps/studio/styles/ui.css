@@ -203,12 +203,6 @@
     );
   }
 
-  // h1,
-  // h2,
-  // h3 {
-  //   @apply p-4 m-0;
-  // }
-
   .doc-heading {
     @apply text-foreground capitalize mt-4 px-6 w-1/2;
     hyphens: auto;
@@ -256,10 +250,6 @@
   .code-column {
     @apply p-4 px-6 w-1/2;
     max-width: 50%;
-
-    // a:not(.btn-primary):not(.btn-secondary) {
-    //   @apply text-green-500;
-    // }
 
     a {
       @apply transition;
@@ -340,14 +330,12 @@
     display: none !important;
   }
 
-  // for Firefox
-  scrollbar-width: none; // auto | thin | none | <length>;
+  scrollbar-width: none;
 }
 
 .radix-tooltip-arrow {
   polygon {
     @apply fill-background-alternative [[data-theme*=dark]_&]:fill-background-alternative;
-    // fill: #eeeeee;
   }
 }
 

@@ -103,7 +103,6 @@ input.form-control,
 .form-control textarea {
   @apply block;
   @apply box-border;
-  // @apply  w-full ;
   @apply rounded-md;
   @apply shadow-sm;
   @apply transition-all;
@@ -147,7 +146,6 @@ input.form-control,
   box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
 }
 
-// icons in date / time inputs
 .dark input[type='date']::-webkit-calendar-picker-indicator,
 .dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
 .dark input[type='time']::-webkit-calendar-picker-indicator {
@@ -215,7 +213,6 @@ input[type='number'] {
   -moz-appearance: textfield; /* Firefox, Not included in tailwind styles reset */
 }
 
-// TODO: It doesnt' work, need to check
 .hide-scrollbar {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
@@ -284,7 +281,7 @@ div[data-radix-portal]:not(.portal--toast) {
   }
 }
 
-// to do: remove this CSS and do the same thing in a reusable tooltip component
+/* to do: remove this CSS and do the same thing in a reusable tooltip component */
 [data-radix-popper-content-wrapper] {
   @apply z-50 #{!important};
 }

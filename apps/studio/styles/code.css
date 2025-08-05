@@ -6,8 +6,6 @@
     background-color: none;
     white-space: normal;
     word-break: break-word;
-
-    // overflow: auto !important;
   }
 
   .token-line {
@@ -134,7 +132,6 @@
   }
 
   .code-header {
-    // @apply bg-gray-600;
     color: #ccc;
     padding: 5px 15px;
     border-radius: 4px 4px 0 0;
