@@ -1,12 +1,12 @@
-import { AiIconAnimation } from 'ui'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { Branch } from 'data/branches/branches-query'
-import { tablesToSQL } from 'lib/helpers'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Branch } from 'data/branches/branches-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRefQuery } from 'hooks/misc/useSelectedProject'
+import { tablesToSQL } from 'lib/helpers'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { AiIconAnimation } from 'ui'
 
 interface ReviewWithAIProps {
   currentBranch?: Branch
@@ -28,7 +28,7 @@ export const ReviewWithAI = ({
   const { mutate: sendEvent } = useSendEventMutation()
 
   // Get parent project for production schema
-  const parentProject = useProjectByRef(parentProjectRef)
+  const { data: parentProject } = useProjectByRefQuery(parentProjectRef)
 
   // Fetch production schema tables
   const { data: productionTables } = useTablesQuery(

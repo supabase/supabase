@@ -26,7 +26,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRef, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -54,7 +54,7 @@ const MergePage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
 
-  const parentProject = useProjectByRef(parentProjectRef)
+  const { data: parentProject } = useProjectByRefQuery(parentProjectRef)
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },

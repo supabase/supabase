@@ -2,7 +2,7 @@ import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo } from 'react'
 
-import { useProjectByRef, useProjectByRefQuery } from './useSelectedProject'
+import { useProjectByRefQuery } from './useSelectedProject'
 
 /**
  * @deprecated Use useSelectedOrganizationQuery instead for access to loading states etc
@@ -22,7 +22,7 @@ export function useSelectedOrganization({ enabled = true } = {}) {
   const { ref, slug } = useParams()
   const { data } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
 
-  const selectedProject = useProjectByRef(ref)
+  const { data: selectedProject } = useProjectByRefQuery(ref)
 
   return useMemo(() => {
     return data?.find((org) => {
