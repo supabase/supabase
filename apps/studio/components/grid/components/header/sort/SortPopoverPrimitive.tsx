@@ -185,7 +185,7 @@ export const SortPopoverPrimitive = ({
       ))}
       {localSorts.length === 0 && (
         <div className="space-y-1 px-3">
-          <h5 className="text-sm text-foreground-light">No sorts applied to this view</h5>
+          <h5 className="text-foreground-light">No sorts applied to this view</h5>
           <p className="text-xs text-foreground-lighter">Add a column below to sort the view</p>
         </div>
       )}
