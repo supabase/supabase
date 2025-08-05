@@ -36,6 +36,15 @@ on storage.objects
 for delete
 TO authenticated
 USING (
-    owner = (select auth.uid()::text)
+owner = (select auth.uid()::text)
 );
 ```
+
+Limits:
+
+The remove method can handle up to 1000 object paths in a single call. If you need to delete more objects, consider batching your delete operations.
+
+Timing:
+
+The time taken for the delete operation can vary based on the number of objects and the server load. In a serverless context, it is recommended to batch delete operations to avoid timeouts.
+
