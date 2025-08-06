@@ -10,8 +10,8 @@ import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -37,8 +37,8 @@ import { UpgradingState } from './UpgradingState'
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
-  '/project/[ref]/settings/storage',
+  '/project/[ref]/database/settings',
+  '/project/[ref]/storage/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]
@@ -53,7 +53,7 @@ const routesToIgnoreDBConnection = [
 const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
+  '/project/[ref]/database/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]
@@ -66,6 +66,8 @@ export interface ProjectLayoutProps {
   productMenu?: ReactNode
   selectedTable?: string
   resizableSidebar?: boolean
+  stickySidebarBottom?: boolean
+  productMenuClassName?: string
 }
 
 const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
@@ -79,13 +81,15 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       children,
       selectedTable,
       resizableSidebar = false,
+      stickySidebarBottom = false,
+      productMenuClassName,
     },
     ref
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const selectedOrganization = useSelectedOrganization()
-    const selectedProject = useSelectedProject()
+    const { data: selectedOrganization } = useSelectedOrganizationQuery()
+    const { data: selectedProject } = useSelectedProjectQuery()
 
     const {
       editorPanel,
@@ -190,7 +194,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         isBlocking={isBlocking}
                         productMenu={productMenu}
                       >
-                        <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                        <ProductMenuBar title={product} className={productMenuClassName}>
+                          {productMenu}
+                        </ProductMenuBar>
                       </MenuBarWrapper>
                     </motion.div>
                   </AnimatePresence>
@@ -260,7 +266,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         </div>
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <MobileSheetNav
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
+          stickyBottom={stickySidebarBottom}
+        >
           {productMenu}
         </MobileSheetNav>
       </>
@@ -288,7 +298,7 @@ const MenuBarWrapper = ({
   children,
 }: MenuBarWrapperProps) => {
   const router = useRouter()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   if (!isBlocking) {
@@ -323,7 +333,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const router = useRouter()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')

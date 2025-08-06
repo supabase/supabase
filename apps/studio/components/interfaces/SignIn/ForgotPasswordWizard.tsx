@@ -60,10 +60,13 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
       if (user?.factors?.length) {
         await router.push({
           pathname: '/forgot-password-mfa',
-          query: { returnTo: '/reset-password' },
+          query: router.query,
         })
       } else {
-        await router.push('reset-password')
+        await router.push({
+          pathname: '/reset-password',
+          query: router.query,
+        })
       }
     }
   }

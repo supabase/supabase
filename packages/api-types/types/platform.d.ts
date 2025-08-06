@@ -11088,6 +11088,12 @@ export interface operations {
           'application/json': components['schemas']['OrganizationSlugResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   OrganizationSlugController_deleteOrganization: {
@@ -11146,6 +11152,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdateOrganizationResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update organization */
       500: {
@@ -11888,6 +11900,12 @@ export interface operations {
           'application/json': components['schemas']['CreateDpaDocumentResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   OrgDocumentsController_getSoc2Type2ReportUrl: {
@@ -11910,6 +11928,12 @@ export interface operations {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   OrgDocumentsController_getStandardSecurityQuestionnaireUrl: {
@@ -11931,6 +11955,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -12839,6 +12869,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrganizationRoleResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve the organization's roles */
       500: {
