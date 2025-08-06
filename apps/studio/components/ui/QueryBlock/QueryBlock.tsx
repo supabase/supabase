@@ -1,4 +1,4 @@
-import { Code, Play, Edit, MoreVertical } from 'lucide-react'
+import { Code, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
 import { toast } from 'sonner'
@@ -7,40 +7,20 @@ import { useParams } from 'common'
 import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useDatabaseTestCreateMutation } from 'data/database-tests/database-test-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
-import {
-  ChartContainer,
-  ChartTooltipContent,
-  cn,
-  CodeBlock,
-  SQL_ICON,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { ChartContainer, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
+import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -142,17 +122,7 @@ export const QueryBlock = ({
   onDragStart,
   onResults,
 }: QueryBlockProps) => {
-  const router = useRouter()
   const { ref } = useParams()
-  const { newQuery } = useNewQuery()
-  const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const { setEditorPanel } = useAppStateSnapshot()
-  const snap = useAiAssistantStateSnapshot()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const isInSQLEditor = router.pathname.includes('/sql')
-  const isInNewSnippet = router.pathname.endsWith('/sql')
 
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
   const { xKey, yKey, view = 'table' } = chartSettings
@@ -188,12 +158,6 @@ export const QueryBlock = ({
   const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
   const postgresConnectionString = primaryDatabase?.connectionString
   const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
-
-  const { mutate: createTest, isLoading: isCreatingTest } = useDatabaseTestCreateMutation({
-    onSuccess: () => {
-      toast.success('Test created successfully')
-    },
-  })
 
   const chartData = chartSettings.cumulative
     ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
@@ -244,139 +208,6 @@ export const QueryBlock = ({
       })
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
-    }
-  }
-
-  const handleSaveAsSnippet = () => {
-    if (!sql) return
-
-    if (id !== undefined) {
-      // Navigate to existing snippet
-      router.push(`/project/${ref}/sql/${id}`)
-      return
-    }
-
-    if (!isInSQLEditor || isInNewSnippet) {
-      if (isInlineEditorEnabled) {
-        setEditorPanel({
-          open: true,
-          initialValue: sql,
-        })
-        snap.closeAssistant()
-      } else {
-        if (sql) newQuery(sql, label)
-      }
-      sendEvent({
-        action: 'assistant_edit_in_sql_editor_clicked',
-        properties: {
-          isInSQLEditor,
-          isInNewSnippet,
-        },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
-    } else {
-      // Show dropdown options for SQL editor context
-      sqlEditorSnap.setDiffContent(sql, DiffType.Addition)
-    }
-  }
-
-  const handleSaveAsTest = () => {
-    if (!sql) return
-
-    createTest({
-      projectRef: ref!,
-      name: label,
-      query: sql,
-    })
-  }
-
-  const renderQueryActionsDropdown = () => {
-    if (id !== undefined) {
-      // If this is an existing snippet, just show the edit button
-      return (
-        <ButtonTooltip
-          asChild
-          type="text"
-          size="tiny"
-          className="w-7 h-7"
-          icon={<Edit size={14} strokeWidth={1.5} />}
-          tooltip={{
-            content: { side: 'bottom', text: 'Edit in SQL Editor' },
-          }}
-        >
-          <Link href={`/project/${ref}/sql/${id}`} />
-        </ButtonTooltip>
-      )
-    }
-
-    if (!isInSQLEditor || isInNewSnippet) {
-      // Show dropdown for save options
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              className="w-7 h-7"
-              icon={<MoreVertical size={14} strokeWidth={1.5} />}
-              tooltip={{
-                content: { side: 'bottom', text: 'Save options' },
-              }}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleSaveAsSnippet} disabled={!sql}>
-              <Edit size={14} className="mr-2" />
-              Save as snippet
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleSaveAsTest} disabled={!sql || isCreatingTest}>
-              <Code size={14} className="mr-2" />
-              Save as test
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    } else {
-      // In SQL editor, show the original dropdown behavior
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              disabled={!sql}
-              className="w-7 h-7"
-              icon={<Edit size={14} strokeWidth={1.5} />}
-              tooltip={
-                !!sql
-                  ? { content: { side: 'bottom', text: 'Edit in SQL Editor' } }
-                  : { content: { side: 'bottom', text: undefined } }
-              }
-            />
-          </DropdownMenuTrigger>
-          {!!sql && (
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.Addition)}
-              >
-                Insert code
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.Modification)}
-              >
-                Replace code
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => newQuery(sql, label)}>
-                Create new snippet
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSaveAsTest} disabled={isCreatingTest}>
-                <Code size={14} className="mr-2" />
-                Save as test
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          )}
-        </DropdownMenu>
-      )
     }
   }
 
@@ -464,7 +295,7 @@ export const QueryBlock = ({
             </>
           )}
 
-          {renderQueryActionsDropdown()}
+          <EditQueryButton id={id} title={label} sql={sql} />
 
           {(showRunButtonIfNotReadOnly || !readOnlyError) && (
             <ButtonTooltip
