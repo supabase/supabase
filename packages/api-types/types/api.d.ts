@@ -1402,7 +1402,7 @@ export interface paths {
     /** Gets a specific SQL snippet within a project */
     get: operations['v1-project-get-snippet']
     /** Updates an existing SQL snippet in the project */
-    put: operations['v1-project-upsert-snippet']
+    put: operations['v1-project-update-snippet']
     post?: never
     /** Deletes an SQL snippet from the project */
     delete: operations['v1-project-delete-snippet']
@@ -1637,7 +1637,7 @@ export interface components {
       name: string
       prefix?: string | null
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
       /** @enum {string|null} */
       type?: 'legacy' | 'publishable' | 'secret' | null
@@ -1975,7 +1975,7 @@ export interface components {
       description?: string | null
       name: string
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
       /** @enum {string} */
       type: 'publishable' | 'secret'
@@ -2817,7 +2817,7 @@ export interface components {
       description?: string | null
       name?: string
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
     }
     UpdateAuthConfigBody: {
@@ -7405,7 +7405,7 @@ export interface operations {
       }
     }
   }
-  'v1-project-upsert-snippet': {
+  'v1-project-update-snippet': {
     parameters: {
       query?: never
       header?: never

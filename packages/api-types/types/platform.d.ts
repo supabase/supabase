@@ -4933,56 +4933,56 @@ export interface components {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
           metadata_xml_url?: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
       | {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
     CreateSSOProviderResponse:
       | {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
           metadata_xml_url?: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
       | {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
     CreateStorageBucketBody: {
       allowed_mime_types?: string[]
@@ -5633,28 +5633,28 @@ export interface components {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
           metadata_xml_url?: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
       | {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
     GetStorageCredentialsResponse: {
       data: {
@@ -5885,6 +5885,7 @@ export interface components {
     }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
+      AUDIT_LOG_DISABLE_POSTGRES: boolean | null
       DB_MAX_POOL_SIZE: number | null
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
@@ -8279,6 +8280,7 @@ export interface components {
     }
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
+      AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
       DB_MAX_POOL_SIZE?: number | null
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
@@ -8738,56 +8740,56 @@ export interface components {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
           metadata_xml_url?: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
       | {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
     UpdateSSOProviderResponse:
       | {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
           metadata_xml_url?: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
       | {
           domains: string[]
           email_mapping: string[]
           enabled: boolean
-          first_name_mapping: string[]
+          first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
-          last_name_mapping: string[]
+          last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
-          user_name_mapping: string[]
+          user_name_mapping?: string[]
         }
     UpdateStorageBucketBody: {
       allowed_mime_types?: string[] | null
@@ -11966,12 +11968,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
