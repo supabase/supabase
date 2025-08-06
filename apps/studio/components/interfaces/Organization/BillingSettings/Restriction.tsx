@@ -2,16 +2,22 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { usePathname } from 'next/navigation'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  CriticalIcon,
+  WarningIcon,
+} from 'ui'
 
 export const Restriction = () => {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess: isSuccessOrgUsage } = useOrgUsageQuery({ orgSlug: org?.slug })
 
   const pathname = usePathname()

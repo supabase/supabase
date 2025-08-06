@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
@@ -19,8 +18,8 @@ import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer-config-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -49,9 +48,8 @@ const PoolingConfigurationFormSchema = z.object({
  */
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
-  const snap = useDatabaseSettingsStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -80,15 +78,6 @@ export const ConnectionPooling = () => {
   const { mutate: updatePoolerConfig, isLoading: isUpdatingPoolerConfig } =
     usePgbouncerConfigurationUpdateMutation()
 
-  const form = useForm<z.infer<typeof PoolingConfigurationFormSchema>>({
-    resolver: zodResolver(PoolingConfigurationFormSchema),
-    defaultValues: {
-      default_pool_size: undefined,
-      max_client_conn: null,
-    },
-  })
-  const { default_pool_size } = form.watch()
-
   const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const computeSize =
@@ -100,6 +89,15 @@ export const ConnectionPooling = () => {
     ]
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
+
+  const form = useForm<z.infer<typeof PoolingConfigurationFormSchema>>({
+    resolver: zodResolver(PoolingConfigurationFormSchema),
+    defaultValues: {
+      default_pool_size: undefined,
+      max_client_conn: null,
+    },
+  })
+  const { default_pool_size } = form.watch()
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
   const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
 
@@ -128,7 +126,10 @@ export const ConnectionPooling = () => {
   }
 
   const resetForm = () => {
-    form.reset({ default_pool_size: pgbouncerConfig?.default_pool_size })
+    form.reset({
+      default_pool_size: pgbouncerConfig?.default_pool_size ?? defaultPoolSize,
+      max_client_conn: pgbouncerConfig?.max_client_conn ?? defaultMaxClientConn,
+    })
   }
 
   useEffect(() => {
@@ -236,8 +237,8 @@ export const ConnectionPooling = () => {
                           {...field}
                           type="number"
                           className="w-full"
-                          value={field.value || undefined}
-                          placeholder={!field.value ? `${defaultPoolSize}` : ''}
+                          value={field.value || ''}
+                          placeholder={defaultPoolSize.toString()}
                           {...form.register('default_pool_size', {
                             setValueAs: setValueAsNullableNumber,
                           })}
@@ -291,7 +292,7 @@ export const ConnectionPooling = () => {
                           className="w-full"
                           value={pgbouncerConfig?.max_client_conn || ''}
                           disabled={true}
-                          placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
+                          placeholder={defaultMaxClientConn.toString()}
                           {...form.register('max_client_conn', {
                             setValueAs: setValueAsNullableNumber,
                           })}

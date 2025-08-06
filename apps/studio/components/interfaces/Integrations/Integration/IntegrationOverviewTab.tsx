@@ -4,7 +4,7 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
@@ -22,7 +22,7 @@ export const IntegrationOverviewTab = ({
 }: PropsWithChildren<IntegrationOverviewTabProps>) => {
   const { id } = useParams()
   const router = useRouter()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
 

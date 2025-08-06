@@ -1,9 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -20,13 +25,8 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
-import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -41,7 +41,7 @@ const CreateEnumeratedTypeSidePanel = ({
 }: CreateEnumeratedTypeSidePanelProps) => {
   const initialValues = { name: '', description: '', values: [{ value: '' }] }
   const submitRef = useRef<HTMLButtonElement>(null)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: (res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
