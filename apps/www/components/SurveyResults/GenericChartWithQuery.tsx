@@ -243,81 +243,84 @@ export function GenericChartWithQuery({
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="overflow-hidden">
-        <div
-          style={{
-            height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
-          }}
-        >
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-foreground-lighter">Loading data...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-red-500">Error: {error}</div>
-            </div>
-          ) : (
-            <div className="flex flex-col h-full w-full justify-between gap-[1px]">
-              {/* Each bar as a vertical stack: label above, bar below */}
-              <div
-                className="flex flex-col gap-10"
-                style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
-              >
-                {chartData.map((item, index) => (
-                  <div key={index} className="flex flex-col">
-                    {/* Label above the bar */}
-                    <div className="mb-2">
-                      <span className="text-sm font-mono uppercase tracking-widest">
-                        {item.label}
-                      </span>
-                    </div>
+      <CardContent
+        className="overflow-hidden"
+        style={{
+          height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
+        }}
+      >
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-foreground-lighter">Loading data...</div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-red-500">Error: {error}</div>
+          </div>
+        ) : (
+          <div className="flex flex-col h-full w-full justify-between gap-[1px] relative">
+            {/* Each bar as a vertical stack: label above, bar below */}
+            <div
+              className="flex flex-col gap-10"
+              style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
+            >
+              {chartData.map((item, index) => (
+                <div key={index} className="flex flex-col">
+                  {/* Label above the bar */}
+                  <div className="mb-2">
+                    <span className="text-sm font-mono uppercase tracking-widest">
+                      {item.label}
+                    </span>
+                  </div>
 
-                    {/* Bar and percentage row */}
-                    <div className="flex items-center gap-3">
-                      {/* Bar container with flex layout */}
+                  {/* Bar and percentage row */}
+                  <div className="flex items-center gap-3">
+                    {/* Bar container with flex layout */}
+                    <div
+                      className="flex-1 h-[48px] relative flex items-center"
+                      style={
+                        {
+                          '--reference': maxValue,
+                          '--bar-value': item.rawValue || item.value, // Use rawValue for scaling
+                          '--index': index,
+                        } as React.CSSProperties
+                      }
+                    >
+                      {/* Animated Bar */}
                       <div
-                        className="flex-1 h-[48px] relative flex items-center"
-                        style={
-                          {
-                            '--reference': maxValue,
-                            '--bar-value': item.rawValue || item.value, // Use rawValue for scaling
-                            '--index': index,
-                          } as React.CSSProperties
-                        }
-                      >
-                        {/* Animated Bar */}
-                        <div
-                          className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
-                          style={{
-                            width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
-                          }}
-                        />
+                        className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
+                        style={{
+                          width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
+                        }}
+                      />
 
-                        {/* Percentage positioned after the bar */}
-                        <div className="tabular-nums text-fluid-14-20 font-medium min-w-[60px] ml-3">
-                          {item.value < 1 ? '<1%' : `${item.value}%`}
-                        </div>
+                      {/* Percentage positioned after the bar */}
+                      <div className="tabular-nums text-fluid-14-20 font-medium min-w-[60px] ml-3">
+                        {item.value < 1 ? '<1%' : `${item.value}%`}
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )}
-        </div>
-        {!isExpanded && (
-          <div className="flex justify-center mt-4" style={{ height: `${BUTTON_AREA_HEIGHT}px` }}>
-            {!isLoading && !error && chartData.length > 3 && (
-              <Button
-                type="default"
-                size="tiny"
-                iconRight={<ChevronDown />}
-                onClick={() => setIsExpanded(true)}
-                className="shadow-xl"
-              >
-                Show {chartData.length - 3} more
-              </Button>
+
+            {!isExpanded && !isLoading && !error && chartData.length > 3 && (
+              <>
+                {/* Gradient overlay to show clipping */}
+                <div className="absolute -bottom-4 -left-6 -right-6 h-16 pointer-events-none bg-gradient-to-b from-transparent to-background" />
+                {/* Button positioned at bottom */}
+                <div className="absolute bottom-2 left-0 right-0 flex justify-center pointer-events-auto">
+                  <Button
+                    type="default"
+                    size="tiny"
+                    iconRight={<ChevronDown />}
+                    onClick={() => setIsExpanded(true)}
+                    className="shadow-xl"
+                  >
+                    Show {chartData.length - 3} more
+                  </Button>
+                </div>
+              </>
             )}
           </div>
         )}
