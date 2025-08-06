@@ -26,6 +26,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -50,6 +51,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+
+  const [showWarning, setShowWarning] = useQueryState(
+    'showWarning',
+    parseAsBoolean.withDefault(false)
+  )
+  console.log({ showWarning })
 
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
@@ -257,7 +264,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 )}
               </>
             ) : (
-              <Popover_Shadcn_ modal={false}>
+              <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger_Shadcn_ asChild>
                   <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
@@ -297,7 +304,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             )
           ) : null}
           {isView && viewHasLints && (
-            <Popover_Shadcn_ modal={false}>
+            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Security Definer view
@@ -347,7 +354,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Popover_Shadcn_>
           )}
           {isMaterializedView && materializedViewHasLints && (
-            <Popover_Shadcn_ modal={false}>
+            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Security Definer view
@@ -389,7 +396,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Popover_Shadcn_>
           )}
           {isForeignTable && table.schema === 'public' && (
-            <Popover_Shadcn_ modal={false}>
+            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Unprotected Data API access

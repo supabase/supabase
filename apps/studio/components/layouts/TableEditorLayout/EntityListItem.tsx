@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import {
   MAX_EXPORT_ROW_COUNT,
   MAX_EXPORT_ROW_COUNT_MESSAGE,
@@ -16,6 +16,7 @@ import {
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { InlineLink } from 'components/ui/InlineLink'
 import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
@@ -453,28 +454,53 @@ const EntityTooltipTrigger = ({
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
 }) => {
-  let tooltipContent = ''
+  const { ref } = useParams()
+
+  let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
+  const learnMoreCTA = (
+    <InlineLink
+      href={`/project/${ref}/editor/${entity.id}?schema=${entity.schema}&showWarning=true`}
+    >
+      Learn more
+    </InlineLink>
+  )
 
   switch (entity.type) {
     case ENTITY_TYPE.TABLE:
       if (tableHasLints) {
-        tooltipContent = `${accessWarning} as RLS is disabled`
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+          </>
+        )
       }
       break
     case ENTITY_TYPE.VIEW:
       if (viewHasLints) {
-        tooltipContent = `${accessWarning} as this is a Security definer view`
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view. {learnMoreCTA}.
+          </>
+        )
       }
       break
     case ENTITY_TYPE.MATERIALIZED_VIEW:
       if (materializedViewHasLints) {
-        tooltipContent = `${accessWarning} Security definer view`
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view {learnMoreCTA}.
+          </>
+        )
       }
       break
     case ENTITY_TYPE.FOREIGN_TABLE:
       if (foreignTableHasLints) {
-        tooltipContent = `${accessWarning} as RLS is not enforced on foreign tables`
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is not enforced on foreign tables. {learnMoreCTA}.
+          </>
+        )
       }
       break
     default:
@@ -483,12 +509,12 @@ const EntityTooltipTrigger = ({
 
   if (tooltipContent) {
     return (
-      <Tooltip disableHoverableContent={true}>
+      <Tooltip>
         <TooltipTrigger className="min-w-4">
           <Badge variant="destructive">Unrestricted</Badge>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-44 text-center">
-          <span>{tooltipContent}</span>
+        <TooltipContent side="right" className="max-w-52 text-center">
+          {tooltipContent}
         </TooltipContent>
       </Tooltip>
     )
