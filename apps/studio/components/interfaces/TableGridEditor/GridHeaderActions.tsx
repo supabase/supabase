@@ -251,7 +251,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       passHref
                       href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
                     >
-                      Auth {policies.length > 1 ? 'policies' : 'policy'}
+                      RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
                   </Button>
                 )}

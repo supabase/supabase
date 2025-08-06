@@ -89,6 +89,17 @@ const MonacoEditor = ({
     })
 
     editor.addAction({
+      id: 'save-query',
+      label: 'Save Query',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: () => {
+        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+      },
+    })
+
+    editor.addAction({
       id: 'explain-code',
       label: 'Explain Code',
       contextMenuGroupId: 'operation',
