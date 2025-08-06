@@ -7715,34 +7715,10 @@ export interface components {
       /** @description Pipeline id */
       pipeline_id: number
       /** @description Pipeline status */
-      status:
-        | {
-            /** @enum {string} */
-            name: 'stopped'
-          }
-        | {
-            /** @enum {string} */
-            name: 'starting'
-          }
-        | {
-            /** @enum {string} */
-            name: 'started'
-          }
-        | {
-            /** @enum {string} */
-            name: 'stopping'
-          }
-        | {
-            /** @enum {string} */
-            name: 'unknown'
-          }
-        | {
-            exit_code?: number | null
-            message?: string | null
-            /** @enum {string} */
-            name: 'failed'
-            reason?: string | null
-          }
+      status: {
+        /** @enum {string} */
+        name: 'stopped' | 'starting' | 'started' | 'stopping' | 'unknown' | 'failed'
+      }
     }
     ReplicationPublicationsResponse: {
       /** @description List of publications */
