@@ -7,7 +7,6 @@ import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
@@ -23,7 +22,8 @@ import {
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -42,8 +42,8 @@ const DEFAULT_CHART_ROW_COUNT = 1
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
 

@@ -7,12 +7,13 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -30,7 +31,6 @@ import {
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
@@ -42,7 +42,7 @@ const FormSchema = z.object({
 
 export const AdvancedAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 

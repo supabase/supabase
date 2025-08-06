@@ -10,7 +10,6 @@ import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEdi
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -19,6 +18,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -66,7 +66,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     search?: string
   }>()
   const { schema = 'public', search: searchString = '' } = params
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { setEditorPanel } = useAppStateSnapshot()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 

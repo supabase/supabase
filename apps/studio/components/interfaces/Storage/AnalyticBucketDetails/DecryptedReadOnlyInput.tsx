@@ -2,8 +2,8 @@ import { ExternalLink, Eye, EyeOff, Loader } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const DecryptedReadOnlyInput = ({
@@ -18,7 +18,7 @@ export const DecryptedReadOnlyInput = ({
   label: string
 }) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [showHidden, setShowHidden] = useState(false)
 
   const { data: decryptedValue, isLoading: isDecryptedValueLoading } =

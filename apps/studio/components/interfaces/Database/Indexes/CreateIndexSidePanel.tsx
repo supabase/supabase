@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -11,7 +10,7 @@ import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-crea
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -45,7 +44,7 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
 
   const [selectedSchema, setSelectedSchema] = useState('public')

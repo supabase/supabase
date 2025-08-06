@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common/hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface EdgeFunctionsListItemProps {
@@ -17,7 +17,7 @@ interface EdgeFunctionsListItemProps {
 export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isCopied, setIsCopied] = useState(false)
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })

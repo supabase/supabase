@@ -11,13 +11,13 @@ import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
 import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -222,7 +222,7 @@ const DefaultHeader = () => {
 }
 
 const RowHeader = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 

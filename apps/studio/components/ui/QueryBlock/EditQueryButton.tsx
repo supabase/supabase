@@ -6,7 +6,7 @@ import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePrevi
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { ComponentProps } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -52,7 +52,7 @@ export const EditQueryButton = ({
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   if (id !== undefined) {
