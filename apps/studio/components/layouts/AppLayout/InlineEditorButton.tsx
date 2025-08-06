@@ -1,11 +1,9 @@
 import { SqlEditor } from 'icons'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { KeyboardShortcut } from 'ui'
 
 export const InlineEditorButton = () => {
-  const { closeAssistant } = useAiAssistantStateSnapshot()
   const { setShowEditorPanel, showEditorPanel } = useAppStateSnapshot()
 
   return (
@@ -15,7 +13,6 @@ export const InlineEditorButton = () => {
       id="editor-trigger"
       className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
       onClick={() => {
-        closeAssistant()
         setShowEditorPanel(!showEditorPanel)
       }}
       tooltip={{

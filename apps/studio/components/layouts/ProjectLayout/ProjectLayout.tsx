@@ -125,7 +125,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         }
         // Cmd+E: Toggle Editor Panel, always close AI Assistant
         if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
-          aiSnap.closeAssistant()
           setShowEditorPanel(!showEditorPanel)
           e.preventDefault()
           e.stopPropagation()
