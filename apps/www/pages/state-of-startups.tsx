@@ -6,7 +6,7 @@ import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
-import { ChevronDown, X } from 'lucide-react'
+import { Maximize2, Expand, UnfoldVertical, X } from 'lucide-react'
 
 import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
 import { Input } from 'ui/src/components/shadcn/ui/input'
@@ -20,6 +20,7 @@ import data from '~/data/surveys/state-of-startups-2025'
 
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
+import { Button as ShadcnButton } from 'ui/src/components/shadcn/ui/button'
 
 interface FormData {
   email: string
@@ -148,16 +149,20 @@ function StateOfStartupsPage() {
         <div className="relative">
           {/* Closed state - shows current chapter */}
           {!isTocOpen && (
-            <button
+            <Button
+              type="default"
+              size="small"
+              iconRight={<Maximize2 size={14} />}
               onClick={() => setIsTocOpen(true)}
-              className=" shadow-xl flex items-center gap-2 bg-surface-100 border border-default rounded-md px-4 py-2 text-sm text-foreground hover:bg-surface-200 transition-colors"
+              className="flex flex-row gap-2 shadow-xl rounded-2xl px-3"
             >
-              <span className="text-muted font-mono uppercase text-xs">
-                {activeChapter} / {pageData.pageChapters.length}
-              </span>
-              <span className="max-w-[200px] truncate">{currentChapter?.title}</span>
-              <ChevronDown className="w-4 h-4 text-muted" />
-            </button>
+              <div className="flex items-center gap-2">
+                <span className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light font-mono uppercase text-xs">
+                  {activeChapter}
+                </span>
+                {currentChapter?.title}
+              </div>
+            </Button>
           )}
 
           {/* Open state - shows full table of contents */}

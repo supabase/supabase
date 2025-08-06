@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
 import { FilterDropdown } from './FilterDropdown'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, UnfoldVertical } from 'lucide-react'
 
 // Create a separate Supabase client for your external project
 const externalSupabase = createClient(
@@ -244,7 +244,7 @@ export function GenericChartWithQuery({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent
-        className="overflow-hidden"
+        className="overflow-hidden relative"
         style={{
           height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
         }}
@@ -258,7 +258,7 @@ export function GenericChartWithQuery({
             <div className="text-red-500">Error: {error}</div>
           </div>
         ) : (
-          <div className="flex flex-col h-full w-full justify-between gap-[1px] relative">
+          <div className="flex flex-col h-full w-full justify-between gap-[1px]">
             {/* Each bar as a vertical stack: label above, bar below */}
             <div
               className="flex flex-col gap-10"
@@ -303,25 +303,22 @@ export function GenericChartWithQuery({
                 </div>
               ))}
             </div>
+          </div>
+        )}
 
-            {!isExpanded && !isLoading && !error && chartData.length > 3 && (
-              <>
-                {/* Gradient overlay to show clipping */}
-                <div className="absolute -bottom-4 -left-6 -right-6 h-16 pointer-events-none bg-gradient-to-b from-transparent to-background" />
-                {/* Button positioned at bottom */}
-                <div className="absolute bottom-2 left-0 right-0 flex justify-center pointer-events-auto">
-                  <Button
-                    type="default"
-                    size="tiny"
-                    iconRight={<ChevronDown />}
-                    onClick={() => setIsExpanded(true)}
-                    className="shadow-xl"
-                  >
-                    Show {chartData.length - 3} more
-                  </Button>
-                </div>
-              </>
-            )}
+        {/* Expand button overlay */}
+        {!isExpanded && !isLoading && !error && chartData.length > 3 && (
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
+            <Button
+              type="default"
+              size="tiny"
+              // iconRight={<UnfoldVertical />}
+              onClick={() => setIsExpanded(true)}
+              className="shadow-sm"
+            >
+              {/* Show {chartData.length - 3} more */}
+              Show more
+            </Button>
           </div>
         )}
       </CardContent>
