@@ -70,26 +70,7 @@ export function handlePageTelemetry(
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(
-    `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
-    telemetryDataOverride !== undefined
-      ? { feature_flags: featureFlags, ...telemetryDataOverride }
-      : {
-          ...getSharedTelemetryData(pathname),
-          ...(slug || ref
-            ? {
-                groups: {
-                  ...(slug ? { organization: slug } : {}),
-                  ...(ref ? { project: ref } : {}),
-                },
-              }
-            : {}),
-          feature_flags: featureFlags,
-        },
-    { headers: { Version: '2' } }
-  )
+  return Promise.resolve()
 }
 
 export function handlePageLeaveTelemetry(
@@ -111,22 +92,7 @@ export function handlePageLeaveTelemetry(
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    pathname,
-    page_url: isBrowser ? window.location.href : '',
-    page_title: isBrowser ? document?.title : '',
-    feature_flags: featureFlags,
-    ...(slug || ref
-      ? {
-          groups: {
-            ...(slug ? { organization: slug } : {}),
-            ...(ref ? { project: ref } : {}),
-          },
-        }
-      : {}),
-  })
+  return Promise.resolve()
 }
 
 export const PageTelemetry = ({
