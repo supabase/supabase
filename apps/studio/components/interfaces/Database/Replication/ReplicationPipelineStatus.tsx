@@ -17,7 +17,15 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Badge,
+  Button,
+  cn,
+  Input_Shadcn_,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
@@ -184,19 +192,32 @@ export const ReplicationPipelineStatus = () => {
       )}
 
       {hasErrors && (
-        <div className="p-4 border border-destructive-300 bg-destructive-100 rounded-lg">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-destructive-600 mt-0.5 shrink-0" />
-            <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-destructive-900 mb-1">
-                {errorTables.length} table{errorTables.length > 1 ? 's' : ''} failed
-              </h4>
-              <p className="text-sm text-destructive-700">
-                Some tables encountered replication errors. See the table below for more details.
-              </p>
-            </div>
-          </div>
-        </div>
+        <Alert_Shadcn_ variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle_Shadcn_>
+            {errorTables.length} table{errorTables.length > 1 ? 's' : ''} failed
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_ className="space-y-3">
+            <p>
+              Some tables encountered replication errors. Check the logs for detailed error
+              information.
+            </p>
+            <ButtonTooltip
+              type="outline"
+              size="tiny"
+              icon={<ExternalLink className="w-3 h-3" />}
+              className="text-destructive-600 border-destructive-300"
+              disabled
+              tooltip={{
+                content: {
+                  text: 'Coming soon',
+                },
+              }}
+            >
+              View Logs
+            </ButtonTooltip>
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       )}
 
       {hasTableData && (

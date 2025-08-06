@@ -34,7 +34,11 @@ export const getStatusConfig = (state: TableState['state']) => {
     case 'error':
       return {
         badge: <Badge variant="destructive">Error</Badge>,
-        description: state.reason,
+        description: (
+          <pre className="text-xs font-mono whitespace-pre-wrap break-words text-destructive-600 bg-destructive-50 p-2 rounded border">
+            {state.reason}
+          </pre>
+        ),
         color: 'text-destructive-600',
       }
     default:

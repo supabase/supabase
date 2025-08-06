@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { isValidRetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 import { RetryCountdown } from './RetryCountdown'
 import { RetryOptionsDropdown } from './RetryOptionsDropdown'
@@ -53,11 +54,31 @@ export const ErroredTableDetails = ({
               intervention from our support team. You can always recreate the pipeline if needed.
             </div>
 
-            <Button asChild type="primary" size="tiny" icon={<ExternalLink className="w-3 h-3" />}>
-              <Link href="https://supabase.com/support" target="_blank" rel="noopener noreferrer">
-                Contact Support
-              </Link>
-            </Button>
+            <div className="flex items-center space-x-2">
+              <ButtonTooltip
+                type="outline"
+                size="tiny"
+                icon={<ExternalLink className="w-3 h-3" />}
+                disabled
+                tooltip={{
+                  content: {
+                    text: 'Coming soon',
+                  },
+                }}
+              >
+                View Logs
+              </ButtonTooltip>
+              <Button
+                asChild
+                type="primary"
+                size="tiny"
+                icon={<ExternalLink className="w-3 h-3" />}
+              >
+                <Link href="https://supabase.com/support" target="_blank" rel="noopener noreferrer">
+                  Contact Support
+                </Link>
+              </Button>
+            </div>
           </div>
         )
 
