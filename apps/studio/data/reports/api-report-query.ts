@@ -6,11 +6,9 @@ import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export const useApiReport = () => {
-  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 

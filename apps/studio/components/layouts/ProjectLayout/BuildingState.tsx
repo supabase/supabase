@@ -10,13 +10,13 @@ import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/Project
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
 
   useProjectStatusQuery(

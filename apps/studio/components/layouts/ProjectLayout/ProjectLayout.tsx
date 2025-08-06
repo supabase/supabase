@@ -9,8 +9,8 @@ import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -66,6 +66,8 @@ export interface ProjectLayoutProps {
   productMenu?: ReactNode
   selectedTable?: string
   resizableSidebar?: boolean
+  stickySidebarBottom?: boolean
+  productMenuClassName?: string
 }
 
 const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
@@ -79,13 +81,15 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       children,
       selectedTable,
       resizableSidebar = false,
+      stickySidebarBottom = false,
+      productMenuClassName,
     },
     ref
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const selectedOrganization = useSelectedOrganization()
-    const selectedProject = useSelectedProject()
+    const { data: selectedOrganization } = useSelectedOrganizationQuery()
+    const { data: selectedProject } = useSelectedProjectQuery()
 
     const { showEditorPanel, mobileMenuOpen, showSidebar, setMobileMenuOpen, setShowEditorPanel } =
       useAppStateSnapshot()
@@ -183,7 +187,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         isBlocking={isBlocking}
                         productMenu={productMenu}
                       >
-                        <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                        <ProductMenuBar title={product} className={productMenuClassName}>
+                          {productMenu}
+                        </ProductMenuBar>
                       </MenuBarWrapper>
                     </motion.div>
                   </AnimatePresence>
@@ -250,7 +256,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <MobileSheetNav
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
+          stickyBottom={stickySidebarBottom}
+        >
           {productMenu}
         </MobileSheetNav>
       </>
@@ -278,7 +288,7 @@ const MenuBarWrapper = ({
   children,
 }: MenuBarWrapperProps) => {
   const router = useRouter()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   if (!isBlocking) {
@@ -313,7 +323,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const router = useRouter()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')

@@ -1,11 +1,11 @@
 import { useParams } from 'common'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 /**
@@ -13,10 +13,10 @@ import type { NextPageWithLayout } from 'types'
  */
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { error, isError } = useBucketsQuery({ projectRef: ref })
 
-  if (!project) return <div></div>
+  if (!project) return null
 
   if (isError) <StorageBucketsError error={error as any} />
 
