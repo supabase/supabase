@@ -265,7 +265,12 @@ const Hero = (props: any) => {
         )}
       >
         <div className="flex flex-col text-center items-center justify-center min-h-[600px] lg:min-h-[70vh]">
-          <div className="absolute overflow-hidden -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
+          <div
+            className="absolute -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center -translate-y-1/2"
+            style={{
+              transform: 'translateY(-50%) scale(1.2)',
+            }}
+          >
             <svg
               width="558"
               height="392"
@@ -292,7 +297,7 @@ const Hero = (props: any) => {
                   cy="0"
                   r="1"
                   gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(349.764 144.755) rotate(-132.179) scale(202.74 202.839)"
+                  gradientTransform="translate(349.764 247.245) rotate(47.821) scale(202.74 202.839)"
                 >
                   <stop stopColor="hsl(var(--brand-200))" />
                   <stop offset="1" stopColor="hsl(var(--brand-200))" stopOpacity="0" />
@@ -326,7 +331,7 @@ const Hero = (props: any) => {
                     cy="0"
                     r="1"
                     gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
+                    gradientTransform="translate(571.212 539.13) rotate(-57.818) scale(542.117 690.275)"
                   >
                     {/* Inner core */}
                     <stop stopColor="hsl(var(--brand-200))" />
@@ -343,7 +348,7 @@ const Hero = (props: any) => {
                     cy="0"
                     r="1"
                     gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
+                    gradientTransform="translate(814.301 944.97) rotate(141.0399) scale(142.974 294.371)"
                   >
                     {/* Outer slither ring */}
                     <stop stopColor="hsl(var(--brand-600))" />
@@ -355,33 +360,8 @@ const Hero = (props: any) => {
                 </defs>
               </svg>
             </div>
-            <svg
-              width="1096"
-              height="482"
-              viewBox="0 0 1096 482"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute min-w-full inset-0 top-auto z-10"
-            >
-              <rect x="0.500488" width="1095" height="482" fill="url(#paint0_linear_183_1694)" />
-              <defs>
-                <linearGradient
-                  id="paint0_linear_183_1694"
-                  x1="922.165"
-                  y1="63.3564"
-                  x2="922.165"
-                  y2="419.772"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  {/* Bottom shadow */}
-                  <stop stopColor="hsl(var(--background-alternative-default))" stopOpacity="0" />
-                  <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
-                </linearGradient>
-              </defs>
-            </svg>
           </div>
-          <div className="relative w-full z-10 flex flex-col gap-10 items-center mx-auto">
-            {/* <div className={cn('flex flex-col gap-4 items-center')}> */}
+          <div className="relative w-full z-10 flex flex-col gap-12 items-center mx-auto">
             <h1 className="flex flex-col gap-4 items-center">
               <span className="!leading-[90%] tracking-[-0.025em] text-7xl md:text-[8rem] lg:text-[11.25rem] ">
                 State of
@@ -389,8 +369,7 @@ const Hero = (props: any) => {
               </span>
               <span className="text-foreground text-2xl md:text-4xl leading-[100%]">2025</span>
             </h1>
-            <p className="p md:text-2xl max-w-lg">{props.subheader}</p>
-            {/* </div> */}
+            <div className="p md:text-2xl max-w-lg flex flex-col gap-4">{props.subheader}</div>
           </div>
         </div>
       </div>

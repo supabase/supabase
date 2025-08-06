@@ -8,10 +8,11 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
     title: 'State of Startups 2025',
     subheader: (
       <>
-        We surveyed over 1,800 startup founders and builders to uncover What’s powering modern
-        startups: their stacks, their go-to-market motion, and their approach to AI.
-        <br />
-        This report is built for builders.
+        <p>
+          We surveyed over 1,800 startup founders and builders to uncover What’s powering modern
+          startups: their stacks, their go-to-market motion, and their approach to AI.
+        </p>
+        <p>This report is built for builders.</p>
       </>
     ),
     className: '[&_h1]:max-w-2xl',
