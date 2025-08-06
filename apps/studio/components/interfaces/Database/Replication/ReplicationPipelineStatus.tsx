@@ -1,4 +1,4 @@
-import { Activity, ChevronLeft, ExternalLink, Search } from 'lucide-react'
+import { Activity, ChevronLeft, ExternalLink, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -16,8 +16,9 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
+import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { ErroredTableDetails } from './ErroredTableDetails'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
@@ -89,8 +90,6 @@ export const ReplicationPipelineStatus = () => {
           table.table_name.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  const errorTables = tableStatuses.filter((table: TableState) => table.state.name === 'error')
-  const hasErrors = errorTables.length > 0
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
   const isEnablingDisabling =
@@ -150,19 +149,28 @@ export const ReplicationPipelineStatus = () => {
               className="absolute left-2 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
               size={14}
             />
-            <Input_Shadcn_
+            <Input
               className="pl-7 h-[26px] text-xs"
               placeholder="Search for tables"
               value={filterString}
               disabled={isPipelineError}
               onChange={(e) => setFilterString(e.target.value)}
+              actions={[
+                <X
+                  key="close"
+                  className="mx-2 cursor-pointer text-foreground"
+                  size={14}
+                  strokeWidth={2}
+                  onClick={() => setFilterString('')}
+                />,
+              ]}
             />
           </div>
           <Button
             type={statusName === 'stopped' ? 'primary' : 'default'}
             onClick={() => onTogglePipeline()}
             loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-            disabled={!['failed', 'started', 'stopped'].includes(statusName ?? '')}
+            disabled={!['failed', 'started', 'stopped', 'stopping'].includes(statusName ?? '')}
           >
             {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
           </Button>
@@ -215,78 +223,85 @@ export const ReplicationPipelineStatus = () => {
                 <Table.th key="status">Status</Table.th>,
                 <Table.th key="details">Details</Table.th>,
               ]}
-              body={filteredTableStatuses.map((table: TableState, index: number) => {
-                const statusConfig = getStatusConfig(table.state)
-                return (
-                  <Table.tr key={`${table.table_name}-${index}`} className="border-t">
-                    <Table.td className="align-top">
-                      <div className="flex items-center gap-x-2">
-                        <p>{table.table_name}</p>
+              body={
+                <>
+                  {filteredTableStatuses.length === 0 && hasTableData && (
+                    <Table.tr>
+                      <Table.td colSpan={3}>
+                        <div className="space-y-1">
+                          <p className="text-sm text-foreground">No results found</p>
+                          <p className="text-sm text-foreground-light">
+                            Your search for "{filterString}" did not return any results
+                          </p>
+                        </div>
+                      </Table.td>
+                    </Table.tr>
+                  )}
+                  {filteredTableStatuses.map((table: TableState, index: number) => {
+                    const statusConfig = getStatusConfig(table.state)
+                    return (
+                      <Table.tr key={`${table.table_name}-${index}`} className="border-t">
+                        <Table.td className="align-top">
+                          <div className="flex items-center gap-x-2">
+                            <p>{table.table_name}</p>
 
-                        <ButtonTooltip
-                          asChild
-                          type="text"
-                          className="px-1.5"
-                          icon={<ExternalLink />}
-                          tooltip={{ content: { side: 'bottom', text: 'Open in Table Editor' } }}
-                        >
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`/project/${projectRef}/editor/${table.table_id}`}
-                          />
-                        </ButtonTooltip>
-                      </div>
-                    </Table.td>
-                    <Table.td className="align-top">
-                      {showDisabledState ? (
-                        <Badge variant="default">Not Available</Badge>
-                      ) : (
-                        statusConfig.badge
-                      )}
-                    </Table.td>
-                    <Table.td className="align-top">
-                      {showDisabledState ? (
-                        <p className="text-sm text-foreground-lighter">
-                          Status unavailable while pipeline is {config.badge.toLowerCase()}
-                        </p>
-                      ) : (
-                        <div className="space-y-3">
-                          <div className="text-sm text-foreground">{statusConfig.description}</div>
-                          {'lag' in table.state && (
-                            <div className="text-xs text-foreground-light">
-                              Lag: {table.state.lag}ms
+                            <ButtonTooltip
+                              asChild
+                              type="text"
+                              className="px-1.5"
+                              icon={<ExternalLink />}
+                              tooltip={{
+                                content: { side: 'bottom', text: 'Open in Table Editor' },
+                              }}
+                            >
+                              <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href={`/project/${projectRef}/editor/${table.table_id}`}
+                              />
+                            </ButtonTooltip>
+                          </div>
+                        </Table.td>
+                        <Table.td className="align-top">
+                          {showDisabledState ? (
+                            <Badge variant="default">Not Available</Badge>
+                          ) : (
+                            statusConfig.badge
+                          )}
+                        </Table.td>
+                        <Table.td className="align-top">
+                          {showDisabledState ? (
+                            <p className="text-sm text-foreground-lighter">
+                              Status unavailable while pipeline is {config.badge.toLowerCase()}
+                            </p>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="text-sm text-foreground">
+                                {statusConfig.description}
+                              </div>
+                              {'lag' in table.state && (
+                                <div className="text-xs text-foreground-light">
+                                  Lag: {table.state.lag}ms
+                                </div>
+                              )}
+                              {table.state.name === 'error' && (
+                                <ErroredTableDetails
+                                  state={table.state}
+                                  tableName={table.table_name}
+                                  tableId={table.table_id}
+                                />
+                              )}
                             </div>
                           )}
-                          {table.state.name === 'error' && (
-                            <ErroredTableDetails
-                              state={table.state}
-                              tableName={table.table_name}
-                              tableId={table.table_id}
-                            />
-                          )}
-                        </div>
-                      )}
-                    </Table.td>
-                  </Table.tr>
-                )
-              })}
+                        </Table.td>
+                      </Table.tr>
+                    )
+                  })}
+                </>
+              }
             />
           </div>
         </div>
-      )}
-
-      {filteredTableStatuses.length === 0 && hasTableData && (
-        <Table.tr>
-          <Table.td colSpan={3}>
-            <div className="space-y-1">
-              <p className="text-sm text-foreground">No results found</p>
-              <p className="text-sm text-foreground-light">
-                Your search for "{filterString}" did not return any results
-              </p>
-            </div>
-          </Table.td>
-        </Table.tr>
       )}
 
       {!isStatusLoading && tableStatuses.length === 0 && (
