@@ -14,7 +14,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatBytes } from 'lib/helpers'
 import {
   Button,
@@ -59,7 +59,7 @@ const StorageSettings = () => {
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
 
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
@@ -171,8 +171,8 @@ const StorageSettings = () => {
                 </div>
 
                 <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
-                  <div className="grid grid-cols-12 col-span-12 gap-2 items-start">
-                    <div className="col-span-8">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-grow">
                       <FormField_Shadcn_
                         control={form.control}
                         name="fileSizeLimit"
@@ -194,7 +194,7 @@ const StorageSettings = () => {
                         )}
                       />
                     </div>
-                    <div className="col-span-4">
+                    <div className="flex-shrink-0">
                       <FormField_Shadcn_
                         control={form.control}
                         name="unit"

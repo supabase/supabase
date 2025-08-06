@@ -8,7 +8,6 @@ import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
@@ -25,6 +24,7 @@ import {
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -45,7 +45,7 @@ const Reports = () => {
   const router = useRouter()
   const { id, ref } = useParams()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
@@ -396,7 +396,7 @@ const Reports = () => {
       <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl text-foreground">{currentReport?.name || 'Reports'}</h1>
+            <h1>{currentReport?.name || 'Reports'}</h1>
             <p className="text-foreground-light">{currentReport?.description}</p>
           </div>
           {hasEdits && (

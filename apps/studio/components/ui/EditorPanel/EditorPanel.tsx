@@ -13,7 +13,7 @@ import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunBu
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -50,7 +50,7 @@ interface EditorPanelProps {
 
 export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { editorPanel, setEditorPanel } = useAppStateSnapshot()
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
