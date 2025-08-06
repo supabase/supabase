@@ -150,7 +150,7 @@ function StateOfStartupsPage() {
           {!isTocOpen && (
             <button
               onClick={() => setIsTocOpen(true)}
-              className="flex items-center gap-2 bg-surface-100 border border-default rounded-md px-4 py-2 text-sm text-foreground hover:bg-surface-200 transition-colors"
+              className=" shadow-xl flex items-center gap-2 bg-surface-100 border border-default rounded-md px-4 py-2 text-sm text-foreground hover:bg-surface-200 transition-colors"
             >
               <span className="text-muted font-mono uppercase text-xs">
                 {activeChapter} / {pageData.pageChapters.length}

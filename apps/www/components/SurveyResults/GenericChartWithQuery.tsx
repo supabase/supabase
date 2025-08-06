@@ -234,20 +234,20 @@ export function GenericChartWithQuery({
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Fixed height for all states (loading, error, loaded collapsed)
-  const FIXED_HEIGHT = 400 // px
+  const FIXED_HEIGHT = 300 // px
   const BUTTON_AREA_HEIGHT = 40 // px
   const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px (FIXED_HEIGHT - 40px for button area)
   const BUTTON_HEIGHT = 32 // px
   const BUTTON_SPACER_HEIGHT = 32 // px
 
   return (
-    <Card className="w-full overflow-hidden">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-hidden">
         <div
-          className="overflow-hidden"
+          // className="overflow-hidden"
           style={{
             height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
           }}
@@ -318,7 +318,7 @@ export function GenericChartWithQuery({
               size="tiny"
               iconRight={<ChevronDown />}
               onClick={() => setIsExpanded(true)}
-              className="text-foreground-lighter hover:text-foreground"
+              className="shadow-xl"
             >
               Show {chartData.length - 3} more
             </Button>
