@@ -308,5 +308,5 @@ div[data-radix-portal]:not(.portal--toast) {
   bottom: 3px !important;
   width: 6px !important;
   height: 6px !important;
-  @apply !border-strong !dark:border-r-2 !dark:border-b-2 !dark:border-overlay;
+  @apply !border-strong dark:!border-r-2 dark:!border-b-2 dark:!border-overlay;
 }
