@@ -1,11 +1,10 @@
-import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { getPipelineStateMessages, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { getPipelineStateMessages } from './Pipeline.utils'
 
 export enum PipelineStatusName {
   FAILED = 'failed',
@@ -122,7 +121,14 @@ export const PipelineStatus = ({
     <>
       {isLoading && <ShimmeringLoader />}
       {isError && (
-        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
+        <Tooltip>
+          <TooltipTrigger>
+            <WarningIcon />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="w-64 text-center">
+            Unable to retrieve status: {error?.message}
+          </TooltipContent>
+        </Tooltip>
       )}
       {isSuccess && (
         <Tooltip>

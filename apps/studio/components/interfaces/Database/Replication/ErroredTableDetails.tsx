@@ -1,7 +1,5 @@
+import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { Button } from 'ui'
 import { isValidRetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 import { RetryCountdown } from './RetryCountdown'
 import { RetryOptionsDropdown } from './RetryOptionsDropdown'
@@ -10,108 +8,49 @@ interface ErroredTableDetailsProps {
   state: Extract<TableState['state'], { name: 'error' }>
   tableName: string
   tableId: number
-  projectRef: string
-  pipelineId: number
 }
 
-const ContactSupportButton = ({ size = 'tiny' }: { size?: 'tiny' | 'small' | 'medium' }) => (
-  <Button asChild type="default" size={size} icon={<ExternalLink className="w-3 h-3" />}>
-    <Link href="https://supabase.com/support" target="_blank" rel="noopener noreferrer">
-      Contact Support
-    </Link>
-  </Button>
-)
+export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableDetailsProps) => {
+  const { ref: projectRef } = useParams()
+  const retryPolicy = state.retry_policy.policy
 
-export const ErroredTableDetails = ({
-  state,
-  tableName,
-  tableId,
-  projectRef,
-  pipelineId,
-}: ErroredTableDetailsProps) => {
   if (!isValidRetryPolicy(state.retry_policy)) {
     return (
-      <div className="space-y-3" role="region" aria-label={`Error details for table ${tableName}`}>
-        {state.solution && (
-          <div className="text-xs text-foreground-light">
-            <span className="font-medium">Solution:</span> {state.solution}
-          </div>
-        )}
-        <div className="text-xs text-warning-600">
-          <span className="font-medium">Invalid retry policy configuration</span>
-        </div>
+      <div
+        role="region"
+        className="flex flex-col gap-y-3"
+        aria-label={`Error details for table ${tableName}`}
+      >
+        {state.solution && <div className="text-xs text-foreground-light">{state.solution}</div>}
+        <div className="text-xs text-foreground-lighter">Invalid retry policy configuration</div>
       </div>
     )
   }
 
-  const renderRetryPolicyUI = () => {
-    switch (state.retry_policy.policy) {
-      case 'no_retry':
-        return (
-          <p className="text-xs text-foreground-lighter">
-            <span className="font-medium">Support required:</span> This error requires manual
-            intervention from our{' '}
-            <InlineLink
-              className="text-foreground-lighter hover:text-foreground"
-              href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
-            >
-              support
-            </InlineLink>
-            . Alternatively, you may also recreate the pipeline.
-          </p>
-        )
-
-      case 'manual_retry':
-        return (
-          <div className="space-y-3">
-            <p className="text-xs">
-              <span className="font-medium">Manual intervention available:</span> Fix the problem
-              and then rollback.
-            </p>
-
-            <div className="flex items-center space-x-2">
-              <RetryOptionsDropdown
-                projectRef={projectRef}
-                pipelineId={pipelineId}
-                tableId={tableId}
-                tableName={tableName}
-              />
-              <ContactSupportButton />
-            </div>
-          </div>
-        )
-
-      case 'timed_retry':
-        return (
-          <div className="space-y-3">
-            <p className="text-xs">
-              <span className="font-medium">Automatic retry scheduled:</span> The system will
-              automatically retry this table.
-            </p>
-
-            <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
-          </div>
-        )
-
-      default:
-        return (
-          <div className="space-y-3">
-            <div className="text-xs text-warning-600">
-              <span className="font-medium">Unknown retry policy</span>
-            </div>
-          </div>
-        )
-    }
-  }
-
   return (
-    <div className="space-y-3" role="region" aria-label={`Error details for table ${tableName}`}>
-      {state.solution && (
-        <div className="text-xs text-foreground-light">
-          <span className="font-medium">Solution:</span> {state.solution}
+    <div role="region" aria-label={`Error details for table ${tableName}`}>
+      {retryPolicy === 'no_retry' ? (
+        <p className="text-xs text-foreground-lighter">
+          This error requires manual intervention from our{' '}
+          <InlineLink
+            className="text-foreground-lighter hover:text-foreground"
+            href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
+          >
+            support
+          </InlineLink>
+          . Alternatively, you may also recreate the pipeline.
+        </p>
+      ) : retryPolicy === 'manual_retry' ? (
+        <div className="flex flex-col gap-y-2 text-foreground-lighter">
+          <p className="text-xs">{state.solution}. You may thereafter rollback the pipeline.</p>
+          <RetryOptionsDropdown tableId={tableId} tableName={tableName} />
         </div>
-      )}
-      {renderRetryPolicyUI()}
+      ) : retryPolicy === 'timed_retry' ? (
+        <div className="flex flex-col gap-y-2 text-foreground-lighter">
+          <p className="text-xs">The system will automatically retry this table.</p>
+          <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
+        </div>
+      ) : null}
     </div>
   )
 }

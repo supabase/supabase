@@ -263,8 +263,6 @@ export const ReplicationPipelineStatus = () => {
                               state={table.state}
                               tableName={table.table_name}
                               tableId={table.table_id}
-                              projectRef={projectRef!}
-                              pipelineId={pipelineId}
                             />
                           )}
                         </div>

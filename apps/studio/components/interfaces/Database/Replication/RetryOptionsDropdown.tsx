@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import { ChevronDown, RotateCcw, Undo2 } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useParams } from 'common'
 import { RollbackType, useRollbackTableMutation } from 'data/replication/rollback-table-mutation'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import {
   Button,
   DropdownMenu,
@@ -28,62 +29,64 @@ const RETRY_OPTIONS = [
 ] as const
 
 interface RetryOptionsDropdownProps {
-  projectRef: string
-  pipelineId: number
   tableId: number
   tableName: string
 }
 
-export const RetryOptionsDropdown = ({
-  projectRef,
-  pipelineId,
-  tableId,
-  tableName,
-}: RetryOptionsDropdownProps) => {
+export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdownProps) => {
+  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [isOpen, setIsOpen] = useState(false)
-  const [currentAction, setCurrentAction] = useState<RollbackType | null>(null)
 
-  const { mutateAsync: rollbackTable, isLoading: isRollingBack } = useRollbackTableMutation()
-  const { mutateAsync: startPipeline, isLoading: isRestartingPipeline } = useStartPipelineMutation()
+  const { mutate: rollbackTable, isLoading: isRollingBack } = useRollbackTableMutation({
+    onSuccess: (_, vars) => {
+      const { projectRef, pipelineId } = vars
+      toast.success(`Table "${tableName}" rolled back successfully`)
+      startPipeline({ projectRef, pipelineId })
+    },
+    onError: (error, vars) => {
+      const { rollbackType } = vars
+      toast.error(
+        `Failed to ${rollbackType === 'full' ? 'reset' : 'rollback'} table: ${error.message}`
+      )
+    },
+  })
+  const { mutate: startPipeline, isLoading: isRestartingPipeline } = useStartPipelineMutation({
+    onSuccess: () => {
+      toast.success('Pipeline restarted successfully')
+      setIsOpen(false)
+    },
+    onError: (error) => {
+      toast.error(`Failed to restart pipeline: ${error.message}`)
+      setIsOpen(false)
+    },
+  })
 
   const isLoading = isRollingBack || isRestartingPipeline
 
   const handleRollback = async (rollbackType: RollbackType) => {
-    try {
-      setCurrentAction(rollbackType)
+    if (!projectRef) return toast.error('Project ref is required')
+    if (!_pipelineId) return toast.error('Pipeline ID is required')
 
-      await rollbackTable({
-        projectRef,
-        pipelineId,
-        tableId,
-        rollbackType,
-      })
+    const pipelineId = Number(_pipelineId)
 
-      toast.success(`Table "${tableName}" rolled back successfully`)
-
-      await startPipeline({ projectRef, pipelineId })
-      toast.success('Pipeline restarted successfully')
-    } catch (error: any) {
-      const errorMessage = error?.message || 'An unexpected error occurred'
-      toast.error(
-        `Failed to ${rollbackType === 'full' ? 'reset' : 'rollback'} table: ${errorMessage}`
-      )
-    } finally {
-      setCurrentAction(null)
-      setIsOpen(false)
-    }
+    rollbackTable({
+      projectRef,
+      pipelineId,
+      tableId,
+      rollbackType,
+    })
   }
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          type="primary"
+          type="default"
           size="tiny"
           loading={isLoading}
           disabled={isLoading}
           className="h-7 text-xs px-3"
-          icon={<ChevronDown className="w-3 h-3" />}
+          iconRight={<ChevronDown className="w-3 h-3" />}
           aria-label={`Rollback ${tableName}`}
         >
           Rollback
@@ -99,19 +102,16 @@ export const RetryOptionsDropdown = ({
             className="flex flex-col items-start px-3 py-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             aria-describedby={`rollback-${option.type}-description`}
           >
-            <div className="flex items-center gap-2 w-full">
+            <div className="flex items-center gap-x-2 w-full">
               {option.icon}
-              <span className="font-medium text-xs">
-                {option.title}
-                {currentAction === option.type && <span className="ml-1">(Processing...)</span>}
-              </span>
+              <div
+                id={`rollback-${option.type}-description`}
+                className="flex flex-col gap-y-1 text-xs text-foreground-light"
+              >
+                <p>{option.title}</p>
+                <p className="text-foreground-light">{option.description}</p>
+              </div>
             </div>
-            <p
-              id={`rollback-${option.type}-description`}
-              className="text-xs text-foreground-light mt-1 leading-tight"
-            >
-              {option.description}
-            </p>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
