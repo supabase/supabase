@@ -2,7 +2,8 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
     await db.execute(sql`
-        INSERT INTO storage.buckets (id, name, public) VALUES ('cms', 'cms', false);
+        INSERT INTO storage.buckets (id, name, public) VALUES ('cms', 'cms', false)
+        ON CONFLICT (id) DO NOTHING;
     `)
 }
 
