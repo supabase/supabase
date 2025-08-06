@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
  * @param inputs - The array of strings to generate a UUID from
  * @returns A deterministic UUID v4 string
  */
-export function generateDeterministicUuid(inputs: (string | null)[]): string {
+export function generateDeterministicUuid(inputs: (string | undefined | null)[]): string {
   const simpleHash = (str: string): number => {
     let hash = 0
     if (str.length === 0) return hash

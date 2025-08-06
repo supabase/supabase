@@ -104,18 +104,24 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
+  const { ids } = req.query
 
-  if (!id || typeof id !== 'string') {
-    return res.status(400).json({ error: 'Snippet ID is required' })
+  if (!ids || typeof ids !== 'string') {
+    return res.status(400).json({ error: 'Snippet IDs are required' })
+  }
+  const snippetIds = ids.split(',').map((id) => id.trim())
+  if (snippetIds.length === 0) {
+    return res.status(400).json({ error: 'No snippet IDs provided' })
   }
 
   try {
-    await deleteSnippet(id)
-    return res.status(204).send(null)
+    for (const id of snippetIds) {
+      await deleteSnippet(id)
+    }
+    return res.status(200).send(snippetIds.map((id) => ({ id })))
   } catch (error) {
-    console.error('Error deleting snippet:', error)
-    return res.status(500).json({ error: 'Failed to delete snippet' })
+    console.error('Error deleting snippets:', error)
+    return res.status(500).json({ error: 'Failed to delete snippets' })
   }
 }
 

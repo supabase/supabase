@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { useEditorType } from 'components/layouts/editors/EditorsLayout.hooks'
@@ -16,7 +17,6 @@ import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
