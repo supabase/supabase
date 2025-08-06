@@ -51,6 +51,7 @@ import { Telemetry } from 'lib/telemetry'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { useRouter } from 'next/router'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -77,12 +78,16 @@ loader.config({
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
+  const router = useRouter()
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
+
+      // [Jordi] pathname is used in Sentry dashboards to group data. Since it doesn't send the actual project ref, instead it just sends the name of the param (e.g. /dashboard/[ref]/database/tables)
+      scope.setTag('route', router.pathname)
       Sentry.captureException(error)
     })
 
