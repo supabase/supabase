@@ -336,17 +336,17 @@ describe('isValueTruncated', () => {
 
 describe('convertByteaToHex', () => {
   it('should convert buffer data to hex', () => {
-    const input = { type: 'Buffer', data: [72, 101, 108, 108, 111] }
+    const input = { type: 'Buffer' as 'Buffer', data: [72, 101, 108, 108, 111] }
     expect(convertByteaToHex(input)).toBe('\\x48656c6c6f')
   })
 
   it('should convert empty buffer', () => {
-    const input = { type: 'Buffer', data: [] }
+    const input = { type: 'Buffer' as 'Buffer', data: [] }
     expect(convertByteaToHex(input)).toBe('\\x')
   })
 
   it('should handle errors gracefully and return original value', () => {
-    const invalidInput = { type: 'Buffer', data: null as any }
+    const invalidInput = { type: 'Buffer' as 'Buffer', data: null as any }
     expect(convertByteaToHex(invalidInput)).toBe(invalidInput)
   })
 
@@ -557,7 +557,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
       createField({
         name: 'metadata',
         format: 'json',
-        value: { key: 'value' },
+        value: { key: 'value' } as any,
       }),
     ]
     expect(generateRowObjectFromFields(fields)).toEqual({ metadata: { key: 'value' } })
@@ -628,7 +628,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: '2023-12-01T10:30:45',
       }),
     ]
-    const result = generateRowObjectFromFields(fields)
+    const result: any = generateRowObjectFromFields(fields)
     expect(result.created_at).toBeDefined()
     expect(typeof result.created_at).toBe('string')
   })
@@ -641,7 +641,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: '2023-12-01T10:30',
       }),
     ]
-    const result = generateRowObjectFromFields(fields)
+    const result: any = generateRowObjectFromFields(fields)
     expect(result.created_at).toBeDefined()
     expect(typeof result.created_at).toBe('string')
   })
