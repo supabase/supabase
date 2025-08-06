@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, ChevronLeft, ExternalLink, Search } from 'lucide-react'
+import { Activity, ChevronLeft, ExternalLink, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -10,22 +10,13 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-// import { useRollbackTableMutation } from 'data/replication/rollback-table-mutation'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Badge,
-  Button,
-  cn,
-  Input_Shadcn_,
-} from 'ui'
+import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
@@ -191,35 +182,6 @@ export const ReplicationPipelineStatus = () => {
         />
       )}
 
-      {hasErrors && (
-        <Alert_Shadcn_ variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle_Shadcn_>
-            {errorTables.length} table{errorTables.length > 1 ? 's' : ''} failed
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="space-y-3">
-            <p>
-              Some tables encountered replication errors. Check the logs for detailed error
-              information.
-            </p>
-            <ButtonTooltip
-              type="outline"
-              size="tiny"
-              icon={<ExternalLink className="w-3 h-3" />}
-              className="text-destructive-600 border-destructive-300"
-              disabled
-              tooltip={{
-                content: {
-                  text: 'Coming soon',
-                },
-              }}
-            >
-              View Logs
-            </ButtonTooltip>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )}
-
       {hasTableData && (
         <div className="flex flex-col gap-y-4">
           {showDisabledState && (
@@ -289,7 +251,7 @@ export const ReplicationPipelineStatus = () => {
                           Status unavailable while pipeline is {config.badge.toLowerCase()}
                         </p>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-3">
                           <div className="text-sm text-foreground">{statusConfig.description}</div>
                           {'lag' in table.state && (
                             <div className="text-xs text-foreground-light">

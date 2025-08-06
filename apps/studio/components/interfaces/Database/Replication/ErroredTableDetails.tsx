@@ -49,7 +49,7 @@ export const ErroredTableDetails = ({
       case 'no_retry':
         return (
           <div className="space-y-3">
-            <div className="text-xs text-destructive-600">
+            <div className="text-xs text-brand-600">
               <span className="font-medium">Support required:</span> This error requires manual
               intervention from our support team. You can always recreate the pipeline if needed.
             </div>
