@@ -6,7 +6,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { cn } from 'ui'
 import InvoicesSection from '../InvoicesSettings/InvoicesSection'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
@@ -30,7 +30,7 @@ export const BillingSettings = () => {
     'billing:invoices',
   ])
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
 

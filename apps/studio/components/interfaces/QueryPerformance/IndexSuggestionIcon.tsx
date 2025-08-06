@@ -1,8 +1,8 @@
 import { Loader2 } from 'lucide-react'
 import { MouseEvent, useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -27,7 +27,7 @@ export const IndexSuggestionIcon = ({
   indexAdvisorResult,
   onClickIcon,
 }: IndexSuggestionIconProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isCreatingIndex, setIsCreatingIndex] = useState(false)
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false)
 

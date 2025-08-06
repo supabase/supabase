@@ -4,12 +4,12 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { ResponseError } from 'types'
 import {
@@ -49,7 +49,7 @@ const UserImpersonationSelector = () => {
   const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } =
     useUsersInfiniteQuery(

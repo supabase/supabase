@@ -1,7 +1,7 @@
-import { useSelectedOrganization } from './useSelectedOrganization'
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 
 export function useCurrentOrgPlan() {
-  const currentOrg = useSelectedOrganization()
+  const { data: currentOrg } = useSelectedOrganizationQuery()
 
   if (!currentOrg) {
     return {
