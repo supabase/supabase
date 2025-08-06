@@ -64,7 +64,7 @@ interface EditorPanelProps {
   label?: string
   saveLabel?: string
   saveValue?: string
-  onSave?: (value: string) => void
+  onSave?: (value: string, saveValue: string) => void
   onRunSuccess?: (value: any[]) => void
   onRunError?: (value: any) => void
   functionName?: string
@@ -404,7 +404,7 @@ export const EditorPanel = ({
               <Form_Shadcn_ {...saveForm}>
                 <form
                   onSubmit={saveForm.handleSubmit((values) => {
-                    onSave(values.saveValue)
+                    onSave(currentValue, values.saveValue)
                   })}
                   className="flex items-center gap-2"
                 >
@@ -417,12 +417,7 @@ export const EditorPanel = ({
                       )}
                     />
                   )}
-                  <Button
-                    size="tiny"
-                    type="default"
-                    htmlType="submit"
-                    disabled={!saveForm.formState.isDirty}
-                  >
+                  <Button size="tiny" type="default" htmlType="submit">
                     {saveLabel}
                   </Button>
                 </form>
