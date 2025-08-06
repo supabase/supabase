@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-// Dynamically import charts to improve page load
-import dynamic from 'next/dynamic'
 
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
-import { Maximize2, Expand, UnfoldVertical, X } from 'lucide-react'
+import { Maximize2, X } from 'lucide-react'
 
 import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
 import { Input } from 'ui/src/components/shadcn/ui/input'
 import { Label } from 'ui/src/components/shadcn/ui/label'
-import ChartPieStacked from '../../design-system/registry/default/block/chart-pie-stacked'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
@@ -20,7 +17,6 @@ import data from '~/data/surveys/state-of-startups-2025'
 
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
-import { Button as ShadcnButton } from 'ui/src/components/shadcn/ui/button'
 
 interface FormData {
   email: string
@@ -260,79 +256,6 @@ function StateOfStartupsPage() {
 }
 
 const Hero = (props: any) => {
-  const animRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (!animRef.current) return
-
-    const strings = [
-      'What’s in a modern tech stack?',
-      'Where is AI delivering real product value?',
-      'Which dev tools do builders swear by?',
-      'How do technical founders think about growth in 2025?',
-      'Where are early users really coming from?',
-      'Which tools save founders the most time?',
-    ]
-
-    let currentIndex = 0
-
-    const animateText = () => {
-      const animatedText = animRef.current?.querySelector('#anim')
-      if (!animatedText) return
-
-      const currentText = strings[currentIndex]
-
-      animatedText.textContent = currentText
-      // Split by words and wrap each word, then wrap letters within each word
-      animatedText.innerHTML = currentText
-        .split(' ')
-        .map((word) => {
-          if (word.trim() === '') return ' '
-          const wrappedLetters = word.replace(
-            /\S/g,
-            "<span class='letter' style='opacity: 0; transform: translateY(-6px); display: inline-block;'>$&</span>"
-          )
-          return `<span class="word" style="display: inline-block; white-space: nowrap;">${wrappedLetters}</span>`
-        })
-        .join(' ')
-
-      createTimeline({
-        onComplete: () => {
-          currentIndex = (currentIndex + 1) % strings.length
-          setTimeout(() => {
-            animateOut()
-          }, 100)
-        },
-      }).add(animatedText.querySelectorAll('.letter'), {
-        opacity: [0, 1],
-        translateY: [-8, 0],
-        ease: createSpring({ stiffness: 150, damping: 15 }),
-        duration: 500,
-        delay: stagger(10),
-      })
-    }
-
-    const animateOut = () => {
-      const animatedText = animRef.current?.querySelector('#anim')
-      if (!animatedText) return
-
-      animate(animatedText.querySelectorAll('.letter'), {
-        opacity: [1, 0],
-        translateY: [0, 8],
-        ease: 'inExpo',
-        duration: 500,
-        delay: stagger(10),
-        onComplete: () => {
-          setTimeout(animateText, -100)
-        },
-      })
-    }
-
-    animateText()
-
-    return () => {}
-  }, [])
-
   return (
     <>
       <div
@@ -341,10 +264,7 @@ const Hero = (props: any) => {
           props.className
         )}
       >
-        <div
-          ref={animRef}
-          className="flex flex-col text-center items-center justify-center min-h-[600px] lg:min-h-[70vh]"
-        >
+        <div className="flex flex-col text-center items-center justify-center min-h-[600px] lg:min-h-[70vh]">
           <div className="absolute overflow-hidden -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
             <svg
               width="558"
@@ -352,7 +272,7 @@ const Hero = (props: any) => {
               viewBox="0 0 558 392"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="absolute w-full h-full inset-0 -top-40 lg:top-0 xl:-left-40 animate-pulse"
+              className="absolute w-full h-full inset-0 -top-40 lg:-top-20 xl:-left-40 animate-pulse"
               style={{
                 animationDuration: '20000ms',
               }}
@@ -374,8 +294,8 @@ const Hero = (props: any) => {
                   gradientUnits="userSpaceOnUse"
                   gradientTransform="translate(349.764 144.755) rotate(-132.179) scale(202.74 202.839)"
                 >
-                  <stop stopColor="hsl(var(--foreground-default))" />
-                  <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+                  <stop stopColor="hsl(var(--brand-200))" />
+                  <stop offset="1" stopColor="hsl(var(--brand-200))" stopOpacity="0" />
                 </radialGradient>
               </defs>
             </svg>
@@ -408,16 +328,14 @@ const Hero = (props: any) => {
                     gradientUnits="userSpaceOnUse"
                     gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
                   >
-                    <stop stopColor="hsl(var(--border-muted))" />
-                    <stop
-                      offset="0.716346"
-                      stopColor="hsl(var(--background-alternative-default))"
-                    />
-                    <stop
-                      offset="0.754808"
-                      stopColor="hsl(var(--background-alternative-default))"
-                    />
-                    <stop offset="1" stopColor="hsl(var(--border-strong))" />
+                    {/* Inner core */}
+                    <stop stopColor="hsl(var(--brand-200))" />
+                    {/* Inner band */}
+                    <stop offset="0.675" stopColor="hsl(var(--brand-200))" />
+                    {/* Outer band */}
+                    <stop offset="0.75" stopColor="hsl(var(--brand-300))" />
+                    {/* Outermost band */}
+                    <stop offset="1" stopColor="hsl(var(--brand-500))" />
                   </radialGradient>
                   <radialGradient
                     id="paint2_radial_183_1690"
@@ -427,8 +345,9 @@ const Hero = (props: any) => {
                     gradientUnits="userSpaceOnUse"
                     gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
                   >
-                    <stop stopColor="hsl(var(--foreground-default))" />
-                    <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+                    {/* Outer slither ring */}
+                    <stop stopColor="hsl(var(--brand-600))" />
+                    <stop offset="1" stopColor="hsl(var(--brand-600))" stopOpacity="0" />
                   </radialGradient>
                   <clipPath id="clip0_183_1690">
                     <rect width="1119" height="1119" fill="white" />
@@ -454,49 +373,24 @@ const Hero = (props: any) => {
                   y2="419.772"
                   gradientUnits="userSpaceOnUse"
                 >
+                  {/* Bottom shadow */}
                   <stop stopColor="hsl(var(--background-alternative-default))" stopOpacity="0" />
                   <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
                 </linearGradient>
               </defs>
             </svg>
           </div>
-          <div className="relative w-full z-10 flex flex-col items-center mx-auto">
-            <div className="flex gap-2 mb-4 md:mb-8">
-              <div className="w-11 h-11 relative flex items-center justify-center bg-default border rounded-lg">
-                <Image
-                  src="/images/supabase-logo-icon.svg"
-                  alt="Supabase icon"
-                  width={60}
-                  height={60}
-                  className="w-6 h-6"
-                />
-              </div>
-            </div>
-            <div>
-              {props.icon || props.title ? (
-                <div className="mb-2 flex justify-center items-center gap-3">
-                  {props.title && (
-                    <h1
-                      className="text-brand font-mono uppercase tracking-widest text-sm"
-                      key={`product-name-${props.title}`}
-                    >
-                      {props.title}
-                    </h1>
-                  )}
-                </div>
-              ) : null}
-            </div>
-            <div className={cn('flex flex-col gap-4 items-center')}>
-              <div className="flex h-[150px] items-center">
-                <div
-                  id="anim"
-                  className="will-change-transform leading-[120%] text-4xl sm:text-5xl md:text-6xl min-h-[4rem] max-w-2xl [&_.letter]:transform"
-                >
-                  State of Startups
-                </div>
-              </div>
-              <p className="p !text-foreground-light max-w-lg">{props.subheader}</p>
-            </div>
+          <div className="relative w-full z-10 flex flex-col gap-10 items-center mx-auto">
+            {/* <div className={cn('flex flex-col gap-4 items-center')}> */}
+            <h1 className="flex flex-col gap-4 items-center">
+              <span className="!leading-[90%] tracking-[-0.025em] text-7xl md:text-[8rem] lg:text-[11.25rem] ">
+                State of
+                <br /> Startups
+              </span>
+              <span className="text-foreground text-2xl md:text-4xl leading-[100%]">2025</span>
+            </h1>
+            <p className="p md:text-2xl max-w-lg">{props.subheader}</p>
+            {/* </div> */}
           </div>
         </div>
       </div>
