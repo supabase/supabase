@@ -4,7 +4,6 @@ import { Alert, Button, AiIconAnimation } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 import { DatabaseTest } from 'data/database-tests/database-tests-query'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { Play } from 'lucide-react'
 import TestsList from 'components/interfaces/Database/Tests/TestsList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
@@ -48,13 +47,6 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   })
 
   const setupTestIds = (tests ?? []).filter((t) => t.name.startsWith('00_setup')).map((t) => t.id)
-
-  const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const pgtap = extensions?.find((ext) => ext.name === 'pgtap')
-  const isPgtapInstalled = pgtap !== undefined && pgtap.installed_version !== null
 
   const { mutate: createTest, isLoading: isCreatingTest } = useDatabaseTestCreateMutation({
     onSuccess: () => {
@@ -225,30 +217,13 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   return (
     <PageLayout
       title="Database Tests"
-      subtitle="Run pgTAP tests against your database"
+      subtitle="Run tests against your database"
       primaryActions={primaryActions}
       secondaryActions={secondaryActions}
     >
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12 space-y-4">
-            {!isLoadingExtensions && !isPgtapInstalled && (
-              <Alert
-                withIcon
-                variant="info"
-                title="pgTAP is not enabled"
-                actions={
-                  <Button asChild type="default">
-                    <Link href={`/project/${project?.ref}/database/extensions?filter=pgtap`}>
-                      Enable pgTAP
-                    </Link>
-                  </Button>
-                }
-              >
-                The pgTAP extension is required to run database tests. Please enable it from the
-                database extensions page.
-              </Alert>
-            )}
             <TestsList
               tests={tests ?? []}
               statuses={statuses}
@@ -307,7 +282,6 @@ rollback;
         onSave={(query: string, name: string) => {
           if (!profile?.id) return
           if (selectedTest) {
-            // Editing existing test
             updateTest({
               projectRef: project?.ref!,
               id: selectedTest.id,
@@ -316,7 +290,6 @@ rollback;
               ownerId: profile?.id,
             })
           } else {
-            // Creating new test
             createTest({
               projectRef: project?.ref!,
               name: name || 'New test',
