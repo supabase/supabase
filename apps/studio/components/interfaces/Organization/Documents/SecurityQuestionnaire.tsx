@@ -15,7 +15,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
-const SecurityQuestionnaire = () => {
+export const SecurityQuestionnaire = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
   const { mutate: sendEvent } = useSendEventMutation()
@@ -86,5 +86,3 @@ const SecurityQuestionnaire = () => {
     </>
   )
 }
-
-export default SecurityQuestionnaire

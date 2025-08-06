@@ -17,7 +17,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-const SOC2 = () => {
+export const SOC2 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
   const { mutate: sendEvent } = useSendEventMutation()
@@ -124,5 +124,3 @@ const SOC2 = () => {
     </ScaffoldSection>
   )
 }
-
-export default SOC2

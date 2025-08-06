@@ -1,15 +1,16 @@
+import { ExternalLink } from 'lucide-react'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { ExternalLink } from 'lucide-react'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
 
-const HIPAA = () => {
-  const organization = useSelectedOrganization()
+export const HIPAA = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (
@@ -55,5 +56,3 @@ const HIPAA = () => {
     </>
   )
 }
-
-export default HIPAA

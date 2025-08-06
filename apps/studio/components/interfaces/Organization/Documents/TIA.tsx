@@ -1,15 +1,16 @@
+import { ExternalLink } from 'lucide-react'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { ExternalLink } from 'lucide-react'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
 
-const TIA = () => {
-  const organization = useSelectedOrganization()
+export const TIA = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (
@@ -45,5 +46,3 @@ const TIA = () => {
     </ScaffoldSection>
   )
 }
-
-export default TIA
