@@ -1,7 +1,7 @@
 import { Book, Save, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
@@ -28,21 +28,22 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  FormField_Shadcn_,
   Form_Shadcn_,
+  FormField_Shadcn_,
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
   Input_Shadcn_ as Input,
+  KeyboardShortcut,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SQL_ICON,
-  SheetDescription,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
@@ -110,10 +111,12 @@ export const EditorPanel = ({
 
   const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
   const errorContent =
-    error?.formattedError
-      ?.split('\n')
-      ?.filter((x: string) => x.length > 0)
-      ?.slice(1) ?? []
+    'formattedError' in (error || {})
+      ? error?.formattedError
+          ?.split('\n')
+          ?.filter((x: string) => x.length > 0)
+          ?.slice(1) ?? []
+      : [error?.message ?? '']
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
@@ -297,12 +300,23 @@ export const EditorPanel = ({
               }}
             />
 
-            <Button
+            <ButtonTooltip
               size="tiny"
               type="default"
               className="w-7 h-7"
               onClick={onClose}
               icon={<X size={16} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: (
+                    <div className="flex items-center gap-4">
+                      <span>Close Editor</span>
+                      <KeyboardShortcut keys={['Meta', 'e']} />
+                    </div>
+                  ),
+                },
+              }}
             />
           </div>
         </SheetHeader>
@@ -310,6 +324,7 @@ export const EditorPanel = ({
         <div className="flex-1 overflow-hidden flex flex-col h-full">
           <div className="flex-1 min-h-0 relative">
             <AIEditor
+              autoFocus
               language="pgsql"
               value={currentValue}
               onChange={handleChange}
@@ -331,6 +346,7 @@ export const EditorPanel = ({
                 lineNumbersMinChars: 3,
               }}
               executeQuery={onExecuteSql}
+              onClose={() => onClose()}
             />
           </div>
 
@@ -391,7 +407,7 @@ export const EditorPanel = ({
               </p>
             </div>
           )}
-          {results !== undefined && results.length === 0 && (
+          {results !== undefined && results.length === 0 && !error && (
             <div className="shrink-0">
               <p className="text-xs text-foreground-light font-mono py-2 px-5">
                 Success. No rows returned.
