@@ -234,7 +234,11 @@ export function GenericChartWithQuery({
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Fixed height for all states (loading, error, loaded collapsed)
-  const FIXED_HEIGHT = 320 // px
+  const FIXED_HEIGHT = 400 // px
+  const BUTTON_AREA_HEIGHT = 40 // px
+  const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px (FIXED_HEIGHT - 40px for button area)
+  const BUTTON_HEIGHT = 32 // px
+  const BUTTON_SPACER_HEIGHT = 32 // px
 
   return (
     <Card className="w-full overflow-hidden">
@@ -261,7 +265,7 @@ export function GenericChartWithQuery({
               {/* Each bar as a vertical stack: label above, bar below */}
               <div
                 className="flex flex-col gap-10"
-                style={{ height: isExpanded ? 'auto' : '280px' }}
+                style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
               >
                 {chartData.map((item, index) => (
                   <div key={index} className="flex flex-col">
@@ -307,19 +311,19 @@ export function GenericChartWithQuery({
         </div>
 
         {/* Button container - always rendered to maintain height */}
-        <div className="flex justify-center mt-4" style={{ height: '40px' }}>
+        <div className="flex justify-center mt-4" style={{ height: `${BUTTON_AREA_HEIGHT}px` }}>
           {!isLoading && !error && chartData.length > 3 && !isExpanded ? (
             <Button
-              type="text"
-              size="small"
-              icon={<ChevronDown className="w-4 h-4" />}
+              type="default"
+              size="tiny"
+              iconRight={<ChevronDown />}
               onClick={() => setIsExpanded(true)}
               className="text-foreground-lighter hover:text-foreground"
             >
               Show {chartData.length - 3} more
             </Button>
           ) : (
-            <div style={{ height: '32px' }}></div> // Invisible spacer to maintain height
+            <div style={{ height: `${BUTTON_SPACER_HEIGHT}px` }}></div> // Invisible spacer to maintain height
           )}
         </div>
       </CardContent>
