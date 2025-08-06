@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 
 import { useFeatureFlags } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
 
 const isObjectEmpty = (obj: Object) => {
@@ -58,7 +58,7 @@ export function usePHFlag<T = string | boolean>(name: string) {
 }
 
 export const useIsRealtimeSettingsFFEnabled = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   // This flag is used to enable/disable the realtime settings for specific projects.
   const approvedProjects = useFlag<string>('isRealtimeSettingsEnabledOnProjects')

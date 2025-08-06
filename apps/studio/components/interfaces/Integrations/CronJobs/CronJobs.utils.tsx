@@ -1,9 +1,13 @@
 import parser from 'cron-parser'
 import { toString as CronToString } from 'cronstrue'
 import dayjs from 'dayjs'
+import { Column } from 'react-data-grid'
 
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { cn } from 'ui'
 import { CronJobType } from './CreateCronJobSheet'
-import { HTTPHeader } from './CronJobs.constants'
+import { CRON_TABLE_COLUMNS, HTTPHeader } from './CronJobs.constants'
+import { CronJobTableCell } from './CronJobTableCell'
 
 export function buildCronQuery(name: string, schedule: string, command: string) {
   const escapedName = name.replace(/'/g, "''")
@@ -262,4 +266,47 @@ export const getNextRun = (schedule: string, lastRun?: string) => {
       return undefined
     }
   }
+}
+
+export const formatCronJobColumns = ({
+  onSelectEdit,
+  onSelectDelete,
+}: {
+  onSelectEdit: (job: CronJob) => void
+  onSelectDelete: (job: CronJob) => void
+}) => {
+  return CRON_TABLE_COLUMNS.map((col) => {
+    const res: Column<any> = {
+      key: col.id,
+      name: col.name,
+      minWidth: col.minWidth ?? 100,
+      maxWidth: col.maxWidth,
+      width: col.width,
+      resizable: false,
+      sortable: false,
+      draggable: false,
+      headerCellClass: undefined,
+      renderHeaderCell: () => {
+        return (
+          <div
+            className={cn(
+              'flex items-center justify-between font-normal text-xs w-full',
+              col.id === 'jobname' && 'ml-8'
+            )}
+          >
+            <p className="!text-foreground">{col.name}</p>
+          </div>
+        )
+      },
+      renderCell: ({ row }) => (
+        <CronJobTableCell
+          row={row}
+          col={col}
+          onSelectEdit={onSelectEdit}
+          onSelectDelete={onSelectDelete}
+        />
+      ),
+    }
+    return res
+  })
 }
