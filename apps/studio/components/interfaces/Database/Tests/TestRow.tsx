@@ -14,12 +14,13 @@ import TestStatusHoverCard from './TestStatusHoverCard'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
-import { DatabaseTest, DatabaseTestStatus } from 'data/database-tests/database-tests-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { DatabaseTest } from 'data/database-tests/database-tests-query'
+import { DatabaseTestStatus } from './Tests.types'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useDatabaseTestDeleteMutation } from 'data/database-tests/database-test-delete-mutation'
 
 interface TestRowProps {
-  test: DatabaseTest
+  test: DatabaseTest & { status: DatabaseTestStatus }
   canRun?: boolean
   onSelectTest: (test: DatabaseTest) => void
   onRun: () => void
@@ -39,7 +40,7 @@ const TestRow = ({
   isActive,
   status = test.status,
 }: TestRowProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   const shouldFetchDetail = isActive
