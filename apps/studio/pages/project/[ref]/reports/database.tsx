@@ -17,7 +17,6 @@ import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -35,11 +34,12 @@ import { getReportAttributes, getReportAttributesV2 } from 'data/reports/databas
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { formatBytes } from 'lib/helpers'
 
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseReport: NextPageWithLayout = () => {
@@ -61,9 +61,9 @@ export default DatabaseReport
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
-  const { project } = useProjectContext()
   const isReportsV2 = useFlag('reportsDatabaseV2')
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const {
     selectedDateRange,

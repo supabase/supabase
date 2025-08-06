@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type SuggestionsType = {
   title: string
@@ -432,7 +432,7 @@ export type AiAssistantState = AiAssistantData & {
 export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())
 
 export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
 
