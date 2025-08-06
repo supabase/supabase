@@ -2701,6 +2701,7 @@ export interface components {
       cursor?: string
       data: {
         description: string | null
+        /** Format: uuid */
         id: string
         inserted_at: string
         name: string
@@ -2730,6 +2731,7 @@ export interface components {
         sql?: string
       }
       description: string | null
+      /** Format: uuid */
       id: string
       inserted_at: string
       name: string
