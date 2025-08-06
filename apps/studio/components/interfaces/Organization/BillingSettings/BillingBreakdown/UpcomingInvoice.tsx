@@ -165,7 +165,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       Compute, Disk Size, provisioned Disk IOPS, provisioned Disk Throughput, and
                       IPv4. See{' '}
                       <Link
-                        href={'https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas'}
+                        href={
+                          'https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas'
+                        }
                         target="_blank"
                       >
                         docs
