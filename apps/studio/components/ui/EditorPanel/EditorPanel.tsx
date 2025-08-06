@@ -131,7 +131,7 @@ export const EditorPanel = ({
     },
   })
 
-  const onExecuteSql = async (skipValidation = false) => {
+  const onExecuteSql = (skipValidation = false) => {
     setError(undefined)
     setShowWarning(undefined)
 
