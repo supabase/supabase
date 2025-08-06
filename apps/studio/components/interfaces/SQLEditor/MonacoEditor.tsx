@@ -89,8 +89,8 @@ const MonacoEditor = ({
     })
 
     editor.addAction({
-      id: 'run-query',
-      label: 'Run Query',
+      id: 'save-query',
+      label: 'Save Query',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
