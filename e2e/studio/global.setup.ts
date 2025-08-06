@@ -1,23 +1,22 @@
-import { expect, test as setup } from '@playwright/test'
-import dotenv from 'dotenv'
-import path from 'path'
-import { env, STORAGE_STATE_PATH } from '../env.config'
+import { chromium, type FullConfig } from '@playwright/test'
+import { expect } from '@playwright/test'
+import { env, STORAGE_STATE_PATH } from './env.config'
 
 /**
  * Run any setup tasks for the tests.
  * Catch errors and show useful messages.
  */
 
-dotenv.config({
-  path: path.resolve(__dirname, '..', '.env.local'),
-  override: true,
-})
-
 const IS_PLATFORM = process.env.IS_PLATFORM
 
 const envHasAuth = env.AUTHENTICATION
 
-setup('Global Setup', async ({ page }) => {
+console.log(env)
+
+export default async (config: FullConfig) => {
+  const browser = await chromium.launch()
+  const page = await browser.newPage()
+
   console.log(`\n 🧪 Setting up test environment.
     - Studio URL: ${env.STUDIO_URL}
     - API URL: ${env.API_URL}
@@ -29,8 +28,13 @@ setup('Global Setup', async ({ page }) => {
    * Studio Check
    */
 
+  if (!env.STUDIO_URL || !env.STUDIO_URL) {
+    console.error(`Missing environment variables. Check README.md for more information.`)
+    throw new Error('Missing environment variables')
+  }
+
   const studioUrl = env.STUDIO_URL
-  const apiUrl = env.API_URL
+  const apiUrl = env.STUDIO_URL
 
   await page.goto(studioUrl).catch((err) => {
     console.error(
@@ -69,8 +73,9 @@ To start API locally, run:
   /**
    * Only run authentication if the environment requires it
    */
-  if (!env.AUTHENTICATION) {
+  if (env.AUTHENTICATION !== `true`) {
     console.log(`\n 🔑 Skipping authentication for ${env.STUDIO_URL}`)
+    await browser.close()
     return
   } else {
     if (!env.EMAIL || !env.PASSWORD || !env.PROJECT_REF) {
@@ -83,8 +88,6 @@ To start API locally, run:
   console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
 
   await page.goto(signInUrl, { waitUntil: 'networkidle' })
-  await page.waitForLoadState('domcontentloaded')
-  await page.waitForLoadState('networkidle')
 
   // Check if we're still on the sign-in page
   const currentUrl = page.url()
@@ -97,14 +100,13 @@ To start API locally, run:
     if (currentUrl.includes('/projects')) {
       console.log('\n ✅ Already authenticated, proceeding with tests')
       await page.context().storageState({ path: STORAGE_STATE_PATH })
+      await browser.close()
       return
     }
 
     // If we're redirected somewhere else, try to navigate back to sign-in
     console.log('\n 🔄 Attempting to navigate back to sign-in page')
-    await page.goto(signInUrl, { waitUntil: 'networkidle' })
-    await page.waitForLoadState('domcontentloaded')
-    await page.waitForLoadState('networkidle')
+    await page.goto(signInUrl, { waitUntil: 'networkidle', timeout: 30000 })
 
     // Check URL again after second attempt
     const secondAttemptUrl = page.url()
@@ -152,4 +154,7 @@ To start API locally, run:
   await page.waitForURL('**/organizations')
 
   await page.context().storageState({ path: STORAGE_STATE_PATH })
-})
+
+  await page.close()
+  await browser.close()
+}

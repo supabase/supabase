@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test'
 import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
+
 const LOGS_PAGES = [
   { label: 'API Gateway', route: 'edge-logs' },
   { label: 'Postgres', route: 'postgres-logs' },
@@ -46,7 +46,7 @@ test.describe('Logs', () => {
       /**
        * Navigates to Logs
        */
-      await page.goto(toUrl(`/project/${ref}/logs/${logPage.route}`))
+      await page.goto(`/project/${ref}/logs/${logPage.route}`)
 
       await expect(page.getByRole('heading', { name: 'Logs & Analytics' }), {
         message: 'Logs & Analytics heading should be visible',
@@ -72,8 +72,7 @@ test.describe('Logs', () => {
       /**
        * Can select and view log details
        */
-      const gridcells = page.getByText('Random event message')
-      await gridcells.click()
+      await page.waitForLoadState('networkidle')
 
       const firstRow = page.getByRole('row', { name: /Random event/ })
 

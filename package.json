@@ -20,6 +20,7 @@
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
+    "dev:up": "cd docker && docker-compose up",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
     "test:prettier": "prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",

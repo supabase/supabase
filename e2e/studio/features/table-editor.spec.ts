@@ -115,7 +115,7 @@ const deleteEnum = async (page: Page, enumName: string, ref: string) => {
   await expect(page.getByText(`Successfully deleted "${enumName}"`)).toBeVisible()
 }
 
-test.skip('Table Editor', () => {
+test.describe('Table Editor', () => {
   let page: Page
   const testTableName = `pw-test-table-editor`
   const tableNameRlsEnabled = `pw-test-rls-enabled`
@@ -152,7 +152,7 @@ test.skip('Table Editor', () => {
     await deleteTable(page, tableNameCsv)
   })
 
-  test.skip('should perform all table operations sequentially', async ({ ref }) => {
+  test('should perform all table operations sequentially', async ({ ref }) => {
     await createTable(page, testTableName)
     const s = getSelectors(testTableName)
     test.setTimeout(60000)

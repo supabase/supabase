@@ -16,7 +16,7 @@ test.describe('SQL Editor', () => {
   const pwTestQueryName = 'pw-test-query'
 
   test.beforeAll(async ({ browser, ref }) => {
-    test.setTimeout(60000)
+    test.setTimeout(60_000)
 
     // Create a new table for the tests
     page = await browser.newPage()
@@ -59,7 +59,7 @@ test.describe('SQL Editor', () => {
         page.getByText('Successfully deleted 1 query'),
         'Delete confirmation toast should be visible'
       ).toBeVisible({
-        timeout: 50000,
+        timeout: 50_000,
       })
       await page.waitForTimeout(1000)
       privateSnippetText =
@@ -121,7 +121,7 @@ test.describe('SQL Editor', () => {
     })
   })
 
-  test('destructive query would tripper a warning modal', async () => {
+  test('destructive query would trigger a warning modal', async () => {
     await page.getByTestId('sql-editor-new-query-button').click()
     await page.getByRole('menuitem', { name: 'Create a new snippet' }).click()
 
@@ -189,7 +189,7 @@ test.describe('SQL Editor', () => {
         response.status().toString().startsWith('2')
     )
     await expect(privateSnippet.getByText(pwTestQueryName, { exact: true })).toBeVisible({
-      timeout: 50000,
+      timeout: 50_000,
     })
     const privateSnippet2 = await privateSnippet.getByText(pwTestQueryName, { exact: true })
 
@@ -223,7 +223,7 @@ test.describe('SQL Editor', () => {
         page.getByText('Successfully deleted 1 query'),
         'Delete confirmation toast should be visible'
       ).toBeVisible({
-        timeout: 50000,
+        timeout: 50_000,
       })
     }
   })
