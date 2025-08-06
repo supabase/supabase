@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Payload CMS for Supabase",
   "license": "MIT",
-  "type": "module",
   "engines": {
     "node": "22.*"
   },
