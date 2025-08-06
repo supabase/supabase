@@ -15,7 +15,7 @@ There are three general ways to use Sign in with Apple, depending on the applica
 
 - Sign in on the web or in web-based apps
   - Using an OAuth flow initiated by Supabase Auth using the [Sign in with Apple REST API](https://developer.apple.com/documentation/signinwithapplerestapi).
-  - Using [Sign in with Apple JS](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js) directly in the browser, usually suitable for websites.
+  - Using [Sign in with Apple JS](https://developer.apple.com/documentation/signinwithapplejs/) directly in the browser, usually suitable for websites.
 - Sign in natively inside iOS, macOS, watchOS or tvOS apps using [Apple's Authentication Services](https://developer.apple.com/documentation/authenticationservices)
 
 In some cases you're able to use the OAuth flow within web-based native apps such as with [React Native](https://reactnative.dev), [Expo](https://expo.dev) or other similar frameworks. It is best practice to use native Sign in with Apple capabilities on those platforms instead.
@@ -95,7 +95,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
     ## Using sign in with Apple JS
 
-    [Sign in with Apple JS](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js) is an official Apple framework for authenticating Apple users on websites. Although it can be used in web-based apps, those use cases will benefit more with the OAuth flow described above. We recommend using this method on classic websites only.
+    [Sign in with Apple JS](https://developer.apple.com/documentation/signinwithapplejs/) is an official Apple framework for authenticating Apple users on websites. Although it can be used in web-based apps, those use cases will benefit more with the OAuth flow described above. We recommend using this method on classic websites only.
 
     You can use the `signInWithIdToken()` method from the Supabase JavaScript library on the website to obtain an access and refresh token once the user has given consent using Sign in with Apple JS:
 

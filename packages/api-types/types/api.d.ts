@@ -2450,6 +2450,11 @@ export interface components {
       grant_type?: 'authorization_code' | 'refresh_token'
       redirect_uri?: string
       refresh_token?: string
+      /**
+       * @description Resource indicator for MCP (Model Context Protocol) clients
+       * @enum {string}
+       */
+      resource?: 'http://localhost:8080/mcp'
     }
     OAuthTokenResponse: {
       access_token: string
@@ -3697,7 +3702,11 @@ export interface operations {
         client_id: string
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
+        /** @description Organization slug */
+        organization_slug?: string
         redirect_uri: string
+        /** @description Resource indicator for MCP (Model Context Protocol) clients */
+        resource?: 'http://localhost:8080/mcp'
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string

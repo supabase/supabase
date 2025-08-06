@@ -11,15 +11,12 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -42,6 +39,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -76,11 +74,14 @@ export type CreateBucketForm = z.infer<typeof FormSchema>
 
 const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ref } = useParams()
-  const org = useSelectedOrganization()
-  const { mutate: sendEvent } = useSendEventMutation()
   const router = useRouter()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation()
+  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+    // [Joshen] Silencing the error here as it's being handled in onSubmit
+    onError: () => {},
+  })
   const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
@@ -150,9 +151,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
       onClose()
-    } catch (error) {
-      console.error(error)
-      toast.error('Failed to create bucket')
+    } catch (error: any) {
+      toast.error(`Failed to create bucket: ${error.message}`)
     }
   }
 
@@ -235,20 +235,16 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                                 </p>
                               </div>
                             </div>
-                            {icebergCatalogEnabled ? null : (
+                            {!icebergCatalogEnabled && (
                               <div className="w-full flex gap-x-2 py-2 items-center">
                                 <WarningIcon />
-                                <span className="text-xs text-left">
-                                  This feature is currently in alpha and not yet enabled for your
-                                  project. Sign up{' '}
-                                  <a
-                                    className="underline"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    href="https://forms.supabase.com/analytics-buckets"
-                                  >
+                                <span className="text-xs text-left text-foreground-lighter">
+                                  This is currently in alpha and not enabled for your project. Sign
+                                  up{' '}
+                                  <InlineLink href="https://forms.supabase.com/analytics-buckets">
                                     here
-                                  </a>
+                                  </InlineLink>
+                                  .
                                 </span>
                               </div>
                             )}
@@ -387,7 +383,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                               <p className="text-foreground-light text-sm">
                                 Note: Individual bucket uploads will still be capped at the{' '}
                                 <Link
-                                  href={`/project/${ref}/settings/storage`}
+                                  href={`/project/${ref}/storage/settings`}
                                   className="font-bold underline"
                                 >
                                   global upload limit
