@@ -237,8 +237,6 @@ export function GenericChartWithQuery({
   const FIXED_HEIGHT = 300 // px
   const BUTTON_AREA_HEIGHT = 40 // px
   const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px (FIXED_HEIGHT - 40px for button area)
-  const BUTTON_HEIGHT = 32 // px
-  const BUTTON_SPACER_HEIGHT = 32 // px
 
   return (
     <Card className="w-full">
@@ -247,7 +245,6 @@ export function GenericChartWithQuery({
       </CardHeader>
       <CardContent className="overflow-hidden">
         <div
-          // className="overflow-hidden"
           style={{
             height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
           }}
@@ -309,23 +306,21 @@ export function GenericChartWithQuery({
             </div>
           )}
         </div>
-
-        {/* Button container - always rendered to maintain height */}
-        <div className="flex justify-center mt-4" style={{ height: `${BUTTON_AREA_HEIGHT}px` }}>
-          {!isLoading && !error && chartData.length > 3 && !isExpanded ? (
-            <Button
-              type="default"
-              size="tiny"
-              iconRight={<ChevronDown />}
-              onClick={() => setIsExpanded(true)}
-              className="shadow-xl"
-            >
-              Show {chartData.length - 3} more
-            </Button>
-          ) : (
-            <div style={{ height: `${BUTTON_SPACER_HEIGHT}px` }}></div> // Invisible spacer to maintain height
-          )}
-        </div>
+        {!isExpanded && (
+          <div className="flex justify-center mt-4" style={{ height: `${BUTTON_AREA_HEIGHT}px` }}>
+            {!isLoading && !error && chartData.length > 3 && (
+              <Button
+                type="default"
+                size="tiny"
+                iconRight={<ChevronDown />}
+                onClick={() => setIsExpanded(true)}
+                className="shadow-xl"
+              >
+                Show {chartData.length - 3} more
+              </Button>
+            )}
+          </div>
+        )}
       </CardContent>
 
       {/* Filters */}
