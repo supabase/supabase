@@ -4,10 +4,10 @@ import { useParams } from 'common'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor/TableGridEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
@@ -16,7 +16,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const id = _id ? Number(_id) : undefined
   const store = useTabsStateSnapshot()
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: selectedTable, isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
