@@ -157,8 +157,8 @@ export const TopApiRoutesRenderer = (
   const { ref: projectRef } = useParams()
   const [showMore, setShowMore] = useState(false)
 
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
-  const cellClasses = '!text-xs !py-2 !border-x-0 !rounded-none align-middle'
+  const headerClasses = 'text-xs! py-2! p-0 font-bold bg-surface-200! border-x-0! rounded-none!'
+  const cellClasses = 'text-xs! py-2! border-x-0! rounded-none! align-middle'
 
   if (props.data.length === 0) return null
 
@@ -352,7 +352,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible_Shadcn_>
     <CollapsibleTrigger_Shadcn_ asChild>
       <div className="flex gap-2 items-center">
-        <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
+        <Button asChild type="text" className=" py-0! p-1!" title="Show more route details">
           <span>
             <ChevronRight
               size={14}
@@ -387,7 +387,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </CollapsibleTrigger_Shadcn_>
     <CollapsibleContent_Shadcn_ className="pt-2">
       {datum.search ? (
-        <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 !text-xs`}>
+        <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 text-xs!`}>
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{

@@ -109,8 +109,8 @@ export const FormContents = ({
 
   return (
     <div>
-      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSection header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <Input
             id="name"
             name="name"
@@ -123,7 +123,7 @@ export const FormContents = ({
       <FormSection
         header={
           <FormSectionLabel
-            className="lg:!col-span-4"
+            className="lg:col-span-4!"
             description={
               <p className="text-sm text-foreground-light">
                 Select which table and events will trigger your webhook
@@ -134,7 +134,7 @@ export const FormContents = ({
           </FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <Listbox
             size="medium"
             id="table_id"
@@ -187,10 +187,10 @@ export const FormContents = ({
       <SidePanel.Separator />
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">Webhook configuration</FormSectionLabel>
+          <FormSectionLabel className="lg:col-span-4!">Webhook configuration</FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <Radio.Group id="function_type" name="function_type" label="Type of webhook" type="cards">
             {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
               <Radio

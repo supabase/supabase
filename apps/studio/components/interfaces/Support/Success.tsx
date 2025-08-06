@@ -51,7 +51,7 @@ const Success = ({
       </div>
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
         <>
-          <div className="!my-10 w-full">
+          <div className="my-10! w-full">
             <Separator />
           </div>
           <div className="flex flex-col items-center px-12 space-y-2 text-center">
@@ -61,7 +61,7 @@ const Success = ({
               GitHub discussions or on Discord - build the next best thing together
             </p>
           </div>
-          <div className="w-full px-12 !mt-8">
+          <div className="w-full px-12 mt-8!">
             <Input
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
@@ -87,7 +87,7 @@ const Success = ({
           </div>
         </>
       )}
-      <div className="!mt-10 w-full">
+      <div className="mt-10! w-full">
         <Separator />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">

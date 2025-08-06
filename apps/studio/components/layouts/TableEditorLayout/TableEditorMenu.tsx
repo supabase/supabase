@@ -122,7 +122,7 @@ export const TableEditorMenu = () => {
 
   return (
     <>
-      <div className="flex flex-col flex-grow gap-5 pt-5 h-full">
+      <div className="flex flex-col grow gap-5 pt-5 h-full">
         <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
             className="mx-4"
@@ -259,7 +259,7 @@ export const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1 flex-grow" data-testid="tables-list">
+                <div className="flex flex-1 grow" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
                     // @ts-expect-error

@@ -132,7 +132,7 @@ export const ChartConfig = ({
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
+    <ResizablePanelGroup direction="horizontal" className="grow h-full">
       <ResizablePanel className="p-4 h-full" defaultSize={75}>
         {!hasConfig ? (
           <ResizablePanel className="p-4 h-full" defaultSize={75}>
@@ -175,7 +175,7 @@ export const ChartConfig = ({
       <ResizablePanel
         defaultSize={25}
         minSize={15}
-        className="px-3 py-3 space-y-4 !overflow-y-auto"
+        className="px-3 py-3 space-y-4 overflow-y-auto!"
       >
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>

@@ -109,7 +109,7 @@ export const DeleteAccountButton = () => {
           Request to delete account
         </Button>
       </DialogTrigger>
-      <DialogContent className="!w-[500px]">
+      <DialogContent className="w-[500px]!">
         <DialogHeader>
           {(organizations ?? []).length > 0 ? (
             <>

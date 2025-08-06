@@ -249,7 +249,7 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0" title="Users" />
+        <FormHeader className="py-4 px-6 mb-0!" title="Users" />
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
@@ -297,7 +297,7 @@ export const UsersV2 = () => {
                 <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
                   <SelectTrigger_Shadcn_
                     size="tiny"
-                    className={cn('w-[140px] !bg-transparent', filter === 'all' && 'border-dashed')}
+                    className={cn('w-[140px] bg-transparent!', filter === 'all' && 'border-dashed')}
                   >
                     <SelectValue_Shadcn_ />
                   </SelectTrigger_Shadcn_>
@@ -453,14 +453,14 @@ export const UsersV2 = () => {
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
           direction="horizontal"
-          className="relative flex flex-grow bg-alternative min-h-0"
+          className="relative flex grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
           <ResizablePanel defaultSize={1}>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
-                className="flex-grow border-t-0"
+                className="grow border-t-0"
                 rowHeight={44}
                 headerRowHeight={36}
                 columns={columns}

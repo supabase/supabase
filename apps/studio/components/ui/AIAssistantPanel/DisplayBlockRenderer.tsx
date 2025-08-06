@@ -105,7 +105,7 @@ export const DisplayBlockRenderer = ({
   }
 
   return (
-    <div className="display-block w-auto overflow-x-hidden !my-6">
+    <div className="display-block w-auto overflow-x-hidden my-6!">
       <QueryBlock
         label={label}
         sql={sqlQuery}

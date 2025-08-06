@@ -177,14 +177,14 @@ export const ProjectClaimConfirm = ({
 
                 <ChevronRight
                   size={16}
-                  className="text-foreground-light transition-all group-data-[state=open]:rotate-90 w-20"
+                  className="text-foreground-light transition-all group-data-open:rotate-90 w-20"
                   strokeWidth={1}
                 />
               </CollapsibleTrigger_Shadcn_>
               <CollapsibleContent_Shadcn_
                 className={cn(
                   'flex flex-col gap-8 transition-all',
-                  'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                  'data-closed:animate-collapsible-up data-open:animate-collapsible-down'
                 )}
               >
                 <div>

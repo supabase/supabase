@@ -50,7 +50,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
         </div>
       )}
       {saved.length === 0 && (
-        <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
+        <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
           <Save className="animate-bounce" />
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
           <p className="text-sm text-foreground-lighter">

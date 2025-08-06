@@ -108,7 +108,7 @@ const TableSelector = ({
               )}
 
               {showError && isError && (
-                <Alert_Shadcn_ variant="warning" className="!px-3 !py-3 !border-0 rounded-none">
+                <Alert_Shadcn_ variant="warning" className="px-3! py-3! border-0! rounded-none">
                   <AlertTitle_Shadcn_ className="text-xs text-amber-900">
                     Failed to load tables
                   </AlertTitle_Shadcn_>

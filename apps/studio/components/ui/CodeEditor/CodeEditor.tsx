@@ -247,7 +247,7 @@ const CodeEditor = ({
         <div
           className={cn(
             'monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono',
-            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter',
+            '[&>div>p]:text-foreground-lighter [&>div>p]:m-0! tracking-tighter',
             showPlaceholder ? 'block' : 'hidden'
           )}
         >

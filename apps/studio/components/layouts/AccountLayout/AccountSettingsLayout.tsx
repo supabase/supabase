@@ -52,7 +52,7 @@ export const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
           ))}
         </ul>
       </nav>
-      <div className="flex-1 flex-grow">{children}</div>
+      <div className="flex-1 grow">{children}</div>
     </ScaffoldContainerLegacy>
   )
 }

@@ -197,7 +197,7 @@ export const EditWrapperSheet = ({
                     Edit {wrapperMeta.label} wrapper: {wrapper.name}
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex-grow overflow-y-auto">
+                <div className="grow overflow-y-auto">
                   <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
                     <FormSectionContent loading={false}>
                       <Input

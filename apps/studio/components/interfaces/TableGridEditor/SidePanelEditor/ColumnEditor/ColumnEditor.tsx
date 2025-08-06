@@ -208,8 +208,8 @@ const ColumnEditor = ({
         />
       }
     >
-      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSection header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <Input
             label="Name"
             type="text"
@@ -232,7 +232,7 @@ const ColumnEditor = ({
       <FormSection
         header={
           <FormSectionLabel
-            className="lg:!col-span-4"
+            className="lg:col-span-4!"
             description={
               <div className="space-y-2">
                 <Button asChild type="default" size="tiny" icon={<Plus strokeWidth={2} />}>
@@ -261,7 +261,7 @@ const ColumnEditor = ({
           </FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <ColumnType
             showRecommendation
             value={columnFields?.format ?? ''}
@@ -317,9 +317,9 @@ const ColumnEditor = ({
       <SidePanel.Separator />
 
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
+        header={<FormSectionLabel className="lg:col-span-4!">Foreign Keys</FormSectionLabel>}
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <ColumnForeignKey
             column={columnFields}
             relations={fkRelations}
@@ -337,9 +337,9 @@ const ColumnEditor = ({
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Constraints</FormSectionLabel>}
+        header={<FormSectionLabel className="lg:col-span-4!">Constraints</FormSectionLabel>}
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <Toggle
             label="Is Primary Key"
             descriptionText="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table"

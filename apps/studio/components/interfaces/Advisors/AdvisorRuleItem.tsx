@@ -106,7 +106,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
           else setExpandedLint(undefined)
         }}
       >
-        <CollapsibleTrigger_Shadcn_ asChild className="[&[data-state=open]>div>svg]:!rotate-90">
+        <CollapsibleTrigger_Shadcn_ asChild className="[&[data-state=open]>div>svg]:rotate-90!">
           <Card className="border-b-0 rounded-none">
             <CardContent className="py-3 flex items-center justify-between text-sm gap-4 cursor-pointer transition hover:bg-surface-200">
               <div className="flex items-center justify-center [&>svg]:text-foreground-lighter">
@@ -138,7 +138,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_
           className={cn(
-            'bg-surface border-x border-t !rounded-none',
+            'bg-surface border-x border-t rounded-none!',
             rules.length > 0 ? 'divide-y' : ''
           )}
         >

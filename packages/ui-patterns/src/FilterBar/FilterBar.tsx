@@ -1038,7 +1038,7 @@ export function FilterBar({
         </Command_Shadcn_>
       )}
       <Dialog open={isDialogOpen} onOpenChange={(open: boolean) => setIsDialogOpen(open)}>
-        <DialogContent hideClose className="!w-fit max-w-screen">
+        <DialogContent hideClose className="w-fit! max-w-screen">
           {dialogContent}
         </DialogContent>
       </Dialog>

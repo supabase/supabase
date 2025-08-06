@@ -36,7 +36,7 @@ export const ScrollGradient = ({ scrollRef, className = '', offset = 0 }: Scroll
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className={`absolute -top-24 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-background-200 pointer-events-none ${className}`}
+          className={`absolute -top-24 left-0 right-0 h-24 bg-linear-to-b from-transparent to-background-200 pointer-events-none ${className}`}
         />
       )}
     </AnimatePresence>

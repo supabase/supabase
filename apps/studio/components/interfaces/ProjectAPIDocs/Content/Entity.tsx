@@ -64,7 +64,7 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
         </div>
         <LanguageSelector />
       </div>
-      <div className="space-y-2 px-4 py-4 !border-t-0">
+      <div className="space-y-2 px-4 py-4 border-t-0!">
         <p className="text-sm text-foreground-light">Columns</p>
         <Table
           head={[

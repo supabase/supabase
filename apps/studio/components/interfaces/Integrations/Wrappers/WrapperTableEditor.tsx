@@ -174,7 +174,7 @@ const Option = ({ option }: { option: TableOption }) => {
         {[
           ...(!option.required
             ? [
-                <Listbox.Option key="empty" value="" label="---" className="!w-96">
+                <Listbox.Option key="empty" value="" label="---" className="w-96!">
                   ---
                 </Listbox.Option>,
               ]
@@ -185,7 +185,7 @@ const Option = ({ option }: { option: TableOption }) => {
               id={option.name + subOption.value}
               value={subOption.value}
               label={subOption.label}
-              className="!w-96"
+              className="w-96!"
             >
               {subOption.label}
             </Listbox.Option>
@@ -305,7 +305,7 @@ const TableForm = ({
             ))}
 
             <div className="form-group">
-              <label className="!w-full">
+              <label className="w-full!">
                 {table.availableColumns
                   ? 'Select the columns to be added to your table'
                   : 'Add columns to your table'}

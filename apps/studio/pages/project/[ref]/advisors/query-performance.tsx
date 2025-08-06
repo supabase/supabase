@@ -54,7 +54,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   return (
     <div className="h-full flex flex-col">
       <FormHeader
-        className="py-4 px-6 !mb-0"
+        className="py-4 px-6 mb-0!"
         title="Query Performance"
         actions={
           <div className="flex items-center gap-2">

@@ -111,7 +111,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                 <FormControl_Shadcn_>
                   <Input_Shadcn_
                     type="number"
-                    className="flex-grow font-mono rounded-r-none max-w-32"
+                    className="grow font-mono rounded-r-none max-w-32"
                     {...field}
                     value={field.value}
                     disabled={disableInput || disableIopsInput || isError}

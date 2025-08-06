@@ -49,7 +49,7 @@ export const QueryDetail = ({
           language="sql"
           className={cn(
             'max-w-full max-h-[310px]',
-            '!py-3 !px-3.5 prose dark:prose-dark transition',
+            'py-3! px-3.5! prose dark:prose-dark transition',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
           )}
         />

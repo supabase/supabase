@@ -37,11 +37,11 @@ const RadioGroupCardItem = React.forwardRef<
         'p-2',
         // 'hover:bg-selection',
         'hover:border-foreground-muted',
-        'hover:z-[1] focus-visible:z-[1]',
-        'data-[state=checked]:z-[1]',
-        'data-[state=checked]:ring-2 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-200 dark:data-[state=checked]:bg-surface-300',
-        'data-[state=checked]:border-foreground/50',
+        'hover:z-1 focus-visible:z-1',
+        'data-checked:z-1',
+        'data-checked:ring-2 data-checked:ring-border',
+        'data-checked:bg-surface-200 dark:data-checked:bg-surface-300',
+        'data-checked:border-foreground/50',
         'transition-colors',
         'group',
         props.className
@@ -53,7 +53,7 @@ const RadioGroupCardItem = React.forwardRef<
           <div
             className="
                 aspect-square h-4 w-4 
-                rounded-full border group-data-[state=checked]:border-foreground-muted
+                rounded-full border group-data-checked:border-foreground-muted
                 group-focus:border-foreground-muted
                 group-hover:border-foreground-muted
                 ring-offset-background 
@@ -75,7 +75,7 @@ const RadioGroupCardItem = React.forwardRef<
             'w-full',
             'text-xs transition-colors text-left',
             'text-light',
-            'group-hover:text-foreground group-data-[state=checked]:text-foreground',
+            'group-hover:text-foreground group-data-checked:text-foreground',
             props.disabled ? 'cursor-not-allowed' : 'cursor-pointer'
           )}
         >

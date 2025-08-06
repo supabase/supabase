@@ -128,7 +128,7 @@ export const DisplayApiSettings = ({
               key={x.api_key}
               className={
                 i >= 1 &&
-                'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
+                'border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark'
               }
             >
               <Input
@@ -146,7 +146,7 @@ export const DisplayApiSettings = ({
                     ))}
                     {x.tags === 'service_role' && (
                       <>
-                        <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
+                        <code className="text-xs text-code bg-destructive! text-white! border-destructive!">
                           secret
                         </code>
                       </>

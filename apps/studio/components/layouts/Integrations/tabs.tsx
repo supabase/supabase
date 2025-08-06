@@ -49,10 +49,10 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
 
   return (
     <AnimatePresence>
-      <div className="sticky top-[0px] z-[1] bg-dash-sidebar" ref={navRef}>
+      <div className="sticky top-[0px] z-1 bg-dash-sidebar" ref={navRef}>
         <MotionNavMenu
           transition={{ duration: 0.2 }}
-          className={cn('px-4 md:px-10 [&_ul]:items-center bg-200', isMobile && '!px-4')}
+          className={cn('px-4 md:px-10 [&_ul]:items-center bg-200', isMobile && 'px-4!')}
           aria-label="Integration menu"
           style={{ paddingLeft: !isSticky ? (navInnerLeftPaddingX as unknown as number) : 40 }}
         >

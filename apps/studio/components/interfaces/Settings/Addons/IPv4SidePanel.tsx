@@ -143,7 +143,7 @@ const IPv4SidePanel = () => {
             </p>
           )}
 
-          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('mt-8! pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"
@@ -153,7 +153,7 @@ const IPv4SidePanel = () => {
               <Radio
                 name="ipv4"
                 checked={selectedOption === 'ipv4_none'}
-                className="col-span-4 !p-0"
+                className="col-span-4 p-0!"
                 label="No IPv4"
                 value="ipv4_none"
               >
@@ -167,14 +167,14 @@ const IPv4SidePanel = () => {
                     </p>
                     <div className="flex items-center space-x-1 mt-2">
                       <p className="text-foreground text-sm">$0</p>
-                      <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                      <p className="text-foreground-light translate-y-px"> / month</p>
                     </div>
                   </div>
                 </div>
               </Radio>
               {availableOptions.map((option) => (
                 <Radio
-                  className="col-span-4 !p-0"
+                  className="col-span-4 p-0!"
                   name="ipv4"
                   key={option.identifier}
                   disabled={isFreePlan || !isAws}
@@ -194,7 +194,7 @@ const IPv4SidePanel = () => {
                         <p className="text-foreground text-sm" translate="no">
                           {formatCurrency(option.price)}
                         </p>
-                        <p className="text-foreground-light translate-y-[1px]">
+                        <p className="text-foreground-light translate-y-px">
                           / month / database
                         </p>
                       </div>

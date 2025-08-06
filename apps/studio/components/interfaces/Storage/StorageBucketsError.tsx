@@ -11,7 +11,7 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
   const { ref } = useParams()
 
   return (
-    <div className="storage-container flex items-center justify-center flex-grow">
+    <div className="storage-container flex items-center justify-center grow">
       <div>
         <Alert
           withIcon

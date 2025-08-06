@@ -30,13 +30,13 @@ export const MarkdownContent = ({ integrationId }: { integrationId: string }) =>
           className="overflow-hidden"
           transition={{ duration: 0.4 }}
         >
-          <Markdown content={displayContent} className="!max-w-3xl" />
+          <Markdown content={displayContent} className="max-w-3xl!" />
         </motion.div>
         {!isExpanded && (
           <div
             className={cn(
               'bottom-0 left-0 right-0 h-24',
-              supportExpanding && 'bg-gradient-to-t from-background-200 to-transparent',
+              supportExpanding && 'bg-linear-to-t from-background-200 to-transparent',
               !isExpanded ? 'absolute' : 'relative'
             )}
           />

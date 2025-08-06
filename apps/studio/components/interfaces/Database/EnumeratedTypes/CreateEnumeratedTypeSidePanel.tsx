@@ -166,7 +166,7 @@ const CreateEnumeratedTypeSidePanel = ({
                                   After creation, values cannot be deleted or sorted
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
-                                  <p className="!leading-normal track">
+                                  <p className="leading-normal! track">
                                     You will need to delete and recreate the enumerated type with
                                     the updated values instead.
                                   </p>

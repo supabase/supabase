@@ -206,7 +206,7 @@ const TableList = ({
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
         <div className="flex gap-2 items-center">
           <SchemaSelector
-            className="flex-grow lg:flex-grow-0 w-[180px]"
+            className="grow lg:grow-0 w-[180px]"
             size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
@@ -259,10 +259,10 @@ const TableList = ({
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </div>
-        <div className="flex flex-grow justify-between gap-2 items-center">
+        <div className="flex grow justify-between gap-2 items-center">
           <Input
             size="tiny"
-            className="flex-grow lg:flex-grow-0 w-52"
+            className="grow lg:grow-0 w-52"
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
@@ -300,7 +300,7 @@ const TableList = ({
         <div className="w-full">
           <Table
             head={[
-              <Table.th key="icon" className="!px-0" />,
+              <Table.th key="icon" className="px-0!" />,
               <Table.th key="name">Name</Table.th>,
               <Table.th key="description" className="hidden lg:table-cell">
                 Description
@@ -365,7 +365,7 @@ const TableList = ({
                 {entities.length > 0 &&
                   entities.map((x) => (
                     <Table.tr key={x.id}>
-                      <Table.td className="!pl-5 !pr-1">
+                      <Table.td className="pl-5! pr-1!">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             {x.type === ENTITY_TYPE.TABLE ? (
@@ -487,7 +487,7 @@ const TableList = ({
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <DropdownMenuItem
-                                          className="!pointer-events-auto gap-x-2"
+                                          className="pointer-events-auto! gap-x-2"
                                           disabled={!canUpdateTables}
                                           onClick={() => {
                                             if (canUpdateTables) onEditTable(x)
@@ -520,7 +520,7 @@ const TableList = ({
                                       <TooltipTrigger asChild>
                                         <DropdownMenuItem
                                           disabled={!canUpdateTables || isSchemaLocked}
-                                          className="!pointer-events-auto gap-x-2"
+                                          className="pointer-events-auto! gap-x-2"
                                           onClick={() => {
                                             if (canUpdateTables && !isSchemaLocked) {
                                               onDeleteTable({

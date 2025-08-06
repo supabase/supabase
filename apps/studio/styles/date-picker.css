@@ -1,3 +1,5 @@
+@reference './globals.css';
+
 .react-datepicker__input-container input {
   @apply block w-full text-base md:text-sm bg-white border border-background-surface-100 rounded shadow-sm;
 }

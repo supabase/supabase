@@ -20,7 +20,7 @@ const IndexesPage: NextPageWithLayout = () => {
       <ScaffoldSection>
         <ScaffoldSectionContent className="gap-0">
           <FormHeader
-            className="!mb-0"
+            className="mb-0!"
             title="Database Indexes"
             description="Improve query performance against your database"
           />

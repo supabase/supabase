@@ -55,7 +55,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
 
     if (document !== undefined) {
       // [Joshen] This is to ensure that any 3DS popup from Stripe remains clickable
-      document.body.classList.add('!pointer-events-auto')
+      document.body.classList.add('pointer-events-auto!')
     }
 
     const result = await paymentRef.current?.confirmSetup()
@@ -130,7 +130,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
     }
 
     if (document !== undefined) {
-      document.body.classList.remove('!pointer-events-auto')
+      document.body.classList.remove('pointer-events-auto!')
     }
   }
 

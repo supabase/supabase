@@ -111,7 +111,7 @@ const WorkflowLogsCard = ({
         className="overflow-hidden border-0 overflow-y-auto relative p-0"
       >
         {/* sticky gradient overlay */}
-        <div className="sticky top-0 -mb-8 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none z-10" />
+        <div className="sticky top-0 -mb-8 h-8 bg-linear-to-b from-background to-transparent pointer-events-none z-10" />
         {logs ? (
           <pre className="p-6 text-xs text-foreground-light p-0 rounded">{logs}</pre>
         ) : (

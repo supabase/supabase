@@ -157,7 +157,7 @@ const ProjectUsage = () => {
                           disabled
                           key={i.key}
                           value={i.key}
-                          className="!pointer-events-auto"
+                          className="pointer-events-auto!"
                         >
                           {i.label}
                         </DropdownMenuRadioItem>

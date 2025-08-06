@@ -52,7 +52,7 @@ export const filterFields = [
 
       return (
         <div className="flex items-center gap-2 w-full min-w-0">
-          <span className="flex-shrink-0 text-foreground">{statusValue}</span>
+          <span className="shrink-0 text-foreground">{statusValue}</span>
           {statusLabel && (
             <span className="text-[0.7rem] text-foreground-lighter truncate" title={statusLabel}>
               {statusLabel}

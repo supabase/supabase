@@ -100,7 +100,7 @@ const Migrations = () => {
                             <Table.td
                               className={
                                 (migration?.name ?? '').length === 0
-                                  ? '!text-foreground-lighter'
+                                  ? 'text-foreground-lighter!'
                                   : ''
                               }
                             >

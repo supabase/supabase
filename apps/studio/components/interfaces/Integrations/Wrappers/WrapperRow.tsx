@@ -45,7 +45,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   return (
     <>
       <TableRow>
-        <TableCell className="gap-2 align-top !py-3 min-w-80">
+        <TableCell className="gap-2 align-top py-3! min-w-80">
           {wrapper.name}
 
           {visibleMetadata.map((metadata) => (
@@ -61,7 +61,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           ))}
         </TableCell>
 
-        <TableCell className="space-y-2 !p-4">
+        <TableCell className="space-y-2 p-4!">
           {_tables?.map((table) => {
             const target = table.table ?? table.object
 

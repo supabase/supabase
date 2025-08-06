@@ -46,9 +46,9 @@ export const HeaderBanner = ({
     <motion.div
       {...bannerMotionProps}
       className={cn(
-        `relative ${bannerStyles} border-b border-muted py-1 flex items-center justify-center flex-shrink-0 px-0`,
+        `relative ${bannerStyles} border-b border-muted py-1 flex items-center justify-center shrink-0 px-0`,
         type === 'incident' && 'hover:bg-brand-300',
-        'flex-shrink-0'
+        'shrink-0'
       )}
     >
       <div className={cn('items-center flex flex-row gap-3')}>
@@ -69,12 +69,12 @@ export const HeaderBanner = ({
           />
         </div>
         <Icon
-          className={cn('z-[1] flex-shrink-0', type === 'incident' && 'bg-brand text-brand-200')}
+          className={cn('z-1 shrink-0', type === 'incident' && 'bg-brand text-brand-200')}
         />
         <div className="flex flex-col md:flex-row gap-0 md:gap-3">
           <span
             className={cn(
-              'text-xs sm:text-sm z-[1]',
+              'text-xs sm:text-sm z-1',
               type === 'danger'
                 ? 'text-destructive'
                 : type === 'incident'
@@ -86,7 +86,7 @@ export const HeaderBanner = ({
           </span>
           <span
             className={cn(
-              'text-xs sm:text-sm z-[1] opacity-75',
+              'text-xs sm:text-sm z-1 opacity-75',
               type === 'danger'
                 ? 'text-destructive'
                 : type === 'incident'
@@ -101,7 +101,7 @@ export const HeaderBanner = ({
           <button
             className={cn(
               'lg:block hidden',
-              'text-foreground-lighter text-sm z-[1] m-0',
+              'text-foreground-lighter text-sm z-1 m-0',
               type === 'danger' ? 'text-destructive' : 'text-warning'
             )}
           >

@@ -114,7 +114,7 @@ export const S3Connection = () => {
           {projectIsLoading ? (
             <GenericSkeletonLoader />
           ) : isProjectActive ? (
-            <Panel className="!mb-0">
+            <Panel className="mb-0!">
               <FormField_Shadcn_
                 name="s3ConnectionEnabled"
                 control={form.control}
@@ -274,7 +274,7 @@ export const S3Connection = () => {
                       ))
                     ) : (
                       <Table.tr>
-                        <Table.td colSpan={4} className="!rounded-b-md overflow-hidden">
+                        <Table.td colSpan={4} className="rounded-b-md! overflow-hidden">
                           <p className="text-sm text-foreground">No access keys created</p>
                           <p className="text-sm text-foreground-light">
                             There are no access keys associated with your project yet

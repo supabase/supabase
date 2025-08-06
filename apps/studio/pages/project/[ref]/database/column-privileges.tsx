@@ -247,7 +247,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   <Button
                     type="outline"
                     aria-label="Dismiss"
-                    className="absolute top-2 right-2 p-1 !pl-1"
+                    className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
                       setDiffWarningDismissed(true)
                     }}
@@ -275,7 +275,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   <Button
                     type="outline"
                     aria-label="Dismiss"
-                    className="absolute top-2 right-2 p-1 !pl-1"
+                    className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
                       setSelectStarWarningDismissed(true)
                     }}
@@ -320,7 +320,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   />
                 </div>
               ) : (tables ?? []).length === 0 ? (
-                <div className="flex-grow flex flex-col items-center justify-center w-[600px] mx-auto">
+                <div className="grow flex flex-col items-center justify-center w-[600px] mx-auto">
                   <p className="text-center">There are no tables in the {selectedSchema} schema</p>
                   <p className="text-sm text-foreground-light text-center">
                     Once a table is available in the schema, you may manage it's column-level

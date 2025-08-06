@@ -89,7 +89,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
                     href={
                       'https://supabase.com/docs/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project'
                     }
-                    className="translate-y-[1px]"
+                    className="translate-y-px"
                   >
                     Troubleshooting
                   </Link>

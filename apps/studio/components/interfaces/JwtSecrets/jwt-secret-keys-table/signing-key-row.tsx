@@ -77,9 +77,9 @@ export const SigningKeyRow = ({
           )}
         >
           {signingKey.status === 'standby' ? (
-            <Timer className="size-4 flex-shrink-0" />
+            <Timer className="size-4 shrink-0" />
           ) : (
-            <Key className="size-4 flex-shrink-0" />
+            <Key className="size-4 shrink-0" />
           )}
           <span className="truncate">{statusLabels[signingKey.status]}</span>
         </Badge>

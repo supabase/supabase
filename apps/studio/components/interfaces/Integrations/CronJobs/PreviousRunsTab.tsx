@@ -59,7 +59,7 @@ const cronJobColumns = [
             <SimpleCodeBlock
               showCopy={true}
               className="sql"
-              parentClassName="!p-0 [&>div>span]:text-xs"
+              parentClassName="p-0! [&>div>span]:text-xs"
             >
               {row.return_message}
             </SimpleCodeBlock>
@@ -113,7 +113,7 @@ const columns = cronJobColumns.map((col) => {
       return (
         <div className="flex items-center justify-between font-mono font-normal text-xs w-full">
           <div className="flex items-center gap-x-2">
-            <p className="!text-foreground">{col.name}</p>
+            <p className="text-foreground!">{col.name}</p>
           </div>
         </div>
       )
@@ -203,7 +203,7 @@ export const PreviousRunsTab = () => {
     <div className="h-full flex flex-col">
       <LoadingLine loading={isFetching} />
       <DataGrid
-        className="flex-grow"
+        className="grow"
         rowHeight={44}
         headerRowHeight={36}
         onScroll={handleScroll}
@@ -264,11 +264,11 @@ export const PreviousRunsTab = () => {
                   <SimpleCodeBlock
                     showCopy={false}
                     className="sql"
-                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
+                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 p-2! rounded-md"
                   >
                     {job?.command}
                   </SimpleCodeBlock>
-                  <div className="bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background-200 to-transparent absolute " />
+                  <div className="bottom-0 left-0 right-0 h-8 bg-linear-to-t from-background-200 to-transparent absolute " />
                 </TooltipTrigger>
                 <TooltipContent
                   side="bottom"
@@ -279,7 +279,7 @@ export const PreviousRunsTab = () => {
                   <SimpleCodeBlock
                     showCopy={false}
                     className="sql"
-                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-3"
+                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 p-3!"
                   >
                     {job?.command}
                   </SimpleCodeBlock>

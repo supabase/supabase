@@ -65,7 +65,7 @@ const FeaturePreviewModal = () => {
       hideFooter
       showCloseButton
       size="xlarge"
-      className="!max-w-4xl"
+      className="max-w-4xl!"
       header="Dashboard feature previews"
       visible={showFeaturePreviewModal}
       onCancel={closeFeaturePreviewModal}
@@ -101,7 +101,7 @@ const FeaturePreviewModal = () => {
                 })}
             </ScrollArea>
           </div>
-          <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
+          <div className="grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-2">
                 <p>{selectedFeature?.name}</p>

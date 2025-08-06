@@ -36,7 +36,7 @@ export const APIKeyDeleteDialog = ({ apiKey, lastSeen }: APIKeyDeleteDialogProps
   return (
     <>
       <DropdownMenuItem
-        className="flex gap-2 !pointer-events-auto"
+        className="flex gap-2 pointer-events-auto!"
         onClick={async (e) => {
           if (canDeleteAPIKeys) {
             e.preventDefault()

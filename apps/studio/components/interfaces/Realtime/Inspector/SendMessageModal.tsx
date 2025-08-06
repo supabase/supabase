@@ -51,7 +51,7 @@ export const SendMessageModal = ({
         <Input
           label="Message name"
           size="small"
-          className="flex-grow"
+          className="grow"
           value={values.message}
           onChange={(v) => setValues({ ...values, message: v.target.value })}
         />
@@ -60,7 +60,7 @@ export const SendMessageModal = ({
           <CodeEditor
             id="message-payload"
             language="json"
-            className="!mb-0 h-32 overflow-hidden rounded border"
+            className="mb-0! h-32 overflow-hidden rounded border"
             onInputChange={(e: string | undefined) => setValues({ ...values, payload: e ?? '{}' })}
             options={{ wordWrap: 'off', contextmenu: false }}
             value={values.payload}

@@ -167,7 +167,7 @@ const ProjectLinker = ({
     <div className="flex flex-col bg border shadow rounded-lg overflow-hidden">
       <div className="relative p-12 border-b border-muted">
         <div
-          className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
+          className="absolute inset-0 bg-grid-black/5 mask-[linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:mask-[linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
         />
 
@@ -228,14 +228,14 @@ const ProjectLinker = ({
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
-                  className="p-0 !w-72"
+                  className="p-0 w-72!"
                   side="bottom"
                   align="center"
                   style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />
-                    <CommandList_Shadcn_ className="!max-h-[170px]">
+                    <CommandList_Shadcn_ className="max-h-[170px]!">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
                         {supabaseProjects.map((project, i) => {
@@ -319,14 +319,14 @@ const ProjectLinker = ({
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
-                  className="p-0 !w-72"
+                  className="p-0 w-72!"
                   side="bottom"
                   align="center"
                   style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />
-                    <CommandList_Shadcn_ className="!max-h-[170px]">
+                    <CommandList_Shadcn_ className="max-h-[170px]!">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
                         {foreignProjects.map((project, i) => {

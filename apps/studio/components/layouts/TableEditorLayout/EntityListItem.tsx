@@ -1,5 +1,14 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import {
+  Clipboard,
+  Copy,
+  Download,
+  Edit,
+  Lock,
+  MoreVertical,
+  MoreHorizontal,
+  Trash,
+} from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -288,7 +297,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label={`Actions for ${entity.name}`}
-              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground"
+              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
             >
               <MoreHorizontal size={14} strokeWidth={2} />
             </DropdownMenuTrigger>

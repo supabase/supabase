@@ -135,7 +135,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                             shouldValidate: true,
                           })
                         }}
-                        className="flex-grow font-mono rounded-r-none max-w-32"
+                        className="grow font-mono rounded-r-none max-w-32"
                         disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
                       />
                     </FormControl_Shadcn_>

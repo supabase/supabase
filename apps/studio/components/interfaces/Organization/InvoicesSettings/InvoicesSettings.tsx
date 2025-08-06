@@ -98,7 +98,7 @@ const InvoicesSettings = () => {
             ))
           ) : isError ? (
             <Table.tr className="rounded-b">
-              <Table.td colSpan={6} className="!p-0 !rounded-b overflow-hidden">
+              <Table.td colSpan={6} className="p-0! rounded-b! overflow-hidden">
                 <AlertError
                   className="border-0 rounded-none"
                   error={error}

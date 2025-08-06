@@ -75,22 +75,22 @@ export const LocalVersionPopover = () => {
                   </TabsTrigger_Shadcn_>
                 </TabsList_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="macos">
-                  <SimpleCodeBlock parentClassName="bg-selection rounded !px-2">
+                  <SimpleCodeBlock parentClassName="bg-selection rounded px-2!">
                     brew upgrade supabase
                   </SimpleCodeBlock>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="windows">
-                  <SimpleCodeBlock parentClassName="bg-selection rounded !px-2">
+                  <SimpleCodeBlock parentClassName="bg-selection rounded px-2!">
                     scoop update supabase
                   </SimpleCodeBlock>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="linux">
-                  <SimpleCodeBlock parentClassName="bg-selection rounded !px-2">
+                  <SimpleCodeBlock parentClassName="bg-selection rounded px-2!">
                     brew upgrade supabase
                   </SimpleCodeBlock>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="npm">
-                  <SimpleCodeBlock parentClassName="bg-selection rounded !px-2">
+                  <SimpleCodeBlock parentClassName="bg-selection rounded px-2!">
                     npm update supabase --save-dev
                   </SimpleCodeBlock>
                 </TabsContent_Shadcn_>
@@ -145,7 +145,7 @@ export const LocalVersionPopover = () => {
                   title="Beta Releases"
                   description="Beta releases are also available between stable releases through the Beta version of the CLI, which might be helpful if you are waiting for a specific fix."
                 >
-                  <p className="!mt-2">If you'd like to try, we recommend doing so via npm:</p>
+                  <p className="mt-2!">If you'd like to try, we recommend doing so via npm:</p>
                   <div className="flex items-center bg-surface-200 py-1 px-2 rounded mt-2 mb-1">
                     <SimpleCodeBlock parentClassName="bg-surface-200">
                       npm i supabase@beta --save-dev
@@ -158,7 +158,7 @@ export const LocalVersionPopover = () => {
                   }
                   <DocsButton
                     href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#using-beta-version"
-                    className="!no-underline mt-2"
+                    className="no-underline! mt-2"
                   />
                 </Admonition>
               </DialogSection>

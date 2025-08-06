@@ -328,7 +328,7 @@ const MapView = ({
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <DropdownMenuItem
-                                  className="gap-x-2 !pointer-events-auto"
+                                  className="gap-x-2 pointer-events-auto!"
                                   disabled={!canManageReplicas}
                                   onClick={() => onSelectDropReplica(database)}
                                 >

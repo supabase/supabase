@@ -11,7 +11,7 @@ interface SqlSnippetSectionProps {
 
 export const SqlSnippetSection = ({ form }: SqlSnippetSectionProps) => {
   return (
-    <SheetSection className="!px-0 !pb-0">
+    <SheetSection className="px-0! pb-0!">
       <FormField_Shadcn_
         control={form.control}
         name="values.snippet"

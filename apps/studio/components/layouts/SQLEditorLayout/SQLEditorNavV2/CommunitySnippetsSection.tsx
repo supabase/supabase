@@ -38,7 +38,7 @@ export function CommunitySnippetsSection() {
       }}
     >
       <InnerSideMenuCollapsibleTrigger title="Community" />
-      <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+      <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
         {OPTIONS.map((pageId) => {
           const active = isPageActive(pageId)
           return (

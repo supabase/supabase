@@ -64,7 +64,7 @@ export const ReportBlockContainer = ({
             )}
             <h3
               title={label}
-              className="!text-xs font-medium text-foreground-light flex-1 truncate"
+              className="text-xs! font-medium text-foreground-light flex-1 truncate"
             >
               {label}
             </h3>
@@ -77,7 +77,7 @@ export const ReportBlockContainer = ({
           </TooltipContent>
         )}
       </Tooltip>
-      <div className={cn('flex flex-col flex-grow items-center', hasChildren && 'border-t')}>
+      <div className={cn('flex flex-col grow items-center', hasChildren && 'border-t')}>
         {children}
       </div>
     </div>

@@ -318,7 +318,7 @@ export const ForeignKeySelector = ({
                           value={fk.columns[idx].source}
                           onChange={(value: string) => updateSelectedColumn(idx, 'source', value)}
                         >
-                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
+                          <Listbox.Option key="empty" value={''} label="---" className="w-[170px]!">
                             ---
                           </Listbox.Option>
                           {(table?.columns ?? [])
@@ -328,7 +328,7 @@ export const ForeignKeySelector = ({
                                 key={column.id}
                                 value={column.name}
                                 label={column.name}
-                                className="!w-[170px]"
+                                className="w-[170px]!"
                               >
                                 <div className="flex items-center gap-2">
                                   <span className="text-foreground">{column.name}</span>
@@ -349,7 +349,7 @@ export const ForeignKeySelector = ({
                           value={fk.columns[idx].target}
                           onChange={(value: string) => updateSelectedColumn(idx, 'target', value)}
                         >
-                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
+                          <Listbox.Option key="empty" value={''} label="---" className="w-[170px]!">
                             ---
                           </Listbox.Option>
                           {(selectedTable?.columns ?? []).map((column) => (
@@ -357,7 +357,7 @@ export const ForeignKeySelector = ({
                               key={column.id}
                               value={column.name}
                               label={column.name}
-                              className="!w-[170px]"
+                              className="w-[170px]!"
                             >
                               <div className="flex items-center gap-2">
                                 <span className="text-foreground">{column.name}</span>

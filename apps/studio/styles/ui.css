@@ -1,3 +1,5 @@
+@reference './globals.css';
+
 /* Brought over from platform to be cleaned if needed */
 
 /* Form panels */
@@ -26,7 +28,7 @@
   flex-wrap: wrap;
 }
 
-// TO DO: REMOVE
+/* TO DO: REMOVE */
 .form-group label {
   @apply inline-block text-foreground-light text-sm py-2;
   width: 33%;

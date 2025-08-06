@@ -39,7 +39,7 @@ const RestoreToNewProjectPage: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <FormHeader className="!mb-0" title="Database Backups" />
+            <FormHeader className="mb-0!" title="Database Backups" />
             <DatabaseBackupsNav active="rtnp" />
             <div className="space-y-8">
               <RestoreToNewProject />
@@ -284,7 +284,7 @@ const RestoreToNewProject = () => {
     return (
       <Admonition type="default" title="This project cannot be restored to a new project">
         <Markdown
-          className="max-w-full [&>p]:!leading-normal"
+          className="max-w-full [&>p]:leading-normal!"
           content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
           If you need to restore from a restored project, please reach out via [support](/support/new?projectRef=${project?.ref}).`}
         />

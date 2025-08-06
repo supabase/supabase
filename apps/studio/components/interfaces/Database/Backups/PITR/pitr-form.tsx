@@ -240,7 +240,7 @@ export function PITRForm({
                       closest backup within the 2-minute window
                     </p>
                   </div>
-                  <div className="!mt-4 space-y-1">
+                  <div className="mt-4! space-y-1">
                     <h3 className="text-sm text-foreground-light"></h3>
                     {isSelectedOnEarliestDay && (
                       <p className="text-sm text-foreground-light">

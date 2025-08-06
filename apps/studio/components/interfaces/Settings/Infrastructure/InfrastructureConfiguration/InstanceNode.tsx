@@ -299,7 +299,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
-                      labelBottomClass="text-xs !normal-nums text-foreground-light"
+                      labelBottomClass="text-xs normal-nums! text-foreground-light"
                       type="horizontal"
                       value={stagePercent * 100}
                       max={100}
@@ -373,7 +373,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuItem
-                  className="gap-x-2 !pointer-events-auto"
+                  className="gap-x-2 pointer-events-auto!"
                   disabled={!canManageReplicas}
                   onClick={() => {
                     if (canManageReplicas) onSelectDropReplica()

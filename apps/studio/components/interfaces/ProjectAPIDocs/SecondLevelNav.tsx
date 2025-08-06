@@ -149,14 +149,14 @@ const SecondLevelNav = () => {
             <p className="text-xs">Unable to find what you're looking for?</p>
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_ className="space-y-1">
-            <p className="text-xs !leading-normal">
+            <p className="text-xs leading-normal!">
               The API methods shown here are only the commonly used ones to get you started building
               quickly.
             </p>
-            <p className="text-xs !leading-normal">
+            <p className="text-xs leading-normal!">
               Head over to our docs site for the full API documentation.
             </p>
-            <DocsButton className="!mt-2" href={content[section].docsUrl} />
+            <DocsButton className="mt-2!" href={content[section].docsUrl} />
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       </div>

@@ -237,7 +237,7 @@ export function LogDrainDestinationSheetForm({
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
-        <SheetSection className="!px-0 !pb-0">
+        <SheetSection className="px-0! pb-0!">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
@@ -548,7 +548,7 @@ export function LogDrainDestinationSheetForm({
             </FormItemLayout>
           </SheetSection>
 
-          <SheetFooter className="p-content !mt-0">
+          <SheetFooter className="p-content mt-0!">
             <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
               Save destination
             </Button>

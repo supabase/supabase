@@ -25,7 +25,7 @@ export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInf
       type="default"
       title={`Your organization is on the ${organization.plan.name} plan with no projects running`}
       description={
-        <div className="!max-w-full prose text-sm">
+        <div className="max-w-full! prose text-sm">
           The monthly fees for the paid plan still apply. To cancel your subscription, head over to
           your{' '}
           <Link href={`/org/${organization?.slug}/billing`}>organization billing settings</Link>

@@ -92,7 +92,7 @@ const PanelNotice = forwardRef<
         {...props}
         className={cn(
           'relative px-4 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
-          layout === 'vertical' && '!flex-col !items-start gap-y-2',
+          layout === 'vertical' && 'flex-col! items-start! gap-y-2',
           className
         )}
       >
@@ -112,14 +112,14 @@ const PanelNotice = forwardRef<
           <div className="flex flex-row items-center -space-x-px">
             <Badge
               variant={'default'}
-              className="rounded-r-none pr-2 flex-shrink-0 gap-1.5 border-dashed bg-opacity-0 bg-surface-400 text-foreground-lighter"
+              className="rounded-r-none pr-2 shrink-0 gap-1.5 border-dashed bg-opacity-0 bg-surface-400 text-foreground-lighter"
             >
               <Megaphone size={16} strokeWidth={1.2} />
               <span className="text-foreground-lighter">{badgeLabel ?? 'Upcoming change'}</span>
             </Badge>
             <Badge
               variant="default"
-              className="rounded-l-none flex-shrink-0 gap-1.5 bg-opacity-0 bg-surface-400 text-foreground-lighter border-l-0"
+              className="rounded-l-none shrink-0 gap-1.5 bg-opacity-0 bg-surface-400 text-foreground-lighter border-l-0"
             >
               <span className="text-foreground text-xs">{title}</span>
             </Badge>

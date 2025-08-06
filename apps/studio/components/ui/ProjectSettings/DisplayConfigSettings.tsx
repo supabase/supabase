@@ -66,7 +66,7 @@ const DisplayConfigSettings = () => {
               layout="horizontal"
             />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+          <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
             <Input
               label="JWT Secret"
               readOnly

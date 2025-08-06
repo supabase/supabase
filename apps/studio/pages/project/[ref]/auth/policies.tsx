@@ -114,7 +114,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               setParams({ ...params, search: undefined, schema })
             }}
           />
-          <div className="w-full flex-grow flex items-center justify-between gap-2 lg:gap-4">
+          <div className="w-full grow flex items-center justify-between gap-2 lg:gap-4">
             <Input
               size="tiny"
               placeholder="Filter tables and policies"

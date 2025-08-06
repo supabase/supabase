@@ -14,7 +14,7 @@ import { Button } from 'ui'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
 
-const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
+const Separator = () => <div className="border-t mt-3! pb-1 mx-3" />
 
 const FirstLevelNav = () => {
   const { ref } = useParams()
@@ -165,7 +165,7 @@ const FirstLevelNav = () => {
           }
           onClick={() => snap.setShowProjectApiDocs(false)}
         >
-          <Link className="!justify-start" href={`/project/${ref}/api/graphiql`}>
+          <Link className="justify-start!" href={`/project/${ref}/api/graphiql`}>
             GraphiQL
           </Link>
         </Button>
@@ -174,7 +174,7 @@ const FirstLevelNav = () => {
             href="https://supabase.com/docs/guides/graphql"
             target="_blank"
             rel="noreferrer"
-            className="!justify-start"
+            className="justify-start!"
           >
             GraphQL guide
           </Link>
@@ -187,7 +187,7 @@ const FirstLevelNav = () => {
             href="https://supabase.com/docs"
             target="_blank"
             rel="noreferrer"
-            className="!justify-start"
+            className="justify-start!"
           >
             Documentation
           </Link>
@@ -197,7 +197,7 @@ const FirstLevelNav = () => {
             href="https://supabase.com/docs/guides/api"
             target="_blank"
             rel="noreferrer"
-            className="!justify-start"
+            className="justify-start!"
           >
             REST guide
           </Link>

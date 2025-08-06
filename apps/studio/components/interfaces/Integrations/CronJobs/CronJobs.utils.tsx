@@ -294,7 +294,7 @@ export const formatCronJobColumns = ({
               col.id === 'jobname' && 'ml-8'
             )}
           >
-            <p className="!text-foreground">{col.name}</p>
+            <p className="text-foreground!">{col.name}</p>
           </div>
         )
       },

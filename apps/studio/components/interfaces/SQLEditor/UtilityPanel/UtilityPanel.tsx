@@ -114,10 +114,10 @@ const UtilityPanel = ({
       <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            <span className="translate-y-[1px]">Results</span>
+            <span className="translate-y-px">Results</span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            <span className="translate-y-[1px]">Chart</span>
+            <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
           {result?.rows && (
             <DownloadResultsButton
@@ -154,7 +154,7 @@ const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
+      <TabsContent_Shadcn_ asChild value="results" className="mt-0 grow">
         <UtilityTabResults
           id={id}
           isExecuting={isExecuting}
@@ -164,7 +164,7 @@ const UtilityPanel = ({
         />
       </TabsContent_Shadcn_>
 
-      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
+      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>

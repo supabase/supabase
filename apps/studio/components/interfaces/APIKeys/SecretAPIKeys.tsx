@@ -138,7 +138,7 @@ export const SecretAPIKeys = () => {
   if (!canReadAPIKeys) {
     return (
       <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+        <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
           <EyeOffIcon />
           <p className="text-sm text-foreground">
             You do not have permission to read API Secret Keys
@@ -154,7 +154,7 @@ export const SecretAPIKeys = () => {
   if (error) {
     return (
       <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+        <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
           <WarningIcon />
           <p className="text-sm text-warning-600">Error loading Secret API Keys</p>
           <p className="text-warning/75">{error.message}</p>
@@ -166,7 +166,7 @@ export const SecretAPIKeys = () => {
   if (empty) {
     return (
       <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+        <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
           <p className="text-sm text-foreground">No secret API keys found</p>
           <p className="text-sm text-foreground-light">
             Your project is not accessible via secret keys—there are no active secret keys created.

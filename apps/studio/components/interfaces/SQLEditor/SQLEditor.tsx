@@ -662,7 +662,7 @@ export const SQLEditor = () => {
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
           <ResizablePanel maxSize={70}>
-            <div className="flex-grow overflow-y-auto border-b h-full">
+            <div className="grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />

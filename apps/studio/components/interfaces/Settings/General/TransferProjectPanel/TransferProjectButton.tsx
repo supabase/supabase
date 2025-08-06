@@ -147,7 +147,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Wrench size={24} className="flex-shrink-0" />
+                <Wrench size={24} className="shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>
@@ -244,13 +244,13 @@ const TransferProjectButton = () => {
                       <div className="space-y-1">
                         {transferPreviewData.warnings.map((warning) => (
                           <div key={warning.key} className="flex items-center gap-2">
-                            <WarningIcon className="flex-shrink-0 mt-0.25" />
+                            <WarningIcon className="shrink-0 mt-0.25" />
                             <p className="mb-0.5">{warning.message}</p>
                           </div>
                         ))}
                         {transferPreviewData.info.map((info) => (
                           <div key={info.key} className="flex items-center gap-2">
-                            <InfoIcon className="flex-shrink-0 mt-0.25" />
+                            <InfoIcon className="shrink-0 mt-0.25" />
                             <p className="mb-0.5">{info.message}</p>
                           </div>
                         ))}

@@ -255,7 +255,7 @@ const StaticDestinations = () => {
         <div className="z-10 bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30" />
 
         <ScaffoldContainer>
-          <ScaffoldSection className="!py-0">
+          <ScaffoldSection className="py-0!">
             <div className="col-span-12">
               <div className="flex items-center justify-between">
                 <div className="relative w-52">

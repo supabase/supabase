@@ -14,7 +14,7 @@ export const ProjectClaimLayout = ({
 }>) => {
   return (
     <>
-      <div className="flex flex-row justify-between flex-grow mx-auto w-full h-[52px] items-center px-4">
+      <div className="flex flex-row justify-between grow mx-auto w-full h-[52px] items-center px-4">
         <div className="flex items-center gap-2">
           <span className="sr-only">Supabase</span>
           <Image

@@ -21,7 +21,7 @@ const PageLayout: NextPageWithLayout = () => {
   if (isError) <StorageBucketsError error={error as any} />
 
   return (
-    <div className="storage-container flex flex-grow">
+    <div className="storage-container flex grow">
       <ProductEmptyState
         title="Storage"
         infoButtonLabel="About storage"

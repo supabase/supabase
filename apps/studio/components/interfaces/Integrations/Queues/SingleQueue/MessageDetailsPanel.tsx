@@ -101,7 +101,7 @@ export const MessageDetailsPanel = ({
         <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
           <TabsTrigger_Shadcn_
             value="details"
-            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
           >
             Overview
           </TabsTrigger_Shadcn_>

@@ -47,7 +47,7 @@ export const OrganizationDropdown = () => {
     <>
       <Link
         href={slug ? `/org/${slug}` : '/organizations'}
-        className="flex items-center gap-2 flex-shrink-0 text-sm"
+        className="flex items-center gap-2 shrink-0 text-sm"
       >
         <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
         <span

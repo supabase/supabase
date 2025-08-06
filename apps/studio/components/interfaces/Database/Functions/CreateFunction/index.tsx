@@ -159,7 +159,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         className={cn(
           // 'bg-surface-200',
           'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
+          assistantVisible ? 'min-w-screen! lg:min-w-[1200px]!' : 'min-w-screen! lg:min-w-[600px]!'
         )}
       >
         <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
@@ -172,7 +172,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
-              className="flex-grow overflow-auto"
+              className="grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -248,7 +248,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              <SheetSection className={`${focusedEditor ? 'h-full' : ''} !px-0`}>
+              <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
                 <FormField_Shadcn_
                   control={form.control}
                   name="definition"
@@ -268,7 +268,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       <div
                         className={cn(
                           'border border-default flex',
-                          focusedEditor ? 'flex-grow ' : 'h-72'
+                          focusedEditor ? 'grow ' : 'h-72'
                         )}
                       >
                         <FunctionEditor

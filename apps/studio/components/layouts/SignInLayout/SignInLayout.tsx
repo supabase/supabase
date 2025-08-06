@@ -89,7 +89,7 @@ const SignInLayout = ({
           }`}
         >
           <nav className="relative flex items-center justify-between sm:h-10">
-            <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
+            <div className="flex items-center grow shrink-0 lg:grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
                   <Image
@@ -113,7 +113,7 @@ const SignInLayout = ({
         </div>
 
         <div className="flex flex-1 h-full">
-          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
+          <main className="flex flex-col items-center flex-1 shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">
                 <h1 className="mt-8 mb-2 lg:text-3xl">{heading}</h1>
@@ -146,7 +146,7 @@ const SignInLayout = ({
             )}
           </main>
 
-          <aside className="flex-col items-center justify-center flex-1 flex-shrink hidden basis-1/4 xl:flex">
+          <aside className="flex-col items-center justify-center flex-1 shrink hidden basis-1/4 xl:flex">
             {quote !== null && (
               <div className="relative flex flex-col gap-6">
                 <div className="absolute select-none -top-12 -left-11">

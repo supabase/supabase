@@ -270,7 +270,7 @@ const ReportFilterBar = ({
               <Button
                 type="text"
                 size="tiny"
-                className="!p-0 !space-x-0"
+                className="p-0! space-x-0!"
                 onClick={() => onRemoveFilters([filter])}
                 icon={<X className="text-foreground-light" />}
               >

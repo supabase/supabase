@@ -100,7 +100,7 @@ const columns = messagesCols.map((col) => {
       return (
         <div className="flex items-center justify-between font-normal text-xs w-full">
           <div className="flex items-center gap-x-2">
-            <p className="!text-foreground">{col.name}</p>
+            <p className="text-foreground!">{col.name}</p>
             {col.description && <p className="text-foreground-lighter">{col.description}</p>}
           </div>
         </div>

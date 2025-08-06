@@ -119,7 +119,7 @@ const WrapperDynamicColumns = ({
           <div key={column.id} className="flex flex-col">
             <div className="flex items-center gap-x-2">
               <Input
-                className="flex-1 [&_label]:!p-0"
+                className="flex-1 [&_label]:p-0!"
                 layout="vertical"
                 label="Name"
                 value={column.name}
@@ -131,7 +131,7 @@ const WrapperDynamicColumns = ({
                   value={column.type}
                   enumTypes={[]}
                   onOptionSelect={(value) => onUpdateValue(column.id, 'type', value)}
-                  className="[&_label]:!p-0"
+                  className="[&_label]:p-0!"
                 />
               </div>
 

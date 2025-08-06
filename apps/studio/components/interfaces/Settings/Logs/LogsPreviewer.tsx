@@ -251,6 +251,7 @@ export const LogsPreviewer = ({
           (showChart && logData.length > 0 ? 'mb-2 mt-1 opacity-100' : 'h-0 opacity-0')
         }
       >
+        <ShimmerLine active />
         <div className={condensedLayout ? 'px-3' : ''}>
           {showChart && (
             <LogsBarChart
@@ -281,7 +282,7 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
+      <div className="relative flex flex-col grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable

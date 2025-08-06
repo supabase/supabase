@@ -34,7 +34,7 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
             displayAs="utc"
             utcTimestamp={secret.updated_at}
             labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-            className="!text-sm"
+            className="text-sm!"
           />
         ) : (
           '-'

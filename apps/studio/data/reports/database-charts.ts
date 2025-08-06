@@ -583,7 +583,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
                 label: 'Spend cap enabled',
                 value:
                   (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
-                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
+                className: '[&_line]:stroke-yellow-800! [&_line]:opacity-100!',
                 opacity: 1,
               }
             : {
@@ -591,7 +591,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
                 provider: 'reference-line',
                 isReferenceLine: true,
                 label: '90% - Disk resize threshold',
-                className: '[&_line]:!stroke-yellow-800',
+                className: '[&_line]:stroke-yellow-800!',
                 value:
                   (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) *
                   1024 *

@@ -336,7 +336,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
       <div
         className={cn(
           'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
+          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
           `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
@@ -411,7 +411,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
 
         <div
           className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
           }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select

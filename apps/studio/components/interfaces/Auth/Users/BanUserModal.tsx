@@ -94,7 +94,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
               This will revoke the user's access to your project and prevent them from logging in
               for a specified duration.
             </p>
-            <div className="flex items-start gap-x-2 [&>div:first-child]:flex-grow">
+            <div className="flex items-start gap-x-2 [&>div:first-child]:grow">
               <FormField_Shadcn_
                 control={form.control}
                 name="value"

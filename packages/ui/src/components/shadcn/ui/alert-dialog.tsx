@@ -41,10 +41,10 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 const AlertDialogContentVariants = cva(
   cn(
     'relative z-50 w-full max-w-screen border shadow-md dark:shadow-sm',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out',
-    'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
-    'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
+    'data-open:animate-in data-closed:animate-out',
+    'data-closed:zoom-out-95 data-open:zoom-in-95',
+    'data-closed:slide-out-to-left-[0%] data-closed:slide-out-to-top-[0%]',
+    'data-open:slide-in-from-left-[0%] data-open:slide-in-from-top-[0%]',
     'sm:rounded-lg md:w-full',
     'bg-dash-sidebar'
   ),

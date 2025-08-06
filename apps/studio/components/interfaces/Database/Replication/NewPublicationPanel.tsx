@@ -101,7 +101,7 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
                 </SheetClose>
               </div>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-auto">
+            <SheetSection className="grow overflow-auto">
               <Form_Shadcn_ {...form}>
                 <form
                   id={formId}

@@ -412,7 +412,7 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                       <Button
                         type="outline"
                         aria-label="Dismiss"
-                        className="absolute top-2 right-2 p-1 !pl-1"
+                        className="absolute top-2 right-2 p-1 pl-1!"
                         onClick={() => {
                           setRlsBypassedWarningDismissed(true)
                         }}

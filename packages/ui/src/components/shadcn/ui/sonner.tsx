@@ -45,23 +45,23 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay group-[.toaster]:shadow-lg'
           ),
           icon: 'mt-0.5',
-          title: '!font-normal',
+          title: 'font-normal!',
           description:
-            'text-xs group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:!opacity-100',
+            'text-xs group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:opacity-100!',
           actionButton: cn('block', buttonVariants({ type: 'primary', size: 'tiny' })),
           cancelButton: cn('block', buttonVariants({ type: 'default', size: 'tiny' })),
-          // success: 'group toast group-[.toaster]:!bg-brand-200 group-[.toaster]:border-brand-500',
+          // success: 'group toast group-[.toaster]:bg-brand-200! group-[.toaster]:border-brand-500',
           warning:
-            'group toast group-[.toaster]:!bg-warning-200 group-[.toaster]:!border-warning-500',
+            'group toast group-[.toaster]:bg-warning-200! group-[.toaster]:border-warning-500!',
           error:
-            'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
+            'group toast group-[.toaster]:bg-destructive-200! group-[.toaster]:border-destructive-500!',
           closeButton: cn(
             // unset all styles set from sonner
             'absolute right-2 top-2 rounded-md text-foreground/50 opacity-0 transition-opacity',
             'hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100',
             'group-[.destructive]:text-destructive-300 group-[.destructive]:hover:text-destructive-50',
             'group-[.destructive]:focus:ring-destructive-400 group-[.destructive]:focus:ring-offset-destructive-600',
-            'left-auto transform-none bg-transparent border-0 border-transparent hover:!bg-transparent hover:border-transparent'
+            'left-auto transform-none bg-transparent border-0 border-transparent hover:bg-transparent! hover:border-transparent'
           ),
           content: 'grow',
           //group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay

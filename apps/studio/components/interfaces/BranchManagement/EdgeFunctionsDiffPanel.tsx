@@ -132,7 +132,7 @@ const FunctionDiff = ({
                       )}
                     >
                       <Icon
-                        className={cn('flex-shrink-0', getStatusColor(fileInfo.status))}
+                        className={cn('shrink-0', getStatusColor(fileInfo.status))}
                         size={12}
                         strokeWidth={1}
                       />

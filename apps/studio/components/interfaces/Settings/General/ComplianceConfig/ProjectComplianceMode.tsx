@@ -84,7 +84,7 @@ const ComplianceConfig = () => {
             </FormSectionLabel>
           }
         >
-          <FormSectionContent loading={false} className="lg:!col-span-3">
+          <FormSectionContent loading={false} className="lg:col-span-3!">
             <div className="flex items-center justify-end mt-2.5 space-x-2">
               {(isLoading || isSubmitting) && (
                 <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />

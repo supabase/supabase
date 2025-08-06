@@ -20,7 +20,7 @@ export const ActionCard = (card: {
           </Badge>
         )}
         <div
-          className={`rounded-full ${card.bgColor} w-8 h-8 flex items-center justify-center flex-shrink-0`}
+          className={`rounded-full ${card.bgColor} w-8 h-8 flex items-center justify-center shrink-0`}
         >
           {card.icon}
         </div>

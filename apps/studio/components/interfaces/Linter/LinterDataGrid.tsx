@@ -96,7 +96,7 @@ const LinterDataGrid = ({
         return (
           <div className="flex items-center justify-between font-mono font-normal text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
+              <p className="text-foreground!">{col.name}</p>
               {col.description && <p className="text-foreground-lighter">{col.description}</p>}
             </div>
           </div>
@@ -129,14 +129,14 @@ const LinterDataGrid = ({
   return (
     <ResizablePanelGroup
       direction="horizontal"
-      className="relative flex flex-grow bg-alternative min-h-0"
+      className="relative flex grow bg-alternative min-h-0"
       autoSaveId="linter-layout-v1"
     >
       <ResizablePanel defaultSize={1}>
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -198,14 +198,14 @@ const LinterDataGrid = ({
               <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
                 <TabsTrigger_Shadcn_
                   value="details"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
                 >
                   Overview
                 </TabsTrigger_Shadcn_>
               </TabsList_Shadcn_>
               <TabsContent_Shadcn_
                 value="details"
-                className="mt-0 flex-grow min-h-0 overflow-y-auto prose"
+                className="mt-0 grow min-h-0 overflow-y-auto prose"
               >
                 {selectedLint && (
                   <div className="py-4 px-5">

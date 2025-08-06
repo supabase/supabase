@@ -21,7 +21,7 @@ const MobileViewNav = ({ title }: PropsWithChildren<Props>) => {
       <button
         title="Menu dropdown button"
         className={cn(
-          'group/view-toggle flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+          'group/view-toggle flex justify-center flex-col border-none space-x-0 items-start gap-1 bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px]'
         )}
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       >

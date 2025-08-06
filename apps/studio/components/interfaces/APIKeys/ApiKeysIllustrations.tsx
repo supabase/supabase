@@ -94,9 +94,9 @@ export const ApiKeysIllustrationWithOverlay = () => {
       {/* Gradient overlay - horizontal on desktop, vertical on mobile */}
       <div
         className="absolute inset-x-0 bottom-0 h-1/2 xl:h-full xl:inset-x-auto xl:-right-16 xl:top-3 w-full xl:w-2/3
-        bg-gradient-to-t xl:bg-gradient-to-l
-        from-background-alternative via-background-alternative/90 via-[5%] to-transparent
-        z-[3] pointer-events-none xl:max-w-[500px]"
+        bg-linear-to-t xl:bg-linear-to-l
+        from-background-alternative via-background-alternative/90 via-5% to-transparent
+        z-3 pointer-events-none xl:max-w-[500px]"
       />
 
       <div className="absolute scale-100 left-10 -bottom-14 w-[720px] xl:w-[500px] xl:left-auto xl:-right-[200px] 2xl:-right-16 xl:top-[21px] xl:scale-75">
@@ -112,7 +112,7 @@ export const ApiKeysIllustrationWithOverlay = () => {
 export const ApiKeysComingSoonBanner = () => {
   return (
     <FeatureBanner illustration={<ApiKeysIllustrationWithOverlay />} bgAlt>
-      <div className="flex flex-col gap-0 z-[2]">
+      <div className="flex flex-col gap-0 z-2">
         <p className="text-sm text-foreground">New API keys are coming soon</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
           We're rolling out new API keys to better support your application needs.
@@ -143,7 +143,7 @@ export const ApiKeysCreateCallout = () => {
 
   return (
     <FeatureBanner illustration={<ApiKeysIllustrationWithOverlay />} bgAlt>
-      <div className="flex flex-col gap-0 z-[2]">
+      <div className="flex flex-col gap-0 z-2">
         <p className="text-sm text-foreground">Create API keys</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
           Use keys to authenticate requests to your app
@@ -170,7 +170,7 @@ export const ApiKeysFeedbackBanner = () => {
   return (
     <FeatureBanner
       storageKey={LOCAL_STORAGE_KEYS.API_KEYS_FEEDBACK_DISMISSED}
-      className="!p-0 flex flex-col gap-0"
+      className="p-0! flex flex-col gap-0"
       dismissable
     >
       <div className="p-5">

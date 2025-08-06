@@ -32,7 +32,7 @@ const TableNode = ({
 }: NodeProps<TableNodeData> & { placeholder?: boolean }) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
-  const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
+  const hiddenNodeConnector = 'h-px! w-px! min-w-0! min-h-0! cursor-grab! border-0! opacity-0!'
 
   const itemHeight = 'h-[22px]'
 
@@ -98,27 +98,27 @@ const TableNode = ({
                     strokeWidth={1}
                     className={cn(
                       // 'sb-grid-column-header__inner__primary-key'
-                      'flex-shrink-0',
+                      'shrink-0',
                       'text-light'
                     )}
                   />
                 )}
                 {column.isNullable && (
-                  <DiamondIcon size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {!column.isNullable && (
                   <DiamondIcon
                     size={8}
                     strokeWidth={1}
                     fill="currentColor"
-                    className="flex-shrink-0 text-light"
+                    className="shrink-0 text-light"
                   />
                 )}
                 {column.isUnique && (
-                  <Fingerprint size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Fingerprint size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {column.isIdentity && (
-                  <Hash size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Hash size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
               </div>
               <div className="flex w-full justify-between">
@@ -134,7 +134,7 @@ const TableNode = ({
                   type="target"
                   id={column.id}
                   position={targetPosition}
-                  className={cn(hiddenNodeConnector, '!left-0')}
+                  className={cn(hiddenNodeConnector, 'left-0!')}
                 />
               )}
               {sourcePosition && (
@@ -142,7 +142,7 @@ const TableNode = ({
                   type="source"
                   id={column.id}
                   position={sourcePosition}
-                  className={cn(hiddenNodeConnector, '!right-0')}
+                  className={cn(hiddenNodeConnector, 'right-0!')}
                 />
               )}
             </div>

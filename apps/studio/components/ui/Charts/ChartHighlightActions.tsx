@@ -62,7 +62,7 @@ const ChartHighlightActions = ({
         <DropdownMenuSeparator className="my-0" />
         <DropdownMenuItem
           disabled={disableZoomIn}
-          className={cn('group', disableZoomIn && '!bg-transparent')}
+          className={cn('group', disableZoomIn && 'bg-transparent!')}
         >
           <button
             disabled={disableZoomIn}
@@ -70,14 +70,14 @@ const ChartHighlightActions = ({
             className="w-full flex items-center gap-1.5"
           >
             <SearchIcon className="text-foreground-lighter" size={12} />
-            <span className="flex-grow text-left text-foreground-light">Zoom in</span>
+            <span className="grow text-left text-foreground-light">Zoom in</span>
             {disableZoomIn && <span className="text-xs">Min. 10 minutes</span>}
           </button>
         </DropdownMenuItem>
-        <DropdownMenuItem className={cn('group', disableZoomIn && '!bg-transparent')}>
+        <DropdownMenuItem className={cn('group', disableZoomIn && 'bg-transparent!')}>
           <button onClick={handleOpenLogsExplorer} className="w-full flex items-center gap-1.5">
             <LogsIcon className="text-foreground-lighter" size={12} />
-            <span className="flex-grow text-left text-foreground-light">
+            <span className="grow text-left text-foreground-light">
               Open range in Logs Explorer
             </span>
           </button>

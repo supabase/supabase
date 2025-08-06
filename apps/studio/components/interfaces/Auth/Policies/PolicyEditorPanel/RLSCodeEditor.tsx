@@ -171,7 +171,7 @@ export const RLSCodeEditor = ({
           id={placeholderId}
           className={cn(
             'monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono tracking-tighter',
-            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0'
+            '[&>div>p]:text-foreground-lighter [&>div>p]:m-0!'
           )}
           style={{ display: 'none' }}
         >

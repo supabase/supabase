@@ -133,10 +133,10 @@ export const RealtimeSettings = () => {
                   name="allow_public"
                   render={({ field }) => (
                     <FormSection
-                      className="!p-0 !pt-2"
+                      className="p-0! pt-2!"
                       header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loading={isLoading} className="gap-y-2!">
                         <FormItemLayout
                           layout="flex"
                           label="Allow public access"
@@ -185,11 +185,11 @@ export const RealtimeSettings = () => {
                   name="connection_pool"
                   render={({ field }) => (
                     <FormSection
-                      className="!p-0 !py-2"
+                      className="p-0! py-2!"
                       header={
                         <FormSectionLabel
                           description={
-                            <p className="text-foreground-lighter text-sm !mt-1">
+                            <p className="text-foreground-lighter text-sm mt-1!">
                               Realtime Authorization uses this database pool to check client access
                             </p>
                           }
@@ -198,7 +198,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loading={isLoading} className="gap-y-2!">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -227,11 +227,11 @@ export const RealtimeSettings = () => {
                   name="max_concurrent_users"
                   render={({ field }) => (
                     <FormSection
-                      className="!p-0 !py-2"
+                      className="p-0! py-2!"
                       header={
                         <FormSectionLabel
                           description={
-                            <p className="text-foreground-lighter text-sm !mt-1">
+                            <p className="text-foreground-lighter text-sm mt-1!">
                               Sets maximum number of concurrent clients that can connect to your
                               Realtime service
                             </p>
@@ -241,7 +241,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loading={isLoading} className="gap-y-2!">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -288,11 +288,11 @@ export const RealtimeSettings = () => {
                   name="max_events_per_second"
                   render={({ field }) => (
                     <FormSection
-                      className="!p-0 !py-2"
+                      className="p-0! py-2!"
                       header={
                         <FormSectionLabel
                           description={
-                            <p className="text-foreground-lighter text-sm !mt-1">
+                            <p className="text-foreground-lighter text-sm mt-1!">
                               Sets maximum number of events per second rate per channel limit
                             </p>
                           }
@@ -301,7 +301,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loading={isLoading} className="gap-y-2!">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -324,11 +324,11 @@ export const RealtimeSettings = () => {
                     const { value, unit } = convertFromBytes(field.value ?? 0)
                     return (
                       <FormSection
-                        className="!p-0 !py-2"
+                        className="p-0! py-2!"
                         header={
                           <FormSectionLabel
                             description={
-                              <p className="text-foreground-lighter text-sm !mt-1">
+                              <p className="text-foreground-lighter text-sm mt-1!">
                                 Sets maximum number of bytes per second rate per channel limit
                               </p>
                             }
@@ -337,7 +337,7 @@ export const RealtimeSettings = () => {
                           </FormSectionLabel>
                         }
                       >
-                        <FormSectionContent loading={isLoading} className="!gap-y-2">
+                        <FormSectionContent loading={isLoading} className="gap-y-2!">
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
@@ -365,11 +365,11 @@ export const RealtimeSettings = () => {
                   name="max_channels_per_client"
                   render={({ field }) => (
                     <FormSection
-                      className="!p-0 !py-2"
+                      className="p-0! py-2!"
                       header={
                         <FormSectionLabel
                           description={
-                            <p className="text-foreground-lighter text-sm !mt-1">
+                            <p className="text-foreground-lighter text-sm mt-1!">
                               Sets maximum number of channels per client rate limit
                             </p>
                           }
@@ -378,7 +378,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loading={isLoading} className="gap-y-2!">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -400,11 +400,11 @@ export const RealtimeSettings = () => {
                   name="max_joins_per_second"
                   render={({ field }) => (
                     <FormSection
-                      className="!p-0 !py-2"
+                      className="p-0! py-2!"
                       header={
                         <FormSectionLabel
                           description={
-                            <p className="text-foreground-lighter text-sm !mt-1">
+                            <p className="text-foreground-lighter text-sm mt-1!">
                               Sets maximum number of joins per second rate limit
                             </p>
                           }
@@ -413,7 +413,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
+                      <FormSectionContent loading={isLoading} className="gap-y-2!">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}

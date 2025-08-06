@@ -55,7 +55,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ type: 'default' }),
-            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
+            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-open:bg-overlay-hover/30 hover:border-strong data-open:border-stronger hover:bg-overlay-hover/50! bg-transparent',
             'rounded-full overflow-hidden opacity-0 transition-opacity animate-fade-in'
           )}
         >

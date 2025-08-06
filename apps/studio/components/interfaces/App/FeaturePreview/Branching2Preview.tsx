@@ -49,7 +49,7 @@ export const Branching2Preview = () => {
         </ul>
       </div>
 
-      <div className="space-y-2 !mt-4">
+      <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>Enable the new Branching 2.0 workflow for your project.</li>

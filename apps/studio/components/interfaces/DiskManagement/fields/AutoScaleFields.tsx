@@ -77,7 +77,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <Input_Shadcn_
                       {...field}
                       type="number"
-                      className="flex-grow font-mono rounded-r-none max-w-20"
+                      className="grow font-mono rounded-r-none max-w-20"
                       value={field.value ?? undefined}
                       disabled={isError}
                       onChange={(e) => {
@@ -133,7 +133,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <Input_Shadcn_
                       {...field}
                       type="number"
-                      className="flex-grow font-mono rounded-r-none max-w-32"
+                      className="grow font-mono rounded-r-none max-w-32"
                       value={field.value ?? undefined}
                       disabled={isError}
                       onChange={(e) => {
@@ -184,7 +184,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <Input_Shadcn_
                       {...field}
                       type="number"
-                      className="flex-grow font-mono rounded-r-none max-w-32"
+                      className="grow font-mono rounded-r-none max-w-32"
                       value={field.value ?? undefined}
                       disabled={isError}
                       onChange={(e) => {

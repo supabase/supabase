@@ -47,7 +47,7 @@ const CommandWrapper = forwardRef<
       ref={ref}
       className={cn(
         'h-full w-full flex flex-col overflow-hidden',
-        '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+        '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:bg-transparent! [&_[cmdk-group-heading]]:bg-transparent! [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
         '[&_[cmdk-item]_svg]:h-5',
         '[&_[cmdk-item]_svg]:w-5',
         '[&_[cmdk-item]_svg]:stroke-1',
@@ -181,14 +181,14 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         className={cn(
           'relative flex flex-col my-0 mx-auto rounded-t-lg overflow-hidden',
           'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
-          '!animate-in !slide-in-from-bottom-[85%] !duration-300',
-          'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
+          'animate-in! slide-in-from-bottom-[85%]! duration-300!',
+          'data-closed:animate-out! data-closed:slide-out-to-bottom!',
           // Remove defaults set from primitive component
-          '!slide-in-from-left-[0%] :!slide-in-from-top-[0%]',
+          'slide-in-from-left-[0%]! :!slide-in-from-top-[0%]',
           // Remove defaults set from primitive component
-          '!slide-out-to-left-[0%] !slide-out-to-top-[0%]',
-          'md:data-[state=open]:!slide-in-from-bottom-[0%] md:data-[state=closed]:!slide-out-to-bottom-[0%]',
-          'md:data-[state=open]:!zoom-in-95 md:data-[state=closed]:!zoom-out-95'
+          'slide-out-to-left-[0%]! slide-out-to-top-[0%]!',
+          'md:data-open:slide-in-from-bottom-[0%]! md:data-closed:slide-out-to-bottom-[0%]!',
+          'md:data-open:zoom-in-95! md:data-closed:zoom-out-95!'
         )}
         dialogOverlayProps={{
           className: cn('overflow-hidden flex data-closed:delay-100'),

@@ -82,7 +82,7 @@ export const SQLEditorMenu = () => {
 
   return (
     <div className="h-full flex flex-col justify-between">
-      <div className="flex flex-col gap-y-4 flex-grow">
+      <div className="flex flex-col gap-y-4 grow">
         <div className="mt-4 mx-4 flex items-center justify-between gap-x-2">
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput

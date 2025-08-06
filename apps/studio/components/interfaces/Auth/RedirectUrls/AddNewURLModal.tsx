@@ -91,7 +91,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
     <Modal
       hideFooter
       size="medium"
-      className="!max-w-[440px]"
+      className="max-w-[440px]!"
       visible={visible}
       onCancel={() => {
         form.reset(initialValues)

@@ -1,3 +1,9 @@
+@reference './globals.css';
+
+@utility text-grid {
+  font-size: 13px;
+}
+
 .sb-grid {
   @apply flex h-full flex-col;
 }
@@ -9,17 +15,14 @@
 }
 
 .rdg-cell {
-  @apply flex;
-  @apply text-grid;
-  @apply border-secondary border-r border-b;
-  @apply text-foreground;
+  @apply flex text-grid border-secondary border-r border-b text-foreground;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: inherit;
 }
 
-// Apply parent bg colour while editing
+/* Apply parent bg colour while editing */
 .rdg-cell.rdg-editor-container > * {
   background-color: inherit;
 }
@@ -37,8 +40,7 @@
 }
 
 .rdg {
-  @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas;
-  @apply border-t border-r-0 border-l-0;
+  @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas border-t border-r-0 border-l-0;
   contain: strict;
   -webkit-user-select: none;
   font-size: 14px;

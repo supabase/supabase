@@ -173,7 +173,7 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
         >
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-2">
-              <div className="flex-shrink-0 flex gap-x-2 items-center max-w-40 ">
+              <div className="shrink-0 flex gap-x-2 items-center max-w-40 ">
                 <HandleIcon type={'Supabase'} />
                 <span title={project?.name} className="text-sm truncate">
                   {project?.name}
@@ -182,14 +182,14 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
 
               <ArrowRight
                 size={14}
-                className="flex-shrink-0 text-foreground-lighter"
+                className="shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
               />
 
               <div className="flex-1 min-w-0 flex gap-2 items-center">
                 {!connection?.metadata?.framework ? (
                   <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                    <HandleIcon type={type} className={'!w-2.5'} />
+                    <HandleIcon type={type} className={'w-2.5!'} />
                   </div>
                 ) : (
                   <img
@@ -227,7 +227,7 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
             </div>
           </div>
 
-          <div className="flex-shrink-0">{actions}</div>
+          <div className="shrink-0">{actions}</div>
         </div>
       </li>
     )

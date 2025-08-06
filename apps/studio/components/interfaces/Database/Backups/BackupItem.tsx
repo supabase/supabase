@@ -105,7 +105,7 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
           displayAs="utc"
           utcTimestamp={backup.inserted_at}
           labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-          className="text-left !text-sm font-mono tracking-tight"
+          className="text-left text-sm! font-mono tracking-tight"
         />
         <Tooltip>
           <TooltipTrigger>

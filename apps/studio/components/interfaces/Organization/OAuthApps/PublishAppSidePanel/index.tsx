@@ -205,7 +205,7 @@ export const PublishAppSidePanel = ({
           return (
             <>
               <div className="h-full flex flex-col">
-                <div className="flex-grow">
+                <div className="grow">
                   <SidePanel.Content>
                     <div className="py-4 flex items-start justify-between gap-10">
                       <div className="space-y-4 w-full">
@@ -381,7 +381,7 @@ export const PublishAppSidePanel = ({
 
               <Modal
                 hideFooter
-                className="!max-w-[600px]"
+                className="max-w-[600px]!"
                 visible={showPreview}
                 onCancel={() => setShowPreview(false)}
               >

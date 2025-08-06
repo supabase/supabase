@@ -81,7 +81,7 @@ export const PageLayout = ({
         className={cn(
           'w-full mx-auto',
           size === 'full' &&
-            (isCompact ? 'max-w-none !px-6 border-b pt-4' : 'max-w-none pt-6 border-b'),
+            (isCompact ? 'max-w-none px-6! border-b pt-4' : 'max-w-none pt-6 border-b'),
           size !== 'full' && (isCompact ? 'pt-4' : 'pt-12'),
           navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
           className

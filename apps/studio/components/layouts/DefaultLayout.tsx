@@ -39,7 +39,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
           <div className="flex flex-col h-screen w-screen">
             {/* Top Banner */}
             <AppBannerWrapper />
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <MobileNavigationBar />
               <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
             </div>
@@ -48,7 +48,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
               {/* Sidebar */}
               <Sidebar />
               {/* Main Content */}
-              <div className="flex-grow h-full overflow-y-auto">{children}</div>
+              <div className="grow h-full overflow-y-auto">{children}</div>
             </div>
           </div>
         </AppBannerContextProvider>

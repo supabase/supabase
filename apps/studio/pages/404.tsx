@@ -20,7 +20,7 @@ const Error404: NextPage = ({}) => {
     <div className="relative mx-auto flex h-screen w-full flex-col items-center justify-center">
       <div className="absolute top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
         <nav className="relative flex items-center justify-between sm:h-10">
-          <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
+          <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href="/projects">
                 <Image
@@ -39,7 +39,7 @@ const Error404: NextPage = ({}) => {
         </nav>
       </div>
       <div
-        className={`absolute select-none opacity-[5%] filter transition duration-200 ${
+        className={`absolute select-none opacity-5 filter transition duration-200 ${
           show404 ? 'blur-sm' : 'blur-none'
         }`}
       >

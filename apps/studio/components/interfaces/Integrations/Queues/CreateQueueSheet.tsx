@@ -153,11 +153,11 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
           <SheetTitle>Create a new queue</SheetTitle>
         </SheetHeader>
 
-        <div className="overflow-auto flex-grow">
+        <div className="overflow-auto grow">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
-              className="flex-grow overflow-auto"
+              className="grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <SheetSection>
@@ -334,7 +334,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                     title="Row Level Security for queues is only relevant if exposure through PostgREST has been enabled"
                   >
                     <Markdown
-                      className="[&>p]:!leading-normal"
+                      className="[&>p]:leading-normal!"
                       content={`You may opt to manage your queues via any Supabase client libraries or PostgREST
                       endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
                     />

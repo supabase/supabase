@@ -253,10 +253,10 @@ const LogsQueryPanel = ({
                 >
                   <Table
                     head={[
-                      <Table.th className="text-xs !p-2" key="path">
+                      <Table.th className="text-xs p-2!" key="path">
                         Path
                       </Table.th>,
-                      <Table.th key="type" className="text-xs !p-2">
+                      <Table.th key="type" className="text-xs p-2!">
                         Type
                       </Table.th>,
                     ]}
@@ -289,7 +289,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -314,7 +314,7 @@ const Field = ({
           </Tooltip>
         )}
       </Table.td>
-      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
     </Table.tr>
   )
 }

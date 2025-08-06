@@ -189,7 +189,7 @@ You can change the scope of the access for Supabase by configuring
                               disabled={isBranch || !canUpdateVercelConnection}
                               type={'Vercel' as IntegrationName}
                               onDeleteConnection={onDeleteVercelConnection}
-                              className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
+                              className={cn(isProjectScoped && 'rounded-b-none! mb-0!')}
                             />
                             {isProjectScoped ? (
                               <div className="relative pl-8 ml-6 border-l border-muted pb-6">

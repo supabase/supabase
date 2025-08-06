@@ -56,7 +56,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <Button
             icon={<PlusCircle size="16" />}
             type={isFiltered ? 'primary' : 'dashed'}
-            className={cn('rounded-full px-1.5 text-xs', isFiltered ? '!py-0.5' : '!py-1')}
+            className={cn('rounded-full px-1.5 text-xs', isFiltered ? 'py-0.5!' : 'py-1!')}
             size="small"
           >
             {isFiltered ? (
@@ -168,7 +168,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   <p className="w-[60px] flex justify-end text-sm">AND</p>
                   <Input
                     size="tiny"
-                    className="flex-grow"
+                    className="grow"
                     placeholder="body=eq.hey"
                     value={tempConfig.filter}
                     onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}

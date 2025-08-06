@@ -179,7 +179,7 @@ const JWTSettings = () => {
                 </div>
               }
             >
-              <Panel.Content className="space-y-6 border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+              <Panel.Content className="space-y-6 border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
                 {isError ? (
                   <div className="flex items-center justify-center py-8 space-x-2">
                     <AlertCircle size={16} strokeWidth={1.5} />
@@ -192,7 +192,7 @@ const JWTSettings = () => {
                         type="warning"
                         title="Legacy JWT secret has been migrated to new JWT Signing Keys"
                       >
-                        <p className="!leading-normal">
+                        <p className="leading-normal!">
                           Changing the legacy JWT secret can only be done by rotating to a standby
                           key and then revoking it. It is used to{' '}
                           <em className="text-foreground not-italic">
@@ -202,7 +202,7 @@ const JWTSettings = () => {
                         </p>
 
                         {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
-                          <p className="!leading-normal">
+                          <p className="leading-normal!">
                             <em className="text-warning not-italic">
                               This includes the <code>anon</code> and <code>service_role</code> JWT
                               based API keys.
@@ -488,7 +488,7 @@ const JWTSettings = () => {
       >
         <ul className="space-y-4 text-sm">
           <li className="flex gap-2 bg border rounded-md p-4">
-            <Lightbulb size={24} className="flex-shrink-0 text-brand" />
+            <Lightbulb size={24} className="shrink-0 text-brand" />
 
             <div className="flex flex-col gap-2">
               <p>Use new JWT Signing Keys and API Keys instead</p>
@@ -503,7 +503,7 @@ const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <CloudOff size={24} className="text-foreground-light flex-shrink-0" />
+            <CloudOff size={24} className="text-foreground-light shrink-0" />
 
             <div className="flex flex-col gap-2">
               <p>Your application will experience significant downtime</p>
@@ -528,7 +528,7 @@ const JWTSettings = () => {
           </li>
 
           <li className="flex gap-2 px-4">
-            <Power size={24} className="text-foreground-light flex-shrink-0" />
+            <Power size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Your project and database will be restarted</p>
               <p className="text-foreground-light">
@@ -540,7 +540,7 @@ const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <Hourglass size={24} className="text-foreground-light flex-shrink-0" />
+            <Hourglass size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>20-minute cooldown period</p>
               <p className="text-foreground-light">
@@ -550,7 +550,7 @@ const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <TriangleAlert size={24} className="text-foreground-light flex-shrink-0" />
+            <TriangleAlert size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Irreversible change! This cannot be undone!</p>
               <p className="text-foreground-light">

@@ -82,13 +82,13 @@ const LayoutHeader = ({
   const showOrgSelection = slug || (selectedOrganization && projectRef)
 
   return (
-    <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
+    <header className={cn('flex h-12 items-center shrink-0 border-b')}>
       {showProductMenu && (
         <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
           <button
             title="Menu dropdown button"
             className={cn(
-              'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+              'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px]'
             )}
             onClick={() => setMobileMenuOpen(true)}
           >

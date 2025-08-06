@@ -117,7 +117,7 @@ const Policies = ({
 
   if (tables.length === 0) {
     return (
-      <div className="flex-grow flex items-center justify-center">
+      <div className="grow flex items-center justify-center">
         <ProductEmptyState
           size="large"
           title="Row-Level Security (RLS) Policies"

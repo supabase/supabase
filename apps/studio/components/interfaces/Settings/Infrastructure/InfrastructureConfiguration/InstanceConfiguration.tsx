@@ -147,7 +147,7 @@ const InstanceConfigurationUI = () => {
                     target: primary.identifier,
                     type: 'smoothstep',
                     animated: true,
-                    className: '!cursor-default',
+                    className: 'cursor-default!',
                   },
                 ]
               : []),
@@ -158,7 +158,7 @@ const InstanceConfigurationUI = () => {
                 target: database.identifier,
                 type: 'smoothstep',
                 animated: true,
-                className: '!cursor-default',
+                className: 'cursor-default!',
                 data: {
                   status: database.status,
                   identifier: database.identifier,

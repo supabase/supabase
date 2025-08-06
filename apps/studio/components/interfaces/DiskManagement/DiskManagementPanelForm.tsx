@@ -24,7 +24,7 @@ export function DiskManagementPanelForm() {
           <Button type="default" asChild>
             <Link
               href={`/project/${projectRef}/settings/compute-and-disk`}
-              className="!no-underline"
+              className="no-underline!"
             >
               Go to Compute and Disk
             </Link>

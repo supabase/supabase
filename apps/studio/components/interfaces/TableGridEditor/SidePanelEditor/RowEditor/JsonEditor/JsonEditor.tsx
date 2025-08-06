@@ -168,7 +168,7 @@ const JsonEdit = ({
     >
       <div className="flex flex-auto h-full flex-col gap-y-4 relative">
         {view === 'edit' ? (
-          <div className="w-full h-full flex-grow">
+          <div className="w-full h-full grow">
             <JsonCodeEditor
               key={jsonString}
               readOnly={readOnly}

@@ -392,7 +392,7 @@ const LogTable = ({
           <DataGrid
             role="table"
             style={{ height: '100%' }}
-            className={cn('flex-1 flex-grow h-full border-0', {
+            className={cn('flex-1 grow h-full border-0', {
               'data-grid--simple-logs': queryType,
               'data-grid--logs-explorer': !queryType,
             })}
@@ -407,9 +407,9 @@ const LogTable = ({
             columns={columns}
             rowClass={(row: LogData) => {
               return cn(
-                'font-mono tracking-tight !bg-studio hover:!bg-surface-100 cursor-pointer',
+                'font-mono tracking-tight bg-studio! hover:bg-surface-100! cursor-pointer',
                 {
-                  '!bg-surface-200 rdg-row--focused': isEqual(row, selectedRow),
+                  'bg-surface-200! rdg-row--focused': isEqual(row, selectedRow),
                 }
               )
             }}

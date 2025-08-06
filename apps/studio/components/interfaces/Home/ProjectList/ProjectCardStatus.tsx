@@ -113,9 +113,9 @@ export const ProjectCardStatus = ({
     <Alert_Shadcn_
       variant={alertType}
       className={cn(
-        'border-0 p-5 pb-[1.25rem]',
+        'border-0 p-5 pb-5',
         'bg-transparent',
-        '[&>svg]:left-[1.25rem] [&>svg]:top-3.5 [&>svg]:border',
+        '[&>svg]:left-5 [&>svg]:top-3.5 [&>svg]:border',
         !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-surface-100' : ''
       )}
     >

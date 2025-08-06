@@ -136,7 +136,7 @@ const SignUpForm = () => {
                   <Button
                     icon={passwordHidden ? <Eye /> : <EyeOff />}
                     type="default"
-                    className="!mr-1"
+                    className="mr-1!"
                     onClick={() => setPasswordHidden((prev) => !prev)}
                   />
                 }

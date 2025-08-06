@@ -33,7 +33,7 @@ const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(n
 
 const commandItemClass = cn(
   'relative text-foreground-lighter text-left px-2 py-1.5 rounded',
-  'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
+  'hover:text-foreground hover:bg-overlay-hover! w-full flex items-center space-x-2',
   'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
 )
 
@@ -286,7 +286,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           )}
           <span
             className={cn(
-              'text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1 opacity-0 transition-opacity hidden',
+              'text-foreground-muted whitespace-nowrap leading-5.5 ml-1 opacity-0 transition-opacity hidden',
               !IS_INLINE_MODE &&
                 (persistLabel || values.length === 0) &&
                 'opacity-100 visible inline'
@@ -390,7 +390,7 @@ const MultiSelectorInput = React.forwardRef<
       wrapperClassName={wrapperClassName}
       className={cn(
         MultiSelectorInputVariants({ size }),
-        'text-sm bg-transparent h-full flex-grow border-none outline-none placeholder:text-foreground-muted flex-1',
+        'text-sm bg-transparent h-full grow border-none outline-none placeholder:text-foreground-muted flex-1',
         activeIndex !== -1 && 'caret-transparent',
         className
       )}
@@ -510,13 +510,13 @@ const MultiSelectorItem = React.forwardRef<
           'transition-colors duration-150 ease-in-out',
           'hover:border-strong',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background',
+          'disabled:cursor-not-allowed disabled:opacity-50 data-checked:bg-foreground data-checked:text-background',
           isSelected ? 'bg-foreground text-background' : '[&_svg]:invisible'
         )}
       >
         <Check className="h-3 w-3" strokeWidth={4} />
       </div>
-      <div className="text-xs flex-grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
+      <div className="text-xs grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
         {children}
       </div>
     </CommandItem>

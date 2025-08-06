@@ -80,7 +80,7 @@ export const PolicyTemplates = ({
                   className={cn(
                     'transition w-full',
                     template.id === selectedTemplate
-                      ? '!border-stronger bg-surface-200 hover:!border-stronger'
+                      ? 'border-stronger! bg-surface-200 hover:border-stronger!'
                       : ''
                   )}
                   key={template.id}
@@ -91,7 +91,7 @@ export const PolicyTemplates = ({
                     <div className="min-w-16">
                       <Badge
                         className={cn(
-                          '!rounded font-mono',
+                          'rounded! font-mono',
                           template.command === 'UPDATE'
                             ? 'bg-blue-400 text-blue-900 border border-blue-800'
                             : ''
@@ -126,7 +126,7 @@ export const PolicyTemplates = ({
                 <SimpleCodeBlock
                   showCopy={false}
                   className="sql"
-                  parentClassName="!p-0 [&>div>span]:text-xs"
+                  parentClassName="p-0! [&>div>span]:text-xs"
                 >
                   {template.statement}
                 </SimpleCodeBlock>

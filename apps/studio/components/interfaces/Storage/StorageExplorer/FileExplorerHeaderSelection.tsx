@@ -21,7 +21,7 @@ const FileExplorerHeaderSelection = () => {
   } = useStorageExplorerStateSnapshot()
 
   return (
-    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow [[data-theme*=dark]_&]:bg-brand-500">
+    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow in-data-[theme*=dark]:bg-brand-500">
       <Button
         icon={<X size={16} strokeWidth={2} />}
         type="text"

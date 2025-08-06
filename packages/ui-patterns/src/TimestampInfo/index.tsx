@@ -118,7 +118,7 @@ export const TimestampInfo = ({
           <p>{label}</p>
           <div className="border-t w-full border-dashed" />
         </div>
-        <div className="relative flex items-center gap-x-2 flex-grow">
+        <div className="relative flex items-center gap-x-2 grow">
           <div className="border-t w-full border-dashed z-10" />
           {copied && (
             <span className="flex items-center justify-end w-full absolute inset-0 flex items-right text-brand-600 bg-surface-100">

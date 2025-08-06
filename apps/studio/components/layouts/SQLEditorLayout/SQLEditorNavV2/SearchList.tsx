@@ -43,7 +43,7 @@ export const SearchList = ({ search }: SearchListProps) => {
   const snippets = useMemo(() => data?.pages.flatMap((page) => page.content), [data?.pages])
 
   return (
-    <div className="flex flex-col flex-grow">
+    <div className="flex flex-col grow">
       {isLoading ? (
         <div className="px-4 py-1 pb-2.5">
           <Loader2 className="animate-spin" size={14} />
@@ -81,7 +81,7 @@ const SearchListItem = ({ snippet }: { snippet: Content }) => {
     <Link
       className={cn(
         'h-full flex items-center gap-x-3 pl-4 hover:bg-control transition',
-        isSelected && '!bg-selection [&>svg]:fill-foreground [&>p]:text-foreground'
+        isSelected && 'bg-selection! [&>svg]:fill-foreground [&>p]:text-foreground'
       )}
       href={`/project/${ref}/sql/${snippet.id}`}
     >

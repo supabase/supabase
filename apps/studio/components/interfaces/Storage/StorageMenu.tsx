@@ -67,7 +67,7 @@ const StorageMenu = () => {
 
   return (
     <>
-      <Menu type="pills" className="my-6 flex flex-grow flex-col">
+      <Menu type="pills" className="my-6 flex grow flex-col">
         <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
           <ButtonTooltip
             block
@@ -123,9 +123,9 @@ const StorageMenu = () => {
 
             {isLoading && (
               <div className="space-y-2 mx-2">
-                <ShimmeringLoader className="!py-2.5" />
-                <ShimmeringLoader className="!py-2.5" />
-                <ShimmeringLoader className="!py-2.5" />
+                <ShimmeringLoader className="py-2.5!" />
+                <ShimmeringLoader className="py-2.5!" />
+                <ShimmeringLoader className="py-2.5!" />
               </div>
             )}
 

@@ -40,7 +40,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
-      'fixed inset-0 z-50 bg-alternative/90 backdrop-blur-sm transition-all duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in',
+      'fixed inset-0 z-50 bg-alternative/90 backdrop-blur-sm transition-all duration-100 data-closed:animate-out data-closed:fade-out data-open:fade-in',
       className
     )}
     {...props}
@@ -51,18 +51,18 @@ SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const classes = cn([
   'fixed z-50 scale-100 gap-4 bg-studio opacity-100 shadow-lg',
-  'data-[state=open]:animate-in data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:duration-300',
+  'data-open:animate-in data-open:duration-300 data-closed:animate-out data-closed:duration-300',
 ])
 
 const sheetVariants = cva(classes, {
   variants: {
     side: {
-      top: 'data-[state=open]:slide-in-from-top data-[state=closed]:slide-out-to-top w-full border-b inset-x-0 top-0',
+      top: 'data-open:slide-in-from-top data-closed:slide-out-to-top w-full border-b inset-x-0 top-0',
       bottom:
-        'data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom w-full border-t inset-x-0 bottom-0',
-      left: 'data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left h-full border-r inset-y-0 left-0',
+        'data-open:slide-in-from-bottom data-closed:slide-out-to-bottom w-full border-t inset-x-0 bottom-0',
+      left: 'data-open:slide-in-from-left data-closed:slide-out-to-left h-full border-r inset-y-0 left-0',
       right:
-        'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right h-full border-l inset-y-0 right-0',
+        'data-open:slide-in-from-right data-closed:slide-out-to-right h-full border-l inset-y-0 right-0',
     },
     size: {
       content: '',

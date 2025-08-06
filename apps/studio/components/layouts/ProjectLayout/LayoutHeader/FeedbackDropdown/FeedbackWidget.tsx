@@ -207,7 +207,7 @@ export const FeedbackWidget = ({
                 title="This looks like an issue that's better handled by support"
                 className="rounded-none border-x-0 border-b-0 mb-0 [&>h5]:text-xs [&>h5]:mb-0.5"
               >
-                <p className="text-xs text-foreground-light !leading-tight">
+                <p className="text-xs text-foreground-light leading-tight!">
                   Please{' '}
                   <InlineLink
                     className="text-foreground-light hover:text-foreground"

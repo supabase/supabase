@@ -32,7 +32,7 @@ export const InfoPill = ({ label, icon, title, description, links }: InfoPillPro
         </Badge>
       </HoverCardTrigger>
       <HoverCardContent className="w-80 flex items-start gap-3" side="right" align="center">
-        <div className="rounded-full bg-surface-300 p-2 flex-shrink-0">
+        <div className="rounded-full bg-surface-300 p-2 shrink-0">
           {React.cloneElement(icon as React.ReactElement, {
             className: 'w-5 h-5',
             strokeWidth: 1.5,
@@ -51,7 +51,7 @@ export const InfoPill = ({ label, icon, title, description, links }: InfoPillPro
                   rel="noopener noreferrer"
                   className="text-xs text-brand hover:text-brand-600 flex items-center"
                 >
-                  <ExternalLink className="w-3 h-3 mr-1 flex-shrink-0" />
+                  <ExternalLink className="w-3 h-3 mr-1 shrink-0" />
                   <span className="truncate">{link.label}</span>
                 </a>
               ))}

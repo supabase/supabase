@@ -85,17 +85,17 @@ const LintPageTabs = ({
             value={tab.id}
             className={cn(
               'group relative',
-              'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
-              'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
-              tab.id === currentTab ? '!bg-surface-200' : '!bg-surface-200/[33%]',
-              'hover:!bg-surface-100',
-              'data-[state=active]:!bg-surface-200',
+              'px-6 py-3 border-b-0 flex flex-col items-start shadow-none! border-default border-t',
+              'even:border-x last:border-r even:border-x-strong! last:border-r-strong!',
+              tab.id === currentTab ? 'bg-surface-200!' : 'bg-surface-200/33!',
+              'hover:bg-surface-100!',
+              'data-[state=active]:bg-surface-200!',
               'hover:text-foreground-light',
               'transition'
             )}
           >
             {tab.id === currentTab && (
-              <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
+              <div className="absolute top-0 left-0 w-full h-px bg-foreground" />
             )}
             <div className="flex items-center gap-x-2">
               <span

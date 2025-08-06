@@ -45,8 +45,8 @@ export const TopCacheMissesRenderer = (
   }>
 ) => {
   if (props.data.length === 0) return null
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200'
-  const cellClasses = '!text-xs !py-2'
+  const headerClasses = 'text-xs! py-2! p-0 font-bold bg-surface-200!'
+  const cellClasses = 'text-xs! py-2!'
 
   return (
     <>

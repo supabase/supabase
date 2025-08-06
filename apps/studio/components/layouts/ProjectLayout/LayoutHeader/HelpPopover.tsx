@@ -42,7 +42,7 @@ export const HelpPopover = () => {
             <HelpCircle
               size={18}
               strokeWidth={1.5}
-              className="!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground"
+              className="h-[18px]! w-[18px]! text-foreground-light group-hover:text-foreground"
             />
           }
           tooltip={{ content: { side: 'bottom', text: 'Help' } }}

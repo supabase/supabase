@@ -61,7 +61,7 @@ const HTTPRequestFields = ({
     <>
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">
+          <FormSectionLabel className="lg:col-span-4!">
             {type === 'http_request'
               ? 'HTTP Request'
               : type === 'supabase_function'
@@ -70,7 +70,7 @@ const HTTPRequestFields = ({
           </FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <Listbox id="http_method" name="http_method" size="medium" label="Method">
             <Listbox.Option id="GET" value="GET" label="GET">
               GET
@@ -125,9 +125,9 @@ const HTTPRequestFields = ({
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">HTTP Headers</FormSectionLabel>}
+        header={<FormSectionLabel className="lg:col-span-4!">HTTP Headers</FormSectionLabel>}
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <div className="space-y-2">
             {httpHeaders.map((header, idx: number) => (
               <div key={header.id} className="flex items-center space-x-2">
@@ -225,9 +225,9 @@ const HTTPRequestFields = ({
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">HTTP Parameters</FormSectionLabel>}
+        header={<FormSectionLabel className="lg:col-span-4!">HTTP Parameters</FormSectionLabel>}
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <div className="space-y-2">
             {httpParameters.map((parameter, idx: number) => (
               <div key={parameter.id} className="flex items-center space-x-2">

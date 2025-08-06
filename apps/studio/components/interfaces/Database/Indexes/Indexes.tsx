@@ -120,7 +120,7 @@ const Indexes = () => {
 
             {!isSchemaLocked && (
               <Button
-                className="ml-auto flex-grow lg:flex-grow-0"
+                className="ml-auto grow lg:grow-0"
                 type="primary"
                 onClick={() => setShowCreateIndex(true)}
                 disabled={!isSuccessSchemas}

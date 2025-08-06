@@ -9,7 +9,7 @@ export default function RLSDisableModalContent() {
       <div className="grid gap-1">
         <Alert
           variant="warning"
-          className="!px-4 !py-3"
+          className="px-4! py-3!"
           title="This table will be publicly readable and writable"
           withIcon
         >
@@ -27,7 +27,7 @@ export default function RLSDisableModalContent() {
           </li>
 
           <li className="flex gap-3">
-            <Lock size={14} className="flex-shrink-0" />
+            <Lock size={14} className="shrink-0" />
             <div>
               <strong>Before you turn off Row Level Security, consider:</strong>
               <ul className="space-y-2 mt-2">

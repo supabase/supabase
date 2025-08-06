@@ -218,7 +218,7 @@ const Addons = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex-grow">
+                  <div className="grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
                     {isLoading || (computeInstance === undefined && isLoadingProject) ? (
                       <ShimmeringLoader className="w-32" />

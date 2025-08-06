@@ -30,11 +30,11 @@ export const ColumnRenderer: Column<LogData, unknown>[] = [
           >
             {ICONS[type]}
           </div>
-          <span className={cn('font-mono', isErrorLog(data.row) ? '!text-warning-600' : '')}>
+          <span className={cn('font-mono', isErrorLog(data.row) ? 'text-warning-600!' : '')}>
             {new Date(data.row.timestamp).toISOString()}
           </span>
           <span
-            className={cn('truncate font-mono', isErrorLog(data.row) ? '!text-warning-600' : '')}
+            className={cn('truncate font-mono', isErrorLog(data.row) ? 'text-warning-600!' : '')}
           >
             {JSON.stringify(data.row.metadata)}
           </span>

@@ -1,3 +1,5 @@
+@reference './globals.css';
+
 .monaco-editor {
   @apply relative overflow-visible;
   -webkit-text-size-adjust: 100%;

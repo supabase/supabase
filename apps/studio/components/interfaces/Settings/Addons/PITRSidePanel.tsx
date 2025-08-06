@@ -184,7 +184,7 @@ const PITRSidePanel = () => {
             in granularity.
           </p>
 
-          <div className="!mt-8 pb-4">
+          <div className="mt-8! pb-4">
             <div className="flex gap-3">
               {PITR_CATEGORY_OPTIONS.map((option) => {
                 const isSelected = selectedCategory === option.id
@@ -263,7 +263,7 @@ const PITRSidePanel = () => {
           ) : null}
 
           {selectedCategory === 'on' && (
-            <div className="!mt-8 pb-4">
+            <div className="mt-8! pb-4">
               {isFreePlan ? (
                 <Alert
                   withIcon
@@ -312,7 +312,7 @@ const PITRSidePanel = () => {
                   <Radio
                     name="pitr"
                     disabled={isFreePlan || subscriptionCompute === undefined}
-                    className="col-span-4 !p-0"
+                    className="col-span-4 p-0!"
                     key={option.identifier}
                     checked={selectedOption === option.identifier}
                     label={<span className="text-sm">{option.name}</span>}
@@ -331,7 +331,7 @@ const PITRSidePanel = () => {
                           <p className="text-foreground text-sm" translate="no">
                             {formatCurrency(option.price)}
                           </p>
-                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          <p className="text-foreground-light translate-y-px"> / month</p>
                         </div>
                       </div>
                     </div>

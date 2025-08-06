@@ -32,7 +32,7 @@ export const RealtimePolicies = () => {
   return (
     <div className="flex min-h-full w-full flex-col p-4 gap-y-4">
       <FormHeader
-        className="!mb-0"
+        className="mb-0!"
         title="Realtime policies"
         description="You can use RLS policies to control access to Realtime Channels"
       />

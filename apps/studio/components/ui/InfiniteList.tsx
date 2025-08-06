@@ -111,7 +111,7 @@ function InfiniteList<T, P>({
 
   return (
     <>
-      <div className="flex-grow">
+      <div className="grow">
         <AutoSizer>
           {({ height, width }: { height: number; width: number }) => (
             <InfiniteLoader

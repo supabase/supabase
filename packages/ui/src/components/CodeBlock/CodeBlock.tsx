@@ -173,7 +173,7 @@ export const CodeBlock = ({
             wrapLines={wrapLines}
             style={monokaiTheme}
             className={cn(
-              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100 outline-none focus:border-foreground-lighter/50',
+              'code-block border border-surface p-4 w-full my-0! bg-surface-100! outline-none focus:border-foreground-lighter/50',
               `${!title ? 'rounded-md' : 'rounded-t-none rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
               className

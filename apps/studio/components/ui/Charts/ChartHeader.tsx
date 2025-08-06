@@ -83,7 +83,7 @@ const ChartHeader = ({
   }
 
   return (
-    <div className="flex-grow flex justify-between items-start min-h-16">
+    <div className="grow flex justify-between items-start min-h-16">
       <div className="flex flex-col">
         {title && chartTitle}
         {highlightedValue !== undefined && !hideHighlightedValue && highlighted}

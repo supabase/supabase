@@ -240,7 +240,7 @@ const DestinationPanel = ({
                     <Label className="text-sm mx-2">Enable</Label>
                   </div>
                 </SheetHeader>
-                <SheetSection className="flex-grow overflow-auto">
+                <SheetSection className="grow overflow-auto">
                   <Form_Shadcn_ {...form}>
                     <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
                       <FormField_Shadcn_
@@ -367,7 +367,7 @@ const DestinationPanel = ({
                           <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-start mb-0 mt-8">
                             Advanced Settings
                           </AccordionTrigger_Shadcn_>
-                          <AccordionContent_Shadcn_ asChild className="!pb-0">
+                          <AccordionContent_Shadcn_ asChild className="pb-0!">
                             <FormField_Shadcn_
                               control={form.control}
                               name="maxSize"
@@ -486,7 +486,7 @@ const DestinationPanel = ({
                 <SheetHeader>
                   <SheetTitle>New Destination</SheetTitle>
                 </SheetHeader>
-                <SheetSection className="flex-grow overflow-auto">
+                <SheetSection className="grow overflow-auto">
                   <Alert_Shadcn_>
                     <WarningIcon />
                     <AlertTitle_Shadcn_>

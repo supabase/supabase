@@ -120,7 +120,7 @@ ClaimProjectPage.getLayout = (page) => (
     <Head>
       <title>Claim project | Supabase</title>
     </Head>
-    <main className="flex-grow flex flex-col w-full h-full overflow-y-auto">{page}</main>
+    <main className="grow flex flex-col w-full h-full overflow-y-auto">{page}</main>
   </>
 )
 

@@ -305,7 +305,7 @@ export function DataTableFilterCommand({
                           className="group"
                         >
                           {item.search}
-                          <span className="ml-auto truncate text-muted-foreground/80 group-aria-[selected=true]:block">
+                          <span className="ml-auto truncate text-muted-foreground/80 group-aria-selected:block">
                             {formatDistanceToNow(item.timestamp, {
                               addSuffix: true,
                             })}
@@ -322,7 +322,7 @@ export function DataTableFilterCommand({
                               // TODO: extract into function
                               setLastSearches(lastSearches.filter((i) => i.search !== item.search))
                             }}
-                            className="ml-1 hidden rounded-md p-0.5 hover:bg-background group-aria-[selected=true]:block"
+                            className="ml-1 hidden rounded-md p-0.5 hover:bg-background group-aria-selected:block"
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -376,7 +376,7 @@ export function DataTableFilterCommand({
 function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<TData> }) {
   const { table, getFacetedMinMaxValues, getFacetedUniqueValues } = useDataTable()
   const value = field.value as string
-  const className = 'ml-2 hidden truncate text-foreground-lighter group-aria-[selected=true]:block'
+  const className = 'ml-2 hidden truncate text-foreground-lighter group-aria-selected:block'
 
   switch (field.type) {
     case 'checkbox': {

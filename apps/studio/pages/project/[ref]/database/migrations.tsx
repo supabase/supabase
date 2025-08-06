@@ -20,7 +20,7 @@ const MigrationsPage: NextPageWithLayout = () => {
       <ScaffoldSection>
         <ScaffoldSectionContent>
           <FormHeader
-            className="!mb-0"
+            className="mb-0!"
             title="Database Migrations"
             description="History of migrations that have been run on your database"
           />

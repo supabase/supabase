@@ -76,7 +76,7 @@ export const PolicyTableRow = ({
 
   return (
     <Panel
-      className="!m-0"
+      className="m-0!"
       title={
         <PolicyTableRowHeader
           table={table}

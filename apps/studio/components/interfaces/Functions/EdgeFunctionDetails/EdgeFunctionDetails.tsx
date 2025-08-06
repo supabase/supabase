@@ -143,7 +143,7 @@ export const EdgeFunctionDetails = () => {
   return (
     <div className="mx-auto flex flex-col-reverse 2xl:flex-row gap-8 pb-8">
       <div className="flex-1 min-w-0 overflow-hidden">
-        <ScaffoldSection isFullWidth className="!pt-0 2xl:first:!pt-12">
+        <ScaffoldSection isFullWidth className="pt-0! 2xl:first:pt-12!">
           <ScaffoldSectionTitle className="mb-4">Function Configuration</ScaffoldSectionTitle>
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>
@@ -236,7 +236,7 @@ export const EdgeFunctionDetails = () => {
                       <CodeBlock
                         language={tab.language}
                         hideLineNumbers={tab.hideLineNumbers}
-                        className="p-0 text-xs !mt-0 border-none"
+                        className="p-0 text-xs mt-0! border-none"
                         value={tab.code(functionUrl, selectedFunction?.name ?? '', apiKey)}
                       />
                     </div>
@@ -312,7 +312,7 @@ export const EdgeFunctionDetails = () => {
       </div>
 
       <div className="w-full 2xl:max-w-[600px] shrink-0">
-        <ScaffoldSection isFullWidth className="!pt-6 2xl:first:!pt-12">
+        <ScaffoldSection isFullWidth className="pt-6! 2xl:first:pt-12!">
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>

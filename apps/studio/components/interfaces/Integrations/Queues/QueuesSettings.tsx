@@ -231,7 +231,7 @@ export const QueuesSettings = () => {
                           title="Existing Queues must have RLS enabled first before exposing via PostgREST"
                           className="mt-2"
                         >
-                          <p className="!m-0">
+                          <p className="m-0!">
                             Please ensure that the following {tablesWithoutRLS.length} queue
                             {tablesWithoutRLS.length > 1 ? 's' : ''} have RLS enabled in order to
                             prevent anonymous access.

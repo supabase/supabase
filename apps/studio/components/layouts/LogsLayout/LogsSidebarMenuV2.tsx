@@ -62,7 +62,7 @@ export function SidebarCollapsible({
 }) {
   return (
     <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
-      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:!rotate-90 pb-2">
+      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:rotate-90! pb-2">
         <ChevronRight
           size={16}
           className={'text-foreground-light transition-transform duration-200'}
@@ -250,7 +250,7 @@ export function LogsSidebarMenuV2() {
         />
       )}
 
-      <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-[1]">
+      <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-1">
         <InnerSideBarFilters className="w-full p-0 gap-0">
           <InnerSideBarFilterSearchInput
             name="search-collections"

@@ -43,12 +43,12 @@ const MobileNavigationBar = () => {
             <button
               className={cn(
                 'group',
-                'flex-grow h-[30px] rounded-md',
+                'grow h-[30px] rounded-md',
                 'p-2',
                 'flex items-center justify-between',
                 'bg-transparent border-none text-foreground-lighter',
                 'hover:bg-opacity-100 hover:border-strong hover:text-foreground-light',
-                'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+                'focus-visible:outline-4! focus-visible:outline-offset-1 focus-visible:outline-brand-600',
                 'transition'
               )}
             >
@@ -61,7 +61,7 @@ const MobileNavigationBar = () => {
             title="Menu dropdown button"
             className={cn(
               buttonVariants({ type: 'default' }),
-              'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
+              'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
             )}
             onClick={() => setIsSheetOpen(true)}
           >

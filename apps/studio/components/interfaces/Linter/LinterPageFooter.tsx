@@ -26,7 +26,7 @@ const LinterPageFooter = ({
 
         <Button
           type="default"
-          className="!mt-3 w-min"
+          className="mt-3! w-min"
           disabled={isLoading || isRefetching}
           loading={isLoading || isRefetching}
           onClick={() => refetch()}

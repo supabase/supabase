@@ -1,3 +1,5 @@
+@reference '../../../styles/globals.css';
+
 .graphiqlContainer .graphiqlSessions {
   margin: 0;
   border-radius: 0;

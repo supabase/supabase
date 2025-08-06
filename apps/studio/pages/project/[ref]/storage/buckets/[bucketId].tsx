@@ -20,7 +20,7 @@ const PageLayout: NextPageWithLayout = () => {
   if (!project || !projectRef) return null
 
   return (
-    <div className="storage-container flex flex-grow">
+    <div className="storage-container flex grow">
       {isError && <StorageBucketsError error={error as any} />}
 
       {isSuccess ? (

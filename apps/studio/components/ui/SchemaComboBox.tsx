@@ -80,7 +80,7 @@ export const SchemaComboBox = ({
       )}
 
       {showError && isSchemasError && (
-        <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
+        <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load schemas
           </AlertTitle_Shadcn_>

@@ -220,14 +220,14 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
             size="invisible"
             onOpen={() => {
               // [Joshen] This is to ensure that hCaptcha popup remains clickable
-              if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+              if (document !== undefined) document.body.classList.add('pointer-events-auto!')
             }}
             onClose={() => {
-              if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+              if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
             }}
             onVerify={(token) => {
               setCaptchaToken(token)
-              if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+              if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
             }}
             onExpire={() => {
               setCaptchaToken(null)

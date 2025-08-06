@@ -70,7 +70,7 @@ export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) 
                 )}
               </AnimatePresence>
             </div>
-            <div className="flex flex-col gap-0 flex-grow">
+            <div className="flex flex-col gap-0 grow">
               <p className="text-sm text-foreground">
                 For 6 hours you will not be able to change any disk attributes.
               </p>

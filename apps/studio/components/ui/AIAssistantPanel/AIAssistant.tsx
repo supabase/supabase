@@ -323,7 +323,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       ]}
     >
       <div className={cn('flex flex-col h-full', className)}>
-        <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
+        <div ref={scrollContainerRef} className={cn('grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
             <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
               <div className="text-sm flex-1 flex items-center">
@@ -500,7 +500,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 exit={{ opacity: 0 }}
                 className="pointer-events-none z-10 -mt-24"
               >
-                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
                   <motion.div
                     className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
                     variants={{
@@ -557,7 +557,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             <AssistantChatForm
               textAreaRef={inputRef}
               className={cn(
-                'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
+                'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-none! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
               )}
               loading={isChatLoading}
               disabled={!isApiKeySet || disablePrompts || isChatLoading}

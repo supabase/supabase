@@ -79,7 +79,7 @@ const CommandItem = forwardRef<
       {...props}
     >
       <div className="w-full flex flex-row justify-between items-center">
-        <div className="flex flex-row gap-2 flex-grow items-center">
+        <div className="flex flex-row gap-2 grow items-center">
           {command.icon?.()}
           {children}
         </div>

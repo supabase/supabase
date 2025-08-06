@@ -109,12 +109,12 @@ export const NotificationsPopoverV2 = () => {
                 size={18}
                 strokeWidth={1.5}
                 className={cn(
-                  '!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground'
+                  'h-[18px]! w-[18px]! text-foreground-light group-hover:text-foreground'
                 )}
               />
               {hasCritical && (
                 <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
-                  <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-destructive" />
+                  <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-10 border-l-transparent border-r-transparent border-b-destructive" />
                 </div>
               )}
               {hasWarning && !hasCritical && (
@@ -228,7 +228,7 @@ export const NotificationsPopoverV2 = () => {
                   onLoadNextPage={() => fetchNextPage()}
                 />
               ) : (
-                <div className="flex flex-col gap-y-4 items-center flex-grow justify-center">
+                <div className="flex flex-col gap-y-4 items-center grow justify-center">
                   <InboxIcon size={32} className="text-foreground-light" />
                   <div className="flex flex-col gap-y-1">
                     <p className="text-foreground-light text-sm mx-auto text-center">

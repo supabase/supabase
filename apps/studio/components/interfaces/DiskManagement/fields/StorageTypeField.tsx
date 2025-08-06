@@ -107,7 +107,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                           key={item.type}
                           disabled={disableInput || disableIo2}
                           value={item.type}
-                          className={cn(disableIo2 && '!pointer-events-auto')}
+                          className={cn(disableIo2 && 'pointer-events-auto!')}
                         >
                           <div className="flex flex-col gap-0 items-start">
                             <div className="flex gap-3 items-center">

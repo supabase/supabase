@@ -33,7 +33,7 @@ export const AIOnboarding = ({
     ? suggestions.prompts.map((suggestion) => ({
         title: suggestion.label,
         prompt: suggestion.description,
-        icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
+        icon: <FileText strokeWidth={1.25} size={14} className="w-4! h-4!" />,
       }))
     : sqlSnippets && sqlSnippets.length > 0
       ? codeSnippetPrompts
@@ -55,7 +55,7 @@ export const AIOnboarding = ({
             <AssistantChatForm
               textAreaRef={inputRef}
               className={cn(
-                'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
+                'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-none! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
               )}
               loading={false}
               disabled={false}
@@ -86,7 +86,7 @@ export const AIOnboarding = ({
                 <Button
                   size="small"
                   type="outline"
-                  className="text-xs rounded-full !h-auto py-1 px-2 text-foreground-light"
+                  className="text-xs rounded-full h-auto! py-1 px-2 text-foreground-light"
                   onClick={() => {
                     onValueChange(item.prompt)
                     inputRef.current?.focus()

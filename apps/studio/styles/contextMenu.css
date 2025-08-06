@@ -1,3 +1,5 @@
+@reference './globals.css';
+
 .react-contexify {
   @apply border border-default;
   background-color: hsl(var(--background-surface-100)) !important;

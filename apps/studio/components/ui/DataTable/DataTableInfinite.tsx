@@ -145,7 +145,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         {/* Only show load more section if we have rows OR if we're not in initial loading state */}
         {(rows.length > 0 || (!isLoading && !rows.length)) && (
           <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
-            <TableCell colSpan={columns.length} className="text-center !py-2">
+            <TableCell colSpan={columns.length} className="text-center py-2!">
               {hasNextPage || isFetching ? (
                 <div className="flex flex-col items-center gap-2">
                   <Button

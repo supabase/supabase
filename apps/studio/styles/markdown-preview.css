@@ -1,4 +1,5 @@
-// [Joshen] https://github.com/sindresorhus/github-markdown-css
+@reference './globals.css';
+/* [Joshen] https://github.com/sindresorhus/github-markdown-css */
 
 @media (prefers-color-scheme: dark) {
   .markdown-body,

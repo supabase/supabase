@@ -456,7 +456,7 @@ const DeployNewReplicaPanel = ({
             {showNewDiskManagementUI ? (
               <>
                 <Collapsible_Shadcn_>
-                  <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
+                  <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:-rotate-180!">
                     <p className="text-sm text-left">
                       New replica will cost an additional{' '}
                       <span translate="no">

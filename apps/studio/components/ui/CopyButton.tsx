@@ -57,7 +57,7 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         className={cn(
           {
             'px-1': iconOnly,
-            // '!pointer-events-auto': props.disabled,
+            // 'pointer-events-auto!': props.disabled,
           },
           props.className
         )}

@@ -47,7 +47,7 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
         name: getName(x),
         route: `/project/${ref}/integrations/${x.id}/overview`,
         icon: () => (
-          <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+          <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:p-1! [&>svg]:p-1!">
             {x.icon()}
           </div>
         ),

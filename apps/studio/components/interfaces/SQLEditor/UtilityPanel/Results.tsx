@@ -109,7 +109,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   return (
     <>
       {rows.length === 0 ? (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
           <p className="m-0 border-0 px-4 py-3 font-mono text-sm text-foreground-light">
             Success. No rows returned
           </p>
@@ -119,7 +119,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
           <DataGrid
             columns={columns}
             rows={rows}
-            className="h-full flex-grow border-t-0"
+            className="h-full grow border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
             onCellKeyDown={handleCopyCell}

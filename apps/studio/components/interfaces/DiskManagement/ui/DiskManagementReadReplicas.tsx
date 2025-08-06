@@ -79,10 +79,10 @@ export const DiskManagementDiskSizeReadReplicas = ({
       {/* Hide for now until we have the utilization for each RR specifically */}
       {/* <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center cursor-pointer rounded gap-2 mt-3 text-foreground-light hover:text-foreground data-[state=open]:text-foreground group">
+          <div className="flex items-center cursor-pointer rounded gap-2 mt-3 text-foreground-light hover:text-foreground data-open:text-foreground group">
             <h3 className="text-sm">Read replica disk size information</h3>
             <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 group-data-[state=open]:transform group-data-[state=open]:rotate-180 group-data-[state=open]:text-foreground`}
+              className={`h-4 w-4 transition-transform duration-200 group-data-open:transform group-data-open:rotate-180 group-data-open:text-foreground`}
             />
           </div>
         </CollapsibleTrigger>

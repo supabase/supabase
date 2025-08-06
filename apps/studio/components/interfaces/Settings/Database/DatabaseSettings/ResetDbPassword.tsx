@@ -88,7 +88,7 @@ const ResetDbPassword = ({ disabled = false }) => {
 
   return (
     <>
-      <Panel className="!m-0">
+      <Panel className="m-0!">
         <Panel.Content>
           <div
             className="grid grid-cols-1 items-center lg:grid-cols-3 scroll-mt-6"

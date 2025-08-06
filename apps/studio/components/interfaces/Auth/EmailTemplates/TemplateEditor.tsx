@@ -302,7 +302,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     id="code-id"
                     language="html"
                     isReadOnly={!canUpdateConfig}
-                    className="!mb-0 relative h-96 overflow-hidden p-0"
+                    className="mb-0! relative h-96 overflow-hidden p-0"
                     onInputChange={(e: string | undefined) => {
                       setBodyValue(e ?? '')
                       if (bodyValue !== e) setHasUnsavedChanges(true)
@@ -337,7 +337,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ value="preview" className="pt-0 mt-0">
                   <iframe
-                    className="!mb-0 mt-0 overflow-hidden h-96 w-full"
+                    className="mb-0! mt-0 overflow-hidden h-96 w-full"
                     title={id}
                     srcDoc={bodyValue}
                     sandbox="allow-scripts allow-forms"

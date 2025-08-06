@@ -23,7 +23,7 @@ export const AdvisorRulesPreview = () => {
         alt="api-docs-side-panel-preview"
         className="rounded border mb-4"
       />
-      <div className="space-y-2 !mt-4">
+      <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>

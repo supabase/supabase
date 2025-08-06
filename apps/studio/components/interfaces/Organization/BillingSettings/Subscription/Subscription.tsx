@@ -129,7 +129,7 @@ const Subscription = () => {
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <div className="[&>p]:!leading-normal prose text-sm">
+                      <div className="[&>p]:leading-normal! prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}

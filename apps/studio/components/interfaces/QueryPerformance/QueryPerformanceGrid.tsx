@@ -61,7 +61,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             onClick={() => onSortChange(col.id)}
           >
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
+              <p className="text-foreground!">{col.name}</p>
               {col.description && <p className="text-foreground-lighter">{col.description}</p>}
             </div>
             {sort?.column === col.id && (
@@ -154,14 +154,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   return (
     <ResizablePanelGroup
       direction="horizontal"
-      className="relative flex flex-grow bg-alternative min-h-0"
+      className="relative flex grow bg-alternative min-h-0"
       autoSaveId="query-performance-layout-v1"
     >
       <ResizablePanel defaultSize={1}>
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -231,14 +231,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
                 <TabsTrigger_Shadcn_
                   value="details"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
                 {showIndexSuggestions && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
-                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                   >
                     Indexes
                   </TabsTrigger_Shadcn_>
@@ -246,7 +246,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               </TabsList_Shadcn_>
               <TabsContent_Shadcn_
                 value="details"
-                className="mt-0 flex-grow min-h-0 overflow-y-auto"
+                className="mt-0 grow min-h-0 overflow-y-auto"
               >
                 <QueryDetail
                   reportType={reportType}
@@ -256,7 +256,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               </TabsContent_Shadcn_>
               <TabsContent_Shadcn_
                 value="suggestion"
-                className="mt-0 flex-grow min-h-0 overflow-y-auto"
+                className="mt-0 grow min-h-0 overflow-y-auto"
               >
                 <QueryIndexes selectedRow={reportData[selectedRow]} />
               </TabsContent_Shadcn_>

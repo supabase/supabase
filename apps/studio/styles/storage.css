@@ -1,3 +1,5 @@
+@reference './globals.css';
+
 .storage-container {
   .sbui-space-col {
     @apply flex-grow;

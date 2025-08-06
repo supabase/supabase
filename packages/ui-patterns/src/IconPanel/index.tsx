@@ -118,7 +118,7 @@ export const IconPanel = ({
           effect="solid"
           backgroundColor="hsl(var(--background-alternative-default))"
           textColor="hsl(var(--foreground-light))"
-          className="!py-2 !px-4"
+          className="py-2! px-4!"
         />
       )}
     </>

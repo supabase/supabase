@@ -1,3 +1,5 @@
+@reference './globals.css';
+
 .Toastify__toast-container {
   z-index: 9999;
   -webkit-transform: translate3d(0, 0, 9999px);
@@ -559,5 +561,3 @@
     word-break: break-word;
   }
 }
-
-/*# sourceMappingURL=ReactToastify.css.map */

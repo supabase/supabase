@@ -34,7 +34,7 @@ function PartnerIcon({
       return (
         <div
           className={cn(
-            'bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center flex-shrink-0',
+            'bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center shrink-0',
             size === 'small' && 'h-5 w-5',
             size === 'medium' && 'w-7 h-7',
             size === 'large' && 'w-10 h-10'
@@ -50,7 +50,7 @@ function PartnerIcon({
         <TooltipTrigger asChild>
           <div
             className={cn(
-              'bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center hover:bg-surface-400 dark:hover:bg-surface-400 hover:border-stronger flex-shrink-0',
+              'bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center hover:bg-surface-400 dark:hover:bg-surface-400 hover:border-stronger shrink-0',
               size === 'small' && 'h-5 w-5',
               size === 'medium' && 'w-7 h-7',
               size === 'large' && 'w-10 h-10'

@@ -5,7 +5,7 @@ import type { NextPageWithLayout } from 'types'
 
 const StoragePoliciesPage: NextPageWithLayout = () => {
   return (
-    <div className="storage-container flex flex-grow p-4">
+    <div className="storage-container flex grow p-4">
       <StoragePolicies />
     </div>
   )

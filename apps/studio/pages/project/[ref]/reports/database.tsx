@@ -283,7 +283,7 @@ const DatabaseUsage = () => {
                   <ReportChart
                     key={`${chart.id}-${i}`}
                     chart={chart}
-                    className="!mb-0"
+                    className="mb-0!"
                     interval={selectedDateRange.interval}
                     startDate={selectedDateRange?.period_start?.date}
                     endDate={selectedDateRange?.period_end?.date}

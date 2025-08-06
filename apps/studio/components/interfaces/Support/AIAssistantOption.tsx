@@ -61,7 +61,7 @@ export const AIAssistantOption = ({
           className="w-full overflow-hidden border rounded-md relative"
         >
           <div className={`flex flex-col xl:flex-row ${isCondensed ? 'py-4 px-5' : 'py-8 px-10'}`}>
-            <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
+            <div className="flex flex-col gap-3 z-2 shrink-0 w-full">
               <div>
                 <p className="text-sm text-foreground">Try the AI Assistant</p>
                 <p className="text-sm text-foreground-lighter">
@@ -77,7 +77,7 @@ export const AIAssistantOption = ({
               </div>
             </div>
             {!isCondensed && (
-              <div className="absolute z-[1] scale-75 -right-24 top-0">
+              <div className="absolute z-1 scale-75 -right-24 top-0">
                 <div className="relative grow flex flex-col gap-3 w-[400px]">
                   <div className="flex items-start gap-3 pl-12">
                     <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
@@ -98,7 +98,7 @@ export const AIAssistantOption = ({
                     </div>
                   </div>
                 </div>
-                <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[95%] to-background-200 to-[100%] z-[1]" />
+                <div className="absolute -inset-2 bg-linear-to-l from-transparent via-background-200 via-95% to-background-200 to-100% z-1" />
               </div>
             )}
           </div>

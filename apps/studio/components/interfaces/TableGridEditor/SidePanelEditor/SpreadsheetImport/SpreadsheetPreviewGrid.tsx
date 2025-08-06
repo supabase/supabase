@@ -49,7 +49,7 @@ const SpreadsheetPreviewGrid = ({
         }
       })}
       rows={previewRows}
-      className="!border-l !border-r"
+      className="border-l! border-r!"
       style={{ height: height || `${34 + 34 * (previewRows.length || 1)}px` }}
     />
   )

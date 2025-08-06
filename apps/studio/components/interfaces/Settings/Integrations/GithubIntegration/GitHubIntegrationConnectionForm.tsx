@@ -453,7 +453,7 @@ const GitHubIntegrationConnectionForm = ({
                       <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
-                          <CommandList_Shadcn_ className="!max-h-[200px]">
+                          <CommandList_Shadcn_ className="max-h-[200px]!">
                             <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
                             <CommandGroup_Shadcn_>
                               {githubRepos.map((repo, i) => (

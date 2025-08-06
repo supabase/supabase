@@ -40,7 +40,7 @@ export const PolicyEditorPanelHeader = ({
           <X className="h-3 w-3" />
           <span className="sr-only">Close</span>
         </SheetClose>
-        <div className="h-[24px] w-[1px] bg-border-overlay" />
+        <div className="h-[24px] w-px bg-border-overlay" />
         <div>
           <SheetTitle className="truncate">
             {selectedPolicy !== undefined
@@ -53,7 +53,7 @@ export const PolicyEditorPanelHeader = ({
               open={showDetails}
               onOpenChange={setShowDetails}
             >
-              <CollapsibleTrigger_Shadcn_ className="group  font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+              <CollapsibleTrigger_Shadcn_ className="group  font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                 <div className="flex items-center gap-x-2 w-full">
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     View policy details

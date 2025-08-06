@@ -88,7 +88,7 @@ const DocsAiPage = () => {
           />
         )}
       </CommandHeader>
-      <div className={cn('flex-grow min-h-0 overflow-auto')}>
+      <div className={cn('grow min-h-0 overflow-auto')}>
         {!hasError && messages.length > 0 && <AiMessages messages={messages} />}
         {!hasError && messages.length === 0 && <EmptyState handleSubmit={handleSubmit} />}
         {hasError && <ErrorState handleReset={handleReset} />}
@@ -199,8 +199,8 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
       <CommandList_Shadcn_ />
       <div
         className={cn(
-          'flex-grow min-h-0 overflow-auto p-4',
-          'grid gap-6 md:grid-cols-[max-content,1fr] grid-rows-[max-content]'
+          'grow min-h-0 overflow-auto p-4',
+          'grid gap-6 md:grid-cols-[max-content_1fr] grid-rows-[max-content]'
         )}
       >
         {messages.map((message, index) => {
@@ -244,7 +244,7 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                   </div>
                   <div>
                     {message.status === MessageStatus.Pending && (
-                      <span className="inline-block h-[1lh] w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
+                      <span className="inline-block h-lh w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
                     )}
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}

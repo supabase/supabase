@@ -117,7 +117,7 @@ export function Item({ children, className, header, id, disabled }: ItemProps) {
   let chevronClasses = [__styles.chevron.base, __styles.chevron.align[chevronAlign]]
 
   if (open && !disabled) {
-    chevronClasses.unshift('!rotate-180')
+    chevronClasses.unshift('rotate-180!')
   }
 
   return (

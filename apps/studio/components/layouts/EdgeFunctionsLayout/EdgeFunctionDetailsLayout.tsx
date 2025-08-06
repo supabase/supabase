@@ -187,7 +187,7 @@ const EdgeFunctionDetailsLayout = ({
                     value={`supabase functions download ${functionSlug}`}
                   />
                 </div>
-                <Separator className="!bg-border-overlay" />
+                <Separator className="bg-border-overlay!" />
                 <div className="py-2 px-1">
                   <Button
                     type="text"

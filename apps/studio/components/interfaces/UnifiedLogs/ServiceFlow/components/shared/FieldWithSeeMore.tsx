@@ -109,7 +109,7 @@ const FieldWithSeeMore = ({
       {hasAdditionalData ? (
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <FieldRow label={primaryField.label} value={renderValue()} expandButton={expandButton} />
-          <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
             <div className="mt-1">
               {additionalFields.map((field) => (
                 <BlockField

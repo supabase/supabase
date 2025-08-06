@@ -87,7 +87,7 @@ const GenericProjectPage: NextPage = () => {
       <div className="flex flex-col mx-auto w-full">
         <h1 className="mt-8 max-w-5xl mx-auto w-full">Select a project to continue</h1>
         <div
-          className="flex-grow py-6 overflow-y-auto"
+          className="grow py-6 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
           <div className="w-full max-w-5xl mx-auto flex flex-col gap-y-8">

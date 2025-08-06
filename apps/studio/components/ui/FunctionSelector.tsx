@@ -78,7 +78,7 @@ const FunctionSelector = ({
       )}
 
       {showError && isError && (
-        <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
+        <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load functions
           </AlertTitle_Shadcn_>

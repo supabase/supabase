@@ -77,7 +77,7 @@ const FormSectionContent = ({
     <div
       className={`
         relative col-span-12 flex flex-col gap-6 lg:col-span-7
-        ${fullWidth && '!col-span-12'}
+        ${fullWidth && 'col-span-12!'}
         ${className}
       `}
     >

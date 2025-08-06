@@ -84,7 +84,7 @@ const NewProjectPanel = () => {
                       </div>
                       <h5>Authentication</h5>
                     </div>
-                    <div className="flex flex-grow md:min-h-[50px] xl:min-h-[75px]">
+                    <div className="flex grow md:min-h-[50px] xl:min-h-[75px]">
                       <p className="text-sm text-foreground-light">
                         A complete user management system that works without any additional tools.
                       </p>
@@ -95,7 +95,7 @@ const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -131,7 +131,7 @@ const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -167,7 +167,7 @@ const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -201,7 +201,7 @@ const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -243,7 +243,7 @@ const NewProjectPanel = () => {
             <Button asChild type="default">
               <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
             </Button>
-            <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
+            <Button asChild className="translate-y-px" type="default" icon={<ExternalLink />}>
               <Link
                 href="https://supabase.com/docs/guides/database/api"
                 target="_blank"

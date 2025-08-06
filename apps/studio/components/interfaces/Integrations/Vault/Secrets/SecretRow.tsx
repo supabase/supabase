@@ -82,7 +82,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           }
           onClick={() => setRevealSecret(!revealSecret)}
         />
-        <div className="flex-grow">
+        <div className="grow">
           {revealSecret && revealedValue ? (
             <Input copy size="small" className="font-mono" value={revealedValue} />
           ) : (

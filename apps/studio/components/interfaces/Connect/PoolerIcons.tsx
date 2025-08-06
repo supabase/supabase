@@ -95,7 +95,7 @@ const TopRect = ({ isActive }: { isActive: boolean }) => (
     width={RECT_WIDTH}
     height={3}
     className={cn(
-      'fill-background-surface-200 stroke-border-stronger stroke-[1]',
+      'fill-background-surface-200 stroke-border-stronger stroke-1',
       isActive && 'stroke-foreground/40'
     )}
     x={RECT_X}
@@ -114,7 +114,7 @@ const BottomRect = ({ isActive }: { isActive: boolean }) => (
       width={RECT_WIDTH}
       height={32}
       className={cn(
-        'stroke-border fill-background-surface-100 stroke-[1] transition-all',
+        'stroke-border fill-background-surface-100 stroke-1 transition-all',
         isActive && 'fill-background-surface-100 stroke-border-stronger',
         'flex items-center justify-center'
       )}

@@ -30,7 +30,7 @@ const ProjectsPage: NextPageWithLayout = () => {
     <ScaffoldContainerLegacy>
       {disableAccessMfa ? (
         <Admonition type="note" title={`The organization "${org?.name}" has MFA enforced`}>
-          <p className="!m-0">
+          <p className="m-0!">
             Set up MFA on your account through your{' '}
             <InlineLink href="/account/security">account preferences</InlineLink> to access this
             organization

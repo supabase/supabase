@@ -50,7 +50,7 @@ const CollapsibleSection = ({
             </div>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down pt-1">
+        <CollapsibleContent className="transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down pt-1">
           {fields.map((field) => (
             <BlockField
               key={field.id}

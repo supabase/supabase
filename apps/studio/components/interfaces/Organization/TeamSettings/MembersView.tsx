@@ -109,7 +109,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 ...(isSuccessRoles && isSuccessMembers && !isOrgScopedRole
                   ? [
                       <Table.tr key="project-scope-notice">
-                        <Table.td colSpan={12} className="!p-0">
+                        <Table.td colSpan={12} className="p-0!">
                           <Admonition
                             type="note"
                             title="You are currently assigned with project scoped roles in this organization"

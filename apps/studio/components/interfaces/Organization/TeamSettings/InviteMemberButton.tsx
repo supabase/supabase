@@ -181,7 +181,7 @@ export const InviteMemberButton = () => {
         <ButtonTooltip
           type="primary"
           disabled={!canInviteMembers}
-          className="pointer-events-auto flex-grow md:flex-grow-0"
+          className="pointer-events-auto grow md:grow-0"
           onClick={() => setIsOpen(true)}
           tooltip={{
             content: {

@@ -210,7 +210,7 @@ export const QueueTab = () => {
                   ) : (
                     <>
                       <Markdown
-                        className="[&>p]:!leading-normal text-xs [&>p]:!m-0 flex flex-col gap-y-2"
+                        className="[&>p]:leading-normal! text-xs [&>p]:m-0! flex flex-col gap-y-2"
                         content={`
 RLS for queues is only relevant if exposure through PostgREST has been enabled, in which you can restrict and control who can manage this queue using Row Level Security.
 

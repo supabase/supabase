@@ -144,7 +144,7 @@ const CardButton = ({
             <div className="w-full">{children && children}</div>
           </div>
         )}
-        {footer && <div className="w-full !mt-auto">{footer}</div>}
+        {footer && <div className="w-full mt-auto!">{footer}</div>}
       </div>
       {isLink && (
         <div

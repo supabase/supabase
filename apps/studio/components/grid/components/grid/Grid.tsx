@@ -121,7 +121,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               style={{ height: `calc(100% - 35px)` }}
-              className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
+              className="absolute top-9 p-2 w-full z-1 pointer-events-none"
             >
               {isLoading && <GenericSkeletonLoader />}
               {isError && (
@@ -195,7 +195,7 @@ export const Grid = memo(
 
           <DataGrid
             ref={ref}
-            className={`${gridClass} flex-grow`}
+            className={`${gridClass} grow`}
             rowClass={rowClass}
             columns={snap.gridColumns as CalculatedColumn<any, any>[]}
             rows={rows ?? []}

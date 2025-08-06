@@ -223,11 +223,11 @@ export const PostgrestConfig = () => {
                               variant="warning"
                               className="mb-0 border-none rounded-none"
                             >
-                              <WarningIcon className="!left-[2rem]" />
-                              <AlertTitle_Shadcn_ className="!pl-[3.5rem] !left-[6rem]">
+                              <WarningIcon className="left-8!" />
+                              <AlertTitle_Shadcn_ className="pl-14! left-24!">
                                 No schemas can be queried
                               </AlertTitle_Shadcn_>
-                              <AlertDescription_Shadcn_ className="!pl-[3.5rem]">
+                              <AlertDescription_Shadcn_ className="pl-14!">
                                 <p>
                                   With this setting disabled, you will not be able to query any
                                   schemas via the Data API.
@@ -244,7 +244,7 @@ export const PostgrestConfig = () => {
                     )}
                   />
                   <Collapsible_Shadcn_ open={form.getValues('enableDataApi')}>
-                    <CollapsibleContent_Shadcn_ className="border-t divide-y transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                    <CollapsibleContent_Shadcn_ className="border-t divide-y transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbSchema"

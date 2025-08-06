@@ -207,7 +207,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   </div>
                                 )}
                                 <div className="w-full flex flex-col gap-3 justify-between">
-                                  <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
+                                  <div className="relative px-3 opacity-50 group-data-checked:opacity-100 flex justify-between">
                                     <ComputeBadge
                                       className="inline-flex font-semibold"
                                       infraComputeSize={compute.name as InfraInstanceSize}
@@ -225,7 +225,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                           >
                                             ${price}
                                           </span>
-                                          <span className="text-foreground-light translate-y-[1px]">
+                                          <span className="text-foreground-light translate-y-px">
                                             {' '}
                                             /{' '}
                                             {compute.price_interval === 'monthly'

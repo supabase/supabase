@@ -84,8 +84,8 @@ export function ServiceFlowPanel({
             'border-l fixed right-0 top-0 bottom-0',
             'md:absolute md:h-auto',
             // ' md:w-3/4',
-            'xl:z-[1]',
-            'min-w-[28rem] max-w-[45rem]',
+            'xl:z-1',
+            'min-w-112 max-w-180',
             'xl:relative xl:border-l-0'
           )}
         >
@@ -207,7 +207,7 @@ export function ServiceFlowPanel({
                   </TabsContent>
                 )}
 
-                <TabsContent value="raw-json" className="flex-grow overflow-auto">
+                <TabsContent value="raw-json" className="grow overflow-auto">
                   {isLoading && shouldShowServiceFlow && (
                     <div className="flex items-center gap-3 text-foreground-light p-3 bg-surface-100 border-b border-border">
                       <Skeleton className="h-4 w-4 rounded-full animate-pulse" />
@@ -216,7 +216,7 @@ export function ServiceFlowPanel({
                   )}
                   <CodeBlock
                     language="json"
-                    className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:!leading-tight [&_code]:!leading-tight"
+                    className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:leading-tight! [&_code]:leading-tight!"
                   >
                     {JSON.stringify(jsonData, null, 2)}
                   </CodeBlock>

@@ -58,7 +58,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
 
             <DialogFooter
               padding="small"
-              className={cn(!canUpdateOrganization && '!justify-between')}
+              className={cn(!canUpdateOrganization && 'justify-between!')}
             >
               {!canUpdateOrganization && (
                 <p className="text-sm text-foreground-lighter">

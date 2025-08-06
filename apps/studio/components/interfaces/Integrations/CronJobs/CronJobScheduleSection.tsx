@@ -154,7 +154,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
                       View syntax chart
                     </AccordionTrigger_Shadcn_>
-                    <AccordionContent_Shadcn_ asChild className="!pb-0">
+                    <AccordionContent_Shadcn_ asChild className="pb-0!">
                       <CronSyntaxChart />
                     </AccordionContent_Shadcn_>
                   </AccordionItem_Shadcn_>

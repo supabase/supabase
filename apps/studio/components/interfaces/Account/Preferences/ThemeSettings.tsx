@@ -67,7 +67,7 @@ export const ThemeSettings = () => {
 
   return (
     <Panel title={<h5 key="panel-title">Appearance</h5>}>
-      <Panel.Content className="grid gap-8 !py-5">
+      <Panel.Content className="grid gap-8 py-5!">
         <div className="grid grid-cols-12">
           <div className="col-span-full md:col-span-4 flex flex-col gap-5">
             <Label_Shadcn_ htmlFor="theme" className="text-light">

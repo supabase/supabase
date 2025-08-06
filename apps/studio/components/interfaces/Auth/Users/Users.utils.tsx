@@ -274,7 +274,7 @@ export const formatUserColumns = ({
       draggable: true,
       width: savedConfig?.width ?? col.width,
       minWidth: col.minWidth ?? 120,
-      headerCellClass: 'z-50 outline-none !shadow-none',
+      headerCellClass: 'z-50 outline-none shadow-none!',
       renderHeaderCell: () => {
         // [Joshen] I'm on the fence to support "Select all" for users, as the results are infinitely paginated
         // "Select all" wouldn't be an accurate representation if not all the pages have been fetched, but if decide

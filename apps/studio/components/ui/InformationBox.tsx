@@ -46,7 +46,7 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
           <div className="flex items-center justify-between">
             <div className="flex w-full space-x-3 items-center">
               {icon && <span className="text-foreground-lighter">{icon}</span>}
-              <div className="flex-grow">
+              <div className="grow">
                 <h5 className="text-foreground">{title}</h5>
               </div>
             </div>

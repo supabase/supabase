@@ -109,7 +109,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
             <Table className="w-full text-sm">
               <TableBody>
                 <TableRow>
-                  <TableCell className="!py-2 px-0">{planItem?.description}</TableCell>
+                  <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
                   <TableCell className="text-right py-2 px-0">
                     {planItem == null ? (
                       '-'
@@ -375,7 +375,7 @@ function ComputeLineItem({
   return (
     <>
       <TableRow>
-        <TableCell className="!py-2 px-0 flex items-center gap-1">
+        <TableCell className="py-2! px-0 flex items-center gap-1">
           <span>{title}</span>
           <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>
         </TableCell>
@@ -388,11 +388,11 @@ function ComputeLineItem({
       </TableRow>
       {computeProjects.map((project) => (
         <TableRow key={project.project_ref} className="text-foreground-light text-xs">
-          <TableCell className="!py-2 px-0 pl-6">
+          <TableCell className="py-2! px-0 pl-6">
             {project.project_name} ({project.computeType} - {project.usage} Hours)
           </TableCell>
 
-          <TableCell className="!py-2 px-0 text-right" translate="no">
+          <TableCell className="py-2! px-0 text-right" translate="no">
             {formatCurrency(project.computeCosts)}
           </TableCell>
         </TableRow>
@@ -400,8 +400,8 @@ function ComputeLineItem({
 
       {computeCredits && (
         <TableRow className="text-foreground-light text-xs">
-          <TableCell className="!py-2 px-0 pl-6">Compute Credits</TableCell>
-          <TableCell className="!py-2 px-0 text-right" translate="no">
+          <TableCell className="py-2! px-0 pl-6">Compute Credits</TableCell>
+          <TableCell className="py-2! px-0 text-right" translate="no">
             {formatCurrency(computeCredits.amount)}
           </TableCell>
         </TableRow>

@@ -63,7 +63,7 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
       )}
     >
       <ChevronRight
-        className="transition-all text-foreground-muted group-data-[state=open]:rotate-90"
+        className="transition-all text-foreground-muted group-data-open:rotate-90"
         size={16}
         strokeWidth={1.5}
       />
@@ -229,7 +229,7 @@ const InnerSideBarFilterSortDropdown = forwardRef<
           asChild
           className={cn(
             'absolute right-1 top-[.4rem] md:top-[.3rem]',
-            'text-foreground transition-colors hover:text-foreground data-[state=open]:text-foreground',
+            'text-foreground transition-colors hover:text-foreground data-open:text-foreground',
             triggerClassName
           )}
         >

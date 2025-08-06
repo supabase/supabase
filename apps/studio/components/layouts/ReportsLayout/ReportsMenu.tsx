@@ -191,7 +191,7 @@ const ReportsMenu = () => {
               type="default"
               icon={<Plus />}
               disabled={!canCreateCustomReport}
-              className="justify-start flex-grow"
+              className="justify-start grow"
               onClick={() => {
                 setShowNewReportModal(true)
               }}
@@ -247,7 +247,7 @@ const ReportsMenu = () => {
                             : 'hover:bg-surface-200'
                         )}
                       >
-                        <Link href={subItem.url} className="flex-grow h-7 flex items-center pl-3">
+                        <Link href={subItem.url} className="grow h-7 flex items-center pl-3">
                           {subItem.name}
                         </Link>
                       </li>

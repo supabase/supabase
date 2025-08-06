@@ -112,7 +112,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
 
           return (
             <>
-              <Modal.Content className={cn('!px-0', isChangingBucketVisibility && '!pb-0')}>
+              <Modal.Content className={cn('px-0!', isChangingBucketVisibility && 'pb-0!')}>
                 <Input
                   disabled
                   id="name"
@@ -135,7 +135,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                   {isChangingBucketVisibility && (
                     <Admonition
                       type="warning"
-                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:leading-normal!"
                       title={
                         isMakingBucketPublic
                           ? 'Warning: Making bucket public'

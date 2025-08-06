@@ -16,7 +16,7 @@ const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
         'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
-        'border border-t-0 first:border-t first:!mt-0 shadow transition',
+        'border border-t-0 first:border-t first:mt-0! shadow transition',
         'first:rounded-tl first:rounded-tr',
         'last:rounded-bl last:rounded-br',
       ])}

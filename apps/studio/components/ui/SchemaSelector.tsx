@@ -84,7 +84,7 @@ const SchemaSelector = ({
       )}
 
       {showError && isSchemasError && (
-        <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
+        <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load schemas
           </AlertTitle_Shadcn_>
@@ -105,7 +105,7 @@ const SchemaSelector = ({
               disabled={disabled}
               type="default"
               data-testid="schema-selector"
-              className={`w-full [&>span]:w-full !pr-1 space-x-1`}
+              className={`w-full [&>span]:w-full pr-1! space-x-1`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }

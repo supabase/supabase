@@ -35,7 +35,7 @@ const AddUserDropdown = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <DropdownMenuItem
-                className="space-x-2 !pointer-events-auto"
+                className="space-x-2 pointer-events-auto!"
                 disabled={!canInviteUsers}
                 onClick={() => {
                   if (canInviteUsers) setInviteVisible(true)
@@ -55,7 +55,7 @@ const AddUserDropdown = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <DropdownMenuItem
-                className="space-x-2 !pointer-events-auto"
+                className="space-x-2 pointer-events-auto!"
                 disabled={!canCreateUsers}
                 onClick={() => {
                   if (canCreateUsers) setCreateVisible(true)

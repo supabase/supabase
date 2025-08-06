@@ -35,7 +35,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <FormHeader className="!mb-0" title="Database Backups" />
+            <FormHeader className="mb-0!" title="Database Backups" />
 
             <DatabaseBackupsNav active="scheduled" />
 

@@ -117,7 +117,7 @@ export const TerminalInstructions = forwardRef<
           </div>
         )}
       </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="w-full transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+      <CollapsibleContent_Shadcn_ className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
         <CommandRender commands={commands} className="my-4" />
         {tokens && tokens.length === 0 ? (
           <div className="px-8 py-4 space-y-3 border-t">

@@ -26,7 +26,7 @@ export const LocalDropdown = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
+      <DropdownMenuTrigger className="border shrink-0 px-3" asChild>
         <Button
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"

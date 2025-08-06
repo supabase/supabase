@@ -39,10 +39,10 @@ const ProjectCard = ({
     <li className="list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
-        className="h-44 !px-0 group pt-5 pb-0"
+        className="h-44 px-0! group pt-5 pb-0"
         title={
           <div className="w-full justify-between space-y-1.5 px-5">
-            <p className="flex-shrink truncate text-sm pr-4">{name}</p>
+            <p className="shrink truncate text-sm pr-4">{name}</p>
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center gap-x-1.5">
               {project.status !== 'INACTIVE' && <ComputeBadgeWrapper project={project} />}
@@ -65,7 +65,7 @@ const ProjectCard = ({
                   <div className="w-fit p-1 border rounded-md flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs !ml-2 text-foreground-light truncate">{githubRepository}</p>
+                  <p className="text-xs ml-2! text-foreground-light truncate">{githubRepository}</p>
                 </>
               )}
             </div>

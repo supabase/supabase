@@ -126,7 +126,7 @@ export const BranchDropdown = () => {
 
       {isSuccess && (
         <>
-          <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+          <Link href={`/project/${ref}`} className="flex items-center gap-2 shrink-0 text-sm">
             <span className="text-foreground max-w-32 lg:max-w-none truncate">
               {isBranchingEnabled ? selectedBranch?.name : 'main'}
             </span>

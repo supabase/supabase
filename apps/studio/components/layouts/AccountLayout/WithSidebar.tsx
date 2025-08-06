@@ -47,7 +47,7 @@ const WithSidebar = ({
         />
       )}
       <div className="flex flex-1 flex-col">
-        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
+        <div className="flex-1 grow overflow-y-auto">{children}</div>
       </div>
       <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SidebarContent
@@ -240,7 +240,7 @@ const SidebarLinkItem = ({
             <ArrowUpRight size={14} />
           </span>
         )}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <span
             title={label}
             className={cn(

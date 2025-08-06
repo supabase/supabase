@@ -57,7 +57,7 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
 
   return (
     <div className="storage-row flex items-center justify-between rounded bg-gray-500">
-      <div className="flex h-full flex-grow items-center px-2.5">
+      <div className="flex h-full grow items-center px-2.5">
         <div>
           <RowIcon
             view={view}

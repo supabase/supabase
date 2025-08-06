@@ -106,7 +106,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                       <span className="truncate font-normal block">{option.label}</span>
                     )}
                   </div>
-                  <span className="flex-shrink-0 flex items-center justify-center font-mono text-xs">
+                  <span className="shrink-0 flex items-center justify-center font-mono text-xs">
                     {isLoadingCounts ? (
                       <Skeleton className="h-4 w-4" />
                     ) : facetedValue?.has(option.value) ? (

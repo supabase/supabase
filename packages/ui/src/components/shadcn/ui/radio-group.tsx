@@ -58,8 +58,8 @@ const RadioGroupLargeItem = React.forwardRef<
         'shadow-sm',
         'hover:border-stronger hover:bg-surface-300',
         'data-[state=checked]:border-primary',
-        'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-selection data-[state=checked]:border-foreground',
+        'data-checked:ring-1 data-checked:ring-border',
+        'data-checked:bg-selection data-checked:border-foreground',
         'transition-colors',
         'group',
         props.className
@@ -73,12 +73,12 @@ const RadioGroupLargeItem = React.forwardRef<
               className={cn(
                 'absolute',
                 'w-[10px] h-[10px]',
-                'left-[1px] top-[1px]',
+                'left-px top-px',
                 'border border-background-surface-300',
                 'rounded-full',
-                'data-[state=checked]:border-background-surface-300',
-                'data-[state=checked]:ring-foreground',
-                'data-[state=checked]:bg-foreground'
+                'data-checked:border-background-surface-300',
+                'data-checked:ring-foreground',
+                'data-checked:bg-foreground'
               )}
             />
             <div
@@ -88,7 +88,7 @@ const RadioGroupLargeItem = React.forwardRef<
                 'border border-stronger',
                 'rounded-full',
                 'group-hover:border-foreground-light',
-                'group-data-[state=checked]:border-foreground',
+                'group-data-checked:border-foreground',
                 'transition-colors'
               )}
             ></div>
@@ -100,7 +100,7 @@ const RadioGroupLargeItem = React.forwardRef<
           className={cn(
             'text-xs transition-colors text-left',
             'text-light',
-            'group-hover:text-foreground group-data-[state=checked]:text-foreground',
+            'group-hover:text-foreground group-data-checked:text-foreground',
             props.disabled ? 'cursor-not-allowed' : 'cursor-pointer'
           )}
         >

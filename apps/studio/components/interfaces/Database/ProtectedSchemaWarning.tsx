@@ -35,7 +35,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
             </code>
           ))}
         </div>
-        <p className="text-sm !mt-4">
+        <p className="text-sm mt-4!">
           These schemas are critical to the functionality of your Supabase project and hence we
           highly recommend not altering them.
         </p>
@@ -77,7 +77,7 @@ export const ProtectedSchemaWarning = ({
         size === 'sm' ? `Viewing protected schema` : `Viewing ${entity} from a protected schema`
       }
       className={cn(
-        '[&>div>p]:prose [&>div>p]:max-w-full [&>div>p]:!leading-normal',
+        '[&>div>p]:prose [&>div>p]:max-w-full [&>div>p]:leading-normal!',
         size === 'sm' ? '[&>div>p]:text-xs' : '[&>div>p]:text-sm'
       )}
     >

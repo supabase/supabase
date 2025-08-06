@@ -45,13 +45,13 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
                 <Button
                   size="tiny"
                   type="text"
-                  className="!h-4 !w-4 rounded-full p-0"
+                  className="h-4! w-4! rounded-full p-0"
                   onClick={(e) => {
                     e.stopPropagation()
                     onRemoveSnippet(idx)
                   }}
                   aria-label={`Remove snippet ${idx + 1}`}
-                  icon={<X strokeWidth={1.5} className="!h-3 !w-3" />}
+                  icon={<X strokeWidth={1.5} className="h-3! w-3!" />}
                 />
               )}
             </div>

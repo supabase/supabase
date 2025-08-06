@@ -260,7 +260,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
           <Modal.Separator />
           {isStandardBucket ? (
             <>
-              <Modal.Content className="!px-0 !pb-0">
+              <Modal.Content className="px-0! pb-0!">
                 <div className="flex flex-col gap-y-2">
                   <FormField_Shadcn_
                     control={form.control}
@@ -283,7 +283,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   {isPublicBucket && (
                     <Admonition
                       type="warning"
-                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:leading-normal!"
                       title="Public buckets are not protected"
                     >
                       <p className="mb-2">

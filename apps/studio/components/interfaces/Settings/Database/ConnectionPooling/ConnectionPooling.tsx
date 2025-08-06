@@ -139,7 +139,7 @@ export const ConnectionPooling = () => {
   return (
     <section id="connection-pooler">
       <Panel
-        className="!mb-0"
+        className="mb-0!"
         title={
           <div className="w-full flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -173,7 +173,7 @@ export const ConnectionPooling = () => {
             type="default"
             title="Dedicated Pooler is not IPv4 compatible"
           >
-            <p className="!m-0">
+            <p className="m-0!">
               If your network only supports IPv4, consider purchasing the{' '}
               <InlineLink href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
                 IPv4 add-on

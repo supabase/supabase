@@ -55,10 +55,10 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContentVariants = cva(
   cn(
     'relative z-50 w-full max-w-screen border shadow-md dark:shadow-sm',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out',
-    'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
-    'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
+    'data-open:animate-in data-closed:animate-out',
+    'data-closed:zoom-out-95 data-open:zoom-in-95',
+    'data-closed:slide-out-to-left-[0%] data-closed:slide-out-to-top-[0%]',
+    'data-open:slide-in-from-left-[0%] data-open:slide-in-from-top-[0%]',
     'sm:rounded-lg md:w-full',
     'bg-dash-sidebar'
   ),
@@ -102,7 +102,7 @@ const DialogContent = React.forwardRef<
         >
           {children}
           {!hideClose && (
-            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
+            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-open:text-foreground-muted">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogPrimitive.Close>
@@ -181,7 +181,7 @@ const DialogClose = React.forwardRef<
   <DialogPrimitive.Close
     ref={ref}
     className={cn(
-      'opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+      'opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-open:text-foreground-muted',
       className
     )}
     {...props}

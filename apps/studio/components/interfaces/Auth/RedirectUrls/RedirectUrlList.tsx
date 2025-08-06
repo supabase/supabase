@@ -111,7 +111,7 @@ export const RedirectUrlList = ({
                     <Checkbox_Shadcn_ checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
                   </div>
                   <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
-                  <span className="text-sm flex-grow">{url}</span>
+                  <span className="text-sm grow">{url}</span>
                 </div>
               </ValueContainer>
             )

@@ -35,7 +35,7 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
       id="panel-left"
       className={cn(
         'flex flex-col w-full',
-        'min-w-64 max-w-[32rem]',
+        'min-w-64 max-w-128',
         'group-data-[expanded=false]/controls:hidden',
         'hidden sm:flex'
       )}

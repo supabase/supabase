@@ -225,7 +225,7 @@ export const Connect = () => {
                 <TabsContent_Shadcn_
                   key="direct"
                   value="direct"
-                  className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
+                  className={cn('mt-0!', 'p-0', 'flex flex-col gap-6')}
                 >
                   <div className={DIALOG_PADDING_Y}>
                     <DatabaseConnectionString />
@@ -238,7 +238,7 @@ export const Connect = () => {
               <TabsContent_Shadcn_
                 key={`content-${type.key}`}
                 value={type.key}
-                className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+                className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, 'mt-0!')}
               >
                 <div className="flex flex-col md:flex-row gap-2 justify-between">
                   <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">

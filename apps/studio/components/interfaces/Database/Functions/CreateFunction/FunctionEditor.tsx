@@ -15,7 +15,7 @@ export const FunctionEditor = ({
   setFocused: (b: boolean) => void
 }) => {
   return (
-    <div className={cn('rounded-md relative group flex-grow')}>
+    <div className={cn('rounded-md relative group grow')}>
       <FormControl_Shadcn_>
         {language !== undefined && (
           <CodeEditor

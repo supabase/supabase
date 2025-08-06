@@ -170,12 +170,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
-                  'transition-all duration-[120ms]',
+                  'transition-all duration-120',
                   sideBarIsOpen
                     ? resizableSidebar
-                      ? 'min-w-64 max-w-[32rem]'
+                      ? 'min-w-64 max-w-128'
                       : 'min-w-64 max-w-64'
-                    : 'w-0 flex-shrink-0 max-w-0'
+                    : 'w-0 shrink-0 max-w-0'
                 )}
               >
                 {sideBarIsOpen && (
@@ -245,13 +245,13 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       maxSize={50}
                       className={cn(
                         'border-l bg fixed z-40 right-0 top-0 bottom-0',
-                        'w-screen h-[100dvh]',
+                        'w-screen h-dvh',
                         'md:absolute md:h-auto md:w-3/4',
                         'xl:relative xl:border-l-0'
                       )}
                     >
                       {aiSnap.open ? (
-                        <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
+                        <AIAssistant className="w-full h-dvh md:h-full max-h-dvh" />
                       ) : editorPanel.open ? (
                         <EditorPanel />
                       ) : null}

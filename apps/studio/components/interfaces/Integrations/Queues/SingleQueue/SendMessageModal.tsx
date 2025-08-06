@@ -88,7 +88,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
         <Form_Shadcn_ {...form}>
           <form
             id={FORM_ID}
-            className="flex-grow overflow-auto gap-2 flex flex-col"
+            className="grow overflow-auto gap-2 flex flex-col"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField_Shadcn_
@@ -121,7 +121,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                     <CodeEditor
                       id="message-payload"
                       language="json"
-                      className="!mb-0 h-32 overflow-hidden rounded border"
+                      className="mb-0! h-32 overflow-hidden rounded border"
                       onInputChange={(e: string | undefined) => field.onChange(e)}
                       options={{ wordWrap: 'off', contextmenu: false }}
                       value={field.value}

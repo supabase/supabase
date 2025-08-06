@@ -47,7 +47,7 @@ const FileExplorer = ({
     <div
       ref={fileExplorerRef}
       className={cn(
-        'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
+        'file-explorer flex grow overflow-x-auto justify-between h-full w-full relative',
         snap.view === STORAGE_VIEWS.LIST && 'flex-col'
       )}
     >

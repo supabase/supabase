@@ -236,7 +236,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       </div>
       <div className="border rounded-md bg-surface-200">
         {(type === 'headers' ? headerFields : queryParamFields).map((field, index) => (
-          <div key={field.id} className="grid grid-cols-[1fr,1fr,32px] border-b last:border-b-0">
+          <div key={field.id} className="grid grid-cols-[1fr_1fr_32px] border-b last:border-b-0">
             <FormField_Shadcn_
               control={form.control}
               name={`${type}.${index}.key`}
@@ -247,7 +247,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     size="tiny"
                     placeholder="Enter key..."
                     disabled={isLoading}
-                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r-1 border-t-0 border-b-0 border-border"
+                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r border-t-0 border-b-0 border-border"
                   />
                 </FormControl_Shadcn_>
               )}
@@ -389,7 +389,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                             <CodeBlock
                               language="json"
                               hideLineNumbers
-                              className="rounded-md !border-none !px-4 !py-3 h-full"
+                              className="rounded-md border-none! px-4! py-3! h-full"
                               value={prettifyJSON(response.body)}
                             />
                           </TabsContent>
@@ -397,7 +397,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                             <CodeBlock
                               language="json"
                               hideLineNumbers
-                              className="rounded-md !border-none !px-4 !py-3 h-full"
+                              className="rounded-md border-none! px-4! py-3! h-full"
                               value={prettifyJSON(JSON.stringify(response.headers, null, 2))}
                             />
                           </TabsContent>

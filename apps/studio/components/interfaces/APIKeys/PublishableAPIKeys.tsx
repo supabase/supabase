@@ -94,7 +94,7 @@ function ApiKeyInput() {
   const apiKey = publishableApiKeys[0]
 
   const baseClasses =
-    'flex-1 grow gap-1 rounded-full min-w-0 max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:min-w-[24rem]'
+    'flex-1 grow gap-1 rounded-full min-w-0 max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:min-w-96'
   const size = 'tiny'
 
   if (isApiKeysLoading || isPermissionsLoading) {

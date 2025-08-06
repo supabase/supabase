@@ -314,7 +314,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
                   <DialogDescription>{template.description}</DialogDescription>
                 </DialogHeader>
                 <Separator />
-                <DialogSection className="!p-0">
+                <DialogSection className="p-0!">
                   <CodeBlock
                     language="ts"
                     hideLineNumbers={true}

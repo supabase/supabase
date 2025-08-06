@@ -60,7 +60,7 @@ export const HeaderCell = ({
   return (
     <div className="flex items-center justify-between font-normal text-xs w-full">
       <div className="flex items-center gap-x-2">
-        <p className="!text-foreground">{col.name}</p>
+        <p className="text-foreground!">{col.name}</p>
       </div>
       {['created_at', 'email', 'phone'].includes(col.id) && (
         <DropdownMenu

@@ -33,15 +33,15 @@ export const LogsList = ({ logs = [] }: LogsListProps) => {
           return (
             <div key={log.id} className="group py-1.5 px-4 border-b border-border last:border-0">
               <div className="flex items-start gap-5">
-                <div className="flex flex-row items-center gap-5 flex-shrink-0">
-                  <HoverCardTimestamp date={date} className="flex-shrink-0" />
+                <div className="flex flex-row items-center gap-5 shrink-0">
+                  <HoverCardTimestamp date={date} className="shrink-0" />
                   <DataTableColumnStatusCode
                     value={log.level}
                     level={log.level}
-                    className="min-w-20 flex-shrink-0"
+                    className="min-w-20 shrink-0"
                   />
                 </div>
-                <div className="w-full grow relative mt-1 whitespace-pre-wrap break-all pl-2 text-[0.75rem] flex-shrink-0">
+                <div className="w-full grow relative mt-1 whitespace-pre-wrap break-all pl-2 text-[0.75rem] shrink-0">
                   {message.map((x, i) => (
                     <pre key={`message-${i}`} className="font-mono w-full">
                       {x}

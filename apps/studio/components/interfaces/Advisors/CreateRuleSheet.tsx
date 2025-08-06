@@ -127,7 +127,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
         <SheetHeader className="shrink-0 flex items-center gap-4">
           <SheetTitle>Create a rule for "{lint?.title}"</SheetTitle>
         </SheetHeader>
-        <SheetSection className="overflow-auto flex-grow px-0">
+        <SheetSection className="overflow-auto grow px-0">
           <Form_Shadcn_ {...form}>
             <form
               id={formId}

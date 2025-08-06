@@ -115,7 +115,7 @@ const OrganizationPicker = ({
                       <PartnerIcon organization={org} />
                       <span className="truncate">{org.name}</span>{' '}
                       {configurationId && installed[org.slug] && (
-                        <Badge className="!flex-none">Integration Installed</Badge>
+                        <Badge className="flex-none!">Integration Installed</Badge>
                       )}
                     </CommandItem_Shadcn_>
                   )

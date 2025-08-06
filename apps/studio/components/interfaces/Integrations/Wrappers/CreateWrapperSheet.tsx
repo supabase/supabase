@@ -195,7 +195,7 @@ export const CreateWrapperSheet = ({
           id={FORM_ID}
           initialValues={initialValues}
           onSubmit={onSubmit}
-          className="flex-grow flex flex-col h-full"
+          className="grow flex flex-col h-full"
         >
           {({ values, initialValues, setFieldValue }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -218,7 +218,7 @@ export const CreateWrapperSheet = ({
                 <SheetHeader>
                   <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
                 </SheetHeader>
-                <div className="flex-grow overflow-y-auto">
+                <div className="grow overflow-y-auto">
                   <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
                     <FormSectionContent loading={false}>
                       <Input

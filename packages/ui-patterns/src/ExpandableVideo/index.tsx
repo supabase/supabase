@@ -87,8 +87,8 @@ export function ExpandableVideo({
         visible={expandVideo}
         hideFooter
         className={cn(
-          '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80',
-          '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
+          'bg-[#f8f9fa]/95! dark:bg-[#1c1c1c]/80!',
+          'border-[#e6e8eb]/90! dark:border-[#282828]/90!',
           'transition ease-out',
           'mx-auto backdrop-blur-md w-[calc(100%-2rem)]'
         )}
@@ -101,7 +101,7 @@ export function ExpandableVideo({
         }}
         size="xxlarge"
       >
-        <div className="!w-full flex items-center justify-center">
+        <div className="w-full! flex items-center justify-center">
           <div className="relative w-full">
             <button
               onClick={() => setExpandVideo(false)}
@@ -109,7 +109,7 @@ export function ExpandableVideo({
             >
               <p className="text-xs">Close</p>
             </button>
-            <div className="video-container !rounded-lg !border-none !overflow-hidden">
+            <div className="video-container rounded-lg! border-none! overflow-hidden!">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${videoId}`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

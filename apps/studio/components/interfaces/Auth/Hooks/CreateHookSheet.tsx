@@ -293,7 +293,7 @@ export const CreateHookSheet = ({
           <DocsButton href={'https://supabase.com/docs/guides/auth/auth-hooks/' + hook.docSlug} />
         </SheetHeader>
         <Separator />
-        <SheetSection className="overflow-auto flex-grow px-0">
+        <SheetSection className="overflow-auto grow px-0">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}

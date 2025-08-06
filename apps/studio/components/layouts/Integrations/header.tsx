@@ -92,7 +92,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       layout
                       key="integrations-text"
                       transition={layoutTransition}
-                      className="text-foreground text-xl !p-0"
+                      className="text-foreground text-xl p-0!"
                       style={{
                         padding: iconPadding,
                       }}
@@ -104,7 +104,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       layout
                       key="integrations-text"
                       transition={layoutTransition}
-                      className="text-xs text-foreground-light hover:text-foreground !p-0"
+                      className="text-xs text-foreground-light hover:text-foreground p-0!"
                     >
                       <Link href={`/project/${project?.ref}/integrations`}>Integrations</Link>
                     </motion.span>
@@ -130,7 +130,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       transition={{ duration: 0.2 }}
                       layoutId="integration-icon"
                       className={
-                        'relative bg-white border border-muted rounded z-[3] flex flex-shrink-0 items-center justify-center'
+                        'relative bg-white border border-muted rounded z-3 flex shrink-0 items-center justify-center'
                       }
                       style={{
                         y: iconY, // Controlled by scrollY (0 to 128px)

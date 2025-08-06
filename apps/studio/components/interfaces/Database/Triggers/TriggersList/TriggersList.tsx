@@ -114,7 +114,7 @@ const TriggersList = ({
                   disabled={!hasTables || !canCreateTriggers}
                   icon={<Plus />}
                   onClick={() => createTrigger()}
-                  className="flex-grow"
+                  className="grow"
                   tooltip={{
                     content: {
                       side: 'bottom',

@@ -51,7 +51,7 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
             `}
           onClick={() => onSelectKey(key, pane)}
         >
-          <p className="font-mono text-xs !text-blue-900">{key}</p>
+          <p className="font-mono text-xs text-blue-900!">{key}</p>
           <div
             className={`${
               key === activeKey ? 'opacity-100' : 'opacity-50'
@@ -63,10 +63,10 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
       ))}
       {keysWithoutChildren.map((key: string) => (
         <div key={key} className="flex space-x-2 py-2 px-5">
-          <p className="font-mono text-xs !text-blue-900">{key}:</p>
+          <p className="font-mono text-xs text-blue-900!">{key}:</p>
           <p
             className={`break-all font-mono text-xs ${
-              typeof jsonData[key] !== 'string' ? '!text-green-900' : '!text-yellow-900'
+              typeof jsonData[key] !== 'string' ? 'text-green-900!' : 'text-yellow-900!'
             }`}
           >
             {isNull(jsonData[key])

@@ -172,7 +172,7 @@ const StorageSettings = () => {
 
                 <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
                   <div className="flex items-center gap-2">
-                    <div className="flex-grow">
+                    <div className="grow">
                       <FormField_Shadcn_
                         control={form.control}
                         name="fileSizeLimit"
@@ -194,7 +194,7 @@ const StorageSettings = () => {
                         )}
                       />
                     </div>
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <FormField_Shadcn_
                         control={form.control}
                         name="unit"

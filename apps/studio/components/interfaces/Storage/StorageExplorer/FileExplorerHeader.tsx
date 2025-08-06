@@ -300,7 +300,7 @@ const FileExplorerHeader = ({
           />
         )}
         {isEditingPath ? (
-          <form className="ml-2 flex-grow">
+          <form className="ml-2 grow">
             <Input
               autoFocus
               key="pathSet"

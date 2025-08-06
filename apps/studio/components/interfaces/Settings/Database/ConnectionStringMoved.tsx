@@ -4,7 +4,7 @@ import { Plug, GitBranch, ChevronsUpDown, Pointer } from 'lucide-react'
 export const ConnectionStringMoved = () => {
   return (
     <div className="w-full flex flex-col xl:flex-row border py-10 pl-10 rounded-md">
-      <div className="flex flex-col gap-0 z-[2]">
+      <div className="flex flex-col gap-0 z-2">
         <p className="text-sm text-foreground">Connection string has moved</p>
         <p className="text-sm text-foreground-lighter">
           You can find Project connect details by clicking 'Connect' in the top bar
@@ -12,7 +12,7 @@ export const ConnectionStringMoved = () => {
       </div>
       <div className="relative grow flex flex-col -space-y-px">
         <div className="w-full h-3">
-          <div className="bg-gradient-to-t from-background-surface-300 via-[25%] to-background-200 to-[100%] h-full w-full" />
+          <div className="bg-linear-to-t from-background-surface-300 via-25% to-background-200 to-100% h-full w-full" />
         </div>
         <div className="flex justify-end relative">
           <div className="bg-dash-sidebar border-b border-t border-t-border-muted py-2 px-10 flex gap-3 relative overflow-hidden">
@@ -46,7 +46,7 @@ export const ConnectionStringMoved = () => {
             strokeWidth={1}
           />
         </div>
-        <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[95%] to-background-200 to-[100%] z-[1]" />
+        <div className="absolute -inset-2 bg-linear-to-l from-transparent via-background-200 via-95% to-background-200 to-100% z-1" />
       </div>
     </div>
   )

@@ -122,7 +122,7 @@ const ForeignRowSelector = ({
       onCancel={closePanel}
       customFooter={<ActionBar hideApply backButtonLabel="Cancel" closePanel={closePanel} />}
     >
-      <SidePanel.Content className="h-full !px-0">
+      <SidePanel.Content className="h-full px-0!">
         <div className="h-full">
           {isLoading && (
             <div className="flex h-full py-6 flex-col items-center justify-center space-y-2">

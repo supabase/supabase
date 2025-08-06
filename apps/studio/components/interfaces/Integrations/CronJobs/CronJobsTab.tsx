@@ -178,7 +178,7 @@ export const CronjobsTab = () => {
 
           <DataGrid
             ref={gridRef}
-            className="flex-grow border-t-0"
+            className="grow border-t-0"
             rowHeight={44}
             headerRowHeight={36}
             columns={columns}

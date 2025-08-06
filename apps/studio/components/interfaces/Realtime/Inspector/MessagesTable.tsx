@@ -129,7 +129,7 @@ const MessagesTable = ({
       <section className="flex w-full flex-col" style={{ maxHeight: 'calc(100vh - 42px - 3rem)' }}>
         <ShimmerLine active={enabled} />
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
-          <div className="flex flex-grow flex-col">
+          <div className="flex grow flex-col">
             {enabled && (
               <div className="w-full h-9 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">
@@ -165,7 +165,7 @@ const MessagesTable = ({
                   isEqual(row, focusedLog)
                     ? 'bg-scale-800 rdg-row--focused'
                     : 'bg-200 hover:bg-scale-300 cursor-pointer',
-                  isErrorLog(row) && '!bg-warning-300',
+                  isErrorLog(row) && 'bg-warning-300!',
                 ])
               }}
               rows={data}

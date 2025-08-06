@@ -47,11 +47,11 @@ const RadioGroupStackedItem = React.forwardRef<
         'enabled:hover:bg-surface-300',
         'enabled:hover:border-foreground-muted',
         'enabled:cursor-pointer disabled:cursor-not-allowed',
-        'hover:z-[1] focus-visible:z-[1]',
-        'data-[state=checked]:z-[1]',
-        'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-300',
-        'data-[state=checked]:border-foreground-muted',
+        'hover:z-1 focus-visible:z-1',
+        'data-checked:z-1',
+        'data-checked:ring-1 data-checked:ring-border',
+        'data-checked:bg-surface-300',
+        'data-checked:border-foreground-muted',
         'transition',
         'group',
         props.className
@@ -62,7 +62,7 @@ const RadioGroupStackedItem = React.forwardRef<
           <div
             className={cn(
               'aspect-square h-4 w-4 min-w-4 min-h-4',
-              'rounded-full border group-data-[state=checked]:border-foreground-muted',
+              'rounded-full border group-data-checked:border-foreground-muted',
               'group-focus:border-foreground-muted',
               'group-hover:border-foreground-muted',
               'ring-offset-background',
@@ -85,7 +85,7 @@ const RadioGroupStackedItem = React.forwardRef<
               '-mt-[0.15rem]',
               'text-sm transition-colors text-left',
               'text-light',
-              'enabled:group-hover:text-foreground group-data-[state=checked]:text-foreground'
+              'enabled:group-hover:text-foreground group-data-checked:text-foreground'
             )}
           >
             {label}

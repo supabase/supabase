@@ -189,7 +189,7 @@ export default {
         text-foreground-lighter
         rotate-0
         group-state-open:rotate-180
-        group-data-[state=open]:rotate-180
+        group-data-open:rotate-180
         ease-&lsqb;cubic-bezier(0.87,_0,_0.13,_1)&rsqb;
         transition-transform duration-300
         duration-200
@@ -342,7 +342,7 @@ export default {
         hover:text-foreground
       `,
       active: `
-        !text-foreground
+        text-foreground!
         border-b-2 border-foreground
       `,
     },
@@ -679,7 +679,7 @@ export default {
         active: `
           bg-selection z-10
           border-stronger
-          border-1
+          border
         `,
         radio_offset: 'left-4',
       },
@@ -715,7 +715,7 @@ export default {
         active: `
           bg-selection z-10
           border-stronger
-          border-1
+          border
         `,
         radio_offset: 'left-4',
       },
@@ -754,7 +754,7 @@ export default {
         `,
         active: `
           bg-selection z-10
-          border-stronger border-1
+          border-stronger border
         `,
         radio_offset: 'left-4',
       },
@@ -791,7 +791,7 @@ export default {
         active: `
           bg-selection z-10
           border-strong
-          border-1
+          border
         `,
         radio_offset: 'left-4',
       },
@@ -926,19 +926,19 @@ export default {
   toggle: {
     base: `
       p-0 relative
-      inline-flex flex-shrink-0
+      inline-flex shrink-0
       border-2 border-transparent
       rounded-full
       cursor-pointer
       transition-colors ease-in-out duration-200
       ${defaults.focus}
-      focus:!ring-border
+      focus:ring-border!
       bg-foreground-muted/40
 
       hover:bg-foreground-muted/60
     `,
     active: `
-      !bg-brand
+      bg-brand!
       !hover:bg-brand
     `,
     handle_container: {
@@ -957,11 +957,11 @@ export default {
         transition
         ease-in-out duration-200
       `,
-      tiny: '!h-3 !w-3',
-      small: '!h-5 !w-5',
-      medium: '!h-5 !w-5',
-      large: '!h-6 !w-6',
-      xlarge: '!h-6 !w-6',
+      tiny: 'h-3! w-3!',
+      small: 'h-5! w-5!',
+      medium: 'h-5! w-5!',
+      large: 'h-6! w-6!',
+      xlarge: 'h-6! w-6!',
     },
     handle_active: {
       tiny: ' translate-x-3 dark:bg-white',
@@ -1406,7 +1406,7 @@ export default {
   // Icon
 
   icon: {
-    container: `flex-shrink-0 flex items-center justify-center rounded-full p-3`,
+    container: `shrink-0 flex items-center justify-center rounded-full p-3`,
   },
 
   loading: {

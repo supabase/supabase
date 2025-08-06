@@ -169,7 +169,7 @@ const RowEditor = ({
     >
       <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
-          <div className="flex flex-grow flex-col">
+          <div className="flex grow flex-col">
             {requiredFields.length > 0 && (
               <SidePanel.Content>
                 <div className="space-y-10 py-6">
@@ -243,7 +243,7 @@ const RowEditor = ({
               readOnly={!editable}
             />
           </div>
-          <div className="flex-shrink">
+          <div className="shrink">
             <ActionBar
               loading={loading}
               backButtonLabel="Cancel"

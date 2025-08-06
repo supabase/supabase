@@ -120,7 +120,7 @@ const AuditLogs = () => {
             />
             {isSuccess && (
               <>
-                <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                <div className="h-[20px] border-r border-strong ml-4! mr-2!" />
                 <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
               </>
             )}
@@ -205,7 +205,7 @@ const AuditLogs = () => {
                         <Table.tr
                           key={log.occurred_at}
                           onClick={() => setSelectedLog(log)}
-                          className="cursor-pointer hover:!bg-alternative transition duration-100"
+                          className="cursor-pointer hover:bg-alternative! transition duration-100"
                         >
                           <Table.td className="max-w-[250px]">
                             <div className="flex items-center space-x-2">

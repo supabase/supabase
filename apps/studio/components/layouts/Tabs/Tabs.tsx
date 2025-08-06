@@ -133,7 +133,7 @@ export const EditorTabs = () => {
         <CollapseButton hideTabs={false} />
         <TabsList_Shadcn_
           className={cn(
-            'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
+            'rounded-b-none gap-0 h-10 flex items-center w-full z-1',
             'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'
           )}
         >
@@ -178,7 +178,7 @@ export const EditorTabs = () => {
                 'flex items-center gap-2 px-3 text-xs',
                 'bg-dash-sidebar/50 dark:bg-surface-100/50',
                 'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                'relative group h-full border-t-2 !border-b-0',
+                'relative group h-full border-t-2 border-b-0!',
                 'hover:bg-surface-300 dark:hover:bg-surface-100'
               )}
             >
@@ -205,7 +205,7 @@ export const EditorTabs = () => {
               >
                 <X size={12} className="text-foreground-light" />
               </span>{' '}
-              <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+              <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
             </TabsTrigger_Shadcn_>
           )}
 

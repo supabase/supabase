@@ -16,9 +16,9 @@ export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProp
       label={<span className="pt-1 h-6">{legacy ? `Legacy ${details.label}` : details.label}</span>}
       icon={
         algorithm === 'HS256' ? (
-          <RectangleEllipsis className="size-4 flex-shrink-0" />
+          <RectangleEllipsis className="size-4 shrink-0" />
         ) : (
-          <LockKeyholeOpen className="size-4 flex-shrink-0" />
+          <LockKeyholeOpen className="size-4 shrink-0" />
         )
       }
       title={details.name}

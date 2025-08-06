@@ -14,11 +14,11 @@ export function ComputeBadge({ infraComputeSize, className, ...props }: ComputeB
     <Badge
       className={cn(
         'rounded-md text-center flex justify-center font-mono uppercase',
-        'group-data-[state=open]:bg-opacity-20 group-data-[state=open]:ring-2 group-data-[state=open]:ring-opacity-20',
+        'group-data-[state=open]:bg-opacity-20 group-data-open:ring-2 group-data-[state=open]:ring-opacity-20',
         'transition-all',
         smallCompute
-          ? 'group-data-[state=open]:ring-foreground-muted bg-opacity-50 group-data-[state=open]:bg-opacity-75'
-          : 'group-data-[state=open]:ring-brand',
+          ? 'group-data-open:ring-foreground-muted bg-opacity-50 group-data-[state=open]:bg-opacity-75'
+          : 'group-data-open:ring-brand',
 
         className
       )}

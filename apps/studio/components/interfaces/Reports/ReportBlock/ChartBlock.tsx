@@ -208,19 +208,19 @@ export const ChartBlock = ({
       }
     >
       {loading ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <Loader2 size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter text-center">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <WarningIcon />
           <p className="text-xs text-foreground-lighter text-center">
             Unable to load data for {label}
           </p>
         </div>
       ) : data.length === 0 ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2">
           <NoDataPlaceholder
             size="small"
             className="border-0"

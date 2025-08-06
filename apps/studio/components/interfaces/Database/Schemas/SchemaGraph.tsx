@@ -310,7 +310,7 @@ export const SchemaGraph = () => {
               >
                 <Background
                   gap={16}
-                  className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                  className="*:stroke-foreground-muted opacity-25"
                   variant={BackgroundVariant.Dots}
                   color={'inherit'}
                 />

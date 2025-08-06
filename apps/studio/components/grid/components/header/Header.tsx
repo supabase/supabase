@@ -132,7 +132,7 @@ const DefaultHeader = () => {
                               <div
                                 className={cn([
                                   'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
+                                  'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-x-0',
                                 ])}
                               />
                             </div>
@@ -158,7 +158,7 @@ const DefaultHeader = () => {
                               <div
                                 className={cn([
                                   'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
+                                  'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-y-0',
                                 ])}
                               />
                             </div>
@@ -197,7 +197,7 @@ const DefaultHeader = () => {
                               <ArrowUp
                                 className={cn(
                                   'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
+                                  'group-data-highlighted:translate-y-0 group-data-highlighted:text-brand group-data-highlighted:opacity-100'
                                 )}
                                 strokeWidth={3}
                                 size={12}

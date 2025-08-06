@@ -101,7 +101,7 @@ export const useTableRowDeleteMutation = ({
             toast(initialMessage, {
               description: <Markdown content={resolutionCTA} className="[&>p]:m-0" />,
               action: (
-                <div className="w-full flex gap-x-2 !mx-0 mt-3">
+                <div className="w-full flex gap-x-2 mx-0! mt-3">
                   {/* [Joshen] Ideally we also are able to add this CTA but we can't guarantee this info without an on-demand fetch */}
                   {/* <Button asChild key="cta-1" type="default">
                     <Link href={`/project/${projectRef}/editor`}>

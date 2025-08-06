@@ -116,7 +116,7 @@ const AddRestrictionModal = ({
       <Form
         validateOnBlur
         id={formId}
-        className="!border-t-0"
+        className="border-t-0!"
         initialValues={{
           ipAddress: '',
           cidrBlockSize:
@@ -176,7 +176,7 @@ const AddRestrictionModal = ({
                       placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'}
                     />
                   </div>
-                  <div className="flex-grow">
+                  <div className="grow">
                     <Input
                       label={
                         <div className="flex items-center space-x-2">

@@ -57,7 +57,7 @@ const GenericOrganizationPage: NextPage = () => {
           Select an organization to continue
         </h3>
         <div
-          className="flex-grow py-6 overflow-y-auto"
+          className="grow py-6 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
           <div className="w-full max-w-5xl mx-auto flex flex-col gap-y-8">
@@ -98,7 +98,7 @@ const GenericOrganizationPage: NextPage = () => {
                       linkHref={urlRewriterFactory(routeSlug)(organization.slug)}
                       title={
                         <div className="flex w-full flex-row justify-between gap-1">
-                          <span className="flex-shrink truncate">{organization.name}</span>
+                          <span className="shrink truncate">{organization.name}</span>
                         </div>
                       }
                       footer={
