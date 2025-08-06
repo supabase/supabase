@@ -1,7 +1,7 @@
+import { InlineLink } from 'components/ui/InlineLink'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { isValidRetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 import { RetryCountdown } from './RetryCountdown'
 import { RetryOptionsDropdown } from './RetryOptionsDropdown'
@@ -48,37 +48,15 @@ export const ErroredTableDetails = ({
     switch (state.retry_policy.policy) {
       case 'no_retry':
         return (
-          <div className="space-y-3">
-            <div className="text-xs text-brand-600">
-              <span className="font-medium">Support required:</span> This error requires manual
-              intervention from our support team. You can always recreate the pipeline if needed.
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <ButtonTooltip
-                type="outline"
-                size="tiny"
-                icon={<ExternalLink className="w-3 h-3" />}
-                disabled
-                tooltip={{
-                  content: {
-                    text: 'Coming soon',
-                  },
-                }}
-              >
-                View Logs
-              </ButtonTooltip>
-              <Button
-                asChild
-                type="primary"
-                size="tiny"
-                icon={<ExternalLink className="w-3 h-3" />}
-              >
-                <Link href="https://supabase.com/support" target="_blank" rel="noopener noreferrer">
-                  Contact Support
-                </Link>
-              </Button>
-            </div>
+          <div className="text-xs text-foreground-lighter">
+            <span className="font-medium">Support required:</span> This error requires manual
+            intervention from our{' '}
+            <InlineLink
+              href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
+            >
+              support
+            </InlineLink>
+            . Alternatively, you may also recreate the pipeline.
           </div>
         )
 

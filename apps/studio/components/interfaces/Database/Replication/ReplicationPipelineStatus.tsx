@@ -18,11 +18,11 @@ import {
 } from 'state/replication-pipeline-request-status'
 import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { ErroredTableDetails } from './ErroredTableDetails'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { TableState } from './ReplicationPipelineStatus.types'
-import { ErroredTableDetails } from './ErroredTableDetails'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 
 /**
@@ -219,7 +219,7 @@ export const ReplicationPipelineStatus = () => {
                 const statusConfig = getStatusConfig(table.state)
                 return (
                   <Table.tr key={`${table.table_name}-${index}`} className="border-t">
-                    <Table.td>
+                    <Table.td className="align-top">
                       <div className="flex items-center gap-x-2">
                         <p>{table.table_name}</p>
 
@@ -238,14 +238,14 @@ export const ReplicationPipelineStatus = () => {
                         </ButtonTooltip>
                       </div>
                     </Table.td>
-                    <Table.td>
+                    <Table.td className="align-top">
                       {showDisabledState ? (
                         <Badge variant="default">Not Available</Badge>
                       ) : (
                         statusConfig.badge
                       )}
                     </Table.td>
-                    <Table.td>
+                    <Table.td className="align-top">
                       {showDisabledState ? (
                         <p className="text-sm text-foreground-lighter">
                           Status unavailable while pipeline is {config.badge.toLowerCase()}
