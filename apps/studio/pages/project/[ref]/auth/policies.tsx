@@ -14,7 +14,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
-import type { EditorPanelState } from 'components/ui/EditorPanel/EditorPanel.types'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -73,10 +72,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
-  
+
   // Local editor panel state
   const [editorPanelOpen, setEditorPanelOpen] = useState(false)
-  const [editorPanelProps, setEditorPanelProps] = useState<EditorPanelState>({})
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
 
@@ -146,43 +144,20 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           hasTables={tables.length > 0}
           isLocked={isSchemaLocked}
           onSelectCreatePolicy={(table: string) => {
+            setSelectedTable(table)
+            setSelectedPolicyToEdit(undefined)
             if (isInlineEditorEnabled) {
-              setEditorPanelProps({
-                initialValue: `create policy "replace_with_policy_name"
-  on ${schema}.${table}
-  for select
-  to authenticated
-  using (
-    true  -- Write your policy condition here
-);`,
-                label: `Create new RLS policy on "${table}"`,
-                saveLabel: 'Create policy',
-                initialPrompt: `Create and name a entirely new RLS policy for the "${table}" table in the ${schema} schema. The policy should...`,
-              })
               setEditorPanelOpen(true)
             } else {
-              setSelectedTable(table)
               setShowPolicyAiEditor(true)
             }
           }}
           onSelectEditPolicy={(policy) => {
+            setSelectedPolicyToEdit(policy)
+            setSelectedTable(undefined)
             if (isInlineEditorEnabled) {
-              const sql = generatePolicyUpdateSQL(policy)
-              const templates = getGeneralPolicyTemplates(policy.schema, policy.table)
-              setEditorPanelProps({
-                initialValue: sql,
-                label: `Edit policy "${policy.name}"`,
-                saveLabel: 'Update policy',
-                templates: templates.map((template) => ({
-                  name: template.templateName,
-                  description: template.description,
-                  content: template.statement,
-                })),
-                initialPrompt: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
-              })
               setEditorPanelOpen(true)
             } else {
-              setSelectedPolicyToEdit(policy)
               setShowPolicyAiEditor(true)
             }
           }}
@@ -202,11 +177,58 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         }}
         authContext="database"
       />
-      
+
       <EditorPanel
         open={editorPanelOpen}
-        onClose={() => setEditorPanelOpen(false)}
-        {...editorPanelProps}
+        onClose={() => {
+          setEditorPanelOpen(false)
+          setSelectedPolicyToEdit(undefined)
+          setSelectedTable(undefined)
+        }}
+        onRunSuccess={() => {
+          setEditorPanelOpen(false)
+          setSelectedPolicyToEdit(undefined)
+          setSelectedTable(undefined)
+        }}
+        initialValue={
+          selectedPolicyToEdit
+            ? generatePolicyUpdateSQL(selectedPolicyToEdit)
+            : selectedTable
+              ? `create policy "replace_with_policy_name"
+  on ${schema}.${selectedTable}
+  for select
+  to authenticated
+  using (
+    true  -- Write your policy condition here
+);`
+              : ''
+        }
+        label={
+          selectedPolicyToEdit
+            ? 'RLS policies are just SQL statements that you can alter'
+            : selectedTable
+              ? `Create new RLS policy on "${selectedTable}"`
+              : ''
+        }
+        initialPrompt={
+          selectedPolicyToEdit
+            ? `Update the policy with name "${selectedPolicyToEdit.name}" in the ${selectedPolicyToEdit.schema} schema on the ${selectedPolicyToEdit.table} table. It should...`
+            : selectedTable
+              ? `Create and name a entirely new RLS policy for the "${selectedTable}" table in the ${schema} schema. The policy should...`
+              : ''
+        }
+        templates={
+          selectedPolicyToEdit
+            ? getGeneralPolicyTemplates(
+                selectedPolicyToEdit.schema,
+                selectedPolicyToEdit.table
+              ).map((template) => ({
+                name: template.templateName,
+                description: template.description,
+                content: template.statement,
+              }))
+            : []
+        }
       />
     </div>
   )

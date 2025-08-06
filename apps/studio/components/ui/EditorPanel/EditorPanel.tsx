@@ -1,7 +1,7 @@
-import { debounce } from 'lodash'
 import { Book, Save, X } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useForm } from 'react-hook-form'
 
 import { useParams } from 'common'
 import {
@@ -13,7 +13,7 @@ import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunBu
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -28,9 +28,12 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
+  Input_Shadcn_ as Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -39,6 +42,7 @@ import {
   SheetHeader,
   SheetTitle,
   SQL_ICON,
+  SheetDescription,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
@@ -46,21 +50,45 @@ import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { InlineLink } from '../InlineLink'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
-import type { EditorPanelProps } from './EditorPanel.types'
+
+type Template = {
+  name: string
+  description: string
+  content: string
+}
+
+interface EditorPanelProps {
+  open: boolean
+  onClose: () => void
+  initialValue?: string
+  label?: string
+  saveLabel?: string
+  saveValue?: string
+  onSave?: (value: string) => void
+  onRunSuccess?: (value: any[]) => void
+  onRunError?: (value: any) => void
+  functionName?: string
+  templates?: Template[]
+  initialPrompt?: string
+  onChange?: (value: string) => void
+}
 
 export const EditorPanel = ({
   open,
   onClose,
   initialValue = '',
-  label = 'SQL Editor',
-  saveLabel = 'Run',
+  label = '',
+  saveLabel = 'Save',
+  saveValue = '',
   onSave,
+  onRunSuccess,
+  onRunError,
   templates = [],
   initialPrompt = '',
   onChange,
 }: EditorPanelProps) => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
@@ -71,10 +99,14 @@ export const EditorPanel = ({
   const [results, setResults] = useState<undefined | any[]>(undefined)
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [currentValue, setCurrentValue] = useState(initialValue)
-  const [savedCode, setSavedCode] = useState<string>('')
-  const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [showResults, setShowResults] = useState(true)
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
+
+  const saveForm = useForm({
+    defaultValues: {
+      saveValue: saveValue || '',
+    },
+  })
 
   const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
   const errorContent =
@@ -86,14 +118,20 @@ export const EditorPanel = ({
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
       setResults(res.result)
+      if (onRunSuccess) {
+        onRunSuccess(res.result)
+      }
     },
     onError: (error) => {
       setError(error)
       setResults([])
+      if (onRunError) {
+        onRunError(error)
+      }
     },
   })
 
-  const onExecuteSql = (skipValidation = false) => {
+  const onExecuteSql = async (skipValidation = false) => {
     setError(undefined)
     setShowWarning(undefined)
 
@@ -107,11 +145,6 @@ export const EditorPanel = ({
         return
       }
     }
-
-    if (onSave) {
-      onSave(currentValue)
-    }
-
     executeSql({
       sql: suffixWithLimit(currentValue, 100),
       projectRef: project?.ref,
@@ -133,27 +166,20 @@ export const EditorPanel = ({
     setIsTemplatesOpen(false)
   }
 
-  // Create a debounced version of the revert code function
-  const debouncedRevertCode = useCallback(
-    debounce(() => {
-      setIsPreviewingTemplate(false)
-      handleChange(savedCode)
-    }, 300),
-    [savedCode]
-  )
-
-  // Cleanup debounce on unmount
-  useEffect(() => {
-    return () => {
-      debouncedRevertCode.cancel()
-    }
-  }, [debouncedRevertCode])
-
   useEffect(() => {
     if (initialValue !== undefined && initialValue !== currentValue) {
       setCurrentValue(initialValue)
+      setResults(undefined)
+      setError(undefined)
+      setShowWarning(undefined)
     }
   }, [initialValue])
+
+  useEffect(() => {
+    saveForm.reset({
+      saveValue: saveValue || '',
+    })
+  }, [saveValue, saveForm])
 
   return (
     <Sheet open={open} onOpenChange={(open) => !open && onClose()}>
@@ -162,7 +188,10 @@ export const EditorPanel = ({
         className="w-full sm:max-w-3xl flex flex-col h-full p-0 space-y-0 gap-0"
       >
         <SheetHeader className="flex shrink-0 items-center gap-x-3">
-          <SheetTitle className="text-sm flex-1">{label}</SheetTitle>
+          <div className="flex-1">
+            <SheetTitle className="text-sm">SQL Editor</SheetTitle>
+            {label && <SheetDescription className="text-sm">{label}</SheetDescription>}
+          </div>
           <div className="flex gap-2 items-center">
             {templates.length > 0 && (
               <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
@@ -371,6 +400,34 @@ export const EditorPanel = ({
           )}
 
           <div className="flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
+            {onSave && (
+              <Form_Shadcn_ {...saveForm}>
+                <form
+                  onSubmit={saveForm.handleSubmit((values) => {
+                    onSave(values.saveValue)
+                  })}
+                  className="flex items-center gap-2"
+                >
+                  {saveValue && (
+                    <FormField_Shadcn_
+                      control={saveForm.control}
+                      name="saveValue"
+                      render={({ field }) => (
+                        <Input size="tiny" placeholder="Enter save value..." {...field} />
+                      )}
+                    />
+                  )}
+                  <Button
+                    size="tiny"
+                    type="default"
+                    htmlType="submit"
+                    disabled={!saveForm.formState.isDirty}
+                  >
+                    {saveLabel}
+                  </Button>
+                </form>
+              </Form_Shadcn_>
+            )}
             <SqlRunButton
               isDisabled={isExecuting}
               isExecuting={isExecuting}

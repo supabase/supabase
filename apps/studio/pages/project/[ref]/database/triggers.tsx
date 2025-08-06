@@ -11,7 +11,6 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
-import type { EditorPanelState } from 'components/ui/EditorPanel/EditorPanel.types'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
@@ -23,25 +22,17 @@ const TriggersPage: NextPageWithLayout = () => {
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
-  
+
   // Local editor panel state
   const [editorPanelOpen, setEditorPanelOpen] = useState(false)
-  const [editorPanelProps, setEditorPanelProps] = useState<EditorPanelState>({})
+  const [selectedTriggerForEditor, setSelectedTriggerForEditor] = useState<PostgresTrigger>()
 
   const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
   const isPermissionsLoaded = usePermissionsLoaded()
 
   const createTrigger = () => {
     if (isInlineEditorEnabled) {
-      setEditorPanelProps({
-        initialValue: `create trigger trigger_name
-after insert or update or delete on table_name
-for each row
-execute function function_name();`,
-        label: 'Create new database trigger',
-        saveLabel: 'Create trigger',
-        initialPrompt: 'Create a new database trigger that...',
-      })
+      setSelectedTriggerForEditor(undefined)
       setEditorPanelOpen(true)
     } else {
       setSelectedTrigger(undefined)
@@ -51,13 +42,7 @@ execute function function_name();`,
 
   const editTrigger = (trigger: PostgresTrigger) => {
     if (isInlineEditorEnabled) {
-      const sql = generateTriggerCreateSQL(trigger)
-      setEditorPanelProps({
-        initialValue: sql,
-        label: `Edit trigger "${trigger.name}"`,
-        saveLabel: 'Update trigger',
-        initialPrompt: `Update the database trigger "${trigger.name}" to...`,
-      })
+      setSelectedTriggerForEditor(trigger)
       setEditorPanelOpen(true)
     } else {
       setSelectedTrigger(trigger)
@@ -102,11 +87,35 @@ execute function function_name();`,
         visible={showDeleteTriggerForm}
         setVisible={setShowDeleteTriggerForm}
       />
-      
+
       <EditorPanel
         open={editorPanelOpen}
-        onClose={() => setEditorPanelOpen(false)}
-        {...editorPanelProps}
+        onRunSuccess={() => {
+          setEditorPanelOpen(false)
+          setSelectedTriggerForEditor(undefined)
+        }}
+        onClose={() => {
+          setEditorPanelOpen(false)
+          setSelectedTriggerForEditor(undefined)
+        }}
+        initialValue={
+          selectedTriggerForEditor
+            ? generateTriggerCreateSQL(selectedTriggerForEditor)
+            : `create trigger trigger_name
+after insert or update or delete on table_name
+for each row
+execute function function_name();`
+        }
+        label={
+          selectedTriggerForEditor
+            ? `Edit trigger "${selectedTriggerForEditor.name}"`
+            : 'Create new database trigger'
+        }
+        initialPrompt={
+          selectedTriggerForEditor
+            ? `Update the database trigger "${selectedTriggerForEditor.name}" to...`
+            : 'Create a new database trigger that...'
+        }
       />
     </>
   )
