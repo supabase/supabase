@@ -50,7 +50,6 @@ import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { InlineLink } from '../InlineLink'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
-import type content from 'pages/api/platform/projects/[ref]/content'
 
 type Template = {
   name: string
