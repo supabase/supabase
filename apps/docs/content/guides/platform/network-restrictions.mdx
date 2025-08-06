@@ -6,17 +6,17 @@ description: "Apply network restrictions for your project's database."
 
 <Admonition type="note">
 
-If you can't find the Network Restrictions section at the bottom of your [Database Settings](/dashboard/project/_/settings/database), update your version of Postgres in the [Infrastructure Settings](/dashboard/project/_/settings/infrastructure).
+If you can't find the Network Restrictions section at the bottom of your [Database Settings](/dashboard/project/_/database/settings), update your version of Postgres in the [Infrastructure Settings](/dashboard/project/_/settings/infrastructure).
 
 </Admonition>
 
 Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and its pooler ("your database"). These restrictions are enforced before traffic reaches your database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.
 
-If direct connections to your database [resolve to a IPv6 address](https://supabase.com/dashboard/project/_/settings/database), you need to add both IPv4 and IPv6 CIDRs to the list of allowed CIDRs. Network Restrictions will be applied to all database connection routes, whether pooled or direct. You will need to add both the IPv4 and IPv6 networks you want to allow. There are two exceptions: If you have been granted an extension on the IPv6 migration OR if you have purchased the [IPv4 add-on](https://supabase.com/dashboard/project/_/settings/addons), you need only add IPv4 CIDRs.
+If direct connections to your database [resolve to a IPv6 address](https://supabase.com/dashboard/project/_/database/settings), you need to add both IPv4 and IPv6 CIDRs to the list of allowed CIDRs. Network Restrictions will be applied to all database connection routes, whether pooled or direct. You will need to add both the IPv4 and IPv6 networks you want to allow. There are two exceptions: If you have been granted an extension on the IPv6 migration OR if you have purchased the [IPv4 add-on](https://supabase.com/dashboard/project/_/settings/addons), you need only add IPv4 CIDRs.
 
 ## To get started via the Dashboard:
 
-Network restrictions can be configured in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) page. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
+Network restrictions can be configured in the [Database Settings](https://supabase.com/dashboard/project/_/database/settings) page. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
 
 ## To get started via the Management API:
 

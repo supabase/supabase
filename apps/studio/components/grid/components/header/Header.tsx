@@ -11,13 +11,13 @@ import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
 import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -222,7 +222,7 @@ const DefaultHeader = () => {
 }
 
 const RowHeader = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -504,11 +504,9 @@ const RowHeader = () => {
               Export
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className={snap.allRowsSelected ? 'w-52' : 'w-40'}>
+          <DropdownMenuContent align="start" className={snap.allRowsSelected ? 'w-52' : 'w-40'}>
             <DropdownMenuItem onClick={onRowsExportCSV}>Export as CSV</DropdownMenuItem>
             <DropdownMenuItem onClick={onRowsExportSQL}>Export as SQL</DropdownMenuItem>
-            {/* [Joshen] Should make this available for all cases, but that'll involve updating
-            the Dialog's SQL output to be dynamic based on any filters applied */}
             {snap.allRowsSelected ? (
               <DropdownMenuItem className="group" onClick={() => setShowExportModal(true)}>
                 <div>
@@ -535,7 +533,9 @@ const RowHeader = () => {
       </div>
 
       <ExportDialog
-        table={{ name: snap.table.name, schema: snap.table.schema ?? '' }}
+        table={snap.table}
+        filters={filters}
+        sorts={sorts}
         open={showExportModal}
         onOpenChange={() => setShowExportModal(false)}
       />

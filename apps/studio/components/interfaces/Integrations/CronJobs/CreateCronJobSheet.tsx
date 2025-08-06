@@ -10,7 +10,6 @@ import z from 'zod'
 import { useWatch } from '@ui/components/shadcn/ui/form'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getDatabaseCronJob } from 'data/database-cron-jobs/database-cron-job-query'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
@@ -19,6 +18,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Form_Shadcn_,
@@ -119,6 +119,7 @@ const sqlFunctionSchema = z.object({
   // When editing a cron job, we want to keep the original command as a snippet in case the user wants to manually edit it
   snippet: z.string().trim(),
 })
+
 const sqlSnippetSchema = z.object({
   type: z.literal('sql_snippet'),
   snippet: z.string().trim().min(1),
@@ -200,9 +201,10 @@ export const CreateCronJobSheet = ({
   setIsClosing,
   onClose,
 }: CreateCronJobSheetProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
+  const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
 
   const isEditing = !!selectedCronJob?.jobname
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -215,7 +217,8 @@ export const CreateCronJobSheet = ({
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
+  const { mutate: upsertCronJob, isLoading: isUpserting } = useDatabaseCronJobCreateMutation()
+  const isLoading = isLoadingGetCronJob || isUpserting
 
   const canToggleExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -306,18 +309,25 @@ export const CreateCronJobSheet = ({
     if (!project) return console.error('Project is required')
 
     if (!isEditing) {
-      const checkExistingJob = await getDatabaseCronJob({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        name,
-      })
-      const nameExists = !!checkExistingJob
-
-      if (nameExists) {
-        return form.setError('name', {
-          type: 'manual',
-          message: 'A cron job with this name already exists',
+      try {
+        setIsLoadingGetCronJob(true)
+        const checkExistingJob = await getDatabaseCronJob({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          name,
         })
+        const nameExists = !!checkExistingJob
+
+        if (nameExists) {
+          return form.setError('name', {
+            type: 'manual',
+            message: 'A cron job with this name already exists',
+          })
+        }
+      } catch (error: any) {
+        toast.error(`Failed to validate cron job name: ${error.message}`)
+      } finally {
+        setIsLoadingGetCronJob(false)
       }
     }
 
@@ -369,6 +379,7 @@ export const CreateCronJobSheet = ({
         },
       }
     )
+    setIsLoadingGetCronJob(false)
   }
 
   return (

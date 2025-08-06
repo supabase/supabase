@@ -5,11 +5,11 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ActionCard } from 'components/layouts/Tabs/ActionCard'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn, SQL_ICON } from 'ui'
@@ -18,9 +18,9 @@ import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 const SQLTemplates = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const org = useSelectedOrganization()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const [sql] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -61,7 +61,7 @@ const SQLTemplates = () => {
     <div className="block h-full space-y-8 overflow-y-auto p-6 px-10 bg-dash-sidebar dark:bg-surface-100">
       <div>
         <div className="mb-6">
-          <h1 className="text-foreground mb-1 text-xl">Scripts</h1>
+          <h2 className="mb-1">Scripts</h2>
           <p className="text-foreground-light text-sm">Quick scripts to run on your database.</p>
           <p className="text-foreground-light text-sm">
             Click on any script to fill the query box, modify the script, then click

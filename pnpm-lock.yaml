@@ -498,6 +498,9 @@ importers:
       remark-math:
         specifier: ^6.0.0
         version: 6.0.0(supports-color@8.1.1)
+      remove-types:
+        specifier: 1.0.0
+        version: 1.0.0(supports-color@8.1.1)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -1438,8 +1441,8 @@ importers:
         specifier: ^4.1.3
         version: 4.4.1
       shadcn:
-        specifier: 2.4.0-canary.16
-        version: 2.4.0-canary.16(@types/node@22.13.14)(supports-color@8.1.1)(typescript@5.5.2)
+        specifier: ^2.10.0
+        version: 2.10.0(@types/node@22.13.14)(supports-color@8.1.1)(typescript@5.5.2)
       shiki:
         specifier: ^1.1.7
         version: 1.6.0
@@ -16047,6 +16050,9 @@ packages:
   remove-trailing-spaces@1.0.9:
     resolution: {integrity: sha512-xzG7w5IRijvIkHIjDk65URsJJ7k4J95wmcArY5PRcmjldIOl7oTvG8+X2Ag690R7SfwiOcHrWZKVc1Pp5WIOzA==}
 
+  remove-types@1.0.0:
+    resolution: {integrity: sha512-G7Hk1Q+UJ5DvlNAoJZObxANkBZGiGdp589rVcTW/tYqJWJ5rwfraSnKSQaETN8Epaytw8J40nS/zC7bcHGv36w==}
+
   rename-keys@1.2.0:
     resolution: {integrity: sha512-U7XpAktpbSgHTRSNRrjKSrjYkZKuhUukfoBlXWXUExCAqhzh1TU3BDRAfJmarcl5voKS+pbKU9MvyLWKZ4UEEg==}
     engines: {node: '>= 0.8.0'}
@@ -16388,8 +16394,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shadcn@2.4.0-canary.16:
-    resolution: {integrity: sha512-HajpBYMB5P1iFoHrQ+bbfjuBtHfeQ0IVQWJIOsM4NgqymhMT0BpvOkncMf6Y0ttFc/CvhoZle5OJYkgA2oNzdA==}
+  shadcn@2.10.0:
+    resolution: {integrity: sha512-/zxjmHGbaYVFtI6bUridFVV7VFStIv3vU/w1h7xenhz7KRzc9pqHsyFvcExZprG7dlA5kW9knRgv8+Cl/H7w9w==}
     hasBin: true
 
   shallowequal@1.1.0:
@@ -32065,7 +32071,7 @@ snapshots:
 
   https-proxy-agent@6.2.1(supports-color@8.1.1):
     dependencies:
-      agent-base: 7.1.1(supports-color@8.1.1)
+      agent-base: 7.1.3
       debug: 4.4.0(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
@@ -36838,6 +36844,15 @@ snapshots:
 
   remove-trailing-spaces@1.0.9: {}
 
+  remove-types@1.0.0(supports-color@8.1.1):
+    dependencies:
+      '@babel/core': 7.26.10(supports-color@8.1.1)
+      '@babel/plugin-syntax-decorators': 7.25.9(@babel/core@7.26.10(supports-color@8.1.1))
+      '@babel/plugin-transform-typescript': 7.27.0(@babel/core@7.26.10(supports-color@8.1.1))(supports-color@8.1.1)
+      prettier: 2.8.8
+    transitivePeerDependencies:
+      - supports-color
+
   rename-keys@1.2.0: {}
 
   repeat-element@1.1.4: {}
@@ -37257,18 +37272,19 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@2.4.0-canary.16(@types/node@22.13.14)(supports-color@8.1.1)(typescript@5.5.2):
+  shadcn@2.10.0(@types/node@22.13.14)(supports-color@8.1.1)(typescript@5.5.2):
     dependencies:
       '@antfu/ni': 23.3.1
       '@babel/core': 7.26.10(supports-color@8.1.1)
-      '@babel/parser': 7.26.10
+      '@babel/parser': 7.27.0
       '@babel/plugin-transform-typescript': 7.27.0(@babel/core@7.26.10(supports-color@8.1.1))(supports-color@8.1.1)
+      '@modelcontextprotocol/sdk': 1.12.1(supports-color@8.1.1)
       commander: 10.0.1
       cosmiconfig: 8.3.6(typescript@5.5.2)
       deepmerge: 4.3.1
-      diff: 5.1.0
+      diff: 5.2.0
       execa: 7.2.0
-      fast-glob: 3.3.2
+      fast-glob: 3.3.3
       fs-extra: 11.3.0
       https-proxy-agent: 6.2.1(supports-color@8.1.1)
       kleur: 4.1.5
@@ -37282,6 +37298,7 @@ snapshots:
       ts-morph: 18.0.0
       tsconfig-paths: 4.2.0
       zod: 3.23.8
+      zod-to-json-schema: 3.24.5(zod@3.23.8)
     transitivePeerDependencies:
       - '@types/node'
       - supports-color
