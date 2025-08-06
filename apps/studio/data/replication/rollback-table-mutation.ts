@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
 
 export type RollbackType = 'individual' | 'full'
 
@@ -44,10 +44,7 @@ async function rollbackTableState(
     }
   )
 
-  if (error) {
-    handleError(error)
-  }
-
+  if (error) handleError(error)
   return data
 }
 
@@ -68,10 +65,13 @@ export const useRollbackTableMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, pipelineId } = variables
-        await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
-        await queryClient.invalidateQueries(
-          replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
-        )
+        await Promise.all([
+          queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId)),
+          queryClient.invalidateQueries(
+            replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
+          ),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
