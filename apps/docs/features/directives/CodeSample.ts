@@ -344,6 +344,8 @@ function matchLang(lang: string) {
       return 'swift'
     case 'sql':
       return 'sql'
+    case 'svelte':
+      return 'svelte'
     default:
       return null
   }

@@ -66,6 +66,7 @@ export interface ProjectLayoutProps {
   productMenu?: ReactNode
   selectedTable?: string
   resizableSidebar?: boolean
+  stickySidebarBottom?: boolean
   productMenuClassName?: string
 }
 
@@ -80,6 +81,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       children,
       selectedTable,
       resizableSidebar = false,
+      stickySidebarBottom = false,
       productMenuClassName,
     },
     ref
@@ -264,7 +266,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         </div>
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <MobileSheetNav
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
+          stickyBottom={stickySidebarBottom}
+        >
           {productMenu}
         </MobileSheetNav>
       </>
