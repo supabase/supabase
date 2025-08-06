@@ -52,7 +52,7 @@ export const Branching2Preview = () => {
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            Allow you to create, manage, review and merge database branches directly via the
+            Allow you to create, manage, review, and merge database branches directly via the
             branches page within the dashboard
           </li>
         </ul>
