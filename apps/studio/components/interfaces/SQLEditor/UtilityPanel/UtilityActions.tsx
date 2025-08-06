@@ -26,6 +26,7 @@ export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
+  hasSelection?: boolean
   prettifyQuery: () => void
   executeQuery: () => void
 }
@@ -34,6 +35,7 @@ const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
+  hasSelection = false,
   prettifyQuery,
   executeQuery,
 }: UtilityActionsProps) => {
@@ -185,6 +187,7 @@ const UtilityActions = ({
             variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
           <SqlRunButton
+            hasSelection={hasSelection}
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}
             className="rounded-l-none min-w-[82px]"
