@@ -16,18 +16,18 @@ import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-function
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { LogoLoader } from 'ui'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
   const canDeployFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')

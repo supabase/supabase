@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Modal } from 'ui'
 import { TIER_QUERY_LIMITS } from './Logs.constants'
 
@@ -26,7 +26,7 @@ const UpgradePrompt: React.FC<Props> = ({
   description = 'Logs can be retained up to a duration of 3 months depending on the plan that your project is on.',
   source = 'logsRetentionUpgradePrompt',
 }) => {
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   return (
     <Modal

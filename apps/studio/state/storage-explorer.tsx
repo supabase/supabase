@@ -42,7 +42,7 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
@@ -275,7 +275,15 @@ function createStorageExplorerState({
       })
     },
 
-    addNewFolder: async (folderName: string, columnIndex: number) => {
+    addNewFolder: async ({
+      folderName,
+      columnIndex,
+      onError,
+    }: {
+      folderName: string
+      columnIndex: number
+      onError?: () => void
+    }) => {
       if (!state.supabaseClient) return console.error('Supabase Client is missing')
 
       const autofix = false
@@ -284,10 +292,16 @@ function createStorageExplorerState({
         autofix,
         columnIndex,
       })
-      if (formattedName === null) return
+      if (formattedName === null) {
+        onError?.()
+        return
+      }
 
       if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
-        return toast.error('Folder name contains invalid special characters')
+        onError?.()
+        return toast.error(
+          'Only alphanumeric characters, hyphens, and underscores are allowed for folder names.'
+        )
       }
 
       if (formattedName.length === 0) {
@@ -318,6 +332,9 @@ function createStorageExplorerState({
           paths: [`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
         })
       }
+
+      const newFolder = state.columns[columnIndex].items.find((x) => x.name === formattedName)
+      if (newFolder) state.openFolder(columnIndex, newFolder)
     },
 
     fetchFolderContents: async ({
@@ -728,6 +745,19 @@ function createStorageExplorerState({
         return column
       })
       state.columns = updatedColumns
+    },
+
+    openFolder: async (columnIndex: number, folder: StorageItem) => {
+      state.setSelectedFilePreview(undefined)
+      state.clearSelectedItems(columnIndex + 1)
+      state.popOpenedFoldersAtIndex(columnIndex - 1)
+      state.pushOpenedFolderAtIndex(folder, columnIndex)
+      await state.fetchFolderContents({
+        bucketId: state.selectedBucket.id,
+        folderId: folder.id,
+        folderName: folder.name,
+        index: columnIndex,
+      })
     },
 
     downloadFolder: async (folder: StorageItemWithColumn) => {
@@ -1743,7 +1773,7 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 )
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))

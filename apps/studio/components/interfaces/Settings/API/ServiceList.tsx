@@ -1,26 +1,21 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { configKeys } from 'data/config/keys'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Badge, Input } from 'ui'
 import { PostgrestConfig } from './PostgrestConfig'
 
 const ServiceList = () => {
-  const client = useQueryClient()
-  const { project, isLoading } = useProjectContext()
-  const { ref: projectRef, source } = useParams()
+  const { data: project, isLoading } = useSelectedProjectQuery()
+  const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })

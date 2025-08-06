@@ -4,11 +4,11 @@ import { Loader, Search, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { VaultSecret } from 'types'
 import { Button, Input, Listbox, Separator } from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
@@ -18,7 +18,7 @@ import SecretRow from './SecretRow'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
