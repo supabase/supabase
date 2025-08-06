@@ -9,13 +9,13 @@ import { cn } from 'ui'
  */
 const ReportPadding = ({ children }: PropsWithChildren<{}>) => {
   const snap = useAiAssistantStateSnapshot()
-  const { editorPanel } = useAppStateSnapshot()
+  const { showEditorPanel } = useAppStateSnapshot()
 
   return (
     <div
       className={cn(
         'flex flex-col gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 2xl:px-32 w-full',
-        snap.open || editorPanel.open ? 'xl:px-6' : 'xl:px-22'
+        snap.open || showEditorPanel ? 'xl:px-6' : 'xl:px-22'
       )}
     >
       {children}
