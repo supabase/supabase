@@ -35,21 +35,21 @@ export const HIPAA = () => {
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <div className="flex items-center justify-center h-full">
-            <a
-              href="https://forms.supabase.com/hipaa2"
-              target="_blank"
-              rel="noreferrer noopener"
-              onClick={() =>
-                sendEvent({
-                  action: 'hipaa_request_button_clicked',
-                  groups: { organization: organization?.slug ?? 'Unknown' },
-                })
-              }
-            >
-              <Button type="default" iconRight={<ExternalLink />}>
+            <Button asChild type="default" iconRight={<ExternalLink />}>
+              <a
+                href="https://forms.supabase.com/hipaa2"
+                target="_blank"
+                rel="noreferrer noopener"
+                onClick={() =>
+                  sendEvent({
+                    action: 'hipaa_request_button_clicked',
+                    groups: { organization: organization?.slug ?? 'Unknown' },
+                  })
+                }
+              >
                 Request HIPAA
-              </Button>
-            </a>
+              </a>
+            </Button>
           </div>
         </ScaffoldSectionContent>
       </ScaffoldSection>

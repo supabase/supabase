@@ -25,23 +25,23 @@ export const TIA = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent className="flex items-center justify-center h-full">
-        <a
-          href="https://supabase.com/downloads/docs/Supabase+TIA+250314.pdf"
-          target="_blank"
-          rel="noreferrer noopener"
-          download={true}
-          onClick={() =>
-            sendEvent({
-              action: 'document_view_button_clicked',
-              properties: { documentName: 'TIA' },
-              groups: { organization: organization?.slug ?? 'Unknown' },
-            })
-          }
-        >
-          <Button type="default" iconRight={<ExternalLink />}>
+        <Button asChild type="default" iconRight={<ExternalLink />}>
+          <a
+            href="https://supabase.com/downloads/docs/Supabase+TIA+250314.pdf"
+            target="_blank"
+            rel="noreferrer noopener"
+            download={true}
+            onClick={() =>
+              sendEvent({
+                action: 'document_view_button_clicked',
+                properties: { documentName: 'TIA' },
+                groups: { organization: organization?.slug ?? 'Unknown' },
+              })
+            }
+          >
             View TIA
-          </Button>
-        </a>
+          </a>
+        </Button>
       </ScaffoldSectionContent>
     </ScaffoldSection>
   )
