@@ -165,7 +165,6 @@ const MonacoEditor = ({
       } else {
         if (ref && profile !== undefined && project !== undefined) {
           const snippet = createSqlSnippetSkeletonV2({
-            id,
             name: untitledSnippetTitle,
             sql: value,
             owner_id: profile?.id,

@@ -22,7 +22,6 @@ import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
-import uuidv4 from 'lib/uuid'
 import {
   SnippetWithContent,
   useSnippetFolders,
@@ -416,7 +415,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     }
 
     const snippetCopy = createSqlSnippetSkeletonV2({
-      id: uuidv4(),
       name: `${snippet.name} (Duplicate)`,
       sql,
       owner_id: profile?.id,
@@ -763,7 +761,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     onSelectCreate={() => {
                       if (profile && project) {
                         const snippet = createSqlSnippetSkeletonV2({
-                          id: uuidv4(),
                           name: untitledSnippetTitle,
                           owner_id: profile?.id,
                           project_id: project?.id,

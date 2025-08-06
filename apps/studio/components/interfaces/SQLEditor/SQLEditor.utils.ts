@@ -1,4 +1,6 @@
-import { removeCommentsFromSql } from 'lib/helpers'
+import { IS_PLATFORM } from 'common'
+import { generateDeterministicUuid } from 'lib/api/snippets.browser'
+import { removeCommentsFromSql, uuidv4 } from 'lib/helpers'
 import type { SnippetWithContent } from 'state/sql-editor-v2'
 import type { SqlSnippets, UserContent } from 'types'
 import {
@@ -39,20 +41,20 @@ export const createSqlSnippetSkeleton = ({
 }
 
 export const createSqlSnippetSkeletonV2 = ({
-  id,
   name,
   sql,
   owner_id,
   project_id,
   folder_id,
 }: {
-  id: string
   name: string
   sql: string
   owner_id: number
   project_id: number
   folder_id?: string
 }): SnippetWithContent => {
+  const id = IS_PLATFORM ? uuidv4() : generateDeterministicUuid([folder_id, name])
+
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,

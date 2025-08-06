@@ -298,16 +298,22 @@ const Reports = () => {
     if (!label || !sql) return console.error('SQL and Label required')
 
     const toastId = toast.loading(`Creating new query: ${label}`)
-    const id = uuidv4()
+
+    const payload = createSqlSnippetSkeletonV2({
+      name: label,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    }) as UpsertContentPayload
 
     const updatedLayout = [...config.layout]
     updatedLayout.push({
-      id,
+      id: payload.id,
       label,
       x: 0,
       y: 0,
       chart_type: 'bar',
-      attribute: `new_snippet_${id}` as Dashboards.ChartType,
+      attribute: `new_snippet_${payload.id}` as Dashboards.ChartType,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
       chartConfig: { ...DEFAULT_CHART_CONFIG, ...(sqlConfig ?? {}) },
@@ -315,14 +321,6 @@ const Reports = () => {
     })
 
     setConfig({ ...config, layout: [...updatedLayout] })
-
-    const payload = createSqlSnippetSkeletonV2({
-      id,
-      name: label,
-      sql,
-      owner_id: profile?.id,
-      project_id: project?.id,
-    }) as UpsertContentPayload
 
     upsertContent(
       { projectRef: ref, payload },

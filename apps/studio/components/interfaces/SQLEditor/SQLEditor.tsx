@@ -348,7 +348,6 @@ export const SQLEditor = () => {
 
       try {
         const snippet = createSqlSnippetSkeletonV2({
-          id: uuidv4(),
           name,
           sql,
           owner_id: profile.id,
