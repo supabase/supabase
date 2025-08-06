@@ -87,11 +87,6 @@ export const appState = proxy({
     appState.ongoingQueriesPanelOpen = value
   },
 
-  showEditorPanel: false,
-  setShowEditorPanel: (value: boolean) => {
-    appState.showEditorPanel = value
-  },
-
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value

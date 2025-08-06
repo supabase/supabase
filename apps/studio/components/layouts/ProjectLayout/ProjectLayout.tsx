@@ -12,6 +12,7 @@ import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustio
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -31,7 +32,6 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -91,9 +91,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
 
-    const { showEditorPanel, mobileMenuOpen, showSidebar, setMobileMenuOpen, setShowEditorPanel } =
-      useAppStateSnapshot()
+    const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
+
+    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap])
 
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
@@ -117,27 +118,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     useEffect(() => {
       setIsClient(true)
     }, [])
-
-    useEffect(() => {
-      const handler = (e: KeyboardEvent) => {
-        // Cmd+I: Open AI Assistant, close Editor Panel
-        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
-          setShowEditorPanel(false)
-          aiSnap.toggleAssistant()
-          e.preventDefault()
-          e.stopPropagation()
-        }
-        // Cmd+E: Toggle Editor Panel, always close AI Assistant
-        if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
-          setShowEditorPanel(!showEditorPanel)
-          e.preventDefault()
-          e.stopPropagation()
-        }
-      }
-      window.addEventListener('keydown', handler)
-      return () => window.removeEventListener('keydown', handler)
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setShowEditorPanel, aiSnap, showEditorPanel])
 
     return (
       <>
@@ -253,7 +233,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
         <CreateBranchModal />
         <ProjectAPIDocs />
         <MobileSheetNav
