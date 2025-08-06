@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
 import { FilterDropdown } from './FilterDropdown'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 
 // Create a separate Supabase client for your external project
 const externalSupabase = createClient(
@@ -234,7 +234,7 @@ export function GenericChartWithQuery({
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Fixed height for all states (loading, error, loaded collapsed)
-  const FIXED_HEIGHT = 320 // px (includes space for potential expand button)
+  const FIXED_HEIGHT = 320 // px
 
   return (
     <Card className="w-full overflow-hidden">
@@ -242,7 +242,12 @@ export function GenericChartWithQuery({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div style={{ height: `${FIXED_HEIGHT}px`, overflow: 'hidden' }}>
+        <div
+          className="overflow-hidden"
+          style={{
+            height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
+          }}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-foreground-lighter">Loading data...</div>
@@ -256,7 +261,7 @@ export function GenericChartWithQuery({
               {/* Each bar as a vertical stack: label above, bar below */}
               <div
                 className="flex flex-col gap-10"
-                style={{ height: isExpanded ? 'auto' : '280px', overflow: 'hidden' }}
+                style={{ height: isExpanded ? 'auto' : '280px' }}
               >
                 {chartData.map((item, index) => (
                   <div key={index} className="flex flex-col">
@@ -301,26 +306,17 @@ export function GenericChartWithQuery({
           )}
         </div>
 
-        {/* Expand/Collapse button - always rendered to maintain consistent height */}
+        {/* Button container - always rendered to maintain height */}
         <div className="flex justify-center mt-4" style={{ height: '40px' }}>
-          {!isLoading && !error && chartData.length > 3 ? (
+          {!isLoading && !error && chartData.length > 3 && !isExpanded ? (
             <Button
               type="text"
               size="small"
-              onClick={() => setIsExpanded(!isExpanded)}
+              icon={<ChevronDown className="w-4 h-4" />}
+              onClick={() => setIsExpanded(true)}
               className="text-foreground-lighter hover:text-foreground"
             >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="w-4 h-4 mr-1" />
-                  Show less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="w-4 h-4 mr-1" />
-                  Show {chartData.length - 3} more
-                </>
-              )}
+              Show {chartData.length - 3} more
             </Button>
           ) : (
             <div style={{ height: '32px' }}></div> // Invisible spacer to maintain height
