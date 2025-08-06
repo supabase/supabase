@@ -93,7 +93,7 @@ Save the link under **App Federation Metadata URL** in \*section 3 **SAML Certif
 
 2. Toggle **Enable Single Sign-On** to begin configuration. Once enabled, the configuration form appears. ![SSO enabled](/docs/img/sso-dashboard-enabled.png)
 
-## Step 9: Configure Domains [#dashboard-configure-domain]
+## Step 9: Configure domains [#dashboard-configure-domain]
 
 Enter one or more domains associated with your users email addresses (e.g., `supabase.com`).
 These domains determine which users are eligible to sign in via SSO.
@@ -105,22 +105,24 @@ If your organization uses more than one email domain - for example, `supabase.co
 ![Domain configuration with multiple domains](/docs/img/sso-dashboard-configure-domain-multi.png)
 
 <Admonition type="note">
+
 We do not permit use of public domains like `gmail.com`, `yahoo.com`.
+
 </Admonition>
 
-## Step 10: Configure Metadata [#dashboard-configure-metadata]
+## Step 10: Configure metadata [#dashboard-configure-metadata]
 
 Enter the metadata URL you obtained from [Step 7](#idp-metadata-url) into the Metadata URL field:
 
 ![Metadata configuration with Azure AD](/docs/img/sso-dashboard-configure-metadata-azure.png)
 
-## Step 11: Configure Attribute Mapping [#dashboard-configure-attributes]
+## Step 11: Configure attribute Mapping [#dashboard-configure-attributes]
 
 Fill out the Attribute Mapping section using the **Azure** preset.
 
 ![Attribute mapping configuration](/docs/img/sso-dashboard-configure-attributes-azure.png)
 
-## Step 12: Join Organization on Signup (Optional) [#dashboard-configure-autojoin]
+## Step 12: Join organization on signup (optional) [#dashboard-configure-autojoin]
 
 By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
 
@@ -137,10 +139,12 @@ When auto-join is enabled, you can choose the **default role** for new users:
 Choose a role that fits the level of access you want to grant to new members.
 
 <Admonition type="note">
-Please visit [access-control](/docs/guides/platform/access-control) documentation for details about each role.
+
+Visit [access-control](/docs/guides/platform/access-control) documentation for details about each role.
+
 </Admonition>
 
-## Step 13: Save Changes and Test single sign-on [#dashboard-configure-save]
+## Step 13: Save changes and test single sign-on [#dashboard-configure-save]
 
 When you click **Save changes**, your new SSO configuration is applied immediately. From that moment, any user with an email address matching one of your configured domains who visits your organization's sign-in URL will be routed through the SSO flow.
 

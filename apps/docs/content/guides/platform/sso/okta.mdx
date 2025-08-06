@@ -77,7 +77,7 @@ The link usually has this structure: `https://<okta-org>.okta.com/apps/<app-id>/
 
 2. Toggle **Enable Single Sign-On** to begin configuration. Once enabled, the configuration form appears. ![SSO enabled](/docs/img/sso-dashboard-enabled.png)
 
-## Step 8: Configure Domains [#dashboard-configure-domain]
+## Step 8: Configure domains [#dashboard-configure-domain]
 
 Enter one or more domains associated with your users email addresses (e.g., `supabase.com`).
 These domains determine which users are eligible to sign in via SSO.
@@ -89,26 +89,30 @@ If your organization uses more than one email domain - for example, `supabase.co
 ![Domain configuration with multiple domains](/docs/img/sso-dashboard-configure-domain-multi.png)
 
 <Admonition type="note">
+
 We do not permit use of public domains like `gmail.com`, `yahoo.com`.
+
 </Admonition>
 
-## Step 9: Configure Metadata [#dashboard-configure-metadata]
+## Step 9: Configure metadata [#dashboard-configure-metadata]
 
 Enter the metadata URL you obtained from [Step 6](#idp-metadata-url) into the Metadata URL field:
 
 ![Metadata configuration with Okta](/docs/img/sso-dashboard-configure-metadata-okta.png)
 
-## Step 10: Configure Attribute Mapping [#dashboard-configure-attributes]
+## Step 10: Configure attribute mapping [#dashboard-configure-attributes]
 
 Enter the SAML attributes you filled out in [Step 5](#add-attribute-statements) into the Attribute Mapping section.
 
 ![Attribute mapping configuration](/docs/img/sso-dashboard-configure-attributes.png)
 
 <Admonition type="note">
+
 If you did not customize your settings you may save some time by clicking the **Okta** preset.
+
 </Admonition>
 
-## Step 11: Join Organization on Signup (Optional) [#dashboard-configure-autojoin]
+## Step 11: Join organization on signup (optional) [#dashboard-configure-autojoin]
 
 By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
 
@@ -125,11 +129,13 @@ When auto-join is enabled, you can choose the **default role** for new users:
 Choose a role that fits the level of access you want to grant to new members.
 
 <Admonition type="note">
-Please visit [access-control](/docs/guides/platform/access-control) documentation for details about each role.
+
+Visit [access-control](/docs/guides/platform/access-control) documentation for details about each role.
+
 </Admonition>
 
 
-## Step 12: Save Changes and Test single sign-on [#dashboard-configure-save]
+## Step 12: Save changes and test single sign-on [#dashboard-configure-save]
 
 When you click **Save changes**, your new SSO configuration is applied immediately. From that moment, any user with an email address matching one of your configured domains who visits your organization's sign-in URL will be routed through the SSO flow.
 
