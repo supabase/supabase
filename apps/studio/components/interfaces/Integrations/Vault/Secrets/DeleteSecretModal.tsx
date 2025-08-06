@@ -1,20 +1,30 @@
+import { useState } from 'react'
 import { toast } from 'sonner'
-
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
 import type { VaultSecret } from 'types'
-import { Modal } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+} from 'ui'
 
 interface DeleteSecretModalProps {
-  selectedSecret: VaultSecret | undefined
+  visible: boolean
+  secret: VaultSecret
   onClose: () => void
 }
 
-const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
+const DeleteSecretModal = ({ visible, secret, onClose }: DeleteSecretModalProps) => {
   const { project } = useProjectContext()
-  const { mutate: deleteSecret, isLoading: isDeleting } = useVaultSecretDeleteMutation({
+  const { mutate: deleteSecret, isLoading } = useVaultSecretDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
+      toast.success(`Successfully deleted secret ${secret.name}`)
       onClose()
     },
     onError: (error) => {
@@ -22,39 +32,44 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
     },
   })
 
-  const onConfirmDeleteSecret = async () => {
+  const onConfirmDeleteSecret = () => {
     if (!project) return console.error('Project is required')
-    if (!selectedSecret) return
 
     deleteSecret({
       projectRef: project.ref,
-      connectionString: project?.connectionString,
-      id: selectedSecret.id,
+      connectionString: project.connectionString,
+      id: secret.id,
     })
   }
 
   return (
-    <Modal
-      size="small"
-      alignFooter="right"
-      visible={selectedSecret !== undefined}
-      onCancel={onClose}
-      onConfirm={onConfirmDeleteSecret}
-      loading={isDeleting}
-      header="Confirm to delete secret"
-    >
-      <Modal.Content className="space-y-4">
-        <p className="text-sm">
-          The following secret will be permanently removed and cannot be recovered. Are you sure?
-        </p>
-        <div className="space-y-1">
-          <p className="text-sm">{selectedSecret?.description}</p>
-          <p className="text-sm text-foreground-light">
-            ID: <span className="font-mono">{selectedSecret?.id}</span>
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirm to delete secret</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="space-y-4">
+          <p className="text-sm">
+            The following secret will be permanently removed and cannot be recovered. Are you sure?
           </p>
-        </div>
-      </Modal.Content>
-    </Modal>
+          <div className="space-y-1">
+            <p className="text-sm">{secret.description}</p>
+            <p className="text-sm text-foreground-light">
+              ID: <span className="font-mono">{secret.id}</span>
+            </p>
+          </div>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" disabled={isLoading} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button htmlType="submit" loading={isLoading} onClick={onConfirmDeleteSecret}>
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
