@@ -6,6 +6,7 @@ import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
+import { ChevronDown, X } from 'lucide-react'
 
 import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
 import { Input } from 'ui/src/components/shadcn/ui/input'
@@ -69,23 +70,154 @@ const isValidEmail = (email: string): boolean => {
 
 function StateOfStartupsPage() {
   const pageData = data()
+  const [showFloatingToc, setShowFloatingToc] = useState(false)
+  const [isTocOpen, setIsTocOpen] = useState(false)
+  const [activeChapter, setActiveChapter] = useState(1)
+  const tocRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
+
+  // Scroll detection to show floating ToC
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const heroElement = heroRef.current
+
+      if (heroElement) {
+        const heroHeight = heroElement.offsetHeight
+        const heroTop = heroElement.offsetTop
+
+        if (scrollY > heroTop + heroHeight) {
+          setShowFloatingToc(true)
+        } else {
+          setShowFloatingToc(false)
+          setIsTocOpen(false)
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Active chapter detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const chapters = pageData.pageChapters
+      const scrollY = window.scrollY + 100 // Offset for better detection
+
+      for (let i = chapters.length - 1; i >= 0; i--) {
+        const chapterElement = document.getElementById(`chapter-${i + 1}`)
+        if (chapterElement && scrollY >= chapterElement.offsetTop) {
+          setActiveChapter(i + 1)
+          break
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [pageData.pageChapters])
+
+  // Close ToC when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (tocRef.current && !tocRef.current.contains(event.target as Node)) {
+        setIsTocOpen(false)
+      }
+    }
+
+    if (isTocOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isTocOpen])
+
+  const FloatingTableOfContents = () => {
+    if (!showFloatingToc) return null
+
+    const currentChapter = pageData.pageChapters[activeChapter - 1]
+
+    return (
+      <div
+        ref={tocRef}
+        className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300"
+      >
+        <div className="relative">
+          {/* Closed state - shows current chapter */}
+          {!isTocOpen && (
+            <button
+              onClick={() => setIsTocOpen(true)}
+              className="flex items-center gap-2 bg-surface-100 border border-default rounded-md px-4 py-2 text-sm text-foreground hover:bg-surface-200 transition-colors"
+            >
+              <span className="text-muted font-mono uppercase text-xs">
+                {activeChapter} / {pageData.pageChapters.length}
+              </span>
+              <span className="max-w-[200px] truncate">{currentChapter?.title}</span>
+              <ChevronDown className="w-4 h-4 text-muted" />
+            </button>
+          )}
+
+          {/* Open state - shows full table of contents */}
+          {isTocOpen && (
+            <div className="bg-surface-100 border border-default rounded-md shadow-lg min-w-[300px] max-w-[400px]">
+              <div className="flex items-center justify-between p-4 border-b border-default">
+                <button
+                  onClick={() => setIsTocOpen(false)}
+                  className="text-muted hover:text-foreground transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <ol className="max-h-[60vh] overflow-y-auto">
+                {pageData.pageChapters.map((chapter, chapterIndex) => (
+                  <li key={chapterIndex + 1}>
+                    <Link
+                      href={`#chapter-${chapterIndex + 1}`}
+                      onClick={() => setIsTocOpen(false)}
+                      className={cn(
+                        'block py-3 px-4 text-sm transition-colors',
+                        chapterIndex + 1 === activeChapter
+                          ? 'bg-brand/10 text-brand border-r-2 border-brand'
+                          : 'text-foreground hover:bg-surface-200'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-muted font-mono uppercase text-xs min-w-[2rem]">
+                          {chapterIndex + 1} / {pageData.pageChapters.length}
+                        </span>
+                        <span className="text-balance leading-relaxed">{chapter.title}</span>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
       {/* <NextSeo {...pageData.seo} /> */}
       <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
-        <Hero {...pageData.heroSection} />
+        <FloatingTableOfContents />
+        <div ref={heroRef}>
+          <Hero {...pageData.heroSection} />
+        </div>
         <SectionContainer>
-          <ol className="flex flex-col divide-y divide-dashed bg-surface-100 border border-default rounded-md px-6 py-2 mb-12">
+          {/* table of contents */}
+          <ol className="flex flex-col divide-y divide-dashed bg-surface-100 border border-default rounded-md px-6 py-2 mb-12 max-w-md mx-auto">
             {pageData.pageChapters.map((chapter, chapterIndex) => (
               <li key={chapterIndex + 1}>
                 <Link
                   href={`#chapter-${chapterIndex + 1}`}
-                  className="py-4 text-foreground text-xl text-balance leading-relaxed text-sm flex flex-row gap-6"
+                  className="block flex-1 py-4 text-foreground-light font-mono uppercase text-center flex flex-row gap-6"
                 >
-                  <span className="text-muted font-mono uppercase ">
-                    {`${chapterIndex + 1}`} / {pageData.pageChapters.length}
-                  </span>{' '}
                   {chapter.title}
                 </Link>
               </li>
