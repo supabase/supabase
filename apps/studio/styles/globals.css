@@ -50,7 +50,7 @@
 
 @layer utilities {
   .btn-primary {
-    @apply inline-block rounded-sm border border-green-500 bg-green-500 py-1 px-3 text-sm;
+    @apply inline-block border border-green-500 bg-green-500 py-1 px-3 text-sm;
     color: #fff !important;
     font-weight: 600;
     line-height: 20px;
@@ -178,7 +178,7 @@ input::placeholder {
 }
 
 .billing-input-fixed {
-  @apply w-full appearance-none rounded-sm border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow;
+  @apply w-full appearance-none border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow;
 }
 
 a {
