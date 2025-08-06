@@ -10,7 +10,7 @@ In Postgres, an [event trigger](https://www.postgresql.org/docs/current/event-tr
 With our `Supautils` extension (installed automatically for all Supabase projects), the `postgres` user has the ability to create and manage event triggers.
 
 Some use cases for event triggers ares:
-- Capturing Data Definition Language (DDL) changes - these are changes to your database schema (though the [pgaudit](/docs/guides/database/extensions/pgaudit) extension provides a more complete solution)
+- Capturing Data Definition Language (DDL) changes - these are changes to your database schema (though the [pgAudit](/docs/guides/database/extensions/pgaudit) extension provides a more complete solution)
 - Monitoring/preventing actions - such as preventing tables from being dropped in Production or enforcing RLS on all new tables
 
 In this guide, we will go through an example event trigger that prevents accidental dropping of a table
