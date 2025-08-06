@@ -48,7 +48,7 @@ export const ErroredTableDetails = ({
     switch (state.retry_policy.policy) {
       case 'no_retry':
         return (
-          <div className="text-xs text-foreground-lighter">
+          <p className="text-xs text-foreground-lighter">
             <span className="font-medium">Support required:</span> This error requires manual
             intervention from our{' '}
             <InlineLink
@@ -58,16 +58,16 @@ export const ErroredTableDetails = ({
               support
             </InlineLink>
             . Alternatively, you may also recreate the pipeline.
-          </div>
+          </p>
         )
 
       case 'manual_retry':
         return (
           <div className="space-y-3">
-            <div className="text-xs text-brand-600">
+            <p className="text-xs">
               <span className="font-medium">Manual intervention available:</span> Fix the problem
               and then rollback.
-            </div>
+            </p>
 
             <div className="flex items-center space-x-2">
               <RetryOptionsDropdown
@@ -84,10 +84,10 @@ export const ErroredTableDetails = ({
       case 'timed_retry':
         return (
           <div className="space-y-3">
-            <div className="text-xs text-brand-600">
+            <p className="text-xs">
               <span className="font-medium">Automatic retry scheduled:</span> The system will
               automatically retry this table.
-            </div>
+            </p>
 
             <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
           </div>
