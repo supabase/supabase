@@ -36,7 +36,7 @@ import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -148,7 +148,7 @@ export const QueryBlock = ({
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
   const { setEditorPanel } = useAppStateSnapshot()
   const snap = useAiAssistantStateSnapshot()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const isInSQLEditor = router.pathname.includes('/sql')
@@ -192,9 +192,6 @@ export const QueryBlock = ({
   const { mutate: createTest, isLoading: isCreatingTest } = useDatabaseTestCreateMutation({
     onSuccess: () => {
       toast.success('Test created successfully')
-    },
-    onError: (error) => {
-      toast.error(`Failed to create test: ${error.message}`)
     },
   })
 
