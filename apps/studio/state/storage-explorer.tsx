@@ -42,7 +42,7 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
@@ -1743,7 +1743,7 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 )
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))

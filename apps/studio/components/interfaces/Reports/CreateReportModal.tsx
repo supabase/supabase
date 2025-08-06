@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Button, Form, Input, Modal } from 'ui'
@@ -18,7 +18,7 @@ export interface CreateReportModal {
 export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
   const router = useRouter()
   const { profile } = useProfile()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref ?? 'default'
 
   // Preserve date range query parameters when navigating to new report

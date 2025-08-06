@@ -7,12 +7,12 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
@@ -69,7 +69,7 @@ const FormSchema = z.object({
 })
 
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   // For now, there's no AI assistant for functions
@@ -601,7 +601,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
 const ALL_ALLOWED_LANGUAGES = ['plpgsql', 'sql', 'plcoffee', 'plv8', 'plls']
 
 const FormFieldLanguage = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: enabledExtensions } = useDatabaseExtensionsQuery(
     {
