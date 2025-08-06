@@ -5,8 +5,8 @@ import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 // Default behaviour here is to be throttled (e.g if this env var is not available, IS_THROTTLED should be true, unless specified 'false')
 const IS_THROTTLED = true //process.env.IS_THROTTLED !== 'false'
 
-const BEDROCK_PRO_MODEL = 'openai.gpt-oss-120b-1:0'
-const BEDROCK_NORMAL_MODEL = 'openai.gpt-oss-20b-1:0'
+const BEDROCK_PRO_MODEL = 'anthropic.claude-sonnet-4-20250514-v1:0'
+const BEDROCK_NORMAL_MODEL = 'openai.gpt-oss-120b-1:0'
 const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {
