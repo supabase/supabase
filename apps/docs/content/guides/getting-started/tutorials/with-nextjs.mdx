@@ -585,7 +585,6 @@ export default function AccountForm({ user }) {
   const [fullname, setFullname] = useState(null)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
-  const [avatar_url, setAvatarUrl] = useState(null)
 
   const getProfile = useCallback(async () => {
     try {
@@ -605,7 +604,6 @@ export default function AccountForm({ user }) {
         setFullname(data.full_name)
         setUsername(data.username)
         setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
       alert('Error loading user data!')
@@ -627,7 +625,6 @@ export default function AccountForm({ user }) {
         full_name: fullname,
         username,
         website,
-        avatar_url,
         updated_at: new Date().toISOString(),
       })
       if (error) throw error
@@ -676,7 +673,7 @@ export default function AccountForm({ user }) {
       <div>
         <button
           className="button primary block"
-          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
+          onClick={() => updateProfile({ fullname, username, website})}
           disabled={loading}
         >
           {loading ? 'Loading ...' : 'Update'}
@@ -705,7 +702,7 @@ export default function AccountForm({ user }) {
 
 <$CodeSample
 path="/user-management/nextjs-user-management/app/account/account-form.tsx"
-lines={[[1, 4], [7, 78], [88, -1]]}
+lines={[[1, 4], [7, 13], [16,34], [36,50], [52,55], [57,65], [67,79],[89, -1]]}
 meta="name=app/account/account-form.tsx"
 />
 
