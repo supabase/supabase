@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
@@ -15,9 +14,9 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
 
@@ -29,7 +28,7 @@ interface SecretRowProps {
 
 const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [revealSecret, setRevealSecret] = useState(false)
   const name = secret?.name ?? 'No name provided'
