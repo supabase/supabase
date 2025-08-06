@@ -8,13 +8,13 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 

@@ -25,6 +25,7 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -46,7 +47,6 @@ import {
   TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 export interface EntityListItemProps {
   id: number | string
@@ -69,7 +69,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   isActive: _isActive,
   onExportCLI,
 }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 

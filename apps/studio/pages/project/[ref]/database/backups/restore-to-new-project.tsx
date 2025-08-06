@@ -13,7 +13,6 @@ import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement
 import { Markdown } from 'components/interfaces/Markdown'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -25,8 +24,12 @@ import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8sCloudProvider, useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
@@ -58,8 +61,8 @@ RestoreToNewProjectPage.getLayout = (page) => (
 )
 
 const RestoreToNewProject = () => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan?.id === 'free'
   const isOrioleDb = useIsOrioleDb()
   const isAwsK8s = useIsAwsK8sCloudProvider()

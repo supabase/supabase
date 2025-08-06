@@ -3,11 +3,11 @@ import { useState } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -39,7 +39,7 @@ interface QueryIndexesProps {
 export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [showStartupCosts, setShowStartupCosts] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
 
