@@ -1,13 +1,13 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
 import { toPng, toSvg } from 'html-to-image'
-import { Check, Download, Loader2, Clipboard, Info } from 'lucide-react'
+import { Check, Clipboard, Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
+import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -16,18 +16,24 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { toast } from 'sonner'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { tablesToSQL } from 'lib/helpers'
+import {
+  copyToClipboard,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
-import { copyToClipboard } from 'ui'
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [copied, setCopied] = useState(false)
@@ -167,59 +173,6 @@ export const SchemaGraph = () => {
     }
   }
 
-  function tablesToSQL(t: typeof tables) {
-    if (!Array.isArray(t)) return ''
-    const warning =
-      '-- WARNING: This schema is for context only and is not meant to be run.\n-- Table order and constraints may not be valid for execution.\n\n'
-    const sql = t
-      .map((table) => {
-        if (!table || !Array.isArray((table as any).columns)) return ''
-
-        const columns = (table as { columns?: any[] }).columns ?? []
-        const columnLines = columns.map((c) => {
-          let line = `  ${c.name} ${c.data_type}`
-          if (c.is_identity) {
-            line += ' GENERATED ALWAYS AS IDENTITY'
-          }
-          if (c.is_nullable === false) {
-            line += ' NOT NULL'
-          }
-          if (c.default_value !== null && c.default_value !== undefined) {
-            line += ` DEFAULT ${c.default_value}`
-          }
-          if (c.is_unique) {
-            line += ' UNIQUE'
-          }
-          if (c.check) {
-            line += ` CHECK (${c.check})`
-          }
-          return line
-        })
-
-        const constraints: string[] = []
-
-        if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
-          const pkCols = table.primary_keys.map((pk) => pk.name).join(', ')
-          constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
-        }
-
-        if (Array.isArray(table.relationships)) {
-          table.relationships.forEach((rel) => {
-            if (rel && rel.source_table_name === table.name) {
-              constraints.push(
-                `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
-              )
-            }
-          })
-        }
-
-        const allLines = [...columnLines, ...constraints]
-        return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
-      })
-      .join('\n')
-    return warning + sql
-  }
-
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
@@ -278,17 +231,10 @@ export const SchemaGraph = () => {
               >
                 Copy as SQL
               </ButtonTooltip>
-              <ButtonTooltip
-                type="default"
-                loading={isDownloading}
-                className="px-1.5"
-                icon={<Download />}
-                onClick={() => downloadImage('png')}
-                tooltip={{ content: { side: 'bottom', text: 'Download current view as PNG' } }}
-              />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <ButtonTooltip
+                    aria-label="Download Schema"
                     type="default"
                     loading={isDownloading}
                     className="px-1.5"

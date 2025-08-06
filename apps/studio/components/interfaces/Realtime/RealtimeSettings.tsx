@@ -1,16 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
 import {
@@ -18,7 +19,8 @@ import {
   useRealtimeConfigurationQuery,
 } from 'data/realtime/realtime-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
@@ -29,15 +31,17 @@ import {
   FormField_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
+  Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const formId = 'realtime-configuration-form'
 
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const canUpdateConfig = useCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
 
   const { data: maxConn } = useMaxConnectionsQuery({
@@ -48,7 +52,20 @@ export const RealtimeSettings = () => {
     projectRef,
   })
 
+  const { data: policies } = useDatabasePoliciesQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    schema: 'realtime',
+  })
+
   const isUsageBillingEnabled = organization?.usage_billing_enabled
+
+  // Check if RLS policies exist for realtime.messages table
+  const realtimeMessagesPolicies = policies?.filter(
+    (policy) => policy.schema === 'realtime' && policy.table === 'messages'
+  )
+  const hasRealtimeMessagesPolicies =
+    realtimeMessagesPolicies && realtimeMessagesPolicies.length > 0
 
   const { mutate: updateRealtimeConfig, isLoading: isUpdatingConfig } =
     useRealtimeConfigurationUpdateMutation({
@@ -70,25 +87,25 @@ export const RealtimeSettings = () => {
     // max_channels_per_client: z.coerce.number().min(1).max(10000),
     // max_joins_per_second: z.coerce.number().min(1).max(5000),
 
-    // [Filipe] This field is temporarily hidden from the UI
-    // allow_public: z.boolean(),
+    allow_public: z.boolean(),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       ...REALTIME_DEFAULT_CONFIG,
-      // [Filipe] This field is temporarily hidden from the UI
-      // allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
+      allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
     },
   })
+
+  const { allow_public } = form.watch()
+  const isSettingToPrivate = !data?.private_only && !allow_public
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
     if (!projectRef) return console.error('Project ref is required')
     updateRealtimeConfig({
       ref: projectRef,
-      // [Filipe] This field is temporarily hidden from the UI
-      // private_only: !data.allow_public,
+      private_only: !data.allow_public,
       connection_pool: data.connection_pool,
       max_concurrent_users: data.max_concurrent_users,
     })
@@ -97,10 +114,9 @@ export const RealtimeSettings = () => {
   useEffect(() => {
     // [Joshen] Temp typed with any - API typing marks all the properties as nullable,
     // but checked with Filipe that they're not supposed to
-    // [Filipe] This field is temporarily hidden from the UI
-    // if (data) form.reset({ ...data, allow_public: !data.private_only } as any)
-
-    if (data) form.reset({ ...data } as any)
+    if (isSuccess) {
+      form.reset({ ...data, allow_public: !data.private_only } as any)
+    }
   }, [isSuccess])
 
   return (
@@ -111,10 +127,7 @@ export const RealtimeSettings = () => {
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
             <Card>
-              {/*
-                [Filipe] We're hidding this field until we implement a 'kill all sockets` on change to be triggered in realtime server
-              */}
-              {/* <CardContent>
+              <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
                   name="allow_public"
@@ -137,11 +150,35 @@ export const RealtimeSettings = () => {
                             />
                           </FormControl_Shadcn_>
                         </FormItemLayout>
+
+                        {!hasRealtimeMessagesPolicies && !allow_public && (
+                          <Admonition
+                            showIcon={false}
+                            type="warning"
+                            title="No Realtime RLS policies found"
+                            description={
+                              <>
+                                <p className="prose max-w-full text-sm">
+                                  Private mode is {isSettingToPrivate ? 'being ' : ''}
+                                  enabled, but no RLS policies exists on the{' '}
+                                  <code className="text-xs">realtime.messages</code> table. No
+                                  messages will be received by users.
+                                </p>
+
+                                <Button asChild type="default" className="mt-2">
+                                  <Link href={`/project/${projectRef}/realtime/policies`}>
+                                    Create policy
+                                  </Link>
+                                </Button>
+                              </>
+                            }
+                          />
+                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
                 />
-              </CardContent> */}
+              </CardContent>
               <CardContent>
                 <FormField_Shadcn_
                   control={form.control}

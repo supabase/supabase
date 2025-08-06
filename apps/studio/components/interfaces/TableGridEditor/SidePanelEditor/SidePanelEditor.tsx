@@ -5,8 +5,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -21,7 +19,9 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
+import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -50,7 +50,6 @@ import {
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
 import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
-import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -71,11 +70,10 @@ const SidePanelEditor = ({
   const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -493,7 +491,7 @@ const SidePanelEditor = ({
             `Table ${table.name} has been updated but there were some errors. Please check these errors separately.`
           )
         } else {
-          if (isTableEditorTabsEnabled && ref && payload.name) {
+          if (ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
             tabsSnap.updateTab(tabId, { label: payload.name })
@@ -630,7 +628,11 @@ const SidePanelEditor = ({
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
-      <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
+      <SchemaEditor
+        visible={snap.sidePanel?.type === 'schema'}
+        onSuccess={onClosePanel}
+        closePanel={onClosePanel}
+      />
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}

@@ -2,7 +2,7 @@ import { Check, ChevronsUpDown, X } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Button,
   cn,
@@ -90,8 +90,14 @@ export const BillingCustomerDataForm = ({
     form.setValue('tax_id_value', '', { shouldDirty: true })
   }
 
-  const { tax_id_name } = form.watch()
+  const { tax_id_name, country } = form.watch()
   const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
+
+  const availableTaxIds = useMemo(() => {
+    return TAX_IDS.filter((taxId) => !country || taxId.countryIso2 === country).sort((a, b) =>
+      a.country.localeCompare(b.country)
+    )
+  }, [country])
 
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
@@ -99,9 +105,9 @@ export const BillingCustomerDataForm = ({
         control={form.control}
         name="billing_name"
         render={({ field }: { field: any }) => (
-          <FormItemLayout hideMessage>
+          <FormItemLayout hideMessage label="Name">
             <FormControl>
-              <Input {...field} placeholder="Name" disabled={disabled} />
+              <Input {...field} disabled={disabled} />
             </FormControl>
             <FormMessage />
           </FormItemLayout>
@@ -112,9 +118,9 @@ export const BillingCustomerDataForm = ({
         control={form.control}
         name="line1"
         render={({ field }: { field: any }) => (
-          <FormItemLayout hideMessage>
+          <FormItemLayout hideMessage label="Address line 1">
             <FormControl>
-              <Input {...field} placeholder="Address line 1" disabled={disabled} />
+              <Input {...field} placeholder="123 Main Street" disabled={disabled} />
             </FormControl>
             <FormMessage />
           </FormItemLayout>
@@ -125,9 +131,13 @@ export const BillingCustomerDataForm = ({
         control={form.control}
         name="line2"
         render={({ field }: { field: any }) => (
-          <FormItemLayout hideMessage>
+          <FormItemLayout hideMessage label="Address line 2 (optional)">
             <FormControl>
-              <Input {...field} placeholder="Address line 2 (Optional)" disabled={disabled} />
+              <Input
+                {...field}
+                placeholder="Apartment, suite, unit, building, floor, etc."
+                disabled={disabled}
+              />
             </FormControl>
             <FormMessage />
           </FormItemLayout>
@@ -139,7 +149,7 @@ export const BillingCustomerDataForm = ({
           control={form.control}
           name="country"
           render={({ field }: { field: any }) => (
-            <FormItemLayout hideMessage>
+            <FormItemLayout hideMessage label="Country">
               <Popover open={showCountriesPopover} onOpenChange={setShowCountriesPopover}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -207,9 +217,9 @@ export const BillingCustomerDataForm = ({
           control={form.control}
           name="postal_code"
           render={({ field }: { field: any }) => (
-            <FormItemLayout hideMessage>
+            <FormItemLayout hideMessage label="Postal code">
               <FormControl>
-                <Input {...field} placeholder="Postal code" disabled={disabled} />
+                <Input {...field} placeholder="12345" disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItemLayout>
@@ -222,9 +232,9 @@ export const BillingCustomerDataForm = ({
           control={form.control}
           name="city"
           render={({ field }: { field: any }) => (
-            <FormItemLayout hideMessage>
+            <FormItemLayout hideMessage label="City">
               <FormControl>
-                <Input {...field} placeholder="City" disabled={disabled} />
+                <Input {...field} disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItemLayout>
@@ -234,9 +244,9 @@ export const BillingCustomerDataForm = ({
           control={form.control}
           name="state"
           render={({ field }: { field: any }) => (
-            <FormItemLayout hideMessage>
+            <FormItemLayout hideMessage label="State / Province">
               <FormControl>
-                <Input {...field} placeholder="State / Province" disabled={disabled} />
+                <Input {...field} disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItemLayout>
@@ -281,26 +291,24 @@ export const BillingCustomerDataForm = ({
                     <CommandList>
                       <CommandEmpty>No tax ID found.</CommandEmpty>
                       <CommandGroup>
-                        {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
-                          (option) => (
-                            <CommandItem
-                              key={option.name}
-                              value={`${option.country} - ${option.name}`}
-                              onSelect={() => {
-                                onSelectTaxIdType(option.name)
-                                setShowTaxIDsPopover(false)
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  selectedTaxId?.name === option.name ? 'opacity-100' : 'opacity-0'
-                                )}
-                              />
-                              {option.country} - {option.name}
-                            </CommandItem>
-                          )
-                        )}
+                        {availableTaxIds.map((option) => (
+                          <CommandItem
+                            key={option.name}
+                            value={`${option.country} - ${option.name}`}
+                            onSelect={() => {
+                              onSelectTaxIdType(option.name)
+                              setShowTaxIDsPopover(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                selectedTaxId?.name === option.name ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {option.country} - {option.name}
+                          </CommandItem>
+                        ))}
                       </CommandGroup>
                     </CommandList>
                   </Command>

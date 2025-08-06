@@ -14,10 +14,10 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -99,12 +99,11 @@ type FormValues = z.infer<typeof FormSchema>
 const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
-  const project = useSelectedProject()
-  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
-  const includeSchemaMetadata = (isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -169,10 +168,22 @@ const NewFunctionPage = () => {
         title:
           'I can help you understand and improve your edge function. Here are a few example prompts to get you started:',
         prompts: [
-          'Explain what this function does...',
-          'Help me optimize this function...',
-          'Show me how to add more features...',
-          'Help me handle errors better...',
+          {
+            label: 'Explain Function',
+            description: 'Explain what this function does...',
+          },
+          {
+            label: 'Optimize Function',
+            description: 'Help me optimize this function...',
+          },
+          {
+            label: 'Add Features',
+            description: 'Show me how to add more features...',
+          },
+          {
+            label: 'Error Handling',
+            description: 'Help me handle errors better...',
+          },
         ],
       },
     })
@@ -324,7 +335,7 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,

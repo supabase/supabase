@@ -1,59 +1,67 @@
-import { useMemo } from 'react'
-
 import { useIsLoggedIn, useParams } from 'common'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { PROVIDERS } from 'lib/constants'
 
-export function useSelectedProject({ enabled = true } = {}) {
+export function useSelectedProjectQuery({ enabled = true } = {}) {
   const { ref } = useParams()
-  const { data } = useProjectDetailQuery({ ref }, { enabled })
 
-  return useMemo(
-    () => data && { ...data, parentRef: data?.parent_project_ref ?? data?.ref },
-    [data]
+  return useProjectDetailQuery(
+    { ref },
+    {
+      enabled,
+      select: (data) => {
+        return { ...data, parentRef: data.parent_project_ref ?? data.ref }
+      },
+    }
   )
 }
 
-export function useProjectByRef(
-  ref?: string
-): Omit<ProjectInfo, 'organization_slug' | 'preview_branch_refs'> | undefined {
+export function useProjectByRefQuery(ref?: string) {
   const isLoggedIn = useIsLoggedIn()
 
-  const { data: project } = useProjectDetailQuery({ ref }, { enabled: isLoggedIn })
+  const projectQuery = useProjectDetailQuery({ ref }, { enabled: isLoggedIn })
 
   // [Alaister]: This is here for the purpose of improving performance.
   // Chances are, the user will already have the list of projects in the cache.
   // We can't exclusively rely on this method, as useProjectsQuery does not return branch projects.
-  const { data: projects } = useProjectsQuery({ enabled: isLoggedIn })
+  const projectsQuery = useProjectsQuery({
+    enabled: isLoggedIn,
+    select: (data) => {
+      return data.find((project) => project.ref === ref)
+    },
+  })
 
-  return useMemo(() => {
-    if (!ref) return undefined
-    if (project) return project
-    return projects?.find((project) => project.ref === ref)
-  }, [project, projects, ref])
+  if (projectQuery.isSuccess) {
+    return projectQuery
+  }
+
+  return projectsQuery
+}
+
+export const useIsAwsCloudProvider = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const isAws = project?.cloud_provider === PROVIDERS.AWS.id
+
+  return isAws
+}
+
+export const useIsAwsK8sCloudProvider = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const isAwsK8s = project?.cloud_provider === PROVIDERS.AWS_K8S.id
+
+  return isAwsK8s
 }
 
 export const useIsOrioleDb = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
   return isOrioleDb
 }
 
 export const useIsOrioleDbInAws = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isOrioleDbInAws =
     project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
   return isOrioleDbInAws
-}
-
-export const useIsOrioleDbInAwsRevamped = () => {
-  const project = useSelectedProject()
-
-  const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
-  const isOrioleDbInAws =
-    project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
-  const isOrioleDbInAwsRevamped = isOrioleDb && !isOrioleDbInAws
-
-  return isOrioleDbInAwsRevamped
 }

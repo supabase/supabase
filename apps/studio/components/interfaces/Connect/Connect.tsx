@@ -2,14 +2,15 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
@@ -34,7 +35,7 @@ import ConnectTabContent from './ConnectTabContent'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [showConnect, setShowConnect] = useQueryState(
@@ -137,13 +138,28 @@ export const Connect = () => {
     return []
   }
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
-  const apiUrl = canReadAPIKeys ? apiHost : null
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { anonKey, publishableKey } = canReadAPIKeys
+    ? getKeys(apiKeys)
+    : { anonKey: null, publishableKey: null }
 
-  const { anonKey } = canReadAPIKeys ? getAPIKeys(settings) : { anonKey: null }
-  const projectKeys = { apiUrl, anonKey: anonKey?.api_key ?? null }
+  const projectKeys = useMemo(() => {
+    const protocol = settings?.app_config?.protocol ?? 'https'
+    const endpoint = settings?.app_config?.endpoint ?? ''
+    const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
+
+    return {
+      apiUrl: apiHost ?? null,
+      anonKey: anonKey?.api_key ?? null,
+      publishableKey: publishableKey?.api_key ?? null,
+    }
+  }, [
+    settings?.app_config?.protocol,
+    settings?.app_config?.endpoint,
+    canReadAPIKeys,
+    anonKey?.api_key,
+    publishableKey?.api_key,
+  ])
 
   const filePath = getContentFilePath({
     connectionObject,

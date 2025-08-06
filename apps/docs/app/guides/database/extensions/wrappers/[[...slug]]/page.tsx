@@ -3,8 +3,12 @@ import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
+import Link from 'next/link'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { Guide, GuideArticle, GuideHeader, GuideFooter, GuideMdxContent } from '~/features/ui/guide'
+import { newEditLink } from '~/features/helpers.edit-link'
 import {
   genGuideMeta,
   genGuidesStaticParams,
@@ -18,8 +22,7 @@ import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { octokit } from '~/lib/octokit'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-
-export const dynamicParams = false
+import { IS_PROD } from 'common'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -102,6 +105,7 @@ const pageMap = [
     slug: 'airtable',
     meta: {
       title: 'Airtable',
+      dashboardIntegrationPath: 'airtable_wrapper',
     },
     remoteFile: 'airtable.md',
   },
@@ -109,6 +113,7 @@ const pageMap = [
     slug: 'auth0',
     meta: {
       title: 'Auth0',
+      dashboardIntegrationPath: 'auth0_wrapper',
     },
     remoteFile: 'auth0.md',
   },
@@ -116,6 +121,7 @@ const pageMap = [
     slug: 'bigquery',
     meta: {
       title: 'BigQuery',
+      dashboardIntegrationPath: 'bigquery_wrapper',
     },
     remoteFile: 'bigquery.md',
   },
@@ -123,6 +129,7 @@ const pageMap = [
     slug: 'clerk',
     meta: {
       title: 'Clerk',
+      dashboardIntegrationPath: 'clerk_wrapper',
     },
     remoteFile: 'clerk.md',
   },
@@ -130,6 +137,7 @@ const pageMap = [
     slug: 'clickhouse',
     meta: {
       title: 'ClickHouse',
+      dashboardIntegrationPath: 'clickhouse_wrapper',
     },
     remoteFile: 'clickhouse.md',
   },
@@ -137,20 +145,38 @@ const pageMap = [
     slug: 'cognito',
     meta: {
       title: 'AWS Cognito',
+      dashboardIntegrationPath: 'cognito_wrapper',
     },
     remoteFile: 'cognito.md',
+  },
+  {
+    slug: 'duckdb',
+    meta: {
+      title: 'DuckDB',
+    },
+    remoteFile: 'duckdb.md',
   },
   {
     slug: 'firebase',
     meta: {
       title: 'Firebase',
+      dashboardIntegrationPath: 'firebase_wrapper',
     },
     remoteFile: 'firebase.md',
+  },
+  {
+    slug: 'iceberg',
+    meta: {
+      title: 'Iceberg',
+      dashboardIntegrationPath: 'iceberg_wrapper',
+    },
+    remoteFile: 'iceberg.md',
   },
   {
     slug: 'logflare',
     meta: {
       title: 'Logflare',
+      dashboardIntegrationPath: 'logflare_wrapper',
     },
     remoteFile: 'logflare.md',
   },
@@ -158,6 +184,7 @@ const pageMap = [
     slug: 'mssql',
     meta: {
       title: 'MSSQL',
+      dashboardIntegrationPath: 'mssql_wrapper',
     },
     remoteFile: 'mssql.md',
   },
@@ -165,6 +192,7 @@ const pageMap = [
     slug: 'notion',
     meta: {
       title: 'Notion',
+      dashboardIntegrationPath: 'notion_wrapper',
     },
     remoteFile: 'notion.md',
   },
@@ -172,6 +200,7 @@ const pageMap = [
     slug: 'paddle',
     meta: {
       title: 'Paddle',
+      dashboardIntegrationPath: 'paddle_wrapper',
     },
     remoteFile: 'paddle.md',
   },
@@ -179,6 +208,7 @@ const pageMap = [
     slug: 'redis',
     meta: {
       title: 'Redis',
+      dashboardIntegrationPath: 'redis_wrapper',
     },
     remoteFile: 'redis.md',
   },
@@ -186,6 +216,7 @@ const pageMap = [
     slug: 's3',
     meta: {
       title: 'AWS S3',
+      dashboardIntegrationPath: 's3_wrapper',
     },
     remoteFile: 's3.md',
   },
@@ -193,6 +224,7 @@ const pageMap = [
     slug: 'snowflake',
     meta: {
       title: 'Snowflake',
+      dashboardIntegrationPath: 'snowflake_wrapper',
     },
     remoteFile: 'snowflake.md',
   },
@@ -200,6 +232,7 @@ const pageMap = [
     slug: 'stripe',
     meta: {
       title: 'Stripe',
+      dashboardIntegrationPath: 'stripe_wrapper',
     },
     remoteFile: 'stripe.md',
   },
@@ -211,7 +244,20 @@ interface Params {
 
 const WrappersDocs = async (props: { params: Promise<Params> }) => {
   const params = await props.params
-  const { isExternal, meta, ...data } = await getContent(params)
+  const { isExternal, meta, assetsBaseUrl, ...data } = await getContent(params)
+
+  // Create a combined URL transformer that handles both regular URLs and asset URLs
+  const combinedUrlTransformer: UrlTransformFunction = (url, node) => {
+    // First try assets URL transformation (starts with ../assets/)
+    const transformedUrl = assetUrlTransform(url, assetsBaseUrl)
+
+    // If URL wasn't changed proceed with regular URL transformation
+    if (transformedUrl === url) {
+      return urlTransform(url, node)
+    }
+
+    return transformedUrl
+  }
 
   const options = isExternal
     ? ({
@@ -222,12 +268,36 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
             remarkPyMdownTabs,
             [removeTitle, meta.title],
           ],
-          rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
+          rehypePlugins: [[linkTransform, combinedUrlTransformer], rehypeSlug],
         },
       } as SerializeOptions)
     : undefined
 
-  return <GuideTemplate meta={meta} mdxOptions={options} {...data} />
+  const dashboardIntegrationURL = getDashboardIntegrationURL(meta.dashboardIntegrationPath)
+
+  return (
+    <Guide meta={meta}>
+      <GuideArticle>
+        <GuideHeader />
+
+        {dashboardIntegrationURL && (
+          <Admonition type="tip" className="mb-4">
+            <p>You can enable the {meta.title} wrapper right from the Supabase dashboard.</p>
+
+            <Button asChild>
+              <Link href={dashboardIntegrationURL} className="no-underline">
+                Open wrapper in dashboard
+              </Link>
+            </Button>
+          </Admonition>
+        )}
+
+        <GuideMdxContent content={data.content} mdxOptions={options} />
+
+        <GuideFooter editLink={data.editLink} />
+      </GuideArticle>
+    </Guide>
+  )
 }
 
 /**
@@ -242,6 +312,7 @@ const getContent = async (params: Params) => {
   let meta: any
   let content: string
   let editLink: string
+  let assetsBaseUrl: string = ''
 
   if (!federatedPage) {
     isExternal = false
@@ -278,6 +349,8 @@ const getContent = async (params: Params) => {
     })
     const rawContent = await response.text()
 
+    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
+
     const { content: contentWithoutFrontmatter } = matter(rawContent)
     content = removeRedundantH1(contentWithoutFrontmatter)
   }
@@ -289,7 +362,24 @@ const getContent = async (params: Params) => {
     editLink: newEditLink(editLink),
     meta,
     content,
+    assetsBaseUrl,
   }
+}
+
+const getDashboardIntegrationURL = (wrapperPath?: string) => {
+  return wrapperPath
+    ? `https://supabase.com/dashboard/project/_/integrations/${wrapperPath}/overview`
+    : null
+}
+
+const assetUrlTransform = (url: string, baseUrl: string): string => {
+  const assetPattern = /(\.\.\/)+assets\//
+
+  if (assetPattern.test(url)) {
+    return url.replace(assetPattern, baseUrl)
+  }
+
+  return url
 }
 
 const urlTransform: UrlTransformFunction = (url) => {
@@ -325,6 +415,10 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => {
+  if (IS_PROD) {
+    return []
+  }
+
   const mdxPaths = await genGuidesStaticParams('database/extensions/wrappers')()
   const federatedPaths = pageMap.map(({ slug }) => ({
     slug: [slug],

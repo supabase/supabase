@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
-
 import { apiKeysKeys } from './keys'
 
 type LegacyKeys = {
@@ -43,12 +43,14 @@ type PublishableKeys = {
   updated_at?: string
 }
 
-export interface APIKeysVariables {
+interface APIKeysVariables {
   projectRef?: string
-  reveal: boolean
+  reveal?: boolean
 }
 
-export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
+type APIKey = LegacyKeys | SecretKeys | PublishableKeys
+
+async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
@@ -56,25 +58,37 @@ export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signa
     signal,
   })
 
-  if (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
-  return data as unknown as (LegacyKeys | SecretKeys | PublishableKeys)[]
+  return data as unknown as APIKey[]
 }
 
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
-  { projectRef, reveal }: APIKeysVariables,
-  { enabled, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
-) =>
-  useQuery<APIKeysData, ResponseError, TData>(
-    apiKeysKeys.list(projectRef),
+  { projectRef, reveal = false }: APIKeysVariables,
+  { enabled = true, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
+) => {
+  return useQuery<APIKeysData, ResponseError, TData>(
+    apiKeysKeys.list(projectRef, reveal),
     ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
+}
+
+export const getKeys = (apiKeys: APIKey[] = []) => {
+  const anonKey = apiKeys.find((x) => x.name === 'anon')
+  const serviceKey = apiKeys.find((x) => x.name === 'service_role')
+
+  // [Joshen] For now I just want 1 of each, I don't need all
+  const publishableKey = apiKeys.find((x) => x.type === 'publishable')
+  const secretKey = apiKeys.find((x) => x.type === 'secret')
+
+  const allSecretKeys = apiKeys.filter((x) => x.type === 'secret')
+
+  return { anonKey, serviceKey, publishableKey, secretKey, allSecretKeys }
+}

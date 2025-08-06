@@ -17,7 +17,7 @@ import {
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -66,7 +66,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
@@ -105,14 +105,27 @@ const ProjectUsage = () => {
 
   const handleBarClick = (
     value: UsageApiCounts,
-    // TODO (ziinc): link to edge logs with correct filter applied
     _type: 'rest' | 'realtime' | 'storage' | 'auth'
   ) => {
     const unit = selectedInterval.startUnit
     const selectedStart = dayjs(value?.timestamp)
     const selectedEnd = selectedStart.add(1, unit)
+
+    if (_type === 'rest') {
+      router.push(
+        `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}`
+      )
+      return
+    }
+
     router.push(
-      `/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selectedEnd.toISOString())}`
+      `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}&f=${JSON.stringify(
+        {
+          product: {
+            [_type]: true,
+          },
+        }
+      )}`
     )
   }
 

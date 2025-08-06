@@ -1,8 +1,5 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Toggle } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { X } from 'lucide-react'
+import { Toggle } from 'ui'
 import { toast } from 'sonner'
-
 import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'

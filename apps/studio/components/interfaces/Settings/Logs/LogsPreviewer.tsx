@@ -12,8 +12,9 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -27,9 +28,8 @@ import {
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePrompt } from './Logs.utils'
-import UpgradePrompt from './UpgradePrompt'
-import { useFlag } from 'hooks/ui/useFlag'
 import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUniversal'
+import UpgradePrompt from './UpgradePrompt'
 
 /**
  * Acts as a container component for the entire log display
@@ -64,7 +64,7 @@ export const LogsPreviewer = ({
 
   const router = useRouter()
   const { db } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [showChart, setShowChart] = useState(true)
@@ -271,7 +271,7 @@ export const LogsPreviewer = ({
               }}
               EmptyState={
                 <div className="flex flex-col items-center justify-center h-[67px]">
-                  <h2 className="text-foreground-light text-xs">No data</h2>
+                  <p className="text-foreground-light text-xs">No data</p>
                   <p className="text-foreground-lighter text-xs">
                     It may take up to 24 hours for data to refresh
                   </p>

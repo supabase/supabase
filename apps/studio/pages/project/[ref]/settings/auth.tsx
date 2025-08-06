@@ -13,8 +13,7 @@ const ProjectSettings: NextPageWithLayout = () => {
     <ProductEmptyState title="Authentication settings have moved">
       <div className="text-sm">
         <p className="text-foreground-light mb-4">
-          All settings are now under configuration within the Authentication page. All other product
-          settings will follow in the coming weeks.
+          All settings are now under configuration within the Authentication page.
         </p>
         <Link
           href={`/project/${ref}/auth/providers`}
@@ -59,7 +58,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/settings/api#jwt-settings`}
+          href={`/project/${ref}/settings/jwt`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Access token expiry

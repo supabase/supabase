@@ -19,7 +19,7 @@ import {
 import { ReleaseChannel } from 'data/projects/new-project.constants'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -67,7 +67,7 @@ const ProjectUpgradeAlert = () => {
   const router = useRouter()
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
@@ -187,6 +187,7 @@ const ProjectUpgradeAlert = () => {
                     [right-sized](https://supabase.com/docs/guides/platform/upgrading#disk-sizing) with the upgrade.`}
                   />
                 )}
+                {/* @ts-ignore */}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
                   <Alert_Shadcn_ variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />

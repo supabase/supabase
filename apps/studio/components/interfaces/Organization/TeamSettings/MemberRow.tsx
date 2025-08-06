@@ -7,7 +7,7 @@ import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
 import {
@@ -32,7 +32,7 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { data: projects } = useProjectsQuery()
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
@@ -41,7 +41,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
 
   const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
-  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
@@ -89,7 +88,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           />
           <div className="flex item-center gap-x-2">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
-            {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
+            {member.gotrue_id === profile?.gotrue_id && <Badge color="scale">You</Badge>}
           </div>
 
           {(member.metadata as any)?.origin && (
@@ -204,7 +203,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
         )}
       </Table.td>
 
-      <Table.td>{!memberIsUser && <MemberActions member={member} />}</Table.td>
+      <Table.td>
+        <MemberActions member={member} />
+      </Table.td>
     </Table.tr>
   )
 }

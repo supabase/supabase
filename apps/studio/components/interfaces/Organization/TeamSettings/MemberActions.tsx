@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
@@ -15,20 +16,19 @@ import {
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
@@ -43,13 +43,13 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
 
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
+  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
   const isPendingInviteAcceptance = !!member.invited_id
@@ -147,21 +147,10 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     )
   }
 
-  if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
+  if (memberIsUser) {
     return (
       <div className="flex items-center justify-end">
-        <ButtonTooltip
-          disabled
-          type="text"
-          className="px-1.5"
-          icon={<MoreVertical size={18} />}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: 'You need additional permissions to manage this team member',
-            },
-          }}
-        />
+        <LeaveTeamButton />
       </div>
     )
   }
@@ -197,47 +186,54 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               icon={<MoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-52">
+          <DropdownMenuContent side="bottom" align="end" className="w-40">
             <>
               {isPendingInviteAcceptance ? (
                 <>
-                  {canRevokeInvite && (
-                    <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
-                      <div className="flex flex-col">
-                        <p>Cancel invitation</p>
-                        <p className="text-foreground-lighter">Revoke this invitation.</p>
-                      </div>
-                    </DropdownMenuItem>
-                  )}
-                  {canResendInvite && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleResendInvite(member)}>
-                        <div className="flex flex-col">
-                          <p>Resend invitation</p>
-                          <p className="text-foreground-lighter">Invites expire after 24hrs.</p>
-                        </div>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                  <DropdownMenuItemTooltip
+                    className="gap-x-2"
+                    disabled={!canRevokeInvite}
+                    onClick={() => handleRevokeInvitation(member)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Additional permissions required to cancel invitation',
+                      },
+                    }}
+                  >
+                    <p>Cancel invitation</p>
+                  </DropdownMenuItemTooltip>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItemTooltip
+                    className="gap-x-2"
+                    disabled={!canResendInvite}
+                    onClick={() => handleResendInvite(member)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Additional permissions required to resend invitation',
+                      },
+                    }}
+                  >
+                    <p>Resend invitation</p>
+                  </DropdownMenuItemTooltip>
                 </>
               ) : (
                 organizationMembersDeletionEnabled && (
-                  <DropdownMenuItem
-                    className="space-x-2 items-start"
+                  <DropdownMenuItemTooltip
+                    className="gap-x-2"
                     disabled={!canRemoveMember}
-                    onClick={() => {
-                      setIsDeleteModalOpen(true)
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Additional permissions required to remove member',
+                      },
                     }}
                   >
-                    <Trash size={16} />
-                    <div className="flex flex-col">
-                      <p>Remove member</p>
-                      {!canRemoveMember && (
-                        <p className="text-foreground-lighter">Additional permissions required</p>
-                      )}
-                    </div>
-                  </DropdownMenuItem>
+                    <Trash size={12} />
+                    <p>Remove member</p>
+                  </DropdownMenuItemTooltip>
                 )
               )}
             </>

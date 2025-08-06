@@ -12,7 +12,7 @@ import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configur
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -63,7 +63,7 @@ const StepLabel = ({
  */
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
@@ -202,7 +202,7 @@ export const DatabaseConnectionString = () => {
   }
   const poolerSettingsUrl = {
     text: 'Pooler settings',
-    url: `/project/${projectRef}/settings/database#connection-pooling`,
+    url: `/project/${projectRef}/database/settings#connection-pooling`,
   }
   const buttonLinks = !ipv4Addon
     ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
@@ -239,7 +239,7 @@ export const DatabaseConnectionString = () => {
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </div>
-        <DatabaseSelector buttonProps={{ size: 'small' }} />
+        <DatabaseSelector portal={false} buttonProps={{ size: 'small' }} />
       </div>
 
       {isLoading && (
@@ -526,7 +526,7 @@ export const DatabaseConnectionString = () => {
         <p className="text-sm text-foreground-lighter">
           You may reset your database password in your project's{' '}
           <InlineLink
-            href={`/project/${projectRef}/settings/database`}
+            href={`/project/${projectRef}/database/settings`}
             className="text-foreground-lighter hover:text-foreground"
           >
             Database Settings

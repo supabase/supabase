@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { AIAssistantOption } from 'components/interfaces/Support/AIAssistantOption'
 import Success from 'components/interfaces/Support/Success'
 import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
@@ -15,8 +16,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
 import { NextPageWithLayout } from 'types'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { AIAssistantOption } from 'components/interfaces/Support/AIAssistantOption'
+import { Button, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SupportPage: NextPageWithLayout = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -36,7 +36,7 @@ const SupportPage: NextPageWithLayout = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
             <div className="flex items-center space-x-3">
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
-              <h1 className="m-0 text-lg">Supabase support</h1>
+              <h3 className="m-0 text-lg">Supabase support</h3>
             </div>
 
             <div className="flex items-center gap-x-3">
@@ -118,9 +118,7 @@ const SupportPage: NextPageWithLayout = () => {
                     type="text"
                     text="support@supabase.com"
                     iconOnly
-                    onClick={() => {
-                      toast.success('Copied to clipboard')
-                    }}
+                    onClick={() => toast.success('Copied to clipboard')}
                   />
                 </p>
                 <p>
@@ -139,7 +137,7 @@ const SupportPage: NextPageWithLayout = () => {
                           <li key={project.id} className="cursor-default">
                             <button
                               onClick={() => {
-                                navigator.clipboard.writeText(project.ref)
+                                copyToClipboard(project.ref)
                                 toast.success('Copied to clipboard')
                               }}
                               className="w-full group py-1.5 px-2 gap-x-1 text-foreground hover:bg-muted grid grid-cols-2 text-left rounded-sm"
