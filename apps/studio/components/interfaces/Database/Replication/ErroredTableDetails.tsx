@@ -52,6 +52,7 @@ export const ErroredTableDetails = ({
             <span className="font-medium">Support required:</span> This error requires manual
             intervention from our{' '}
             <InlineLink
+              className="text-foreground-lighter hover:text-foreground"
               href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
             >
               support
