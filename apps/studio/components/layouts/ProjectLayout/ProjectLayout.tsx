@@ -7,7 +7,6 @@ import { useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -32,13 +31,14 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
-  '/project/[ref]/settings/storage',
+  '/project/[ref]/database/settings',
+  '/project/[ref]/storage/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]
@@ -53,7 +53,7 @@ const routesToIgnoreDBConnection = [
 const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
+  '/project/[ref]/database/settings',
   '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/addons',
 ]
@@ -87,14 +87,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
 
-    const {
-      editorPanel,
-      mobileMenuOpen,
-      showSidebar,
-      setMobileMenuOpen,
-      toggleEditorPanel,
-      setEditorPanel,
-    } = useAppStateSnapshot()
+    const { showEditorPanel, mobileMenuOpen, showSidebar, setMobileMenuOpen, setShowEditorPanel } =
+      useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
     const editor = useEditorType()
@@ -124,15 +118,14 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       const handler = (e: KeyboardEvent) => {
         // Cmd+I: Open AI Assistant, close Editor Panel
         if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
-          setEditorPanel({ open: false })
+          setShowEditorPanel(false)
           aiSnap.toggleAssistant()
           e.preventDefault()
           e.stopPropagation()
         }
         // Cmd+E: Toggle Editor Panel, always close AI Assistant
         if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
-          aiSnap.closeAssistant()
-          toggleEditorPanel()
+          setShowEditorPanel(!showEditorPanel)
           e.preventDefault()
           e.stopPropagation()
         }
@@ -140,7 +133,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       window.addEventListener('keydown', handler)
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setEditorPanel, aiSnap, editorPanel.open])
+    }, [setShowEditorPanel, aiSnap, showEditorPanel])
 
     return (
       <>
@@ -232,7 +225,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && (aiSnap.open || editorPanel.open) && (
+                {isClient && aiSnap.open && (
                   <>
                     <ResizableHandle withHandle />
                     <ResizablePanel
@@ -246,11 +239,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         'xl:relative xl:border-l-0'
                       )}
                     >
-                      {aiSnap.open ? (
-                        <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
-                      ) : editorPanel.open ? (
-                        <EditorPanel />
-                      ) : null}
+                      <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
                     </ResizablePanel>
                   </>
                 )}
@@ -258,6 +247,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
+        <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
         <CreateBranchModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

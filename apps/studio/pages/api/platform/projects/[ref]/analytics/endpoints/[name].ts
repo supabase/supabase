@@ -30,14 +30,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const proxyRequest = async (req: NextApiRequest) => {
-  const { name, ...toForward } = req.query
-  const project_tier = 'ENTERPRISE'
+  const { name, ref: project, ...toForward } = req.query
 
   if (req.method === 'GET') {
-    const payload = { ...toForward, project_tier }
+    const payload = { ...toForward, project }
     return retrieveAnalyticsData(name as string, payload)
   } else if (req.method === 'POST') {
-    const payload = { ...req.body, project_tier }
+    const payload = { ...req.body, project }
     return retrieveAnalyticsData(name as string, payload)
   }
 }

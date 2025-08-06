@@ -97,7 +97,9 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
                       >
                         <NavMenuItem active={true} className="flex items-center gap-2">
                           {tab.childIcon}
-                          <Link href={`${tabUrl}/${childId}`}>
+                          <Link
+                            href={`${tabUrl}/${childId}${childLabel ? `?child-label=${childLabel}` : ''}`}
+                          >
                             {childLabel ? childLabel : childId}
                           </Link>
                         </NavMenuItem>
