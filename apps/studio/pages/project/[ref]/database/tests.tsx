@@ -12,7 +12,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
 import { useProfile } from 'lib/profile'
@@ -27,9 +26,9 @@ import { databaseTestsKeys } from 'data/database-tests/database-tests-key'
 import { SETUP_TEST_PREFIX } from 'components/interfaces/Database/Tests/Tests.constants'
 import { DatabaseTestStatus } from 'components/interfaces/Database/Tests/Tests.types'
 import { isTestSuccessful } from 'components/interfaces/Database/Tests/Tests.utils'
+import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
 
 const DatabaseTestsPage: NextPageWithLayout = () => {
-  const { setEditorPanel } = useAppStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -38,6 +37,8 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   const [statuses, setStatuses] = useState<Record<string, DatabaseTestStatus>>({})
   const [executionQueue, setExecutionQueue] = useState<string[]>([])
   const [confirmRunTestId, setConfirmRunTestId] = useState<string | null>(null)
+  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
+  const [selectedTest, setSelectedTest] = useState<DatabaseTest | null>(null)
 
   const queryClient = useQueryClient()
   const { mutateAsync: executeSql } = useExecuteSqlMutation()
@@ -57,57 +58,26 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
 
   const { mutate: createTest, isLoading: isCreatingTest } = useDatabaseTestCreateMutation({
     onSuccess: () => {
-      setEditorPanel({ open: false })
+      setEditorPanelOpen(false)
+      setSelectedTest(null)
     },
   })
 
   const { mutate: updateTest, isLoading: isUpdatingTest } = useDatabaseTestUpdateMutation({
     onSuccess: () => {
-      setEditorPanel({ open: false })
+      setEditorPanelOpen(false)
+      setSelectedTest(null)
     },
   })
 
   const onSelectTest = (test: DatabaseTest) => {
-    setEditorPanel({
-      open: true,
-      initialValue: test.query,
-      label: `Edit test: ${test.name}`,
-      saveLabel: 'Save test',
-      onSave: (query: string, name: string) => {
-        if (!profile?.id) return
-        updateTest({
-          projectRef: project?.ref!,
-          id: test.id,
-          name: name || test.name,
-          query,
-          ownerId: profile?.id,
-        })
-        setEditorPanel({ open: false })
-      },
-    })
+    setSelectedTest(test)
+    setEditorPanelOpen(true)
   }
 
   const createNewTest = () => {
-    setEditorPanel({
-      open: true,
-      initialValue: `
-begin;
-select plan(1);
--- Verify RLS is enabled on all tables in the public schema
-select tests.rls_enabled('public');
-select * from finish();
-rollback;
-      `.trim(),
-      label: 'Create new test',
-      saveLabel: 'Save test',
-      onSave: (query, name) => {
-        createTest({
-          projectRef: project?.ref!,
-          name: name || 'New test',
-          query,
-        })
-      },
-    })
+    setSelectedTest(null)
+    setEditorPanelOpen(true)
   }
 
   const onRunAllTests = () => {
@@ -312,6 +282,50 @@ rollback;
         variant="destructive"
         onCancel={cancelRun}
         onConfirm={confirmRun}
+      />
+      <EditorPanel
+        open={editorPanelOpen}
+        onClose={() => {
+          setEditorPanelOpen(false)
+          setSelectedTest(null)
+        }}
+        initialValue={
+          selectedTest
+            ? selectedTest.query
+            : `
+begin;
+select plan(1);
+-- Verify RLS is enabled on all tables in the public schema
+select tests.rls_enabled('public');
+select * from finish();
+rollback;
+      `.trim()
+        }
+        label={selectedTest ? `Edit test: ${selectedTest.name}` : 'Create new test'}
+        saveLabel={'Save test'}
+        saveValue={selectedTest?.name || 'New test'}
+        onSave={(query: string, name: string) => {
+          if (!profile?.id) return
+          if (selectedTest) {
+            // Editing existing test
+            updateTest({
+              projectRef: project?.ref!,
+              id: selectedTest.id,
+              name: name || selectedTest.name,
+              query,
+              ownerId: profile?.id,
+            })
+          } else {
+            // Creating new test
+            createTest({
+              projectRef: project?.ref!,
+              name: name || 'New test',
+              query,
+            })
+          }
+          setEditorPanelOpen(false)
+          setSelectedTest(null)
+        }}
       />
     </PageLayout>
   )
