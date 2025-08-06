@@ -52,10 +52,10 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
-  const snap = useTableEditorTableStateSnapshot()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
+  const snap = useTableEditorTableStateSnapshot()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
