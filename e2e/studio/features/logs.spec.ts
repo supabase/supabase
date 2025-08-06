@@ -75,6 +75,14 @@ test.describe('Logs', () => {
       const gridcells = page.getByText('Random event message')
       await gridcells.click()
 
+      const firstRow = page.getByRole('row', { name: /Random event/ })
+
+      await expect(firstRow, {
+        message: 'Logs table should be visible with one row at least',
+      }).toBeVisible()
+
+      await firstRow.click({ force: true })
+
       const tabPanel = page.getByTestId('log-selection')
       await expect(tabPanel).toBeVisible()
 
