@@ -8,6 +8,20 @@
       <lastBuildDate>Fri, 18 Jul 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/firebase-vs-supabase</guid>
+  <title>Firebase vs. Supabase</title>
+  <link>https://supabase.com/blog/firebase-vs-supabase</link>
+  <description>When, why, and how to migrate to Supabase from Firebase.</description>
+  <pubDate>Mon, 11 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-auth-build-vs-buy</guid>
+  <title>Supabase Auth: Build vs. Buy</title>
+  <link>https://supabase.com/blog/supabase-auth-build-vs-buy</link>
+  <description>The reasons why (and why not) to use Supabase Auth instead of building your own.</description>
+  <pubDate>Tue, 12 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/launch-week-15-top-10</guid>
   <title>Top 10 Launches of Launch Week 15</title>
   <link>https://supabase.com/blog/launch-week-15-top-10</link>

@@ -93,4 +93,28 @@ export const days: BuildDay[] = [
       },
     ],
   },
+  {
+    title: 'Supabase Auth: Build vs. Buy',
+    id: 'auth-build-vs-buy',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/supabase-auth-build-vs-buy',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+  },
+  {
+    title: 'Firebase vs. Supabase',
+    id: 'firebase-vs-supabase',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/firebase-vs-supabase',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+  },
 ]
