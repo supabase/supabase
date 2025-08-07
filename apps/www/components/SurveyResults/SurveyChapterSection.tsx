@@ -124,14 +124,14 @@ export function SurveyChapterSection({
         return ChartComponent ? <ChartComponent key={index} /> : null
       })}
 
-      {pullQuote && (
+      {/* {pullQuote && (
         <SurveyPullQuote
           quote={pullQuote.quote}
           author={pullQuote.author}
           authorPosition={pullQuote.authorPosition}
           authorAvatar={pullQuote.authorAvatar}
         />
-      )}
+      )} */}
 
       {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
 

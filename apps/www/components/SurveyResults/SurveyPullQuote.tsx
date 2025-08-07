@@ -12,7 +12,7 @@ export function SurveyPullQuote({
   authorAvatar: string
 }) {
   return (
-    <div className="flex flex-col gap-4 text-center items-center px-6 py-8 bg-alternative">
+    <aside className="flex flex-col gap-4 text-center items-center px-6 py-24 bg-alternative border-t">
       {/* TODO add quote marks via CSS instead, hang quote marks outside*/}
       <p className="text-foreground-lighter text-2xl text-balance max-w-prose">“{quote}”</p>
       <Image
@@ -27,6 +27,6 @@ export function SurveyPullQuote({
         <br />
         <span className="text-foreground-muted text-sm">{authorPosition}</span>
       </p>
-    </div>
+    </aside>
   )
 }

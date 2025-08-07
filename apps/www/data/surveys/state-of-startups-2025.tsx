@@ -6,15 +6,9 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
   docsUrl: '',
   heroSection: {
     title: 'State of Startups 2025',
-    subheader: (
-      <>
-        <p>
-          We surveyed over 1,800 startup founders and builders to uncover What’s powering modern
-          startups: their stacks, their go-to-market motion, and their approach to AI.
-        </p>
-        <p>This report is built for builders.</p>
-      </>
-    ),
+    subheader:
+      'We surveyed over 1,800 startup founders and builders to uncover What’s powering modern startups: their stacks, their go-to-market motion, and their approach to AI.',
+    cta: 'This report is built for builders. Let’s dive in.',
     className: '[&_h1]:max-w-2xl',
   },
   pageChapters: [
@@ -22,6 +16,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'Who’s Building Startups',
       description:
         "Today's startup ecosystem is dominated by young, technical builders shipping fast with lean teams. They've done this before.",
+      pullQuote: {
+        quote:
+          "We’re a two-person team, both technical. It's not our first rodeo, and that experience helped us move way faster this time.",
+        author: 'John Doe',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'Roles and Experience',
@@ -33,13 +34,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 33, unit: '%', label: 'Repeat founders' },
           ],
           charts: ['RoleChart'],
-          pullQuote: {
-            quote:
-              "We’re a two-person team, both technical. It's not our first rodeo, and that experience helped us move way faster this time.",
-            author: 'John Doe',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -92,6 +86,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'What Startups are Building',
       description:
         'Startups are still experimenting. They’re building a diverse mix of software products, iterating quickly, and pursuing monetization selectively.',
+      pullQuote: {
+        quote:
+          "We’re experimenting in edtech for underserved regions. It's early, but we’re learning fast.",
+        author: 'Sarah Johnson',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'Industries and Focus',
@@ -103,13 +104,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 38, unit: '%', label: 'Founders under 30 building in AI/ML' },
           ],
           charts: ['IndustryChart'],
-          pullQuote: {
-            quote:
-              "We’re experimenting in edtech for underserved regions. It's early, but we’re learning fast.",
-            author: 'Sarah Johnson',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
+
           wordCloud: undefined,
           summarizedAnswer: {
             label: 'Problems startups are solving',
@@ -160,6 +155,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'What’s in a Startup’s Tech Stack',
       description:
         'The modern stack centers around open tools, modular infrastructure, and cautious spending.',
+      pullQuote: {
+        quote:
+          'Supabase gave us everything we needed out of the box. We hooked it up in a weekend and haven’t looked back.',
+        author: 'David Kim',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'Frameworks and Cloud Infra',
@@ -173,13 +175,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 75, unit: '%', label: 'Supabase for databases' },
           ],
           charts: ['DatabasesChart'],
-          pullQuote: {
-            quote:
-              'Supabase gave us everything we needed out of the box. We hooked it up in a weekend and haven’t looked back.',
-            author: 'David Kim',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
+
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -264,6 +260,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'How Startups are Integrating AI',
       description:
         'AI is a core product capability, not an afterthought. Most teams are using models like OpenAI or Claude for real features, not just demos.',
+      pullQuote: {
+        quote:
+          'AI is baked into the core. Semantic search and summarisation are what make the product usable.',
+        author: 'Tom Anderson',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'In-Product AI Use',
@@ -274,13 +277,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 50, unit: '%', label: 'Building agents' },
           ],
           charts: ['AIModelsChart'],
-          pullQuote: {
-            quote:
-              'AI is baked into the core. Semantic search and summarisation are what make the product usable.',
-            author: 'Tom Anderson',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: {
             label: 'Most important AI use cases in product',
@@ -299,6 +295,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
     {
       title: 'Where Startups Go to Learn',
       description: 'Online communities are the learning engine behind every early-stage startup.',
+      pullQuote: {
+        quote:
+          'I mostly lurk, but Twitter and Discord have been where I find the best tools and smartest minds.',
+        author: 'Emma Davis',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'Online Communities',
@@ -311,13 +314,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 7, unit: '%', label: 'Don’t use social media' },
           ],
           charts: ['RegularSocialMediaUseChart'],
-          pullQuote: {
-            quote:
-              'I mostly lurk, but Twitter and Discord have been where I find the best tools and smartest minds.',
-            author: 'Emma Davis',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -359,6 +355,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'How Startups are Finding Customers',
       description:
         'Startups start selling through their networks and dev communities. Only when they grow do they layer in more structured growth via CRMs and sales.',
+      pullQuote: {
+        quote:
+          'Our first 10 customers came from one tweet. No landing page, no funnel. Just good timing and network.',
+        author: 'Sophie Lee',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'Initial Customers',
@@ -376,13 +379,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             },
           ],
           charts: ['InitialPayingCustomersChart'],
-          pullQuote: {
-            quote:
-              'Our first 10 customers came from one tweet. No landing page, no funnel. Just good timing and network.',
-            author: 'Sophie Lee',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -415,6 +411,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'Biggest Challenges for Startups',
       description:
         'Startups remain optimistic about the future but are weighed down by technical complexity, customer acquisition hurdles, and a wish list of tools that still don’t exist.',
+      pullQuote: {
+        quote:
+          'Growth is still our hardest problem. We’ve got a good product, but breaking through the noise is brutal.',
+        author: 'Nina Patel',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'The Road Ahead',
@@ -431,13 +434,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 81, unit: '%', label: 'Evaluate tools via hands-on experience' },
           ],
           charts: ['BiggestChallengeChart'],
-          pullQuote: {
-            quote:
-              'Growth is still our hardest problem. We’ve got a good product, but breaking through the noise is brutal.',
-            author: 'Nina Patel',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
+
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,

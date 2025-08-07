@@ -210,23 +210,6 @@ function StateOfStartupsPage() {
 
         <Hero ref={heroRef} {...pageData.heroSection} />
 
-        {/* Replace with bespoke <section> with className */}
-        <SectionContainer>
-          {/* table of contents */}
-          <ol className="flex flex-col divide-y divide-dashed bg-surface-100 border border-default rounded-md px-6 py-2 mb-12 max-w-md mx-auto">
-            {pageData.pageChapters.map((chapter, chapterIndex) => (
-              <li key={chapterIndex + 1}>
-                <Link
-                  href={`#chapter-${chapterIndex + 1}`}
-                  className="block flex-1 py-4 text-foreground-light font-mono uppercase text-center flex flex-row gap-6"
-                >
-                  {chapter.title}
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </SectionContainer>
-
         {pageData.pageChapters.map((chapter, chapterIndex) => (
           <>
             <SurveyChapter
@@ -235,6 +218,7 @@ function StateOfStartupsPage() {
               totalChapters={pageData.pageChapters.length}
               title={chapter.title}
               description={chapter.description}
+              pullQuote={chapter.pullQuote}
             >
               {chapter.sections.map((section, sectionIndex) => (
                 <SurveyChapterSection
@@ -252,7 +236,7 @@ function StateOfStartupsPage() {
               ))}
             </SurveyChapter>
             {/* Pull quote that's full-width */}
-            <div className="bg-alternative py-24">
+            {/* <div className="bg-alternative py-24">
               <aside className="flex flex-col gap-4 text-center items-center max-w-[60rem] mx-auto">
                 <p className="text-foreground text-2xl text-balance max-w-prose">
                   “We started in no-code web development and ran our own agency while teaching
@@ -261,7 +245,7 @@ function StateOfStartupsPage() {
                   steep at times.”
                 </p>
               </aside>
-            </div>
+            </div> */}
           </>
         ))}
       </DefaultLayout>
@@ -270,6 +254,8 @@ function StateOfStartupsPage() {
 }
 
 const Hero = forwardRef<HTMLElement, any>((props, ref) => {
+  const pageData = data()
+
   return (
     <section ref={ref} className="relative w-full overflow-hidden">
       {/* SVG shapes container */}
@@ -368,8 +354,7 @@ const Hero = forwardRef<HTMLElement, any>((props, ref) => {
         </div>
       </div>
       {/* Text container */}
-
-      <header className="container relative mt-[8rem] gap-[8rem] sm:gap-[14rem] w-full z-10 flex flex-col text-center justify-center items-center px-4 mx-auto">
+      <header className="container relative mt-[8rem] gap-[8rem] sm:gap-[14rem] w-full z-10 flex flex-col text-center justify-center items-center px-4 pb-16 mx-auto">
         <h1 className="flex flex-col gap-4 items-center">
           <span className="!leading-[90%] tracking-[-0.025em] text-8xl md:text-[14vw] lg:text-[12vw] xl:text-[10vw]">
             State of
@@ -377,7 +362,24 @@ const Hero = forwardRef<HTMLElement, any>((props, ref) => {
           </span>
           <span className="text-foreground text-2xl md:text-4xl leading-[100%]">2025</span>
         </h1>
-        <div className="p md:text-2xl max-w-lg flex flex-col gap-4">{props.subheader}</div>
+
+        <div className="flex flex-col gap-4 max-w-prose">
+          <p className="p md:text-2xl">{props.subheader}</p>
+          {/* static table of contents */}
+          <ol className="flex flex-col items-center divide-y divide-dashed bg-surface-100 border border-default rounded-md px-6 py-2 mb-12 max-w-md mx-auto">
+            {pageData.pageChapters.map((chapter: any, chapterIndex: number) => (
+              <li key={chapterIndex + 1}>
+                <Link
+                  href={`#chapter-${chapterIndex + 1}`}
+                  className="block flex-1 py-4 text-foreground-light font-mono uppercase text-center flex flex-row gap-6"
+                >
+                  {chapter.title}
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <p className="p md:text-2xl">{props.cta}</p>
+        </div>
       </header>
     </section>
   )
