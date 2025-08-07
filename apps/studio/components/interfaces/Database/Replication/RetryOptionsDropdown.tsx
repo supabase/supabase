@@ -16,13 +16,13 @@ import {
 const RETRY_OPTIONS = [
   {
     type: 'individual' as RollbackType,
-    icon: <Undo2 className="w-3 h-3" />,
+    icon: <Undo2 className="w-3 h-3 mt-0.5" />,
     title: 'Rollback to previous state',
     description: 'Restart from the last working state (may not be enough in some cases)',
   },
   {
     type: 'full' as RollbackType,
-    icon: <RotateCcw className="w-3 h-3" />,
+    icon: <RotateCcw className="w-3 h-3 mt-0.5" />,
     title: 'Reset from scratch',
     description: 'Completely restart the table replication',
   },
@@ -85,7 +85,7 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
           size="tiny"
           loading={isLoading}
           disabled={isLoading}
-          className="h-7 text-xs px-3"
+          className="h-7 text-xs px-3 w-min"
           iconRight={<ChevronDown className="w-3 h-3" />}
           aria-label={`Rollback ${tableName}`}
         >
@@ -102,11 +102,11 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
             className="flex flex-col items-start px-3 py-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             aria-describedby={`rollback-${option.type}-description`}
           >
-            <div className="flex items-center gap-x-2 w-full">
-              {option.icon}
+            <div className="flex items-start gap-x-2 w-full">
+              <div className="w-8">{option.icon}</div>
               <div
                 id={`rollback-${option.type}-description`}
-                className="flex flex-col gap-y-1 text-xs text-foreground-light"
+                className="flex flex-col gap-y-1 text-xs"
               >
                 <p>{option.title}</p>
                 <p className="text-foreground-light">{option.description}</p>
