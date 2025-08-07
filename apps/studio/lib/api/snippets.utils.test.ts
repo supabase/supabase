@@ -72,6 +72,7 @@ describe('snippets.utils', () => {
       mockedFS.readFile
         .mockResolvedValueOnce('SELECT * FROM users;')
         .mockResolvedValueOnce('SELECT * FROM posts;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const entries = await getFilesystemEntries()
 
@@ -138,6 +139,7 @@ describe('snippets.utils', () => {
             return Promise.reject(new Error('File not found'))
         }
       })
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const entries = await getFilesystemEntries()
 
@@ -183,6 +185,7 @@ describe('snippets.utils', () => {
       })
 
       mockedFS.readFile.mockResolvedValue('SELECT * FROM table;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const entries = await getFilesystemEntries()
 
@@ -198,6 +201,7 @@ describe('snippets.utils', () => {
         { name: 'empty.sql', isDirectory: () => false, isFile: () => true },
       ] as any)
       mockedFS.readFile.mockResolvedValue('')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const entries = await getFilesystemEntries()
 
@@ -233,6 +237,7 @@ describe('snippets.utils', () => {
         { name: 'test-snippet.sql', isDirectory: () => false, isFile: () => true },
       ] as any)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM test;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const snippet = await getSnippet(snippetId)
 
@@ -265,6 +270,7 @@ describe('snippets.utils', () => {
         return Promise.resolve([])
       })
       mockedFS.readFile.mockResolvedValue('SELECT * FROM folder_table;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const snippet = await getSnippet(snippetId)
 
@@ -372,6 +378,7 @@ describe('snippets.utils', () => {
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([])
       mockedFS.writeFile.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const result = await saveSnippet(mockSnippet)
 
@@ -410,6 +417,7 @@ describe('snippets.utils', () => {
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([])
       mockedFS.writeFile.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const result = await saveSnippet(mockSnippet)
 
@@ -450,6 +458,7 @@ describe('snippets.utils', () => {
         { name: 'existing-snippet.sql', isDirectory: () => false, isFile: () => true },
       ] as any)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM existing;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(saveSnippet(mockSnippet)).rejects.toThrow(
         `Snippet with id ${mockSnippet.id} already exists`
@@ -484,6 +493,7 @@ describe('snippets.utils', () => {
         { name: 'test-folder', isDirectory: () => true, isFile: () => false },
       ] as any)
       mockedFS.writeFile.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const result = await saveSnippet(mockSnippet)
 
@@ -537,6 +547,7 @@ describe('snippets.utils', () => {
       ] as any)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM test;')
       mockedFS.unlink.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await deleteSnippet(snippetId)
 
@@ -557,6 +568,7 @@ describe('snippets.utils', () => {
       const error = new Error('File not found') as NodeJS.ErrnoException
       error.code = 'ENOENT'
       mockedFS.unlink.mockRejectedValue(error)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(deleteSnippet(snippetId)).resolves.not.toThrow()
     })
@@ -573,6 +585,7 @@ describe('snippets.utils', () => {
       const error = new Error('Permission denied') as NodeJS.ErrnoException
       error.code = 'EACCES'
       mockedFS.unlink.mockRejectedValue(error)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(deleteSnippet(snippetId)).rejects.toThrow('Permission denied')
     })
@@ -609,6 +622,7 @@ describe('snippets.utils', () => {
       })
       mockedFS.readFile.mockResolvedValue('SELECT * FROM folder_table;')
       mockedFS.unlink.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await deleteSnippet(snippetId)
 
@@ -636,6 +650,7 @@ describe('snippets.utils', () => {
 
       // Read the existing snippet content
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const updates = { name: 'updated-snippet', content: { sql: 'SELECT * FROM new;' } }
 
@@ -672,6 +687,7 @@ describe('snippets.utils', () => {
       ] as any)
       // // Mock readFile for both calls (initial and final)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
       // mockedFS.writeFile.mockResolvedValue(undefined)
 
       const updates = {
@@ -713,6 +729,7 @@ describe('snippets.utils', () => {
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
       mockedFS.writeFile.mockResolvedValue(undefined)
       mockedFS.unlink.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const updates = { folder_id: targetFolderId }
 
@@ -757,6 +774,7 @@ describe('snippets.utils', () => {
       mockedFS.readFile.mockResolvedValue('SELECT * FROM folder;')
       mockedFS.writeFile.mockResolvedValue(undefined)
       mockedFS.unlink.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const updates = { folder_id: null }
 
@@ -784,6 +802,7 @@ describe('snippets.utils', () => {
         { name: 'existing-snippet.sql', isDirectory: () => false, isFile: () => true },
       ] as any)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM table;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const updates = { folder_id: nonExistentFolderId }
 
@@ -818,6 +837,7 @@ describe('snippets.utils', () => {
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
       mockedFS.writeFile.mockResolvedValue(undefined)
       mockedFS.unlink.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const updates = {
         name: 'renamed-snippet',
@@ -852,6 +872,7 @@ describe('snippets.utils', () => {
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
       mockedFS.writeFile.mockResolvedValue(undefined)
       mockedFS.unlink.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const updates = { content: { sql: '' } }
 
@@ -873,6 +894,7 @@ describe('snippets.utils', () => {
         { name: 'existing-snippet.sql', isDirectory: () => false, isFile: () => true },
       ] as any)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const error = new Error('Permission denied') as NodeJS.ErrnoException
       error.code = 'EACCES'
@@ -892,6 +914,7 @@ describe('snippets.utils', () => {
       ] as any)
       mockedFS.readFile.mockResolvedValue('SELECT * FROM old;')
       mockedFS.writeFile.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const error = new Error('File not found') as NodeJS.ErrnoException
       error.code = 'ENOENT'
@@ -936,6 +959,7 @@ describe('snippets.utils', () => {
 
       mockedFS.readFile.mockResolvedValue('SELECT * FROM table;')
       mockedFS.unlink.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const updates = { folder_id: targetFolderId }
 
@@ -958,6 +982,7 @@ describe('snippets.utils', () => {
         .mockResolvedValueOnce(mockDirents as any) // First call for getFilesystemEntries
         .mockResolvedValueOnce([]) // folder1 contents (empty)
         .mockResolvedValueOnce([]) // folder2 contents (empty)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const folders = await getFolders()
 
@@ -973,6 +998,7 @@ describe('snippets.utils', () => {
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue(mockDirents as any)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       const folders = await getFolders()
 
@@ -1025,6 +1051,7 @@ describe('snippets.utils', () => {
       mockedFS.readdir.mockResolvedValue([
         { name: 'Existing Folder', isDirectory: () => true, isFile: () => false },
       ] as any)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(createFolder('Existing Folder')).rejects.toThrow(
         'Folder with name Existing Folder already exists'
@@ -1063,6 +1090,7 @@ describe('snippets.utils', () => {
         { name: 'Keep Me', isDirectory: () => true, isFile: () => false, folderId: null },
       ] as any)
       mockedFS.rmdir.mockResolvedValue(undefined)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await deleteFolder(folderId)
 
@@ -1093,6 +1121,7 @@ describe('snippets.utils', () => {
       const error = new Error('Permission denied') as NodeJS.ErrnoException
       error.code = 'EACCES'
       mockedFS.rmdir.mockRejectedValue(error)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(deleteFolder(folderId)).rejects.toThrow('Permission denied')
     })
@@ -1108,6 +1137,7 @@ describe('snippets.utils', () => {
       const error = new Error('Directory not found') as NodeJS.ErrnoException
       error.code = 'ENOENT'
       mockedFS.rmdir.mockRejectedValue(error)
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
       await expect(deleteFolder(folderId)).rejects.toThrow(`Folder with id ${folderId} not found`)
     })
