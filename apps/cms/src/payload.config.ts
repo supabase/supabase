@@ -1,11 +1,17 @@
-import { postgresAdapter } from '@payloadcms/db-postgres'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { plugins } from './plugins/index'
-import { defaultLexical } from '@/fields/defaultLexical'
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
+import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
+import { seoPlugin } from '@payloadcms/plugin-seo'
+import { s3Storage } from '@payloadcms/storage-s3'
+import { buildConfig, type Plugin } from 'payload'
+import { defaultLexical } from './fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+
+import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
+import type { Customer, Event, Post } from './payload-types'
 
 import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
@@ -18,6 +24,55 @@ import { Users } from './collections/Users'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const siteName = 'Supabase'
+
+const generateTitle: GenerateTitle<Post & Customer & Event> = ({ doc, collectionSlug }: any) => {
+  switch (collectionSlug) {
+    case 'customers':
+      return `${doc.name} | ${siteName} Customer Stories`
+    case 'events':
+      return `${doc.title} | ${siteName} Events`
+    case 'posts':
+      return doc.title
+    default:
+      return `${doc.title} | ${siteName}`
+  }
+}
+
+const generateURL: GenerateURL<Post> = ({ doc }: any) => {
+  const url = getServerSideURL()
+
+  return doc?.slug ? `${url}/${doc.slug}` : url
+}
+
+const plugins: Plugin[] = [
+  nestedDocsPlugin({
+    collections: ['categories'],
+    generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
+  }),
+  seoPlugin({
+    generateTitle,
+    generateURL,
+  }),
+  payloadCloudPlugin(),
+  s3Storage({
+    collections: {
+      media: {
+        prefix: 'media',
+      },
+    },
+    bucket: process.env.S3_BUCKET || '',
+    config: {
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+      },
+      region: process.env.S3_REGION,
+      endpoint: process.env.S3_ENDPOINT,
+    },
+  }),
+]
 
 export default buildConfig({
   admin: {
