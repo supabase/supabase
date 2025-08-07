@@ -31,6 +31,8 @@ export const toolSetValidationSchema = z.record(
     'display_edge_function',
     'rename_chat',
     'list_policies',
+
+    // Fallback tools for self-hosted
     'getSchemaTables',
     'getRlsKnowledge',
     'getFunctions',
@@ -96,6 +98,10 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
   list_policies: TOOL_CATEGORIES.SCHEMA,
+  getSchemaTables: TOOL_CATEGORIES.SCHEMA,
+  getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
+  getFunctions: TOOL_CATEGORIES.SCHEMA,
+  getEdgeFunctionKnowledge: TOOL_CATEGORIES.SCHEMA,
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
