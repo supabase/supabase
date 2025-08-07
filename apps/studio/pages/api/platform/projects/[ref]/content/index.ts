@@ -59,7 +59,7 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
     await getSnippet(updates.id)
     const updatedSnippet = await updateSnippet(updates.id, updates)
     return res.status(200).json(updatedSnippet)
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message.includes('not found')) {
       const body = req.body
       const { data, error } = SnippetSchema.safeParse(body)
@@ -77,7 +77,7 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(500).json({ error: 'Failed to create snippet' })
       }
     }
-    return res.status(500)
+    return res.status(500).json({ message: error?.message ?? 'Failed to update snippet' })
   }
 }
 
