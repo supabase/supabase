@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query'
+import { type QueryClient } from '@tanstack/react-query'
 import { tableKeys } from 'data/tables/keys'
 import { viewKeys } from 'data/views/keys'
 import { materializedViewKeys } from 'data/materialized-views/keys'
@@ -51,7 +51,7 @@ export class QueryCacheInvalidator {
   /**
    * Parse SQL statement to extract entity information
    */
-  parseSqlStatement(sql: string, projectRef: string): InvalidationEvent | null {
+  private parseSqlStatement(sql: string, projectRef: string): InvalidationEvent | null {
     const sqlLower = sql.toLowerCase().trim()
 
     // Extract action type
@@ -62,15 +62,11 @@ export class QueryCacheInvalidator {
     else if (sqlLower.includes('enable')) action = 'enable'
     else if (sqlLower.includes('disable')) action = 'disable'
 
-    if (!action) {
-      return null
-    }
+    if (!action) return null
 
     // Parse entity type and details
     const entityInfo = this.extractEntityInfo(sql, sqlLower, action)
-    if (!entityInfo) {
-      return null
-    }
+    if (!entityInfo) return null
 
     const event = {
       ...entityInfo,
@@ -216,7 +212,7 @@ export class QueryCacheInvalidator {
   /**
    * Handle invalidation event and update appropriate caches
    */
-  async handleInvalidation(event: InvalidationEvent): Promise<void> {
+  private async handleInvalidation(event: InvalidationEvent): Promise<void> {
     // Use setTimeout to ensure this runs in the next event loop
     // after all SQL execution and React updates have completed
     setTimeout(async () => {
@@ -439,8 +435,6 @@ export class QueryCacheInvalidator {
    */
   async processSql(sql: string, projectRef: string): Promise<void> {
     const event = this.parseSqlStatement(sql, projectRef)
-    if (event) {
-      await this.handleInvalidation(event)
-    }
+    if (event) await this.handleInvalidation(event)
   }
 }
