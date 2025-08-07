@@ -8,7 +8,8 @@ import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
-import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { QueryResponseError } from 'data/sql/execute-sql-mutation'
+import { useEnhancedExecuteSqlMutation } from 'lib/ai-assistant-invalidation/use-enhanced-execute-sql-mutation'
 import dayjs from 'dayjs'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
@@ -163,7 +164,7 @@ export const QueryBlock = ({
     ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
     : formattedQueryResult
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: execute, isLoading: isExecuting } = useEnhancedExecuteSqlMutation({
     onSuccess: (data) => {
       onResults?.(data.result)
       setQueryResult(data.result)
@@ -171,7 +172,7 @@ export const QueryBlock = ({
       setReadOnlyError(false)
       setQueryError(undefined)
     },
-    onError: (error) => {
+    onError: (error: QueryResponseError) => {
       const permissionDenied = error.message.includes('permission denied')
       const notOwner = error.message.includes('must be owner')
       if (permissionDenied || notOwner) {
@@ -205,6 +206,7 @@ export const QueryBlock = ({
         projectRef: ref,
         connectionString: readOnlyConnectionString,
         sql,
+        useSmartInvalidation: true,
       })
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
@@ -341,6 +343,7 @@ export const QueryBlock = ({
                 projectRef: ref,
                 connectionString: postgresConnectionString,
                 sql,
+                useSmartInvalidation: true,
               })
               onRunQuery?.('mutation')
             }
