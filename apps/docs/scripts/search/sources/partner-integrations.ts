@@ -57,8 +57,8 @@ export class IntegrationSource extends BaseSource {
     super(source, path)
   }
 
-  process() {
-    const { checksum, sections } = processMdx(this.partnerData.overview)
+  async process() {
+    const { checksum, sections } = await processMdx(this.partnerData.overview)
     const meta = {
       title: upperFirst(this.partnerData.slug),
       subtitle: 'Integration',

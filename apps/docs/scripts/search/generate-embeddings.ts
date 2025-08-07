@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
-import type { Json, Section } from '../helpers.mdx.js'
+import type { Section } from '../helpers.mdx.js'
 import { fetchAllSources } from './sources/index.js'
 
 const args = parseArgs({
@@ -78,8 +78,8 @@ async function generateEmbeddings() {
         checksum: string
         sections: Section[]
         ragIgnore?: boolean
-        meta?: Json
-      } = embeddingSource.process()
+        meta?: Record<string, unknown>
+      } = await embeddingSource.process()
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient

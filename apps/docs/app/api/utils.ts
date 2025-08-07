@@ -64,6 +64,16 @@ export class NoDataError<Details extends ObjectOrNever = never> extends ApiError
   }
 }
 
+export class FileNotFoundError<Details extends ObjectOrNever = never> extends Error {
+  constructor(
+    message: string,
+    error: Error,
+    public details?: Details
+  ) {
+    super(`FileNotFound: ${message}`, { cause: error })
+  }
+}
+
 export class MultiError<ErrorType = unknown, Details extends ObjectOrNever = never> extends Error {
   constructor(
     message: string,
@@ -79,7 +89,7 @@ export class MultiError<ErrorType = unknown, Details extends ObjectOrNever = nev
 
   appendError(message: string, error: ErrorType): this {
     this.message = `${this.message}\n\t${message}`
-    ;((this.cause ?? (this.cause = [])) as Array<ErrorType>).push(error)
+    ;((this.cause ??= []) as Array<ErrorType>).push(error)
     return this
   }
 }
