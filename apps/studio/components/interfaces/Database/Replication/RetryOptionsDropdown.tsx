@@ -103,7 +103,7 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
             aria-describedby={`rollback-${option.type}-description`}
           >
             <div className="flex items-start gap-x-2 w-full">
-              <div className="w-8">{option.icon}</div>
+              <div className="min-w-4">{option.icon}</div>
               <div
                 id={`rollback-${option.type}-description`}
                 className="flex flex-col gap-y-1 text-xs"
