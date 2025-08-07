@@ -22,7 +22,9 @@ export async function getTemporaryAPIKey(
   return data
 }
 
-type TemporaryAPIKeyData = Awaited<ReturnType<typeof getTemporaryAPIKey>>
+// [Joshen] Commenting out the useQuery here, unless we need it for realtime
+
+// type TemporaryAPIKeyData = Awaited<ReturnType<typeof getTemporaryAPIKey>>
 
 // export const useLegacyAPIKeysStatusQuery = <TData = LegacyAPIKeysStatusData>(
 //   { projectRef }: getTemporaryAPIKeyVariables,

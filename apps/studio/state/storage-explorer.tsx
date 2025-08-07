@@ -32,7 +32,7 @@ import {
 } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -47,7 +47,6 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
-import { post } from 'data/fetchers'
 
 type UploadProgress = {
   percentage: number
@@ -77,12 +76,10 @@ if (typeof window !== 'undefined') {
 function createStorageExplorerState({
   projectRef,
   resumableUploadUrl,
-  serviceKey,
   supabaseClient,
 }: {
   projectRef: string
   resumableUploadUrl: string
-  serviceKey: string
   supabaseClient?: () => Promise<SupabaseClient<any, 'public', any>>
 }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
@@ -94,7 +91,6 @@ function createStorageExplorerState({
     projectRef,
     supabaseClient,
     resumableUploadUrl,
-    serviceKey,
     uploadProgresses: [] as UploadProgress[],
 
     // abortController,
@@ -960,20 +956,6 @@ function createStorageExplorerState({
       columnIndex: number
       isDrop?: boolean
     }) => {
-      if (!state.serviceKey) {
-        toast(
-          <p>
-            Uploading files to Storage through the dashboard is currently unavailable with the new
-            API keys. Please re-enable{' '}
-            <InlineLink href={`/project/${state.projectRef}/settings/api-keys`}>
-              legacy JWT keys
-            </InlineLink>{' '}
-            if you'd like to upload files to Storage through the dashboard.
-          </p>
-        )
-        return
-      }
-
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
@@ -1172,27 +1154,6 @@ function createStorageExplorerState({
               headers: {
                 'x-source': 'supabase-dashboard',
               },
-              onBeforeRequest: async (req) => {
-                const { data, error } = await post('/platform/projects/{ref}/api-keys/temporary', {
-                  params: {
-                    path: {
-                      ref: state.projectRef,
-                    },
-                    query: {
-                      authorization_exp: '300',
-                      claims: JSON.stringify({
-                        role: 'service_role',
-                      }),
-                    },
-                  },
-                })
-
-                if (error) {
-                  throw error
-                }
-
-                req.setHeader('apikey', data.api_key)
-              },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
               metadata: {
@@ -1201,6 +1162,14 @@ function createStorageExplorerState({
                 ...fileOptions,
               },
               chunkSize,
+              onBeforeRequest: async (req) => {
+                try {
+                  const data = await getTemporaryAPIKey({ projectRef: state.projectRef })
+                  req.setHeader('apikey', data.api_key)
+                } catch (error) {
+                  throw error
+                }
+              },
               onShouldRetry(error) {
                 const status = error.originalResponse ? error.originalResponse.getStatus() : 0
                 const doNotRetryStatuses = [400, 403, 404, 409, 413, 415, 429]
@@ -1211,22 +1180,30 @@ function createStorageExplorerState({
                 numberOfFilesUploadedFail += 1
                 if (error instanceof tus.DetailedError) {
                   const status = error.originalResponse?.getStatus()
-                  if (status === 415) {
-                    // Unsupported mime type
-                    toast.error(
-                      capitalize(
-                        error?.originalResponse?.getBody() ||
-                          `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
-                      ),
-                      {
-                        description: `Allowed MIME types: ${state.selectedBucket.allowed_mime_types?.join(', ')}`,
-                      }
-                    )
-                  } else if (status === 413) {
-                    // Payload too large
-                    toast.error(
-                      `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
-                    )
+
+                  switch (status) {
+                    case 415:
+                      // Unsupported mime type
+                      toast.error(
+                        capitalize(
+                          error?.originalResponse?.getBody() ||
+                            `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
+                        ),
+                        {
+                          description: `Allowed MIME types: ${state.selectedBucket.allowed_mime_types?.join(', ')}`,
+                        }
+                      )
+                      break
+                    case 413:
+                      // Payload too large
+                      toast.error(
+                        `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
+                      )
+                      break
+                    case 409:
+                      // Resource already exists
+                      toast.error(`Failed to upload ${file.name}: File name already exists.`)
+                      break
                   }
                 } else {
                   toast.error(`Failed to upload ${file.name}: ${error.message}`)
@@ -1313,10 +1290,16 @@ function createStorageExplorerState({
         ) {
           toast.dismiss(toastId)
         } else if (numberOfFilesUploadedFail === numberOfFilesToUpload) {
-          toast.error(
-            `Failed to upload ${numberOfFilesToUpload} file${numberOfFilesToUpload > 1 ? 's' : ''}!`,
-            { id: toastId, closeButton: true, duration: SONNER_DEFAULT_DURATION }
-          )
+          if (numberOfFilesToUpload === 1) {
+            // [Joshen] We'd already be showing a toast when the upload files, so this is to prevent a
+            // duplicate error toast if its only one file that's getting uploaded
+            toast.dismiss(toastId)
+          } else {
+            toast.error(
+              `Failed to upload ${numberOfFilesToUpload} file${numberOfFilesToUpload > 1 ? 's' : ''}!`,
+              { id: toastId, closeButton: true, duration: SONNER_DEFAULT_DURATION }
+            )
+          }
         } else if (numberOfFilesUploadedSuccess === numberOfFilesToUpload) {
           toast.success(
             `Successfully uploaded ${numberOfFilesToUpload} file${
@@ -1741,7 +1724,7 @@ function createStorageExplorerState({
             )
           }
         />,
-        { id: toastId, closeButton: false, position: 'top-right' }
+        { id: toastId, closeButton: false, position: 'top-right', duration: Infinity }
       )
     },
 
@@ -1784,7 +1767,6 @@ type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 const DEFAULT_STATE_CONFIG = {
   projectRef: '',
   resumableUploadUrl: '',
-  serviceKey: '',
   supabaseClient: undefined,
 }
 
@@ -1799,10 +1781,8 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
 
-  const { serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
@@ -1814,61 +1794,39 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
     const hasDataReady = !!project?.ref
-    const serviceApiKey = serviceKey?.api_key ?? 'unknown'
 
     if (!isPaused && hasDataReady) {
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
           supabaseClient: async () => {
-            const { data, error } = await post('/platform/projects/{ref}/api-keys/temporary', {
-              params: {
-                path: {
-                  ref: project?.ref ?? '',
-                },
-                query: {
-                  authorization_exp: '300',
-                  claims: JSON.stringify({
-                    role: 'service_role',
-                  }),
-                },
-              },
-            })
+            try {
+              const data = await getTemporaryAPIKey({ projectRef: project.ref })
+              const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
 
-            if (error) {
+              return createClient(clientEndpoint, data.api_key, {
+                auth: {
+                  persistSession: false,
+                  autoRefreshToken: false,
+                  detectSessionInUrl: false,
+                  storage: {
+                    getItem: (key) => {
+                      return null
+                    },
+                    setItem: (key, value) => {},
+                    removeItem: (key) => {},
+                  },
+                },
+              })
+            } catch (error) {
               throw error
             }
-
-            const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-            return createClient(clientEndpoint, data.api_key, {
-              auth: {
-                persistSession: false,
-                autoRefreshToken: false,
-                detectSessionInUrl: false,
-                storage: {
-                  getItem: (key) => {
-                    return null
-                  },
-                  setItem: (key, value) => {},
-                  removeItem: (key) => {},
-                },
-              },
-            })
           },
           resumableUploadUrl,
-          serviceKey: serviceApiKey,
         })
       )
     }
-  }, [
-    project?.ref,
-    stateRef,
-    serviceKey?.api_key,
-    isPaused,
-    resumableUploadUrl,
-    protocol,
-    endpoint,
-  ])
+  }, [project?.ref, stateRef, isPaused, resumableUploadUrl, protocol, endpoint])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>
