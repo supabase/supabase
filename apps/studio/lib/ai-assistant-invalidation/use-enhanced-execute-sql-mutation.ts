@@ -5,7 +5,7 @@ import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { QueryCacheInvalidator } from './query-cache-invalidator'
 
 export type EnhancedExecuteSqlVariables = ExecuteSqlVariables & {
-  useSmartInvalidation?: boolean
+  granularInvalidation?: boolean
 }
 
 /**
@@ -31,10 +31,10 @@ export const useEnhancedExecuteSqlMutation = ({
     (args) => executeSql(args),
     {
       async onSuccess(data, variables, context) {
-        const { sql, projectRef, useSmartInvalidation = true, contextualInvalidation } = variables
+        const { sql, projectRef, granularInvalidation = false, contextualInvalidation } = variables
 
         // Use smart invalidation if enabled
-        if (useSmartInvalidation && projectRef) {
+        if (granularInvalidation && projectRef) {
           await router.processSql(sql, projectRef)
         }
         // Fall back to broad invalidation if requested
