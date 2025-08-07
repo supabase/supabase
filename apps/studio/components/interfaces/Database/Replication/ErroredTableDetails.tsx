@@ -47,7 +47,9 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
         </div>
       ) : retryPolicy === 'timed_retry' ? (
         <div className="flex flex-col gap-y-2 text-foreground-lighter">
-          <p className="text-xs">The system will automatically retry this table.</p>
+          <p className="text-xs">
+            A retry will be triggered automatically by restarting the pipeline on this table.
+          </p>
           <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
         </div>
       ) : null}

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Clock } from 'lucide-react'
 
 interface RetryCountdownProps {
   nextRetryTime: string // RFC3339 formatted date
@@ -65,11 +64,10 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     return () => clearInterval(interval)
   }, [targetTimestamp, calculateTimeRemaining])
 
-  const { timeDisplay, displayColor, statusMessage } = useMemo(() => {
+  const { timeDisplay, statusMessage } = useMemo(() => {
     if (targetTimestamp === null) {
       return {
         timeDisplay: 'Invalid retry time format',
-        displayColor: 'text-warning-600',
         statusMessage: '',
       }
     }
@@ -80,13 +78,11 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
     }
 
     let timeDisplay: string
-    let displayColor: string
     let statusMessage: string
 
     if (timeRemaining.isExpired) {
-      timeDisplay = 'Retry time reached'
-      displayColor = 'text-brand-600'
-      statusMessage = 'Automatic retry'
+      statusMessage = ''
+      timeDisplay = 'Retrying soon...'
     } else {
       const parts = [
         formatTimeUnit(timeRemaining.days, 'day'),
@@ -94,36 +90,17 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
         formatTimeUnit(timeRemaining.minutes, 'minute'),
         formatTimeUnit(timeRemaining.seconds, 'second'),
       ].filter(Boolean)
-
+      statusMessage = parts.length === 0 ? '' : 'Next retry in:'
       timeDisplay = parts.length === 0 ? 'Retrying soon...' : parts.join(' ')
-      statusMessage = 'Next retry in:'
-
-      const totalMinutes =
-        timeRemaining.days * 24 * 60 + timeRemaining.hours * 60 + timeRemaining.minutes
-      if (totalMinutes <= 5) {
-        displayColor = 'text-warning-600'
-      } else if (totalMinutes <= 60) {
-        displayColor = 'text-brand-600'
-      } else {
-        displayColor = 'text-foreground-light'
-      }
     }
 
-    return { timeDisplay, displayColor, statusMessage }
+    return { timeDisplay, statusMessage }
   }, [targetTimestamp, timeRemaining])
 
   return (
-    <div
-      className="flex items-center gap-2"
-      role="status"
-      aria-live="polite"
-      aria-label={`${statusMessage} ${timeDisplay}`}
-    >
-      <Clock className={`w-3 h-3 ${displayColor}`} />
-      <div className="text-xs">
-        <span className="font-medium">{statusMessage}</span>{' '}
-        <span className={`font-mono ${displayColor}`}>{timeDisplay}</span>
-      </div>
+    <div role="status" aria-live="polite" aria-label={`${statusMessage} ${timeDisplay}`}>
+      <span className="text-xs font-medium">{statusMessage}</span>{' '}
+      <span className="text-xs font-mono">{timeDisplay}</span>
     </div>
   )
 }
