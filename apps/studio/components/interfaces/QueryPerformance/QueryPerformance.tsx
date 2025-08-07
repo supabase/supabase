@@ -33,6 +33,35 @@ import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
 
+interface QueryPerformanceItem {
+  total_time?: number
+  calls?: number
+  max_time?: number
+}
+
+const safeMax = (values: (number | undefined | null)[]): number | null => {
+  if (!values.length) return null
+  const validNumbers = values.filter(
+    (val) => typeof val === 'number' && !isNaN(val) && isFinite(val)
+  )
+  return validNumbers.length > 0 ? Math.max(...validNumbers) : null
+}
+
+const formatMaxValue = (value: number | null): string | undefined => {
+  if (value === null || !isFinite(value)) return undefined
+  return value.toFixed(2)
+}
+
+const formatDisplayValue = (value: string | undefined, tabId: string): string => {
+  if (!value) return 'No data yet'
+
+  const numValue = Number(value)
+  if (tabId !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT) {
+    return numValue > 1000 ? `${(numValue / 1000).toFixed(2)}s` : `${numValue.toFixed(0)}ms`
+  }
+  return `${numValue.toLocaleString()} calls`
+}
+
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
   queryPerformanceQuery: DbQueryHook<any>
@@ -88,30 +117,27 @@ export const QueryPerformance = ({
         label: 'Most time consuming',
         description: 'Lists queries ordered by their cumulative total execution time.',
         isLoading: isLoadingMTC,
-        max:
-          (mostTimeConsumingQueries ?? []).length > 0
-            ? Math.max(...(mostTimeConsumingQueries ?? []).map((x: any) => x.total_time)).toFixed(2)
-            : undefined,
+        max: formatMaxValue(
+          safeMax((mostTimeConsumingQueries ?? []).map((x: QueryPerformanceItem) => x.total_time))
+        ),
       },
       {
         id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT,
         label: 'Most frequent',
         description: 'Lists queries in order of their execution count',
         isLoading: isLoadingMFI,
-        max:
-          (mostFrequentlyInvoked ?? []).length > 0
-            ? Math.max(...(mostFrequentlyInvoked ?? []).map((x: any) => x.calls)).toFixed(2)
-            : undefined,
+        max: formatMaxValue(
+          safeMax((mostFrequentlyInvoked ?? []).map((x: QueryPerformanceItem) => x.calls))
+        ),
       },
       {
         id: QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION,
         label: 'Slowest execution',
         description: 'Lists queries ordered by their maximum execution time',
         isLoading: isLoadingMMF,
-        max:
-          (slowestExecutionTime ?? []).length > 0
-            ? Math.max(...(slowestExecutionTime ?? []).map((x: any) => x.max_time)).toFixed(2)
-            : undefined,
+        max: formatMaxValue(
+          safeMax((slowestExecutionTime ?? []).map((x: QueryPerformanceItem) => x.max_time))
+        ),
       },
     ]
   }, [
@@ -136,13 +162,7 @@ export const QueryPerformance = ({
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
           {QUERY_PERFORMANCE_TABS.map((tab) => {
-            const tabMax = Number(tab.max)
-            const maxValue =
-              tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
-                ? tabMax > 1000
-                  ? (tabMax / 1000).toFixed(2)
-                  : tabMax.toFixed(0)
-                : tabMax.toLocaleString()
+            const displayValue = formatDisplayValue(tab.max, tab.id)
 
             return (
               <TabsTrigger_Shadcn_
@@ -174,18 +194,9 @@ export const QueryPerformance = ({
                 </div>
                 {tab.isLoading ? (
                   <ShimmeringLoader className="w-32 pt-1" />
-                ) : tab.max === undefined ? (
-                  <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                    No data yet
-                  </span>
                 ) : (
                   <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                    {maxValue}
-                    {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
-                      ? tabMax > 1000
-                        ? 's'
-                        : 'ms'
-                      : ' calls'}
+                    {displayValue}
                   </span>
                 )}
 
