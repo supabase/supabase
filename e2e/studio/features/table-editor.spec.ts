@@ -1,7 +1,6 @@
-import { expect, Page } from '@playwright/test'
 import fs from 'fs'
+import { expect, Page } from '@playwright/test'
 import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
 
 const getSelectors = (tableName: string) => ({
   tableButton: (page) => page.getByRole('button', { name: `View ${tableName}` }),
@@ -67,7 +66,7 @@ const createTable = async (page: Page, tableName: string) => {
     page.getByText(`Table ${tableName} is good to go!`),
     'Success toast should be visible after table creation'
   ).toBeVisible({
-    timeout: 50000,
+    timeout: 50_000,
   })
 
   await expect(
@@ -127,15 +126,14 @@ test.skip('Table Editor', () => {
   const tableNameCsv = `pw-test-csv`
 
   test.beforeAll(async ({ browser, ref }) => {
-    test.setTimeout(60000)
+    test.setTimeout(60_000)
 
     /**
      * Create a new table for the tests
      */
     page = await browser.newPage()
-    await page.goto(toUrl(`/project/${ref}/editor`))
+    await page.goto(`/project/${ref}/editor`, { waitUntil: `networkidle` })
 
-    await page.waitForTimeout(2000)
     // delete table name if it exists
     await deleteTable(page, testTableName)
     await deleteTable(page, tableNameRlsEnabled)
@@ -145,7 +143,7 @@ test.skip('Table Editor', () => {
   })
 
   test.afterAll(async () => {
-    test.setTimeout(60000)
+    test.setTimeout(60_000)
 
     // delete all tables related to this test
     await deleteTable(page, testTableName)
@@ -155,10 +153,10 @@ test.skip('Table Editor', () => {
     await deleteTable(page, tableNameCsv)
   })
 
-  test.skip('should perform all table operations sequentially', async ({ ref }) => {
+  test('should perform all table operations sequentially', async ({ ref }) => {
     await createTable(page, testTableName)
     const s = getSelectors(testTableName)
-    test.setTimeout(60000)
+    test.setTimeout(60_000)
 
     // 1. View table definition
     await page.evaluate(() => document.querySelector('.ReactQueryDevtools')?.remove())
@@ -291,7 +289,7 @@ test.skip('Table Editor', () => {
       page.getByText(`Table ${tableNameRlsDisabled} is good to go!`),
       'Success toast should be visible after Rls disabled table is created.'
     ).toBeVisible({
-      timeout: 50000,
+      timeout: 50_000,
     })
 
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
@@ -310,7 +308,7 @@ test.skip('Table Editor', () => {
       localStorage.removeItem('dashboard-history-default')
       localStorage.removeItem(`dashboard-history-${ref}`)
     }, ref)
-    await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
+    await page.goto(`/project/${ref}/database/types?schema=public`)
 
     // delete enum if it exists
     await deleteEnum(page, ENUM_NAME, ref)
@@ -335,7 +333,7 @@ test.skip('Table Editor', () => {
     await expect(page.getByRole('cell', { name: 'value1, value2', exact: true })).toBeVisible()
 
     // create a new table with new column for enums
-    await page.goto(toUrl(`/project/${ref}/editor`))
+    await page.goto(`/project/${ref}/editor`)
 
     const s = getSelectors(tableNameEnum)
     await s.newTableBtn(page).click()
@@ -356,7 +354,7 @@ test.skip('Table Editor', () => {
       page.getByText(`Table ${tableNameEnum} is good to go!`),
       'Success toast should be visible after table creation'
     ).toBeVisible({
-      timeout: 50000,
+      timeout: 50_000,
     })
 
     // Wait for the grid to be visible and data to be loaded
@@ -382,7 +380,7 @@ test.skip('Table Editor', () => {
 
     // delete enum and enum table
     await deleteTable(page, tableNameEnum)
-    await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
+    await page.goto(`/project/${ref}/database/types?schema=public`)
     await deleteEnum(page, ENUM_NAME, ref)
 
     // should end at the init link
@@ -391,7 +389,7 @@ test.skip('Table Editor', () => {
       localStorage.removeItem('dashboard-history-default')
       localStorage.removeItem(`dashboard-history-${ref}`)
     }, ref)
-    await page.goto(toUrl(`/project/${ref}/editor`))
+    await page.goto(`/project/${ref}/editor`)
   })
 
   test('csv import works properly', async () => {
