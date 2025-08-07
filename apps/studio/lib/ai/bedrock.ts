@@ -60,11 +60,7 @@ export const regionPrefixMap: Record<BedrockRegion, string> = {
   euc1: 'eu',
 }
 
-export type BedrockModel =
-  | 'anthropic.claude-3-7-sonnet-20250219-v1:0'
-  | 'anthropic.claude-3-5-haiku-20241022-v1:0'
-  | 'openai.gpt-oss-20b-1:0'
-  | 'openai.gpt-oss-120b-1:0'
+export type BedrockModel = 'anthropic.claude-3-7-sonnet-20250219-v1:0' | 'openai.gpt-oss-120b-1:0'
 
 export type RegionWeights = Record<BedrockRegion, number>
 
@@ -78,18 +74,6 @@ const modelRegionWeights: Record<BedrockModel, RegionWeights> = {
     use2: 10,
     usw2: 10,
     euc1: 10,
-  },
-  ['anthropic.claude-3-5-haiku-20241022-v1:0']: {
-    use1: 40,
-    use2: 0,
-    usw2: 40,
-    euc1: 0,
-  },
-  ['openai.gpt-oss-20b-1:0']: {
-    use1: 0,
-    use2: 0,
-    usw2: 40,
-    euc1: 0,
   },
   ['openai.gpt-oss-120b-1:0']: {
     use1: 0,
