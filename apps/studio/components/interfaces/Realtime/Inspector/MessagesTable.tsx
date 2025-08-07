@@ -8,7 +8,7 @@ import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
@@ -111,7 +111,7 @@ const MessagesTable = ({
   const stringData = JSON.stringify(data)
 
   const { ref } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {

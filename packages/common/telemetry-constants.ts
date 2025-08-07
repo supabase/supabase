@@ -1395,6 +1395,63 @@ export interface BranchReviewWithAssistantClickedEvent {
 }
 
 /**
+ * User clicked on a DPA PDF link to open it.
+ *
+ * @group Events
+ * @source www, studio
+ */
+export interface DpaPdfOpenedEvent {
+  action: 'dpa_pdf_opened'
+  properties: {
+    /**
+     * The source of the click, e.g. www, studio
+     */
+    source: 'www' | 'studio'
+  }
+}
+
+/**
+ * User clicked the Request DPA button to open the confirmation modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface DpaRequestButtonClickedEvent {
+  action: 'dpa_request_button_clicked'
+}
+
+/**
+ * User clicked a document view/download button to access a document.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface DocumentViewButtonClickedEvent {
+  action: 'document_view_button_clicked'
+  properties: {
+    /**
+     * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
+     */
+    documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the Request HIPAA button to open the HIPAA request form.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface HipaaRequestButtonClickedEvent {
+  action: 'hipaa_request_button_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1484,3 +1541,7 @@ export type TelemetryEvent =
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | DpaPdfOpenedEvent
+  | DpaRequestButtonClickedEvent
+  | DocumentViewButtonClickedEvent
+  | HipaaRequestButtonClickedEvent

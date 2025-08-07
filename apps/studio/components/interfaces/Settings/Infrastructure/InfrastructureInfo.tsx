@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -13,7 +12,7 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -35,7 +34,7 @@ import {
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
 

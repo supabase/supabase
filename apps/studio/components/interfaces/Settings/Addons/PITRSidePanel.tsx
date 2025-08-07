@@ -8,15 +8,14 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
@@ -29,7 +28,6 @@ import {
   CriticalIcon,
   Radio,
   SidePanel,
-  WarningIcon,
   cn,
 } from 'ui'
 
@@ -56,8 +54,8 @@ const PITR_CATEGORY_OPTIONS: {
 const PITRSidePanel = () => {
   const { ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')

@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
@@ -71,6 +70,7 @@ body,
   @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 * {
