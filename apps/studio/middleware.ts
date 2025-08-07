@@ -23,10 +23,17 @@ const HOSTED_SUPPORTED_API_URLS = [
 ]
 
 export function middleware(request: NextRequest) {
-  if (
-    IS_PLATFORM &&
-    !HOSTED_SUPPORTED_API_URLS.some((url) => request.nextUrl.pathname.endsWith(url))
-  ) {
+  if (!IS_PLATFORM) return
+  
+  const path = request.nextUrl.pathname
+  
+  // [Devang] Check for exact matches or nested paths under supported endpoints
+  const isAllowed = HOSTED_SUPPORTED_API_URLS.some(url => 
+    path === `/api${url}` || 
+    path.startsWith(`/api${url}/`)
+  )
+
+  if (!isAllowed) {
     return Response.json(
       { success: false, message: 'Endpoint not supported on hosted' },
       { status: 404 }
