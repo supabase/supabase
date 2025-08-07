@@ -1095,7 +1095,15 @@ functions:
     title: 'verifyOtp()'
     $ref: '@supabase/auth-js.GoTrueClient.verifyOtp'
     notes: |
-      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
+      - The `verifyOtp` method takes in different verification types.
+      - If a phone number is used, the type can either be:
+        1. `sms` – Used when verifying a one-time password (OTP) sent via SMS during sign-up or sign-in.
+        2. `phone_change` – Used when verifying an OTP sent to a new phone number during a phone number update process.
+      - If an email address is used, the type can be one of the following (note: `signup` and `magiclink` types are deprecated):
+        1. `email` – Used when verifying an OTP sent to the user's email during sign-up or sign-in.
+        2. `recovery` – Used when verifying an OTP sent for account recovery, typically after a password reset request.
+        3. `invite` – Used when verifying an OTP sent as part of an invitation to join a project or organization.
+        4. `email_change` – Used when verifying an OTP sent to a new email address during an email update process.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
       - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
     examples:
@@ -1653,7 +1661,7 @@ functions:
       - Resends a signup confirmation, email change or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
       - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
-      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made(note: For existing users signing in with OTP, you should use `signInWithOtp()` again to resend the OTP).
       - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
     examples:
       - id: resend-email-signup-confirmation

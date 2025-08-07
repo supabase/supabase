@@ -4,11 +4,11 @@ import { Loader, Search, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Input,
@@ -22,11 +22,11 @@ import {
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import SecretRow from './SecretRow'
-import { VaultSecret } from 'types'
+import type { VaultSecret } from 'types'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [showAddSecretModal, setShowAddSecretModal] = useState(false)

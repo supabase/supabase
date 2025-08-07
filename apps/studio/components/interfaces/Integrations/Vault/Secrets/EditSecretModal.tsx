@@ -8,6 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { VaultSecret } from 'types'
 import {
   Button,

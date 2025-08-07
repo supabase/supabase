@@ -16,7 +16,7 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import passwordStrength from 'lib/password-strength'
@@ -31,7 +31,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
           <header>
-            <h1 className="text-xl text-foreground">New project</h1>
+            <h2>New project</h2>
             <Markdown
               className="text-foreground-light"
               content={`Choose the Supabase organization you wish to install in`}
@@ -55,7 +55,7 @@ VercelIntegration.getLayout = (page) => (
 
 const CreateProject = () => {
   const router = useRouter()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')

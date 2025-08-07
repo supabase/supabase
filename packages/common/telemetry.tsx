@@ -12,9 +12,10 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
-import { useTelemetryCookie } from './hooks'
+import { useParams, useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
+import { posthogClient } from './posthog-client'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
@@ -46,14 +47,45 @@ export function handlePageTelemetry(
   featureFlags?: {
     [key: string]: unknown
   },
+  slug?: string,
+  ref?: string,
   telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2']
 ) {
+  // Send to PostHog client-side (only in browser)
+  if (typeof window !== 'undefined') {
+    const pageData = getSharedTelemetryData(pathname)
+    posthogClient.capturePageView({
+      $current_url: pageData.page_url,
+      $pathname: pageData.pathname,
+      $host: new URL(pageData.page_url).hostname,
+      $groups: {
+        ...(slug ? { organization: slug } : {}),
+        ...(ref ? { project: ref } : {}),
+      },
+      page_title: pageData.page_title,
+      ...pageData.ph,
+      ...Object.fromEntries(
+        Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
+      ),
+    })
+  }
+
+  // Send to backend
+  // TODO: Remove this once migration to client-side page telemetry is complete
   return post(
     `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
     telemetryDataOverride !== undefined
       ? { feature_flags: featureFlags, ...telemetryDataOverride }
       : {
           ...getSharedTelemetryData(pathname),
+          ...(slug || ref
+            ? {
+                groups: {
+                  ...(slug ? { organization: slug } : {}),
+                  ...(ref ? { project: ref } : {}),
+                },
+              }
+            : {}),
           feature_flags: featureFlags,
         },
     { headers: { Version: '2' } }
@@ -65,15 +97,35 @@ export function handlePageLeaveTelemetry(
   pathname: string,
   featureFlags?: {
     [key: string]: unknown
-  }
+  },
+  slug?: string,
+  ref?: string
 ) {
+  // Send to PostHog client-side (only in browser)
+  if (typeof window !== 'undefined') {
+    const pageData = getSharedTelemetryData(pathname)
+    posthogClient.capturePageLeave({
+      $current_url: pageData.page_url,
+      $pathname: pageData.pathname,
+      page_title: pageData.page_title,
+    })
+  }
+
+  // Send to backend
+  // TODO: Remove this once migration to client-side page telemetry is complete
   return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    body: {
-      pathname,
-      page_url: isBrowser ? window.location.href : '',
-      page_title: isBrowser ? document?.title : '',
-      feature_flags: featureFlags,
-    },
+    pathname,
+    page_url: isBrowser ? window.location.href : '',
+    page_title: isBrowser ? document?.title : '',
+    feature_flags: featureFlags,
+    ...(slug || ref
+      ? {
+          groups: {
+            ...(slug ? { organization: slug } : {}),
+            ...(ref ? { project: ref } : {}),
+          },
+        }
+      : {}),
   })
 }
 
@@ -81,15 +133,24 @@ export const PageTelemetry = ({
   API_URL,
   hasAcceptedConsent,
   enabled = true,
+  organizationSlug,
+  projectRef,
 }: {
   API_URL: string
   hasAcceptedConsent: boolean
   enabled?: boolean
+  organizationSlug?: string
+  projectRef?: string
 }) => {
   const router = useRouter()
 
   const pagesPathname = router?.pathname
   const appPathname = usePathname()
+
+  // Get from props or try to extract from URL params
+  const params = useParams()
+  const slug = organizationSlug || params.slug
+  const ref = projectRef || params.ref
 
   const featureFlags = useFeatureFlags()
 
@@ -105,21 +166,43 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current).catch((e) => {
+    return handlePageTelemetry(
+      API_URL,
+      pathnameRef.current,
+      featureFlagsRef.current,
+      slug,
+      ref
+    ).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
-  }, [API_URL, enabled, hasAcceptedConsent])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const sendPageLeaveTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current).catch((e) => {
+    if (!pathnameRef.current) return Promise.resolve()
+
+    return handlePageLeaveTelemetry(
+      API_URL,
+      pathnameRef.current,
+      featureFlagsRef.current,
+      slug,
+      ref
+    ).catch((e) => {
       console.error('Problem sending telemetry page-leave:', e)
     })
-  }, [API_URL, enabled, hasAcceptedConsent])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   // Handle initial page telemetry event
   const hasSentInitialPageTelemetryRef = useRef(false)
+
+  // Initialize PostHog client when consent is accepted
+  useEffect(() => {
+    if (hasAcceptedConsent && IS_PLATFORM) {
+      posthogClient.init(true)
+    }
+  }, [hasAcceptedConsent, IS_PLATFORM])
+
   useEffect(() => {
     // Send page telemetry on first page load
     // Waiting for router ready before sending page_view
@@ -136,19 +219,26 @@ export const PageTelemetry = ({
         try {
           const encodedData = telemetryCookie.split('=')[1]
           const telemetryData = JSON.parse(decodeURIComponent(encodedData))
-          handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, telemetryData)
+          handlePageTelemetry(
+            API_URL,
+            pathnameRef.current,
+            featureFlagsRef.current,
+            slug,
+            ref,
+            telemetryData
+          )
           // remove the telemetry cookie
           document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
         } catch (error) {
           console.error('Invalid telemetry data:', error)
         }
       } else {
-        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current)
+        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
       }
 
       hasSentInitialPageTelemetryRef.current = true
     }
-  }, [router?.isReady, hasAcceptedConsent, featureFlags.hasLoaded])
+  }, [router?.isReady, hasAcceptedConsent, featureFlags.hasLoaded, slug, ref])
 
   useEffect(() => {
     // For pages router
@@ -244,9 +334,13 @@ export function useTelemetryIdentify(API_URL: string) {
 
   useEffect(() => {
     if (user?.id) {
+      // Send to backend
       sendTelemetryIdentify(API_URL, {
         user_id: user.id,
       })
+
+      // Also identify in PostHog client-side
+      posthogClient.identify(user.id)
     }
   }, [API_URL, user?.id])
 }

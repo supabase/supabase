@@ -17,6 +17,60 @@ In the Supabase Dashboard:
 6. Configure the other options as needed to automate your GitHub connection.
 7. Click **Enable integration**.
 
+## Preparing your Git repository
+
+You will be using the [Supabase CLI](/docs/guides/cli) to initialise your local `./supabase` directory:
+
+<StepHikeCompact>
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Initialize Supabase locally" fullWidth>
+
+            If you don't have a `./supabase` directory, you can create one:
+
+            ```markdown
+            supabase init
+            ```
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Pull your database migration" fullWidth>
+
+            Pull your database changes using `supabase db pull`. To get your database connection string, go to your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true) and look for the Session pooler connection string.
+
+            ```markdown
+            supabase db pull --db-url <db_connection_string>
+
+            # Your Database connection string will look like this:
+            # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
+            ```
+        <Admonition type="note">
+
+          If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
+        </Admonition>
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3}>
+        <StepHikeCompact.Details title="Commit the `supabase` directory to Git" fullWidth>
+
+            Commit the `supabase` directory to Git, and push your changes to your remote repository.
+
+            ```bash
+            git add supabase
+            git commit -m "Initial migration"
+            git push
+            ```
+
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
 ## Syncing GitHub branches
 
 Enable the **Automatic branching** option in your GitHub Integration configuration to automatically sync GitHub branches with Supabase branches.

@@ -12,7 +12,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { timeout } from 'lib/helpers'
 import {
   Button,
@@ -47,7 +47,7 @@ export const FeedbackWidget = ({
 
   const router = useRouter()
   const { ref, slug } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const uploadButtonRef = useRef(null)
 
   const [isSending, setSending] = useState(false)

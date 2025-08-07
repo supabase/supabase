@@ -1,18 +1,18 @@
 import { useParams } from 'common'
 
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorer } from 'components/interfaces/Storage'
 import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
+import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { bucketId } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { projectRef } = useStorageExplorerStateSnapshot()
   const { bucket, error, isSuccess, isError } = useSelectedBucket()
 
