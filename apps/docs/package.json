@@ -6,7 +6,7 @@
   "scripts": {
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
-    "build:llms": "tsx ./scripts/llms.ts",
+    "build:llms": "tsx --conditions=react-server ./scripts/llms.ts",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
     "clean": "rimraf .next .turbo node_modules features/docs/generated examples __generated__",
     "codegen:examples": "shx cp -r ../../examples ./examples",
