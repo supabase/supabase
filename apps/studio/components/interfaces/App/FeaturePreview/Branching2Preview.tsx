@@ -26,10 +26,6 @@ export const Branching2Preview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>Custom roles created through the dashboard are not captured on branch creation.</li>
           <li>
-            Only <code>public</code> schema changes are supported right now.
-          </li>
-          <li>Extensions are not included in the diff process</li>
-          <li>
             Branches can only be merged to <code>main</code>; merging between preview branches is
             not supported.
           </li>
