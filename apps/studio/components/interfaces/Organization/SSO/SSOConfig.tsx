@@ -145,9 +145,9 @@ export const SSOConfig = () => {
         metadataXmlUrl: ssoConfig.metadata_xml_url,
         metadataXmlFile: ssoConfig.metadata_xml_file,
         emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),
-        userNameMapping: ssoConfig.user_name_mapping.map((userName) => ({ value: userName })),
-        firstNameMapping: ssoConfig.first_name_mapping.map((firstName) => ({ value: firstName })),
-        lastNameMapping: ssoConfig.last_name_mapping.map((lastName) => ({ value: lastName })),
+        userNameMapping: ssoConfig.user_name_mapping?.map((userName) => ({ value: userName })),
+        firstNameMapping: ssoConfig.first_name_mapping?.map((firstName) => ({ value: firstName })),
+        lastNameMapping: ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })),
         joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
         roleOnJoin: ssoConfig.join_org_on_signup_role,
       })
