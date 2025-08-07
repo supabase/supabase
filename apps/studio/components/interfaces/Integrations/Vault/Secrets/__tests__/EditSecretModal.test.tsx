@@ -7,6 +7,7 @@ import { render } from 'tests/helpers'
 import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import EditSecretModal from '../EditSecretModal'
+import { routerMock } from 'tests/lib/route-mock'
 
 const secret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
@@ -40,6 +41,8 @@ mockAnimationsApi()
 
 describe(`EditSecretModal`, () => {
   beforeEach(() => {
+    // useSelectedProjectQuery -> useParams
+    routerMock.setCurrentUrl(`/project/default/integrations/vault/secrets`)
     // 'http://localhost:3000/api/platform/projects/default'
     addAPIMock({
       method: `get`,
@@ -75,9 +78,7 @@ describe(`EditSecretModal`, () => {
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
 
-    await waitFor(() => {
-      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
-    })
+    await screen.findByRole(`dialog`)
 
     const nameInput = screen.getByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
