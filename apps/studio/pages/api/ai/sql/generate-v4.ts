@@ -15,6 +15,7 @@ import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from 'lib/ai/tool-filter'
 import { getTools } from './tools'
+import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 
 export const maxDuration = 120
 
@@ -116,6 +117,42 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     let mcpTools: ToolSet = {}
     let localTools: ToolSet = {
+      list_policies: tool({
+        description:
+          'Get existing policies and examples and instructions on how to write RLS policies',
+        parameters: z.object({
+          schemas: z.array(z.string()).describe('The schema names to get the policies for'),
+        }),
+        execute: async ({ schemas }) => {
+          const data = await getDatabasePolicies(
+            {
+              projectRef,
+              connectionString,
+              schema: schemas?.join(','),
+            },
+            undefined,
+            {
+              'Content-Type': 'application/json',
+              ...(authorization && { Authorization: authorization }),
+            }
+          )
+
+          const formattedPolicies = data
+            .map(
+              (policy) => `
+            Policy Name: "${policy.name}"
+            Action: ${policy.action}
+            Roles: ${policy.roles.join(', ')}
+            Command: ${policy.command}
+            Definition: ${policy.definition}
+            ${policy.check ? `Check: ${policy.check}` : ''}
+          `
+            )
+            .join('\n')
+
+          return formattedPolicies
+        },
+      }),
       display_query: tool({
         description:
           'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',

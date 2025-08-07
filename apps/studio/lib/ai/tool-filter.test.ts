@@ -32,6 +32,7 @@ describe('tool allowance by opt-in level', () => {
       list_extensions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_edge_functions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_branches: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      list_policies: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Log tools
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
@@ -72,6 +73,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
+    expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).not.toContain('get_advisors')
     expect(tools).not.toContain('execute_sql')
@@ -86,6 +88,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
+    expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
     expect(tools).not.toContain('execute_sql')
@@ -100,6 +103,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
+    expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
     expect(tools).not.toContain('execute_sql')
@@ -117,6 +121,7 @@ describe('filterToolsByOptInLevel', () => {
     list_extensions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     list_edge_functions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     list_branches: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    list_policies: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Log tools
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
@@ -173,6 +178,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
+      'list_policies',
       'get_advisors',
     ])
   })
@@ -185,6 +191,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
+      'list_policies',
       'get_advisors',
     ])
   })
@@ -309,6 +316,7 @@ describe('toolSetValidationSchema', () => {
       list_extensions: { parameters: z.object({}), execute: vitest.fn() },
       list_edge_functions: { parameters: z.object({}), execute: vitest.fn() },
       list_branches: { parameters: z.object({}), execute: vitest.fn() },
+      list_policies: { parameters: z.object({}), execute: vitest.fn() },
       search_docs: { parameters: z.object({}), execute: vitest.fn() },
       get_advisors: { parameters: z.object({}), execute: vitest.fn() },
       display_query: { parameters: z.object({}), execute: vitest.fn() },
