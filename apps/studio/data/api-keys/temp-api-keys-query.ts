@@ -1,4 +1,8 @@
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import { handleError, post } from 'data/fetchers'
+import { ResponseError } from 'types'
+import { apiKeysKeys } from './keys'
 
 interface getTemporaryAPIKeyVariables {
   projectRef?: string
@@ -22,19 +26,17 @@ export async function getTemporaryAPIKey(
   return data
 }
 
-// [Joshen] Commenting out the useQuery here, unless we need it for realtime
+type TemporaryAPIKeyData = Awaited<ReturnType<typeof getTemporaryAPIKey>>
 
-// type TemporaryAPIKeyData = Awaited<ReturnType<typeof getTemporaryAPIKey>>
-
-// export const useLegacyAPIKeysStatusQuery = <TData = LegacyAPIKeysStatusData>(
-//   { projectRef }: getTemporaryAPIKeyVariables,
-//   { enabled, ...options }: UseQueryOptions<LegacyAPIKeysStatusData, ResponseError, TData> = {}
-// ) =>
-//   useQuery<LegacyAPIKeysStatusData, ResponseError, TData>(
-//     apiKeysKeys.status(projectRef),
-//     ({ signal }) => getTemporaryAPIKey({ projectRef }, signal),
-//     {
-//       enabled: IS_PLATFORM && enabled && !!projectRef,
-//       ...options,
-//     }
-//   )
+export const useTemporaryAPIKeyQuery = <TData = TemporaryAPIKeyData>(
+  { projectRef }: getTemporaryAPIKeyVariables,
+  { enabled, ...options }: UseQueryOptions<TemporaryAPIKeyData, ResponseError, TData> = {}
+) =>
+  useQuery<TemporaryAPIKeyData, ResponseError, TData>(
+    apiKeysKeys.tempKey(projectRef),
+    ({ signal }) => getTemporaryAPIKey({ projectRef }, signal),
+    {
+      enabled: IS_PLATFORM && enabled && !!projectRef,
+      ...options,
+    }
+  )

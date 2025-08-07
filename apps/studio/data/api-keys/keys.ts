@@ -3,4 +3,5 @@ export const apiKeysKeys = {
     ['projects', projectRef, 'api-keys', reveal].filter(Boolean),
   single: (projectRef?: string, id?: string) => ['projects', projectRef, 'api-keys', id] as const,
   status: (projectRef?: string) => ['projects', projectRef, 'api-keys', 'legacy'] as const,
+  tempKey: (projectRef?: string) => ['projects', projectRef, 'api-keys', 'temp-key'] as const,
 }
