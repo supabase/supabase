@@ -123,11 +123,12 @@ const RenameQueryModal = ({
 
         snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
 
-        // remove the tab for the old snippet
+        // remove the tab for the old snippet if the snippet was open. Renaming can also happen when the tab is not open.
         const tabId = createTabId('sql', { id })
-        tabsSnap.removeTab(tabId)
-
-        await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
+        if (tabsSnap.hasTab(tabId)) {
+          tabsSnap.removeTab(tabId)
+          await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
+        }
       }
 
       toast.success('Successfully renamed snippet!')
