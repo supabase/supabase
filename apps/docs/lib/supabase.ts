@@ -6,14 +6,23 @@ export type Database = {
   graphql_public: DatabaseGenerated['graphql_public']
   public: {
     Tables: Omit<DatabaseGenerated['public']['Tables'], 'page_section'> & {
-      page_section: Omit<DatabaseGenerated['public']['Tables']['page_section'], 'Row' | 'Insert' | 'Update'> & {
+      page_section: Omit<
+        DatabaseGenerated['public']['Tables']['page_section'],
+        'Row' | 'Insert' | 'Update'
+      > & {
         Row: Omit<DatabaseGenerated['public']['Tables']['page_section']['Row'], 'embedding'> & {
           embedding: Array<number> | null
         }
-        Insert: Omit<DatabaseGenerated['public']['Tables']['page_section']['Insert'], 'embedding'> & {
+        Insert: Omit<
+          DatabaseGenerated['public']['Tables']['page_section']['Insert'],
+          'embedding'
+        > & {
           embedding?: Array<number> | null
         }
-        Update: Omit<DatabaseGenerated['public']['Tables']['page_section']['Update'], 'embedding'> & {
+        Update: Omit<
+          DatabaseGenerated['public']['Tables']['page_section']['Update'],
+          'embedding'
+        > & {
           embedding?: Array<number> | null
         }
       }
