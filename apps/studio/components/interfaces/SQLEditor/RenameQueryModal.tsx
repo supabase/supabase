@@ -15,7 +15,7 @@ import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { sqlEditorState, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -117,11 +117,9 @@ const RenameQueryModal = ({
       } else if (changedSnippet) {
         // In self-hosted, the snippet also updates the id when renaming it. This code is to ensure the previous snippet
         // is removed, new one is added, tab state is updated and the router is updated.
-        const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
-        sqlEditorState.snippets = otherSnippets
 
-        const { [id]: result, ...otherResults } = sqlEditorState.results
-        sqlEditorState.results = otherResults
+        // remove the old snippet from the state without saving to API
+        snapV2.removeSnippet(id, true)
 
         snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
 
@@ -129,7 +127,6 @@ const RenameQueryModal = ({
         const tabId = createTabId('sql', { id })
         tabsSnap.removeTab(tabId)
 
-        console.log(`/project/${ref}/sql/${changedSnippet.id}`)
         await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
       }
 

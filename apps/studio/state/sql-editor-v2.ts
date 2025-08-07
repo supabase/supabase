@@ -142,14 +142,14 @@ export const sqlEditorState = proxy({
     }
   },
 
-  removeSnippet: (id: string) => {
+  removeSnippet: (id: string, skipSave: boolean = false) => {
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
 
     const { [id]: result, ...otherResults } = sqlEditorState.results
     sqlEditorState.results = otherResults
 
-    sqlEditorState.needsSaving.delete(id)
+    if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
 
   addFolder: ({ projectRef, folder }: { projectRef: string; folder: SnippetFolder }) => {

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
@@ -140,7 +140,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           if (snippetContent === undefined) {
             return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
           } else {
-            await moveSnippetAsync({
+            const movedSnippet = await moveSnippetAsync({
               projectRef: ref,
               payload: {
                 id: snippet.id,
@@ -154,6 +154,21 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 content: snippetContent as any,
               },
             })
+            if (IS_PLATFORM) {
+              snapV2.updateSnippet({
+                id: snippet.id,
+                snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
+                skipSave: true,
+              })
+            } else if (movedSnippet) {
+              // On selfhosted, we need to update the state with the moved snippet because the snippet depends on the
+              // folder_id the moved snippet has a different id than the original snippet.
+
+              // remove the old snippet from the state without saving to API
+              snapV2.removeSnippet(snippet.id, true)
+
+              snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
+            }
           }
         })
       )
@@ -161,13 +176,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       toast.success(
         `Successfully moved ${snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length} snippets`} to ${selectedId === 'root' ? 'the root of the editor' : selectedFolder}`
       )
-      snippets.forEach((snippet) => {
-        snapV2.updateSnippet({
-          id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
-          skipSave: true,
-        })
-      })
+
       onClose()
     } catch (error: any) {
       toast.error(`Failed to create new folder: ${error.message}`)
