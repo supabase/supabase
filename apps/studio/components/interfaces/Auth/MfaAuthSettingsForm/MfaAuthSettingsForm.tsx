@@ -1,9 +1,9 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
-import { number, object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -63,19 +63,21 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
       : { verifyEnabled: false, enrollEnabled: false }
 }
 
-const totpSchema = object({
-  MFA_TOTP: string().required(),
-  MFA_MAX_ENROLLED_FACTORS: number()
+const totpSchema = z.object({
+  MFA_TOTP: z.string(),
+  MFA_MAX_ENROLLED_FACTORS: z
+    .number()
     .min(0, 'Must be a value 0 or larger')
     .max(30, 'Must be a value no greater than 30'),
 })
 
-const phoneSchema = object({
-  MFA_PHONE: string().required(),
-  MFA_PHONE_OTP_LENGTH: number()
+const phoneSchema = z.object({
+  MFA_PHONE: z.string(),
+  MFA_PHONE_OTP_LENGTH: z
+    .number()
     .min(6, 'Must be a value 6 or larger')
-    .max(30, 'must be a value no greater than 30'),
-  MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
+    .max(30, 'Must be a value no greater than 30'),
+  MFA_PHONE_TEMPLATE: z.string({ required_error: 'SMS template is required.' }),
 })
 
 const MfaAuthSettingsForm = () => {
@@ -101,7 +103,7 @@ const MfaAuthSettingsForm = () => {
   const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
 
   const totpForm = useForm({
-    resolver: yupResolver(totpSchema),
+    resolver: zodResolver(totpSchema),
     defaultValues: {
       MFA_TOTP: 'Enabled',
       MFA_MAX_ENROLLED_FACTORS: 10,
@@ -109,7 +111,7 @@ const MfaAuthSettingsForm = () => {
   })
 
   const phoneForm = useForm({
-    resolver: yupResolver(phoneSchema),
+    resolver: zodResolver(phoneSchema),
     defaultValues: {
       MFA_PHONE: 'Disabled',
       MFA_PHONE_OTP_LENGTH: 6,
@@ -144,16 +146,15 @@ const MfaAuthSettingsForm = () => {
     }
   }, [authConfig, isUpdatingTotpForm, isUpdatingPhoneForm])
 
-  const onSubmitTotpForm = (values: any) => {
+  const onSubmitTotpForm: SubmitHandler<z.infer<typeof totpSchema>> = ({ MFA_TOTP, ...values }) => {
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
-      MfaStatusToState(values.MFA_TOTP)
+      MfaStatusToState(MFA_TOTP)
 
     const payload = {
       ...values,
       MFA_TOTP_ENROLL_ENABLED,
       MFA_TOTP_VERIFY_ENABLED,
     }
-    delete payload.MFA_TOTP
 
     setIsUpdatingTotpForm(true)
 
@@ -172,19 +173,21 @@ const MfaAuthSettingsForm = () => {
     )
   }
 
-  const onSubmitPhoneForm = (values: any) => {
-    let payload = { ...values }
+  const onSubmitPhoneForm: SubmitHandler<z.infer<typeof phoneSchema>> = ({
+    MFA_PHONE,
+    ...values
+  }) => {
+    let payload: any = { ...values }
 
     if (isProPlanAndUp) {
       const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
-        MfaStatusToState(values.MFA_PHONE)
+        MfaStatusToState(MFA_PHONE)
       payload = {
         ...payload,
         MFA_PHONE_ENROLL_ENABLED,
         MFA_PHONE_VERIFY_ENABLED,
       }
     }
-    delete payload.MFA_PHONE
 
     setIsUpdatingPhoneForm(true)
 

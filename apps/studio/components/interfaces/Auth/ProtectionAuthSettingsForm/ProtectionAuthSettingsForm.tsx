@@ -1,10 +1,10 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Eye, EyeOff } from 'lucide-react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
-import { boolean, number, object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -42,39 +42,36 @@ const CAPTCHA_PROVIDERS = [
   { key: 'turnstile', label: 'Turnstile by Cloudflare' },
 ]
 
-const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
-  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
-  SECURITY_CAPTCHA_ENABLED: boolean().required(),
-  SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) => schema.required('Must have a Captcha secret'),
+const schema = z.intersection(
+  z.object({
+    DISABLE_SIGNUP: z.boolean(),
+    EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
+    SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
+    SITE_URL: z.string().url('Must have a Site URL'),
+    SESSIONS_TIMEBOX: z.number().min(0, 'Must be a positive number'),
+    SESSIONS_INACTIVITY_TIMEOUT: z.number().min(0, 'Must be a positive number'),
+    SESSIONS_SINGLE_PER_USER: z.boolean(),
+    PASSWORD_MIN_LENGTH: z.number().min(6, 'Must be greater or equal to 6.'),
+    PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
+    PASSWORD_HIBP_ENABLED: z.boolean(),
   }),
-  SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) =>
-      schema
-        .oneOf(['hcaptcha', 'turnstile'])
-        .required('Captcha provider must be either hcaptcha or turnstile'),
-  }),
-  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
-  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
-  SESSIONS_SINGLE_PER_USER: boolean(),
-  PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
-  PASSWORD_REQUIRED_CHARACTERS: string(),
-  PASSWORD_HIBP_ENABLED: boolean(),
-})
+  z.discriminatedUnion(`SECURITY_CAPTCHA_ENABLED`, [
+    z.object({
+      SECURITY_CAPTCHA_ENABLED: z.literal(false),
+    }),
+    z.object({
+      SECURITY_CAPTCHA_ENABLED: z.literal(true),
+      SECURITY_CAPTCHA_SECRET: z.string({ required_error: 'Must have a Captcha secret' }),
+      SECURITY_CAPTCHA_PROVIDER: z.union([z.literal('hcaptcha'), z.literal('turnstile')], {
+        required_error: 'Captcha provider must be either hcaptcha or turnstile',
+      }),
+    }),
+  ])
+)
 
 const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading,
-    isError,
-  } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingProtection, setIsUpdatingProtection] = useState(false)
   const [hidden, setHidden] = useState(true)
@@ -83,7 +80,7 @@ const ProtectionAuthSettingsForm = () => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const protectionForm = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
@@ -122,18 +119,22 @@ const ProtectionAuthSettingsForm = () => {
     }
   }, [authConfig, isUpdatingProtection])
 
-  const onSubmitProtection = (values: any) => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
     setIsUpdatingProtection(true)
-
-    const payload = { ...values }
-    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    // The backend uses empty string to represent no required characters in the password
-    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
-      payload.PASSWORD_REQUIRED_CHARACTERS = ''
-    }
-
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      {
+        projectRef: projectRef!,
+        config: {
+          ...values,
+          DISABLE_SIGNUP: !values.DISABLE_SIGNUP,
+          // The backend uses empty string to represent no required characters in the password
+          // @ts-expect-error the expected type is narrower than `string`
+          PASSWORD_REQUIRED_CHARACTERS:
+            values.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS
+              ? ''
+              : values.PASSWORD_REQUIRED_CHARACTERS,
+        },
+      },
       {
         onError: (error) => {
           toast.error(`Failed to update settings: ${error?.message}`)
@@ -166,7 +167,13 @@ const ProtectionAuthSettingsForm = () => {
       <ScaffoldSectionTitle className="mb-4">Bot and Abuse Protection</ScaffoldSectionTitle>
 
       <Form_Shadcn_ {...protectionForm}>
-        <form onSubmit={protectionForm.handleSubmit(onSubmitProtection)} className="space-y-4">
+        <form
+          onSubmit={
+            // @ts-expect-error SECURITY_CAPTCHA_ENABLED is a literal because of our use of discriminatedUnion, where boolean is expected
+            protectionForm.handleSubmit(onSubmit)
+          }
+          className="space-y-4"
+        >
           <Card>
             <CardContent>
               <FormField_Shadcn_
