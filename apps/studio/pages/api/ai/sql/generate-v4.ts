@@ -2,7 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { convertToModelMessages, ModelMessage, streamText, tool, ToolSet, stepCountIs } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
 import { getOrganizations } from 'data/organizations/organizations-query'
