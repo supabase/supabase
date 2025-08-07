@@ -274,7 +274,7 @@ const Hero = forwardRef<HTMLElement, any>((props, ref) => {
     <section ref={ref} className="relative w-full overflow-hidden">
       {/* SVG shapes container */}
       {/* absolute -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center overflow-x-hidden */}
-      <div className="absolute inset-0 -top-[40vh]">
+      <div className="absolute inset-0 -top-[30rem] xs:w-[calc(100%+50vw)] xs:-mx-[25vw]">
         <svg
           width="558"
           height="392"
@@ -368,10 +368,10 @@ const Hero = forwardRef<HTMLElement, any>((props, ref) => {
         </div>
       </div>
       {/* Text container */}
-      {/* mx-auto px-6 py-8 md:py-16 sm:px-16 xl:px-20 */}
-      <header className="container relative mt-[14vh] gap-[20vh] w-full z-10 flex flex-col text-center justify-center items-center px-4 mx-auto">
+
+      <header className="container relative mt-[8rem] gap-[8rem] sm:gap-[14rem] w-full z-10 flex flex-col text-center justify-center items-center px-4 mx-auto">
         <h1 className="flex flex-col gap-4 items-center">
-          <span className="!leading-[90%] tracking-[-0.025em] text-7xl md:text-[14vw] xl:text-[10vw]">
+          <span className="!leading-[90%] tracking-[-0.025em] text-8xl md:text-[14vw] lg:text-[12vw] xl:text-[10vw]">
             State of
             <br /> Startups
           </span>
