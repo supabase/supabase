@@ -20,16 +20,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+type GetRequestData =
+  paths['/platform/projects/{ref}/content/folders/{id}']['get']['parameters']['query']
 type GetResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  const folderId = req.query.id as string
+  const params = req.query as GetRequestData
+  const folderId = (params as any)?.id ?? null
 
   const folders = await getFolders(folderId)
-  const snippets = await getSnippets(folderId)
+  const { cursor, snippets } = await getSnippets({
+    searchTerm: params?.name,
+    cursor: params?.cursor,
+    folderId: folderId,
+    limit: params?.limit ? Number(params.limit) : undefined,
+    sort: params?.sort_by,
+    sortOrder: params?.sort_order,
+  })
 
-  return res.status(200).json({ data: { folders: folders, contents: snippets } })
+  return res.status(200).json({ data: { folders: folders, contents: snippets }, cursor })
 }
 
 type PatchResponseData =

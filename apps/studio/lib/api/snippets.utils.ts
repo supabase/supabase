@@ -1,5 +1,5 @@
 import fs from 'fs/promises'
-import { compact } from 'lodash'
+import { compact, reverse, sortBy } from 'lodash'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
@@ -195,14 +195,78 @@ export const getSnippet = async (snippetId: string) => {
   )
 }
 
-export const getSnippets = async (folderId: string | null = null): Promise<Snippet[]> => {
+/**
+ * Gets a filtered paginated list of snippets based on the provided criteria
+ */
+export const getSnippets = async ({
+  searchTerm,
+  limit,
+  cursor,
+  sort,
+  sortOrder,
+  folderId,
+}: {
+  searchTerm?: string
+  limit?: number
+  cursor?: string
+  sortOrder?: 'asc' | 'desc'
+  sort?: 'name' | 'inserted_at'
+  folderId?: string | null
+}): Promise<{ cursor: string | undefined; snippets: Snippet[] }> => {
+  searchTerm = searchTerm?.trim() ?? ''
+  limit = limit ?? 100
+  sort = sort ?? 'inserted_at'
+  sortOrder = sortOrder ?? 'desc'
+  cursor = cursor ?? undefined
+  folderId = folderId ?? null
+
   const entries = await getFilesystemEntries()
   const files = entries.filter(
     (entry): entry is FilesystemEntry & { type: 'file'; content: string } =>
-      entry.type === 'file' && entry.folderId === folderId
+      entry.type === 'file' && entry.content !== undefined && entry.content !== null
   )
-  const snippets = files.map((file) => buildSnippet(file.name, file.content, file.folderId))
-  return snippets
+
+  let snippets = files
+  // if there's a search term, filter snippets across all folders.
+  if (searchTerm) {
+    snippets = files.filter((file) => file.name.includes(searchTerm))
+  } else {
+    snippets = files.filter((file) => file.folderId === folderId)
+  }
+
+  snippets = sortBy(snippets, (s) => {
+    if (sort === 'inserted_at') {
+      return s.createdAt.getTime()
+    }
+    return s.name
+  })
+
+  if (sortOrder === 'desc') {
+    snippets = reverse(snippets)
+  }
+
+  if (cursor) {
+    const cursorIndex = snippets.findIndex((s) => s.id === cursor)
+    if (cursorIndex !== -1) {
+      snippets = snippets.slice(cursorIndex + 1)
+    }
+  }
+
+  let nextCursor: string | undefined = undefined
+  let paginated = snippets
+  if (limit) {
+    paginated = snippets.slice(0, Number(limit))
+    if (snippets.length > paginated.length) {
+      nextCursor = paginated[paginated.length - 1].id
+    }
+  }
+
+  return {
+    cursor: nextCursor,
+    snippets: paginated.map((file) =>
+      buildSnippet(file.name, file.content, file.folderId, file.createdAt)
+    ),
+  }
 }
 
 /**

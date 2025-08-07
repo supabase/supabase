@@ -22,17 +22,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+type GetRequestData =
+  paths['/platform/projects/{ref}/content/folders']['get']['parameters']['query']
 type GetResponseData =
   paths['/platform/projects/{ref}/content/folders']['get']['responses']['200']['content']['application/json']
 
-type GetRequestData =
-  paths['/platform/projects/{ref}/content/folders']['get']['parameters']['query']
-
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  const folders = await getFolders()
-  const snippets = await getSnippets()
+  const params = req.query as GetRequestData
 
-  res.status(200).json({ data: { folders, contents: snippets } })
+  const folders = await getFolders()
+  const { cursor, snippets } = await getSnippets({
+    searchTerm: params?.name,
+    limit: params?.limit ? Number(params.limit) : undefined,
+    cursor: params?.cursor,
+    sort: params?.sort_by,
+    sortOrder: params?.sort_order,
+  })
+
+  res.status(200).json({ data: { folders, contents: snippets }, cursor })
 }
 
 type PostResponseData =

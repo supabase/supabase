@@ -44,8 +44,15 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
   }
 
   try {
-    const snippets = await getSnippets()
-    return res.status(200).json({ data: snippets })
+    const { cursor, snippets } = await getSnippets({
+      searchTerm: params?.name,
+      limit: params?.limit ? Number(params.limit) : undefined,
+      cursor: params?.cursor,
+      sort: params?.sort_by,
+      sortOrder: params?.sort_order,
+    })
+
+    return res.status(200).json({ data: snippets, cursor })
   } catch (error) {
     console.error('Error fetching snippets:', error)
     return res.status(500).json({ data: [] })
