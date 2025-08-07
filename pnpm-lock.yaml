@@ -31649,12 +31649,6 @@ snapshots:
       ws: 8.18.1
     optional: true
 
-  graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.3):
-    dependencies:
-      graphql: 16.11.0
-    optionalDependencies:
-      ws: 8.18.3
-
   graphql@16.11.0: {}
 
   gray-matter@2.1.1:
