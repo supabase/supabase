@@ -55,7 +55,7 @@
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
-    "supabase": "^1.151.1",
+    "supabase": "^2.33.9",
     "supports-color": "^8.0.0",
     "turbo": "2.3.3",
     "typescript": "~5.5.0"
@@ -79,6 +79,13 @@
     "pnpm": ">=9",
     "node": ">=22"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@9.15.5"
 }
