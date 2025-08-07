@@ -1,13 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { IS_PLATFORM } from 'common'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { apiKeysKeys } from './keys'
 
 interface getTemporaryAPIKeyVariables {
   projectRef?: string
 }
 
+// [Joshen] This one specifically shouldn't need a useQuery hook since the expiry is meant to be short lived
+// Used in storage explorer and realtime inspector.
 export async function getTemporaryAPIKey(
   { projectRef }: getTemporaryAPIKeyVariables,
   signal?: AbortSignal
@@ -25,18 +23,3 @@ export async function getTemporaryAPIKey(
   if (error) handleError(error)
   return data
 }
-
-type TemporaryAPIKeyData = Awaited<ReturnType<typeof getTemporaryAPIKey>>
-
-export const useTemporaryAPIKeyQuery = <TData = TemporaryAPIKeyData>(
-  { projectRef }: getTemporaryAPIKeyVariables,
-  { enabled, ...options }: UseQueryOptions<TemporaryAPIKeyData, ResponseError, TData> = {}
-) =>
-  useQuery<TemporaryAPIKeyData, ResponseError, TData>(
-    apiKeysKeys.tempKey(projectRef),
-    ({ signal }) => getTemporaryAPIKey({ projectRef }, signal),
-    {
-      enabled: IS_PLATFORM && enabled && !!projectRef,
-      ...options,
-    }
-  )
