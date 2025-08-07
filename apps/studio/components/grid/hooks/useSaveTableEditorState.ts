@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
 
 import { saveTableEditorStateToLocalStorage } from 'components/grid/SupabaseGrid.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 /**
  * Hook for saving state and triggering side effects.
  */
 export function useSaveTableEditorState() {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorTableStateSnapshot()
 
   const saveDataAndTriggerSideEffects = useCallback(

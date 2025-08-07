@@ -32,7 +32,7 @@ export const getFallbackTools = ({
   return {
     getSchemaTables: tool({
       description: 'Get more information about one or more schemas',
-      parameters: z.object({
+      inputSchema: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the definitions for'),
       }),
       execute: async ({ schemas }) => {
@@ -82,7 +82,7 @@ export const getFallbackTools = ({
     getRlsKnowledge: tool({
       description:
         'Get existing policies and examples and instructions on how to write RLS policies',
-      parameters: z.object({
+      inputSchema: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the policies for'),
       }),
       execute: async ({ schemas }) => {
@@ -354,7 +354,7 @@ export const getFallbackTools = ({
     }),
     getFunctions: tool({
       description: 'Get database functions for one or more schemas',
-      parameters: z.object({
+      inputSchema: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the functions for'),
       }),
       execute: async ({ schemas }) => {
@@ -395,7 +395,7 @@ export const getFallbackTools = ({
     }),
     getEdgeFunctionKnowledge: tool({
       description: 'Get knowledge about how to write edge functions for Supabase',
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: async ({}) => {
         return stripIndent`
         # Writing Supabase Edge Functions

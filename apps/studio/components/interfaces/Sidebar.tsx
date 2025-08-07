@@ -12,14 +12,13 @@ import {
   generateSettingsRoutes,
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -218,12 +217,10 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
 const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useAppStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
-
-  const showWarehouse = useFlag('warehouse')
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -310,14 +307,11 @@ const ProjectLinks = () => {
               </div>
             )
           } else if (route.key === 'logs') {
-            // TODO: Undo this when warehouse flag is removed
-            const label = showWarehouse ? 'Logs & Analytics' : route.label
-            const newRoute = { ...route, label }
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={newRoute}
-                active={activeRoute === newRoute.key}
+                route={route}
+                active={activeRoute === route.key}
               />
             )
           } else {
@@ -349,7 +343,7 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 

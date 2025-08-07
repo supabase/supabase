@@ -1,14 +1,14 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToCoreMessages, CoreMessage, streamText, tool, ToolSet } from 'ai'
+import { convertToModelMessages, ModelMessage, streamText, tool, ToolSet, stepCountIs } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
 import { getOrganizations } from 'data/organizations/organizations-query'
 import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { AiOptInLevel, getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -75,10 +75,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  // Server-side safety: limit to last 5 messages and remove `results` property to prevent accidental leakage.
+  // Server-side safety: limit to last 7 messages and remove `results` property to prevent accidental leakage.
   // Results property is used to cache results client-side after queries are run
   // Tool results will still be included in history sent to model
-  const messages = (rawMessages || []).slice(-5).map((msg: any) => {
+  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
     if (msg && msg.role === 'assistant' && 'results' in msg) {
       const cleanedMsg = { ...msg }
       delete cleanedMsg.results
@@ -87,34 +87,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return msg
   })
 
-  // Get organizations and compute opt in level server-side
-  const [organizations, projects] = await Promise.all([
-    getOrganizations({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
-    getProjects({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
-  ])
+  let aiOptInLevel: AiOptInLevel = 'schema'
+  let isLimited = false
 
-  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const selectedProject = projects.find(
-    (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
-  )
+  if (IS_PLATFORM) {
+    // Get organizations and compute opt in level server-side
+    const [organizations, projects] = await Promise.all([
+      getOrganizations({
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+      }),
+      getProjects({
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+      }),
+    ])
 
-  // If the project is not in the organization specific by the org slug, return an error
-  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
-    return res.status(400).json({ error: 'Project and organization do not match' })
+    const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+    const selectedProject = projects.find(
+      (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
+    )
+
+    // If the project is not in the organization specific by the org slug, return an error
+    if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+      return res.status(400).json({ error: 'Project and organization do not match' })
+    }
+
+    aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+    isLimited = selectedOrg?.plan.id === 'free'
   }
-
-  const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
-  const isLimited = selectedOrg?.plan.id === 'free'
 
   const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
 
@@ -162,7 +167,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-    const coreMessages: CoreMessage[] = [
+    const coreMessages: ModelMessage[] = [
       {
         role: 'system',
         content: system,
@@ -178,7 +183,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         // Add any dynamic context here
         content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
       },
-      ...convertToCoreMessages(messages),
+      ...convertToModelMessages(messages),
     ]
 
     // Get tools
@@ -192,13 +197,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const result = streamText({
       model,
-      maxSteps: 5,
+      stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,
     })
 
-    result.pipeDataStreamToResponse(res, {
-      getErrorMessage: (error) => {
+    result.pipeUIMessageStreamToResponse(res, {
+      onError: (error) => {
         if (error == null) {
           return 'unknown error'
         }

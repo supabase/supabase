@@ -1,4 +1,4 @@
-import { Tool, ToolSet, ToolExecutionOptions } from 'ai'
+import { Tool, ToolSet } from 'ai'
 import { describe, expect, it, vitest } from 'vitest'
 import { z } from 'zod'
 
@@ -249,7 +249,7 @@ describe('transformToolResult', () => {
 
     // Execute the transformed tool
     const args = { key: 'value' }
-    const options = {} as ToolExecutionOptions
+    const options = {} as any
 
     if (!transformedTool.execute) {
       throw new Error('Transformed tool does not have an execute function')

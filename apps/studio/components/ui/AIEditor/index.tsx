@@ -1,5 +1,5 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
-import { useCompletion } from 'ai/react'
+import { useCompletion } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'
@@ -23,9 +23,11 @@ interface AIEditorProps {
   }
   initialPrompt?: string
   readOnly?: boolean
+  autoFocus?: boolean
   className?: string
   options?: monacoEditor.IStandaloneEditorConstructionOptions
   onChange?: (value: string) => void
+  onClose?: () => void
   executeQuery?: () => void
 }
 
@@ -41,9 +43,11 @@ const AIEditor = ({
   aiMetadata,
   initialPrompt,
   readOnly = false,
+  autoFocus = false,
   className = '',
   options = {},
   onChange,
+  onClose,
   executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
@@ -75,9 +79,6 @@ const AIEditor = ({
   } = useCompletion({
     api: aiEndpoint || '',
     body: aiMetadata,
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
-    },
     onError: (error) => {
       toast.error(`Failed to generate: ${error.message}`)
     },
@@ -149,6 +150,17 @@ const AIEditor = ({
       })
     }
 
+    if (!!onClose) {
+      editor.addAction({
+        id: 'close-editor',
+        label: 'Close editor',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
+        contextMenuGroupId: 'operation',
+        contextMenuOrder: 0,
+        run: () => onClose(),
+      })
+    }
+
     editor.addAction({
       id: 'generate-ai',
       label: 'Generate with AI',
@@ -176,6 +188,11 @@ const AIEditor = ({
         })
       },
     })
+
+    if (autoFocus) {
+      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
+      editor.focus()
+    }
   }
 
   const handlePrompt = async (
@@ -327,6 +344,7 @@ const AIEditor = ({
         </div>
       ) : (
         <div className="w-full h-full relative">
+          {/* [Joshen] Refactor: Use CodeEditor.tsx instead, reduce duplicate declaration of Editor */}
           <Editor
             theme="supabase"
             language={language}

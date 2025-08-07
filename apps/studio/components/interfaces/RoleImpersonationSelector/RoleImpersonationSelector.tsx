@@ -59,7 +59,7 @@ const RoleImpersonationSelector = ({
   return (
     <>
       <div className={cn('flex flex-col gap-3', padded ? 'p-5' : 'pb-5')}>
-        <h2 className="text-foreground text-base">Database role settings</h2>
+        <p className="text-foreground text-base">Database role settings</p>
 
         <form
           onSubmit={(e) => {
@@ -131,9 +131,7 @@ const RoleImpersonationSelector = ({
       {selectedOption === 'authenticated' && (
         <>
           <DropdownMenuSeparator />
-          <div className={cn('py-5', padded && 'px-5')}>
-            <UserImpersonationSelector />
-          </div>
+          <UserImpersonationSelector />
         </>
       )}
     </>
