@@ -6,9 +6,6 @@ import { env, STORAGE_STATE_PATH } from './env.config'
  * Catch errors and show useful messages.
  */
 
-const IS_PLATFORM = process.env.IS_PLATFORM
-const envHasAuth = env.AUTHENTICATION
-
 export default async () => {
   const browser = await chromium.launch()
   const page = await browser.newPage()
@@ -16,8 +13,8 @@ export default async () => {
   console.log(`\n 🧪 Setting up test environment.
     - Studio URL: ${env.STUDIO_URL}
     - API URL: ${env.API_URL}
-    - Auth: ${envHasAuth ? 'enabled' : 'disabled'}
-    - Is Platform: ${IS_PLATFORM}
+    - Auth: ${env.AUTHENTICATION ? 'enabled' : 'disabled'}
+    - Is Platform: ${env.IS_PLATFORM}
     `)
 
   /**
