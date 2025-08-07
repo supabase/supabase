@@ -7,7 +7,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
@@ -20,7 +20,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const snap = useAppStateSnapshot()
   const isUserMFAEnabled = useIsMFAEnabled()
 
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [dashboardHistory, _, { isSuccess: isSuccessStorage }] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref ?? ''),

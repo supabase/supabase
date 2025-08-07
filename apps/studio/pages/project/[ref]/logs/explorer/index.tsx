@@ -10,7 +10,6 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LOGS_TABLES,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
 import {
@@ -37,7 +36,7 @@ import {
 } from 'data/content/content-upsert-mutation'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -65,9 +64,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref, q, queryId, source: routerSource } = useParams()
+  const { ref, q, queryId } = useParams()
   const projectRef = ref as string
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
   const [editorId] = useState<string>(uuidv4())

@@ -11,7 +11,7 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
@@ -21,7 +21,7 @@ import { Admonition } from 'ui-patterns'
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 

@@ -67,7 +67,7 @@ const StorageMenu = () => {
 
   return (
     <>
-      <Menu type="pills" className="my-6 flex flex-grow flex-col">
+      <Menu type="pills" className="mt-6 flex flex-grow flex-col">
         <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
           <ButtonTooltip
             block
@@ -180,9 +180,7 @@ const StorageMenu = () => {
             )}
           </div>
 
-          <div className="h-px w-full bg-border" />
-
-          <div className="mx-3">
+          <div className="w-full bg-dash-sidebar px-3 py-6 sticky bottom-0 border-t border-border">
             <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`}>
               <Menu.Item rounded active={page === 'policies'}>

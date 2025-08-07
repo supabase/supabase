@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -12,6 +11,7 @@ import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signin
 import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDialog,
@@ -50,7 +50,7 @@ type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'd
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
-  const { project, isLoading: isProjectLoading } = useProjectContext()
+  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 
   const newJwtSecrets = useFlag('newJwtSecrets')
 

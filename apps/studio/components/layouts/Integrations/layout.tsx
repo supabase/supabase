@@ -9,7 +9,7 @@ import { ProductMenu } from 'components/ui/ProductMenu'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useScroll } from 'framer-motion'
-import { useSelectedProject, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Menu, Separator } from 'ui'
@@ -32,7 +32,7 @@ const IntegrationsLayout = ({ ...props }: PropsWithChildren) => {
  * Top level layout
  */
 const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const router = useRouter()
   // Refs for the main scrollable area and header
   const mainElementRef = useRef<HTMLDivElement>(null)

@@ -5,16 +5,13 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
@@ -29,7 +26,7 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 const RestartServerButton = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
