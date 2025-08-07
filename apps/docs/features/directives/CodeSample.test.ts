@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, it, expect, vi } from 'vitest'
 
+import { stripIndent } from 'common-tags'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -17,6 +18,42 @@ let env: NodeJS.Process['env']
 vi.mock('~/lib/constants', () => ({
   IS_PLATFORM: true,
 }))
+
+/**
+ * Checks if str1 contains str2, ignoring leading whitespace on each line.
+ * Lines are matched if they have the same content after trimming leading whitespace.
+ *
+ * @param str1 - The string to search in
+ * @param str2 - The string to search for
+ * @returns true if str1 contains str2 modulo leading whitespace, false otherwise
+ */
+export function containsStringIgnoringLeadingWhitespace(str1: string, str2: string): boolean {
+  const lines1 = str1.split('\n').map((line) => line.trimStart())
+  const lines2 = str2.split('\n').map((line) => line.trimStart())
+
+  if (lines2.length === 0) {
+    return true
+  }
+
+  if (lines2.length > lines1.length) {
+    return false
+  }
+
+  for (let i = 0; i <= lines1.length - lines2.length; i++) {
+    let matches = true
+    for (let j = 0; j < lines2.length; j++) {
+      if (lines1[i + j] !== lines2[j]) {
+        matches = false
+        break
+      }
+    }
+    if (matches) {
+      return true
+    }
+  }
+
+  return false
+}
 
 describe('$CodeSample', () => {
   beforeAll(() => {
@@ -532,6 +569,169 @@ Some more text.
 `.trimStart()
 
     expect(output).toEqual(expected)
+  })
+
+  describe('convertToJs option', () => {
+    it('should convert TypeScript to JavaScript when convertToJs is true', async () => {
+      const markdown = `
+# Embed code sample
+
+<$CodeSample path="/_internal/fixtures/typescript.ts" lines={[[1, -1]]} convertToJs={true} />
+
+Some more text.
+`.trim()
+
+      const mdast = fromMarkdown(markdown, {
+        mdastExtensions: [mdxFromMarkdown()],
+        extensions: [mdxjs()],
+      })
+      const transformed = await transformWithMock(mdast)
+      const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+      const expected = stripIndent`
+        \`\`\`javascript
+        const users = [
+          { id: 1, name: 'John', email: 'john@example.com' },
+          { id: 2, name: 'Jane' },
+        ];
+
+        function getUserById(id) {
+          return users.find((user) => user.id === id);
+        }
+
+        function createUser(name, email) {
+          const newId = Math.max(...users.map((u) => u.id)) + 1;
+          const newUser = { id: newId, name };
+          if (email) {
+            newUser.email = email;
+          }
+          users.push(newUser);
+          return newUser;
+        }
+
+        class UserManager {
+          users = [];
+
+          constructor(initialUsers = []) {
+            this.users = initialUsers;
+          }
+
+          addUser(user) {
+            this.users.push(user);
+          }
+
+          getUsers() {
+            return [...this.users];
+          }
+        }
+	\`\`\`
+      `.trim()
+
+      expect(containsStringIgnoringLeadingWhitespace(output, expected)).toBe(true)
+    })
+
+    it('should preserve TypeScript when convertToJs is false', async () => {
+      const markdown = `
+# Embed code sample
+
+<$CodeSample path="/_internal/fixtures/typescript.ts" lines={[[1, -1]]} convertToJs={false} />
+
+Some more text.
+`.trim()
+
+      const mdast = fromMarkdown(markdown, {
+        mdastExtensions: [mdxFromMarkdown()],
+        extensions: [mdxjs()],
+      })
+      const transformed = await transformWithMock(mdast)
+      const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+      // The output should contain TypeScript types
+      expect(output).toContain('```typescript')
+      expect(output).toContain('interface User')
+      expect(output).toContain('type Status')
+      expect(output).toContain(': User')
+      expect(output).toContain(': number')
+      expect(output).toContain(': string')
+    })
+
+    it('should preserve TypeScript when convertToJs is not specified (default)', async () => {
+      const markdown = `
+# Embed code sample
+
+<$CodeSample path="/_internal/fixtures/typescript.ts" lines={[[1, -1]]} />
+
+Some more text.
+`.trim()
+
+      const mdast = fromMarkdown(markdown, {
+        mdastExtensions: [mdxFromMarkdown()],
+        extensions: [mdxjs()],
+      })
+      const transformed = await transformWithMock(mdast)
+      const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+      // The output should contain TypeScript types by default
+      expect(output).toContain('```typescript')
+      expect(output).toContain('interface User')
+      expect(output).toContain('type Status')
+    })
+
+    it('should convert types but preserve line selection and elision', async () => {
+      const markdown = `
+# Embed code sample
+
+<$CodeSample path="/_internal/fixtures/typescript.ts" lines={[[1, 4], [10, -1]]} convertToJs={true} />
+
+Some more text.
+`.trim()
+
+      const mdast = fromMarkdown(markdown, {
+        mdastExtensions: [mdxFromMarkdown()],
+        extensions: [mdxjs()],
+      })
+      const transformed = await transformWithMock(mdast)
+      const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+      const expected = `
+        \`\`\`javascript
+        const users = [
+          { id: 1, name: 'John', email: 'john@example.com' },
+          { id: 2, name: 'Jane' },
+        ];
+
+        // ...
+
+        function createUser(name, email) {
+          const newId = Math.max(...users.map((u) => u.id)) + 1;
+          const newUser = { id: newId, name };
+          if (email) {
+            newUser.email = email;
+          }
+          users.push(newUser);
+          return newUser;
+        }
+
+        class UserManager {
+          users = [];
+
+          constructor(initialUsers = []) {
+            this.users = initialUsers;
+          }
+
+          addUser(user) {
+            this.users.push(user);
+          }
+
+          getUsers() {
+            return [...this.users];
+          }
+        }
+        \`\`\`
+      `.trim()
+
+      expect(containsStringIgnoringLeadingWhitespace(output, expected)).toBe(true)
+    })
   })
 })
 
