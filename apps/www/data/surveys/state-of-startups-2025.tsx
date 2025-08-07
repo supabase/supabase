@@ -48,13 +48,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 6, unit: '%', label: 'Over 5 years old' },
           ],
           charts: ['FundingStageChart'],
-          pullQuote: {
-            quote:
-              'We’re bootstrapped and under a year old… just three of us wearing every hat imaginable.',
-            author: 'Jane Smith',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -69,13 +62,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 9, unit: '%', label: 'North American startups in NYC' },
           ],
           charts: ['HeadquartersChart'],
-          pullQuote: {
-            quote:
-              'We’re building from Toronto, but most of our early users are still in San Francisco.',
-            author: 'Alex Chen',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -138,13 +124,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 58, unit: '%', label: 'Pre-revenue' },
           ],
           charts: ['AcceleratorParticipationChart'],
-          pullQuote: {
-            quote:
-              'We joined an accelerator outside the US, which gave us credibility but we still had to pivot twice.',
-            author: 'Mike Rodriguez',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -155,13 +134,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'What’s in a Startup’s Tech Stack',
       description:
         'The modern stack centers around open tools, modular infrastructure, and cautious spending.',
-      pullQuote: {
-        quote:
-          'Supabase gave us everything we needed out of the box. We hooked it up in a weekend and haven’t looked back.',
-        author: 'David Kim',
-        authorPosition: 'Founder',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-      },
       sections: [
         {
           title: 'Frameworks and Cloud Infra',
@@ -191,13 +163,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 5, unit: '%', label: 'Don’t pay for AI tools' },
           ],
           charts: ['AICodingToolsChart'],
-          pullQuote: {
-            quote:
-              'I spend less time fighting code thanks to Cursor and Claude. It’s like pair programming without the scheduling.',
-            author: 'Lisa Wang',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: {
             label: 'Must-have developer tools',
             words: [
@@ -329,13 +294,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 36, unit: '%', label: 'Built a dev community' },
           ],
           charts: ['NewIdeasChart'],
-          pullQuote: {
-            quote:
-              'I discovered most of our stack via GitHub and indie YouTubers showing their setups.',
-            author: 'Ryan Chen',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: [
@@ -394,13 +352,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 18, unit: '%', label: 'Initial customers from personal network' },
           ],
           charts: ['SalesToolsChart'],
-          pullQuote: {
-            quote:
-              "I'm still doing sales calls manually. No CRM yet. It's scrappy, but it keeps me close to the customer.",
-            author: 'Marcus Johnson',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -449,13 +400,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 42, unit: '%', label: 'Other roles that are optimistic' },
           ],
           charts: ['WorldOutlookChart'],
-          pullQuote: {
-            quote:
-              "I'm cautiously optimistic. There's more uncertainty, but also more tools and leverage than ever.",
-            author: 'Carlos Rodriguez',
-            authorPosition: 'Founder',
-            authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-          },
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
