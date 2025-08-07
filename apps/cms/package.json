@@ -4,9 +4,6 @@
   "description": "Payload CMS for Supabase",
   "license": "MIT",
   "type": "module",
-  "engines": {
-    "node": "22.*"
-  },
   "scripts": {
     "build": "pnpm migrate && cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
     "ci": "payload migrate && pnpm build",
