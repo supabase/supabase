@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Code, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -15,6 +16,7 @@ import {
   useSnippetFolders,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -63,6 +65,8 @@ interface MoveQueryModalProps {
 export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryModalProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
+  const router = useRouter()
 
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string>()
@@ -172,6 +176,13 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
               snapV2.removeSnippet(snippet.id, true)
 
               snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
+
+              // remove the tab for the old snippet if the snippet was open. Renaming can also happen when the tab is not open.
+              const tabId = createTabId('sql', { id: snippet.id })
+              if (tabsSnap.hasTab(tabId)) {
+                tabsSnap.removeTab(tabId)
+                await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
+              }
             }
           }
         })
