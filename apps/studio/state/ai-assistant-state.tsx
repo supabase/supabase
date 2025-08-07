@@ -2,10 +2,11 @@ import type { Message as MessageType } from 'ai/react'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type SuggestionsType = {
   title: string
@@ -91,6 +92,15 @@ async function saveAiState(state: StoredAiAssistantState): Promise<void> {
     await db.put(STORE_NAME, state)
   } catch (error) {
     console.error('Failed to save AI state to IndexedDB:', error)
+  }
+}
+
+async function clearStorage(): Promise<void> {
+  try {
+    const db = await openAiDb()
+    await db.clear(STORE_NAME)
+  } catch (error) {
+    console.error('Failed to clear AI state from IndexedDB:', error)
   }
 }
 
@@ -234,7 +244,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
-      const chatId = crypto.randomUUID()
+      const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
         name: options?.name ?? 'Untitled',
@@ -386,6 +396,10 @@ export const createAiAssistantState = (): AiAssistantState => {
         }
       }
     },
+
+    clearStorage: async () => {
+      await clearStorage()
+    },
   })
 
   return state
@@ -412,12 +426,13 @@ export type AiAssistantState = AiAssistantData & {
   clearSqlSnippets: () => void
   getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
+  clearStorage: () => Promise<void>
 }
 
 export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())
 
 export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
 

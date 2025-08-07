@@ -16,20 +16,18 @@ import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-function
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { LogoLoader } from 'ui'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
   const canDeployFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
@@ -221,11 +219,7 @@ const CodePage = () => {
           <FileExplorerAndEditor
             files={files}
             onFilesChange={setFiles}
-            aiEndpoint={
-              useBedrockAssistant
-                ? `${BASE_PATH}/api/ai/edge-function/complete-v2`
-                : `${BASE_PATH}/api/ai/edge-function/complete`
-            }
+            aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,

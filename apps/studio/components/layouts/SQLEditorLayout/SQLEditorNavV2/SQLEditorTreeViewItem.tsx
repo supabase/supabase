@@ -6,7 +6,18 @@ import { Snippet } from 'data/content/sql-folders-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useProfile } from 'lib/profile'
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
+import {
+  Copy,
+  Download,
+  Edit,
+  ExternalLink,
+  Heart,
+  Lock,
+  Move,
+  Plus,
+  Share,
+  Trash,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
@@ -19,6 +30,7 @@ import {
   ContextMenuTrigger_Shadcn_,
   ContextMenu_Shadcn_,
   TreeViewItem,
+  cn,
 } from 'ui'
 
 interface SQLEditorTreeViewItemProps
@@ -85,6 +97,7 @@ export const SQLEditorTreeViewItem = ({
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
+  const isFavorite = element.metadata.favorite
 
   const isEditing = status === 'editing'
   const isSaving = status === 'saving'
@@ -151,6 +164,14 @@ export const SQLEditorTreeViewItem = ({
       fetchNestPageInFolder()
     } else if (typeof _fetchNextPage === 'function') {
       _fetchNextPage()
+    }
+  }
+
+  const onToggleFavorite = () => {
+    const snippetId = element.metadata.id
+    if (snippetId) {
+      if (isFavorite) snapV2.removeFavorite(snippetId)
+      else snapV2.addFavorite(snippetId)
     }
   }
 
@@ -322,6 +343,19 @@ export const SQLEditorTreeViewItem = ({
                   Duplicate query
                 </ContextMenuItem_Shadcn_>
               )}
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onSelect={() => onToggleFavorite()}
+                onFocusCapture={(e) => e.stopPropagation()}
+              >
+                <Heart
+                  size={14}
+                  className={cn(
+                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                  )}
+                />
+                {isFavorite ? 'Remove from' : 'Add to'} favorites
+              </ContextMenuItem_Shadcn_>
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"

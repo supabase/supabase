@@ -1,26 +1,27 @@
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
-import { ResponseError } from 'types'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import RowMenu from './RowMenu'
-import PipelineStatus, { PipelineStatusRequestStatus, PipelineStatusName } from './PipelineStatus'
-import { useParams } from 'common'
-import {
-  ReplicationPipelineStatusData,
-  useReplicationPipelineStatusQuery,
-} from 'data/replication/pipeline-status-query'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { Pipeline } from 'data/replication/pipelines-query'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from 'state/replication-pipeline-request-status'
+import { ResponseError } from 'types'
+import { Button } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import DeleteDestination from './DeleteDestination'
 import DestinationPanel from './DestinationPanel'
-
-export type Pipeline = ReplicationPipelinesData['pipelines'][0]
-
-const refreshFrequencyMs: number = 5000
+import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
+import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { RowMenu } from './RowMenu'
 
 interface DestinationRowProps {
   sourceId: number | undefined
@@ -34,7 +35,7 @@ interface DestinationRowProps {
   isSuccess: boolean
 }
 
-const DestinationRow = ({
+export const DestinationRow = ({
   sourceId,
   destinationId,
   destinationName,
@@ -60,78 +61,25 @@ const DestinationRow = ({
       projectRef,
       pipelineId: pipeline?.id,
     },
-    { refetchInterval: refreshFrequencyMs }
+    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
-  const [requestStatus, setRequestStatus] = useState<PipelineStatusRequestStatus>(
-    PipelineStatusRequestStatus.None
-  )
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const requestStatus = pipeline?.id
+    ? getRequestStatus(pipeline.id)
+    : PipelineStatusRequestStatus.None
+
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const pipelineStatus = pipelineStatusData?.status
-  const getStatusName = (
-    status: ReplicationPipelineStatusData['status'] | undefined
-  ): string | undefined => {
-    if (status && typeof status === 'object' && 'name' in status) {
-      return status.name
-    }
-
-    return undefined
-  }
-
-  const statusName = getStatusName(pipelineStatus)
-  if (
-    (requestStatus === PipelineStatusRequestStatus.EnableRequested &&
-      (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED)) ||
-    (requestStatus === PipelineStatusRequestStatus.DisableRequested &&
-      (statusName === PipelineStatusName.STOPPED || statusName === PipelineStatusName.FAILED))
-  ) {
-    setRequestStatus(PipelineStatusRequestStatus.None)
-  }
-
-  const onEnableClick = async () => {
-    if (!projectRef) {
-      console.error('Project ref is required')
-      return
-    }
-    if (!pipeline) {
-      toast.error('No pipeline found')
-      return
-    }
-
-    try {
-      await startPipeline({ projectRef, pipelineId: pipeline.id })
-    } catch (error) {
-      toast.error('Failed to enable destination')
-    }
-    setRequestStatus(PipelineStatusRequestStatus.EnableRequested)
-  }
-  const onDisableClick = async () => {
-    if (!projectRef) {
-      console.error('Project ref is required')
-      return
-    }
-    if (!pipeline) {
-      toast.error('No pipeline found')
-      return
-    }
-
-    try {
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
-    } catch (error) {
-      toast.error('Failed to disable destination')
-    }
-    setRequestStatus(PipelineStatusRequestStatus.DisableRequested)
-  }
   const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
+
+  const pipelineStatus = pipelineStatusData?.status
+  const statusName = getStatusName(pipelineStatus)
 
   const onDeleteClick = async () => {
     if (!projectRef) {
-      console.error('Project ref is required')
-      return
+      return console.error('Project ref is required')
     }
     if (!pipeline) {
-      toast.error('No pipeline found')
-      return
+      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
     }
 
     try {
@@ -140,24 +88,28 @@ const DestinationRow = ({
       // so we don't need to call deletePipeline explicitly
       await deleteDestination({ projectRef, destinationId: destinationId })
     } catch (error) {
-      toast.error('Failed to delete destination')
+      toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
     }
   }
+
+  useEffect(() => {
+    if (pipeline?.id) {
+      updatePipelineStatus(pipeline.id, statusName)
+    }
+  }, [pipeline?.id, statusName, updatePipelineStatus])
 
   return (
     <>
       {isPipelineError && (
-        <AlertError error={pipelineError} subject="Failed to retrieve pipeline" />
+        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
       )}
       {isPipelineSuccess && (
         <Table.tr>
-          <Table.td>
-            {isPipelineLoading ? <ShimmeringLoader></ShimmeringLoader> : destinationName}
-          </Table.td>
-          <Table.td>{isPipelineLoading ? <ShimmeringLoader></ShimmeringLoader> : type}</Table.td>
+          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : destinationName}</Table.td>
+          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
           <Table.td>
             {isPipelineLoading || !pipeline ? (
-              <ShimmeringLoader></ShimmeringLoader>
+              <ShimmeringLoader />
             ) : (
               <PipelineStatus
                 pipelineStatus={pipelineStatusData?.status}
@@ -166,27 +118,33 @@ const DestinationRow = ({
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
                 requestStatus={requestStatus}
-              ></PipelineStatus>
+              />
             )}
           </Table.td>
           <Table.td>
             {isPipelineLoading || !pipeline ? (
-              <ShimmeringLoader></ShimmeringLoader>
+              <ShimmeringLoader />
             ) : (
               pipeline.config.publication_name
             )}
           </Table.td>
           <Table.td>
-            <RowMenu
-              pipelineStatus={pipelineStatusData?.status}
-              error={pipelineStatusError}
-              isLoading={isPipelineStatusLoading}
-              isError={isPipelineStatusError}
-              onEnableClick={onEnableClick}
-              onDisableClick={onDisableClick}
-              onDeleteClick={() => setShowDeleteDestinationForm(true)}
-              onEditClick={() => setShowEditDestinationPanel(true)}
-            ></RowMenu>
+            <div className="flex items-center justify-end gap-x-2">
+              <Button asChild type="default">
+                <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+                  View status
+                </Link>
+              </Button>
+              <RowMenu
+                pipeline={pipeline}
+                pipelineStatus={pipelineStatusData?.status}
+                error={pipelineStatusError}
+                isLoading={isPipelineStatusLoading}
+                isError={isPipelineStatusError}
+                onDeleteClick={() => setShowDeleteDestinationForm(true)}
+                onEditClick={() => setShowEditDestinationPanel(true)}
+              />
+            </div>
           </Table.td>
         </Table.tr>
       )}
@@ -211,5 +169,3 @@ const DestinationRow = ({
     </>
   )
 }
-
-export default DestinationRow

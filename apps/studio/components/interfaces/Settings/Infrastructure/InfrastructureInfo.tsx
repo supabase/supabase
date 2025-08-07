@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -13,7 +12,7 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -35,7 +34,7 @@ import {
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
 
@@ -65,8 +64,9 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '')
     .split('supabase-postgres-')[1]
     ?.replace('-orioledb', '')
-  const isOnNonGenerallyAvailableReleaseChannel =
-    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+  const isVisibleReleaseChannel =
+    current_app_version_release_channel &&
+    !['ga', 'withdrawn'].includes(current_app_version_release_channel)
       ? current_app_version_release_channel
       : undefined
   const isOrioleDb = useIsOrioleDb()
@@ -144,16 +144,16 @@ const InfrastructureInfo = () => {
                           value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
                           label="Postgres version"
                           actions={[
-                            isOnNonGenerallyAvailableReleaseChannel && (
+                            isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1 capitalize">
-                                    {isOnNonGenerallyAvailableReleaseChannel}
+                                    {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
-                                  database version release
+                                  This project uses a {isVisibleReleaseChannel} database version
+                                  release
                                 </TooltipContent>
                               </Tooltip>
                             ),

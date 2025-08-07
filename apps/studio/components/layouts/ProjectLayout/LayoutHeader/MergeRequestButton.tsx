@@ -1,20 +1,26 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GitMerge } from 'lucide-react'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useParams } from 'common'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useRouter } from 'next/router'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const MergeRequestButton = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const projectDetails = useSelectedProject()
+  const { data: projectDetails } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
   const { data: branches } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -44,6 +50,17 @@ export const MergeRequestButton = () => {
           onSuccess: () => {
             toast.success('Merge request created')
             router.push(`/project/${selectedBranch.project_ref}/merge`)
+            sendEvent({
+              action: 'branch_create_merge_request_button_clicked',
+              properties: {
+                branchType: selectedBranch.persistent ? 'persistent' : 'preview',
+                origin: 'header',
+              },
+              groups: {
+                project: projectRef ?? 'Unknown',
+                organization: selectedOrg?.slug ?? 'Unknown',
+              },
+            })
           },
         }
       )

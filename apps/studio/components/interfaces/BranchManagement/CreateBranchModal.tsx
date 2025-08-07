@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
@@ -22,8 +23,11 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -41,23 +45,22 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_ as Label,
+  Switch,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export const CreateBranchModal = () => {
+  const allowDataBranching = useFlag('allowDataBranching')
   const { ref } = useParams()
   const router = useRouter()
   const queryClient = useQueryClient()
-  const projectDetails = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: projectDetails } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
 
-  const organization = useSelectedOrganization()
-  const isProPlanAndUp = organization?.plan?.id !== 'free'
+  const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
@@ -83,12 +86,26 @@ export const CreateBranchModal = () => {
       onError: () => {},
     })
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
         await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
       }
+      sendEvent({
+        action: 'branch_create_button_clicked',
+        properties: {
+          branchType: data.persistent ? 'persistent' : 'preview',
+          gitlessBranching,
+        },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
+
       setShowCreateBranchModal(false)
       router.push(`/project/${data.project_ref}`)
     },
@@ -126,6 +143,7 @@ export const CreateBranchModal = () => {
           (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
           'Git branch name is required when GitHub is connected'
         ),
+      withData: z.boolean().default(false).optional(),
     })
     .superRefine(async (val, ctx) => {
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
@@ -149,7 +167,7 @@ export const CreateBranchModal = () => {
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
-    defaultValues: { branchName: '', gitBranchName: '' },
+    defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
   const canSubmit = !isCreating && !isChecking
@@ -167,7 +185,9 @@ export const CreateBranchModal = () => {
     createBranch({
       projectRef,
       branchName: data.branchName,
+      is_default: false,
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
+      ...(allowDataBranching ? { withData: data.withData } : {}),
     })
   }
 
@@ -279,6 +299,7 @@ export const CreateBranchModal = () => {
                   )}
                 />
               )}
+
               {isLoadingConnections && <GenericSkeletonLoader />}
               {isErrorConnections && (
                 <AlertError
@@ -299,7 +320,7 @@ export const CreateBranchModal = () => {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-foreground-light">
+                        <p className="text-sm text-foreground-lighter">
                           Keep this preview branch in sync with a chosen GitHub branch
                         </p>
                       </div>
@@ -309,6 +330,23 @@ export const CreateBranchModal = () => {
                     </div>
                   )}
                 </>
+              )}
+              {allowDataBranching && (
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="withData"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Include data"
+                      layout="flex-row-reverse"
+                      description="Clone production data into this branch"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
               )}
             </DialogSection>
 

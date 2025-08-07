@@ -1,7 +1,7 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import BackupsEmpty from '../BackupsEmpty'
@@ -12,8 +12,8 @@ interface BackupsListProps {
 }
 
 export const BackupsList = ({ onSelectRestore, disabled }: BackupsListProps) => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const isFreePlan = organization?.plan?.id === 'free'
 
