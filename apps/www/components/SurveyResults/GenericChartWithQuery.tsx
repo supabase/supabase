@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
 import { FilterDropdown } from './FilterDropdown'
 import { ChevronDown, UnfoldVertical } from 'lucide-react'
+import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
 
 // Create a separate Supabase client for your external project
 const externalSupabase = createClient(
@@ -217,6 +218,8 @@ export function GenericChartWithQuery({
   // Use the custom hook to fetch data
   const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(sqlQuery)
 
+  const [view, setView] = useState<'chart' | 'sql'>('chart')
+
   const setFilterValue = (filterKey: string, value: string) => {
     setActiveFilters((prev: Record<string, string>) => ({
       ...prev,
@@ -277,7 +280,7 @@ export function GenericChartWithQuery({
                   <div className="flex items-center gap-3">
                     {/* Bar container with flex layout */}
                     <div
-                      className="flex-1 h-[48px] relative flex items-center"
+                      className="flex-1 h-[12px] relative flex items-center"
                       style={
                         {
                           '--reference': maxValue,
@@ -326,16 +329,25 @@ export function GenericChartWithQuery({
       {/* Filters */}
       <div className="flex flex-col">
         {filters && activeFilters && setFilterValue && (
-          <div className="flex flex-wrap gap-4 p-4 border-b border-border">
-            {Object.entries(filters).map(([filterKey, filterConfig]) => (
-              <FilterDropdown
-                key={filterKey}
-                filterKey={filterKey}
-                filterConfig={filterConfig}
-                selectedValue={activeFilters[filterKey]}
-                setFilterValue={setFilterValue}
-              />
-            ))}
+          <div className="flex flex-wrap gap-4 p-4 border-b border-border justify-between">
+            <div className="flex flex-wrap gap-4">
+              {Object.entries(filters).map(([filterKey, filterConfig]) => (
+                <FilterDropdown
+                  key={filterKey}
+                  filterKey={filterKey}
+                  filterConfig={filterConfig}
+                  selectedValue={activeFilters[filterKey]}
+                  setFilterValue={setFilterValue}
+                />
+              ))}
+            </div>
+
+            <TwoOptionToggle
+              options={['SQL', 'chart']}
+              activeOption={view}
+              onClickOption={setView}
+              borderOverride="border-overlay"
+            />
           </div>
         )}
       </div>

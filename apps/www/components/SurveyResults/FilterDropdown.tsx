@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
   Button,
 } from 'ui'
-import { ChevronDown } from 'lucide-react'
+import { ChevronsUpDown } from 'lucide-react'
 
 // Dropdown component for SQL
 export function FilterDropdown({
@@ -26,16 +26,21 @@ export function FilterDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          type="text"
+          type="default"
           size="tiny"
-          className={`inline-flex items-center gap-1 px-2 py-0 h-auto text-sm font-mono bg-background border border-border hover:bg-surface-100 ${
-            selectedValue === 'unset' ? 'text-foreground-lighter' : ''
-          }`}
-          iconRight={<ChevronDown className="w-3 h-3" />}
+          className="w-full [&>span]:w-full !pr-1 space-x-1"
+          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
-          {selectedValue === 'unset'
-            ? filterConfig.label
-            : `${filterConfig.label}: ${selectedValue}`}
+          {selectedValue === 'unset' ? (
+            <div className="w-full flex gap-1">
+              <p className="text-foreground-lighter">{filterConfig.label.toLowerCase()}</p>
+            </div>
+          ) : (
+            <div className="w-full flex gap-1">
+              <p className="text-foreground-lighter">{filterConfig.label.toLowerCase()}</p>
+              <p className="text-foreground">{selectedValue}</p>
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

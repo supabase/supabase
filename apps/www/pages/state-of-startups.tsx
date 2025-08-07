@@ -227,28 +227,41 @@ function StateOfStartupsPage() {
         </SectionContainer>
 
         {pageData.pageChapters.map((chapter, chapterIndex) => (
-          <SurveyChapter
-            key={chapterIndex + 1}
-            number={chapterIndex + 1}
-            totalChapters={pageData.pageChapters.length}
-            title={chapter.title}
-            description={chapter.description}
-          >
-            {chapter.sections.map((section, sectionIndex) => (
-              <SurveyChapterSection
-                key={sectionIndex + 1}
-                number={`${chapterIndex + 1}.${sectionIndex + 1}`}
-                title={section.title}
-                description={section.description}
-                stats={section.stats}
-                charts={section.charts}
-                wordCloud={section.wordCloud}
-                summarizedAnswer={section.summarizedAnswer}
-                rankedAnswersPair={section.rankedAnswersPair}
-                pullQuote={section.pullQuote}
-              />
-            ))}
-          </SurveyChapter>
+          <>
+            <SurveyChapter
+              key={chapterIndex + 1}
+              number={chapterIndex + 1}
+              totalChapters={pageData.pageChapters.length}
+              title={chapter.title}
+              description={chapter.description}
+            >
+              {chapter.sections.map((section, sectionIndex) => (
+                <SurveyChapterSection
+                  key={sectionIndex + 1}
+                  number={`${chapterIndex + 1}.${sectionIndex + 1}`}
+                  title={section.title}
+                  description={section.description}
+                  stats={section.stats}
+                  charts={section.charts}
+                  wordCloud={section.wordCloud}
+                  summarizedAnswer={section.summarizedAnswer}
+                  rankedAnswersPair={section.rankedAnswersPair}
+                  // pullQuote={section.pullQuote}
+                />
+              ))}
+            </SurveyChapter>
+            {/* Pull quote that's full-width */}
+            <div className="bg-alternative py-24">
+              <aside className="flex flex-col gap-4 text-center items-center max-w-[60rem] mx-auto">
+                <p className="text-foreground text-2xl text-balance max-w-prose">
+                  “We started in no-code web development and ran our own agency while teaching
+                  ourselves to build full-stack apps. That hands-on experience gave us the product
+                  intuition and frontend skills we needed, though the technical learning curve was
+                  steep at times.”
+                </p>
+              </aside>
+            </div>
+          </>
         ))}
       </DefaultLayout>
     </>
