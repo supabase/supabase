@@ -155,15 +155,19 @@ export const ReplicationPipelineStatus = () => {
               value={filterString}
               disabled={isPipelineError}
               onChange={(e) => setFilterString(e.target.value)}
-              actions={[
-                <X
-                  key="close"
-                  className="mx-2 cursor-pointer text-foreground"
-                  size={14}
-                  strokeWidth={2}
-                  onClick={() => setFilterString('')}
-                />,
-              ]}
+              actions={
+                filterString.length > 0
+                  ? [
+                      <X
+                        key="close"
+                        className="mx-2 cursor-pointer text-foreground"
+                        size={14}
+                        strokeWidth={2}
+                        onClick={() => setFilterString('')}
+                      />,
+                    ]
+                  : undefined
+              }
             />
           </div>
           <Button

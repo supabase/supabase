@@ -100,6 +100,7 @@ export const RetryCountdown = ({ nextRetryTime }: RetryCountdownProps) => {
   return (
     <div role="status" aria-live="polite" aria-label={`${statusMessage} ${timeDisplay}`}>
       <span className="text-xs font-medium">{statusMessage}</span>{' '}
+      {/* [Joshen] It's a bit hard to debug without doing this locally, but we could use CountdownTimerSpan here perhaps */}
       <span className="text-xs font-mono">{timeDisplay}</span>
     </div>
   )

@@ -7,14 +7,14 @@ import { replicationKeys } from './keys'
 
 export type RollbackType = 'individual' | 'full'
 
-export type RollbackTableParams = {
+type RollbackTableParams = {
   projectRef: string
   pipelineId: number
   tableId: number
   rollbackType: RollbackType
 }
 
-export type RollbackTableResponse = {
+type RollbackTableResponse = {
   pipeline_id: number
   table_id: number
   new_state: {
@@ -36,10 +36,7 @@ async function rollbackTableState(
     '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state',
     {
       params: { path: { ref: projectRef, pipeline_id: pipelineId } },
-      body: {
-        table_id: tableId,
-        rollback_type: rollbackType,
-      },
+      body: { table_id: tableId, rollback_type: rollbackType },
       signal,
     }
   )

@@ -107,49 +107,16 @@ export const getDisabledStateConfig = ({
   return { title, message, badge, icon, colors }
 }
 
-/**
- * Safely formats a retry timestamp with error handling
- */
-export const formatRetryTimestamp = (timestamp: string): string => {
-  try {
-    const date = new Date(timestamp)
-    if (isNaN(date.getTime())) {
-      return 'Invalid date'
-    }
-    return date.toLocaleString()
-  } catch {
-    return 'Invalid date'
-  }
-}
+export const isValidRetryPolicy = (policy: any): policy is RetryPolicy => {
+  if (!policy || typeof policy !== 'object' || !policy.policy) return false
 
-/**
- * Gets the appropriate retry policy display based on the policy type
- */
-export const getRetryPolicyDisplay = (retryPolicy: RetryPolicy) => {
-  switch (retryPolicy.policy) {
-    case 'manual_retry':
-      return {
-        type: 'manual' as const,
-        message: 'Manual retry available (endpoint pending implementation)',
-        variant: 'warning' as const,
-      }
-    case 'timed_retry':
-      return {
-        type: 'timed' as const,
-        message: `Next retry: ${formatRetryTimestamp('next_retry' in retryPolicy ? retryPolicy.next_retry : '')}`,
-        variant: 'info' as const,
-      }
+  switch (policy.policy) {
     case 'no_retry':
-      return {
-        type: 'none' as const,
-        message: 'Manual intervention required',
-        variant: 'destructive' as const,
-      }
+    case 'manual_retry':
+      return true
+    case 'timed_retry':
+      return typeof policy.next_retry === 'string'
     default:
-      return {
-        type: 'unknown' as const,
-        message: 'Unknown retry policy',
-        variant: 'warning' as const,
-      }
+      return false
   }
 }

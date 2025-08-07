@@ -81,26 +81,26 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          type="default"
           size="tiny"
+          type="default"
           loading={isLoading}
           disabled={isLoading}
-          className="h-7 text-xs px-3 w-min"
-          iconRight={<ChevronDown className="w-3 h-3" />}
+          className="w-min"
+          iconRight={<ChevronDown />}
           aria-label={`Rollback ${tableName}`}
         >
           Rollback
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="w-56" aria-label="Rollback options">
+      <DropdownMenuContent align="start" className="w-72" aria-label="Rollback options">
         {RETRY_OPTIONS.map((option) => (
           <DropdownMenuItem
             key={option.type}
-            onClick={() => handleRollback(option.type)}
             disabled={isLoading}
             className="flex flex-col items-start px-3 py-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             aria-describedby={`rollback-${option.type}-description`}
+            onClick={() => handleRollback(option.type)}
           >
             <div className="flex items-start gap-x-2 w-full">
               <div className="min-w-4">{option.icon}</div>
