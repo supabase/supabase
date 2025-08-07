@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { generateDeterministicUuid } from './snippets.browser'
 import {
   createFolder,
   deleteFolder,
@@ -13,7 +14,6 @@ import {
   updateSnippet,
   type Snippet,
 } from './snippets.utils'
-import { generateDeterministicUuid } from './snippets.browser'
 
 // Mock fs/promises
 vi.mock('fs/promises')
@@ -903,6 +903,45 @@ describe('snippets.utils', () => {
 
       expect(result.name).toBe('new-name')
       expect(result.content.sql).toBe('SELECT * FROM old;')
+    })
+
+    it('should throw error when moving snippet to folder that already contains snippet with same name', async () => {
+      const snippetName = 'existing-snippet'
+      const existingSnippetId = generateDeterministicUuid([snippetName])
+      const targetFolderId = generateDeterministicUuid(['target-folder'])
+      const conflictingSnippetId = generateDeterministicUuid([targetFolderId, snippetName])
+
+      const createMockDirent = (name: string, isDirectory: boolean) => ({
+        name,
+        isDirectory: () => isDirectory,
+        isFile: () => !isDirectory,
+      })
+
+      mockedFS.access.mockResolvedValue(undefined)
+
+      // Mock filesystem structure with:
+      // - existing-snippet.sql in root
+      // - target-folder/ with existing-snippet.sql inside
+      mockedFS.readdir.mockImplementation((dirPath: any) => {
+        if (dirPath === MOCK_SNIPPETS_DIR) {
+          return Promise.resolve([
+            createMockDirent('existing-snippet.sql', false),
+            createMockDirent('target-folder', true),
+          ] as any)
+        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, 'target-folder')) {
+          return Promise.resolve([createMockDirent(`${snippetName}.sql`, false)] as any)
+        }
+        return Promise.resolve([])
+      })
+
+      mockedFS.readFile.mockResolvedValue('SELECT * FROM table;')
+      mockedFS.unlink.mockResolvedValue(undefined)
+
+      const updates = { folder_id: targetFolderId }
+
+      await expect(updateSnippet(existingSnippetId, updates)).rejects.toThrow(
+        `Snippet named "${snippetName}" already exists in the specified folder`
+      )
     })
   })
 

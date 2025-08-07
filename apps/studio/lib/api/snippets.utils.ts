@@ -262,6 +262,21 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
     throw new Error(`Snippet with id ${id} not found`)
   }
 
+  const newId = generateDeterministicUuid([
+    updates.folder_id !== undefined ? updates.folder_id : foundSnippet.folderId,
+    updates.name ?? foundSnippet.name,
+  ])
+
+  const snippetAtTargetLocation = entries.find(
+    (entry) => entry.id === newId && entry.type === 'file'
+  )
+
+  if (snippetAtTargetLocation && snippetAtTargetLocation.id !== foundSnippet.id) {
+    throw new Error(
+      `Snippet named "${updates.name ?? foundSnippet.name}" already exists in the specified folder`
+    )
+  }
+
   const snippet = buildSnippet(foundSnippet.name, foundSnippet.content || '', foundSnippet.folderId)
 
   // it's easier to delete the old file first and then recreate a new one
