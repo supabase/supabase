@@ -1,5 +1,5 @@
 import fs from 'fs/promises'
-import { compact, reverse, sortBy } from 'lodash'
+import { compact, sortBy } from 'lodash'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
@@ -213,12 +213,21 @@ export const getSnippets = async ({
   sort?: 'name' | 'inserted_at'
   folderId?: string | null
 }): Promise<{ cursor: string | undefined; snippets: Snippet[] }> => {
-  searchTerm = searchTerm?.trim() ?? ''
-  limit = limit ?? 100
-  sort = sort ?? 'inserted_at'
-  sortOrder = sortOrder ?? 'desc'
-  cursor = cursor ?? undefined
-  folderId = folderId ?? null
+  // Normalize and set default values
+  const normalizedSearchTerm = searchTerm?.trim() ?? ''
+  const normalizedLimit = limit ?? 100
+  const normalizedSort = sort ?? 'inserted_at'
+  const normalizedSortOrder = sortOrder ?? 'desc'
+  const normalizedCursor = cursor ?? undefined
+  const normalizedFolderId = folderId ?? null
+
+  // Validate inputs
+  if (normalizedLimit <= 0) {
+    throw new Error('Limit must be a positive number')
+  }
+  if (normalizedLimit > 1000) {
+    throw new Error('Limit cannot exceed 1000')
+  }
 
   const entries = await getFilesystemEntries()
   const files = entries.filter(
@@ -226,44 +235,52 @@ export const getSnippets = async ({
       entry.type === 'file' && entry.content !== undefined && entry.content !== null
   )
 
-  let snippets = files
-  // if there's a search term, filter snippets across all folders.
-  if (searchTerm) {
-    snippets = files.filter((file) => file.name.includes(searchTerm))
+  // Filter snippets based on search term or folder
+  let filteredSnippets = files
+  if (normalizedSearchTerm) {
+    // When searching, look across all folders and support case-insensitive search
+    filteredSnippets = files.filter((file) =>
+      file.name.toLowerCase().includes(normalizedSearchTerm.toLowerCase())
+    )
   } else {
-    snippets = files.filter((file) => file.folderId === folderId)
+    // Filter by specific folder or root (null)
+    filteredSnippets = files.filter((file) => file.folderId === normalizedFolderId)
   }
 
-  snippets = sortBy(snippets, (s) => {
-    if (sort === 'inserted_at') {
-      return s.createdAt.getTime()
+  // Sort snippets
+  const sortedSnippets = sortBy(filteredSnippets, (snippet) => {
+    if (normalizedSort === 'inserted_at') {
+      return snippet.createdAt.getTime()
     }
-    return s.name
+    return snippet.name.toLowerCase() // Case-insensitive name sorting
   })
 
-  if (sortOrder === 'desc') {
-    snippets = reverse(snippets)
+  if (normalizedSortOrder === 'desc') {
+    sortedSnippets.reverse()
   }
 
-  if (cursor) {
-    const cursorIndex = snippets.findIndex((s) => s.id === cursor)
+  // Apply cursor-based pagination
+  let paginatedSnippets = sortedSnippets
+  if (normalizedCursor) {
+    const cursorIndex = sortedSnippets.findIndex((s) => s.id === normalizedCursor)
     if (cursorIndex !== -1) {
-      snippets = snippets.slice(cursorIndex + 1)
+      paginatedSnippets = sortedSnippets.slice(cursorIndex + 1)
     }
+    // If cursor not found, return all snippets (graceful degradation)
   }
 
+  // Apply limit and determine next cursor
   let nextCursor: string | undefined = undefined
-  let paginated = snippets
-  if (limit) {
-    paginated = snippets.slice(0, Number(limit))
-    if (snippets.length > paginated.length) {
-      nextCursor = paginated[paginated.length - 1].id
-    }
+  let finalSnippets = paginatedSnippets
+
+  if (normalizedLimit && paginatedSnippets.length > normalizedLimit) {
+    finalSnippets = paginatedSnippets.slice(0, normalizedLimit)
+    nextCursor = finalSnippets[finalSnippets.length - 1].id
   }
 
   return {
     cursor: nextCursor,
-    snippets: paginated.map((file) =>
+    snippets: finalSnippets.map((file) =>
       buildSnippet(file.name, file.content, file.folderId, file.createdAt)
     ),
   }

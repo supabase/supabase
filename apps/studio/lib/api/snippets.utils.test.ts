@@ -291,6 +291,10 @@ describe('snippets.utils', () => {
   })
 
   describe('getSnippets', () => {
+    beforeEach(() => {
+      vi.clearAllMocks()
+    })
+
     it('should get all snippets from root folder', async () => {
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([
@@ -301,14 +305,16 @@ describe('snippets.utils', () => {
       mockedFS.readFile
         .mockResolvedValueOnce('SELECT * FROM table1;')
         .mockResolvedValueOnce('SELECT * FROM table2;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
-      const snippets = await getSnippets(null)
+      const result = await getSnippets({ folderId: null, sort: 'name', sortOrder: 'asc' })
 
-      expect(snippets).toHaveLength(2)
-      expect(snippets[0].name).toBe('snippet1')
-      expect(snippets[1].name).toBe('snippet2')
-      expect(snippets[0].folder_id).toBe(null)
-      expect(snippets[1].folder_id).toBe(null)
+      expect(result.snippets).toHaveLength(2)
+      expect(result.snippets[0].name).toBe('snippet1')
+      expect(result.snippets[1].name).toBe('snippet2')
+      expect(result.snippets[0].folder_id).toBe(null)
+      expect(result.snippets[1].folder_id).toBe(null)
+      expect(result.cursor).toBeUndefined()
     })
 
     it('should get snippets from a specific folder', async () => {
@@ -330,23 +336,349 @@ describe('snippets.utils', () => {
         return Promise.resolve([])
       })
       mockedFS.readFile.mockResolvedValue('SELECT * FROM folder_table;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
 
-      const snippets = await getSnippets(folderId)
+      const result = await getSnippets({ folderId })
 
-      expect(snippets).toHaveLength(1)
-      expect(snippets[0].name).toBe('folder-snippet')
-      expect(snippets[0].folder_id).toBe(folderId)
+      expect(result.snippets).toHaveLength(1)
+      expect(result.snippets[0].name).toBe('folder-snippet')
+      expect(result.snippets[0].folder_id).toBe(folderId)
     })
 
-    it('should return empty array when no snippets in folder', async () => {
+    it('should return empty result when no snippets in folder', async () => {
       const folderId = generateDeterministicUuid(['empty-folder'])
 
       mockedFS.access.mockResolvedValue(undefined)
       mockedFS.readdir.mockResolvedValue([])
 
-      const snippets = await getSnippets(folderId)
+      const result = await getSnippets({ folderId })
 
-      expect(snippets).toEqual([])
+      expect(result.snippets).toEqual([])
+      expect(result.cursor).toBeUndefined()
+    })
+
+    it('should filter snippets by search term across all folders', async () => {
+      const createMockDirent = (name: string, isDirectory: boolean) => ({
+        name,
+        isDirectory: () => isDirectory,
+        isFile: () => !isDirectory,
+      })
+
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockImplementation((dirPath: any) => {
+        if (dirPath === MOCK_SNIPPETS_DIR) {
+          return Promise.resolve([
+            createMockDirent('user-query.sql', false),
+            createMockDirent('admin-report.sql', false),
+            createMockDirent('test-user-data.sql', false),
+            createMockDirent('my-folder', true),
+          ] as any)
+        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, 'my-folder')) {
+          return Promise.resolve([createMockDirent('user-permissions.sql', false)] as any)
+        }
+        return Promise.resolve([])
+      })
+      mockedFS.readFile.mockImplementation((filePath: any) => {
+        const fileName = path.basename(filePath as string)
+        return Promise.resolve(`SELECT * FROM ${fileName.replace('.sql', '')};`)
+      })
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ searchTerm: 'user', sort: 'name', sortOrder: 'asc' })
+
+      expect(result.snippets).toHaveLength(3)
+      expect(result.snippets.map((s) => s.name)).toEqual([
+        'test-user-data',
+        'user-permissions',
+        'user-query',
+      ])
+    })
+
+    it('should sort snippets by name in ascending order', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'zebra.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'apple.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'banana.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ sort: 'name', sortOrder: 'asc' })
+
+      expect(result.snippets.map((s) => s.name)).toEqual(['apple', 'banana', 'zebra'])
+    })
+
+    it('should sort snippets by name in descending order', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'zebra.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'apple.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'banana.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ sort: 'name', sortOrder: 'desc' })
+
+      expect(result.snippets.map((s) => s.name)).toEqual(['zebra', 'banana', 'apple'])
+    })
+
+    it('should sort snippets by creation date', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'newest.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'oldest.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'middle.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockImplementation((filePath: any) => {
+        const fileName = path.basename(filePath as string)
+        switch (fileName) {
+          case 'newest.sql':
+            return Promise.resolve({ birthtime: new Date('2023-03-01') } as any)
+          case 'oldest.sql':
+            return Promise.resolve({ birthtime: new Date('2023-01-01') } as any)
+          case 'middle.sql':
+            return Promise.resolve({ birthtime: new Date('2023-02-01') } as any)
+          default:
+            return Promise.resolve({ birthtime: new Date('2023-01-01') } as any)
+        }
+      })
+
+      // Test descending order (newest first - default behavior)
+      const resultDesc = await getSnippets({ sort: 'inserted_at', sortOrder: 'desc' })
+      expect(resultDesc.snippets.map((s) => s.name)).toEqual(['newest', 'middle', 'oldest'])
+
+      // Test ascending order (oldest first)
+      const resultAsc = await getSnippets({ sort: 'inserted_at', sortOrder: 'asc' })
+      expect(resultAsc.snippets.map((s) => s.name)).toEqual(['oldest', 'middle', 'newest'])
+    })
+
+    it('should paginate results with limit', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'snippet1.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'snippet2.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'snippet3.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'snippet4.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ limit: 2, sort: 'name', sortOrder: 'asc' })
+
+      expect(result.snippets).toHaveLength(2)
+      expect(result.snippets.map((s) => s.name)).toEqual(['snippet1', 'snippet2'])
+      expect(result.cursor).toBeDefined() // Should have a cursor for next page
+    })
+
+    it('should use cursor for pagination', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'snippet1.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'snippet2.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'snippet3.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      // Get first page
+      const firstPage = await getSnippets({ limit: 1, sort: 'name', sortOrder: 'asc' })
+      expect(firstPage.snippets).toHaveLength(1)
+      expect(firstPage.snippets[0].name).toBe('snippet1')
+      expect(firstPage.cursor).toBeDefined()
+
+      // Get second page using cursor
+      const secondPage = await getSnippets({
+        cursor: firstPage.cursor,
+        limit: 1,
+        sort: 'name',
+        sortOrder: 'asc',
+      })
+      expect(secondPage.snippets).toHaveLength(1)
+      expect(secondPage.snippets[0].name).toBe('snippet2')
+    })
+
+    it('should handle invalid cursor gracefully', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'snippet1.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ cursor: 'invalid-cursor-id' })
+
+      expect(result.snippets).toHaveLength(1) // Should return all snippets
+      expect(result.snippets[0].name).toBe('snippet1')
+    })
+
+    it('should use default parameters when none provided', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'snippet1.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({})
+
+      expect(result.snippets).toHaveLength(1)
+      expect(result.cursor).toBeUndefined()
+      // Default sort should be by inserted_at desc
+    })
+
+    it('should handle empty search term', async () => {
+      const folderId = generateDeterministicUuid(['my-folder'])
+
+      const createMockDirent = (name: string, isDirectory: boolean) => ({
+        name,
+        isDirectory: () => isDirectory,
+        isFile: () => !isDirectory,
+      })
+
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockImplementation((dirPath: any) => {
+        if (dirPath === MOCK_SNIPPETS_DIR) {
+          return Promise.resolve([
+            createMockDirent('root-snippet.sql', false),
+            createMockDirent('my-folder', true),
+          ] as any)
+        } else if (dirPath === path.join(MOCK_SNIPPETS_DIR, 'my-folder')) {
+          return Promise.resolve([createMockDirent('folder-snippet.sql', false)] as any)
+        }
+        return Promise.resolve([])
+      })
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      // Empty search term should filter by folderId
+      const result = await getSnippets({ searchTerm: '   ', folderId })
+
+      expect(result.snippets).toHaveLength(1)
+      expect(result.snippets[0].name).toBe('folder-snippet')
+    })
+
+    it('should handle filesystem errors', async () => {
+      mockedFS.access.mockRejectedValue(new Error('Directory not accessible'))
+      mockedFS.mkdir.mockRejectedValue(new Error('Directory not accessible'))
+
+      await expect(getSnippets({})).rejects.toThrow('Directory not accessible')
+    })
+
+    it('should filter out files with empty or null content', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'valid.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'empty.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'null.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockImplementation((filePath: any) => {
+        const fileName = path.basename(filePath as string)
+        switch (fileName) {
+          case 'valid.sql':
+            return Promise.resolve('SELECT 1;')
+          case 'empty.sql':
+            return Promise.resolve('')
+          case 'null.sql':
+            return Promise.resolve('')
+          default:
+            return Promise.resolve('')
+        }
+      })
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({})
+
+      // All files should be included, even empty ones
+      expect(result.snippets).toHaveLength(3)
+      expect(result.snippets.map((s) => s.name)).toContain('valid')
+      expect(result.snippets.map((s) => s.name)).toContain('empty')
+      expect(result.snippets.map((s) => s.name)).toContain('null')
+    })
+
+    it('should return correct snippet structure', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'test-snippet.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT * FROM users;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01T10:00:00Z') } as any)
+
+      const result = await getSnippets({})
+
+      expect(result.snippets).toHaveLength(1)
+      const snippet = result.snippets[0]
+
+      expect(snippet).toMatchObject({
+        name: 'test-snippet',
+        type: 'sql',
+        content: {
+          sql: 'SELECT * FROM users;',
+          schema_version: '1.0',
+        },
+        visibility: 'user',
+        project_id: 1,
+        folder_id: null,
+        owner_id: 1,
+        owner: { id: 1, username: 'johndoe' },
+        updated_by: { id: 1, username: 'johndoe' },
+      })
+
+      expect(snippet.id).toBeDefined()
+      expect(snippet.inserted_at).toBe('2023-01-01T10:00:00.000Z')
+      expect(snippet.updated_at).toBe('2023-01-01T10:00:00.000Z')
+    })
+
+    it('should perform case-insensitive search', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'USER-query.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'admin-report.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'Test-User-Data.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ searchTerm: 'user', sort: 'name', sortOrder: 'asc' })
+
+      expect(result.snippets).toHaveLength(2)
+      expect(result.snippets.map((s) => s.name)).toEqual(['Test-User-Data', 'USER-query'])
+    })
+
+    it('should perform case-insensitive name sorting', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'zebra.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'Apple.sql', isDirectory: () => false, isFile: () => true },
+        { name: 'banana.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ sort: 'name', sortOrder: 'asc' })
+
+      expect(result.snippets.map((s) => s.name)).toEqual(['Apple', 'banana', 'zebra'])
+    })
+
+    it('should validate limit parameter', async () => {
+      await expect(getSnippets({ limit: 0 })).rejects.toThrow('Limit must be a positive number')
+      await expect(getSnippets({ limit: -5 })).rejects.toThrow('Limit must be a positive number')
+      await expect(getSnippets({ limit: 1001 })).rejects.toThrow('Limit cannot exceed 1000')
+    })
+
+    it('should handle large valid limit', async () => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue([
+        { name: 'snippet1.sql', isDirectory: () => false, isFile: () => true },
+      ] as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+
+      const result = await getSnippets({ limit: 1000 })
+
+      expect(result.snippets).toHaveLength(1)
     })
   })
 
