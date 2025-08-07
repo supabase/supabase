@@ -67,13 +67,19 @@ export type FilesystemEntry = {
   type: 'file' | 'folder'
   folderId: string | null
   content?: string // Only for files
+  createdAt: Date
 }
 
-const buildSnippet = (filename: string, content: string, folderId: string | null) => {
+const buildSnippet = (
+  filename: string,
+  content: string,
+  folderId: string | null,
+  createdAt: Date
+) => {
   const snippet: Snippet = {
     id: generateDeterministicUuid([folderId, filename]),
-    inserted_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    inserted_at: createdAt.toISOString(),
+    updated_at: createdAt.toISOString(),
     type: 'sql',
     name: filename.replace('.sql', ''),
     description: '',
@@ -137,6 +143,8 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
           continue
         }
 
+        const stats = await fs.stat(itemPath)
+
         // Add folder entry
         entries.push({
           id: generateDeterministicUuid([folderId, item.name]),
@@ -144,19 +152,24 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
           type: 'folder',
           // Folders are always at root level in this implementation
           folderId: null,
+          createdAt: stats.birthtime,
         })
 
         await readEntriesRecursively(itemPath, item.name)
       } else if (item.isFile() && item.name.endsWith('.sql')) {
-        const content = await fs.readFile(itemPath, 'utf-8')
+        const [content, stats] = await Promise.all([
+          fs.readFile(itemPath, 'utf-8'),
+          fs.stat(itemPath),
+        ])
         const snippetName = item.name.replace('.sql', '')
 
         entries.push({
           id: generateDeterministicUuid([folderId, snippetName]),
-          name: item.name.replace('.sql', ''),
+          name: snippetName,
           type: 'file',
           folderId: folderId,
           content: content,
+          createdAt: stats.birthtime,
         })
       }
     }
@@ -174,7 +187,12 @@ export const getSnippet = async (snippetId: string) => {
     throw new Error(`Snippet with id ${snippetId} not found`)
   }
 
-  return buildSnippet(foundSnippet.name, foundSnippet.content || '', foundSnippet.folderId)
+  return buildSnippet(
+    foundSnippet.name,
+    foundSnippet.content || '',
+    foundSnippet.folderId,
+    foundSnippet.createdAt
+  )
 }
 
 export const getSnippets = async (folderId: string | null = null): Promise<Snippet[]> => {
@@ -216,8 +234,9 @@ export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
   const folderPath = folder ? path.join(SNIPPETS_DIR, folder.name) : SNIPPETS_DIR
   const filePath = path.join(folderPath, `${snippetName}.sql`)
   await fs.writeFile(filePath, content || '', 'utf-8')
+  const stats = await fs.stat(filePath)
 
-  const result = buildSnippet(snippetName, content, snippet.folder_id)
+  const result = buildSnippet(snippetName, content, snippet.folder_id, stats.birthtime)
   return result
 }
 
@@ -231,10 +250,9 @@ export async function deleteSnippet(id: string): Promise<void> {
   if (!found) {
     throw new Error(`Snippet with id ${id} not found`)
   }
-  const snippet = buildSnippet(found.name, found.content || '', found.folderId)
 
-  const filename = `${snippet.name}.sql`
-  const currentFolder = entries.find((f) => f.id === snippet.folder_id && f.type === 'folder')
+  const filename = `${found.name}.sql`
+  const currentFolder = entries.find((f) => f.id === found.folderId && f.type === 'folder')
   const paths = compact([SNIPPETS_DIR, currentFolder?.name, filename])
   const filePath = path.join(...paths)
 
@@ -277,7 +295,12 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
     )
   }
 
-  const snippet = buildSnippet(foundSnippet.name, foundSnippet.content || '', foundSnippet.folderId)
+  const snippet = buildSnippet(
+    foundSnippet.name,
+    foundSnippet.content || '',
+    foundSnippet.folderId,
+    foundSnippet.createdAt
+  )
 
   // it's easier to delete the old file first and then recreate a new one
   await deleteSnippet(snippet.id)
