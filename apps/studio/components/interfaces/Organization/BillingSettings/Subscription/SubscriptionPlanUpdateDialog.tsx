@@ -351,7 +351,9 @@ export const SubscriptionPlanUpdateDialog = ({
                               Credits; additional projects start at <span translate="no">$10</span>
                               /month regardless of usage.{' '}
                               <Link
-                                href={'/docs/guides/platform/manage-your-usage/compute'}
+                                href={
+                                  'https://supabase.com/docs/guides/platform/manage-your-usage/compute'
+                                }
                                 target="_blank"
                               >
                                 Learn more
@@ -587,7 +589,7 @@ export const SubscriptionPlanUpdateDialog = ({
                         /month regardless of usage.{' '}
                       </div>
                       <Link
-                        href={'/docs/guides/platform/manage-your-usage/compute'}
+                        href={'https://supabase.com/docs/guides/platform/manage-your-usage/compute'}
                         target="_blank"
                         className="underline"
                       >
