@@ -17,11 +17,11 @@ If you get stuck while working through this guide, refer to the [full example on
 
 ## Building the app
 
-Let's start building the Svelte app from scratch.
+Start building the Svelte app from scratch.
 
 ### Initialize a Svelte app
 
-We can use the [SvelteKit Skeleton Project](https://svelte.dev/docs/kit) to initialize an app called `supabase-sveltekit` (for this tutorial we will be using TypeScript):
+Use the [SvelteKit Skeleton Project](https://svelte.dev/docs/kit) to initialize an app called `supabase-sveltekit` (for this tutorial, select "SvelteKit minimal" and use TypeScript):
 
 ```bash
 npx sv create supabase-sveltekit
@@ -35,8 +35,8 @@ Then install the Supabase client library: [supabase-js](https://github.com/supab
 npm install @supabase/supabase-js
 ```
 
-And finally we want to save the environment variables in a `.env`.
-All we need are the `SUPABASE_URL` and the `SUPABASE_KEY` key that you copied [earlier](#get-the-api-keys).
+And finally, save the environment variables in a `.env` file.
+All you need are the `PUBLIC_SUPABASE_URL` and the `PUBLIC_SUPABASE_ANON_KEY` key that you copied [earlier](#get-the-api-keys).
 
 <$CodeTabs>
 
@@ -47,26 +47,28 @@ PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 
 </$CodeTabs>
 
-Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
+### App styling (optional)
+
+An optional step is to update the CSS file `src/styles.css` to make the app look nice.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
 
 ### Creating a Supabase client for SSR
 
-The `ssr` package configures Supabase to use Cookies, which is required for server-side languages and frameworks.
+The `ssr` package configures Supabase to use Cookies, which are required for server-side languages and frameworks.
 
-Install the Supabase packages:
+Install the SSR package:
 
 ```bash
-npm install @supabase/ssr @supabase/supabase-js
+npm install @supabase/ssr
 ```
 
-Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means the user's session is available throughout the entire SvelteKit stack - page, layout, server, and hooks.
 
-Add the code below to your `src/hooks.server.ts` to initialize the client on the server:
+Add the code below to a `src/hooks.server.ts` file to initialize the client on the server:
 
 <$CodeTabs>
 
 ```ts name=src/hooks.server.ts
-// src/hooks.server.ts
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
@@ -124,8 +126,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 </$CodeTabs>
 
 <$Partial path="get_session_warning.mdx" />
-
-If you are using TypeScript the compiler might complain about `event.locals.supabase` and `event.locals.safeGetSession`, this can be fixed by updating your `src/app.d.ts` with the content below:
+{/* TODO: Change when adding JS autoconversion */}
+As this tutorial uses TypeScript the compiler will complain about `event.locals.supabase` and `event.locals.safeGetSession`, you can fix this by updating the `src/app.d.ts` with the content below:
 
 <$CodeTabs>
 
@@ -175,7 +177,7 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cooki
 
 <Admonition type="tip">
 
-Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
+Start the dev server (`npm run dev`) to generate the `./$types` files we are referencing in our project.
 
 </Admonition>
 
@@ -224,7 +226,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 </$CodeTabs>
 
-Update your `src/routes/+layout.svelte`:
+Update `src/routes/+layout.svelte`:
 
 <$CodeTabs>
 
@@ -262,7 +264,7 @@ Update your `src/routes/+layout.svelte`:
 
 ## Set up a login page
 
-Create a magic link login/signup page for your application:
+Create a magic link login/signup page for your application by updating the `routes/+page.svelte` file:
 
 <$CodeTabs>
 
@@ -328,7 +330,7 @@ Create a magic link login/signup page for your application:
 
 </$CodeTabs>
 
-Create a `src/routes/+page.server.ts` file that will handle our magic link form when submitted.
+Create a `src/routes/+page.server.ts` file that handles the magic link form when submitted.
 
 <$CodeTabs>
 
@@ -389,26 +391,26 @@ Change the email template to support a server-side authentication flow.
 
 Before we proceed, let's change the email template to support sending a token hash:
 
-- Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard.
-- Select `Confirm signup` template.
+- Go to the [**Auth** > **Emails**](/dashboard/project/_/auth/templates) page in the project dashboard.
+- Select the **Confirm signup** template.
 - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
-- Repeat the previous step for `Magic link` template.
+- Repeat the previous step for **Magic link** template.
 
 <Admonition type="tip">
 
-Did you know? You could also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+**Did you know?** You can also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
 
 </Admonition>
 
 ### Confirmation endpoint
 
-As we are working in a server-side rendering (SSR) environment, it is necessary to create a server endpoint responsible for exchanging the `token_hash` for a session.
+As this is a server-side rendering (SSR) environment, you need to create a server endpoint responsible for exchanging the `token_hash` for a session.
 
-In the following code snippet, we perform the following steps:
+The following code snippet performs the following steps:
 
-- Retrieve the `token_hash` sent back from the Supabase Auth server using the `token_hash` query parameter.
-- Exchange this `token_hash` for a session, which we store in storage (in this case, cookies).
-- Finally, the user is redirected to the `account` page or the `error` page.
+- Retrieves the `token_hash` sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Exchanges this `token_hash` for a session, which you store in storage (in this case, cookies).
+- Finally, redirect the user to the `account` page or the `error` page.
 
 <$CodeTabs>
 
@@ -451,7 +453,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 
 ### Authentication error page
 
-If there is an error with confirming the token you will be redirect to this error page.
+If there is an error with confirming the token, redirect the user to ana error page.
 
 <$CodeTabs>
 
@@ -463,7 +465,7 @@ If there is an error with confirming the token you will be redirect to this erro
 
 ### Account page
 
-After a user is signed in, they need to be able to edit their profile details and manage their account.
+After a user signs in, they need to be able to edit their profile details+page.
 Create a new `src/routes/account/+page.svelte` file with the content below.
 
 <$CodeTabs>
@@ -480,7 +482,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 
 	let profileForm: HTMLFormElement
 	let loading = $state(false)
-	let fullName: string = profile?.full_name ?? ''
+	let full_name: string = profile?.full_name ?? ''
 	let username: string = profile?.username ?? ''
 	let website: string = profile?.website ?? ''
 	let avatarUrl: string = $state(profile?.avatar_url ?? '')
@@ -515,8 +517,8 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 		</div>
 
 		<div>
-			<label for="fullName">Full Name</label>
-			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
+			<label for="full_name">Full Name</label>
+			<input id="full_name" name="full_name" type="text" value={form?.full_name ?? full_name} />
 		</div>
 
 		<div>
@@ -549,8 +551,8 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 
 </$CodeTabs>
 
-Now create the associated `src/routes/account/+page.server.ts` file that will handle loading our data from the server through the `load` function
-and handle all our form actions through the `actions` object.
+Now create the associated `src/routes/account/+page.server.ts` file that handles loading data from the server through the `load` function
+and handle all form actions through the `actions` object.
 
 ```ts name=src/routes/account/+page.server.ts
 import { fail, redirect } from '@sveltejs/kit'
@@ -575,7 +577,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 export const actions: Actions = {
   update: async ({ request, locals: { supabase, safeGetSession } }) => {
     const formData = await request.formData()
-    const fullName = formData.get('fullName') as string
+    const full_name = formData.get('full_name') as string
     const username = formData.get('username') as string
     const website = formData.get('website') as string
     const avatarUrl = formData.get('avatarUrl') as string
@@ -584,7 +586,7 @@ export const actions: Actions = {
 
     const { error } = await supabase.from('profiles').upsert({
       id: session?.user.id,
-      full_name: fullName,
+      full_name: full_name,
       username,
       website,
       avatar_url: avatarUrl,
@@ -593,7 +595,7 @@ export const actions: Actions = {
 
     if (error) {
       return fail(500, {
-        fullName,
+        full_name,
         username,
         website,
         avatarUrl,
@@ -601,7 +603,7 @@ export const actions: Actions = {
     }
 
     return {
-      fullName,
+      full_name,
       username,
       website,
       avatarUrl,
@@ -619,7 +621,7 @@ export const actions: Actions = {
 
 ### Launch!
 
-Now that we have all the pages in place, run this in a terminal window:
+Now that you have all the pages in place, run this command in a terminal:
 
 ```bash
 npm run dev
