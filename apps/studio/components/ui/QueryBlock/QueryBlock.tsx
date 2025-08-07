@@ -8,8 +8,7 @@ import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
-import { QueryResponseError } from 'data/sql/execute-sql-mutation'
-import { useEnhancedExecuteSqlMutation } from 'lib/ai-assistant-invalidation/use-enhanced-execute-sql-mutation'
+import { useExecuteSqlMutation, QueryResponseError } from 'data/sql/execute-sql-mutation'
 import dayjs from 'dayjs'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
@@ -164,7 +163,7 @@ export const QueryBlock = ({
     ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
     : formattedQueryResult
 
-  const { mutate: execute, isLoading: isExecuting } = useEnhancedExecuteSqlMutation({
+  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: (data) => {
       onResults?.(data.result)
       setQueryResult(data.result)
