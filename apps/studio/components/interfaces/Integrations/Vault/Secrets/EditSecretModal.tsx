@@ -1,15 +1,10 @@
-import { isEmpty } from 'lodash'
 import { useState } from 'react'
+import { EyeOff, Eye } from 'lucide-react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { VaultSecret } from 'types'
+
 import {
   Button,
   Dialog,
@@ -24,8 +19,12 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { EyeOff, Eye } from 'lucide-react'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { VaultSecret } from 'types'
 
 interface EditSecretModalProps {
   visible: boolean
@@ -43,7 +42,7 @@ const formId = 'edit-vault-secret-form'
 
 const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => {
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data, isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
     {
       projectRef: project?.ref,
@@ -74,7 +73,7 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
     if (values.name !== secret.name) payload.name = values.name
     if (values.description !== secret.description) payload.description = values.description
 
-    if (!isEmpty(payload)) {
+    if (Object.keys(payload).length > 0) {
       updateSecret(
         {
           projectRef: project.ref,
