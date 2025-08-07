@@ -28,7 +28,6 @@ export function FilterDropdown({
         <Button
           type="default"
           size="tiny"
-          className="w-full [&>span]:w-full !pr-1 space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
           {selectedValue === 'unset' ? (
@@ -44,12 +43,6 @@ export function FilterDropdown({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem
-          onClick={() => setFilterValue(filterKey, 'unset')}
-          className={selectedValue === 'unset' ? 'text-brand-600' : ''}
-        >
-          Unset
-        </DropdownMenuItem>
         {filterConfig.options
           .filter((opt) => opt.value !== 'unset')
           .map((option) => (
@@ -61,6 +54,17 @@ export function FilterDropdown({
               {option.label}
             </DropdownMenuItem>
           ))}
+
+        {selectedValue !== 'unset' && (
+          <div className="border-t border-border mt-1 pt-1">
+            <DropdownMenuItem
+              onClick={() => setFilterValue(filterKey, 'unset')}
+              className="text-foreground-lighter"
+            >
+              Clear filter
+            </DropdownMenuItem>
+          </div>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

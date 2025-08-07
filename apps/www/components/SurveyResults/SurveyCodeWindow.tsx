@@ -26,37 +26,8 @@ export const SurveyCodeWindow = ({
   setFilterValue,
 }: Props) => {
   return (
-    <div
-      className={cn(
-        'relative rounded-2xl shadow-lg p-2 pt-0 w-full h-full bg-alternative-200 border flex flex-col',
-        className
-      )}
-      style={style}
-    >
-      <div className="w-full px-2 py-3 relative flex items-center gap-1.5 lg:gap-2">
-        <div className="w-2 h-2 bg-border rounded-full" />
-        <div className="w-2 h-2 bg-border rounded-full" />
-        <div className="w-2 h-2 bg-border rounded-full" />
-      </div>
-      <div className="h-full w-full rounded-lg flex flex-col">
-        {filters && activeFilters && setFilterValue && (
-          <div className="flex flex-wrap gap-4 p-4 border-b border-border">
-            {Object.entries(filters).map(([filterKey, filterConfig]) => (
-              <FilterDropdown
-                filterKey={filterKey}
-                filterConfig={filterConfig}
-                selectedValue={activeFilters[filterKey]}
-                setFilterValue={setFilterValue}
-              />
-            ))}
-          </div>
-        )}
-        <div className="flex-1 p-4">
-          <CodeBlock lang={lang ?? 'js'} size="small" showLineNumbers={showLineNumbers}>
-            {code}
-          </CodeBlock>
-        </div>
-      </div>
-    </div>
+    <CodeBlock lang={lang ?? 'js'} showLineNumbers={showLineNumbers}>
+      {code}
+    </CodeBlock>
   )
 }

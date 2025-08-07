@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
 import { FilterDropdown } from './FilterDropdown'
 import { ChevronDown, UnfoldVertical } from 'lucide-react'
 import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
+import { SurveyCodeWindow } from './SurveyCodeWindow'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 // Create a separate Supabase client for your external project
 const externalSupabase = createClient(
@@ -246,110 +248,118 @@ export function GenericChartWithQuery({
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent
-        className="overflow-hidden relative"
-        style={{
-          height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
-        }}
+      {/* Was CardContent:
+      <div ref={ref} className={cn('py-4 px-6 border-b last:border-none', className)} {...props} />
+       */}
+      <div
+        className={`${view === 'chart' ? 'bg-surface-100' : 'bg-surface-75'} border-b last:border-none`}
       >
-        {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-foreground-lighter">Loading data...</div>
-          </div>
-        ) : error ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-red-500">Error: {error}</div>
-          </div>
-        ) : (
-          <div className="flex flex-col h-full w-full justify-between gap-[1px]">
-            {/* Each bar as a vertical stack: label above, bar below */}
-            <div
-              className="flex flex-col gap-10"
-              style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
-            >
-              {chartData.map((item, index) => (
-                <div key={index} className="flex flex-col">
-                  {/* Label above the bar */}
-                  <div className="mb-2">
-                    <span className="text-sm font-mono uppercase tracking-widest">
-                      {item.label}
-                    </span>
-                  </div>
+        <div
+          className="overflow-hidden relative"
+          style={{
+            height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
+          }}
+        >
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-foreground-lighter">Loading data...</div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-red-500">Error: {error}</div>
+            </div>
+          ) : view === 'chart' ? (
+            <div className="flex flex-col h-full w-full justify-between gap-[1px] px-6 py-6">
+              {/* Each bar as a vertical stack: label above, bar below */}
+              <div
+                className="flex flex-col gap-10"
+                style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
+              >
+                {chartData.map((item, index) => (
+                  <div key={index} className="flex flex-col">
+                    {/* Label above the bar */}
+                    <div className="mb-2">
+                      <span className="text-sm font-mono uppercase tracking-widest">
+                        {item.label}
+                      </span>
+                    </div>
 
-                  {/* Bar and percentage row */}
-                  <div className="flex items-center gap-3">
-                    {/* Bar container with flex layout */}
-                    <div
-                      className="flex-1 h-[12px] relative flex items-center"
-                      style={
-                        {
-                          '--reference': maxValue,
-                          '--bar-value': item.rawValue || item.value, // Use rawValue for scaling
-                          '--index': index,
-                        } as React.CSSProperties
-                      }
-                    >
-                      {/* Animated Bar */}
+                    {/* Bar and percentage row */}
+                    <div className="flex items-center gap-3">
+                      {/* Bar container with flex layout */}
                       <div
-                        className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
-                        style={{
-                          width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
-                        }}
-                      />
+                        className="flex-1 h-[12px] relative flex items-center"
+                        style={
+                          {
+                            '--reference': maxValue,
+                            '--bar-value': item.rawValue || item.value, // Use rawValue for scaling
+                            '--index': index,
+                          } as React.CSSProperties
+                        }
+                      >
+                        {/* Animated Bar */}
+                        <div
+                          className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
+                          style={{
+                            width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
+                          }}
+                        />
 
-                      {/* Percentage positioned after the bar */}
-                      <div className="tabular-nums text-fluid-14-20 font-medium min-w-[60px] ml-3">
-                        {item.value < 1 ? '<1%' : `${item.value}%`}
+                        {/* Percentage positioned after the bar */}
+                        <div className="tabular-nums text-fluid-14-20 font-medium min-w-[60px] ml-3">
+                          {item.value < 1 ? '<1%' : `${item.value}%`}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <CodeBlock lang="sql" showLineNumbers={true} className="rounded-none border-none">
+              {sqlQuery}
+            </CodeBlock>
+          )}
 
-        {/* Expand button overlay */}
-        {!isExpanded && !isLoading && !error && chartData.length > 3 && (
-          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
-            <Button
-              type="default"
-              size="tiny"
-              // iconRight={<UnfoldVertical />}
-              onClick={() => setIsExpanded(true)}
-              className="shadow-sm"
-            >
-              {/* Show {chartData.length - 3} more */}
-              Show more
-            </Button>
-          </div>
-        )}
-      </CardContent>
+          {/* Expand button overlay */}
+          {!isExpanded && !isLoading && !error && chartData.length > 3 && (
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
+              <Button
+                type="default"
+                size="tiny"
+                // iconRight={<UnfoldVertical />}
+                onClick={() => setIsExpanded(true)}
+                className="shadow-sm"
+              >
+                {/* Show {chartData.length - 3} more */}
+                Show more
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
 
-      {/* Filters */}
-      <div className="flex flex-col">
+      {/* Filters and toggle */}
+      <div className="flex flex-row flex-wrap gap-4 p-4 border-b border-border justify-between">
         {filters && activeFilters && setFilterValue && (
-          <div className="flex flex-wrap gap-4 p-4 border-b border-border justify-between">
-            <div className="flex flex-wrap gap-4">
-              {Object.entries(filters).map(([filterKey, filterConfig]) => (
-                <FilterDropdown
-                  key={filterKey}
-                  filterKey={filterKey}
-                  filterConfig={filterConfig}
-                  selectedValue={activeFilters[filterKey]}
-                  setFilterValue={setFilterValue}
-                />
-              ))}
-            </div>
-
-            <TwoOptionToggle
-              options={['SQL', 'chart']}
-              activeOption={view}
-              onClickOption={setView}
-              borderOverride="border-overlay"
-            />
+          <div className="flex flex-wrap gap-4">
+            {Object.entries(filters).map(([filterKey, filterConfig]) => (
+              <FilterDropdown
+                key={filterKey}
+                filterKey={filterKey}
+                filterConfig={filterConfig}
+                selectedValue={activeFilters[filterKey]}
+                setFilterValue={setFilterValue}
+              />
+            ))}
           </div>
         )}
+        <TwoOptionToggle
+          options={['SQL', 'chart']}
+          activeOption={view}
+          onClickOption={setView}
+          borderOverride="border-overlay"
+        />
       </div>
     </Card>
   )

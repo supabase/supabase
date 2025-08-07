@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
-import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 import { Maximize2, X } from 'lucide-react'
 
@@ -205,11 +204,13 @@ function StateOfStartupsPage() {
   return (
     <>
       {/* <NextSeo {...pageData.seo} /> */}
-      <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
+      {/* <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible"></DefaultLayout> */}
+      <DefaultLayout className="!bg-alternative">
         <FloatingTableOfContents />
-        <div ref={heroRef}>
-          <Hero {...pageData.heroSection} />
-        </div>
+
+        <Hero ref={heroRef} {...pageData.heroSection} />
+
+        {/* Replace with bespoke <section> with className */}
         <SectionContainer>
           {/* table of contents */}
           <ol className="flex flex-col divide-y divide-dashed bg-surface-100 border border-default rounded-md px-6 py-2 mb-12 max-w-md mx-auto">
@@ -268,126 +269,120 @@ function StateOfStartupsPage() {
   )
 }
 
-const Hero = (props: any) => {
+const Hero = forwardRef<HTMLElement, any>((props, ref) => {
   return (
-    <>
-      <div
-        className={cn(
-          'container relative w-full mx-auto px-6 py-8 md:py-16 sm:px-16 xl:px-20',
-          props.className
-        )}
-      >
-        <div className="flex flex-col text-center items-center justify-center min-h-[600px] lg:min-h-[70vh]">
-          <div
-            className="absolute -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center -translate-y-1/2"
+    <section ref={ref} className="relative w-full overflow-hidden">
+      {/* SVG shapes container */}
+      {/* absolute -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center overflow-x-hidden */}
+      <div className="absolute inset-0 -top-[40vh]">
+        <svg
+          width="558"
+          height="392"
+          viewBox="0 0 558 392"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="absolute w-full h-full inset-0 -top-40 animate-pulse"
+          style={{
+            animationDuration: '20000ms',
+          }}
+        >
+          <circle
+            cx="278.831"
+            cy="112.952"
+            r="278.5"
+            transform="rotate(75 278.831 112.952)"
+            fill="url(#paint0_radial_183_1691)"
+            fillOpacity="0.2"
+          />
+          <defs>
+            <radialGradient
+              id="paint0_radial_183_1691"
+              cx="0"
+              cy="0"
+              r="1"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform="translate(349.764 247.245) rotate(47.821) scale(202.74 202.839)"
+            >
+              <stop stopColor="hsl(var(--brand-200))" />
+              <stop offset="1" stopColor="hsl(var(--brand-200))" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+        </svg>
+        {/* <div className="sm:w-full sm_h-full sm:flex sm:justify-center"></div> */}
+        <div className="w-full h-full flex justify-center">
+          <svg
+            width="1119"
+            height="1119"
+            viewBox="0 0 1119 1119"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            // className="sm:w-auto -mb-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
+            className="animate-spinner !ease-linear transform"
             style={{
-              transform: 'translateY(-50%) scale(1.2)',
+              animationDuration: '20000ms',
             }}
           >
-            <svg
-              width="558"
-              height="392"
-              viewBox="0 0 558 392"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute w-full h-full inset-0 -top-40 lg:-top-20 xl:-left-40 animate-pulse"
-              style={{
-                animationDuration: '20000ms',
-              }}
-            >
-              <circle
-                cx="278.831"
-                cy="112.952"
-                r="278.5"
-                transform="rotate(75 278.831 112.952)"
-                fill="url(#paint0_radial_183_1691)"
-                fillOpacity="0.2"
+            <g clipPath="url(#clip0_183_1690)">
+              <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
+              <path
+                d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
+                stroke="url(#paint2_radial_183_1690)"
+                strokeWidth="1.15887"
               />
-              <defs>
-                <radialGradient
-                  id="paint0_radial_183_1691"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(349.764 247.245) rotate(47.821) scale(202.74 202.839)"
-                >
-                  <stop stopColor="hsl(var(--brand-200))" />
-                  <stop offset="1" stopColor="hsl(var(--brand-200))" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-            </svg>
-            <div className="sm:w-full sm_h-full sm:flex sm:justify-center">
-              <svg
-                width="1119"
-                height="1119"
-                viewBox="0 0 1119 1119"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="sm:w-auto -mb-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
-                style={{
-                  animationDuration: '20000ms',
-                }}
+            </g>
+            <defs>
+              <radialGradient
+                id="paint1_radial_183_1690"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(571.212 539.13) rotate(-57.818) scale(542.117 690.275)"
               >
-                <g clipPath="url(#clip0_183_1690)">
-                  <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
-                  <path
-                    d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
-                    stroke="url(#paint2_radial_183_1690)"
-                    strokeWidth="1.15887"
-                  />
-                </g>
-                <defs>
-                  <radialGradient
-                    id="paint1_radial_183_1690"
-                    cx="0"
-                    cy="0"
-                    r="1"
-                    gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(571.212 539.13) rotate(-57.818) scale(542.117 690.275)"
-                  >
-                    {/* Inner core */}
-                    <stop stopColor="hsl(var(--brand-200))" />
-                    {/* Inner band */}
-                    <stop offset="0.675" stopColor="hsl(var(--brand-200))" />
-                    {/* Outer band */}
-                    <stop offset="0.75" stopColor="hsl(var(--brand-300))" />
-                    {/* Outermost band */}
-                    <stop offset="1" stopColor="hsl(var(--brand-500))" />
-                  </radialGradient>
-                  <radialGradient
-                    id="paint2_radial_183_1690"
-                    cx="0"
-                    cy="0"
-                    r="1"
-                    gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(814.301 944.97) rotate(141.0399) scale(142.974 294.371)"
-                  >
-                    {/* Outer slither ring */}
-                    <stop stopColor="hsl(var(--brand-600))" />
-                    <stop offset="1" stopColor="hsl(var(--brand-600))" stopOpacity="0" />
-                  </radialGradient>
-                  <clipPath id="clip0_183_1690">
-                    <rect width="1119" height="1119" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </div>
-          </div>
-          <div className="relative w-full z-10 flex flex-col gap-12 items-center mx-auto">
-            <h1 className="flex flex-col gap-4 items-center">
-              <span className="!leading-[90%] tracking-[-0.025em] text-7xl md:text-[8rem] lg:text-[11.25rem] ">
-                State of
-                <br /> Startups
-              </span>
-              <span className="text-foreground text-2xl md:text-4xl leading-[100%]">2025</span>
-            </h1>
-            <div className="p md:text-2xl max-w-lg flex flex-col gap-4">{props.subheader}</div>
-          </div>
+                {/* Inner core */}
+                <stop stopColor="hsl(var(--brand-200))" />
+                {/* Inner band */}
+                <stop offset="0.675" stopColor="hsl(var(--brand-200))" />
+                {/* Outer band */}
+                <stop offset="0.75" stopColor="hsl(var(--brand-300))" />
+                {/* Outermost band */}
+                <stop offset="1" stopColor="hsl(var(--brand-500))" />
+              </radialGradient>
+              <radialGradient
+                id="paint2_radial_183_1690"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(814.301 944.97) rotate(141.0399) scale(142.974 294.371)"
+              >
+                {/* Outer slither ring */}
+                <stop stopColor="hsl(var(--brand-600))" />
+                <stop offset="1" stopColor="hsl(var(--brand-600))" stopOpacity="0" />
+              </radialGradient>
+              <clipPath id="clip0_183_1690">
+                <rect width="1119" height="1119" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
         </div>
       </div>
-    </>
+      {/* Text container */}
+      {/* mx-auto px-6 py-8 md:py-16 sm:px-16 xl:px-20 */}
+      <header className="container relative mt-[14vh] gap-[20vh] w-full z-10 flex flex-col text-center justify-center items-center px-4 mx-auto">
+        <h1 className="flex flex-col gap-4 items-center">
+          <span className="!leading-[90%] tracking-[-0.025em] text-7xl md:text-[14vw] xl:text-[10vw]">
+            State of
+            <br /> Startups
+          </span>
+          <span className="text-foreground text-2xl md:text-4xl leading-[100%]">2025</span>
+        </h1>
+        <div className="p md:text-2xl max-w-lg flex flex-col gap-4">{props.subheader}</div>
+      </header>
+    </section>
   )
-}
+})
+
+Hero.displayName = 'Hero'
 
 export default StateOfStartupsPage
