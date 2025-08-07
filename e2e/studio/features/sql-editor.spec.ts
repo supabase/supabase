@@ -1,7 +1,6 @@
 import { expect, Page } from '@playwright/test'
 import { isCLI } from '../utils/is-cli'
 import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
 
 const deleteQuery = async (page: Page, queryName: string) => {
   const privateSnippet = page.getByLabel('private-snippets')
@@ -16,11 +15,11 @@ test.describe('SQL Editor', () => {
   const pwTestQueryName = 'pw-test-query'
 
   test.beforeAll(async ({ browser, ref }) => {
-    test.setTimeout(60000)
+    test.setTimeout(60_000)
 
     // Create a new table for the tests
     page = await browser.newPage()
-    await page.goto(toUrl(`/project/${ref}/sql/new?skip=true`))
+    await page.goto(`/project/${ref}/sql/new?skip=true`)
 
     await page.evaluate((ref) => {
       localStorage.removeItem('dashboard-history-default')
@@ -59,7 +58,7 @@ test.describe('SQL Editor', () => {
         page.getByText('Successfully deleted 1 query'),
         'Delete confirmation toast should be visible'
       ).toBeVisible({
-        timeout: 50000,
+        timeout: 50_000,
       })
       privateSnippetText =
         (await page.getByLabel('private-snippets').count()) > 0
@@ -79,7 +78,7 @@ test.describe('SQL Editor', () => {
         page.getByText('Successfully deleted 1 query'),
         'Delete confirmation toast should be visible'
       ).toBeVisible({
-        timeout: 50000,
+        timeout: 50_000,
       })
       privateSnippetText =
         (await page.getByLabel('private-snippets').count()) > 0
@@ -113,7 +112,7 @@ test.describe('SQL Editor', () => {
     await expect(page.getByRole('gridcell', { name: '5' })).toBeVisible()
   })
 
-  test('destructive query would tripper a warning modal', async () => {
+  test('destructive query would trigger a warning modal', async () => {
     await page.getByTestId('sql-editor-new-query-button').click()
     await page.getByRole('menuitem', { name: 'Create a new snippet' }).click()
 
@@ -179,7 +178,7 @@ test.describe('SQL Editor', () => {
         response.status().toString().startsWith('2')
     )
     await expect(privateSnippet.getByText(pwTestQueryName, { exact: true })).toBeVisible({
-      timeout: 50000,
+      timeout: 50_000,
     })
     const privateSnippet2 = await privateSnippet.getByText(pwTestQueryName, { exact: true })
 
@@ -213,7 +212,7 @@ test.describe('SQL Editor', () => {
         page.getByText('Successfully deleted 1 query'),
         'Delete confirmation toast should be visible'
       ).toBeVisible({
-        timeout: 50000,
+        timeout: 50_000,
       })
     }
   })
