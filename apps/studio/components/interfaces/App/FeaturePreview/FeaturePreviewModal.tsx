@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
@@ -15,6 +15,7 @@ import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { InlineEditorPreview } from './InlineEditorPreview'
 import { RealtimeSettingsPreview } from './RealtimeSettingsPreview'
+import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -25,6 +26,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
 }
 
 const FeaturePreviewModal = () => {
@@ -36,7 +38,7 @@ const FeaturePreviewModal = () => {
     closeFeaturePreviewModal,
     isFeaturePreviewReleasedToPublic,
   } = useFeaturePreviewModal()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 

@@ -17,7 +17,7 @@ import {
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -66,7 +66,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',

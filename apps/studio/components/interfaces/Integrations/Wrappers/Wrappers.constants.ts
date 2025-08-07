@@ -1,6 +1,6 @@
 import { BASE_PATH } from 'lib/constants'
 import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
-import type { WrapperMeta } from './Wrappers.types'
+import type { ServerOption, WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',
@@ -25,6 +25,16 @@ export const WRAPPER_HANDLERS = {
   CLOUDFLARE_D1: 'wasm_fdw_handler',
   HUBSPOT: 'wasm_fdw_handler',
   ORB: 'wasm_fdw_handler',
+}
+
+const SUPABASE_TARGET_SCHEMA_OPTION: ServerOption = {
+  name: 'supabase_target_schema',
+  label: 'Target Schema',
+  required: false,
+  encrypted: false,
+  secureEntry: false,
+  readOnly: true,
+  hidden: true,
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -55,6 +65,7 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     tables: [
@@ -1775,6 +1786,7 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     canTargetSchema: true,
@@ -2224,12 +2236,13 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     canTargetSchema: true,
     sourceSchemaOption: {
       name: 'source_schema',
-      label: 'Source Schema',
+      label: 'Namespace',
       description: 'It should match the namespace of the Iceberg catalog.',
       required: true,
       encrypted: false,

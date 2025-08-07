@@ -2,19 +2,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Admonition } from 'ui-patterns'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 
 export const WebhooksOverviewTab = () => {
-  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     data: schemas,

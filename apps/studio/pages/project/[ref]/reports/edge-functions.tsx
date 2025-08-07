@@ -1,29 +1,26 @@
-import { useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ChevronDown, RefreshCw } from 'lucide-react'
-import { useParams } from 'common'
+import { useEffect, useState } from 'react'
 
+import { Label } from '@ui/components/shadcn/ui/label'
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import {
-  LogsDatePicker,
-  DatePickerValue,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import { Label } from '@ui/components/shadcn/ui/label'
 
-import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
 import type { NextPageWithLayout } from 'types'
 
@@ -226,7 +223,6 @@ const EdgeFunctionsUsage = () => {
                 endDate={selectedDateRange?.period_end?.date}
                 updateDateRange={updateDateRange}
                 functionIds={functionIds}
-                orgPlanId={orgPlan?.id}
               />
             ))}
         </div>

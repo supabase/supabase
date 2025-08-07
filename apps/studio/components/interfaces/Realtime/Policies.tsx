@@ -1,16 +1,16 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
-import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const RealtimePolicies = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [showPolicyEditor, setShowPolicyEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()

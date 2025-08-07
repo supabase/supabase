@@ -10,8 +10,8 @@ import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-
-export const dynamicParams = false
+import { IS_PROD } from 'common'
+import { getEmptyArray } from '~/features/helpers.fn'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -190,7 +190,9 @@ const urlTransform: UrlTransformFunction = (url) => {
   }
 }
 
-const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+const generateStaticParams = IS_PROD
+  ? async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+  : getEmptyArray
 const generateMetadata = genGuideMeta(getContent)
 
 export default PGGraphQLDocs

@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +25,7 @@ import {
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
 
 export const EnableIndexAdvisorButton = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 

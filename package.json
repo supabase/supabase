@@ -70,7 +70,8 @@
       "@tanstack/directive-functions-plugin>vite": "catalog:",
       "@tanstack/react-start-plugin>vite": "catalog:",
       "esbuild": "^0.25.2",
-      "payload>image-size": "1.2.1"
+      "payload>image-size": "1.2.1",
+      "@redocly/respect-core>form-data": "^4.0.4"
     },
     "neverBuiltDependencies": ["libpg-query"]
   },

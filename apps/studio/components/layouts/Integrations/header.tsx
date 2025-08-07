@@ -6,7 +6,7 @@ import { forwardRef, useRef } from 'react'
 
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, cn } from 'ui'
 
 interface HeaderProps {
@@ -17,7 +17,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
   const router = useRouter()
   const { id } = useParams()
   // Get project context
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   // Find the integration details based on ID
   const integration = INTEGRATIONS.find((i) => i.id === id)
   // Check if we're on the main integrations page

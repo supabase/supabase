@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
 import { RealtimeTokensPopover } from './RealtimeTokensPopover'
@@ -18,7 +18,7 @@ interface HeaderProps {
 export const Header = ({ config, onChangeConfig }: HeaderProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { ref } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   return (
     <div className="flex flex-row h-14 gap-2.5 items-center px-4">

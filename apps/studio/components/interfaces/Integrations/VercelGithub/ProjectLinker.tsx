@@ -8,7 +8,7 @@ import {
   IntegrationConnectionsCreateVariables,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
@@ -83,7 +83,7 @@ const ProjectLinker = ({
   const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
   const foreignProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
 
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
     defaultSupabaseProjectRef

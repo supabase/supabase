@@ -7,7 +7,7 @@ import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Badge } from 'ui'
@@ -44,7 +44,7 @@ export const DisplayBlockRenderer = ({
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()

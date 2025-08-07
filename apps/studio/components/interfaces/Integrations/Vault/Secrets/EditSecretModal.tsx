@@ -1,14 +1,14 @@
 import { isEmpty } from 'lodash'
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { VaultSecret } from 'types'
 import { Button, Form, Input, Modal } from 'ui'
-import { EyeOff, Eye } from 'lucide-react'
 
 interface EditSecretModalProps {
   selectedSecret: VaultSecret | undefined
@@ -16,8 +16,8 @@ interface EditSecretModalProps {
 }
 
 const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const { project } = useProjectContext()
 
   const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
 

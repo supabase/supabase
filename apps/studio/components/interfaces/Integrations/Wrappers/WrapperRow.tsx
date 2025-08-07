@@ -107,37 +107,39 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
             </div>
           ))}
         </TableCell>
-        <TableCell className="space-x-2 flex-nowrap">
-          <ButtonTooltip
-            disabled={!canManageWrappers}
-            type="default"
-            icon={<Edit strokeWidth={1.5} />}
-            className="px-1.5"
-            onClick={() => setEditWrapperShown(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canManageWrappers
-                  ? 'You need additional permissions to edit wrappers'
-                  : 'Edit wrapper',
-              },
-            }}
-          />
-          <ButtonTooltip
-            type="default"
-            disabled={!canManageWrappers}
-            icon={<Trash strokeWidth={1.5} />}
-            className="px-1.5"
-            onClick={() => setDeleteWrapperShown(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canManageWrappers
-                  ? 'You need additional permissions to delete wrappers'
-                  : 'Delete wrapper',
-              },
-            }}
-          />
+        <TableCell className="flex-nowrap">
+          <div className="flex items-center gap-x-2">
+            <ButtonTooltip
+              disabled={!canManageWrappers}
+              type="default"
+              icon={<Edit strokeWidth={1.5} />}
+              className="px-1.5"
+              onClick={() => setEditWrapperShown(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageWrappers
+                    ? 'You need additional permissions to edit wrappers'
+                    : 'Edit wrapper',
+                },
+              }}
+            />
+            <ButtonTooltip
+              type="default"
+              disabled={!canManageWrappers}
+              icon={<Trash strokeWidth={1.5} />}
+              className="px-1.5"
+              onClick={() => setDeleteWrapperShown(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageWrappers
+                    ? 'You need additional permissions to delete wrappers'
+                    : 'Delete wrapper',
+                },
+              }}
+            />
+          </div>
         </TableCell>
       </TableRow>
       <Sheet open={editWrapperShown} onOpenChange={() => setIsClosingEditWrapper(true)}>

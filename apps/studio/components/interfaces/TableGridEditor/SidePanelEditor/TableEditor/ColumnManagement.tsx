@@ -13,7 +13,7 @@ import { useParams } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -58,7 +58,7 @@ const ColumnManagement = ({
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()

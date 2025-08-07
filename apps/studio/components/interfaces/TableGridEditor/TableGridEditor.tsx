@@ -12,12 +12,9 @@ import {
   isTableLike,
   isView,
 } from 'data/table-editor/table-editor-types'
-import { useGetTables } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -37,12 +34,10 @@ export const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const project = useSelectedProject()
   const appSnap = useAppStateSnapshot()
   const { ref: projectRef, id } = useParams()
 
   const tabs = useTabsStateSnapshot()
-  const { selectedSchema } = useQuerySchemaState()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
     projectRef,
@@ -56,11 +51,6 @@ export const TableGridEditor = ({
   const isReadOnly = !canEditTables && !canEditColumns
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
-
-  const getTables = useGetTables({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const onClearDashboardHistory = useCallback(() => {
     if (projectRef) appSnap.setDashboardHistory(projectRef, 'editor', undefined)
@@ -81,6 +71,8 @@ export const TableGridEditor = ({
       tabs.handleTabClose({ id: tabId, router, editor: 'table', onClearDashboardHistory })
     }
   }, [onClearDashboardHistory, router, selectedTable, tabs])
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
@@ -148,8 +140,8 @@ export const TableGridEditor = ({
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
-  const canEditViaTableEditor = isTableSelected && !isLocked
+
+  const canEditViaTableEditor = isTableSelected && !isSchemaLocked
   const editable = !isReadOnly && canEditViaTableEditor
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`

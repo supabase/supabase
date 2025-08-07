@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
 import { useProjectUnpausePostgresVersionsQuery } from 'data/config/project-unpause-postgres-versions-query'
 import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -62,7 +62,7 @@ export const PostgresVersionSelector = ({
   layout = 'horizontal',
   label = 'Postgres Version',
 }: PostgresVersionSelectorProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     data: createVersions,

@@ -3,13 +3,13 @@ import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
@@ -20,7 +20,7 @@ import { SUPABASE_ROLES } from './Roles.constants'
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
 const RolesList = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')

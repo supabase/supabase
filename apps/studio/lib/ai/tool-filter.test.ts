@@ -9,14 +9,12 @@ import {
   createPrivacyMessageTool,
   toolSetValidationSchema,
   transformToolResult,
-  DatabaseExtension,
 } from './tool-filter'
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
     expect(TOOL_CATEGORY_MAP['display_query']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
-    expect(TOOL_CATEGORY_MAP['get_logs']).toBe(TOOL_CATEGORIES.LOG)
   })
 })
 
@@ -35,9 +33,7 @@ describe('tool allowance by opt-in level', () => {
       list_edge_functions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_branches: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Log tools
-      get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-      get_log_counts: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
     const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
@@ -64,7 +60,6 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('list_extensions')
     expect(tools).not.toContain('list_edge_functions')
     expect(tools).not.toContain('list_branches')
-    expect(tools).not.toContain('get_logs')
     expect(tools).not.toContain('execute_sql')
   })
 
@@ -78,9 +73,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
     expect(tools).toContain('search_docs')
-    expect(tools).not.toContain('get_logs')
     expect(tools).not.toContain('get_advisors')
-    expect(tools).not.toContain('get_log_counts')
     expect(tools).not.toContain('execute_sql')
   })
 
@@ -94,9 +87,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
     expect(tools).toContain('search_docs')
-    expect(tools).toContain('get_logs')
     expect(tools).toContain('get_advisors')
-    expect(tools).toContain('get_log_counts')
     expect(tools).not.toContain('execute_sql')
   })
 
@@ -110,9 +101,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
     expect(tools).toContain('search_docs')
-    expect(tools).toContain('get_logs')
     expect(tools).toContain('get_advisors')
-    expect(tools).toContain('get_log_counts')
     expect(tools).not.toContain('execute_sql')
   })
 })
@@ -130,9 +119,7 @@ describe('filterToolsByOptInLevel', () => {
     list_branches: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Log tools
-    get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-    get_log_counts: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Unknown tool - should be filtered out entirely
     some_other_tool: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
   } as unknown as ToolSet
@@ -186,9 +173,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
-      'get_logs',
       'get_advisors',
-      'get_log_counts',
     ])
   })
 
@@ -200,16 +185,14 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
-      'get_logs',
       'get_advisors',
-      'get_log_counts',
     ])
   })
 
   it('should stub log tools for schema opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
-    await expectStubsFor(tools, ['get_logs', 'get_advisors', 'get_log_counts'])
+    await expectStubsFor(tools, ['get_advisors'])
   })
 
   // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
@@ -293,7 +276,6 @@ describe('toolSetValidationSchema', () => {
   it('should accept subset of known tools', () => {
     const validSubset = {
       list_tables: { parameters: z.object({}), execute: vitest.fn() },
-      get_logs: { parameters: z.object({}), execute: vitest.fn() },
       display_query: { parameters: z.object({}), execute: vitest.fn() },
     }
 
@@ -327,13 +309,11 @@ describe('toolSetValidationSchema', () => {
       list_extensions: { parameters: z.object({}), execute: vitest.fn() },
       list_edge_functions: { parameters: z.object({}), execute: vitest.fn() },
       list_branches: { parameters: z.object({}), execute: vitest.fn() },
-      get_logs: { parameters: z.object({}), execute: vitest.fn() },
       search_docs: { parameters: z.object({}), execute: vitest.fn() },
       get_advisors: { parameters: z.object({}), execute: vitest.fn() },
       display_query: { parameters: z.object({}), execute: vitest.fn() },
       display_edge_function: { parameters: z.object({}), execute: vitest.fn() },
       rename_chat: { parameters: z.object({}), execute: vitest.fn() },
-      get_log_counts: { parameters: z.object({}), execute: vitest.fn() },
     }
 
     const validationResult = toolSetValidationSchema.safeParse(allExpectedTools)

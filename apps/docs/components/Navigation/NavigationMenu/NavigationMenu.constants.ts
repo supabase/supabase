@@ -653,7 +653,10 @@ export const auth = {
     },
     {
       name: 'Debugging',
-      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
+      items: [
+        { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
+        { name: 'Troubleshooting', url: '/guides/auth/troubleshooting' },
+      ],
     },
     {
       name: 'Third-party auth',
@@ -961,6 +964,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Supavisor',
           url: '/guides/database/supavisor',
+        },
+        {
+          name: 'Troubleshooting',
+          url: '/guides/database/troubleshooting',
         },
       ],
     },
@@ -1443,7 +1450,7 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Background Tasks', url: '/guides/functions/background-tasks' },
-        { name: 'Ephemeral Storage', url: '/guides/functions/ephemeral-storage' },
+        { name: 'File Storage', url: '/guides/functions/ephemeral-storage' },
         { name: 'WebSockets', url: '/guides/functions/websockets' },
         { name: 'Custom Routing', url: '/guides/functions/routing' },
         { name: 'Wasm Modules', url: '/guides/functions/wasm' },
@@ -1586,6 +1593,7 @@ export const realtime: NavMenuConstant = {
           name: 'Postgres Changes',
           url: '/guides/realtime/postgres-changes',
         },
+        { name: 'Settings', url: '/guides/realtime/settings' },
       ],
     },
     {
@@ -1622,14 +1630,17 @@ export const realtime: NavMenuConstant = {
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Pricing', url: '/guides/realtime/pricing' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
     },
     {
       name: 'Debugging',
       url: undefined,
-      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
+      items: [
+        { name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] },
+        { name: 'Troubleshooting', url: '/guides/realtime/troubleshooting' },
+      ],
     },
   ],
 }
@@ -1751,6 +1762,7 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Logs', url: '/guides/storage/debugging/logs' },
         { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+        { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
       ],
     },
     {
@@ -2181,6 +2193,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/project-transfer',
         },
         {
+          name: 'Duplicate Project',
+          url: '/guides/platform/clone-project',
+        },
+        {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
           items: [
@@ -2358,6 +2374,10 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/log-drains',
         },
         {
+          name: 'Reports',
+          url: '/guides/telemetry/reports',
+        },
+        {
           name: 'Metrics',
           url: '/guides/telemetry/metrics',
         },
@@ -2457,11 +2477,12 @@ export const deployment: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/deployment/branching' },
-        { name: 'GitHub integration', url: '/guides/deployment/branching/github-integration' },
+        { name: 'Branching via GitHub', url: '/guides/deployment/branching/github-integration' },
         {
-          name: 'Branching 2.0 (Alpha)',
-          url: '/guides/deployment/branching/branching-2',
+          name: 'Branching via dashboard',
+          url: '/guides/deployment/branching/dashboard',
         },
+
         {
           name: 'Working with branches',
           url: '/guides/deployment/branching/working-with-branches',

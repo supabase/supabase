@@ -36,7 +36,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
         ? {
             // secret_jwt_template: payload?.secret_jwt_template || null,
             secret_jwt_template: {
-              role: 'service_role', // @mildtomato (Jonny) this should be default in API for type secret
+              role: 'service_role',
             },
           }
         : name),

@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
@@ -47,7 +47,7 @@ const SpreadsheetImport = ({
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
   const [input, setInput] = useState<string>('')

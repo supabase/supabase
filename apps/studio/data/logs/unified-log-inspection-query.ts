@@ -11,7 +11,10 @@ import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/Unified
 import { handleError, post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { logsKeys } from './keys'
-import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
+import {
+  getUnifiedLogsISOStartEnd,
+  UNIFIED_LOGS_QUERY_OPTIONS,
+} from './unified-logs-infinite-query'
 
 // Service flow types - subset of LOG_TYPES that support service flows
 export const SERVICE_FLOW_TYPES = [
@@ -182,6 +185,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      ...UNIFIED_LOGS_QUERY_OPTIONS,
       ...options,
     }
   )

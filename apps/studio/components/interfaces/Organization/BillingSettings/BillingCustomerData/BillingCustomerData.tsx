@@ -20,15 +20,18 @@ import {
   useAsyncCheckProjectPermissions,
   useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
-import { BillingCustomerDataForm } from './BillingCustomerDataForm'
+import {
+  BillingCustomerDataForm,
+  type BillingCustomerDataFormValues,
+} from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 
 export const BillingCustomerData = () => {
   const { slug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { isSuccess: isPermissionsLoaded, can: canReadBillingCustomerData } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
@@ -51,9 +54,13 @@ export const BillingCustomerData = () => {
     isSuccess: loadedTaxId,
   } = useOrganizationTaxIdQuery({ slug })
 
-  const initialCustomerData = useMemo(
+  const initialCustomerData = useMemo<Partial<BillingCustomerDataFormValues>>(
     () => ({
-      ...customerProfile?.address,
+      city: customerProfile?.address?.city ?? undefined,
+      country: customerProfile?.address?.country,
+      line1: customerProfile?.address?.line1,
+      line2: customerProfile?.address?.line2 ?? undefined,
+      postal_code: customerProfile?.address?.postal_code ?? undefined,
       billing_name: customerProfile?.billing_name,
       tax_id_type: taxId?.type,
       tax_id_value: taxId?.value,

@@ -26,7 +26,7 @@ To check the error message, see the Supabase workflow run for your branch under 
 
 If you enable [network restrictions](/docs/guides/platform/network-restrictions) on your project, the branching cluster will be blocked from connecting to your project by default. This often results in database connection failures when migrating your production project after merging a development branch.
 
-The workaround is to explicitly allow the IPv6 CIDR range of the branching cluster in your project's [database settings](https://supabase.com/dashboard/project/_/settings/database) page: `2600:1f18:2b7d:f600::/56`
+The workaround is to explicitly allow the IPv6 CIDR range of the branching cluster in your project's [Database Settings](https://supabase.com/dashboard/project/_/database/settings) page: `2600:1f18:2b7d:f600::/56`
 
 <Image
   alt="Network restrictions to allow connections from branching cluster"

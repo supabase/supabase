@@ -8,7 +8,7 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -68,10 +68,9 @@ const defaultValues = {
 export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  // const [_, setExpandedLint] = useQueryState('lint')
 
   const routeCategory = router.pathname.split('/').pop()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
 
   const { mutate: createRule, isLoading: isCreating } = useLintRuleCreateMutation({

@@ -54,13 +54,13 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const [[user], otherMembers] = partition(
     filteredMembers,
-    (m) => m.primary_email === profile?.primary_email
+    (m) => m.gotrue_id === profile?.gotrue_id
   )
   const sortedMembers = otherMembers.sort((a, b) =>
     (a.primary_email ?? '').localeCompare(b.primary_email ?? '')
   )
 
-  const userMember = members.find((m) => m.primary_email === profile?.primary_email)
+  const userMember = members.find((m) => m.gotrue_id === profile?.gotrue_id)
   const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
   const isOrgScopedRole = orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
 

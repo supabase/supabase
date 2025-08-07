@@ -8,8 +8,8 @@ import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Organization } from 'types'
 import {
@@ -27,7 +27,6 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
-import { useBranchesQuery } from 'data/branches/branches-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -91,21 +90,20 @@ const ProjectLink = ({
 export const ProjectDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const projectDetails = useSelectedProject()
-  const selectedOrganization = useSelectedOrganization()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
-  const isBranch = projectDetails?.parentRef !== projectDetails?.ref
+  const isBranch = project?.parentRef !== project?.ref
 
   const projects = allProjects
     ?.filter((x) => x.organization_id === selectedOrganization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
-    ? projects?.find((project) => project.ref === projectDetails?.parentRef)
-    : projects?.find((project) => project.ref === ref)
+    ? projects?.find((p) => p.ref === project?.parentRef)
+    : projects?.find((p) => p.ref === ref)
 
   const [open, setOpen] = useState(false)
 

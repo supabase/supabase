@@ -3,11 +3,11 @@ import { ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatCurrency } from 'lib/helpers'
 import {
   Alert_Shadcn_,
@@ -148,8 +148,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
   message,
   buttonSize = 'medium',
 }: DiskSizeMeterProps) => {
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { formState, getValues } = form
 

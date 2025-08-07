@@ -436,12 +436,6 @@ val data = supabase.postgrest.rpc(
 
 ## Troubleshooting
 
-<Admonition type="caution">
-
-The [official PostGIS documentation](https://postgis.net/documentation/tips/tip-move-postgis-schema/) for relocating the schema will cause issues for Supabase projects. These issues might not be apparent immediately but will eventually surface. To relocate your schema, use the following steps instead.
-
-</Admonition>
-
 As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from one schema to another. If you need to move it from one schema to another for any reason (e.g. from the public schema to the extensions schema for security reasons), you would normally run a ALTER EXTENSION to relocate the schema. However, you will now to do the following steps:
 
 1. Backup your Database to prevent data loss - You can do this through the [CLI](https://supabase.com/docs/reference/cli/supabase-db-dump) or Postgres backup tools such as [pg_dumpall](https://www.postgresql.org/docs/current/backup-dump.html#BACKUP-DUMP-ALL)
@@ -451,6 +445,28 @@ As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from 
 3. Enable PostGIS extension in the new schema - `CREATE EXTENSION postgis SCHEMA extensions;`
 
 4. Restore dropped data via the Backup if necessary from step 1 with your tool of choice.
+
+Alternatively, you can contact the [Supabase Support Team](https://supabase.com/dashboard/support/new) and ask them to run the following SQL on your instance:
+
+```sql
+BEGIN;
+	UPDATE pg_extension
+	  SET extrelocatable = true
+	WHERE extname = 'postgis';
+
+	ALTER EXTENSION postgis
+	  SET SCHEMA extensions;
+
+	ALTER EXTENSION postgis
+	  UPDATE TO "<POSTGIS_VERSION>next";
+
+	ALTER EXTENSION postgis UPDATE;
+
+	UPDATE pg_extension
+	  SET extrelocatable = false
+	WHERE extname = 'postgis';
+COMMIT;
+```
 
 ## Resources
 

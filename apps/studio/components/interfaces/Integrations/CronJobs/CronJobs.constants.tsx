@@ -39,3 +39,13 @@ export const CRONJOB_DEFINITIONS = [
 export type HTTPHeader = { name: string; value: string }
 
 export type HTTPParameter = { name: string; value: string }
+
+export const CRON_TABLE_COLUMNS = [
+  { id: 'jobname', name: 'Name', minWidth: 0, width: 200 },
+  { id: 'schedule', name: 'Schedule', width: 100 },
+  { id: 'latest_run', name: 'Last run', width: 265 },
+  { id: 'next_run', name: 'Next run', minWidth: 180 },
+  { id: 'command', name: 'Command', minWidth: 320 },
+  { id: 'active', name: 'Active', width: 70, minWidth: 70, maxWidth: 70 },
+  { id: 'actions', name: '', minWidth: 75, width: 75 },
+]

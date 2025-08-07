@@ -73,7 +73,11 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                     {plan.description}
                   </p>
                   {isUpgradablePlan && hasExistingOrganizations ? (
-                    <UpgradePlan organizations={organizations} onClick={sendPricingEvent} />
+                    <UpgradePlan
+                      planId={plan.planId}
+                      organizations={organizations}
+                      onClick={sendPricingEvent}
+                    />
                   ) : (
                     <Button
                       block

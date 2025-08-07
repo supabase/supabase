@@ -6,9 +6,11 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  // With Fluid compute, don't put this client in a global environment
+  // variable. Always create a new one on each request.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -31,9 +33,9 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // IMPORTANT: DO NOT REMOVE auth.getClaims()
+  // IMPORTANT: If you remove getClaims() and you use server-side rendering
+  // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims()
-
   const user = data?.claims
 
   if (

@@ -12,7 +12,8 @@ import z from 'zod'
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
@@ -60,6 +61,7 @@ export const EdgeFunctionDetails = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const {
@@ -86,8 +88,8 @@ export const EdgeFunctionDetails = () => {
     defaultValues: { name: '', verify_jwt: false },
   })
 
-  const { anonKey } = getAPIKeys(settings)
-  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+  const { anonKey, publishableKey } = getKeys(apiKeys)
+  const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''

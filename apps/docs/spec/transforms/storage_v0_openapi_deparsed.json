@@ -197,6 +197,10 @@
                     "type": "boolean",
                     "examples": [false]
                   },
+                  "type": {
+                    "type": "string",
+                    "enum": ["STANDARD", "ANALYTICS"]
+                  },
                   "file_size_limit": {
                     "anyOf": [
                       {
@@ -289,6 +293,53 @@
         "parameters": [
           {
             "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 10,
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 0,
+            "in": "query",
+            "name": "offset",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["id", "name", "created_at", "updated_at"]
+            },
+            "in": "query",
+            "name": "sortColumn",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            },
+            "in": "query",
+            "name": "sortOrder",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-bucket",
+            "in": "query",
+            "name": "search",
+            "required": false
+          },
+          {
+            "schema": {
               "type": "string"
             },
             "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
@@ -317,8 +368,15 @@
                       "owner": {
                         "type": "string"
                       },
+                      "owner_id": {
+                        "type": "string"
+                      },
                       "public": {
                         "type": "boolean"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": ["STANDARD", "ANALYTICS"]
                       },
                       "file_size_limit": {
                         "type": ["null", "integer"]
@@ -356,6 +414,7 @@
                 "example": [
                   {
                     "id": "avatars",
+                    "type": "STANDARD",
                     "name": "avatars",
                     "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                     "public": false,
@@ -430,7 +489,9 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["Successfully emptied"]
+                      "examples": [
+                        "Empty bucket has been queued. Completion may take up to an hour."
+                      ]
                     }
                   }
                 }
@@ -506,8 +567,15 @@
                     "owner": {
                       "type": "string"
                     },
+                    "owner_id": {
+                      "type": "string"
+                    },
                     "public": {
                       "type": "boolean"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["STANDARD", "ANALYTICS"]
                     },
                     "file_size_limit": {
                       "type": ["null", "integer"]
@@ -1165,8 +1233,15 @@
                           "owner": {
                             "type": "string"
                           },
+                          "owner_id": {
+                            "type": "string"
+                          },
                           "public": {
                             "type": "boolean"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["STANDARD", "ANALYTICS"]
                           },
                           "file_size_limit": {
                             "type": ["null", "integer"]
@@ -2088,8 +2163,15 @@
                           "owner": {
                             "type": "string"
                           },
+                          "owner_id": {
+                            "type": "string"
+                          },
                           "public": {
                             "type": "boolean"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["STANDARD", "ANALYTICS"]
                           },
                           "file_size_limit": {
                             "type": ["null", "integer"]
@@ -2448,8 +2530,15 @@
                         "owner": {
                           "type": "string"
                         },
+                        "owner_id": {
+                          "type": "string"
+                        },
                         "public": {
                           "type": "boolean"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": ["STANDARD", "ANALYTICS"]
                         },
                         "file_size_limit": {
                           "type": ["null", "integer"]
@@ -3019,9 +3108,742 @@
         }
       }
     },
+    "/cdn/{bucketName}/{wildcard}": {
+      "delete": {
+        "summary": "Purge cache for an object",
+        "tags": ["object"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
+            "in": "header",
+            "name": "authorization",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "examples": ["success"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health/": {
       "get": {
         "summary": "healthcheck",
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/config": {
+      "get": {
+        "summary": "Get Iceberg catalog configuration",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-warehouse",
+            "in": "query",
+            "name": "warehouse",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces": {
+      "post": {
+        "summary": "Create a namespace",
+        "tags": ["iceberg"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "namespace": {
+                    "type": "string",
+                    "examples": ["namespace"]
+                  }
+                },
+                "required": ["namespace"]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "get": {
+        "summary": "List namespaces",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "pageToken",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "parent",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces/{namespace}": {
+      "get": {
+        "summary": "Load a namespace",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Create a namespace",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces/{namespace}/tables": {
+      "post": {
+        "summary": "Create a table in the given namespace",
+        "tags": ["iceberg"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "schema"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string",
+                    "format": "uri",
+                    "nullable": true
+                  },
+                  "schema": {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "required": ["type", "fields"],
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["struct"]
+                          },
+                          "fields": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["id", "name", "type", "required"],
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "required": ["type", "fields"],
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": ["struct"]
+                                        },
+                                        "fields": {
+                                          "type": "array",
+                                          "items": {
+                                            "$comment": "recurse nested StructField definitions here"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "object",
+                                      "required": [
+                                        "type",
+                                        "element-id",
+                                        "element",
+                                        "element-required"
+                                      ],
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": ["list"]
+                                        },
+                                        "element-id": {
+                                          "type": "integer"
+                                        },
+                                        "element": {
+                                          "$comment": "Type object (recurse)"
+                                        },
+                                        "element-required": {
+                                          "type": "boolean"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "object",
+                                      "required": [
+                                        "type",
+                                        "key-id",
+                                        "key",
+                                        "value-id",
+                                        "value",
+                                        "value-required"
+                                      ],
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": ["map"]
+                                        },
+                                        "key-id": {
+                                          "type": "integer"
+                                        },
+                                        "key": {
+                                          "$comment": "Type object (recurse)"
+                                        },
+                                        "value-id": {
+                                          "type": "integer"
+                                        },
+                                        "value": {
+                                          "$comment": "Type object (recurse)"
+                                        },
+                                        "value-required": {
+                                          "type": "boolean"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                "required": {
+                                  "type": "boolean"
+                                },
+                                "doc": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "schema-id": {
+                            "type": "integer",
+                            "readOnly": true
+                          },
+                          "identifier-field-ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "spec": {
+                    "type": "object",
+                    "required": ["fields"],
+                    "properties": {
+                      "spec-id": {
+                        "type": "integer",
+                        "readOnly": true
+                      },
+                      "fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["source-id", "transform", "name"],
+                          "properties": {
+                            "field-id": {
+                              "type": "integer"
+                            },
+                            "source-id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "transform": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "stage-create": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "write-order": {
+                    "type": "object",
+                    "nullable": true,
+                    "required": ["fields"],
+                    "properties": {
+                      "order-id": {
+                        "type": "integer",
+                        "readOnly": true
+                      },
+                      "fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["source-id", "transform", "direction", "null-order"],
+                          "properties": {
+                            "source-id": {
+                              "type": "integer"
+                            },
+                            "transform": {
+                              "type": "string"
+                            },
+                            "direction": {
+                              "type": "string",
+                              "enum": ["asc", "desc"]
+                            },
+                            "null-order": {
+                              "type": "string",
+                              "enum": ["nulls-first", "nulls-last"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "get": {
+        "summary": "Create a namespace",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "pageToken",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "parent",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces/{namespace}/tables/{table}": {
+      "get": {
+        "summary": "Load an Iceberg Table",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "table",
+            "in": "path",
+            "name": "table",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "post": {
+        "summary": "Commit updates to multiple tables in an atomic operation",
+        "tags": ["iceberg"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Commit updates to multiple tables in an atomic operation",
+                "properties": {
+                  "requirements": {
+                    "type": "array",
+                    "description": "Assertions to validate before applying updates",
+                    "items": {
+                      "type": "object",
+                      "description": "A requirement assertion",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the requirement (e.g. assert-ref-snapshot-id)",
+                          "examples": ["assert-ref-snapshot-id"]
+                        },
+                        "args": {
+                          "type": "object",
+                          "description": "Arguments for the requirement",
+                          "additionalProperties": true
+                        }
+                      }
+                    }
+                  },
+                  "updates": {
+                    "type": "array",
+                    "description": "Metadata updates to apply to the table",
+                    "items": {
+                      "type": "object",
+                      "description": "A single update operation",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the update operation (e.g. add-column)",
+                          "examples": ["add-column"]
+                        },
+                        "args": {
+                          "type": "object",
+                          "description": "Arguments for the update operation",
+                          "additionalProperties": true
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": ["updates", "requirements"]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "table",
+            "in": "path",
+            "name": "table",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Drop a Table",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false", "True", "False"],
+              "default": "false"
+            },
+            "in": "query",
+            "name": "purgeRequested",
+            "required": false,
+            "description": "If true, the table will be permanently deleted"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "table",
+            "in": "path",
+            "name": "table",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "Default Response"

@@ -87,7 +87,6 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
                apikey_payload.issuer = 'supabase' AND 
                apikey_payload.role IN ('anon', 'service_role')
           THEN apikey_payload.role
-          WHEN sb_apikey.invalid IS NOT NULL THEN '<invalid>'
           WHEN apikey_payload IS NOT NULL THEN '<unrecognized>'
           ELSE NULL
       END as jwt_key_role,
@@ -120,21 +119,21 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
       -- JWT data
       apikey_payload.role as jwt_apikey_role,
       apikey_payload.algorithm as jwt_apikey_algorithm, 
-      null as jwt_apikey_expires_at,
+      apikey_payload.expires_at as jwt_apikey_expires_at,
       apikey_payload.issuer as jwt_apikey_issuer,
-      null as jwt_apikey_signature_prefix,
+      apikey_payload.signature_prefix as jwt_apikey_signature_prefix,
       null as jwt_apikey_key_id,
       null as jwt_apikey_session_id,
-      null as jwt_apikey_subject,
+      apikey_payload.subject as jwt_apikey_subject,
       
       authorization_payload.role as jwt_auth_role,
       authorization_payload.algorithm as jwt_auth_algorithm,
-      null as jwt_auth_expires_at, 
+      authorization_payload.expires_at as jwt_auth_expires_at, 
       authorization_payload.issuer as jwt_auth_issuer,
-      null as jwt_auth_signature_prefix,
-      null as jwt_auth_key_id,
-      null as jwt_auth_session_id,
-      null as jwt_auth_subject,
+      authorization_payload.signature_prefix as jwt_auth_signature_prefix,
+      authorization_payload.key_id as jwt_auth_key_id,
+      authorization_payload.session_id as jwt_auth_session_id,
+      authorization_payload.subject as jwt_auth_subject,
       
       -- Storage specific data (included for all but only populated for storage)
       edge_logs_response_headers.sb_gateway_mode as storage_edge_gateway_mode,
@@ -153,8 +152,8 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
     left join unnest(edge_logs_request.cf) as edge_logs_cf
     left join unnest(edge_logs_request.sb) as sb
     left join unnest(sb.jwt) as jwt
-    left join unnest(COALESCE(jwt.apikey, [])) as sb_apikey
-    left join unnest(COALESCE(sb_apikey.payload, [])) as apikey_payload
+    left join unnest(COALESCE(jwt.apikey, [])) as apikey
+    left join unnest(COALESCE(apikey.payload, [])) as apikey_payload
     left join unnest(COALESCE(jwt.authorization, [])) as auth
     left join unnest(COALESCE(auth.payload, [])) as authorization_payload
     left join unnest(COALESCE(sb.apikey, [])) as sb_apikey_outer
@@ -246,7 +245,6 @@ export const getEdgeFunctionServiceFlowQuery = (logId: string): string => {
                apikey_payload.issuer = 'supabase' AND 
                apikey_payload.role IN ('anon', 'service_role')
           THEN apikey_payload.role
-          WHEN sb_apikey.invalid IS NOT NULL THEN '<invalid>'
           WHEN apikey_payload IS NOT NULL THEN '<unrecognized>'
           ELSE NULL
       END as jwt_key_role,
@@ -273,21 +271,21 @@ export const getEdgeFunctionServiceFlowQuery = (logId: string): string => {
       -- JWT data
       apikey_payload.role as jwt_apikey_role,
       apikey_payload.algorithm as jwt_apikey_algorithm, 
-      null as jwt_apikey_expires_at,
+      apikey_payload.expires_at as jwt_apikey_expires_at,
       apikey_payload.issuer as jwt_apikey_issuer,
-      null as jwt_apikey_signature_prefix,
+      apikey_payload.signature_prefix as jwt_apikey_signature_prefix,
       null as jwt_apikey_key_id,
       null as jwt_apikey_session_id,
-      null as jwt_apikey_subject,
+      apikey_payload.subject as jwt_apikey_subject,
       
       authorization_payload.role as jwt_auth_role,
       authorization_payload.algorithm as jwt_auth_algorithm,
-      null as jwt_auth_expires_at, 
+      authorization_payload.expires_at as jwt_auth_expires_at, 
       authorization_payload.issuer as jwt_auth_issuer,
-      null as jwt_auth_signature_prefix,
-      null as jwt_auth_key_id,
-      null as jwt_auth_session_id,
-      null as jwt_auth_subject,
+      authorization_payload.signature_prefix as jwt_auth_signature_prefix,
+      authorization_payload.key_id as jwt_auth_key_id,
+      authorization_payload.session_id as jwt_auth_session_id,
+      authorization_payload.subject as jwt_auth_subject,
       
       -- Function logs aggregation
       function_logs_agg.function_log_count as function_log_count,
@@ -305,8 +303,8 @@ export const getEdgeFunctionServiceFlowQuery = (logId: string): string => {
     left join unnest(fel_request.headers) as fel_request_headers
     left join unnest(fel_request.sb) as sb
     left join unnest(sb.jwt) as jwt
-    left join unnest(COALESCE(jwt.apikey, [])) as sb_apikey
-    left join unnest(COALESCE(sb_apikey.payload, [])) as apikey_payload
+    left join unnest(COALESCE(jwt.apikey, [])) as apikey
+    left join unnest(COALESCE(apikey.payload, [])) as apikey_payload
     left join unnest(COALESCE(jwt.authorization, [])) as auth
     left join unnest(COALESCE(auth.payload, [])) as authorization_payload
     left join unnest(COALESCE(sb.apikey, [])) as sb_apikey_outer

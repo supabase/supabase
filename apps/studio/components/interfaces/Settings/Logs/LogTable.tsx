@@ -49,8 +49,6 @@ interface Props {
   onSave?: () => void
   hasEditorValue?: boolean
   className?: string
-  collectionName?: string // Used for warehouse queries
-  warehouseError?: string
   EmptyState?: ReactNode
   showHeader?: boolean
   showHistogramToggle?: boolean
@@ -79,7 +77,6 @@ const LogTable = ({
   onSave,
   hasEditorValue,
   className,
-  collectionName,
   EmptyState,
   showHeader = true,
   showHistogramToggle = true,
@@ -154,9 +151,6 @@ const LogTable = ({
     columns
   } else {
     switch (queryType) {
-      case 'warehouse':
-        columns = DEFAULT_COLUMNS
-        break
       case 'api':
         columns = DatabaseApiColumnRender
         break
@@ -460,7 +454,6 @@ const LogTable = ({
               log={selectedLog}
               error={selectedLogError}
               queryType={queryType}
-              collectionName={collectionName}
             />
           </ResizablePanel>
         )}

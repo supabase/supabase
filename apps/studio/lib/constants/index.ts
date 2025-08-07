@@ -37,6 +37,12 @@ export const GOTRUE_ERRORS = {
 export const STRIPE_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'
 
+export const POSTHOG_URL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+    ? 'https://ph.supabase.green'
+    : 'https://ph.supabase.com'
+
 export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const OPT_IN_TAGS = {

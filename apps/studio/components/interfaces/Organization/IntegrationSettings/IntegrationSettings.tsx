@@ -20,16 +20,16 @@ import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-conn
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
   GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
 } from 'lib/github'
+import { useRouter } from 'next/router'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
-import { useRouter } from 'next/router'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -42,8 +42,8 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const org = useSelectedOrganization()
   const router = useRouter()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const canReadGithubConnection = useCheckPermissions(
     PermissionAction.READ,

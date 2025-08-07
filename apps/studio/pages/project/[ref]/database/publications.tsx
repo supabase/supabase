@@ -3,21 +3,21 @@ import { useState } from 'react'
 
 import { PublicationsList, PublicationsTables } from 'components/interfaces/Database'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
 // be consolidated somewhere else eventually for better UX
 
 const DatabasePublications: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data } = useDatabasePublicationsQuery({
     projectRef: project?.ref,

@@ -90,7 +90,6 @@ export type QueryType =
   | 'storage'
   | 'supavisor'
   | 'postgrest'
-  | 'warehouse'
   | 'pg_upgrade'
   | 'pg_cron'
   | 'pgbouncer'
@@ -144,10 +143,4 @@ export interface DatetimeHelper {
   default?: boolean
   disabled?: boolean
   availableIn?: PlanId[]
-}
-
-export interface WarehouseCollection {
-  name: string
-  id: number
-  token: string
 }

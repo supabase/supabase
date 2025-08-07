@@ -2,17 +2,17 @@ import { Search } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { QueuesRows } from './QueuesRows'
 
 export const QueuesTab = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   // used for confirmation prompt in the Create Queue Sheet
   const [isClosingCreateQueueSheet, setIsClosingCreateQueueSheet] = useState(false)

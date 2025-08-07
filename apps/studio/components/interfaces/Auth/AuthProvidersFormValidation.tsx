@@ -19,11 +19,6 @@ const PROVIDER_EMAIL = {
       description: 'This will enable Email based signup and login for your application',
       type: 'boolean',
     },
-    MAILER_AUTOCONFIRM: {
-      title: 'Confirm email',
-      description: `Users will need to confirm their email address before signing in for the first time.`,
-      type: 'boolean',
-    },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
       title: 'Secure email change',
       description: `Users will be required to confirm any email change on both the old email address and new email address.

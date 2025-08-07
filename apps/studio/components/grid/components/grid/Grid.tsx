@@ -3,12 +3,12 @@ import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
@@ -54,6 +54,9 @@ export const Grid = memo(
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
 
+      const { data: org } = useSelectedOrganizationQuery()
+      const { data: project } = useSelectedProjectQuery()
+
       const onRowsChange = useOnRowsChange(rows)
 
       function onSelectedRowsChange(selectedRows: Set<number>) {
@@ -71,8 +74,6 @@ export const Grid = memo(
       const tableEntityType = snap.originalTable?.entity_type
 
       const { mutate: sendEvent } = useSendEventMutation()
-      const org = useSelectedOrganization()
-      const { project } = useProjectContext()
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
         connectionString: project?.connectionString,

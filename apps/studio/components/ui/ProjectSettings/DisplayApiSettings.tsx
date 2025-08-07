@@ -10,10 +10,10 @@ import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
+import Link from 'next/link'
 import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
-import Link from 'next/link'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -49,6 +49,7 @@ export const DisplayApiSettings = ({
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
+
   const apiKeys = useMemo(() => settings?.service_api_keys ?? [], [settings])
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0

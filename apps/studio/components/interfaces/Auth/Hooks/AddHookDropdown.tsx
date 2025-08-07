@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -30,7 +30,7 @@ export const AddHookDropdown = ({
   onSelectHook,
 }: AddHookDropdownProps) => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
   const canUpdateAuthHook = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')

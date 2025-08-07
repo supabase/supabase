@@ -23,7 +23,6 @@ export const toolSetValidationSchema = z.record(
     'list_extensions',
     'list_edge_functions',
     'list_branches',
-    'get_logs',
     'search_docs',
     'get_advisors',
 
@@ -31,7 +30,6 @@ export const toolSetValidationSchema = z.record(
     'display_query',
     'display_edge_function',
     'rename_chat',
-    'get_log_counts',
     'getSchemaTables',
     'getRlsKnowledge',
     'getFunctions',
@@ -98,9 +96,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_branches: TOOL_CATEGORIES.SCHEMA,
 
   // Log tools - MCP and local
-  get_logs: TOOL_CATEGORIES.LOG,
   get_advisors: TOOL_CATEGORIES.LOG,
-  get_log_counts: TOOL_CATEGORIES.LOG,
 }
 
 /**

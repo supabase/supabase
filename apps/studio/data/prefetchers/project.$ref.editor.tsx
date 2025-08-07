@@ -2,17 +2,17 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { prefetchSchemas } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchEntityTypes } from 'data/entity-types/entity-types-infinite-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 export function usePrefetchEditorIndexPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [entityTypesSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',

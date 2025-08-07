@@ -12,13 +12,13 @@ import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQu
 import { QueueSettings } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
 import { SendMessageModal } from 'components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -33,7 +33,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [openRlsPopover, setOpenRlsPopover] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)

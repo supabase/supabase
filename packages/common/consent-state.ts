@@ -61,10 +61,13 @@ export const consentState = proxy({
 async function initUserCentrics() {
   if (process.env.NODE_ENV === 'test' || !IS_PLATFORM) return
 
-  // [Alaister] For local development, we accept all consent by default.
-  // If you need to test usercentrics locally, comment out the
+  // [Alaister] For local development and staging, we accept all consent by default.
+  // If you need to test usercentrics in these environments, comment out this
   // NEXT_PUBLIC_ENVIRONMENT check and add an ngrok domain to usercentrics
-  if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
+  if (
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+  ) {
     consentState.hasConsented = true
     return
   }

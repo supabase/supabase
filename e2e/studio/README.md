@@ -10,6 +10,8 @@ Edit the `.env.local` file with your credentials and environment.
 
 ### Install the playwright browser
 
+⚠️ This should be done in the `e2e/studio` directory
+
 ```bash
 pnpm exec playwright install
 ```

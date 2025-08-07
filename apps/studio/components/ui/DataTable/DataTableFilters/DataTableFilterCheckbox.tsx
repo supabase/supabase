@@ -6,6 +6,7 @@ import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
+import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 
 export function DataTableFilterCheckbox<TData>({
   value: _value,
@@ -34,31 +35,13 @@ export function DataTableFilterCheckbox<TData>({
   const filters = filterValue ? (Array.isArray(filterValue) ? filterValue : [filterValue]) : []
 
   // REMINDER: if no options are defined, while fetching data, we should show a skeleton
-  if (isLoading && !filterOptions?.length)
-    return (
-      <div className="grid divide-y rounded border border-border">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="flex items-center justify-between gap-2 px-2 py-2.5">
-            <Skeleton className="h-4 w-4 rounded-sm" />
-            <Skeleton className="h-4 w-full rounded-sm" />
-          </div>
-        ))}
-      </div>
-    )
+  if (isLoading && !filterOptions?.length) return <DataTableFilterCheckboxLoader />
 
   // Show empty state when no original options are available (not due to search filtering)
   if (!options?.length)
     return (
-      <div className="flex items-center justify-center px-2 py-6 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-            <Search className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">No options available</p>
-            <p className="text-xs text-muted-foreground/70">Try adjusting your filters</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center px-2 py-4 text-center border border-border rounded">
+        <p className="text-xs text-foreground-light">No options available</p>
       </div>
     )
 
@@ -77,9 +60,9 @@ export function DataTableFilterCheckbox<TData>({
       <div className="max-h-[200px] overflow-y-auto rounded border border-border empty:border-none">
         {filterOptions.length === 0 && inputValue !== '' ? (
           <div className="flex items-center justify-center px-2 py-4 text-center">
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">No results found</p>
-              <p className="text-xs text-muted-foreground/70">Try a different search term</p>
+            <div className="space-y-0.5">
+              <p className="text-xs text-foreground">No results found</p>
+              <p className="text-xs text-foreground-lighter">Try a different search term</p>
             </div>
           </div>
         ) : (

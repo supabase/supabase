@@ -7,16 +7,19 @@
  * This component acts as a bridge between the data-fetching logic and the
  * presentational chart component.
  */
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+
+import Link from 'next/link'
+import { useRef, useState } from 'react'
+
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import LogChartHandler from 'components/ui/Charts/LogChartHandler'
+import Panel from 'components/ui/Panel'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useChartData } from 'hooks/useChartData'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import Link from 'next/link'
 import { Button, cn } from 'ui'
-import Panel from 'components/ui/Panel'
-import { useRef, useState } from 'react'
 
 const ReportChart = ({
   chart,
@@ -25,9 +28,7 @@ const ReportChart = ({
   interval,
   updateDateRange,
   functionIds,
-  orgPlanId,
   isLoading,
-  availableIn,
   className,
 }: {
   chart: any
@@ -36,20 +37,21 @@ const ReportChart = ({
   interval: string
   updateDateRange: UpdateDateRange
   functionIds?: string[]
-  orgPlanId?: string
   isLoading?: boolean
-  availableIn?: string[]
   className?: string
 }) => {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { plan: orgPlan } = useCurrentOrgPlan()
+  const orgPlanId = orgPlan?.id
+
   const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
   const isAvailable =
     chart.availableIn === undefined || (orgPlanId && chart.availableIn.includes(orgPlanId))
+
   const canFetch = orgPlanId !== undefined
   const {
     data,
     isLoading: isLoadingChart,
-    chartAttributes,
     highlightedValue,
   } = useChartData({
     attributes: chart.attributes,
@@ -72,9 +74,7 @@ const ReportChart = ({
   const { data: filledData, isError: isFillError } = useFillTimeseriesSorted(
     chartDataArray,
     'period_start',
-    (chartAttributes.length > 0 ? chartAttributes : chart.attributes).map(
-      (attr: any) => attr.attribute
-    ),
+    chart.attributes.map((attr: any) => attr.attribute),
     0,
     startDate,
     endDate,
@@ -110,14 +110,16 @@ const ReportChart = ({
   if (!isAvailable && !isLoading) {
     return (
       <Panel
-        title={<h2 className="text-sm">{chart.label}</h2>}
+        title={<p className="text-sm">{chart.label}</p>}
         className={cn('h-[260px] relative', className)}
       >
         <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
-          <h2 className="">{chart.label}</h2>
+          <h2>{chart.label}</h2>
           <p className="text-sm text-foreground-light">
             This chart is available from{' '}
-            <span className="capitalize">{!!availableIn?.length ? availableIn[0] : 'Pro'}</span>{' '}
+            <span className="capitalize">
+              {!!chart.availableIn?.length ? chart.availableIn[0] : 'Pro'}
+            </span>{' '}
             plan and above
           </p>
           <Button
@@ -128,7 +130,9 @@ const ReportChart = ({
           >
             <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=reports`}>
               Upgrade to{' '}
-              <span className="capitalize">{!!availableIn?.length ? availableIn[0] : 'Pro'}</span>
+              <span className="capitalize">
+                {!!chart.availableIn?.length ? chart.availableIn[0] : 'Pro'}
+              </span>
             </Link>
           </Button>
         </div>
@@ -159,9 +163,7 @@ const ReportChart = ({
   return (
     <LogChartHandler
       {...chart}
-      attributes={
-        (chartAttributes.length > 0 ? chartAttributes : chart.attributes) as MultiAttribute[]
-      }
+      attributes={chart.attributes as MultiAttribute[]}
       data={finalData}
       isLoading={isLoadingChart || isLoading}
       highlightedValue={highlightedValue as any}

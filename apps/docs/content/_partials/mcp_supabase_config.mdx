@@ -54,6 +54,28 @@
     }
     ```
 
+Or, if using `pnpm` instead of `npm`
+
+    ```json
+    {
+      "mcpServers": {
+        "supabase": {
+          "command": "cmd",
+          "args": [
+            "/c",
+            "pnpm",
+            "dlx",
+            "@supabase/mcp-server-supabase@latest",
+            "--read-only",
+            "--project-ref=<project-ref>"
+          ],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+          }
+        }
+      }
+    }
+    ```
     Replace `<project-ref>` with your project ref, and `<personal-access-token>` with your personal access token.
 
     <Admonition type="note">

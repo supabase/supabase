@@ -2,11 +2,11 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Search } from 'lucide-react'
 import { Button, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -16,7 +16,7 @@ const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data, isLoading, isSuccess, isError, error } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,

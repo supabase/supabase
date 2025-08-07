@@ -1,10 +1,12 @@
-import { AiIconAnimation } from 'ui'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { Branch } from 'data/branches/branches-query'
-import { tablesToSQL } from 'lib/helpers'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Branch } from 'data/branches/branches-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRefQuery } from 'hooks/misc/useSelectedProject'
+import { tablesToSQL } from 'lib/helpers'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { AiIconAnimation } from 'ui'
 
 interface ReviewWithAIProps {
   currentBranch?: Branch
@@ -22,9 +24,11 @@ export const ReviewWithAI = ({
   disabled = false,
 }: ReviewWithAIProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // Get parent project for production schema
-  const parentProject = useProjectByRef(parentProjectRef)
+  const { data: parentProject } = useProjectByRefQuery(parentProjectRef)
 
   // Fetch production schema tables
   const { data: productionTables } = useTablesQuery(
@@ -39,6 +43,15 @@ export const ReviewWithAI = ({
 
   const handleReviewWithAssistant = () => {
     if (!currentBranch || !mainBranch) return
+
+    // Track review with assistant button pressed
+    sendEvent({
+      action: 'branch_review_with_assistant_clicked',
+      groups: {
+        project: parentProjectRef ?? 'Unknown',
+        organization: selectedOrg?.slug ?? 'Unknown',
+      },
+    })
 
     // Prepare diff content for the assistant
     const sqlSnippets = []

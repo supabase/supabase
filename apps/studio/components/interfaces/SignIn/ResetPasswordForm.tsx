@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { auth } from 'lib/gotrue'
+import { auth, getReturnToPath } from 'lib/gotrue'
 import {
   Button,
   Form_Shadcn_,
@@ -67,7 +67,7 @@ const ResetPasswordForm = () => {
 
       // logout all other sessions after changing password
       await auth.signOut({ scope: 'others' })
-      await router.push('/organizations')
+      await router.push(getReturnToPath('/organizations'))
     } else {
       toast.error(`Failed to save password: ${error.message}`, { id: toastId })
       if (!WHITELIST_ERRORS.some((e) => error.message.includes(e))) {
