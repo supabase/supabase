@@ -215,7 +215,7 @@ describe('createPrivacyMessageTool', () => {
   it('should create a privacy message tool', async () => {
     const originalTool = {
       description: 'Original description',
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: vitest.fn(),
     }
 
@@ -282,8 +282,8 @@ describe('transformToolResult', () => {
 describe('toolSetValidationSchema', () => {
   it('should accept subset of known tools', () => {
     const validSubset = {
-      list_tables: { parameters: z.object({}), execute: vitest.fn() },
-      display_query: { parameters: z.object({}), execute: vitest.fn() },
+      list_tables: { inputSchema: z.object({}), execute: vitest.fn() },
+      display_query: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const result = toolSetValidationSchema.safeParse(validSubset)
@@ -292,9 +292,9 @@ describe('toolSetValidationSchema', () => {
 
   it('should reject unknown tools', () => {
     const toolsWithUnknown = {
-      list_tables: { parameters: z.object({}), execute: vitest.fn() },
-      unknown_tool: { parameters: z.object({}), execute: vitest.fn() },
-      another_unknown: { parameters: z.object({}), execute: vitest.fn() },
+      list_tables: { inputSchema: z.object({}), execute: vitest.fn() },
+      unknown_tool: { inputSchema: z.object({}), execute: vitest.fn() },
+      another_unknown: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const result = toolSetValidationSchema.safeParse(toolsWithUnknown)
@@ -312,16 +312,16 @@ describe('toolSetValidationSchema', () => {
 
   it('should validate all expected tools from the old schema', () => {
     const allExpectedTools = {
-      list_tables: { parameters: z.object({}), execute: vitest.fn() },
-      list_extensions: { parameters: z.object({}), execute: vitest.fn() },
-      list_edge_functions: { parameters: z.object({}), execute: vitest.fn() },
-      list_branches: { parameters: z.object({}), execute: vitest.fn() },
-      list_policies: { parameters: z.object({}), execute: vitest.fn() },
-      search_docs: { parameters: z.object({}), execute: vitest.fn() },
-      get_advisors: { parameters: z.object({}), execute: vitest.fn() },
-      display_query: { parameters: z.object({}), execute: vitest.fn() },
-      display_edge_function: { parameters: z.object({}), execute: vitest.fn() },
-      rename_chat: { parameters: z.object({}), execute: vitest.fn() },
+      list_tables: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_extensions: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_edge_functions: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_branches: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_policies: { inputSchema: z.object({}), execute: vitest.fn() },
+      search_docs: { inputSchema: z.object({}), execute: vitest.fn() },
+      get_advisors: { inputSchema: z.object({}), execute: vitest.fn() },
+      display_query: { inputSchema: z.object({}), execute: vitest.fn() },
+      display_edge_function: { inputSchema: z.object({}), execute: vitest.fn() },
+      rename_chat: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const validationResult = toolSetValidationSchema.safeParse(allExpectedTools)

@@ -5,7 +5,7 @@ export const getRenderingTools = () => ({
   display_query: tool({
     description:
       'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
-    parameters: z.object({
+    inputSchema: z.object({
       manualToolCallId: z
         .string()
         .optional()
@@ -34,7 +34,7 @@ export const getRenderingTools = () => ({
   }),
   display_edge_function: tool({
     description: 'Renders the code for a Supabase Edge Function for the user to deploy manually.',
-    parameters: z.object({
+    inputSchema: z.object({
       name: z
         .string()
         .describe('The URL-friendly name of the Edge Function (e.g., "my-function").'),
@@ -46,7 +46,7 @@ export const getRenderingTools = () => ({
   }),
   rename_chat: tool({
     description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
-    parameters: z.object({
+    inputSchema: z.object({
       newName: z.string().describe('The new name for the chat session. Five words or less.'),
     }),
     execute: async () => {

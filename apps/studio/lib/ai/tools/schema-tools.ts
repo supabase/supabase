@@ -13,7 +13,7 @@ export const getSchemaTools = ({
 }) => ({
   list_policies: tool({
     description: 'Get existing RLS policies for a given schema',
-    parameters: z.object({
+    inputSchema: z.object({
       schemas: z.array(z.string()).describe('The schema names to get the policies for'),
     }),
     execute: async ({ schemas }) => {
