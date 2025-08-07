@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
-import { Badge, Input, copyToClipboard } from 'ui'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Hook } from './hooks.constants'
 import { DocsButton } from 'components/ui/DocsButton'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { Badge, Input, copyToClipboard } from 'ui'
+import { Hook } from './hooks.constants'
 
 interface HookCardProps {
   hook: Hook
@@ -13,7 +13,10 @@ interface HookCardProps {
 }
 
 export const HookCard = ({ hook, onSelect }: HookCardProps) => {
-  const canUpdateAuthHook = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canUpdateAuthHook } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    '*'
+  )
 
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">

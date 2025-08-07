@@ -1,9 +1,9 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 
 interface ApiKeysVisibilityState {
@@ -21,7 +21,7 @@ interface ApiKeysVisibilityState {
  */
 export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const { ref: projectRef } = useParams()
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
+  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(PermissionAction.READ, 'api_keys')
   const isBasicApiKeysEnabled = useFlag('basicApiKeys')
 
   const { data: apiKeysData, isLoading } = useAPIKeysQuery({

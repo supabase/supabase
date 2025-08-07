@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -23,8 +22,6 @@ import {
   Select_Shadcn_,
   Textarea,
 } from 'ui'
-
-dayjs.extend(relativeTime)
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']

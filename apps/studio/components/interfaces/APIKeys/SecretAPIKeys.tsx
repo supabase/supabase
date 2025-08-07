@@ -1,15 +1,12 @@
-import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
-import relativeTime from 'dayjs/plugin/relativeTime'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { Card, CardContent, EyeOffIcon, Skeleton, WarningIcon, cn } from 'ui'
 import {
   Table,
@@ -21,9 +18,6 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
 import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
-
-dayjs.extend(duration)
-dayjs.extend(relativeTime)
 
 interface LastSeenData {
   [hash: string]: { timestamp: string }
@@ -62,8 +56,10 @@ export const SecretAPIKeys = () => {
     error,
   } = useAPIKeysQuery({ projectRef, reveal: false })
 
-  const isLoadingPermissions = !usePermissionsLoaded()
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    '*'
+  )
 
   const lastSeen = useLastSeen(projectRef!)
 

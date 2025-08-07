@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Mail, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -17,8 +17,14 @@ import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
 const AddUserDropdown = () => {
-  const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
-  const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
+  const { can: canInviteUsers } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'invite_user'
+  )
+  const { can: canCreateUsers } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'create_user'
+  )
 
   const [inviteVisible, setInviteVisible] = useState(false)
   const [createVisible, setCreateVisible] = useState(false)
