@@ -15,7 +15,7 @@ thumb: firebase-vs-supabase/thumb.png
 
 ## Introduction
 
-Firebase and Supabase both promise to give teams a full‑featured backend without managing servers. Firebase, owned by Google, combines a NoSQL database with authentication, file storage and serverless functions. Supabase is an open‑source alternative [built on Postgres](https://supabase.com/docs/guides/database/overview) that offers similar services—[auth](https://supabase.com/docs/guides/auth), [storage](https://supabase.com/docs/guides/storage), [real‑time](https://supabase.com/docs/guides/realtime), and [functions](https://supabase.com/docs/guides/functions), but with the predictability of SQL and the freedom to self‑host. Choosing between them depends on how your application models data, how you plan to scale, and your tolerance for vendor lock‑in.
+Firebase and Supabase both promise to give teams a full‑featured backend without managing servers. Firebase, owned by Google, combines a NoSQL database with authentication, file storage and serverless functions. Supabase is an open‑source alternative [built on Postgres](/docs/guides/database/overview) that offers similar services—[auth](/docs/guides/auth), [storage](/docs/guides/storage), [real‑time](/docs/guides/realtime), and [functions](/docs/guides/functions), but with the predictability of SQL and the freedom to self‑host. Choosing between them depends on how your application models data, how you plan to scale, and your tolerance for vendor lock‑in.
 
 ## What is Supabase?
 
@@ -71,7 +71,7 @@ Firebase Cloud Functions integrate tightly with other Firebase products and supp
 | **Image tools** | No built‑in transformations (you can add Firebase Extensions for resizing) | Built‑in image transformations and CDN delivery |
 | **Free tier** | Spark plan includes 5 GB of Cloud Storage in select regions; additional usage is billed by region and operation | Free plan allows files up to 50 MB and 1 GB total storage; Pro/Team plans allow up to 500 GB per file and include CDN |
 
-Firebase Storage is reliable and integrates with the auth SDK. Pricing depends on region and includes separate charges for storage, bandwidth and operations. Supabase Storage integrates with Postgres: metadata is stored in a table, so you can apply the same RLS policies you use elsewhere[.](https://supabase.com/docs/guides/storage/security/access-control#:~:text=Supabase%20Storage%20is%20designed%20to,RLS) Free plans include 50 MB per file, and Pro plans raise that limit to hundreds of gigabytes.
+Firebase Storage is reliable and integrates with the auth SDK. Pricing depends on region and includes separate charges for storage, bandwidth and operations. Supabase Storage integrates with Postgres: metadata is stored in a table, so you can apply the same RLS policies you use elsewhere[.](/docs/guides/storage/security/access-control#:~:text=Supabase%20Storage%20is%20designed%20to,RLS) Free plans include 50 MB per file, and Pro plans raise that limit to hundreds of gigabytes.
 
 ## Open source vs. proprietary
 
@@ -92,7 +92,7 @@ Firebase provides a polished, fully managed experience. Supabase embraces open s
 | **Billing model** | Pay‑as‑you‑go; you pay per document read, write, delete and per function invocation[.](https://firebase.google.com/docs/firestore/pricing#:~:text=Document%20reads%2050%2C000%20per%20day,transfer%2010%20GiB%20per%20month) Pricing varies by region and can be hard to predict | Transparent tiered pricing: pay for database storage, file storage, and compute. There are no charges for API requests, and you can track usage from the dashboard |
 | **Self‑hosting** | Not supported | Available—self‑hosting lets you control costs and comply with regulatory requirements |
 
-Firebase’s usage‑based pricing can surprise teams as their apps grow because every document read, write or listener contributes to cost[.](https://firebase.google.com/docs/firestore/pricing#:~:text=Document%20reads%2050%2C000%20per%20day,transfer%2010%20GiB%20per%20month) Supabase offers predictable tiers and does not bill per request, which can simplify budgeting[.](https://supabase.com/pricing#:~:text=Get%20started%20with%3A)
+Firebase’s usage‑based pricing can surprise teams as their apps grow because every document read, write or listener contributes to cost[.](https://firebase.google.com/docs/firestore/pricing#:~:text=Document%20reads%2050%2C000%20per%20day,transfer%2010%20GiB%20per%20month) Supabase offers predictable tiers and does not bill per request, which can simplify budgeting[.](/pricing#:~:text=Get%20started%20with%3A)
 
 ## Ecosystem, extensibility and community
 
@@ -119,7 +119,7 @@ Many teams start with Firebase for fast prototyping and switch to Supabase when 
 1. **Run both services side by side.** Export your Firestore collections and import them into Supabase—initially as JSON or JSONB columns—while your app continues to read from Firebase. Then incrementally swap Firebase SDK calls for Supabase queries.
 2. **Normalize your data.** Refactor JSON into proper Postgres tables, add foreign keys and indexes and write RLS policies. This is when you begin to enjoy SQL’s power and simplified code.
 
-Supabase provides [open‑source migration tools](https://supabase.com/docs/guides/platform/migrating-to-supabase). There is a utility for [migrating Firebase Authentication to Supabase Auth](https://supabase.com/docs/guides/platform/migrating-to-supabase/firebase-auth) by exporting users and re‑creating them in Postgres, another for [copying Firestore collections to Postgres tables](https://supabase.com/docs/guides/platform/migrating-to-supabase/firestore-data), and a tool for [migrating files from Cloud Storage to Supabase Storage](https://supabase.com/docs/guides/platform/migrating-to-supabase/firebase-storage). These tools are maintained on GitHub and have been used by startups to migrate tens of thousands of users with minimal downtime.
+Supabase provides [open‑source migration tools](/docs/guides/platform/migrating-to-supabase). There is a utility for [migrating Firebase Authentication to Supabase Auth](/docs/guides/platform/migrating-to-supabase/firebase-auth) by exporting users and re‑creating them in Postgres, another for [copying Firestore collections to Postgres tables](/docs/guides/platform/migrating-to-supabase/firestore-data), and a tool for [migrating files from Cloud Storage to Supabase Storage](/docs/guides/platform/migrating-to-supabase/firebase-storage). These tools are maintained on GitHub and have been used by startups to migrate tens of thousands of users with minimal downtime.
 
 ## Conclusion
 
