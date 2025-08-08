@@ -2,7 +2,7 @@ import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, Info, RefreshCw, Settings, X } from 'lucide-react'
+import { ArrowDown, Eraser, Info, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -365,7 +365,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <ButtonTooltip
                     type="text"
                     size="tiny"
-                    icon={<Settings strokeWidth={1.5} size={14} />}
+                    icon={<Settings strokeWidth={1.5} />}
                     onClick={() => setIsConfirmOptInModalOpen(true)}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
@@ -379,7 +379,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <ButtonTooltip
                     type="text"
                     size="tiny"
-                    icon={<RefreshCw strokeWidth={1.5} size={14} />}
+                    icon={<Eraser strokeWidth={1.5} />}
                     onClick={handleClearMessages}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
@@ -389,7 +389,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     type="text"
                     className="w-7 h-7"
                     onClick={snap.closeAssistant}
-                    icon={<X strokeWidth={1.5} size={14} />}
+                    icon={<X strokeWidth={1.5} />}
                     tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
                   />
                 </div>
@@ -436,7 +436,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             <div className="w-full px-7 py-8 space-y-6">
               {renderedMessages}
               {error && (
-                <div className="border rounded-md pl-2 pr-1 py-2 flex items-center justify-between">
+                <div className="border rounded-md px-2 py-2 flex items-center justify-between gap-x-4">
                   <div className="flex items-start gap-2 text-foreground-light text-sm">
                     <div>
                       <Info size={16} className="mt-0.5" />
@@ -452,9 +452,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       </p>
                     </div>
                   </div>
-                  <Button type="text" size="tiny" onClick={() => regenerate()} className="text-xs">
-                    Retry
-                  </Button>
+                  <div className="flex items-center gap-x-2">
+                    <Button
+                      type="default"
+                      size="tiny"
+                      onClick={() => regenerate()}
+                      className="text-xs"
+                    >
+                      Retry
+                    </Button>
+                    <ButtonTooltip
+                      type="default"
+                      size="tiny"
+                      onClick={handleClearMessages}
+                      className="w-7 h-7"
+                      icon={<Eraser />}
+                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                    />
+                  </div>
                 </div>
               )}
               <AnimatePresence>
