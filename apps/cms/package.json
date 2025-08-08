@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Payload CMS for Supabase",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
     "ci": "pnpm migrate && pnpm build",
