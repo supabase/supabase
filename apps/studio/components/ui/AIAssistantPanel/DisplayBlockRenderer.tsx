@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Message } from 'ai/react'
+import type { UIDataTypes, UIMessagePart, UITools } from 'ai'
 import { useRouter } from 'next/router'
 import { DragEvent, PropsWithChildren, useMemo, useState } from 'react'
 
@@ -27,7 +27,7 @@ interface DisplayBlockRendererProps {
     yAxis?: string
     runQuery?: boolean
   }
-  messageParts: Readonly<Message['parts']> | undefined
+  messageParts: UIMessagePart<UIDataTypes, UITools>[] | undefined
   isLoading: boolean
   onResults: (args: { messageId: string; resultId?: string; results: any[] }) => void
 }

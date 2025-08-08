@@ -1,6 +1,6 @@
+import { useCompletion } from '@ai-sdk/react'
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCompletion } from 'ai/react'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -458,14 +458,12 @@ export const SQLEditor = () => {
     completion,
     isLoading: isCompletionLoading,
   } = useCompletion({
-    api: `${BASE_PATH}/api/ai/sql/complete-v2`,
+    api: `${BASE_PATH}/api/ai/code/complete`,
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      includeSchemaMetadata,
-    },
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
+      language: 'sql',
+      orgSlug: org?.slug,
     },
     onError: (error) => {
       toast.error(`Failed to generate SQL: ${error.message}`)
