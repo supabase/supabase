@@ -4809,6 +4809,8 @@ export interface components {
         }
       | {
           billing_email: string | null
+          /** @enum {string|null} */
+          billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
