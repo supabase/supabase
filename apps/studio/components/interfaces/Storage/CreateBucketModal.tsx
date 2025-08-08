@@ -53,9 +53,9 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 
 const FormSchema = z.object({
   name: z
@@ -91,7 +91,10 @@ const CreateBucketModal = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
   const router = useRouter()
-  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canCreateBuckets } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
 
   const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit

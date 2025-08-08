@@ -1,9 +1,11 @@
-import { useState } from 'react'
-import { useParams } from 'common'
 import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
@@ -19,21 +21,37 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface DeleteBucketModalProps {
+  visible: boolean
   bucket: Bucket
   onClose: () => void
 }
 
-export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) => {
+const formId = `delete-storage-bucket-form`
+
+export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModalProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [value, setValue] = useState<string>(``)
+
+  const schema = z.object({
+    confirm: z.literal(bucket.name, {
+      errorMap: () => ({ message: `Please enter "${bucket.name}" to confirm` }),
+    }),
+  })
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+  })
 
   const { data } = useBucketsQuery({ projectRef })
   const { data: policies } = useDatabasePoliciesQuery({
@@ -83,7 +101,7 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
 
   const buckets = data ?? []
 
-  const onDeleteBucket = async () => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
     deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
@@ -91,7 +109,7 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
 
   return (
     <Dialog
-      open
+      open={visible}
       onOpenChange={(open) => {
         if (!open) {
           onClose()
@@ -116,27 +134,45 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
         </DialogSection>
         <DialogSectionSeparator />
         <DialogSection>
-          <Label_Shadcn_ htmlFor="confirm">
-            Type <span className="font-bold text-foreground">{bucket.name}</span> to confirm.
-          </Label_Shadcn_>
-          <Input_Shadcn_
-            id="confirm"
-            value={value}
-            autoComplete="off"
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Type in name of bucket"
-          />
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField_Shadcn_
+                key="confirm"
+                name="confirm"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    name="confirm"
+                    label={
+                      <>
+                        Type <span className="font-bold text-foreground">{bucket.name}</span> to
+                        confirm.
+                      </>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        id="confirm"
+                        autoComplete="off"
+                        {...field}
+                        placeholder="Type in name of bucket"
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
           <Button type="default" disabled={isLoading} onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            type="danger"
-            disabled={value !== bucket.name}
-            loading={isLoading}
-            onClick={onDeleteBucket}
-          >
+          <Button form={formId} htmlType="submit" type="danger" loading={isLoading}>
             Delete Bucket
           </Button>
         </DialogFooter>

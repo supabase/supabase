@@ -1,19 +1,10 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { screen, waitFor, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { MoreVertical } from 'lucide-react'
 import { faker } from '@faker-js/faker'
 
 import { addAPIMock } from 'tests/lib/msw'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
 import DeleteBucketModal from '../DeleteBucketModal'
@@ -35,40 +26,22 @@ const bucket: Bucket = {
 }
 
 const Page = ({ onClose }: { onClose: () => void }) => {
-  const [modal, setModal] = useState<string | null>(null)
-  const renderModal = () => {
-    switch (modal) {
-      case `delete`:
-        return (
-          <DeleteBucketModal
-            bucket={bucket}
-            onClose={() => {
-              setModal(null)
-              onClose()
-            }}
-          />
-        )
-      default:
-        return null
-    }
-  }
+  const [open, setOpen] = useState(false)
   return (
     <ProjectContextProvider projectRef="default">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button title="Manage Bucket" type="text" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => setModal(`delete`)}>Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <button onClick={() => setOpen(true)}>Open</button>
 
-      {renderModal()}
+      <DeleteBucketModal
+        visible={open}
+        bucket={bucket}
+        onClose={() => {
+          setOpen(false)
+          onClose()
+        }}
+      />
     </ProjectContextProvider>
   )
 }
-
-mockAnimationsApi()
 
 describe(`DeleteBucketModal`, () => {
   beforeEach(() => {
@@ -133,25 +106,36 @@ describe(`DeleteBucketModal`, () => {
     const onClose = vi.fn()
     render(<Page onClose={onClose} />)
 
-    const menuTrigger = screen.getByRole(`button`, { name: `Manage Bucket` })
-    await userEvent.click(menuTrigger)
-    const deleteOption = await screen.findByRole(`menuitem`, { name: `Delete` })
-    await userEvent.click(deleteOption)
-
-    await waitFor(() => {
-      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
-    })
-
-    const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
-    expect(confirmButton).toBeDisabled()
+    const openButton = screen.getByRole(`button`, { name: `Open` })
+    await userEvent.click(openButton)
+    await screen.findByRole(`dialog`)
 
     const input = screen.getByLabelText(/Type/)
     await userEvent.type(input, `test`)
-    expect(confirmButton).not.toBeDisabled()
 
+    const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets`)
+  })
+
+  it(`prevents submission when the input doesn't match the bucket name`, async () => {
+    const onClose = vi.fn()
+    render(<Page onClose={onClose} />)
+
+    const openButton = screen.getByRole(`button`, { name: `Open` })
+    await userEvent.click(openButton)
+    await screen.findByRole(`dialog`)
+
+    const input = screen.getByLabelText(/Type/)
+    await userEvent.type(input, `invalid`)
+
+    const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
+    fireEvent.click(confirmButton)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Please enter/)).toBeInTheDocument()
+    })
   })
 })

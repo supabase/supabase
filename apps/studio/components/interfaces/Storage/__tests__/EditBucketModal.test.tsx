@@ -1,19 +1,10 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { screen, waitFor, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { MoreVertical } from 'lucide-react'
 import { faker } from '@faker-js/faker'
 
 import { addAPIMock } from 'tests/lib/msw'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
 import { render } from 'tests/helpers'
@@ -33,40 +24,22 @@ const bucket: Bucket = {
 }
 
 const Page = ({ onClose }: { onClose: () => void }) => {
-  const [modal, setModal] = useState<string | null>(null)
-  const renderModal = () => {
-    switch (modal) {
-      case `edit`:
-        return (
-          <EditBucketModal
-            bucket={bucket}
-            onClose={() => {
-              setModal(null)
-              onClose()
-            }}
-          />
-        )
-      default:
-        return null
-    }
-  }
+  const [open, setOpen] = useState(false)
   return (
     <ProjectContextProvider projectRef="default">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button title="Manage Bucket" type="text" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => setModal(`edit`)}>Edit</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <button onClick={() => setOpen(true)}>Open</button>
 
-      {renderModal()}
+      <EditBucketModal
+        visible={open}
+        bucket={bucket}
+        onClose={() => {
+          setOpen(false)
+          onClose()
+        }}
+      />
     </ProjectContextProvider>
   )
 }
-
-mockAnimationsApi()
 
 describe(`EditBucketModal`, () => {
   beforeEach(() => {
@@ -99,14 +72,9 @@ describe(`EditBucketModal`, () => {
     const onClose = vi.fn()
     render(<Page onClose={onClose} />)
 
-    const menuTrigger = screen.getByRole(`button`, { name: `Manage Bucket` })
-    await userEvent.click(menuTrigger)
-    const deleteOption = await screen.findByRole(`menuitem`, { name: `Edit` })
-    await userEvent.click(deleteOption)
-
-    await waitFor(() => {
-      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
-    })
+    const openButton = screen.getByRole(`button`, { name: `Open` })
+    await userEvent.click(openButton)
+    await screen.findByRole(`dialog`)
 
     const nameInput = screen.getByLabelText(`Name of bucket`)
     expect(nameInput).toHaveValue(`test`)

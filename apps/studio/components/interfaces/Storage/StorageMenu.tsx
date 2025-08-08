@@ -1,16 +1,13 @@
-import { useLocalStorage } from '@uidotdev/usehooks'
-import { ArrowUpRight } from 'lucide-react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 
 import { useParams } from 'common'
-import { DeleteBucketModal } from 'components/interfaces/Storage'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
-
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -25,6 +22,7 @@ const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const { data: projectDetails } = useSelectedProjectQuery()
+  const snap = useStorageExplorerStateSnapshot()
   const isBranch = projectDetails?.parent_project_ref !== undefined
 
   const [searchText, setSearchText] = useState<string>('')

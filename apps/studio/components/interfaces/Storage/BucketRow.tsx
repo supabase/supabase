@@ -4,7 +4,7 @@ import { Columns3, Edit2, MoreVertical, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
 
 import type { Bucket } from 'data/storage/buckets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
 import DeleteBucketModal from 'components/interfaces/Storage/DeleteBucketModal'
 import EmptyBucketModal from 'components/interfaces/Storage/EmptyBucketModal'
@@ -29,22 +29,12 @@ export interface BucketRowProps {
 }
 
 const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
-  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateBuckets } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
   const [modal, setModal] = useState<string | null>(null)
-
-  const renderModal = () => {
-    const onClose = () => setModal(null)
-    switch (modal) {
-      case `edit`:
-        return <EditBucketModal bucket={bucket} onClose={onClose} />
-      case `empty`:
-        return <EmptyBucketModal bucket={bucket} onClose={onClose} />
-      case `delete`:
-        return <DeleteBucketModal bucket={bucket} onClose={onClose} />
-      default:
-        return null
-    }
-  }
+  const onClose = () => setModal(null)
 
   return (
     <div
@@ -121,7 +111,10 @@ const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowPro
       ) : (
         <div className="w-7 mr-1" />
       )}
-      {renderModal()}
+
+      <EditBucketModal visible={modal === `edit`} bucket={bucket} onClose={onClose} />
+      <EmptyBucketModal visible={modal === `empty`} bucket={bucket} onClose={onClose} />
+      <DeleteBucketModal visible={modal === `delete`} bucket={bucket} onClose={onClose} />
     </div>
   )
 }

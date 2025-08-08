@@ -17,11 +17,12 @@ import {
 import { Admonition } from 'ui-patterns'
 
 export interface EmptyBucketModalProps {
+  visible: boolean
   bucket?: Bucket
   onClose: () => void
 }
 
-export const EmptyBucketModal = ({ bucket, onClose }: EmptyBucketModalProps) => {
+export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalProps) => {
   const { ref: projectRef } = useParams()
   const { fetchFolderContents } = useStorageExplorerStateSnapshot()
 
@@ -47,7 +48,7 @@ export const EmptyBucketModal = ({ bucket, onClose }: EmptyBucketModalProps) => 
 
   return (
     <Dialog
-      open
+      open={visible}
       onOpenChange={(open) => {
         if (!open) {
           onClose()

@@ -46,6 +46,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { isNonNullable } from 'lib/isNonNullable'
 
 export interface EditBucketModalProps {
+  visible: boolean
   bucket: Bucket
   onClose: () => void
 }
@@ -63,7 +64,7 @@ const BucketSchema = z.object({
 
 const formId = 'edit-storage-bucket-form'
 
-export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
+export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
   const { ref } = useParams()
 
   const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation()
@@ -129,7 +130,7 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
 
   return (
     <Dialog
-      open
+      open={visible}
       onOpenChange={(open) => {
         if (!open) {
           form.reset()
