@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
-    "build:prod": "pnpm build && pnpm start",
-    "ci": "payload migrate && pnpm build",
+    "ci": "pnpm migrate && pnpm build",
     "clean": "rimraf node_modules .next",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
@@ -17,6 +16,7 @@
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3030",
+    "vercel-build": "pnpm migrate && pnpm build",
     "typecheck_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
