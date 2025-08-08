@@ -12,7 +12,7 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { cn } from 'ui'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
@@ -29,20 +29,19 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 
 const GitHubSection = () => {
   const { ref: projectRef } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const canReadGitHubConnection = useCheckPermissions(
     PermissionAction.READ,
     'integrations.github_connections'
   )
 
-  const organization = useSelectedOrganization()
   const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const { data: connections } = useGitHubConnectionsQuery(
-    { organizationId: selectedOrganization?.id },
-    { enabled: !!projectRef && !!selectedOrganization?.id }
+    { organizationId: organization?.id },
+    { enabled: !!projectRef && !!organization?.id }
   )
 
   const existingConnection = useMemo(

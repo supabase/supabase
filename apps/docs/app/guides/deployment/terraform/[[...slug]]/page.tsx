@@ -17,8 +17,8 @@ import {
   terraformDocsRepo,
 } from '../terraformConstants'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-
-export const dynamicParams = false
+import { IS_PROD } from 'common'
+import { getEmptyArray } from '~/features/helpers.fn'
 
 // Each external docs page is mapped to a local page
 const pageMap = [
@@ -142,7 +142,9 @@ const getContent = async ({ slug }: Params) => {
   }
 }
 
-const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+const generateStaticParams = IS_PROD
+  ? async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+  : getEmptyArray
 const generateMetadata = genGuideMeta(getContent)
 
 export default TerraformDocs

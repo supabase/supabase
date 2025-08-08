@@ -18,8 +18,8 @@ After developing your project and deciding it's Production Ready, you should run
 - Enable replication on tables containing sensitive data by enabling Row Level Security (RLS) and setting row security policies:
   - Go to the Authentication > Policies page in the Supabase Dashboard to enable RLS and create security policies.
   - Go to the Database > Publications page in the Supabase Dashboard to manage replication tables.
-- Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement)
-- Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for your database.
+- Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) (see: [dashboard](https://supabase.com/dashboard/project/_/auth/policies))
+- Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for your database (see: [dashboard](https://supabase.com/dashboard/project/_/database/settings#network-restrictions)).
 - Ensure that your Supabase Account is protected with multi-factor authentication (MFA).
   - If using a GitHub signin, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
   - If using email+password signin, set up [MFA for your Supabase account](https://supabase.com/docs/guides/platform/multi-factor-authentication#enable-mfa).

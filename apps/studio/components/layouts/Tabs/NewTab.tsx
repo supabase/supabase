@@ -10,7 +10,8 @@ import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -26,7 +27,6 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 
@@ -35,8 +35,8 @@ export function NewTab() {
   const { ref } = useParams()
   const editor = useEditorType()
   const { profile } = useProfile()
-  const org = useSelectedOrganization()
-  const { project } = useProjectContext()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
   const snap = useTableEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
