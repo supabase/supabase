@@ -5,19 +5,20 @@ import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 import { handleError, del } from 'data/fetchers'
 
-export type DeleteDestinationParams = {
+export type DeleteDestinationPipelineParams = {
   projectRef: string
   destinationId: number
+  pipelineId: number
 }
 
-async function deleteDestination(
-  { projectRef, destinationId: destinationId }: DeleteDestinationParams,
+async function deleteDestinationPipeline(
+  { projectRef, destinationId, pipelineId }: DeleteDestinationPipelineParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await del('/platform/replication/{ref}/destinations/{destination_id}', {
-    params: { path: { ref: projectRef, destination_id: destinationId } },
+  const { data, error } = await del('/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}', {
+    params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
     signal,
   })
   if (error) {
@@ -27,29 +28,29 @@ async function deleteDestination(
   return data
 }
 
-type DeleteDestinationData = Awaited<ReturnType<typeof deleteDestination>>
+type DeleteDestinationPipelineData = Awaited<ReturnType<typeof deleteDestinationPipeline>>
 
-export const useDeleteDestinationMutation = ({
+export const useDeleteDestinationPipelineMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteDestinationData, ResponseError, DeleteDestinationParams>,
+  UseMutationOptions<DeleteDestinationPipelineData, ResponseError, DeleteDestinationPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteDestinationData, ResponseError, DeleteDestinationParams>(
-    (vars) => deleteDestination(vars),
+  return useMutation<DeleteDestinationPipelineData, ResponseError, DeleteDestinationPipelineParams>(
+    (vars) => deleteDestinationPipeline(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, destinationId } = variables
+        const { projectRef } = variables
         await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete destination: ${data.message}`)
+          toast.error(`Failed to delete destination and pipeline: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
