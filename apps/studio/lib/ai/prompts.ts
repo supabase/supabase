@@ -693,57 +693,136 @@ CREATE INDEX idx_products_tenant ON products(tenant_id);
 `
 
 export const EDGE_FUNCTION_PROMPT = `
-# Edge Functions
-- **Dependencies**:
-- Prefer Web APIs (\`fetch\`, \`WebSocket\`) and Deno standard libraries.
-- If using external dependencies, import using \`npm:<package>@<version>\` or \`jsr:<package>@<version>\`. Specify versions.
-- Minimize use of CDNs like \`deno.land/x\`, \`esm.sh\`, \`unpkg.com\`.
-- Use \`node:<module>\` for Node.js built-in APIs (e.g., \`import process from "node:process"\`).
-- **Runtime & APIs**:
-- Use the built-in \`Deno.serve\` for handling requests, not older \`http/server\` imports.
-- Pre-populated environment variables are available: \`SUPABASE_URL\`, \`SUPABASE_ANON_KEY\`, \`SUPABASE_SERVICE_ROLE_KEY\`, \`SUPABASE_DB_URL\`.
-- Handle multiple routes within a single function using libraries like Express (\`npm:express@<version>\`) or Hono (\`npm:hono@<version>\`). Prefix routes with the function name (e.g., \`/function-name/route\`).
-- File writes are restricted to the \`/tmp\` directory.
-- Use \`EdgeRuntime.waitUntil(promise)\` for background tasks.
-- **Supabase Integration**:
-- Create the Supabase client within the function using the request's Authorization header to respect RLS policies:
-\`\`\`typescript
-import { createClient } from 'jsr:@supabase/supabase-js@^2' // Use jsr: or npm:
-// ...
-const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY')!,
-    {
-    global: {
-        headers: { Authorization: req.headers.get('Authorization')! }
-    }
-    }
-)
-// ... use supabaseClient to interact with the database
+# Writing Supabase Edge Functions
+You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **high-quality Supabase Edge Functions** that adhere to the following best practices:
+## Guidelines
+1. Try to use Web APIs and Denos core APIs instead of external dependencies (eg: use fetch instead of Axios, use WebSockets API instead of node-ws)
+2. If you are reusing utility methods between Edge Functions, add them to \`supabase/functions/_shared\` and import using a relative path. Do NOT have cross dependencies between Edge Functions.
+3. Do NOT use bare specifiers when importing dependecnies. If you need to use an external dependency, make sure it's prefixed with either \`npm:\` or \`jsr:\`. For example, \`@supabase/supabase-js\` should be written as \`npm:@supabase/supabase-js\`.
+4. For external imports, always define a version. For example, \`npm:@express\` should be written as \`npm:express@4.18.2\`.
+5. For external dependencies, importing via \`npm:\` and \`jsr:\` is preferred. Minimize the use of imports from @\`deno.land/x\` , \`esm.sh\` and @\`unpkg.com\` . If you have a package from one of those CDNs, you can replace the CDN hostname with \`npm:\` specifier.
+6. You can also use Node built-in APIs. You will need to import them using \`node:\` specifier. For example, to import Node process: \`import process from "node:process". Use Node APIs when you find gaps in Deno APIs.
+7. Do NOT use \`import { serve } from "https://deno.land/std@0.168.0/http/server.ts"\`. Instead use the built-in \`Deno.serve\`.
+8. Following environment variables (ie. secrets) are pre-populated in both local and hosted Supabase environments. Users don't need to manually set them:
+	* SUPABASE_URL
+	* SUPABASE_ANON_KEY
+	* SUPABASE_SERVICE_ROLE_KEY
+	* SUPABASE_DB_URL
+9. To set other environment variables (ie. secrets) users can put them in a env file and run the \`supabase secrets set --env-file path/to/env-file\`
+10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with \`/function-name\` so they are routed correctly.
+11. File write operations are ONLY permitted on \`/tmp\` directory. You can use either Deno or Node File APIs.
+12. Use \`EdgeRuntime.waitUntil(promise)\` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
+13. Where possible, use the Supabase client with global authentication headers to make use of the Supabase auth system including RLS policies.
+14. Use Deno.serve where possible to create an Edge Function
+
+## Example Templates
+### Simple Hello World Function
+\`\`\`tsx
+interface reqPayload {
+	name: string;
+}
+console.info('server started');
+Deno.serve(async (req: Request) => {
+	const { name }: reqPayload = await req.json();
+	const data = {
+		message: \`Hello \${name} from foo!\`,
+	};
+	return new Response(
+		JSON.stringify(data),
+		{ headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
+		);
+});
 \`\`\`
-- Ensure function code is compatible with the database schema.
-- OpenAI Example:
-\`\`\`typescript
-import OpenAI from 'https://deno.land/x/openai@v4.24.0/mod.ts'
-Deno.serve(async (req) => {
-    const { query } = await req.json()
-    const apiKey = Deno.env.get('OPENAI_API_KEY')
-    const openai = new OpenAI({
-    apiKey: apiKey,
+### Example Function using Supabase client
+\`\`\`tsx
+import { createClient } from 'npm:supabase-js@2'
+import { corsHeaders } from '../_shared/cors.ts'
+Deno.serve(async (req: Request) => {
+  // This is needed if you're planning to invoke your function from a browser.
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+  try {
+    // Create a Supabase client with the Auth context of the logged in user.
+    const supabaseClient = createClient(
+      // Supabase API URL - env var exported by default.
+      Deno.env.get('SUPABASE_URL') ?? '',
+      // Supabase API ANON KEY - env var exported by default.
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      // Create client with Auth context of the user that called the function.
+      // This way your row-level-security (RLS) policies are applied.
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    )
+    // First get the token from the Authorization header
+    const token = req.headers.get('Authorization').replace('Bearer ', '')
+    // Now we can get the session or user object
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser(token)
+    // And we can run queries in the context of our authenticated user
+    const { data, error } = await supabaseClient.from('users').select('*')
+    if (error) throw error
+    return new Response(JSON.stringify({ user, data }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
     })
-    // Documentation here: https://github.com/openai/openai-node
-    const chatCompletion = await openai.chat.completions.create({
-    messages: [{ role: 'user', content: query }],
-    // Choose model from here: https://platform.openai.com/docs/models
-    model: 'gpt-3.5-turbo',
-    stream: false,
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
     })
-    const reply = chatCompletion.choices[0].message.content
-    return new Response(reply, {
-    headers: { 'Content-Type': 'text/plain' },
-    })
+  }
 })
 \`\`\`
+### Example Function using Node built-in API
+\`\`\`tsx
+import { randomBytes } from "node:crypto";
+import { createServer } from "node:http";
+import process from "node:process";
+const generateRandomString = (length) => {
+    const buffer = randomBytes(length);
+    return buffer.toString('hex');
+};
+const randomString = generateRandomString(10);
+console.log(randomString);
+const server = createServer((req, res) => {
+    const message = \`Hello\`;
+    res.end(message);
+});
+server.listen(9999);
+\`\`\`
+### Using npm packages in Functions
+\`\`\`tsx
+import express from "npm:express@4.18.2";
+const app = express();
+app.get(/(.*)/, (req, res) => {
+    res.send("Welcome to Supabase");
+});
+app.listen(8000);
+\`\`\`
+### Generate embeddings using built-in @Supabase.ai API
+\`\`\`tsx
+const model = new Supabase.ai.Session('gte-small');
+Deno.serve(async (req: Request) => {
+	const params = new URL(req.url).searchParams;
+	const input = params.get('text');
+	const output = await model.run(input, { mean_pool: true, normalize: true });
+	return new Response(
+		JSON.stringify(
+			output,
+		),
+		{
+			headers: {
+				'Content-Type': 'application/json',
+				'Connection': 'keep-alive',
+			},
+		},
+	);
+});
 `
 
 export const PG_BEST_PRACTICES = `

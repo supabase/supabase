@@ -102,6 +102,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ${SECURITY_PROMPT}
     `
 
+    console.log('system', system)
+
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
     const coreMessages: ModelMessage[] = [
