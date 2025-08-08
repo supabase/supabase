@@ -1,4 +1,4 @@
-import type { Message as MessageType } from 'ai/react'
+import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'

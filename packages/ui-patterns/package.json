@@ -499,7 +499,7 @@
     "mdast": "^3.0.0",
     "monaco-editor": "*",
     "next-themes": "*",
-    "openai": "^4.20.1",
+    "openai": "^4.75.1",
     "react": "catalog:",
     "react-countdown": "^2.3.5",
     "react-dom": "catalog:",
@@ -521,7 +521,7 @@
     "ui": "workspace:*",
     "unist-util-visit": "^5.0.0",
     "valtio": "catalog:",
-    "zod": "^3.22.4"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.0.0",

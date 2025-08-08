@@ -1,4 +1,4 @@
-import { Tool, ToolSet, ToolExecutionOptions } from 'ai'
+import { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
@@ -56,11 +56,11 @@ export function transformToolResult<OriginalResult, NewResult>(
   // Intercept the tool to add a custom execute function
   return {
     ...tool,
-    execute: async (args: any, options: ToolExecutionOptions) => {
+    execute: async (args: any, options: any) => {
       const result = await tool.execute!(args, options)
       return execute(result)
     },
-  } as Tool<any, NewResult>
+  } as unknown as Tool<any, NewResult>
 }
 
 /**
