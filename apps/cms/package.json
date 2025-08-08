@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Payload CMS for Supabase",
   "license": "MIT",
-  "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
     "ci": "pnpm migrate && pnpm build",
@@ -17,7 +16,7 @@
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/migrate.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3030",
-    "vercel-build": "payload migrate && pnpm build",
+    "vercel-build": "pnpm migrate && pnpm build",
     "typecheck_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
