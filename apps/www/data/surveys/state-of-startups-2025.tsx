@@ -179,7 +179,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
           ],
           charts: ['AICodingToolsChart'],
           wordCloud: {
-            label: 'What are your must-have developer tools?',
+            label: 'Must-have developer tools by keyword frequency',
             words: [
               { text: 'cursor', count: 495 },
               { text: 'code', count: 396 },

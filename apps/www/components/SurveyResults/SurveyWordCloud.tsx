@@ -10,7 +10,6 @@ export function SurveyWordCloud({
   const [currentItems, setCurrentItems] = useState<{ text: string; count: number }[]>([])
   const [isRotating, setIsRotating] = useState(false)
   const [scramblingTexts, setScramblingTexts] = useState<string[]>([])
-  const [scramblingIndexes, setScramblingIndexes] = useState<Set<number>>(new Set())
 
   // Calculate the range within the current context
   const counts = answers.map((answer) => answer.count)
@@ -40,7 +39,7 @@ export function SurveyWordCloud({
   useEffect(() => {
     if (!isRotating || answers.length <= 12 || scramblingTexts.length === 0) return
 
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     const characterDelay = 50 // 50ms between each character change
 
     const rotateItems = () => {
@@ -55,27 +54,37 @@ export function SurveyWordCloud({
       // Start scramble animation for each item
       newItems.forEach((newItem, index) => {
         const oldText = scramblingTexts[index] || ''
-        const newText = newItem.text // Keep original case
+        const newText = newItem.text
         const maxLength = Math.max(oldText.length, newText.length)
-
-        // Mark this index as scrambling
-        setScramblingIndexes((prev) => new Set([...prev, index]))
 
         for (let charIndex = 0; charIndex < maxLength; charIndex++) {
           setTimeout(() => {
-            const newChar = newText[charIndex] || ' '
+            const newChar = newText[charIndex]
 
             // If we're past the old text length, just show the new char
             if (charIndex >= oldText.length) {
+              if (newChar) {
+                // Only animate if there's actually a character to show
+                setScramblingTexts((prev) => {
+                  const updated = [...prev]
+                  updated[index] = (updated[index] || '').substring(0, charIndex) + newChar
+                  return updated
+                })
+              }
+              return
+            }
+
+            // If we're past the new text length, remove the character
+            if (charIndex >= newText.length) {
               setScramblingTexts((prev) => {
                 const updated = [...prev]
-                updated[index] = (updated[index] || '').substring(0, charIndex) + newChar
+                updated[index] = (updated[index] || '').substring(0, charIndex)
                 return updated
               })
               return
             }
 
-            // Scramble through alphabet for existing characters
+            // Scramble through alphabet for existing characters that are being replaced
             let scrambleCount = 0
             const scrambleInterval = setInterval(() => {
               const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)]
@@ -107,18 +116,6 @@ export function SurveyWordCloud({
             }, characterDelay)
           }, charIndex * 100) // Stagger each character
         }
-
-        // Clear scrambling state after animation completes
-        setTimeout(
-          () => {
-            setScramblingIndexes((prev) => {
-              const newSet = new Set(prev)
-              newSet.delete(index)
-              return newSet
-            })
-          },
-          maxLength * 100 + 1000
-        ) // Wait for all characters to finish + buffer
       })
     }
 
@@ -129,8 +126,7 @@ export function SurveyWordCloud({
   }, [isRotating, answers, scramblingTexts, currentItems])
 
   return (
-    <aside className="flex flex-col gap-3 px-6 py-8">
-      <p className="text-foreground-light text-sm">{label}</p>
+    <aside className="flex flex-col gap-4 px-6 py-8">
       <ol className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
         {currentItems.map(({ text, count }, index) => (
           <li key={`${text}-${index}`} className="py-4 border-t border-muted border-opacity-50">
@@ -140,6 +136,8 @@ export function SurveyWordCloud({
           </li>
         ))}
       </ol>
+
+      <p className="text-foreground-lighter text-sm">{label}</p>
     </aside>
   )
 }
