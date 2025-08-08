@@ -29,8 +29,8 @@ function StateOfStartupsPage() {
 
   // Auto-rotate chapters for inline ToC
   useEffect(() => {
-    // Don't rotate if the ToC is open
-    if (isTocOpen) return
+    // Only rotate when the inline ToC is visible (not floating)
+    if (showFloatingToc) return
 
     const interval = setInterval(() => {
       setInlineRotatingChapter((prev) => {
@@ -40,7 +40,7 @@ function StateOfStartupsPage() {
     }, 1200)
 
     return () => clearInterval(interval)
-  }, [pageData.pageChapters.length, isTocOpen])
+  }, [pageData.pageChapters.length, showFloatingToc])
 
   // Scroll detection to show floating ToC
   useEffect(() => {
@@ -143,10 +143,10 @@ function StateOfStartupsPage() {
           <Button
             type="default"
             size="small"
-            iconRight={<Maximize2 size={14} />}
+            // iconRight={<Maximize2 size={14} />}
             onClick={() => setIsTocOpen(true)}
             className={cn(
-              'flex flex-row gap-2 shadow-xl rounded-full px-3',
+              'flex flex-row gap-2 shadow-xl rounded-full px-3 pr-5',
               isTocOpen && (isFloating ? 'hidden' : 'invisible')
             )}
           >
@@ -162,34 +162,26 @@ function StateOfStartupsPage() {
           {isTocOpen && (
             <div
               className={cn(
-                'bg-surface-100 border border-default rounded-lg shadow-xl overflow-hidden min-w-[300px]',
+                'bg-background/75 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden min-w-[280px]',
                 // For inline variant, position absolutely to avoid layout shift
                 !isFloating &&
                   'absolute top-full left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50'
               )}
             >
-              <ol className="max-h-[60vh] overflow-y-auto">
+              <ol className="max-h-[60vh] overflow-y-auto p-1 flex flex-col gap-1">
                 {pageData.pageChapters.map((chapter, chapterIndex) => (
                   <li key={chapterIndex + 1}>
                     <Link
                       href={`#chapter-${chapterIndex + 1}`}
                       onClick={() => setIsTocOpen(false)}
                       className={cn(
-                        'block py-3 px-4 text-sm transition-colors',
+                        'block py-2 rounded-lg text-sm transition-colors text-balance text-center',
                         chapterIndex + 1 === activeChapter
                           ? 'bg-brand/10 text-brand'
-                          : 'text-foreground hover:bg-surface-300'
+                          : 'text-foreground-light hover:text-foreground hover:bg-surface-300'
                       )}
                     >
-                      <div className="flex justify-between gap-6">
-                        <span className="hidden bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light font-mono uppercase text-xs">
-                          {chapterIndex + 1}
-                        </span>
-                        <span className="text-balance text-center flex-1">{chapter.title}</span>
-                        <span className="hidden opacity-0 bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light font-mono uppercase text-xs">
-                          {chapterIndex + 1}
-                        </span>
-                      </div>
+                      {chapter.title}
                     </Link>
                   </li>
                 ))}
