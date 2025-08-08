@@ -4,12 +4,14 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -92,6 +94,8 @@ export const EditorPanel = ({
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = !!check?.hasKey
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
 
   const [isSaving, setIsSaving] = useState(false)
@@ -273,9 +277,13 @@ export const EditorPanel = ({
 
                 try {
                   setIsSaving(true)
-                  const { title: name } = await generateSqlTitle({
-                    sql: currentValue,
-                  })
+                  let name = generateSnippetTitle()
+                  if (isApiKeySet) {
+                    const { title } = await generateSqlTitle({
+                      sql: currentValue,
+                    })
+                    name = title
+                  }
                   const snippet = createSqlSnippetSkeletonV2({
                     name,
                     sql: currentValue,

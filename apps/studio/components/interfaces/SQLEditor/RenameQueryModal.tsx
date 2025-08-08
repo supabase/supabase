@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { getContentById } from 'data/content/content-id-query'
@@ -64,6 +66,8 @@ const RenameQueryModal = ({
       toast.error(`Failed to rename query: ${error.message}`)
     },
   })
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = !!check?.hasKey
 
   const generateTitle = async () => {
     if ('content' in snippet && isSQLSnippet) {
@@ -169,11 +173,19 @@ const RenameQueryModal = ({
               />
               <div className="flex w-full justify-end mt-2">
                 {!hasHipaaAddon && (
-                  <Button
+                  <ButtonTooltip
                     type="default"
                     onClick={() => generateTitle()}
                     size="tiny"
-                    disabled={isTitleGenerationLoading}
+                    disabled={isTitleGenerationLoading || !isApiKeySet}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isApiKeySet
+                          ? undefined
+                          : 'Add your `OPENAI_API_KEY` to your environment variables to use this feature.',
+                      },
+                    }}
                   >
                     <div className="flex items-center gap-1">
                       <div className="scale-75">
@@ -181,7 +193,7 @@ const RenameQueryModal = ({
                       </div>
                       <span>Rename with Supabase AI</span>
                     </div>
-                  </Button>
+                  </ButtonTooltip>
                 )}
               </div>
               <Input.TextArea
