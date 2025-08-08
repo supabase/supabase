@@ -1,12 +1,12 @@
-'use client'
-
-import { useBreakpoint } from 'common'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
-import { Button, ExpandingTextArea } from 'ui'
+
+import { useBreakpoint } from 'common'
+import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
-import { SnippetRow, getSnippetContent } from './SnippetRow'
+import { ButtonTooltip } from '../ButtonTooltip'
 import { type SqlSnippet } from './AIAssistant.types'
+import { SnippetRow, getSnippetContent } from './SnippetRow'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -124,18 +124,19 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
           <div className="absolute right-1.5 bottom-1.5 flex gap-3 items-center">
             {loading ? (
               onStop ? (
-                <Button
+                <ButtonTooltip
                   type="outline"
-                  aria-label="Stop generating"
-                  icon={<Square fill="currentColor" />}
+                  aria-label="Stop response"
+                  icon={<Square fill="currentColor" className="scale-75" />}
                   onClick={onStop}
                   className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
+                  tooltip={{ content: { side: 'top', text: 'Stop response' } }}
                 />
               ) : (
                 <Loader2 size={22} className="animate-spin size-7 text-muted" strokeWidth={1} />
               )
             ) : (
-              <Button
+              <ButtonTooltip
                 htmlType="submit"
                 aria-label="Send message"
                 icon={<ArrowUp />}
@@ -144,6 +145,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
                   'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
                   !canSubmit ? 'opacity-50' : 'opacity-100'
                 )}
+                tooltip={{ content: { side: 'top', text: 'Send message' } }}
               />
             )}
           </div>
