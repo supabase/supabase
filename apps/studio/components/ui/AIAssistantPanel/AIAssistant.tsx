@@ -163,7 +163,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     messages: chatMessages,
     status: chatStatus,
     error,
-    reload,
     sendMessage,
     setMessages,
     addToolResult,
