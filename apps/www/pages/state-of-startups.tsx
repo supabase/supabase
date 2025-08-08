@@ -29,6 +29,9 @@ function StateOfStartupsPage() {
 
   // Auto-rotate chapters for inline ToC
   useEffect(() => {
+    // Don't rotate if the ToC is open
+    if (isTocOpen) return
+
     const interval = setInterval(() => {
       setInlineRotatingChapter((prev) => {
         const next = prev + 1
@@ -37,7 +40,7 @@ function StateOfStartupsPage() {
     }, 1200)
 
     return () => clearInterval(interval)
-  }, [pageData.pageChapters.length])
+  }, [pageData.pageChapters.length, isTocOpen])
 
   // Scroll detection to show floating ToC
   useEffect(() => {
@@ -85,7 +88,13 @@ function StateOfStartupsPage() {
   // Close ToC when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (tocRef.current && !tocRef.current.contains(event.target as Node)) {
+      // Check both floating and inline refs
+      const isOutsideFloating = tocRef.current && !tocRef.current.contains(event.target as Node)
+      const isOutsideInline =
+        inlineTocRef.current && !inlineTocRef.current.contains(event.target as Node)
+
+      // Close if clicking outside the currently relevant ToC
+      if (showFloatingToc ? isOutsideFloating : isOutsideInline) {
         setIsTocOpen(false)
       }
     }
@@ -131,7 +140,6 @@ function StateOfStartupsPage() {
       >
         <div className={cn('relative', className)}>
           {/* Closed state - shows current chapter */}
-
           <Button
             type="default"
             size="small"
@@ -154,20 +162,12 @@ function StateOfStartupsPage() {
           {isTocOpen && (
             <div
               className={cn(
-                'bg-surface-100 border border-default rounded-md shadow-lg min-w-[300px] max-w-[400px] ',
+                'bg-surface-100 border border-default rounded-lg shadow-xl overflow-hidden min-w-[300px]',
                 // For inline variant, position absolutely to avoid layout shift
                 !isFloating &&
-                  'absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 -translate-y-1/2'
+                  'absolute top-full left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50'
               )}
             >
-              <div className="flex items-center justify-between p-4 border-b border-default">
-                <button
-                  onClick={() => setIsTocOpen(false)}
-                  className="text-muted hover:text-foreground transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
               <ol className="max-h-[60vh] overflow-y-auto">
                 {pageData.pageChapters.map((chapter, chapterIndex) => (
                   <li key={chapterIndex + 1}>
@@ -177,15 +177,18 @@ function StateOfStartupsPage() {
                       className={cn(
                         'block py-3 px-4 text-sm transition-colors',
                         chapterIndex + 1 === activeChapter
-                          ? 'bg-brand/10 text-brand border-r-2 border-brand'
-                          : 'text-foreground hover:bg-surface-200'
+                          ? 'bg-brand/10 text-brand'
+                          : 'text-foreground hover:bg-surface-300'
                       )}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-muted font-mono uppercase text-xs min-w-[2rem]">
-                          {chapterIndex + 1} / {pageData.pageChapters.length}
+                      <div className="flex justify-between gap-6">
+                        <span className="hidden bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light font-mono uppercase text-xs">
+                          {chapterIndex + 1}
                         </span>
-                        <span className="text-balance leading-relaxed">{chapter.title}</span>
+                        <span className="text-balance text-center flex-1">{chapter.title}</span>
+                        <span className="hidden opacity-0 bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light font-mono uppercase text-xs">
+                          {chapterIndex + 1}
+                        </span>
                       </div>
                     </Link>
                   </li>
@@ -201,12 +204,12 @@ function StateOfStartupsPage() {
   return (
     <>
       {/* <NextSeo {...pageData.seo} /> */}
-      <DefaultLayout className="!bg-alternative">
+      <DefaultLayout className="!bg-alternative overflow-hidden">
         {/* Floating version */}
         <TableOfContents variant="floating" />
 
         {/* Previously <Hero /> */}
-        <section ref={heroRef} className="relative w-full overflow-hidden">
+        <section ref={heroRef} className="relative w-full">
           {/* SVG shapes container */}
           <div className="absolute inset-0 -top-[30rem] xs:w-[calc(100%+50vw)] xs:-mx-[25vw]">
             <svg
