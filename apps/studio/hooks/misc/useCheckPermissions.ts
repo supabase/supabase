@@ -133,6 +133,9 @@ export function useGetProjectPermissions(
   }
 }
 
+/**
+ * @deprecated Use useAsyncCheckProjectPermissions instead
+ */
 export function useCheckPermissions(
   action: string,
   resource: string,

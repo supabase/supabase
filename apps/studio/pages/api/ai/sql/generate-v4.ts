@@ -1,25 +1,25 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, streamText, stepCountIs } from 'ai'
+import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
+import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 
 import {
-  GENERAL_PROMPT,
-  RLS_PROMPT,
-  PG_BEST_PRACTICES,
   CHAT_PROMPT,
-  SECURITY_PROMPT,
   EDGE_FUNCTION_PROMPT,
+  GENERAL_PROMPT,
+  PG_BEST_PRACTICES,
+  RLS_PROMPT,
+  SECURITY_PROMPT,
 } from 'lib/ai/prompts'
 
 export const maxDuration = 120
