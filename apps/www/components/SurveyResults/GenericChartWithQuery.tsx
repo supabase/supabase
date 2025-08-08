@@ -248,9 +248,6 @@ export function GenericChartWithQuery({
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      {/* Was CardContent:
-      <div ref={ref} className={cn('py-4 px-6 border-b last:border-none', className)} {...props} />
-       */}
       <div
         className={`${view === 'chart' ? 'bg-surface-100' : 'bg-surface-75'} border-b last:border-none`}
       >
@@ -269,7 +266,7 @@ export function GenericChartWithQuery({
               <div className="text-red-500">Error: {error}</div>
             </div>
           ) : view === 'chart' ? (
-            <div className="flex flex-col h-full w-full justify-between gap-[1px] px-6 py-6">
+            <div className="flex flex-col h-full w-full justify-between px-6 py-6">
               {/* Each bar as a vertical stack: label above, bar below */}
               <div
                 className="flex flex-col gap-10"
@@ -277,35 +274,39 @@ export function GenericChartWithQuery({
               >
                 {chartData.map((item, index) => (
                   <div key={index} className="flex flex-col">
-                    {/*  Above the bar */}
-                    <div className="mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums">
-                      {/* Label */}
+                    {/*  Text above the bar */}
+                    <div
+                      className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums ${item.value === maxValue ? 'text-brand-link dark:text-brand' : 'text-foreground'}`}
+                    >
                       <span>{item.label}</span>
-                      {/* Percentage */}
                       <span>{item.value < 1 ? '<1%' : `${item.value}%`}</span>
                     </div>
 
-                    {/* Bar */}
-                    <div className="flex items-center gap-3 rounded-xs overflow-hidden">
-                      {/* Bar container with flex layout */}
+                    {/* Entire bar (including background) */}
+                    <div
+                      className="h-[16px] flex items-center"
+                      style={
+                        {
+                          background: `repeating-linear-gradient(
+                            45deg,
+                            transparent,
+                            transparent 4px,
+                            color-mix(in srgb, hsl(var(--foreground-muted)) 30%, transparent) 4px,
+                            color-mix(in srgb, hsl(var(--foreground-muted)) 30%, transparent) 6px
+                          )`,
+                          '--reference': maxValue,
+                          '--bar-value': item.rawValue || item.value,
+                          '--index': index,
+                        } as React.CSSProperties
+                      }
+                    >
+                      {/* Filled portion of the bar */}
                       <div
-                        className="flex-1 h-[12px] relative flex items-center bg-surface-300/50 rounded-xs"
-                        style={
-                          {
-                            '--reference': maxValue,
-                            '--bar-value': item.rawValue || item.value, // Use rawValue for scaling
-                            '--index': index,
-                          } as React.CSSProperties
-                        }
-                      >
-                        {/* Animated Bar */}
-                        <div
-                          className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-selection'} rounded-sm transition-all duration-1000 delay-[calc(var(--index)*100ms)]`}
-                          style={{
-                            width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
-                          }}
-                        />
-                      </div>
+                        className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-muted'}`}
+                        style={{
+                          width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
+                        }}
+                      />
                     </div>
                   </div>
                 ))}

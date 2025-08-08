@@ -109,39 +109,30 @@ function StateOfStartupsPage() {
               isTocOpen && 'hidden'
             )}
           >
-            <motion.div
-              className={cn('flex items-center gap-2 font-mono uppercase text-xs')}
-              layout
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 30,
-              }}
-            >
+            <div className={cn('flex items-center gap-2 font-mono uppercase text-xs')}>
+              {/* <motion.span
+                className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.1 }}
+              >
+                {activeChapter}
+              </motion.span> */}
               <span className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light">
                 {activeChapter}
               </span>
               <motion.span
+                key={currentChapter?.shortTitle}
                 className="text-foreground tracking-widest"
-                layout
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                // transition={{
-                //   duration: 1,
-                //   ease: 'easeOut',
-                // }}
-                transition={{
-                  layout: {
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 30,
-                  },
-                  opacity: { duration: 0.2 },
-                }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.1 }}
               >
                 {currentChapter?.shortTitle}
               </motion.span>
-            </motion.div>
+            </div>
           </Button>
 
           {/* Open state - shows full table of contents */}
@@ -172,7 +163,7 @@ function StateOfStartupsPage() {
                       className={cn(
                         'block py-2 rounded-lg text-sm transition-colors text-balance text-center',
                         chapterIndex + 1 === activeChapter
-                          ? 'bg-brand/10 text-brand'
+                          ? 'bg-brand/10 text-brand-link dark:text-brand'
                           : 'text-foreground-light hover:text-foreground hover:bg-surface-300'
                       )}
                     >
@@ -340,6 +331,7 @@ function StateOfStartupsPage() {
               key={chapterIndex + 1}
               number={chapterIndex + 1}
               totalChapters={pageData.pageChapters.length}
+              shortTitle={chapter.shortTitle}
               title={chapter.title}
               description={chapter.description}
               pullQuote={chapter.pullQuote}

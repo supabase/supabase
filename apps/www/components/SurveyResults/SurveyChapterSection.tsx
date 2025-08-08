@@ -102,17 +102,24 @@ export function SurveyChapterSection({
   return (
     <div
       id={title.toLowerCase().replace(/\s+/g, '-')}
-      className="flex flex-col gap-6 border-t border-muted pt-24"
+      className="flex flex-col  border-t border-muted pt-24"
     >
       <header className="flex flex-col gap-3 text-center text-balance max-w-[48rem] mx-auto">
-        <h3 className="text-brand font-mono uppercase tracking-widest text-sm">{title}</h3>
+        <h3 className="text-brand-link dark:text-brand font-mono uppercase tracking-widest text-sm">
+          {title}
+        </h3>
         <p className="text-foreground text-xl leading-relaxed">{description}</p>
       </header>
 
       {stats && (
-        <aside className="flex flex-row divide-x bg-alternative">
+        <aside className="flex flex-row divide-x divide-muted divide-opacity-40 bg-surface-75">
           {stats.map((stat, index) => (
-            <SurveyStatCard key={index} number={stat.number} unit={stat.unit} label={stat.label} />
+            <SurveyStatCard
+              key={index}
+              progressValue={stat.number}
+              unit={stat.unit}
+              label={stat.label}
+            />
           ))}
         </aside>
       )}
