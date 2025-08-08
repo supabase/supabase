@@ -227,6 +227,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/cloud-marketplace/buyers/{buyer_id}/onboarding-info': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get info needed for AWS Marketplace onboarding */
+    get: operations['ClazarController_getCloudMarketplaceOnboardingInfo']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/database/{ref}/backups': {
     parameters: {
       query?: never
@@ -1634,23 +1651,6 @@ export interface paths {
     put?: never
     /** Creates organization billed by AWS Marketplace */
     post: operations['OrganizationsController_createAwsBilledOrganization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/cloud-marketplace/check-eligibility': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Check whether given organizations are eligible for AWS billing */
-    get: operations['OrganizationsController_checkCloudMarketplaceEligibility']
-    put?: never
-    post?: never
     delete?: never
     options?: never
     head?: never
@@ -4437,11 +4437,6 @@ export interface components {
     ChangeMFAEnforcementStateRequest: {
       enforced: boolean
     }
-    CheckCloudMarketplaceEligibilityResponse: {
-      is_eligible: boolean
-      reasons: string[]
-      slug: string
-    }[]
     CloneBackupsResponse: {
       backups: {
         id: number
@@ -4469,6 +4464,22 @@ export interface components {
       newProjectName: string
       /** @default 0 */
       recoveryTimeTarget?: number
+    }
+    CloudMarketplaceOnboardingInfoResponse: {
+      aws_contract_auto_renewal: boolean
+      aws_contract_end_date: string
+      aws_contract_settings_url: string
+      aws_contract_start_date: string
+      organization_linking_eligibility: {
+        is_eligible: boolean
+        reasons: (
+          | 'ALREADY_BILLED_BY_PARTNER'
+          | 'ALREADY_BILLED_BY_PARTNER_AWS'
+          | 'OVERDUE_INVOICES'
+        )[]
+        slug: string
+      }[]
+      plan_name_selected_on_marketplace: string
     }
     ConfirmCreateSubscriptionChangeBody: {
       kind?: string
@@ -6582,6 +6593,8 @@ export interface components {
     }
     OrganizationResponse: {
       billing_email: string | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -6634,9 +6647,8 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata: {
-        [key: string]: unknown
-      } | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -9760,6 +9772,34 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve CLI login session */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ClazarController_getCloudMarketplaceOnboardingInfo: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        buyer_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CloudMarketplaceOnboardingInfoResponse']
+        }
+      }
+      /** @description Failed to get info for AWS Marketplace onboarding */
       500: {
         headers: {
           [name: string]: unknown
@@ -13252,36 +13292,10 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateOrganizationResponse']
+          'application/json': components['schemas']['OrganizationResponse']
         }
       }
       /** @description Failed to create organization billed by AWS Marketplace */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationsController_checkCloudMarketplaceEligibility: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CheckCloudMarketplaceEligibilityResponse']
-        }
-      }
-      /** @description Failed to check whether organizations are eligible for AWS billing */
       500: {
         headers: {
           [name: string]: unknown
