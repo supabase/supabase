@@ -55,8 +55,8 @@ SELECT
 FROM 
   cron.job job
 LEFT JOIN most_recent_runs mr ON job.jobid = mr.jobid
-ORDER BY job.jobid
 ${!!searchTerm ? `WHERE job.jobname ILIKE '%${searchTerm}%'` : ''}
+ORDER BY job.jobid
 LIMIT ${CRON_JOBS_PAGE_LIMIT}
 OFFSET ${page * CRON_JOBS_PAGE_LIMIT};
 `.trim()
