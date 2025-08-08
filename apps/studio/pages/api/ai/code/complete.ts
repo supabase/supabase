@@ -62,7 +62,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       aiOptInLevel = orgAIOptInLevel
     }
 
-    const { model, error: modelError } = await getModel(projectRef)
+    // for code completions we use a different model for speed and cost
+    const { model, error: modelError } = await getModel(projectRef, true)
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
