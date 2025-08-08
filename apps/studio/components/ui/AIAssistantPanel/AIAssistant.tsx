@@ -106,7 +106,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
+  const { ref: scrollContainerRef, isSticky, scrollToEnd, setIsSticky } = useAutoScroll()
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showMetadataWarning =
@@ -403,6 +403,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
+
+  useEffect(() => {
+    if (chatMessages.length === 0 && !isSticky) setIsSticky(true)
+  }, [chatMessages, isSticky, setIsSticky])
 
   return (
     <ErrorBoundary
