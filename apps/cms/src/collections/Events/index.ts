@@ -17,7 +17,7 @@ import { Code } from '@/blocks/Code/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'
 import { Quote } from '@/blocks/Quote/config'
 import { YouTube } from '@/blocks/YouTube/config'
-import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
+import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent.ts'
 
 import {
   MetaDescriptionField,
@@ -27,7 +27,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '@/fields/slug'
-import { timezoneOptions } from '../../utilities/timezones'
+import { timezoneOptions } from '../../utilities/timezones.ts'
 
 const eventTypeOptions = [
   { label: 'Conference', value: 'conference' },

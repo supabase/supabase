@@ -17,8 +17,8 @@ import { Code } from '@/blocks/Code/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'
 import { Quote } from '@/blocks/Quote/config'
 import { YouTube } from '@/blocks/YouTube/config'
-import { populateAuthors } from './hooks/populateAuthors'
-import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
+import { populateAuthors } from './hooks/populateAuthors.ts'
+import { revalidateDelete, revalidatePost } from './hooks/revalidatePost.ts'
 
 import {
   MetaDescriptionField,

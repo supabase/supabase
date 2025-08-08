@@ -1,5 +1,5 @@
-import * as migration_20250619_155345 from './20250619_155345';
-import * as migration_20250619_160549 from './20250619_160549';
+import * as migration_20250619_155345 from './20250619_155345.ts';
+import * as migration_20250619_160549 from './20250619_160549.ts';
 
 export const migrations = [
   {

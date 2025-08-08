@@ -12,12 +12,12 @@ import {
 import { isAnyone } from '@/access/isAnyone'
 import { isAuthenticated } from '@/access/isAuthenticated'
 
-import { Banner } from '../../blocks/Banner/config'
-import { Code } from '../../blocks/Code/config'
-import { MediaBlock } from '../../blocks/MediaBlock/config'
-import { Quote } from '../../blocks/Quote/config'
-import { YouTube } from '../../blocks/YouTube/config'
-import { revalidateDelete, revalidateCustomer } from './hooks/revalidateCustomer'
+import { Banner } from '../../blocks/Banner/config.ts'
+import { Code } from '../../blocks/Code/config.ts'
+import { MediaBlock } from '../../blocks/MediaBlock/config.ts'
+import { Quote } from '../../blocks/Quote/config.ts'
+import { YouTube } from '../../blocks/YouTube/config.ts'
+import { revalidateDelete, revalidateCustomer } from './hooks/revalidateCustomer.ts'
 
 import {
   MetaDescriptionField,
