@@ -68,7 +68,7 @@ export const MonacoEditor = ({
         lineNumbersMinChars: 0,
         scrollBeyondLastLine: false,
         wordWrap: 'on',
-        unusualLineTerminators: 'auto',
+        unusualLineTerminators: 'off',
       }}
     />
   )
