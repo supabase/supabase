@@ -54,6 +54,14 @@ const SQL_PATTERNS = {
 
 const DEFAULT_SCHEMA = 'public' as const
 
+// Entity types that require entity list invalidation
+const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = [
+  'table',
+  'view',
+  'materialized_view',
+  'foreign_table',
+]
+
 /**
  * QueryCacheInvalidator handles smart cache invalidation for database schema changes
  * It parses SQL statements, determines affected entities, and invalidates the appropriate React Query caches
@@ -314,15 +322,7 @@ export class QueryCacheInvalidator {
     projectRef: string,
     entityType: EntityType
   ): Promise<void> {
-    // Entity types that require entity list invalidation
-    const entityTypesRequiringListInvalidation: EntityType[] = [
-      'table',
-      'view',
-      'materialized_view',
-      'foreign_table',
-    ]
-
-    if (entityTypesRequiringListInvalidation.includes(entityType)) {
+    if (ENTITY_TYPES_REQUIRING_LIST_INVALIDATION.includes(entityType)) {
       await this.queryClient.invalidateQueries({
         queryKey: entityTypeKeys.list(projectRef),
         exact: false,
