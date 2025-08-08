@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { streamText } from 'ai'
+import { streamText, stepCountIs } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -71,9 +71,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         )
       : { result: [] }
 
-    const result = await streamText({
+    const result = streamText({
       model,
-      maxSteps: 5,
+      stopWhen: stepCountIs(2),
       tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
       system: source`
         VERY IMPORTANT RULES:
@@ -287,30 +287,25 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         REMEMBER: ONLY OUTPUT THE CODE MODIFICATION.
       `,
-      messages: [
-        {
-          role: 'user',
-          content: source`
-            You are helping me write TypeScript/JavaScript code for an edge function.
-            Here is the context:
-            ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
-            
-            Instructions:
-            1. Only modify the selected text based on this prompt: ${prompt}
-            2. Your response should be ONLY the modified selection text, nothing else. Remove selected text if needed.
-            3. Do not wrap in code blocks or markdown
-            4. You can respond with one word or multiple words
-            5. Ensure the modified text flows naturally within the current line
-            6. Avoid duplicating variable declarations, imports, or function definitions when considering the full code
-            7. If there is no surrounding context (before or after), make sure your response is a complete valid Deno Edge Function including imports.
-            
-            Modify the selected text now:
-          `,
-        },
-      ],
+      prompt: source`
+              You are helping me write TypeScript/JavaScript code for an edge function.
+              Here is the context:
+              ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
+              
+              Instructions:
+              1. Only modify the selected text based on this prompt: ${prompt}
+              2. Your response should be ONLY the modified selection text, nothing else. Remove selected text if needed.
+              3. Do not wrap in code blocks or markdown
+              4. You can respond with one word or multiple words
+              5. Ensure the modified text flows naturally within the current line
+              6. Avoid duplicating variable declarations, imports, or function definitions when considering the full code
+              7. If there is no surrounding context (before or after), make sure your response is a complete valid Deno Edge Function including imports.
+              
+              Modify the selected text now:
+            `,
     })
 
-    return result.pipeDataStreamToResponse(res)
+    return result.pipeUIMessageStreamToResponse(res)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({

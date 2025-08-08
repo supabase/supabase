@@ -1,7 +1,8 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCompletion } from 'ai/react'
-import { ChevronUp, Loader2 } from 'lucide-react'
+import { useCompletion } from '@ai-sdk/react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronUp, Command, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -463,9 +464,6 @@ export const SQLEditor = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       includeSchemaMetadata,
-    },
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
     },
     onError: (error) => {
       toast.error(`Failed to generate SQL: ${error.message}`)
