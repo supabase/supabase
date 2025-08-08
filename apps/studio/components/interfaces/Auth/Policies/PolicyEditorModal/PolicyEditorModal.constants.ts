@@ -50,26 +50,6 @@ with check (true);`.trim(),
   {
     id: 'policy-3',
     preview: false,
-    templateName: 'Enable update access for users based on their email *',
-    description:
-      'This policy assumes that your table has a column "email", and allows users to update rows which the "email" column matches their email.',
-    statement: `
-create policy "Enable update for users based on email"
-on "${schema}"."${table}"
-for update using (
-  (select auth.jwt()) ->> 'email' = email
-) with check (
-  (select auth.jwt()) ->> 'email' = email
-);`.trim(),
-    name: 'Enable update for users based on email',
-    definition: `(select auth.jwt()) ->> 'email' = email`,
-    check: `(select auth.jwt()) ->> 'email' = email`,
-    command: 'UPDATE',
-    roles: [],
-  },
-  {
-    id: 'policy-4',
-    preview: false,
     templateName: 'Enable delete access for users based on their user ID *',
     description:
       'This policy assumes that your table has a column "user_id", and allows users to delete rows which the "user_id" column matches their ID',
@@ -86,7 +66,7 @@ for delete using (
     roles: [],
   },
   {
-    id: 'policy-5',
+    id: 'policy-4',
     preview: false,
     templateName: 'Enable insert access for users based on their user ID *',
     description:
@@ -104,7 +84,7 @@ for insert with check (
     roles: [],
   },
   {
-    id: 'policy-6',
+    id: 'policy-5',
     preview: true,
     name: 'Policy with table joins',
     templateName: 'Policy with table joins',
@@ -126,7 +106,7 @@ on teams for update using (
     roles: [],
   },
   {
-    id: 'policy-7',
+    id: 'policy-6',
     preview: true,
     templateName: 'Policy with security definer functions',
     description: `
@@ -152,7 +132,7 @@ for all using (
     roles: [],
   },
   {
-    id: 'policy-8',
+    id: 'policy-7',
     preview: true,
     name: 'Policy to implement Time To Live (TTL)',
     templateName: 'Policy to implement Time To Live (TTL)',
@@ -173,7 +153,7 @@ for select using (
     roles: [],
   },
   {
-    id: 'policy-9',
+    id: 'policy-8',
     preview: false,
     templateName: 'Allow users to only view their own data',
     description: 'Restrict users to reading only their own data.',

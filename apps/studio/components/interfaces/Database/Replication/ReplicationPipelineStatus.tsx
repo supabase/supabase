@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, ChevronLeft, Copy, ExternalLink, Search } from 'lucide-react'
+import { Activity, ChevronLeft, ExternalLink, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -16,14 +16,20 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { Badge, Button, cn, copyToClipboard, Input_Shadcn_ } from 'ui'
+import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { ErroredTableDetails } from './ErroredTableDetails'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 
+/**
+ * Component for displaying replication pipeline status and table replication details.
+ * Supports both legacy 'error' state and new 'errored' state with retry policies.
+ */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [filterString, setFilterString] = useState<string>('')
@@ -84,27 +90,12 @@ export const ReplicationPipelineStatus = () => {
           table.table_name.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  const errorTables = tableStatuses.filter((table: TableState) => table.state.name === 'error')
-  const hasErrors = errorTables.length > 0
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
   const isEnablingDisabling =
     requestStatus === PipelineStatusRequestStatus.EnableRequested ||
     requestStatus === PipelineStatusRequestStatus.DisableRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
-
-  const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
-    const statusText = `Table: ${tableName}\nStatus: ${state.name}${
-      'message' in state ? `\nError: ${state.message}` : ''
-    }${'lag' in state ? `\nLag: ${state.lag}ms` : ''}`
-
-    try {
-      await copyToClipboard(statusText)
-      toast.success('Table status copied to clipboard')
-    } catch {
-      toast.error(PIPELINE_ERROR_MESSAGES.COPY_TABLE_STATUS)
-    }
-  }
 
   const onTogglePipeline = async () => {
     if (!projectRef) {
@@ -158,19 +149,32 @@ export const ReplicationPipelineStatus = () => {
               className="absolute left-2 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
               size={14}
             />
-            <Input_Shadcn_
+            <Input
               className="pl-7 h-[26px] text-xs"
               placeholder="Search for tables"
               value={filterString}
               disabled={isPipelineError}
               onChange={(e) => setFilterString(e.target.value)}
+              actions={
+                filterString.length > 0
+                  ? [
+                      <X
+                        key="close"
+                        className="mx-2 cursor-pointer text-foreground"
+                        size={14}
+                        strokeWidth={2}
+                        onClick={() => setFilterString('')}
+                      />,
+                    ]
+                  : undefined
+              }
             />
           </div>
           <Button
             type={statusName === 'stopped' ? 'primary' : 'default'}
             onClick={() => onTogglePipeline()}
             loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-            disabled={!['failed', 'started', 'stopped'].includes(statusName ?? '')}
+            disabled={!['failed', 'started', 'stopped', 'stopping'].includes(statusName ?? '')}
           >
             {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
           </Button>
@@ -188,38 +192,6 @@ export const ReplicationPipelineStatus = () => {
           error={statusError}
           subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_REPLICATION_STATUS}
         />
-      )}
-
-      {hasErrors && (
-        <div className="p-4 border border-destructive-300 bg-destructive-100 rounded-lg">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-destructive-600 mt-0.5 shrink-0" />
-            <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-destructive-900 mb-1">
-                {errorTables.length} table{errorTables.length > 1 ? 's' : ''} failed
-              </h4>
-              <p className="text-sm text-destructive-700 mb-3">
-                Some tables encountered replication errors. Check the logs for detailed error
-                information.
-              </p>
-              <Button
-                asChild
-                type="outline"
-                size="tiny"
-                icon={<ExternalLink className="w-3 h-3" />}
-                className="text-destructive-600 border-destructive-300 hover:bg-destructive-50"
-              >
-                <Link
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  href={`/project/${projectRef}/logs/postgres-logs`}
-                >
-                  View Logs
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
       )}
 
       {hasTableData && (
@@ -254,93 +226,86 @@ export const ReplicationPipelineStatus = () => {
                 <Table.th key="table">Table</Table.th>,
                 <Table.th key="status">Status</Table.th>,
                 <Table.th key="details">Details</Table.th>,
-                <Table.th key="actions" className="w-16 text-center">
-                  Actions
-                </Table.th>,
               ]}
-              body={filteredTableStatuses.map((table: TableState, index: number) => {
-                const statusConfig = getStatusConfig(table.state)
-                return (
-                  <Table.tr key={`${table.table_name}-${index}`} className="border-t">
-                    <Table.td>
-                      <div className="flex items-center gap-x-2">
-                        <p>{table.table_name}</p>
-
-                        <ButtonTooltip
-                          asChild
-                          type="text"
-                          className="px-1.5"
-                          icon={<ExternalLink />}
-                          tooltip={{ content: { side: 'bottom', text: 'Open in Table Editor' } }}
-                        >
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`/project/${projectRef}/editor/${table.table_id}`}
-                          />
-                        </ButtonTooltip>
-                      </div>
-                    </Table.td>
-                    <Table.td>
-                      {showDisabledState ? (
-                        <Badge variant="default">Not Available</Badge>
-                      ) : (
-                        statusConfig.badge
-                      )}
-                    </Table.td>
-                    <Table.td>
-                      {showDisabledState ? (
-                        <p className="text-sm text-foreground-lighter">
-                          Status unavailable while pipeline is {config.badge.toLowerCase()}
-                        </p>
-                      ) : (
+              body={
+                <>
+                  {filteredTableStatuses.length === 0 && hasTableData && (
+                    <Table.tr>
+                      <Table.td colSpan={3}>
                         <div className="space-y-1">
-                          <div className="text-sm text-foreground">{statusConfig.description}</div>
-                          {'lag' in table.state && (
-                            <div className="text-xs text-foreground-light">
-                              Lag: {table.state.lag}ms
+                          <p className="text-sm text-foreground">No results found</p>
+                          <p className="text-sm text-foreground-light">
+                            Your search for "{filterString}" did not return any results
+                          </p>
+                        </div>
+                      </Table.td>
+                    </Table.tr>
+                  )}
+                  {filteredTableStatuses.map((table: TableState, index: number) => {
+                    const statusConfig = getStatusConfig(table.state)
+                    return (
+                      <Table.tr key={`${table.table_name}-${index}`} className="border-t">
+                        <Table.td className="align-top">
+                          <div className="flex items-center gap-x-2">
+                            <p>{table.table_name}</p>
+
+                            <ButtonTooltip
+                              asChild
+                              type="text"
+                              className="px-1.5"
+                              icon={<ExternalLink />}
+                              tooltip={{
+                                content: { side: 'bottom', text: 'Open in Table Editor' },
+                              }}
+                            >
+                              <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href={`/project/${projectRef}/editor/${table.table_id}`}
+                              />
+                            </ButtonTooltip>
+                          </div>
+                        </Table.td>
+                        <Table.td className="align-top">
+                          {showDisabledState ? (
+                            <Badge variant="default">Not Available</Badge>
+                          ) : (
+                            statusConfig.badge
+                          )}
+                        </Table.td>
+                        <Table.td className="align-top">
+                          {showDisabledState ? (
+                            <p className="text-sm text-foreground-lighter">
+                              Status unavailable while pipeline is {config.badge.toLowerCase()}
+                            </p>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="text-sm text-foreground">
+                                {statusConfig.description}
+                              </div>
+                              {'lag' in table.state && (
+                                <div className="text-xs text-foreground-light">
+                                  Lag: {table.state.lag}ms
+                                </div>
+                              )}
+                              {table.state.name === 'error' && (
+                                <ErroredTableDetails
+                                  state={table.state}
+                                  tableName={table.table_name}
+                                  tableId={table.table_id}
+                                />
+                              )}
                             </div>
                           )}
-                        </div>
-                      )}
-                    </Table.td>
-                    <Table.td className="text-center">
-                      <ButtonTooltip
-                        type="text"
-                        size="tiny"
-                        icon={<Copy className="w-3 h-3" />}
-                        className="px-1.5"
-                        disabled={showDisabledState}
-                        onClick={() => handleCopyTableStatus(table.table_name, table.state)}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: showDisabledState
-                              ? `Copy unavailable while pipeline is ${config.badge.toLowerCase()}`
-                              : 'Copy status details',
-                          },
-                        }}
-                      />
-                    </Table.td>
-                  </Table.tr>
-                )
-              })}
+                        </Table.td>
+                      </Table.tr>
+                    )
+                  })}
+                </>
+              }
             />
           </div>
         </div>
-      )}
-
-      {filteredTableStatuses.length === 0 && hasTableData && (
-        <Table.tr>
-          <Table.td colSpan={4}>
-            <div className="space-y-1">
-              <p className="text-sm text-foreground">No results found</p>
-              <p className="text-sm text-foreground-light">
-                Your search for "{filterString}" did not return any results
-              </p>
-            </div>
-          </Table.td>
-        </Table.tr>
       )}
 
       {!isStatusLoading && tableStatuses.length === 0 && (

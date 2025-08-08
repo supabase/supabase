@@ -2504,6 +2504,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/api-keys/temporary': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create a temporary API key */
+    post: operations['ApiKeysController_createTemporaryApiKey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/api/graphql': {
     parameters: {
       query?: never
@@ -3449,10 +3466,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get all replication pipelines. */
+    /** Retrieves all replication pipelines. */
     get: operations['ReplicationPipelinesController_getPipelines']
     put?: never
-    /** Create a replication pipeline. */
+    /** Creates a replication pipeline. */
     post: operations['ReplicationPipelinesController_createPipeline']
     delete?: never
     options?: never
@@ -3467,12 +3484,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get a replication pipeline by ID. */
+    /** Retrieves a replication pipeline by ID. */
     get: operations['ReplicationPipelinesController_getPipeline']
     put?: never
-    /** Update a replication pipeline. */
+    /** Updates a replication pipeline. */
     post: operations['ReplicationPipelinesController_updatePipeline']
-    /** Delete a replication pipeline. */
+    /** Deletes a replication pipeline. */
     delete: operations['ReplicationPipelinesController_deletePipeline']
     options?: never
     head?: never
@@ -3486,10 +3503,27 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the status of a replication pipeline. */
+    /** Retrieves the replication status of a pipeline. */
     get: operations['ReplicationPipelinesController_getPipelineReplicationStatus']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Rolls back the state of a table in the pipeline. */
+    post: operations['ReplicationPipelinesController_rollbackTableState']
     delete?: never
     options?: never
     head?: never
@@ -3505,7 +3539,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Start a replication pipeline. */
+    /** Starts a replication pipeline. */
     post: operations['ReplicationPipelinesController_startPipeline']
     delete?: never
     options?: never
@@ -3520,7 +3554,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the status of a replication pipeline. */
+    /** Retrieves the status of a replication pipeline. */
     get: operations['ReplicationPipelinesController_getPipelineStatus']
     put?: never
     post?: never
@@ -3539,7 +3573,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Stop a replication pipeline. */
+    /** Stops a replication pipeline. */
     post: operations['ReplicationPipelinesController_stopPipeline']
     delete?: never
     options?: never
@@ -7592,9 +7626,25 @@ export interface components {
               name: 'following_wal'
             }
           | {
-              message: string
               /** @enum {string} */
               name: 'error'
+              reason: string
+              retry_policy:
+                | {
+                    /** @enum {string} */
+                    policy: 'no_retry'
+                  }
+                | {
+                    /** @enum {string} */
+                    policy: 'manual_retry'
+                  }
+                | {
+                    /** @description The time of the next retry (RFC3339 format) */
+                    next_retry: string
+                    /** @enum {string} */
+                    policy: 'timed_retry'
+                  }
+              solution?: string
             }
         /** @description Table id (internal Postgres OID) */
         table_id: number
@@ -7665,34 +7715,10 @@ export interface components {
       /** @description Pipeline id */
       pipeline_id: number
       /** @description Pipeline status */
-      status:
-        | {
-            /** @enum {string} */
-            name: 'stopped'
-          }
-        | {
-            /** @enum {string} */
-            name: 'starting'
-          }
-        | {
-            /** @enum {string} */
-            name: 'started'
-          }
-        | {
-            /** @enum {string} */
-            name: 'stopping'
-          }
-        | {
-            /** @enum {string} */
-            name: 'unknown'
-          }
-        | {
-            exit_code?: number | null
-            message?: string | null
-            /** @enum {string} */
-            name: 'failed'
-            reason?: string | null
-          }
+      status: {
+        /** @enum {string} */
+        name: 'stopped' | 'starting' | 'started' | 'stopping' | 'unknown' | 'failed'
+      }
     }
     ReplicationPublicationsResponse: {
       /** @description List of publications */
@@ -7795,6 +7821,61 @@ export interface components {
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
     }[]
+    RollbackTableStateBody: {
+      /**
+       * @description Rollback type
+       * @enum {string}
+       */
+      rollback_type: 'individual' | 'full'
+      /** @description Table id (internal Postgres OID) */
+      table_id: number
+    }
+    RollbackTableStateResponse: {
+      /** @description Table replication state */
+      new_state:
+        | {
+            /** @enum {string} */
+            name: 'queued'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copying_table'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copied_table'
+          }
+        | {
+            lag: number
+            /** @enum {string} */
+            name: 'following_wal'
+          }
+        | {
+            /** @enum {string} */
+            name: 'error'
+            reason: string
+            retry_policy:
+              | {
+                  /** @enum {string} */
+                  policy: 'no_retry'
+                }
+              | {
+                  /** @enum {string} */
+                  policy: 'manual_retry'
+                }
+              | {
+                  /** @description The time of the next retry (RFC3339 format) */
+                  next_retry: string
+                  /** @enum {string} */
+                  policy: 'timed_retry'
+                }
+            solution?: string
+          }
+      /** @description Pipeline id */
+      pipeline_id: number
+      /** @description Table id (internal Postgres OID) */
+      table_id: number
+    }
     RunLintByNameResponse: {
       lints: {
         cache_key: string
@@ -8077,6 +8158,9 @@ export interface components {
       page_title: string
       page_url: string
       pathname: string
+    }
+    TemporaryApiKeyResponse: {
+      api_key: string
     }
     TransferProjectBody: {
       target_organization_slug: string
@@ -8825,9 +8909,9 @@ export interface components {
         publication_name: string
       }
       /** @description Destination id */
-      destination_id?: number
+      destination_id: number
       /** @description Source id */
-      source_id?: number
+      source_id: number
     }
     UpdateSchemaBody: {
       name?: string
@@ -16463,6 +16547,38 @@ export interface operations {
       }
     }
   }
+  ApiKeysController_createTemporaryApiKey: {
+    parameters: {
+      query: {
+        authorization_exp: string
+        claims: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Temporary API key */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TemporaryApiKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ProjectsApiController_projectGraphql: {
     parameters: {
       query?: never
@@ -19136,7 +19252,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns all pipelines. */
+      /** @description Returns all replication pipelines. */
       200: {
         headers: {
           [name: string]: unknown
@@ -19151,7 +19267,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get replication pipelines. */
+      /** @description Fails to retrieve replication pipelines. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19176,7 +19292,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returns the created replication pipeline ID. */
+      /** @description Returns the ID of the created replication pipeline. */
       201: {
         headers: {
           [name: string]: unknown
@@ -19191,7 +19307,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to create pipeline. */
+      /** @description Fails to create replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19214,7 +19330,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline. */
+      /** @description Returns the details of the specified replication pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -19229,7 +19345,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline. */
+      /** @description Fails to retrieve replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19256,7 +19372,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returned when the pipeline is updated. */
+      /** @description Returns when the replication pipeline is successfully updated. */
       201: {
         headers: {
           [name: string]: unknown
@@ -19269,7 +19385,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update pipeline. */
+      /** @description Fails to update replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19292,7 +19408,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is deleted. */
+      /** @description Returns when the replication pipeline is successfully deleted. */
       200: {
         headers: {
           [name: string]: unknown
@@ -19305,7 +19421,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to delete pipeline. */
+      /** @description Fails to delete replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19328,7 +19444,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline replication status. */
+      /** @description Returns the replication status of the pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -19343,7 +19459,49 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline replication status. */
+      /** @description Fails to retrieve pipeline replication status. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_rollbackTableState: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RollbackTableStateBody']
+      }
+    }
+    responses: {
+      /** @description Returns the table state after the rollback. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RollbackTableStateResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Fails to roll back table state. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19366,7 +19524,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is started. */
+      /** @description Returns when the replication pipeline is successfully started. */
       200: {
         headers: {
           [name: string]: unknown
@@ -19379,7 +19537,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to start pipeline. */
+      /** @description Fails to start replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19402,7 +19560,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline status. */
+      /** @description Returns the current status of the replication pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -19417,7 +19575,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline status. */
+      /** @description Fails to retrieve pipeline status. */
       500: {
         headers: {
           [name: string]: unknown
@@ -19440,7 +19598,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is stopped. */
+      /** @description Returns when the replication pipeline is successfully stopped. */
       200: {
         headers: {
           [name: string]: unknown
@@ -19453,7 +19611,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to stop pipeline. */
+      /** @description Fails to stop replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown

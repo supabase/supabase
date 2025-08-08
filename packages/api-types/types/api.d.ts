@@ -3318,6 +3318,49 @@ export interface components {
        */
       template_url?: string
     }
+    V1GetUsageApiCountResponse: {
+      error?:
+        | string
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: {
+        /** Format: date-time */
+        timestamp: string
+        total_auth_requests: number
+        total_realtime_requests: number
+        total_rest_requests: number
+        total_storage_requests: number
+      }[]
+    }
+    V1GetUsageApiRequestsCountResponse: {
+      error?:
+        | string
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: {
+        count: number
+      }[]
+    }
     V1ListMigrationsResponse: {
       name?: string
       version: string
@@ -4281,7 +4324,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['V1GetUsageApiCountResponse']
         }
       }
       403: {
@@ -4316,8 +4359,14 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['V1GetUsageApiRequestsCountResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get project's usage api requests count */
       500: {

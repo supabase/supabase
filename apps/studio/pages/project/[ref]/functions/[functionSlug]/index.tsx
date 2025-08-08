@@ -22,7 +22,7 @@ import {
 } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -142,11 +142,11 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const canReadFunction = useCheckPermissions(
+  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckProjectPermissions(
     PermissionAction.FUNCTIONS_READ,
     functionSlug as string
   )
-  if (!canReadFunction) {
+  if (!canReadFunction && !permissionsLoading) {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
 

@@ -92,7 +92,7 @@
     "next-plugin-yaml": "^1.0.1",
     "next-themes": "^0.3.0",
     "nuqs": "^1.19.1",
-    "openai": "^4.20.1",
+    "openai": "^4.75.1",
     "openapi-fetch": "0.12.4",
     "react": "catalog:",
     "react-copy-to-clipboard": "^5.1.0",
@@ -118,7 +118,7 @@
     "uuid": "^9.0.1",
     "valtio": "catalog:",
     "yaml": "^2.4.5",
-    "zod": "^3.22.4"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@graphiql/toolkit": "^0.9.1",

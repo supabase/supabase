@@ -50,8 +50,8 @@ const createTable = async (page: Page, tableName: string, newColumnName: string)
 }
 
 const deleteTable = async (page: Page, tableName: string) => {
-  await page.getByLabel(`View ${tableName}`, { exact: true }).click()
-  await page.getByLabel(`View ${tableName}`, { exact: true }).getByRole('button').nth(1).click()
+  await page.getByLabel(`View ${tableName}`).nth(0).click()
+  await page.getByLabel(`View ${tableName}`).getByRole('button').nth(1).click()
   await page.getByText('Delete table').click()
   await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
   await page.getByRole('button', { name: 'Delete' }).click()
@@ -67,11 +67,9 @@ test.describe('Database', () => {
   test.beforeAll(async ({ browser, ref }) => {
     page = await browser.newPage()
     await page.goto(toUrl(`/project/${ref}/editor`))
-    await page.waitForTimeout(1000)
-    if (
-      (await page.getByRole('button', { name: `View ${databaseTableName}`, exact: true }).count()) >
-      0
-    ) {
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
+
+    if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
       await deleteTable(page, databaseTableName)
     }
 
@@ -80,25 +78,27 @@ test.describe('Database', () => {
 
   test.afterAll(async ({ ref }) => {
     await page.goto(toUrl(`/project/${ref}/editor`))
-    await page.waitForTimeout(1000)
-    if (
-      (await page.getByRole('button', { name: `View ${databaseTableName}`, exact: true }).count()) >
-      0
-    ) {
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
+    if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
       await deleteTable(page, databaseTableName)
     }
   })
 
   test.describe('Schema Visualizer', () => {
     test('actions works as expected', async ({ page, ref }) => {
-      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schemea=public`))
+      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
 
       // Wait for schema visualizer to load
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=public')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
 
       // validates table and column exists
       await page.waitForTimeout(500)
-      await expect(page.getByText(databaseTableName)).toBeVisible()
+      await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
       await expect(page.getByText(databaseColumnName)).toBeVisible()
 
       // copies schema definition to clipboard
@@ -122,7 +122,12 @@ test.describe('Database', () => {
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=auth')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=auth'
+      )
       await expect(page.getByText('users')).toBeVisible()
       await expect(page.getByText('sso_providers')).toBeVisible()
       await expect(page.getByText('saml_providers')).toBeVisible()
@@ -140,13 +145,20 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=public')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
 
       // check new table button is present in public schema
       await expect(page.getByRole('button', { name: 'New table' })).toBeVisible()
 
       // validates database name is present and has accurate number of columns
-      const tableRow = await page.getByRole('row', { name: databaseTableName })
+      const tableRow = await page.getByRole('row', {
+        name: `${databaseTableName} No description`,
+      })
       await expect(tableRow).toContainText(databaseTableName)
       await expect(tableRow).toContainText('3 columns')
 
@@ -154,7 +166,12 @@ test.describe('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=auth')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=auth'
+      )
       await expect(page.getByText('sso_providers')).toBeVisible()
       // check new table button is not present in other schemas
       await expect(page.getByRole('button', { name: 'New table' })).not.toBeVisible()
@@ -170,7 +187,12 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=public')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
 
       // drop database tables if exists
       if ((await page.getByText(databaseTableNameNew, { exact: true }).count()) > 0) {
@@ -178,7 +200,7 @@ test.describe('Database', () => {
         await page.getByRole('menuitem', { name: 'Delete table' }).click()
         await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
         await page.getByRole('button', { name: 'Delete' }).click()
-        await waitForApiResponse(page, ref, 'query?key=table-delete')
+        await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete')
       }
 
       if ((await page.getByText(databaseTableNameUpdated, { exact: true }).count()) > 0) {
@@ -186,7 +208,7 @@ test.describe('Database', () => {
         await page.getByRole('menuitem', { name: 'Delete table' }).click()
         await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
         await page.getByRole('button', { name: 'Delete' }).click()
-        await waitForApiResponse(page, ref, 'query?key=table-delete')
+        await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete')
       }
 
       if ((await page.getByText(databaseTableNameDuplicate, { exact: true }).count()) > 0) {
@@ -197,7 +219,7 @@ test.describe('Database', () => {
         await page.getByRole('menuitem', { name: 'Delete table' }).click()
         await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
         await page.getByRole('button', { name: 'Delete' }).click()
-        await waitForApiResponse(page, ref, 'query?key=table-delete')
+        await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete')
       }
 
       // create a new table
@@ -206,8 +228,13 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Save' }).click()
 
       // validate table creation
-      await waitForApiResponse(page, ref, 'query?key=table-create')
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=public')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-create')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
       await expect(page.getByText(databaseTableNameNew, { exact: true })).toBeVisible()
 
       // edit a new table
@@ -217,8 +244,13 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Save' }).click()
 
       // validate table update
-      await waitForApiResponse(page, ref, 'query?key=table-update')
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=public')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-update')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
 
       // duplicate table
@@ -229,8 +261,13 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Save' }).click()
 
       // validate table duplicate
-      await waitForApiResponse(page, ref, 'query?key=')
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=public')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
       await expect(page.getByText(databaseTableNameDuplicate, { exact: true })).toBeVisible()
 
       // delete tables
@@ -241,7 +278,7 @@ test.describe('Database', () => {
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
       await page.getByRole('button', { name: 'Delete' }).click()
-      await waitForApiResponse(page, ref, 'query?key=table-delete')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete')
 
       await page
         .getByRole('row', { name: `${databaseTableNameUpdated}` })
@@ -250,7 +287,7 @@ test.describe('Database', () => {
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
       await page.getByRole('button', { name: 'Delete' }).click()
-      await waitForApiResponse(page, ref, 'query?key=table-delete')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete')
 
       // validate navigating to table editor from database table page
       await page.getByRole('row', { name: databaseTableName }).getByRole('button').click()
@@ -265,7 +302,12 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(page, ref, 'tables?include_columns=true&included_schemas=public')
+      await waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
 
       // navigate to table columns
       const databaseRow = page.getByRole('row', { name: databaseTableName })
@@ -287,8 +329,8 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Save' }).click()
 
       // wait for response + validate
-      await waitForApiResponse(page, ref, 'query?key=column-create')
-      await waitForApiResponse(page, ref, 'query?key=table-editor-')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=column-create')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-editor-')
       const columnDatabase2Row = page.getByRole('row', { name: databaseColumnName2 })
       await expect(columnDatabase2Row).toContainText(databaseColumnName2)
       await expect(columnDatabase2Row).toContainText('numeric')
@@ -300,8 +342,8 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Save' }).click()
 
       // wait for response + validate
-      await waitForApiResponse(page, ref, 'query?key=column-update')
-      await waitForApiResponse(page, ref, 'query?key=table-editor-')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=column-update')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-editor-')
 
       // delete table column
       const columnDatabase3Row = page.getByRole('row', { name: databaseColumnName3 })
@@ -311,8 +353,8 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Delete' }).click()
 
       // wait for response + validate
-      await waitForApiResponse(page, ref, 'query?key=column-delete')
-      await waitForApiResponse(page, ref, 'query?key=table-editor-')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=column-delete')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-editor-')
       await expect(
         page.getByText(`Successfully deleted column "${databaseColumnName3}"`),
         'Delete confirmation toast should be visible'
@@ -330,7 +372,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
       // Wait for database triggers to be populated
-      await waitForApiResponse(page, ref, 'triggers')
+      await waitForApiResponse(page, 'pg-meta', ref, 'triggers')
 
       // create new trigger button to exist in public schema
       await expect(page.getByRole('button', { name: 'New trigger' })).toBeVisible()
@@ -353,7 +395,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
       // Wait for database triggers to be populated
-      await waitForApiResponse(page, ref, 'triggers')
+      await waitForApiResponse(page, 'pg-meta', ref, 'triggers')
 
       // delete trigger if exists
       if ((await page.getByRole('button', { name: databaseTriggerName }).count()) > 0) {
@@ -374,7 +416,7 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'New trigger' }).click()
       await page.getByRole('textbox', { name: 'Name of trigger' }).fill(databaseTriggerName)
       await page.getByRole('combobox').first().click()
-      await page.getByRole('option', { name: `public.${databaseTableName}` }).click()
+      await page.getByRole('option', { name: `public.${databaseTableName}`, exact: true }).click()
       await page.getByRole('checkbox').first().click()
       await page.getByRole('checkbox').nth(1).click()
       await page.getByRole('checkbox').nth(2).click()
@@ -383,7 +425,7 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Create trigger' }).click()
 
       // validate trigger creation
-      await waitForApiResponse(page, ref, 'query?key=trigger-create')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=trigger-create')
       await expect(
         page.getByText(`Successfully created trigger`),
         'Trigger creation confirmation toast should be visible'
@@ -401,7 +443,7 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Create trigger' }).click()
 
       // validate trigger update
-      await waitForApiResponse(page, ref, 'query?key=trigger-update')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=trigger-update')
       await expect(
         page.getByText(`Successfully updated trigger`),
         'Trigger updated confirmation toast should be visible'
@@ -435,7 +477,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
-      await waitForApiResponse(page, ref, 'query?key=indexes-public')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
 
       // create new index button exists in public schema
       await expect(page.getByRole('button', { name: 'Create index' })).toBeVisible()
@@ -444,7 +486,8 @@ test.describe('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(page, ref, 'query?key=indexes-auth')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-auth')
+      await page.waitForTimeout(500)
       expect(page.getByText('sso_providers_pkey')).toBeVisible()
       expect(page.getByText('confirmation_token_idx')).toBeVisible()
       // create new index button does not exist in other schemas
@@ -469,7 +512,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
-      await waitForApiResponse(page, ref, 'query?key=indexes-public')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
 
       // delete index if exist
       const exists = (await page.getByRole('button', { name: databaseIndexName }).count()) > 0
@@ -486,7 +529,7 @@ test.describe('Database', () => {
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
       await page.getByRole('button', { name: 'Choose a table' }).click()
-      await page.getByRole('option', { name: databaseTableName }).click()
+      await page.getByRole('option', { name: databaseTableName, exact: true }).click()
       await page.getByText('Choose which columns to create an index on').click()
       await page.getByRole('option', { name: databaseColumnName }).click()
       await page.getByRole('button', { name: 'Create index' }).click()
@@ -512,7 +555,7 @@ test.describe('Database', () => {
       // delete the index
       await newIndexRow.getByRole('button', { name: 'Delete index' }).click()
       await page.getByRole('button', { name: 'Confirm delete' }).click()
-      await waitForApiResponse(page, ref, 'query?key=indexes')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes')
       await expect(
         page.getByText('Successfully deleted index'),
         'Index deletion confirmation toast should be visible'
@@ -525,7 +568,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/roles`))
 
       // Wait for database roles list to be populated
-      await waitForApiResponse(page, ref, 'query?key=database-roles')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-roles')
 
       // filter between active and all roles
       await page.getByRole('button', { name: 'Active roles' }).click()
@@ -542,7 +585,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/roles`))
 
       // Wait for database roles to be populated
-      await waitForApiResponse(page, ref, 'query?key=database-roles')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-roles')
 
       // delete role if exists
       const exists = (await page.getByRole('button', { name: databaseRoleName }).count()) > 0
@@ -572,7 +615,7 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: databaseRoleName }).getByRole('button').click()
       await page.getByRole('menuitem', { name: 'Delete' }).click()
       await page.getByRole('button', { name: 'Confirm' }).click()
-      await waitForApiResponse(page, ref, 'query?key=roles-delete')
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=roles-delete')
       await expect(
         page.getByText(`Successfully deleted role: ${databaseRoleName}`),
         'Delete confirmation toast should be visible'
@@ -586,7 +629,7 @@ test.describe('Database Enumerated Types', () => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
     // Wait for database enumerated types to be populated
-    await waitForApiResponse(page, ref, 'query?key=schemas')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=schemas')
 
     // create new type button exists in public schema
     await expect(page.getByRole('button', { name: 'Create type' })).toBeVisible()
@@ -611,7 +654,7 @@ test.describe('Database Enumerated Types', () => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
     // Wait for database roles list to be populated
-    await waitForApiResponse(page, ref, 'query?key=schemas')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=schemas')
 
     // if enum exists, delete it.
     await page.waitForTimeout(500)
@@ -636,7 +679,7 @@ test.describe('Database Enumerated Types', () => {
     await page.getByRole('button', { name: 'Create type' }).click()
 
     // Wait for enum response to be completed and validate it
-    await waitForApiResponse(page, ref, 'types')
+    await waitForApiResponse(page, 'pg-meta', ref, 'types')
     const enumRow = page.getByRole('row', { name: `${databaseEnumName}` })
     await expect(enumRow).toContainText(databaseEnumName)
     await expect(enumRow).toContainText(`${databaseEnumValue1Name}, ${databaseEnumValue2Name}`)
@@ -668,7 +711,7 @@ test.describe('Database Functions', () => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
-    await waitForApiResponse(page, ref, 'query?key=database-functions')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
 
     // create a new function button exists in public schema
     await expect(page.getByRole('button', { name: 'Create a new function' })).toBeVisible()
@@ -693,7 +736,7 @@ test.describe('Database Functions', () => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
-    await waitForApiResponse(page, ref, 'query?key=database-functions')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
 
     // delete function if exists
     if ((await page.getByRole('button', { name: databaseFunctionName }).count()) > 0) {
@@ -724,8 +767,8 @@ END;`)
     await page.getByRole('button', { name: 'Confirm' }).click()
 
     // validate function creation
-    await waitForApiResponse(page, ref, 'query?key=functions-create')
-    await waitForApiResponse(page, ref, 'query?key=database-functions')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=functions-create')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
     await expect(
       page.getByText(`Successfully created function`),
       'Trigger creation confirmation toast should be visible'
@@ -742,7 +785,7 @@ END;`)
     await page.getByRole('button', { name: 'Confirm' }).click()
 
     // validate function update
-    await waitForApiResponse(page, ref, 'query?key=functions-update')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=functions-update')
     await expect(
       page.getByText(`Successfully updated function ${databaseFunctionNameUpdated}`),
       'Function updated confirmation toast should be visible'
@@ -761,7 +804,7 @@ END;`)
     await page
       .getByRole('button', { name: `Delete function ${databaseFunctionNameUpdated}` })
       .click()
-    await waitForApiResponse(page, ref, 'query?key=functions-delete')
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=functions-delete')
     await expect(
       page.getByText(`Successfully removed function ${databaseFunctionNameUpdated}`),
       'Delete confirmation toast should be visible'

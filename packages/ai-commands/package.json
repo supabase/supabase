@@ -14,16 +14,16 @@
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
     "@supabase/supabase-js": "catalog:",
-    "ai": "^3.4.33",
+    "ai": "^5.0.0",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.26.1",
-    "zod": "3.23.8"
+    "openai": "^4.75.1",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@ai-sdk/openai": "^0.0.72",
+    "@ai-sdk/openai": "^2.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/mdast": "^4.0.0",
     "@types/node": "catalog:",

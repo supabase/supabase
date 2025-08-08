@@ -8,11 +8,12 @@ dotenv.config({ path: path.resolve(__dirname, '.env.local') })
 const IS_CI = !!process.env.CI
 
 export default defineConfig({
-  timeout: 60 * 1000,
+  // timeout: 60 * 1000,
+  timeout: 30000,
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
-  retries: IS_CI ? 3 : 1,
+  retries: IS_CI ? 3 : 0,
   use: {
     baseURL: env.STUDIO_URL,
     screenshot: 'off',

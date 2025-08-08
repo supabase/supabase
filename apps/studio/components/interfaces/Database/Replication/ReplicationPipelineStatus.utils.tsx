@@ -3,7 +3,7 @@ import { Activity, Clock, HelpCircle, Loader2, XCircle } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { Badge } from 'ui'
 import { getPipelineStateMessages } from './Pipeline.utils'
-import { TableState } from './ReplicationPipelineStatus.types'
+import { RetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 
 export const getStatusConfig = (state: TableState['state']) => {
   switch (state.name) {
@@ -34,7 +34,7 @@ export const getStatusConfig = (state: TableState['state']) => {
     case 'error':
       return {
         badge: <Badge variant="destructive">Error</Badge>,
-        description: state.message,
+        description: <pre className="text-xs font-mono">{state.reason}</pre>,
         color: 'text-destructive-600',
       }
     default:
@@ -105,4 +105,18 @@ export const getDisabledStateConfig = ({
           }
 
   return { title, message, badge, icon, colors }
+}
+
+export const isValidRetryPolicy = (policy: any): policy is RetryPolicy => {
+  if (!policy || typeof policy !== 'object' || !policy.policy) return false
+
+  switch (policy.policy) {
+    case 'no_retry':
+    case 'manual_retry':
+      return true
+    case 'timed_retry':
+      return typeof policy.next_retry === 'string'
+    default:
+      return false
+  }
 }

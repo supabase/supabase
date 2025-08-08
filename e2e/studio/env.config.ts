@@ -7,6 +7,7 @@ export const env = {
   EMAIL: process.env.EMAIL,
   PASSWORD: process.env.PASSWORD,
   PROJECT_REF: process.env.PROJECT_REF || 'default',
+  IS_PLATFORM: process.env.IS_PLATFORM || 'false',
 }
 
 export const STORAGE_STATE_PATH = path.join(__dirname, './playwright/.auth/user.json')

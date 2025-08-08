@@ -9,6 +9,7 @@ interface PostHogClientConfig {
 class PostHogClient {
   private initialized = false
   private pendingGroups: Record<string, string> = {}
+  private pendingIdentification: { userId: string; properties?: Record<string, any> } | null = null
   private config: PostHogClientConfig
 
   constructor(config: PostHogClientConfig = {}) {
@@ -38,6 +39,12 @@ class PostHogClient {
           posthog.group(type, id)
         })
         this.pendingGroups = {}
+
+        // Apply any pending identification
+        if (this.pendingIdentification) {
+          posthog.identify(this.pendingIdentification.userId, this.pendingIdentification.properties)
+          this.pendingIdentification = null
+        }
       },
     }
 
@@ -47,6 +54,14 @@ class PostHogClient {
 
   capturePageView(properties: Record<string, any>, hasConsent: boolean = true) {
     if (!hasConsent || !this.initialized) return
+
+    // Store groups from properties if present (for later group() calls)
+    if (properties.$groups) {
+      Object.entries(properties.$groups).forEach(([type, id]) => {
+        if (id) posthog.group(type, id as string)
+      })
+    }
+
     posthog.capture('$pageview', properties)
   }
 
@@ -56,7 +71,13 @@ class PostHogClient {
   }
 
   identify(userId: string, properties?: Record<string, any>, hasConsent: boolean = true) {
-    if (!hasConsent || !this.initialized) return
+    if (!hasConsent) return
+
+    if (!this.initialized) {
+      // Queue the identification for when PostHog initializes
+      this.pendingIdentification = { userId, properties }
+      return
+    }
 
     posthog.identify(userId, properties)
   }

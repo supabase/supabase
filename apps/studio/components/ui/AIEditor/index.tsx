@@ -1,5 +1,5 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
-import { useCompletion } from 'ai/react'
+import { useCompletion } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'
@@ -19,7 +19,7 @@ interface AIEditorProps {
   aiMetadata?: {
     projectRef?: string
     connectionString?: string | null
-    includeSchemaMetadata?: boolean
+    orgSlug?: string
   }
   initialPrompt?: string
   readOnly?: boolean
@@ -79,9 +79,6 @@ const AIEditor = ({
   } = useCompletion({
     api: aiEndpoint || '',
     body: aiMetadata,
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
-    },
     onError: (error) => {
       toast.error(`Failed to generate: ${error.message}`)
     },

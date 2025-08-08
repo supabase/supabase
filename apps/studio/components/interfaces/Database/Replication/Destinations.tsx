@@ -133,15 +133,15 @@ export const Destinations = () => {
                 'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4 className="text-lg">Send data to your first destination</h4>
-              <p className="prose text-sm text-center mt-2">
+              <h4>Send data to your first destination</h4>
+              <p className="prose text-sm text-center mt-1 max-w-full">
                 Use destinations to improve performance or run analysis on your data via
                 integrations like BigQuery
               </p>
               <Button
                 icon={<Plus />}
                 onClick={() => setShowNewDestinationPanel(true)}
-                className="mt-6"
+                className="mt-4"
               >
                 Add destination
               </Button>
