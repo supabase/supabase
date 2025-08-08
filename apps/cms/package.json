@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
+    "build:prod": "pnpm build && pnpm start",
     "ci": "payload migrate && pnpm build",
     "clean": "rimraf node_modules .next",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
