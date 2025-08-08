@@ -244,10 +244,10 @@ export function GenericChartWithQuery({
   const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px (FIXED_HEIGHT - 40px for button area)
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
+    <div className="w-full bg-surface-100 border-y">
+      <header className="px-6 py-5">
+        <h3 className="text-foreground-light text-lg">{title}</h3>
+      </header>
       <div
         className={`${view === 'chart' ? 'bg-surface-100' : 'bg-surface-75'} border-b last:border-none`}
       >
@@ -266,7 +266,7 @@ export function GenericChartWithQuery({
               <div className="text-red-500">Error: {error}</div>
             </div>
           ) : view === 'chart' ? (
-            <div className="flex flex-col h-full w-full justify-between px-6 py-6">
+            <div className="flex flex-col h-full w-full justify-between px-6 pt-4 pb-10">
               {/* Each bar as a vertical stack: label above, bar below */}
               <div
                 className="flex flex-col gap-10"
@@ -358,6 +358,6 @@ export function GenericChartWithQuery({
           borderOverride="border-overlay"
         />
       </div>
-    </Card>
+    </div>
   )
 }

@@ -97,7 +97,9 @@ export function SurveyStatCard({
         </div>
       )}
       <div className="flex flex-col gap-2">
-        <p className="-ml-1 md:mt-8 text:2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline text-foreground">
+        <p
+          className={`-ml-1 md:mt-8 text:2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-foreground' : 'text-foreground-muted'} transition-colors duration-1000`}
+        >
           {formattedValue}
           <span className="text-sm md:text-4xl">{unit}</span>
         </p>
