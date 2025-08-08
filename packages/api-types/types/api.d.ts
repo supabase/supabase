@@ -929,6 +929,70 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/jit': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get user-id to role mappings for JIT access
+     * @description Mappings of roles a user can assume in the project database
+     */
+    get: operations['v1-get-jit-access']
+    /**
+     * Updates a user mapping for JIT access
+     * @description Modifies the roles that can be assumed and for how long
+     */
+    put: operations['v1-update-jit-access']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/jit/{user_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Delete JIT access by user-id
+     * @description Remove JIT mappings of a user, revoking all JIT database access
+     */
+    delete: operations['v1-delete-jit-access']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/jit/list': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all user-id to role mappings for JIT access
+     * @description Mappings of roles a user can assume in the project database
+     */
+    get: operations['v1-list-jit-access']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/migrations': {
     parameters: {
       query?: never
@@ -1600,7 +1664,7 @@ export interface components {
       name: string
       prefix?: string | null
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
       /** @enum {string|null} */
       type?: 'legacy' | 'publishable' | 'secret' | null
@@ -1938,7 +2002,7 @@ export interface components {
       description?: string | null
       name: string
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
       /** @enum {string} */
       type: 'publishable' | 'secret'
@@ -2267,6 +2331,24 @@ export interface components {
       }
       updated_at?: string
     }
+    JitAccessResponse: {
+      /** Format: uuid */
+      user_id: string
+      user_roles: {
+        expires_at?: string
+        role: string
+      }[]
+    }
+    JitListAccessResponse: {
+      items: {
+        /** Format: uuid */
+        user_id: string
+        user_roles: {
+          expires_at?: string
+          role: string
+        }[]
+      }[]
+    }
     LegacyApiKeysResponse: {
       enabled: boolean
     }
@@ -2564,7 +2646,7 @@ export interface components {
       target_upgrade_versions: {
         app_version: string
         /** @enum {string} */
-        postgres_version: '15' | '17' | '17-oriole'
+        postgres_version: '13' | '14' | '15' | '17' | '17-oriole'
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
@@ -2711,6 +2793,14 @@ export interface components {
       }
     }
     StorageConfigResponse: {
+      capabilities: {
+        iceberg_catalog: boolean
+        list_v2: boolean
+      }
+      external: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features: {
         icebergCatalog?: {
           enabled: boolean
@@ -2765,7 +2855,7 @@ export interface components {
       description?: string | null
       name?: string
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
     }
     UpdateAuthConfigBody: {
@@ -3013,6 +3103,14 @@ export interface components {
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
     }
+    UpdateJitAccessBody: {
+      roles: {
+        expires_at?: string
+        role: string
+      }[]
+      /** Format: uuid */
+      user_id: string
+    }
     UpdatePgsodiumConfigBody: {
       root_key: string
     }
@@ -3090,6 +3188,10 @@ export interface components {
       status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
     }
     UpdateStorageConfigBody: {
+      external?: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features?: {
         icebergCatalog?: {
           enabled: boolean
@@ -3215,6 +3317,49 @@ export interface components {
        * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
        */
       template_url?: string
+    }
+    V1GetUsageApiCountResponse: {
+      error?:
+        | string
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: {
+        /** Format: date-time */
+        timestamp: string
+        total_auth_requests: number
+        total_realtime_requests: number
+        total_rest_requests: number
+        total_storage_requests: number
+      }[]
+    }
+    V1GetUsageApiRequestsCountResponse: {
+      error?:
+        | string
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: {
+        count: number
+      }[]
     }
     V1ListMigrationsResponse: {
       name?: string
@@ -4179,7 +4324,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['V1GetUsageApiCountResponse']
         }
       }
       403: {
@@ -4214,8 +4359,14 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['V1GetUsageApiRequestsCountResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get project's usage api requests count */
       500: {
@@ -5975,6 +6126,149 @@ export interface operations {
         }
       }
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list database jit access */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateJitAccessBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to upsert database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        user_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove JIT access */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-list-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitListAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list database jit access */
+      500: {
         headers: {
           [name: string]: unknown
         }

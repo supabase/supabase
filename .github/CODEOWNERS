@@ -5,9 +5,6 @@
 
 /apps/studio/ @supabase/Dashboard
 
-# temporary until we've ironed out all the problems with sync workflow
-/apps/docs/content/troubleshooting/ @charislam
-
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
 /apps/www/lib/redirects.js

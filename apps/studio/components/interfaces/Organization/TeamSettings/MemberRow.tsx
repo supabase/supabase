@@ -7,7 +7,7 @@ import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
 import {
@@ -32,7 +32,7 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { data: projects } = useProjectsQuery()
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({

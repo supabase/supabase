@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -15,10 +14,12 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SSLConfiguration = () => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const [isEnforced, setIsEnforced] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
@@ -41,7 +42,6 @@ const SSLConfiguration = () => {
     }
   )
 
-  const { project } = useProjectContext()
   const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,

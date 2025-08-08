@@ -12,10 +12,7 @@ import {
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -31,8 +28,12 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDbInAws, useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsOrioleDbInAws,
+  useProjectByRefQuery,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
@@ -48,12 +49,13 @@ const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
-  const selectedOrg = useSelectedOrganization()
-  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
-  const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
-  const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
   const isOrioleDbInAws = useIsOrioleDbInAws()
+
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: parentProject } = useProjectByRefQuery(selectedProject?.parent_project_ref)
+  const isBranch = parentProject !== undefined
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })

@@ -2,7 +2,6 @@ import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo, useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -10,6 +9,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { Loading } from 'components/ui/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { AlertCircle, ChevronLeft, Search } from 'lucide-react'
 import { Button, Input } from 'ui'
@@ -21,7 +21,7 @@ interface PublicationsTablesProps {
 }
 
 const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsTablesProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
   const canUpdatePublications = useCheckPermissions(

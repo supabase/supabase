@@ -10,13 +10,13 @@ import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/Project
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
 
   useProjectStatusQuery(
@@ -42,7 +42,7 @@ const BuildingState = () => {
       <div className="px-4 md:px-6 flex flex-col space-y-16">
         <div className="w-full flex flex-col gap-4">
           <div className="w-full flex flex-col md:flex-row items-start md:items-center gap-3">
-            <h1 className="text-3xl text-foreground">{project?.name}</h1>
+            <h1 className="text-3xl">{project?.name}</h1>
             <Badge variant="default" className="bg-surface-100 bg-opacity-100">
               <div className="flex items-center gap-2">
                 <Loader2 className="animate-spin" size={12} />

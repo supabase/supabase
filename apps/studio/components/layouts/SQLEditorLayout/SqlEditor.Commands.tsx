@@ -10,7 +10,7 @@ import { orderCommandSectionsByPriority } from 'components/interfaces/App/Comman
 import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
 import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
 import {
@@ -59,7 +59,7 @@ export function useSqlEditorGotoCommands(options?: CommandOptions) {
 const SNIPPET_PAGE_NAME = 'Snippets'
 
 export function useSnippetCommands() {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
   useRegisterPage(
@@ -251,7 +251,7 @@ function snippetValue(snippet: SqlSnippet) {
 const QUERY_TABLE_PAGE_NAME = 'Query a table'
 
 export function useQueryTableCommands(options?: CommandOptions) {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
   const commandMenuOpen = useCommandMenuOpen()
@@ -294,7 +294,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
 
 function TableSelector() {
   const router = useRouter()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { data: protectedSchemas } = useProtectedSchemas()
   const {
     data: tablesData,

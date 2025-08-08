@@ -8,10 +8,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -22,6 +19,7 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
@@ -44,7 +42,7 @@ import { getConnectionURL } from './StorageSettings.utils'
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()
   const isProjectActive = useIsProjectActive()
-  const { project, isLoading: projectIsLoading } = useProjectContext()
+  const { data: project, isLoading: projectIsLoading } = useSelectedProjectQuery()
 
   const [openCreateCred, setOpenCreateCred] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
