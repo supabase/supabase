@@ -81,6 +81,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       delete cleanedMsg.results
       return cleanedMsg
     }
+    // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
+    // this happens when a user stops the assistant response while the tool is being called
+    if (msg && msg.role === 'assistant') {
+      const cleanedParts = msg.parts.filter((part: any) => {
+        return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
+      })
+      return { ...msg, parts: cleanedParts }
+    }
     return msg
   })
 
@@ -172,6 +180,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...convertToModelMessages(messages),
     ]
 
+    const abortController = new AbortController()
+    req.on('close', () => abortController.abort())
+    req.on('aborted', () => abortController.abort())
+
     // Get tools
     const tools = await getTools({
       projectRef,
@@ -186,6 +198,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,
+      abortSignal: abortController.signal,
     })
 
     result.pipeUIMessageStreamToResponse(res, {
