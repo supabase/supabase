@@ -712,8 +712,7 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with \`/function-name\` so they are routed correctly.
 11. File write operations are ONLY permitted on \`/tmp\` directory. You can use either Deno or Node File APIs.
 12. Use \`EdgeRuntime.waitUntil(promise)\` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
-13. Where possible, use the Supabase client with global authentication headers to make use of the Supabase auth system including RLS policies.
-14. Use Deno.serve where possible to create an Edge Function
+13. Use Deno.serve where possible to create an Edge Function
 
 ## Example Templates
 ### Simple Hello World Function
@@ -733,51 +732,7 @@ Deno.serve(async (req: Request) => {
 		);
 });
 \`\`\`
-### Example Function using Supabase client
-\`\`\`tsx
-import { createClient } from 'npm:supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
-Deno.serve(async (req: Request) => {
-  // This is needed if you're planning to invoke your function from a browser.
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
-  try {
-    // Create a Supabase client with the Auth context of the logged in user.
-    const supabaseClient = createClient(
-      // Supabase API URL - env var exported by default.
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API ANON KEY - env var exported by default.
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      // Create client with Auth context of the user that called the function.
-      // This way your row-level-security (RLS) policies are applied.
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    )
-    // First get the token from the Authorization header
-    const token = req.headers.get('Authorization').replace('Bearer ', '')
-    // Now we can get the session or user object
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser(token)
-    // And we can run queries in the context of our authenticated user
-    const { data, error } = await supabaseClient.from('users').select('*')
-    if (error) throw error
-    return new Response(JSON.stringify({ user, data }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    })
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
-  }
-})
-\`\`\`
+
 ### Example Function using Node built-in API
 \`\`\`tsx
 import { randomBytes } from "node:crypto";
