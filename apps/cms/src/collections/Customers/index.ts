@@ -9,8 +9,8 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAnyone } from '@/access/isAnyone'
-import { isAuthenticated } from '@/access/isAuthenticated'
+import { isAnyone } from '../../access/isAnyone.ts'
+import { isAuthenticated } from '../../access/isAuthenticated.ts'
 
 import { Banner } from '../../blocks/Banner/config.ts'
 import { Code } from '../../blocks/Code/config.ts'
@@ -26,7 +26,7 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { slugField } from '@/fields/slug'
+import { slugField } from '../../fields/slug/index.ts'
 
 const industryOptions = [
   { label: 'Healthcare', value: 'healthcare' },
