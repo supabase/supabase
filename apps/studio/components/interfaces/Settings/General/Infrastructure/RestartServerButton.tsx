@@ -111,7 +111,7 @@ const RestartServerButton = () => {
                     ? 'Unable to restart project as project is not active'
                     : isAwsK8s
                       ? 'Project restart is not supported for AWS (Revamped) projects'
-                      : '',
+                      : undefined,
             },
           }}
         >

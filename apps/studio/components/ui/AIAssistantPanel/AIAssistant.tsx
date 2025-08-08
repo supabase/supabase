@@ -1,7 +1,8 @@
-import type { Message as MessageType } from '@ai-sdk/react'
+import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, Info, RefreshCw, Settings, X } from 'lucide-react'
+import { ArrowDown, Eraser, Info, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -18,6 +19,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
 import uuidv4 from 'lib/uuid'
 import type { AssistantMessageType } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -128,7 +130,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   // Handle completion of the assistant's response
   const handleChatFinish = useCallback(
-    (message: MessageType, options: { finishReason: string }) => {
+    ({ message }: { message: MessageType }) => {
       if (lastUserMessageRef.current) {
         snap.saveMessage([lastUserMessageRef.current, message])
         lastUserMessageRef.current = null
@@ -144,67 +146,80 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // and don't run the risk of messages getting mixed up between chats.
   const {
     messages: chatMessages,
-    isLoading: isChatLoading,
-    append,
-    setMessages,
+    status: chatStatus,
     error,
-    reload,
+    sendMessage,
+    setMessages,
+    addToolResult,
+    stop,
+    regenerate,
   } = useChat({
     id: snap.activeChatId,
-    api: `${BASE_PATH}/api/ai/sql/generate-v4`,
-    maxSteps: 5,
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
-    initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
+    messages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
     async onToolCall({ toolCall }) {
       if (toolCall.toolName === 'rename_chat') {
-        const { newName } = toolCall.args as { newName: string }
+        const { newName } = toolCall.input as { newName: string }
         if (snap.activeChatId && newName?.trim()) {
           snap.renameChat(snap.activeChatId, newName.trim())
-          return `Chat renamed to "${newName.trim()}"`
+          addToolResult({
+            tool: toolCall.toolName,
+            toolCallId: toolCall.toolCallId,
+            output: 'Chat renamed',
+          })
         }
-        return 'Failed to rename chat: Invalid chat or name'
+        addToolResult({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          output: 'Failed to rename chat: Invalid chat or name',
+        })
       }
     },
-    experimental_prepareRequestBody: ({ messages }) => {
-      // [Joshen] Specifically limiting the chat history that get's sent to reduce the
-      // size of the context that goes into the model. This should always be an odd number
-      // as much as possible so that the first message is always the user's
-      const MAX_CHAT_HISTORY = 5
+    transport: new DefaultChatTransport({
+      api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      async prepareSendMessagesRequest({ messages, ...options }) {
+        // [Joshen] Specifically limiting the chat history that get's sent to reduce the
+        // size of the context that goes into the model. This should always be an odd number
+        // as much as possible so that the first message is always the user's
+        const MAX_CHAT_HISTORY = 5
 
-      const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
+        const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
 
-      // Filter out results from messages before sending to the model
-      const cleanedMessages = slicedMessages.map((message) => {
-        const cleanedMessage = { ...message } as AssistantMessageType
-        if (message.role === 'assistant' && (message as AssistantMessageType).results) {
-          delete cleanedMessage.results
+        // Filter out results from messages before sending to the model
+        const cleanedMessages = slicedMessages.map((message: any) => {
+          const cleanedMessage = { ...message } as AssistantMessageType
+          if (message.role === 'assistant' && (message as AssistantMessageType).results) {
+            delete cleanedMessage.results
+          }
+          return cleanedMessage
+        })
+
+        const headerData = await constructHeaders()
+        const authorizationHeader = headerData.get('Authorization')
+
+        return {
+          ...options,
+          body: {
+            messages: cleanedMessages,
+            aiOptInLevel,
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            schema: currentSchema,
+            table: currentTable?.name,
+            chatName: currentChat,
+            orgSlug: selectedOrganization?.slug,
+          },
+          headers: { Authorization: authorizationHeader ?? '' },
         }
-        return cleanedMessage
-      })
-
-      return JSON.stringify({
-        messages: cleanedMessages,
-        aiOptInLevel,
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        schema: currentSchema,
-        table: currentTable?.name,
-        chatName: currentChat,
-        orgSlug: selectedOrganization?.slug,
-      })
-    },
-    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
-      const headers = await constructHeaders()
-      const existingHeaders = new Headers(init?.headers)
-      for (const [key, value] of headers.entries()) {
-        existingHeaders.set(key, value)
-      }
-      return fetch(input, { ...init, headers: existingHeaders })
-    },
+      },
+    }),
     onError: onErrorChat,
     onFinish: handleChatFinish,
   })
+
+  const formattedError = tryParseJson(error?.message ?? {})
+  const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
 
   const updateMessage = useCallback(
     ({
@@ -233,7 +248,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           />
         )
       }),
-    [chatMessages, isChatLoading]
+    [chatMessages, isChatLoading, updateMessage]
   )
 
   const hasMessages = chatMessages.length > 0
@@ -243,13 +258,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     const payload = {
       role: 'user',
       createdAt: new Date(),
-      content: finalContent,
+      parts: [{ type: 'text', text: finalContent }],
       id: uuidv4(),
     } as MessageType
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
-    append(payload)
+    sendMessage(payload)
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
@@ -350,7 +365,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <ButtonTooltip
                     type="text"
                     size="tiny"
-                    icon={<Settings strokeWidth={1.5} size={14} />}
+                    icon={<Settings strokeWidth={1.5} />}
                     onClick={() => setIsConfirmOptInModalOpen(true)}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
@@ -364,7 +379,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <ButtonTooltip
                     type="text"
                     size="tiny"
-                    icon={<RefreshCw strokeWidth={1.5} size={14} />}
+                    icon={<Eraser strokeWidth={1.5} />}
                     onClick={handleClearMessages}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
@@ -374,7 +389,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     type="text"
                     className="w-7 h-7"
                     onClick={snap.closeAssistant}
-                    icon={<X strokeWidth={1.5} size={14} />}
+                    icon={<X strokeWidth={1.5} />}
                     tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
                   />
                 </div>
@@ -421,14 +436,40 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             <div className="w-full px-7 py-8 space-y-6">
               {renderedMessages}
               {error && (
-                <div className="border rounded-md pl-2 pr-1 py-1 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-foreground-light text-sm">
-                    <Info size={16} />
-                    <p>Sorry, I'm having trouble responding right now</p>
+                <div className="border rounded-md px-2 py-2 flex items-center justify-between gap-x-4">
+                  <div className="flex items-start gap-2 text-foreground-light text-sm">
+                    <div>
+                      <Info size={16} className="mt-0.5" />
+                    </div>
+                    <div>
+                      <p>
+                        Sorry, I'm having trouble responding right now. If the error persists while
+                        retrying, you may try clearing the conversation's messages and try again.
+                      </p>
+
+                      <p className="text-foreground-lighter text-xs mt-1">
+                        Error: {formattedError.message}
+                      </p>
+                    </div>
                   </div>
-                  <Button type="text" size="tiny" onClick={() => reload()} className="text-xs">
-                    Retry
-                  </Button>
+                  <div className="flex items-center gap-x-2">
+                    <Button
+                      type="default"
+                      size="tiny"
+                      onClick={() => regenerate()}
+                      className="text-xs"
+                    >
+                      Retry
+                    </Button>
+                    <ButtonTooltip
+                      type="default"
+                      size="tiny"
+                      onClick={handleClearMessages}
+                      className="w-7 h-7"
+                      icon={<Eraser />}
+                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                    />
+                  </div>
                 </div>
               )}
               <AnimatePresence>
@@ -573,6 +614,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               onSubmit={(finalMessage) => {
                 sendMessageToAssistant(finalMessage)
                 scrollToEnd()
+              }}
+              onStop={() => {
+                stop()
+                // to save partial responses from the AI
+                const lastMessage = chatMessages[chatMessages.length - 1]
+                if (lastMessage && lastMessage.role === 'assistant') {
+                  handleChatFinish({ message: lastMessage })
+                }
               }}
               sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
               onRemoveSnippet={(index) => {
