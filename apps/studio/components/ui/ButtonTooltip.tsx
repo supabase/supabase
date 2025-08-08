@@ -14,7 +14,14 @@ export const ButtonTooltip = forwardRef<
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button ref={ref} {...props} className={cn(props.className, 'pointer-events-auto')}>
+        <Button
+          ref={ref}
+          {...props}
+          className={cn(props.className, 'pointer-events-auto')}
+          onClick={(e) => {
+            if (props.disabled) e.preventDefault()
+          }}
+        >
           {props.children}
         </Button>
       </TooltipTrigger>
