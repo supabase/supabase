@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
 import { FilterDropdown } from './FilterDropdown'
@@ -35,12 +35,14 @@ interface ChartDataItem {
 }
 
 // Custom hook to fetch filter options from Supabase
-function useFilterOptions(filterColumns: string[]) {
+function useFilterOptions(filterColumns: string[], shouldFetch: boolean) {
   const [filters, setFilters] = useState<Filters>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!shouldFetch) return
+
     async function fetchFilterOptions() {
       try {
         setIsLoading(true)
@@ -123,18 +125,20 @@ function useFilterOptions(filterColumns: string[]) {
     }
 
     fetchFilterOptions()
-  }, [filterColumns])
+  }, [filterColumns, shouldFetch])
 
   return { filters, isLoading, error }
 }
 
 // Custom hook to fetch survey data using SQL query via RPC
-function useSurveyData(sqlQuery: string) {
+function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!shouldFetch) return
+
     async function fetchData() {
       try {
         setIsLoading(true)
@@ -181,7 +185,7 @@ function useSurveyData(sqlQuery: string) {
     }
 
     fetchData()
-  }, [sqlQuery])
+  }, [sqlQuery, shouldFetch])
 
   return { chartData, isLoading, error }
 }
@@ -199,12 +203,43 @@ export function GenericChartWithQuery({
   filterColumns,
   generateSQLQuery,
 }: GenericChartWithQueryProps) {
+  const [isInView, setIsInView] = useState(false)
+  const chartRef = useRef<HTMLDivElement>(null)
+
+  // Intersection observer to trigger data loading
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true)
+            observer.disconnect() // Only trigger once
+          }
+        })
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '100px', // Start loading 100px before the component comes into view
+      }
+    )
+
+    if (chartRef.current) {
+      observer.observe(chartRef.current)
+    }
+
+    return () => {
+      if (chartRef.current) {
+        observer.unobserve(chartRef.current)
+      }
+    }
+  }, [])
+
   // Get dynamic filter options
   const {
     filters,
     isLoading: filtersLoading,
     error: filtersError,
-  } = useFilterOptions(filterColumns)
+  } = useFilterOptions(filterColumns, isInView)
 
   // Start with all filters unset (showing "all")
   const [activeFilters, setActiveFilters] = useState(
@@ -218,7 +253,7 @@ export function GenericChartWithQuery({
   const sqlQuery = generateSQLQuery(activeFilters)
 
   // Use the custom hook to fetch data
-  const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(sqlQuery)
+  const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(sqlQuery, isInView)
 
   const [view, setView] = useState<'chart' | 'sql'>('chart')
 
@@ -244,7 +279,7 @@ export function GenericChartWithQuery({
   const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px (FIXED_HEIGHT - 40px for button area)
 
   return (
-    <div className="w-full bg-surface-100 border-y">
+    <div ref={chartRef} className="w-full bg-surface-100 border-y">
       <header className="px-6 py-5">
         <h3 className="text-foreground-light text-lg">{title}</h3>
       </header>
