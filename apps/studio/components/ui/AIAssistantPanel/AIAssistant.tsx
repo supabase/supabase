@@ -19,6 +19,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
 import uuidv4 from 'lib/uuid'
 import type { AssistantMessageType } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -217,6 +218,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     onFinish: handleChatFinish,
   })
 
+  const formattedError = tryParseJson(error?.message ?? {})
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
 
   const updateMessage = useCallback(
@@ -434,10 +436,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             <div className="w-full px-7 py-8 space-y-6">
               {renderedMessages}
               {error && (
-                <div className="border rounded-md pl-2 pr-1 py-1 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-foreground-light text-sm">
-                    <Info size={16} />
-                    <p>Sorry, I'm having trouble responding right now</p>
+                <div className="border rounded-md pl-2 pr-1 py-2 flex items-center justify-between">
+                  <div className="flex items-start gap-2 text-foreground-light text-sm">
+                    <div>
+                      <Info size={16} className="mt-0.5" />
+                    </div>
+                    <div>
+                      <p>
+                        Sorry, I'm having trouble responding right now. If the error persists while
+                        retrying, you may try clearing the conversation's messages and try again.
+                      </p>
+
+                      <p className="text-foreground-lighter text-xs mt-1">
+                        Error: {formattedError.message}
+                      </p>
+                    </div>
                   </div>
                   <Button type="text" size="tiny" onClick={() => regenerate()} className="text-xs">
                     Retry
