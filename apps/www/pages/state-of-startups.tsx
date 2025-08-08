@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
@@ -22,38 +23,20 @@ function StateOfStartupsPage() {
   const [showFloatingToc, setShowFloatingToc] = useState(false)
   const [isTocOpen, setIsTocOpen] = useState(false)
   const [activeChapter, setActiveChapter] = useState(1)
-  const [inlineRotatingChapter, setInlineRotatingChapter] = useState(1)
   const tocRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
-  const inlineTocRef = useRef<HTMLDivElement>(null)
-
-  // Auto-rotate chapters for inline ToC
-  useEffect(() => {
-    // Only rotate when the inline ToC is visible (not floating)
-    if (showFloatingToc) return
-
-    const interval = setInterval(() => {
-      setInlineRotatingChapter((prev) => {
-        const next = prev + 1
-        return next > pageData.pageChapters.length ? 1 : next
-      })
-    }, 1200)
-
-    return () => clearInterval(interval)
-  }, [pageData.pageChapters.length, showFloatingToc])
 
   // Scroll detection to show floating ToC
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
       const heroElement = heroRef.current
-      const inlineTocElement = inlineTocRef.current
 
-      if (heroElement && inlineTocElement) {
-        const inlineTocRect = inlineTocElement.getBoundingClientRect()
+      if (heroElement) {
+        const heroRect = heroElement.getBoundingClientRect()
 
-        // Show floating ToC when the inline ToC is completely out of view (scrolled past)
-        if (inlineTocRect.bottom < 0) {
+        // Show floating ToC when the hero section is completely out of view
+        if (heroRect.bottom < 0) {
           setShowFloatingToc(true)
         } else {
           setShowFloatingToc(false)
@@ -88,13 +71,9 @@ function StateOfStartupsPage() {
   // Close ToC when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Check both floating and inline refs
       const isOutsideFloating = tocRef.current && !tocRef.current.contains(event.target as Node)
-      const isOutsideInline =
-        inlineTocRef.current && !inlineTocRef.current.contains(event.target as Node)
 
-      // Close if clicking outside the currently relevant ToC
-      if (showFloatingToc ? isOutsideFloating : isOutsideInline) {
+      if (isOutsideFloating) {
         setIsTocOpen(false)
       }
     }
@@ -108,69 +87,58 @@ function StateOfStartupsPage() {
     }
   }, [isTocOpen])
 
-  // Shared Table of Contents component
-  const TableOfContents = ({
-    variant = 'floating',
-    className = '',
-    showRotating = false,
-  }: {
-    variant?: 'floating' | 'inline'
-    className?: string
-    showRotating?: boolean
-  }) => {
+  // Floating Table of Contents component
+  const FloatingTableOfContents = () => {
     const currentChapter = pageData.pageChapters[activeChapter - 1]
-    const rotatingChapter = pageData.pageChapters[inlineRotatingChapter - 1]
-    const displayChapter = showRotating ? rotatingChapter : currentChapter
-    const displayChapterNumber = showRotating ? inlineRotatingChapter : activeChapter
 
-    const isFloating = variant === 'floating'
-    const shouldShow = isFloating ? showFloatingToc : true
-
-    if (!shouldShow) return null
+    if (!showFloatingToc) return null
 
     return (
       <div
-        ref={isFloating ? tocRef : inlineTocRef}
-        className={cn(
-          isFloating
-            ? 'fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300'
-            : 'relative transition-opacity duration-300',
-          showFloatingToc && !isFloating ? 'opacity-50' : 'opacity-100'
-        )}
+        ref={tocRef}
+        className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300"
       >
-        <div className={cn('relative', className)}>
+        <div className="relative">
           {/* Closed state - shows current chapter */}
           <Button
             type="default"
             size="small"
-            // iconRight={<Maximize2 size={14} />}
             onClick={() => setIsTocOpen(true)}
             className={cn(
               'flex flex-row gap-2 shadow-xl rounded-full px-3 pr-5',
-              isTocOpen && (isFloating ? 'hidden' : 'invisible')
+              isTocOpen && 'hidden'
             )}
           >
             <div className={cn('flex items-center gap-2')}>
               <span className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light font-mono uppercase text-xs">
-                {displayChapterNumber}
+                {activeChapter}
               </span>
-              {displayChapter?.title}
+              {currentChapter?.title}
             </div>
           </Button>
 
           {/* Open state - shows full table of contents */}
           {isTocOpen && (
-            <div
-              className={cn(
-                'bg-background/75 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden min-w-[280px]',
-                // For inline variant, position absolutely to avoid layout shift
-                !isFloating &&
-                  'absolute top-full left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50'
-              )}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.86, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.1, ease: 'easeOut' }}
+              className="origin-[50%_25%] bg-background/75 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden min-w-[280px]"
             >
               <ol className="max-h-[60vh] overflow-y-auto p-1 flex flex-col gap-1">
                 {pageData.pageChapters.map((chapter, chapterIndex) => (
-                  <li key={chapterIndex + 1}>
+                  <motion.li
+                    key={chapterIndex + 1}
+                    initial={{ opacity: 0, y: -2 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.1,
+                      ease: 'easeOut',
+                      delay:
+                        0.1 +
+                        Math.exp(-(pageData.pageChapters.length - chapterIndex - 1) * 0.3) * 0.2,
+                    }}
+                  >
                     <Link
                       href={`#chapter-${chapterIndex + 1}`}
                       onClick={() => setIsTocOpen(false)}
@@ -183,12 +151,32 @@ function StateOfStartupsPage() {
                     >
                       {chapter.title}
                     </Link>
-                  </li>
+                  </motion.li>
                 ))}
               </ol>
-            </div>
+            </motion.div>
           )}
         </div>
+      </div>
+    )
+  }
+
+  // Inline Table of Contents component (expanded only)
+  const InlineTableOfContents = () => {
+    return (
+      <div className="bg-background/75 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden min-w-[280px]">
+        <ol className="max-h-[60vh] overflow-y-auto p-1 flex flex-col gap-1">
+          {pageData.pageChapters.map((chapter, chapterIndex) => (
+            <li key={chapterIndex + 1}>
+              <Link
+                href={`#chapter-${chapterIndex + 1}`}
+                className="block py-2 rounded-lg text-sm transition-colors text-balance text-center text-foreground-light hover:text-foreground hover:bg-surface-300"
+              >
+                {chapter.title}
+              </Link>
+            </li>
+          ))}
+        </ol>
       </div>
     )
   }
@@ -198,7 +186,7 @@ function StateOfStartupsPage() {
       {/* <NextSeo {...pageData.seo} /> */}
       <DefaultLayout className="!bg-alternative overflow-hidden">
         {/* Floating version */}
-        <TableOfContents variant="floating" />
+        <FloatingTableOfContents />
 
         {/* Previously <Hero /> */}
         <section ref={heroRef} className="relative w-full">
@@ -309,9 +297,9 @@ function StateOfStartupsPage() {
             <div className="flex flex-col gap-4 max-w-prose">
               <p className="p md:text-2xl">{pageData.heroSection.subheader}</p>
 
-              {/* Inline version with rotating chapters */}
+              {/* Inline version - always expanded */}
               <div className="relative flex justify-center mb-4">
-                <TableOfContents variant="inline" showRotating={true} />
+                <InlineTableOfContents />
               </div>
 
               <p className="p md:text-2xl">{pageData.heroSection.cta}</p>
