@@ -5,6 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
 import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { BILLING_MANAGED_BY } from 'lib/constants'
 
 export type OrganizationBase = components['schemas']['OrganizationResponse']
 
@@ -12,7 +13,7 @@ export function castOrganizationResponseToOrganization(org: OrganizationBase): O
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: org.slug.startsWith('vercel_icfg_') ? 'vercel-marketplace' : 'supabase',
+    managed_by: org.billing_partner ?? BILLING_MANAGED_BY.SUPABASE,
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }

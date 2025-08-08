@@ -29,6 +29,22 @@ import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import { Organization } from 'types/base'
+import { BILLING_MANAGED_BY } from 'lib/constants'
+
+const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
+  if (selectedOrganization.managed_by === BILLING_MANAGED_BY.VERCEL_MARKETPLACE) {
+    return {
+      installationId: selectedOrganization?.partner_id,
+    }
+  }
+  if (selectedOrganization.managed_by === BILLING_MANAGED_BY.AWS_MARKETPLACE) {
+    return {
+      organizationSlug: selectedOrganization?.slug,
+      overrideUrl: 'https://console.aws.amazon.com/billing/home#/paymentpreferences/paymentmethods',
+    }
+  }
+}
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -70,9 +86,7 @@ const PaymentMethods = () => {
             <PartnerManagedResource
               partner={selectedOrganization?.managed_by}
               resource="Payment Methods"
-              cta={{
-                installationId: selectedOrganization?.partner_id,
-              }}
+              cta={getPartnerManagedResourceCta(selectedOrganization)}
             />
           ) : isPermissionsLoaded && !canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />

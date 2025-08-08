@@ -28,6 +28,22 @@ import {
 } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import { BILLING_MANAGED_BY } from 'lib/constants'
+import { Organization } from 'types/base'
+
+const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
+  if (selectedOrganization.managed_by === BILLING_MANAGED_BY.VERCEL_MARKETPLACE) {
+    return {
+      installationId: selectedOrganization?.partner_id,
+    }
+  }
+  if (selectedOrganization.managed_by === BILLING_MANAGED_BY.AWS_MARKETPLACE) {
+    return {
+      organizationSlug: selectedOrganization?.slug,
+      overrideUrl: 'https://us-east-1.console.aws.amazon.com/billing/home#/', // TODO: Figure out if this is the correct patch
+    }
+  }
+}
 
 export const BillingCustomerData = () => {
   const { slug } = useParams()
@@ -120,9 +136,7 @@ export const BillingCustomerData = () => {
           <PartnerManagedResource
             partner={selectedOrganization?.managed_by}
             resource="Billing Addresses"
-            cta={{
-              installationId: selectedOrganization?.partner_id,
-            }}
+            cta={getPartnerManagedResourceCta(selectedOrganization)}
           />
         ) : isPermissionsLoaded && !canReadBillingCustomerData ? (
           <NoPermission resourceText="view this organization's billing address" />

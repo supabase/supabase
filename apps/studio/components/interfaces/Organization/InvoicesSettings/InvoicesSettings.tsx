@@ -17,9 +17,25 @@ import { Button } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import InvoicePayButton from './InvoicePayButton'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Organization } from 'types/base'
+import { BILLING_MANAGED_BY } from 'lib/constants'
 
 const PAGE_LIMIT = 5
 
+const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
+  if (selectedOrganization.managed_by === BILLING_MANAGED_BY.VERCEL_MARKETPLACE) {
+    return {
+      installationId: selectedOrganization?.partner_id,
+      path: '/invoices',
+    }
+  }
+  if (selectedOrganization.managed_by === BILLING_MANAGED_BY.AWS_MARKETPLACE) {
+    return {
+      organizationSlug: selectedOrganization?.slug,
+      overrideUrl: 'https://console.aws.amazon.com/billing/home#/bills',
+    }
+  }
+}
 const InvoicesSettings = () => {
   const [page, setPage] = useState(1)
 
@@ -64,11 +80,7 @@ const InvoicesSettings = () => {
       <PartnerManagedResource
         partner={selectedOrganization?.managed_by}
         resource="Invoices"
-        cta={{
-          installationId: selectedOrganization?.partner_id,
-          path: '/invoices',
-        }}
-        // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+        cta={getPartnerManagedResourceCta(selectedOrganization)}
       />
     )
   }

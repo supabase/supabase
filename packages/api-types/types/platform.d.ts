@@ -4808,6 +4808,8 @@ export interface components {
         }
       | {
           billing_email: string | null
+          /** @enum {string|null} */
+          billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -6582,6 +6584,8 @@ export interface components {
     }
     OrganizationResponse: {
       billing_email: string | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -6634,9 +6638,8 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata: {
-        [key: string]: unknown
-      } | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
