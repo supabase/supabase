@@ -4,11 +4,11 @@ import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatPoliciesForStorage } from './Storage.utils'
 import {
   Button,
@@ -32,7 +32,7 @@ export interface DeleteBucketModalProps {
 export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [value, setValue] = useState<string>(``)
 
   const { data } = useBucketsQuery({ projectRef })

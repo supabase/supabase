@@ -25,8 +25,8 @@ import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
@@ -41,8 +41,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 const MergeRequestsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
@@ -307,8 +307,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined

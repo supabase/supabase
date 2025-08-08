@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { DeleteBucketModal } from 'components/interfaces/Storage'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -28,11 +29,6 @@ const StorageMenu = () => {
 
   const [searchText, setSearchText] = useState<string>('')
 
-  const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
-    'storage-explorer-sort',
-    'created-at'
-  )
-
   const page = router.pathname.split('/')[4] as
     | undefined
     | 'policies'
@@ -48,7 +44,7 @@ const StorageMenu = () => {
     isSuccess,
   } = useBucketsQuery({ projectRef: ref })
   const sortedBuckets =
-    sort === 'alphabetical'
+    snap.sortBucket === 'alphabetical'
       ? buckets.sort((a, b) =>
           a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
         )
@@ -61,7 +57,7 @@ const StorageMenu = () => {
 
   return (
     <>
-      <Menu type="pills" className="my-6 flex flex-grow flex-col">
+      <Menu type="pills" className="mt-6 flex flex-grow flex-col">
         <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
           <CreateBucketModal />
 
@@ -76,8 +72,8 @@ const StorageMenu = () => {
               }}
             >
               <InnerSideBarFilterSortDropdown
-                value={sort}
-                onValueChange={(value: any) => setSort(value)}
+                value={snap.sortBucket}
+                onValueChange={(value: any) => snap.setSortBucket(value)}
               >
                 <InnerSideBarFilterSortDropdownItem
                   key="alphabetical"
@@ -154,21 +150,16 @@ const StorageMenu = () => {
             )}
           </div>
 
-          <div className="h-px w-full bg-border" />
-
-          <div className="mx-3">
+          <div className="w-full bg-dash-sidebar px-3 py-6 sticky bottom-0 border-t border-border">
             <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`}>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
               </Menu.Item>
             </Link>
-            <Link href={`/project/${ref}/settings/storage`}>
-              <Menu.Item rounded>
-                <div className="flex items-center justify-between">
-                  <p className="truncate">Settings</p>
-                  <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
-                </div>
+            <Link href={`/project/${ref}/storage/settings`}>
+              <Menu.Item rounded active={page === 'settings'}>
+                <p className="truncate">Settings</p>
               </Menu.Item>
             </Link>
           </div>

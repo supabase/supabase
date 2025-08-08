@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Columns3, Edit2, Trash, XCircle } from 'lucide-react'
+import { Columns3, Edit2, MoreVertical, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
 
 import type { Bucket } from 'data/storage/buckets-query'
@@ -84,7 +84,7 @@ const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowPro
       {canUpdateBuckets && isSelected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" icon={<ChevronDown />} className="mr-1 p-1.5 w-7" />
+            <Button type="text" icon={<MoreVertical />} className="mr-1 h-6 w-6" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
             {bucket.type !== 'ANALYTICS' && (

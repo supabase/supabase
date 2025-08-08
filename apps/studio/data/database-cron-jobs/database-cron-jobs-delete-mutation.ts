@@ -9,6 +9,7 @@ export type DatabaseCronJobDeleteVariables = {
   projectRef: string
   connectionString?: string | null
   jobId: number
+  searchTerm?: string
 }
 
 export async function deleteDatabaseCronJob({
@@ -42,8 +43,10 @@ export const useDatabaseCronJobDeleteMutation = ({
     (vars) => deleteDatabaseCronJob(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseCronJobsKeys.list(projectRef))
+        const { projectRef, searchTerm } = variables
+        await queryClient.invalidateQueries(
+          databaseCronJobsKeys.listInfinite(projectRef, searchTerm)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
