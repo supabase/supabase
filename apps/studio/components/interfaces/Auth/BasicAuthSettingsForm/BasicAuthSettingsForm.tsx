@@ -46,7 +46,7 @@ const BasicAuthSettingsForm = () => {
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,

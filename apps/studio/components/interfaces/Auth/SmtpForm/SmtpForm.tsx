@@ -1,18 +1,18 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
-import * as yup from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -34,16 +34,35 @@ import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
-interface SmtpFormValues {
-  SMTP_ADMIN_EMAIL?: string
-  SMTP_SENDER_NAME?: string
-  SMTP_HOST?: string
-  SMTP_PORT?: number
-  SMTP_MAX_FREQUENCY?: number
-  SMTP_USER?: string
-  SMTP_PASS?: string
-  ENABLE_SMTP: boolean
-}
+const schema = z.intersection(
+  z.object({
+    SMTP_PASS: z.string().optional(),
+  }),
+  z.discriminatedUnion(`ENABLE_SMTP`, [
+    z.object({
+      ENABLE_SMTP: z.literal(false),
+    }),
+    z.object({
+      ENABLE_SMTP: z.literal(true),
+      SMTP_ADMIN_EMAIL: z
+        .string({ required_error: 'Sender email is required' })
+        .email('Must be a valid email'),
+      SMTP_SENDER_NAME: z.string({ required_error: 'Sender name is required' }),
+      SMTP_HOST: z
+        .string({ required_error: 'Host URL is required.' })
+        .regex(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address'),
+      SMTP_PORT: z
+        .number({ required_error: 'Port number is required.' })
+        .min(1, 'Must be a valid port number more than 0')
+        .max(65535, 'Must be a valid port number no more than 65535'),
+      SMTP_MAX_FREQUENCY: z.coerce
+        .number({ required_error: 'Rate limit is required.' })
+        .min(1, 'Must be more than 0')
+        .max(32767, 'Must not be more than 32,767 an hour'),
+      SMTP_USER: z.string({ required_error: 'SMTP Username is required' }),
+    }),
+  ])
+)
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -56,61 +75,9 @@ const SmtpForm = () => {
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const smtpSchema = yup.object({
-    SMTP_ADMIN_EMAIL: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) => schema.email('Must be a valid email').required('Sender email is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_SENDER_NAME: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) => schema.required('Sender name is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_HOST: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) =>
-        schema
-          .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
-          .required('Host URL is required.'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_PORT: yup.number().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) =>
-        schema
-          .required('Port number is required.')
-          .min(1, 'Must be a valid port number more than 0')
-          .max(65535, 'Must be a valid port number no more than 65535'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_MAX_FREQUENCY: yup.number().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) =>
-        schema
-          .required('Rate limit is required.')
-          .min(1, 'Must be more than 0')
-          .max(32767, 'Must not be more than 32,767 an hour'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_USER: yup.string().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) => schema.required('SMTP Username is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_PASS: yup.string(),
-    ENABLE_SMTP: yup.boolean().required(),
-  })
-
-  const form = useForm<SmtpFormValues>({
-    resolver: yupResolver(smtpSchema),
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
-      SMTP_ADMIN_EMAIL: '',
-      SMTP_SENDER_NAME: '',
-      SMTP_HOST: '',
-      SMTP_PORT: undefined,
-      SMTP_MAX_FREQUENCY: undefined,
-      SMTP_USER: '',
       SMTP_PASS: '',
       ENABLE_SMTP: false,
     },
@@ -127,7 +94,7 @@ const SmtpForm = () => {
       form.reset({
         ...formValues,
         ENABLE_SMTP: isSmtpEnabled(authConfig),
-      } as SmtpFormValues)
+      } as z.infer<typeof schema>)
       setEnableSmtp(isSmtpEnabled(authConfig))
     }
   }, [authConfig, form])
@@ -142,13 +109,13 @@ const SmtpForm = () => {
     return () => subscription.unsubscribe()
   }, [form])
 
-  const onSubmit = (values: SmtpFormValues) => {
-    const { ENABLE_SMTP, ...rest } = values
-    const payload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = ({ ENABLE_SMTP, ...values }) => {
+    const payload = ENABLE_SMTP ? values : defaultDisabledSmtpFormValues
 
     // Format payload: Convert port to string
-    if (payload.SMTP_PORT) {
-      payload.SMTP_PORT = payload.SMTP_PORT.toString() as any
+    if (`SMTP_PORT` in payload && typeof payload.SMTP_PORT === `number`) {
+      // @ts-expect-error SMTP_PORT is incorrectly typed as `null` here because of defaultDisabledSmtpFormValues where it should be `number`
+      payload.SMTP_PORT = payload.SMTP_PORT.toString()
     }
 
     // the SMTP_PASS is write-only, it's never shown. If we don't delete it from the payload, it will replace the
@@ -158,7 +125,7 @@ const SmtpForm = () => {
     }
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload as any },
+      { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
           toast.error(`Failed to update settings: ${error.message}`)

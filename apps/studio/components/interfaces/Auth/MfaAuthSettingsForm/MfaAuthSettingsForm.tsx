@@ -65,7 +65,7 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
 
 const totpSchema = z.object({
   MFA_TOTP: z.string(),
-  MFA_MAX_ENROLLED_FACTORS: z
+  MFA_MAX_ENROLLED_FACTORS: z.coerce
     .number()
     .min(0, 'Must be a value 0 or larger')
     .max(30, 'Must be a value no greater than 30'),
@@ -73,7 +73,7 @@ const totpSchema = z.object({
 
 const phoneSchema = z.object({
   MFA_PHONE: z.string(),
-  MFA_PHONE_OTP_LENGTH: z
+  MFA_PHONE_OTP_LENGTH: z.coerce
     .number()
     .min(6, 'Must be a value 6 or larger')
     .max(30, 'Must be a value no greater than 30'),
@@ -102,7 +102,7 @@ const MfaAuthSettingsForm = () => {
   const hasValidMFAPhoneProvider = authConfig?.EXTERNAL_PHONE_ENABLED === true
   const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
 
-  const totpForm = useForm({
+  const totpForm = useForm<z.infer<typeof totpSchema>>({
     resolver: zodResolver(totpSchema),
     defaultValues: {
       MFA_TOTP: 'Enabled',
@@ -110,7 +110,7 @@ const MfaAuthSettingsForm = () => {
     },
   })
 
-  const phoneForm = useForm({
+  const phoneForm = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
     defaultValues: {
       MFA_PHONE: 'Disabled',

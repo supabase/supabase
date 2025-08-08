@@ -1,9 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { AlertCircle } from 'lucide-react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -24,10 +25,9 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { AlertCircle } from 'lucide-react'
 
-const schema = object({
-  SITE_URL: string().required('Must have a Site URL'),
+const schema = z.object({
+  SITE_URL: z.string().url('Must have a Site URL'),
 })
 
 const SiteUrl = () => {
@@ -38,8 +38,8 @@ const SiteUrl = () => {
 
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const siteUrlForm = useForm({
-    resolver: yupResolver(schema),
+  const siteUrlForm = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       SITE_URL: '',
     },
@@ -53,7 +53,7 @@ const SiteUrl = () => {
     }
   }, [authConfig, isUpdatingSiteUrl])
 
-  const onSubmitSiteUrl = (values: any) => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
     setIsUpdatingSiteUrl(true)
 
     updateAuthConfig(
@@ -86,7 +86,7 @@ const SiteUrl = () => {
       <ScaffoldSectionTitle className="mb-4">Site URL</ScaffoldSectionTitle>
 
       <Form_Shadcn_ {...siteUrlForm}>
-        <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
+        <form onSubmit={siteUrlForm.handleSubmit(onSubmit)} className="space-y-4">
           <Card>
             <CardContent className="pt-6">
               <FormField_Shadcn_

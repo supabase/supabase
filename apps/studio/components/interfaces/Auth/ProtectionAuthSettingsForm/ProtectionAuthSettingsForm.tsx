@@ -48,10 +48,10 @@ const schema = z.intersection(
     EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
     SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
     SITE_URL: z.string().url('Must have a Site URL'),
-    SESSIONS_TIMEBOX: z.number().min(0, 'Must be a positive number'),
-    SESSIONS_INACTIVITY_TIMEOUT: z.number().min(0, 'Must be a positive number'),
+    SESSIONS_TIMEBOX: z.coerce.number().min(0, 'Must be a positive number'),
+    SESSIONS_INACTIVITY_TIMEOUT: z.coerce.number().min(0, 'Must be a positive number'),
     SESSIONS_SINGLE_PER_USER: z.boolean(),
-    PASSWORD_MIN_LENGTH: z.number().min(6, 'Must be greater or equal to 6.'),
+    PASSWORD_MIN_LENGTH: z.coerce.number().min(6, 'Must be greater or equal to 6.'),
     PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
     PASSWORD_HIBP_ENABLED: z.boolean(),
   }),
@@ -79,7 +79,7 @@ const ProtectionAuthSettingsForm = () => {
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const protectionForm = useForm({
+  const protectionForm = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,
@@ -87,8 +87,6 @@ const ProtectionAuthSettingsForm = () => {
       SECURITY_MANUAL_LINKING_ENABLED: false,
       SITE_URL: '',
       SECURITY_CAPTCHA_ENABLED: false,
-      SECURITY_CAPTCHA_SECRET: '',
-      SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
       SESSIONS_TIMEBOX: 0,
       SESSIONS_INACTIVITY_TIMEOUT: 0,
       SESSIONS_SINGLE_PER_USER: false,
@@ -100,6 +98,7 @@ const ProtectionAuthSettingsForm = () => {
 
   useEffect(() => {
     if (authConfig && !isUpdatingProtection) {
+      // @ts-expect-error
       protectionForm.reset({
         DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
         EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
@@ -167,13 +166,7 @@ const ProtectionAuthSettingsForm = () => {
       <ScaffoldSectionTitle className="mb-4">Bot and Abuse Protection</ScaffoldSectionTitle>
 
       <Form_Shadcn_ {...protectionForm}>
-        <form
-          onSubmit={
-            // @ts-expect-error SECURITY_CAPTCHA_ENABLED is a literal because of our use of discriminatedUnion, where boolean is expected
-            protectionForm.handleSubmit(onSubmit)
-          }
-          className="space-y-4"
-        >
+        <form onSubmit={protectionForm.handleSubmit(onSubmit)} className="space-y-4">
           <Card>
             <CardContent>
               <FormField_Shadcn_
