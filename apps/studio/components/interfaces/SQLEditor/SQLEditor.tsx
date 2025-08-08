@@ -38,6 +38,7 @@ import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -49,11 +50,11 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
+  generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
@@ -123,7 +124,7 @@ export const SQLEditor = () => {
   // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
   const generatedNewSnippetName = useMemo(
-    () => `${untitledSnippetTitle} ${Math.floor(Math.random() * 900) + 100}`,
+    () => generateSnippetTitle(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [urlId]
   )
@@ -289,7 +290,7 @@ export const SQLEditor = () => {
           return
         }
 
-        if (!isHipaaProjectDisallowed && snippet?.snippet.name === untitledSnippetTitle) {
+        if (!isHipaaProjectDisallowed && snippet?.snippet.name.startsWith(untitledSnippetTitle)) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
