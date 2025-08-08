@@ -9,6 +9,8 @@ export function SurveyWordCloud({
 }) {
   const [currentItems, setCurrentItems] = useState<{ text: string; count: number }[]>([])
   const [isRotating, setIsRotating] = useState(false)
+  const [scramblingTexts, setScramblingTexts] = useState<string[]>([])
+  const [scramblingIndexes, setScramblingIndexes] = useState<Set<number>>(new Set())
 
   // Calculate the range within the current context
   const counts = answers.map((answer) => answer.count)
@@ -18,7 +20,9 @@ export function SurveyWordCloud({
 
   // Initialize with first 12 items
   useEffect(() => {
-    setCurrentItems(answers.slice(0, 12))
+    const initialItems = answers.slice(0, 12)
+    setCurrentItems(initialItems)
+    setScramblingTexts(initialItems.map((item) => item.text))
   }, [answers])
 
   // Start rotation after 3 seconds
@@ -32,25 +36,97 @@ export function SurveyWordCloud({
     return () => clearTimeout(timer)
   }, [answers.length])
 
-  // Simplified rotation logic
+  // Airport board scramble effect
   useEffect(() => {
-    if (!isRotating || answers.length <= 12) return
+    if (!isRotating || answers.length <= 12 || scramblingTexts.length === 0) return
+
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '
+    const characterDelay = 50 // 50ms between each character change
 
     const rotateItems = () => {
-      setCurrentItems((prev) => {
-        return prev.map((item, index) => {
-          // Calculate next item index with wrapping
-          const nextItemIndex = (index + Math.floor(Date.now() / 2000)) % answers.length
-          return answers[nextItemIndex]
-        })
+      const newItems = currentItems.map((item, index) => {
+        // Calculate next item index with wrapping
+        const nextItemIndex = (index + Math.floor(Date.now() / 3000)) % answers.length
+        return answers[nextItemIndex]
+      })
+
+      setCurrentItems(newItems)
+
+      // Start scramble animation for each item
+      newItems.forEach((newItem, index) => {
+        const oldText = scramblingTexts[index] || ''
+        const newText = newItem.text // Keep original case
+        const maxLength = Math.max(oldText.length, newText.length)
+
+        // Mark this index as scrambling
+        setScramblingIndexes((prev) => new Set([...prev, index]))
+
+        for (let charIndex = 0; charIndex < maxLength; charIndex++) {
+          setTimeout(() => {
+            const newChar = newText[charIndex] || ' '
+
+            // If we're past the old text length, just show the new char
+            if (charIndex >= oldText.length) {
+              setScramblingTexts((prev) => {
+                const updated = [...prev]
+                updated[index] = (updated[index] || '').substring(0, charIndex) + newChar
+                return updated
+              })
+              return
+            }
+
+            // Scramble through alphabet for existing characters
+            let scrambleCount = 0
+            const scrambleInterval = setInterval(() => {
+              const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)]
+
+              setScramblingTexts((prev) => {
+                const updated = [...prev]
+                const currentText = updated[index] || ''
+                updated[index] =
+                  currentText.substring(0, charIndex) +
+                  randomChar +
+                  currentText.substring(charIndex + 1)
+                return updated
+              })
+
+              scrambleCount++
+              if (scrambleCount >= 8) {
+                // Scramble 8 times before settling
+                clearInterval(scrambleInterval)
+                setScramblingTexts((prev) => {
+                  const updated = [...prev]
+                  const currentText = updated[index] || ''
+                  updated[index] =
+                    currentText.substring(0, charIndex) +
+                    newChar +
+                    currentText.substring(charIndex + 1)
+                  return updated
+                })
+              }
+            }, characterDelay)
+          }, charIndex * 100) // Stagger each character
+        }
+
+        // Clear scrambling state after animation completes
+        setTimeout(
+          () => {
+            setScramblingIndexes((prev) => {
+              const newSet = new Set(prev)
+              newSet.delete(index)
+              return newSet
+            })
+          },
+          maxLength * 100 + 1000
+        ) // Wait for all characters to finish + buffer
       })
     }
 
-    // Rotate every 4 seconds (slower)
-    const interval = setInterval(rotateItems, 4000)
+    // Rotate every 3 seconds
+    const interval = setInterval(rotateItems, 3000)
 
     return () => clearInterval(interval)
-  }, [isRotating, answers])
+  }, [isRotating, answers, scramblingTexts, currentItems])
 
   return (
     <aside className="flex flex-col gap-3 px-6 py-8">
@@ -58,8 +134,8 @@ export function SurveyWordCloud({
       <ol className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
         {currentItems.map(({ text, count }, index) => (
           <li key={`${text}-${index}`} className="py-4 border-t border-muted border-opacity-50">
-            <span className="font-mono text-foreground md:text-lg text-center transition-opacity duration-500 ease-in-out">
-              {text}
+            <span className="font-mono md:text-lg text-center text-foreground">
+              {scramblingTexts[index].toUpperCase() || text.toUpperCase()}
             </span>
           </li>
         ))}
