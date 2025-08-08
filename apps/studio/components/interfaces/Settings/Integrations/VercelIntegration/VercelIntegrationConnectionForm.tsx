@@ -10,7 +10,7 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
@@ -38,7 +38,7 @@ const VercelIntegrationConnectionForm = ({
 }) => {
   // NOTE(kamil): Ignore sync targets for Vercel Marketplace as it's not synchronized using integration,
   // but through a separate marketplace mechanism. It's not theoretically necessary, but we might have some stale data.
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const envSyncTargets =
     org?.managed_by === 'vercel-marketplace' ? [] : connection.env_sync_targets ?? []
 

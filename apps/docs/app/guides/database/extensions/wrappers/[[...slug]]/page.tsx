@@ -22,8 +22,7 @@ import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { octokit } from '~/lib/octokit'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-
-export const dynamicParams = false
+import { IS_PROD } from 'common'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -416,6 +415,10 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => {
+  if (IS_PROD) {
+    return []
+  }
+
   const mdxPaths = await genGuidesStaticParams('database/extensions/wrappers')()
   const federatedPaths = pageMap.map(({ slug }) => ({
     slug: [slug],
