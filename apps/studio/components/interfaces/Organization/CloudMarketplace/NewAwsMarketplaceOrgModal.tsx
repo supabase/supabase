@@ -52,6 +52,8 @@ const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose }: Pro
       <DialogContent
         onOpenAutoFocus={(event) => event.preventDefault()}
         size="xlarge"
+        onEscapeKeyDown={(e) => (isCreatingOrganization ? e.preventDefault() : onClose())}
+        onPointerDownOutside={(e) => (isCreatingOrganization ? e.preventDefault() : onClose())}
         className="p-2"
       >
         <DialogHeader>

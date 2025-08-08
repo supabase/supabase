@@ -25,7 +25,7 @@ const AwsMarketplaceOnboardingSuccessModal = ({ visible, onClose }: Props) => {
           <div className="p-4 flex flex-col">
             <h1 className="text-xl mb-4">AWS Marketplace Setup completed</h1>
             <p className="text-foreground-light text-sm">
-              The organization is now being managed and billed through AWS Marketplace.
+              The organization is now managed and billed through AWS Marketplace.
             </p>
           </div>
         </DialogSection>
