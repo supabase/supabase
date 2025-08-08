@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common/hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useEffect, useMemo } from 'react'
 import {
   Button,
@@ -35,7 +35,7 @@ const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) =>
 
 export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
   const { ref } = useParams()
-  const { project: selectedProject } = useProjectContext()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const { data: functions, isSuccess, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = useMemo(() => functions ?? [], [functions])

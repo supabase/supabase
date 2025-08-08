@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { useDebounce } from 'use-debounce'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
 import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -33,7 +33,7 @@ interface CronJobScheduleSectionProps {
 }
 
 export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [inputValue, setInputValue] = useState('')
   const [debouncedValue] = useDebounce(inputValue, 750)

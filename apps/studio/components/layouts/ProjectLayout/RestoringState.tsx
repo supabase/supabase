@@ -9,14 +9,14 @@ import { useBackupDownloadMutation } from 'data/database/backup-download-mutatio
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
-import { useProjectContext } from './ProjectContext'
 
 const RestoringState = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)

@@ -16,18 +16,17 @@ import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-function
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { LogoLoader } from 'ui'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
-  const project = useSelectedProject()
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
   const canDeployFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
@@ -219,11 +218,11 @@ const CodePage = () => {
           <FileExplorerAndEditor
             files={files}
             onFilesChange={setFiles}
-            aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
+            aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              includeSchemaMetadata,
+              orgSlug: org?.slug,
             }}
           />
           <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
