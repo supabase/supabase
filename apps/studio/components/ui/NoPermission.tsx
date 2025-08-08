@@ -5,7 +5,7 @@ interface NoPermissionProps {
   isFullPage?: boolean
 }
 
-const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
+export const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
   const NoPermissionMessage = () => (
     <div
       className={[
