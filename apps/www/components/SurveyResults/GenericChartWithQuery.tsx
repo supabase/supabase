@@ -205,14 +205,17 @@ export function GenericChartWithQuery({
 }: GenericChartWithQueryProps) {
   const [isInView, setIsInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
+  const [shouldAnimateBars, setShouldAnimateBars] = useState(false)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
 
   // Intersection observer to trigger data loading
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !hasLoadedOnce) {
             setIsInView(true)
+            setHasLoadedOnce(true)
             observer.disconnect() // Only trigger once
           }
         })
@@ -232,7 +235,7 @@ export function GenericChartWithQuery({
         observer.unobserve(chartRef.current)
       }
     }
-  }, [])
+  }, [hasLoadedOnce])
 
   // Get dynamic filter options
   const {
@@ -254,6 +257,23 @@ export function GenericChartWithQuery({
 
   // Use the custom hook to fetch data
   const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(sqlQuery, isInView)
+
+  // Reset animation state when filters change
+  useEffect(() => {
+    setShouldAnimateBars(false)
+  }, [activeFilters])
+
+  // Trigger bar animation when data loads
+  useEffect(() => {
+    if (!dataLoading && !filtersLoading && chartData.length > 0 && !shouldAnimateBars) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        setShouldAnimateBars(true)
+      }, 100)
+
+      return () => clearTimeout(timer)
+    }
+  }, [dataLoading, filtersLoading, chartData.length, shouldAnimateBars])
 
   const [view, setView] = useState<'chart' | 'sql'>('chart')
 
@@ -315,7 +335,13 @@ export function GenericChartWithQuery({
                   <div key={index} className="flex flex-col">
                     {/*  Text above the bar */}
                     <div
-                      className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums ${item.value === maxValue ? 'text-brand-link dark:text-brand' : 'text-foreground'}`}
+                      className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums transition-colors duration-300 ${
+                        shouldAnimateBars
+                          ? item.value === maxValue
+                            ? 'text-brand-link dark:text-brand'
+                            : 'text-foreground'
+                          : 'text-foreground-muted'
+                      }`}
                     >
                       <span>{item.label}</span>
                       <span>{item.value < 1 ? '<1%' : `${item.value}%`}</span>
@@ -344,6 +370,9 @@ export function GenericChartWithQuery({
                         className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-muted'}`}
                         style={{
                           width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
+                          transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
+                          transformOrigin: 'left',
+                          transition: `transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${index * 0.1}s`,
                         }}
                       />
                     </div>
