@@ -74,7 +74,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
         'Startups are still experimenting. They’re building a diverse mix of software products, iterating quickly, and pursuing monetization selectively.',
       pullQuote: {
         quote:
-          "We’re experimenting in edtech for underserved regions. It's early, but we’re learning fast.",
+          'We’re experimenting in edtech for underserved regions. It’s early, but we’re learning fast.',
         author: 'Sarah Johnson',
         authorPosition: 'Founder',
         authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
@@ -134,6 +134,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'What’s in a Startup’s Tech Stack',
       description:
         'The modern stack centers around open tools, modular infrastructure, and cautious spending.',
+      pullQuote: {
+        quote:
+          'We’re experimenting in edtech for underserved regions. It’s early, but we’re learning fast.',
+        author: 'Sarah Johnson',
+        authorPosition: 'Founder',
+        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+      },
       sections: [
         {
           title: 'Frameworks and Cloud Infra',
@@ -362,13 +369,6 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       title: 'Biggest Challenges for Startups',
       description:
         'Startups remain optimistic about the future but are weighed down by technical complexity, customer acquisition hurdles, and a wish list of tools that still don’t exist.',
-      pullQuote: {
-        quote:
-          'Growth is still our hardest problem. We’ve got a good product, but breaking through the noise is brutal.',
-        author: 'Nina Patel',
-        authorPosition: 'Founder',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-      },
       sections: [
         {
           title: 'The Road Ahead',

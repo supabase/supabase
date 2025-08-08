@@ -340,7 +340,7 @@ export function GenericChartWithQuery({
       </div>
 
       {/* Filters and toggle */}
-      <div className="flex flex-row flex-wrap gap-4 p-4 border-b border-border justify-between">
+      <div className="flex flex-row flex-wrap gap-4 p-4 justify-between">
         {filters && activeFilters && setFilterValue && (
           <div className="flex flex-wrap gap-4">
             {Object.entries(filters).map(([filterKey, filterConfig]) => (

@@ -100,15 +100,10 @@ export function SurveyChapterSection({
   }
 
   return (
-    <div
-      id={title.toLowerCase().replace(/\s+/g, '-')}
-      className="flex flex-col divide-y bg-surface-100 border border-default rounded-md overflow-hidden"
-    >
-      <header className="flex flex-col gap-3 px-6 py-8">
-        <h3 className="text-brand font-mono uppercase tracking-widest text-sm">
-          {number} {title}
-        </h3>
-        <p className="text-foreground text-xl text-balance leading-relaxed">{description}</p>
+    <div id={title.toLowerCase().replace(/\s+/g, '-')} className="flex flex-col">
+      <header className="flex flex-col gap-3 px-6 py-8 text-center text-balance max-w-[48rem] mx-auto">
+        <h3 className="text-brand font-mono uppercase tracking-widest text-sm">{title}</h3>
+        <p className="text-foreground text-xl leading-relaxed">{description}</p>
       </header>
 
       {stats && (
@@ -123,15 +118,6 @@ export function SurveyChapterSection({
         const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
         return ChartComponent ? <ChartComponent key={index} /> : null
       })}
-
-      {/* {pullQuote && (
-        <SurveyPullQuote
-          quote={pullQuote.quote}
-          author={pullQuote.author}
-          authorPosition={pullQuote.authorPosition}
-          authorAvatar={pullQuote.authorAvatar}
-        />
-      )} */}
 
       {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
 
