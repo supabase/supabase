@@ -84,8 +84,11 @@ export const DestinationRow = ({
 
     try {
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      // using the new endpoint that deletes both destination and pipeline together
-      await deleteDestinationPipeline({ projectRef, destinationId: destinationId, pipelineId: pipeline.id })
+      await deleteDestinationPipeline({
+        projectRef,
+        destinationId: destinationId,
+        pipelineId: pipeline.id,
+      })
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
     }

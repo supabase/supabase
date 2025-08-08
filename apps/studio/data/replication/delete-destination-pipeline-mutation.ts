@@ -17,10 +17,13 @@ async function deleteDestinationPipeline(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await del('/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}', {
-    params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
-    signal,
-  })
+  const { data, error } = await del(
+    '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}',
+    {
+      params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
+      signal,
+    }
+  )
   if (error) {
     handleError(error)
   }
