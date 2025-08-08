@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -290,7 +290,11 @@ export const SQLEditor = () => {
           return
         }
 
-        if (!isHipaaProjectDisallowed && snippet?.snippet.name.startsWith(untitledSnippetTitle)) {
+        if (
+          !isHipaaProjectDisallowed &&
+          snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
+          IS_PLATFORM
+        ) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
