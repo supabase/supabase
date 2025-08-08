@@ -171,44 +171,7 @@ For a detailed breakdown of how charges are calculated, refer to [Manage Point-i
 
 ## Restore to a new project
 
-Supabase provides a convenient way to restore data from an existing project into a completely new one. Whether you're using physical backups or Point-in-Time recovery (PITR), this feature allows you to duplicate project data with ease, perform testing safely, or recover data for analysis. Access to this feature is exclusive to users on paid plans and requires that physical backups are enabled for the source project.
-
-<Admonition type="note">
-
-PITR is an additional add-on available for organizations on a paid plan with physical backups enabled.
-
-</Admonition>
-
-To begin, switch to the source project—the project containing the data you wish to restore—and go to the [database backups](https://supabase.com/dashboard/project/_/database/backups/restore-to-new-project) page. Select the **Restore to a New Project** tab.
-
-A list of available backups is displayed. Select the backup you want to use and click the "Restore" button. For projects with PITR enabled, use the date and time selector to specify the exact point in time from which you wish to restore data.
-
-Once you’ve made your choice, Supabase takes care of the rest. A new project is automatically created, replicating key configurations from the original, including the compute instance size, disk attributes, SSL enforcement settings, and network restrictions. The data will remain in the same region as the source project to ensure compliance with data residency requirements. The entire process is fully automated.
-
-<Admonition type="note">
-
-The time required to complete the restoration can vary depending largely on the volume of data involved. If you have a large amount of data you can opt for higher performing disk attributes on the source project _before_ starting a clone operation. These disk attributes will be replicated to the new project. This incurs additional costs which will be displayed before starting.
-
-</Admonition>
-
-There are a few important restrictions to be aware of with the "Restore to a New Project" process:
-
-- Projects that are created through the restoration process cannot themselves be used as a source for further clones at this time.
-- The feature is only accessible to paid plan users with physical backups enabled, ensuring that the necessary resources and infrastructure are available for the restore process.
-
-Before starting the restoration, you’ll be presented with an overview of the costs associated with creating the new project. The new project will incur additional monthly expenses based on the mirrored resources from the source project. It’s important to review these costs carefully before proceeding.
-
-Once the restoration is complete, the new project will be available in your dashboard and will include all data, tables, schemas, and selected settings from the chosen backup source. It is recommended to thoroughly review the new project and perform any necessary tests to ensure everything has been restored as expected.
-
-New projects are completely independent of their source, and as such can be modified and used as desired.
-
-<Admonition type="note">
-
-As the entire database is copied to the new project, this will include all extensions that were enabled at the source. If the source project included extensions that are configured to carry out external operations—for example pg_net, pg_cron, wrappers—these should be disabled once the copy process has completed to avoid any unwanted actions from taking place.
-
-</Admonition>
-
-Restoring to a new project is an excellent way to manage environments more effectively. You can use this feature to create staging environments for testing, experiment with changes without risk to production data, or swiftly recover from unexpected data loss scenarios.
+See the [Duplicate Project docs](/docs/guides/platform/clone-project).
 
 ## Troubleshooting
 

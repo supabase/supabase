@@ -33,8 +33,9 @@ Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/a
 - `redirect_uri`: The URL where Supabase will redirect the user to after providing consent.
 - `response_type`: Set this to `code`.
 - `state`: Information about the state of your app. Note that `redirect_uri` and `state` together cannot exceed 4kB in size.
-- (Recommended) PKCE: We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
-- [deprecated] `scope`: Scopes are configured when you create your OAuth app. Read the [docs](/docs/guides/platform/oauth-apps/oauth-scopes) for more details.
+- `organization_slug`: The slug of the organization you want to connect to. This is optional, but if provided, it will pre-select the organization for the user.
+- [Recommended] PKCE: We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
+- [Deprecated] `scope`: Scopes are configured when you create your OAuth app. Read the [docs](/docs/guides/platform/oauth-apps/oauth-scopes) for more details.
 
 ```ts
 router.get('/connect-supabase/login', async (ctx) => {

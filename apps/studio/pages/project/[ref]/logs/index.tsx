@@ -8,7 +8,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
@@ -17,7 +17,7 @@ export const LogPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const [lastVisitedLogsPage] = useLocalStorageQuery(

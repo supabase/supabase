@@ -56,7 +56,7 @@
     "next-mdx-remote": "^4.4.1",
     "next-seo": "^6.5.0",
     "next-themes": "^0.3.0",
-    "openai": "^4.20.1",
+    "openai": "^4.75.1",
     "parse-numeric-range": "^1.3.0",
     "react": "catalog:",
     "react-copy-to-clipboard": "^5.1.0",
@@ -100,7 +100,7 @@
     "react-hook-form": "^7.45.0",
     "tsconfig": "workspace:*",
     "uuid": "^9.0.1",
-    "zod": "^3.22.4"
+    "zod": "^3.25.76"
   },
   "license": "MIT"
 }

@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
@@ -24,7 +23,8 @@ import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -48,8 +48,8 @@ export interface GridHeaderActionsProps {
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
@@ -251,7 +251,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       passHref
                       href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
                     >
-                      Auth {policies.length > 1 ? 'policies' : 'policy'}
+                      RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
                   </Button>
                 )}

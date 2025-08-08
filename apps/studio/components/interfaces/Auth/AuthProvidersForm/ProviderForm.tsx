@@ -36,7 +36,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const [open, setOpen] = useState(false)
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
+  const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
   const canUpdateConfig: boolean = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'

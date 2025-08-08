@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
@@ -23,8 +24,10 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -46,22 +49,18 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export const CreateBranchModal = () => {
   const allowDataBranching = useFlag('allowDataBranching')
   const { ref } = useParams()
   const router = useRouter()
   const queryClient = useQueryClient()
-  const projectDetails = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: projectDetails } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
 
-  const organization = useSelectedOrganization()
-  const isProPlanAndUp = organization?.plan?.id !== 'free'
+  const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const isBranch = projectDetails?.parent_project_ref !== undefined

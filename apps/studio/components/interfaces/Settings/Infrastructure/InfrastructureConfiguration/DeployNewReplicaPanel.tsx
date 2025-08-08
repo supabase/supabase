@@ -24,8 +24,8 @@ import {
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8sCloudProvider, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
@@ -67,8 +67,8 @@ const DeployNewReplicaPanel = ({
   onClose,
 }: DeployNewReplicaPanelProps) => {
   const { ref: projectRef } = useParams()
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })

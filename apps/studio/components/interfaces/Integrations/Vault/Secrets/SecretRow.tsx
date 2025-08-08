@@ -14,9 +14,9 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
 import EditSecretModal from './EditSecretModal'
@@ -28,7 +28,7 @@ interface SecretRowProps {
 
 const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [modal, setModal] = useState<string | null>(null)
   const [revealSecret, setRevealSecret] = useState(false)
   const name = secret?.name ?? 'No name provided'

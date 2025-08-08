@@ -46,6 +46,7 @@ Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
 Francesco Sansalvadore
+Greg Kress
 Greg P
 Greg Richardson
 Guilherme Souza
@@ -96,6 +97,7 @@ Pavel Borisov
 Paweł Gulbinowicz
 Peter Lyn
 Qiao Han
+Rafael Chacón
 Raminder Singh
 Riccardo Busetti
 Rodrigo Mansueli

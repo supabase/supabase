@@ -10,7 +10,6 @@ import {
   formatWrapperTables,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -28,6 +27,7 @@ import { Bucket } from 'data/storage/buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -50,7 +50,7 @@ import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,

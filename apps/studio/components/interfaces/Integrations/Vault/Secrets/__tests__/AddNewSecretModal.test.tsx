@@ -3,11 +3,14 @@ import { screen, waitFor, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { render } from 'tests/helpers'
 import { addAPIMock } from 'tests/lib/msw'
+import { routerMock } from 'tests/lib/route-mock'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import AddNewSecretModal from '../AddNewSecretModal'
 
 describe(`AddNewSecretModal`, () => {
   beforeEach(() => {
+    // useSelectedProjectQuery -> useParams
+    routerMock.setCurrentUrl(`/project/default/integrations/vault/secrets`)
     // 'http://localhost:3000/api/platform/projects/default'
     addAPIMock({
       method: `get`,

@@ -79,12 +79,12 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         title:
           'Your project is about to exhaust its available disk space, and may become unresponsive once fully exhausted',
         description:
-          'You can opt to increase your disk size up to 200GB on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the Database Settings page.',
       },
       critical: {
         title: 'Your project has exhausted its available disk space, and may become unresponsive',
         description:
-          'You can opt to increase your disk size up to 200GB on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the Database Settings page.',
       },
     },
     cardContent: {

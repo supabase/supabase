@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Eye, EyeOff } from 'lucide-react'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
 import {
   Button,
@@ -37,7 +38,7 @@ const SecretSchema = z.object({
 const AddNewSecretModal = ({ disabled }: AddNewSecretModalProps) => {
   const [visible, setVisible] = useState(false)
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const formId = 'add-vault-secret-form'
   const form = useForm<z.infer<typeof SecretSchema>>({
     resolver: zodResolver(SecretSchema),

@@ -1,7 +1,9 @@
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -10,16 +12,12 @@ import {
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import { useState } from 'react'
-
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { NextPageWithLayout } from 'types'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()

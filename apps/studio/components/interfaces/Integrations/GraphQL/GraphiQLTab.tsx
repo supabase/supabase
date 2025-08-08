@@ -7,12 +7,12 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
@@ -20,7 +20,7 @@ import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
 
   const { data, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
@@ -91,11 +91,11 @@ export const GraphiQLTab = () => {
       <div className="flex flex-col items-center justify-center flex-1 px-4">
         <div className="w-full max-w-md">
           <div className="mb-6">
-            <h1 className="mt-8 mb-2 text-2xl">Enable the GraphQL Extension</h1>
-            <h2 className="text-sm text-foreground-light">
+            <h1 className="mt-8 mb-2">Enable the GraphQL Extension</h1>
+            <p className="text-sm text-foreground-light">
               Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
               API with your Supabase Database.
-            </h2>
+            </p>
           </div>
 
           <ExtensionCard extension={pgGraphqlExtension} />
