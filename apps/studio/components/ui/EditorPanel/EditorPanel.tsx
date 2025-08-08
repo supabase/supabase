@@ -51,6 +51,7 @@ import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { InlineLink } from '../InlineLink'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 type Template = {
   name: string
@@ -93,7 +94,7 @@ export const EditorPanel = ({
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
@@ -328,11 +329,11 @@ export const EditorPanel = ({
               language="pgsql"
               value={currentValue}
               onChange={handleChange}
-              aiEndpoint={`${BASE_PATH}/api/ai/sql/complete-v2`}
+              aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
               aiMetadata={{
                 projectRef: project?.ref,
                 connectionString: project?.connectionString,
-                includeSchemaMetadata,
+                orgSlug: org?.slug,
               }}
               initialPrompt={initialPrompt}
               options={{

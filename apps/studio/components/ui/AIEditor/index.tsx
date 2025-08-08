@@ -19,7 +19,7 @@ interface AIEditorProps {
   aiMetadata?: {
     projectRef?: string
     connectionString?: string | null
-    includeSchemaMetadata?: boolean
+    orgSlug?: string
   }
   initialPrompt?: string
   readOnly?: boolean

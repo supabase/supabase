@@ -5,23 +5,20 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import { IS_PLATFORM } from 'common'
-import { getOrganizations } from 'data/organizations/organizations-query'
-import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { AiOptInLevel, getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 
 import {
-  PRINCIPLES_PROMPT,
+  GENERAL_PROMPT,
   RLS_PROMPT,
   PG_BEST_PRACTICES,
-  GENERAL_PROMPT,
-  RESPONSE_STYLE_PROMPT,
+  CHAT_PROMPT,
   SECURITY_PROMPT,
-  DEBUGGING_PROMPT,
   EDGE_FUNCTION_PROMPT,
 } from 'lib/ai/prompts'
 
@@ -87,38 +84,29 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return msg
   })
 
-  let aiOptInLevel: AiOptInLevel = 'schema'
+  let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
 
-  if (IS_PLATFORM) {
-    // Get organizations and compute opt in level server-side
-    const [organizations, projects] = await Promise.all([
-      getOrganizations({
-        headers: {
-          'Content-Type': 'application/json',
-          ...(authorization && { Authorization: authorization }),
-        },
-      }),
-      getProjects({
-        headers: {
-          'Content-Type': 'application/json',
-          ...(authorization && { Authorization: authorization }),
-        },
-      }),
-    ])
+  if (!IS_PLATFORM) {
+    aiOptInLevel = 'schema'
+  }
 
-    const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-    const selectedProject = projects.find(
-      (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
-    )
+  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+    try {
+      // Get organizations and compute opt in level server-side
+      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
+        orgSlug,
+        authorization,
+        projectRef,
+      })
 
-    // If the project is not in the organization specific by the org slug, return an error
-    if (selectedProject?.organization_slug !== selectedOrg?.slug) {
-      return res.status(400).json({ error: 'Project and organization do not match' })
+      aiOptInLevel = orgAIOptInLevel
+      isLimited = orgAILimited
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ error: 'There was an error fetching your organization details' })
     }
-
-    aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
-    isLimited = selectedOrg?.plan.id === 'free'
   }
 
   const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
@@ -156,13 +144,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
       ${GENERAL_PROMPT}
-      ${PRINCIPLES_PROMPT}
+      ${CHAT_PROMPT}
       ${PG_BEST_PRACTICES}
-      ${RESPONSE_STYLE_PROMPT}
-      ${SECURITY_PROMPT}
-      ${DEBUGGING_PROMPT}
       ${RLS_PROMPT}
       ${EDGE_FUNCTION_PROMPT}
+      ${SECURITY_PROMPT}
     `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`

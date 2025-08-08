@@ -459,11 +459,12 @@ export const SQLEditor = () => {
     completion,
     isLoading: isCompletionLoading,
   } = useCompletion({
-    api: `${BASE_PATH}/api/ai/sql/complete-v2`,
+    api: `${BASE_PATH}/api/ai/code/complete`,
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      includeSchemaMetadata,
+      language: 'sql',
+      orgSlug: org?.slug,
     },
     onError: (error) => {
       toast.error(`Failed to generate SQL: ${error.message}`)
