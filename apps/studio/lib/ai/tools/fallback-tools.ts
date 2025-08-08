@@ -10,7 +10,7 @@ import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
-export const getTools = ({
+export const getFallbackTools = ({
   projectRef,
   connectionString,
   cookie,

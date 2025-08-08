@@ -247,7 +247,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
-        name: options?.name ?? 'Untitled',
+        name: options?.name ?? 'New chat',
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
