@@ -4,7 +4,8 @@ export function SurveyRankedAnswersPair({
   rankedAnswersPair: Array<{ label: string; answers: string[] }>
 }) {
   return (
-    <div className="flex flex-row bg-surface-100 border border-default rounded-md divide-x">
+    <aside className="flex flex-row flex-wrap divide-x divide-muted divide-opacity-50">
+      {/* <div className="flex flex-row bg-surface-100 border border-default rounded-md divide-x"> */}
       {rankedAnswersPair.map((item, index) => (
         <div key={index} className="flex flex-col gap-3 flex-1 px-6 py-8">
           <ol className="flex flex-col gap-3">
@@ -17,6 +18,6 @@ export function SurveyRankedAnswersPair({
           <p className="text-foreground-light text-sm">{item.label}</p>
         </div>
       ))}
-    </div>
+    </aside>
   )
 }

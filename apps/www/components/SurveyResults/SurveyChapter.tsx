@@ -27,12 +27,12 @@ export function SurveyChapter({
       id={`chapter-${number}`}
       className="flex flex-col bg-200 border-t last-of-type:border-b pt-40"
     >
-      <div className="flex flex-col gap-12 container max-w-[60rem] mx-auto px-6 lg:px-0 pb-40">
+      <div className="flex flex-col container max-w-[60rem] mx-auto px-6 lg:px-0">
         <header className="mx-auto flex flex-col gap-4 text-center text-balance">
           <h2 className="text-3xl xl:text-6xl text-balance leading-tight">{title}</h2>
           <p className="text-lg xl:text-xl text-foreground-light text-balance">{description}</p>
         </header>
-        <div className="flex flex-col gap-36">{children}</div>
+        <div className="flex flex-col pb-32">{children}</div>
       </div>
 
       {pullQuote && (

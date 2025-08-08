@@ -102,9 +102,9 @@ export function SurveyChapterSection({
   return (
     <div
       id={title.toLowerCase().replace(/\s+/g, '-')}
-      className="flex flex-col  border-t border-muted pt-24"
+      className="flex flex-col gap-12 border-t border-muted pt-24 mt-24"
     >
-      <header className="flex flex-col gap-3 text-center text-balance max-w-[48rem] mx-auto">
+      <header className="flex flex-col gap-3 text-center text-balance max-w-[48rem] mx-auto pb-12">
         <h3 className="text-brand-link dark:text-brand font-mono uppercase tracking-widest text-sm">
           {title}
         </h3>
@@ -112,7 +112,7 @@ export function SurveyChapterSection({
       </header>
 
       {stats && (
-        <aside className="flex flex-row divide-x divide-muted divide-opacity-40 bg-surface-75">
+        <aside className="flex flex-row flex-wrap divide-x divide-muted divide-opacity-50">
           {stats.map((stat, index) => (
             <SurveyStatCard
               key={index}
@@ -131,11 +131,11 @@ export function SurveyChapterSection({
 
       {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
 
+      {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
+
       {summarizedAnswer && (
         <SurveySummarizedAnswer label={summarizedAnswer.label} answers={summarizedAnswer.answers} />
       )}
-
-      {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
 
       {children}
     </div>

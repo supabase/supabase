@@ -309,7 +309,7 @@ export function GenericChartWithQuery({
   return (
     <div ref={chartRef} className="w-full bg-surface-100 border-y">
       <header className="px-6 py-5">
-        <h3 className="text-foreground-light text-lg">{title}</h3>
+        <h3 className="text-foreground-light text-sm">{title}</h3>
       </header>
       <div
         className={`${view === 'chart' ? 'bg-surface-100' : 'bg-surface-75'} border-b last:border-none`}
@@ -349,7 +349,7 @@ export function GenericChartWithQuery({
 
                     {/* Entire bar (including background) */}
                     <div
-                      className="h-[16px] flex items-center"
+                      className="h-[14px] flex items-center"
                       style={
                         {
                           background: `repeating-linear-gradient(
