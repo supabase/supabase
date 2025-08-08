@@ -219,7 +219,7 @@ export function GenericChartWithQuery({
       },
       {
         threshold: 0.1,
-        rootMargin: '100px', // Start loading 100px before the component comes into view
+        rootMargin: '128px', // Start loading before the component comes into view
       }
     )
 
@@ -278,6 +278,14 @@ export function GenericChartWithQuery({
   const BUTTON_AREA_HEIGHT = 40 // px
   const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px (FIXED_HEIGHT - 40px for button area)
 
+  const skeletonData = [
+    { label: 'Loading', value: 0, rawValue: 0 },
+    { label: 'Loading', value: 0, rawValue: 0 },
+    { label: 'Loading', value: 0, rawValue: 0 },
+  ]
+
+  const displayData = isLoading ? skeletonData : chartData || []
+
   return (
     <div ref={chartRef} className="w-full bg-surface-100 border-y">
       <header className="px-6 py-5">
@@ -292,13 +300,9 @@ export function GenericChartWithQuery({
             height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
           }}
         >
-          {isLoading ? (
+          {error ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-foreground-lighter">Loading data...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-red-500">Error: {error}</div>
+              <p className="text-danger">Error: {error}</p>
             </div>
           ) : view === 'chart' ? (
             <div className="flex flex-col h-full w-full justify-between px-6 pt-4 pb-10">
@@ -307,7 +311,7 @@ export function GenericChartWithQuery({
                 className="flex flex-col gap-10"
                 style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
               >
-                {chartData.map((item, index) => (
+                {displayData.map((item, index) => (
                   <div key={index} className="flex flex-col">
                     {/*  Text above the bar */}
                     <div
