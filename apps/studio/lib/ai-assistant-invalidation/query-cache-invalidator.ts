@@ -297,9 +297,7 @@ export class QueryCacheInvalidator {
    */
   private async handleInvalidation(event: InvalidationEvent): Promise<void> {
     setTimeout(async () => {
-      console.log('start: handleInvalidation')
       await this.executeInvalidation(event)
-      console.log('end: handleInvalidation')
     }, 0)
   }
 
