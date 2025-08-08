@@ -56,8 +56,14 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse<PostResponse
 }
 
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id } = req.query
-  await deleteFolder(id as string)
+  const { ids } = req.query
+
+  if (!ids || typeof ids !== 'string') {
+    return res.status(400).json({ error: 'Snippet IDs are required' })
+  }
+  const folderIds = ids.split(',').map((id) => id.trim())
+
+  await Promise.all(folderIds.map((id) => deleteFolder(id)))
 
   return res.status(200).json({})
 }
