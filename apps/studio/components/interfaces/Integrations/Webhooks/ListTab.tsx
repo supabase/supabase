@@ -39,6 +39,7 @@ export const WebhooksListTab = () => {
     <div className="p-10">
       <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
       <EditHookPanel
+        key={selectedHook?.id}
         visible={showCreateHookForm}
         selectedHook={selectedHook}
         onClose={() => setShowCreateHookForm(false)}

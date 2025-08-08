@@ -181,7 +181,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       <div className="flex h-full" style={{ height: fileExplorerHeight }}>
         <FileExplorer
           columns={columns}
-          openedFolders={openedFolders}
           selectedItems={selectedItems}
           itemSearchString={itemSearchString}
           onFilesUpload={onFilesUpload}

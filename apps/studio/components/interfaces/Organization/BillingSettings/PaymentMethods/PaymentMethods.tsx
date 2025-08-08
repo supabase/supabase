@@ -23,7 +23,7 @@ import {
   useAsyncCheckProjectPermissions,
   useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
 import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
@@ -32,7 +32,7 @@ import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)

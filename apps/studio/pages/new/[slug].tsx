@@ -48,7 +48,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
@@ -140,7 +140,7 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
-  const currentOrg = useSelectedOrganization()
+  const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,

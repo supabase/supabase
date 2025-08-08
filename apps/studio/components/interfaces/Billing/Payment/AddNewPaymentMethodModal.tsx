@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { Modal } from 'ui'
 
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
@@ -34,7 +34,7 @@ const AddNewPaymentMethodModal = ({
 }: AddNewPaymentMethodModalProps) => {
   const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const captchaLoaded = useIsHCaptchaLoaded()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
