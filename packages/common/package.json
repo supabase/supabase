@@ -13,12 +13,13 @@
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
     "@usercentrics/cmp-browser-sdk": "^4.42.0",
-    "flags": "^4.0.0",
     "api-types": "workspace:*",
     "config": "workspace:*",
     "dat.gui": "^0.7.9",
+    "flags": "^4.0.0",
     "lodash": "^4.17.21",
     "next-themes": "^0.3.0",
+    "posthog-js": "^1.257.2",
     "react-use": "^17.4.0",
     "valtio": "catalog:"
   },

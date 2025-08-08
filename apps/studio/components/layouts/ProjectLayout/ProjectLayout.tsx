@@ -7,12 +7,12 @@ import { useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -91,15 +91,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
 
-    const {
-      editorPanel,
-      mobileMenuOpen,
-      showSidebar,
-      setMobileMenuOpen,
-      toggleEditorPanel,
-      setEditorPanel,
-    } = useAppStateSnapshot()
+    const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
+
+    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap])
 
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
@@ -123,28 +118,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     useEffect(() => {
       setIsClient(true)
     }, [])
-
-    useEffect(() => {
-      const handler = (e: KeyboardEvent) => {
-        // Cmd+I: Open AI Assistant, close Editor Panel
-        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
-          setEditorPanel({ open: false })
-          aiSnap.toggleAssistant()
-          e.preventDefault()
-          e.stopPropagation()
-        }
-        // Cmd+E: Toggle Editor Panel, always close AI Assistant
-        if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
-          aiSnap.closeAssistant()
-          toggleEditorPanel()
-          e.preventDefault()
-          e.stopPropagation()
-        }
-      }
-      window.addEventListener('keydown', handler)
-      return () => window.removeEventListener('keydown', handler)
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setEditorPanel, aiSnap, editorPanel.open])
 
     return (
       <>
@@ -238,7 +211,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && (aiSnap.open || editorPanel.open) && (
+                {isClient && aiSnap.open && (
                   <>
                     <ResizableHandle withHandle />
                     <ResizablePanel
@@ -252,11 +225,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         'xl:relative xl:border-l-0'
                       )}
                     >
-                      {aiSnap.open ? (
-                        <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
-                      ) : editorPanel.open ? (
-                        <EditorPanel />
-                      ) : null}
+                      <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
                     </ResizablePanel>
                   </>
                 )}
