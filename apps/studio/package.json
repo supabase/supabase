@@ -25,9 +25,11 @@
     "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch"
   },
   "dependencies": {
-    "@ai-sdk/amazon-bedrock": "^2.2.10",
-    "@ai-sdk/openai": "^1.3.22",
-    "@ai-sdk/react": "^1.2.12",
+    "@ai-sdk/amazon-bedrock": "^3.0.0",
+    "@ai-sdk/openai": "^2.0.0",
+    "@ai-sdk/provider": "^2.0.0",
+    "@ai-sdk/provider-utils": "^3.0.0",
+    "@ai-sdk/react": "^2.0.0",
     "@aws-sdk/credential-providers": "^3.804.0",
     "@dagrejs/dagre": "^1.0.4",
     "@deno/eszip": "0.83.0",
@@ -68,7 +70,7 @@
     "@vercel/functions": "^2.1.0",
     "@vitejs/plugin-react": "^4.3.4",
     "@zip.js/zip.js": "^2.7.29",
-    "ai": "^4.3.16",
+    "ai": "^5.0.0",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
     "common": "workspace:*",
@@ -98,7 +100,7 @@
     "next": "catalog:",
     "next-themes": "^0.3.0",
     "nuqs": "^2.4.1",
-    "openai": "^4.20.1",
+    "openai": "^4.75.1",
     "openapi-fetch": "0.12.4",
     "papaparse": "^5.3.1",
     "path-to-regexp": "^8.0.0",
@@ -141,7 +143,7 @@
     "valtio": "catalog:",
     "yup": "^1.4.0",
     "yup-password": "^0.3.0",
-    "zod": "^3.22.4",
+    "zod": "^3.25.76",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

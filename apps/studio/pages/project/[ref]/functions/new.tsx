@@ -101,7 +101,6 @@ const NewFunctionPage = () => {
   const { ref, template } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -335,11 +334,11 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
+        aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          includeSchemaMetadata,
+          orgSlug: org?.slug,
         }}
       />
 

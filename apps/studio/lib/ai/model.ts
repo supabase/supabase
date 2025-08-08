@@ -6,7 +6,7 @@ import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 const IS_THROTTLED = process.env.IS_THROTTLED !== 'false'
 
 const BEDROCK_PRO_MODEL = 'anthropic.claude-3-7-sonnet-20250219-v1:0'
-const BEDROCK_NORMAL_MODEL = 'anthropic.claude-3-5-haiku-20241022-v1:0'
+const BEDROCK_NORMAL_MODEL = 'openai.gpt-oss-120b-1:0'
 const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {

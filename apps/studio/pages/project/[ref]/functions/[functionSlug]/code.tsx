@@ -25,7 +25,6 @@ const CodePage = () => {
   const { ref, functionSlug } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
@@ -219,11 +218,11 @@ const CodePage = () => {
           <FileExplorerAndEditor
             files={files}
             onFilesChange={setFiles}
-            aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
+            aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              includeSchemaMetadata,
+              orgSlug: org?.slug,
             }}
           />
           <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
