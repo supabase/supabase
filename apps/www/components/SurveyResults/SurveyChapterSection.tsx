@@ -100,8 +100,11 @@ export function SurveyChapterSection({
   }
 
   return (
-    <div id={title.toLowerCase().replace(/\s+/g, '-')} className="flex flex-col">
-      <header className="flex flex-col gap-3 px-6 py-8 text-center text-balance max-w-[48rem] mx-auto">
+    <div
+      id={title.toLowerCase().replace(/\s+/g, '-')}
+      className="flex flex-col gap-6 border-t border-muted pt-24"
+    >
+      <header className="flex flex-col gap-3 text-center text-balance max-w-[48rem] mx-auto">
         <h3 className="text-brand font-mono uppercase tracking-widest text-sm">{title}</h3>
         <p className="text-foreground text-xl leading-relaxed">{description}</p>
       </header>

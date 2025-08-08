@@ -277,18 +277,19 @@ export function GenericChartWithQuery({
               >
                 {chartData.map((item, index) => (
                   <div key={index} className="flex flex-col">
-                    {/* Label above the bar */}
-                    <div className="mb-2">
-                      <span className="text-sm font-mono uppercase tracking-widest">
-                        {item.label}
-                      </span>
+                    {/*  Above the bar */}
+                    <div className="mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums">
+                      {/* Label */}
+                      <span>{item.label}</span>
+                      {/* Percentage */}
+                      <span>{item.value < 1 ? '<1%' : `${item.value}%`}</span>
                     </div>
 
-                    {/* Bar and percentage row */}
-                    <div className="flex items-center gap-3">
+                    {/* Bar */}
+                    <div className="flex items-center gap-3 rounded-xs overflow-hidden">
                       {/* Bar container with flex layout */}
                       <div
-                        className="flex-1 h-[12px] relative flex items-center"
+                        className="flex-1 h-[12px] relative flex items-center bg-surface-300/50 rounded-xs"
                         style={
                           {
                             '--reference': maxValue,
@@ -304,11 +305,6 @@ export function GenericChartWithQuery({
                             width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
                           }}
                         />
-
-                        {/* Percentage positioned after the bar */}
-                        <div className="tabular-nums text-fluid-14-20 font-medium min-w-[60px] ml-3">
-                          {item.value < 1 ? '<1%' : `${item.value}%`}
-                        </div>
                       </div>
                     </div>
                   </div>

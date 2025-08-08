@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
@@ -105,16 +105,43 @@ function StateOfStartupsPage() {
             size="small"
             onClick={() => setIsTocOpen(true)}
             className={cn(
-              'flex flex-row gap-2 shadow-xl rounded-full px-3 pr-5',
+              'flex flex-row gap-2 shadow-xl rounded-full px-2 pr-4',
               isTocOpen && 'hidden'
             )}
           >
-            <div className={cn('flex items-center gap-2')}>
-              <span className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light font-mono uppercase text-xs">
+            <motion.div
+              className={cn('flex items-center gap-2 font-mono uppercase text-xs')}
+              layout
+              transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 30,
+              }}
+            >
+              <span className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light">
                 {activeChapter}
               </span>
-              {currentChapter?.title}
-            </div>
+              <motion.span
+                className="text-foreground tracking-widest"
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                // transition={{
+                //   duration: 1,
+                //   ease: 'easeOut',
+                // }}
+                transition={{
+                  layout: {
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 30,
+                  },
+                  opacity: { duration: 0.2 },
+                }}
+              >
+                {currentChapter?.shortTitle}
+              </motion.span>
+            </motion.div>
           </Button>
 
           {/* Open state - shows full table of contents */}
