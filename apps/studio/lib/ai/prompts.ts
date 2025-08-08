@@ -842,6 +842,7 @@ export const CHAT_PROMPT = `
 # Query rendering**:
   - READ ONLY: Use \`display_query\` with \`sql\` and \`label\`. If results may be visualized, also provide \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\`.
   - The user can run the query from the UI when you use display_query.
+  - Use \`display_query\` in the natural flow of the conversation. **Do not output the query in markdown**
   - WRITE/DDL (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP): Use \`display_query\` with \`sql\` and \`label\`. If using RETURNING (or otherwise returning visualizable data), also provide \`view\`, \`xAxis\`, and \`yAxis\`.
   - If multiple, separate queries are needed, call \`display_query\` once per distinct query.
 
