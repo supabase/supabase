@@ -1,37 +1,15 @@
 import { AuditLogs } from 'components/interfaces/Account'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldContainerLegacy,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
+import { cn } from 'ui'
 
 const Audit: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
-
-  if (newLayoutPreview) {
-    return (
-      <ScaffoldContainerLegacy className="gap-0">
-        <AuditLogs />
-      </ScaffoldContainerLegacy>
-    )
-  }
-
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>Account Audit Logs</ScaffoldTitle>
-        <ScaffoldDescription>
-          View the audit log trail of actions made from your account
-        </ScaffoldDescription>
-      </ScaffoldHeader>
+    <ScaffoldContainer className={cn('[&>div]:mt-8')}>
       <AuditLogs />
     </ScaffoldContainer>
   )

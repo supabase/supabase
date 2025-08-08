@@ -38,11 +38,13 @@ type RefSectionsProps = {
 
 async function RefSections({ libraryId, version }: RefSectionsProps) {
   let flattenedSections = await getFlattenedSections(libraryId, version)
-  flattenedSections = trimIntro(flattenedSections)
+  if (flattenedSections) {
+    flattenedSections = trimIntro(flattenedSections)
+  }
 
   return (
     <div className="flex flex-col my-16 gap-16">
-      {flattenedSections
+      {(flattenedSections || [])
         .filter((section) => section.type !== 'category')
         .map((section, idx) => (
           <Fragment key={`${section.id}-${idx}`}>
@@ -405,7 +407,7 @@ async function FunctionSection({
 }: FunctionSectionProps) {
   const fns = await getFunctionsList(sdkId, version)
 
-  const fn = fns.find((fn) => fn.id === section.id)
+  const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
   let types: MethodTypes | undefined
@@ -470,7 +472,7 @@ async function FunctionSection({
             {fn.examples.map((example) => (
               <TabsContent_Shadcn_ key={example.id} value={example.id}>
                 <MDXRemoteRefs source={example.code} />
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mt-2">
                   {!!example.data?.sql && (
                     <CollapsibleDetails title="Data source" content={example.data.sql} />
                   )}

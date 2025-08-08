@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import { ReactNode, useState } from 'react'
+import { PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { User } from 'data/auth/users-infinite-query'
 import { ChevronDown, User as IconUser } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -8,15 +9,25 @@ import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 import RoleImpersonationSelector from './RoleImpersonationSelector'
 
 export interface RoleImpersonationPopoverProps {
+  portal?: boolean
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
+  disabled?: boolean
+  disabledTooltip?: ReactNode
+  disallowAuthenticatedOption?: boolean
 }
 
 const RoleImpersonationPopover = ({
+  portal = true,
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
+  disallowAuthenticatedOption = false,
+
+  // [Joshen] We can clean these up once the API keys fix is done
+  disabled = false,
+  disabledTooltip,
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -25,9 +36,9 @@ const RoleImpersonationPopover = ({
   const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen} modal={false}>
+    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
+        <ButtonTooltip
           size="tiny"
           type="default"
           className={cn(
@@ -36,6 +47,10 @@ const RoleImpersonationPopover = ({
             variant === 'connected-on-left' && 'rounded-l-none border-l-0',
             variant === 'connected-on-both' && 'rounded-none border-x-0'
           )}
+          disabled={disabled}
+          tooltip={{
+            content: { side: 'bottom', text: disabledTooltip, className: 'text-center w-72' },
+          }}
         >
           <div className="flex items-center gap-1">
             <span className="text-foreground-muted">Role</span>
@@ -54,10 +69,18 @@ const RoleImpersonationPopover = ({
             )}
             <ChevronDown className="text-muted" strokeWidth={1} size={12} />
           </div>
-        </Button>
+        </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-full overflow-hidden" side="bottom" align={align}>
-        <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
+      <PopoverContent_Shadcn_
+        portal={portal}
+        className="p-0 w-[592px] overflow-hidden"
+        side="bottom"
+        align={align}
+      >
+        <RoleImpersonationSelector
+          serviceRoleLabel={serviceRoleLabel}
+          disallowAuthenticatedOption={disallowAuthenticatedOption}
+        />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )

@@ -6,19 +6,36 @@ import { Label } from '@/registry/default/components/ui/label'
 import { useEffect, useState } from 'react'
 
 const names = [
-  'Mark S',
-  'Milchick',
-  'Irving',
-  'Gemma',
-  'Dylan',
-  'Helly R',
-  'Harmony',
-  'Terry',
-  'Ivan',
-  'Alaister',
-  'Joshen',
-  'Jordi',
-  'Filipe',
+  'Ava',
+  'Jasper',
+  'Luna',
+  'Milo',
+  'Zara',
+  'Kai',
+  'Nina',
+  'Leo',
+  'Ivy',
+  'Ezra',
+  'Aria',
+  'Finn',
+  'Sage',
+  'Theo',
+  'Skye',
+  'Rowan',
+  'Mira',
+  'Orion',
+  'Lyra',
+  'Silas',
+  'Nova',
+  'Dashiell',
+  'Freya',
+  'Atlas',
+  'Wren',
+  'Elio',
+  'Calla',
+  'Riven',
+  'Soren',
+  'Indie',
 ]
 
 const RealtimeChatDemo = ({ roomName }: { roomName: string }) => {
@@ -39,7 +56,7 @@ const RealtimeChatDemo = ({ roomName }: { roomName: string }) => {
     },
     {
       id: '2',
-      content: 'in the bathroom',
+      content: 'At the Supabase Meetup - just getting coffee',
       user: {
         name: 'Dylan',
       },
@@ -47,7 +64,7 @@ const RealtimeChatDemo = ({ roomName }: { roomName: string }) => {
     },
     {
       id: '3',
-      content: "Please don't tell us what you're doing in the bathroom",
+      content: "I'm there too!",
       user: {
         name: 'Mark S',
       },

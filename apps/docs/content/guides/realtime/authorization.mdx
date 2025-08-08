@@ -18,6 +18,12 @@ Realtime Authorization is in Public Beta. To use Authorization for your Realtime
 
 </Admonition>
 
+<Admonition type="note">
+
+To enforce private channels you need to disable the 'Allow public access' setting in [Realtime Settings](https://supabase.com/dashboard/project/_?featurePreviewModal=supabase-ui-realtime-settings)
+
+</Admonition>
+
 ## How it works
 
 Realtime uses the `messages` table in your database's `realtime` schema to generate access policies for your clients when they connect to a Channel topic.
@@ -132,6 +138,10 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
 >
   <TabPanel id="js" label="JavaScript">
     ```javascript
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const channel = supabase.channel('room-1', {
       config: { private: true },
     })

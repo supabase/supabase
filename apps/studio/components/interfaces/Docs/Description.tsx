@@ -3,13 +3,13 @@ import { noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
-import { Button } from 'ui'
 import { Loader } from 'lucide-react'
+import { Button } from 'ui'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -35,7 +35,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { table, column, rpc } = metadata
 

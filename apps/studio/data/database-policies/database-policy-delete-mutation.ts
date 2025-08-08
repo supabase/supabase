@@ -1,35 +1,39 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
 export type DatabasePolicyDeleteVariables = {
   projectRef: string
-  connectionString?: string
-  id: number
+  connectionString?: string | null
+  originalPolicy: {
+    id: number
+    name: string
+    schema: string
+    table: string
+  }
 }
 
 export async function deleteDatabasePolicy({
   projectRef,
   connectionString,
-  id,
+  originalPolicy,
 }: DatabasePolicyDeleteVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    headers,
+  const { sql } = pgMeta.policies.remove(originalPolicy)
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['policy', 'delete', originalPolicy.id],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabasePolicyDeleteData = Awaited<ReturnType<typeof deleteDatabasePolicy>>

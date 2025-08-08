@@ -4,13 +4,11 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -28,19 +26,16 @@ import {
   cn,
 } from 'ui'
 
-const OrganizationDropdown = () => {
-  const newLayoutPreview = useNewLayout()
-
+export const OrganizationDropdown = () => {
   const router = useRouter()
   const { slug: routeSlug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
-  const { data: subscription, isSuccess } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   const [open, setOpen] = useState(false)
 
@@ -50,31 +45,30 @@ const OrganizationDropdown = () => {
 
   return (
     <>
-      {newLayoutPreview && (
-        <Link href={`/org/${slug}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
-          <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-          <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
-            {orgName}
-          </span>
-          {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
-        </Link>
-      )}
+      <Link
+        href={slug ? `/org/${slug}` : '/organizations'}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
+        <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <span
+          className={cn(
+            'max-w-32 lg:max-w-none truncate hidden md:block',
+            !!selectedOrganization ? 'text-foreground' : 'text-foreground-lighter'
+          )}
+        >
+          {orgName ?? 'Select an organization'}
+        </span>
+        {!!selectedOrganization && (
+          <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
+        )}
+      </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          {newLayoutPreview ? (
-            <Button
-              type="text"
-              className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-              iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-            />
-          ) : (
-            <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-              <div className="flex items-center space-x-2">
-                <p className={'text-xs'}>{orgName}</p>
-                {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
-              </div>
-            </Button>
-          )}
+          <Button
+            type="text"
+            className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+          />
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
@@ -87,6 +81,7 @@ const OrganizationDropdown = () => {
                     const href = !!routeSlug
                       ? router.pathname.replace('[slug]', org.slug)
                       : `/org/${org.slug}`
+
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}
@@ -110,25 +105,21 @@ const OrganizationDropdown = () => {
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
-              {newLayoutPreview && (
-                <>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer w-full"
-                      onSelect={(e) => {
-                        setOpen(false)
-                        router.push(`/organizations`)
-                      }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <Link href="/organizations" className="flex items-center gap-2 w-full">
-                        <p>All Organizations</p>
-                      </Link>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </>
-              )}
+              <CommandSeparator_Shadcn_ />
+              <CommandGroup_Shadcn_>
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={(e) => {
+                    setOpen(false)
+                    router.push(`/organizations`)
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  <Link href="/organizations" className="flex items-center gap-2 w-full">
+                    <p>All Organizations</p>
+                  </Link>
+                </CommandItem_Shadcn_>
+              </CommandGroup_Shadcn_>
               {organizationCreationEnabled && (
                 <>
                   <CommandSeparator_Shadcn_ />
@@ -156,5 +147,3 @@ const OrganizationDropdown = () => {
     </>
   )
 }
-
-export default OrganizationDropdown

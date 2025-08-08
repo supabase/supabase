@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sat, 08 Mar 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 29 Apr 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/kayhanspace</guid>
+  <title>Kayhan Space saw 8x improvement in developer speed when moving to Supabase</title>
+  <link>https://supabase.com/customers/kayhanspace</link>
+  <description>The Kayhan Space team migrated to Supabase from Amazon RDS and Auth0 to simplify infrastructure and unlock developer velocity.</description>
+  <pubDate>Tue, 20 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/udio</guid>
+  <title>Udio hits the right notes with Supabase</title>
+  <link>https://supabase.com/customers/udio</link>
+  <description>Udio built a scalable, AI-driven music platform on a Supabase backend from day one.</description>
+  <pubDate>Tue, 20 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/euka</guid>
+  <title>Euka used Supabase to unlock faster growth</title>
+  <link>https://supabase.com/customers/euka</link>
+  <description>Supabase helped Euka accelerate development, simplify AI feature rollout, and scale creator marketing faster than ever. A Postgres-based platform gave them the structure, speed, and flexibility they needed to grow.</description>
+  <pubDate>Tue, 29 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/bree</guid>
+  <title>Bree&apos;s Migration to Supabase from Fauna</title>
+  <link>https://supabase.com/customers/bree</link>
+  <description>Bree found 10X performance gains, greater developer velocity, and a better foundation for AI when switching to Supabase.</description>
+  <pubDate>Tue, 08 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/quilia</guid>
   <title>Quilia Saves 75% in Development Time with Supabase’s Data API and RLS Features</title>
   <link>https://supabase.com/customers/quilia</link>

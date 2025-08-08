@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddHookDropdown } from './AddHookDropdown'
@@ -16,11 +16,10 @@ import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
 
   const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)
@@ -83,7 +82,11 @@ export const HooksListing = () => {
           ].join(' ')}
         >
           <p className="text-sm text-foreground-light">No hooks configured yet</p>
-          <AddHookDropdown buttonText="Add a new hook" onSelectHook={setSelectedHook} />
+          <AddHookDropdown
+            align="center"
+            buttonText="Add a new hook"
+            onSelectHook={setSelectedHook}
+          />
         </div>
       )}
 

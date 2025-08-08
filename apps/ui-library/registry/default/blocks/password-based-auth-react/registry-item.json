@@ -20,10 +20,6 @@
     {
       "path": "registry/default/blocks/password-based-auth-react/components/update-password-form.tsx",
       "type": "registry:component"
-    },
-    {
-      "path": "registry/default/clients/react/lib/supabase/client.ts",
-      "type": "registry:lib"
     }
   ],
   "dependencies": ["@supabase/supabase-js@latest"]

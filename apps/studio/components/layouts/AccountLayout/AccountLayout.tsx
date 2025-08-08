@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -21,10 +22,20 @@ export interface AccountLayoutProps {
 }
 
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
-  const newLayoutPreview = useNewLayout()
-
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const backToDashboardURL =
+    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+      ? appSnap.lastRouteBeforeVisitingAccountPage
+      : !!lastVisitedOrganization
+        ? `/org/${lastVisitedOrganization}`
+        : '/organizations'
 
   const accountLinks = [
     {
@@ -47,20 +58,16 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
     }
   }, [router])
 
-  if (!newLayoutPreview) {
-    return children
-  }
-
   return (
     <>
       <Head>
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="flex flex-col h-screen w-screen">
+      <div className={cn('flex flex-col h-screen w-screen')}>
         <ScaffoldContainerLegacy>
           <Link
-            href={appSnap.lastRouteBeforeVisitingAccountPage ?? '/'}
+            href={backToDashboardURL}
             className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
           >
             <ArrowLeft strokeWidth={1.5} size={14} />

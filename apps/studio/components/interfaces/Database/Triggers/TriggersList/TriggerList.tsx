@@ -2,11 +2,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
 import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Badge,
@@ -36,7 +36,7 @@ const TriggerList = ({
   editTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
 
   const { data: triggers } = useDatabaseTriggersQuery({
@@ -139,7 +139,12 @@ const TriggerList = ({
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1" icon={<MoreVertical />} />
+                      <Button
+                        aria-label="More options"
+                        type="default"
+                        className="px-1"
+                        icon={<MoreVertical />}
+                      />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem
@@ -164,9 +169,19 @@ const TriggerList = ({
                               title:
                                 'I can help you make a change to this trigger, here are a few example prompts to get you started:',
                               prompts: [
-                                'Rename this trigger to ...',
-                                'Change the events this trigger responds to ...',
-                                'Modify this trigger to run after instead of before ...',
+                                {
+                                  label: 'Rename Trigger',
+                                  description: 'Rename this trigger to ...',
+                                },
+                                {
+                                  label: 'Change Events',
+                                  description: 'Change the events this trigger responds to ...',
+                                },
+                                {
+                                  label: 'Modify Timing',
+                                  description:
+                                    'Modify this trigger to run after instead of before ...',
+                                },
                               ],
                             },
                             sqlSnippets: [sql],

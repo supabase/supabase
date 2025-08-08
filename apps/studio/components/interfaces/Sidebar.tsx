@@ -1,26 +1,25 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Settings, Users } from 'lucide-react'
+import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, ComponentPropsWithoutRef, FC, useEffect } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useIsMFAEnabled, useParams } from 'common'
 import {
   generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -42,12 +41,7 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns'
-import {
-  useIsAPIDocsSidePanelEnabled,
-  useIsSQLEditorTabsEnabled,
-  useNewLayout,
-} from './App/FeaturePreview/FeaturePreviewContext'
+import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -63,10 +57,6 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
-  const newLayoutPreview = useNewLayout()
-
-  const { ref } = useParams()
-
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
@@ -81,75 +71,57 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
     if (sidebarBehaviour === 'closed') setOpen(false)
   }, [sidebarBehaviour, setOpen])
 
-  if (!newLayoutPreview && !ref) {
-    return null
-  }
-
   return (
-    <>
-      <AnimatePresence>
-        {!hideSideBar && (
-          <SidebarMotion
-            {...props}
-            transition={{
-              delay: 0.4,
-              duration: 0.4,
-            }}
-            overflowing={sidebarBehaviour === 'expandable'}
-            collapsible="icon"
-            variant="sidebar"
-            onMouseEnter={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(true)
-            }}
-            onMouseLeave={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(false)
-            }}
-          >
-            <SidebarContent
-              footer={
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="text"
-                      className="w-min px-1.5 mx-0.5 group-data-[state=expanded]:px-2"
-                      icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="top" align="start" className="w-40">
-                    <DropdownMenuRadioGroup
-                      value={sidebarBehaviour}
-                      onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
-                    >
-                      <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="expandable">
-                        Expand on hover
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
-            />
-          </SidebarMotion>
-        )}
-      </AnimatePresence>
-    </>
+    <AnimatePresence>
+      {!hideSideBar && (
+        <SidebarMotion
+          {...props}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          overflowing={sidebarBehaviour === 'expandable'}
+          collapsible="icon"
+          variant="sidebar"
+          onMouseEnter={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(true)
+          }}
+          onMouseLeave={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(false)
+          }}
+        >
+          <SidebarContent
+            footer={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="text"
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={sidebarBehaviour}
+                    onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
+                  >
+                    <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="expandable">
+                      Expand on hover
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
+          />
+        </SidebarMotion>
+      )}
+    </AnimatePresence>
   )
 }
 
-export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
   const { ref: projectRef } = useParams()
-
-  // temporary logic to show settings route in sidebar footer
-  // this will be removed once we move to an updated org/project nav
-  const router = useRouter()
-  const { ref } = useParams()
-  const { project } = useProjectContext()
-  const settingsRoutes = generateSettingsRoutes(ref, project)
-  const activeRoute = router.pathname.split('/')[3]
 
   return (
     <>
@@ -183,10 +155,12 @@ export function SideBarNavLink({
   route,
   active,
   onClick,
+  disabled,
   ...props
 }: {
   route: any
   active?: boolean
+  disabled?: boolean
   onClick?: () => void
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const [sidebarBehaviour] = useLocalStorageQuery(
@@ -195,9 +169,10 @@ export function SideBarNavLink({
   )
 
   const buttonProps = {
+    disabled,
     tooltip: sidebarBehaviour === 'closed' ? route.label : '',
     isActive: active,
-    className: 'text-sm',
+    className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
     size: 'default' as const,
     onClick: onClick,
   }
@@ -213,7 +188,7 @@ export function SideBarNavLink({
 
   return (
     <SidebarMenuItem>
-      {route.link ? (
+      {route.link && !disabled ? (
         <SidebarMenuButton {...buttonProps} asChild>
           <Link href={route.link}>{content}</Link>
         </SidebarMenuButton>
@@ -239,16 +214,13 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
   )
 }
 
-function ProjectLinks() {
+const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useAppStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
-
-  const showWarehouse = useFlag('warehouse')
-  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -264,9 +236,7 @@ function ProjectLinks() {
     'realtime:all',
   ])
 
-  const toolRoutes = generateToolRoutes(ref, project, {
-    sqlEditorTabs: isSqlEditorTabsEnabled,
-  })
+  const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
@@ -337,14 +307,11 @@ function ProjectLinks() {
               </div>
             )
           } else if (route.key === 'logs') {
-            // TODO: Undo this when warehouse flag is removed
-            const label = showWarehouse ? 'Logs & Analytics' : route.label
-            const newRoute = { ...route, label }
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={newRoute}
-                active={activeRoute === newRoute.key}
+                route={route}
+                active={activeRoute === route.key}
               />
             )
           } else {
@@ -376,13 +343,17 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
 
+  const { data: org } = useSelectedOrganizationQuery()
+  const isUserMFAEnabled = useIsMFAEnabled()
+  const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
+
   const activeRoute = router.pathname.split('/')[3]
 
   const navMenuItems = [
     {
       label: 'Projects',
       href: `/org/${slug}`,
-      key: '',
+      key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
@@ -404,6 +375,12 @@ const OrganizationLinks = () => {
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
+      label: 'Billing',
+      href: `/org/${slug}/billing`,
+      key: 'billing',
+      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
       key: 'settings',
@@ -417,16 +394,16 @@ const OrganizationLinks = () => {
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
             key={item.key}
+            disabled={disableAccessMfa}
             active={
               i === 0
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/billing') ||
-                    router.pathname.includes('/invoices') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
-                    router.pathname.includes('/documents')
+                    router.pathname.includes('/documents') ||
+                    router.pathname.includes('/security')
                   : activeRoute === item.key
             }
             route={{

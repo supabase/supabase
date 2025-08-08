@@ -35,7 +35,10 @@ export const useLintRuleDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(lintKeys.lintRules(projectRef))
+        await Promise.all([
+          queryClient.invalidateQueries(lintKeys.lintRules(projectRef)),
+          queryClient.invalidateQueries(lintKeys.lint(projectRef)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

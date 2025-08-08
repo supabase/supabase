@@ -20,6 +20,50 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Kayhan Space saw 8x improvement in developer speed when moving to Supabase',
+    description:
+      'The Kayhan Space team migrated to Supabase from Amazon RDS and Auth0 to simplify infrastructure and unlock developer velocity.',
+    organization: 'Kayhan Space',
+    imgUrl: 'images/customers/logos/kayhanspace.png',
+    logo: '/images/customers/logos/kayhanspace.png',
+    logo_inverse: '/images/customers/logos/light/kayhanspace.png',
+    url: '/customers/kayhanspace',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Udio hits the right notes with Supabase',
+    description:
+      'Udio built a scalable, AI-driven music platform on a Supabase backend from day one.',
+    organization: 'Udio',
+    imgUrl: 'images/customers/logos/udio.png',
+    logo: '/images/customers/logos/udio.png',
+    logo_inverse: '/images/customers/logos/light/udio.png',
+    url: '/customers/udio',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Euka used Supabase to unlock faster growth',
+    description:
+      'Supabase helped Euka accelerate development, simplify AI feature rollout, and scale creator marketing faster than ever.',
+    organization: 'Euka',
+    imgUrl: 'images/customers/logos/euka.png',
+    logo: '/images/customers/logos/euka.png',
+    logo_inverse: '/images/customers/logos/light/euka.png',
+    url: '/customers/euka',
+  },
+  {
+    type: 'Customer Story',
+    title: "Bree's Migration to Supabase from Fauna",
+    description:
+      'Discover how Bree found 10X performance gains, greater developer velocity, and a better foundation for AI when switching to Supabase.',
+    organization: 'Bree',
+    imgUrl: 'images/customers/logos/bree.png',
+    logo: '/images/customers/logos/bree.png',
+    logo_inverse: '/images/customers/logos/light/bree.png',
+    url: '/customers/bree',
+  },
+  {
+    type: 'Customer Story',
     title: 'Deriv: Accelerating Online Trading with a Scalable Postgres Backend',
     description: 'Accelerating Online Trading with a Scalable Postgres Backend',
     organization: 'Deriv',

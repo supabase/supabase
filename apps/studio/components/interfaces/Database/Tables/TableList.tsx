@@ -20,7 +20,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -35,7 +34,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -54,7 +54,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 
 interface TableListProps {
@@ -72,7 +72,7 @@ const TableList = ({
 }: TableListProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const prefetchEditorTablePage = usePrefetchEditorTablePage()
 
@@ -184,7 +184,7 @@ const TableList = ({
     (x) => visibleTypes.includes(x.type)
   )
 
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
@@ -221,7 +221,7 @@ const TableList = ({
                 icon={<Filter />}
               />
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={true}>
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                 <p className="text-xs">Show entity types</p>
                 <div className="flex flex-col">
@@ -269,7 +269,7 @@ const TableList = ({
             icon={<Search size={12} />}
           />
 
-          {!isLocked && (
+          {!isSchemaLocked && (
             <ButtonTooltip
               className="w-auto ml-auto"
               icon={<Plus />}
@@ -290,7 +290,7 @@ const TableList = ({
         </div>
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
+      {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
 
       {isLoading && <GenericSkeletonLoader />}
 
@@ -462,7 +462,7 @@ const TableList = ({
                             </Link>
                           </Button>
 
-                          {!isLocked && (
+                          {!isSchemaLocked && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button type="default" className="px-1" icon={<MoreVertical />} />
@@ -519,10 +519,10 @@ const TableList = ({
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <DropdownMenuItem
-                                          disabled={!canUpdateTables || isLocked}
+                                          disabled={!canUpdateTables || isSchemaLocked}
                                           className="!pointer-events-auto gap-x-2"
                                           onClick={() => {
-                                            if (canUpdateTables && !isLocked) {
+                                            if (canUpdateTables && !isSchemaLocked) {
                                               onDeleteTable({
                                                 ...x,
                                                 schema: selectedSchema,

@@ -5,8 +5,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -21,11 +19,13 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
+import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, renameTab } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -58,7 +58,7 @@ export interface SidePanelEditorProps {
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
-  onTableCreated?: (table: PostgresTable) => void
+  onTableCreated?: (table: RetrieveTableResult) => void
 }
 
 const SidePanelEditor = ({
@@ -69,11 +69,11 @@ const SidePanelEditor = ({
 }: SidePanelEditorProps) => {
   const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const tabsSnap = useTabsStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -103,7 +103,7 @@ const SidePanelEditor = ({
     onError: () => {},
   })
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const saveRow = async (
     payload: any,
@@ -124,7 +124,7 @@ const SidePanelEditor = ({
           table: selectedTable,
           payload,
           enumArrayColumns,
-          impersonatedRole: getImpersonatedRole(),
+          roleImpersonationState: getImpersonatedRoleState(),
         })
       } catch (error: any) {
         saveRowError = error
@@ -141,7 +141,7 @@ const SidePanelEditor = ({
               configuration,
               payload,
               enumArrayColumns,
-              impersonatedRole: getImpersonatedRole(),
+              roleImpersonationState: getImpersonatedRoleState(),
             })
           } catch (error: any) {
             saveRowError = error
@@ -228,7 +228,7 @@ const SidePanelEditor = ({
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId, primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
+    const { primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     if (!project || selectedTable === undefined) {
       return console.error('no project or table selected')
@@ -246,7 +246,7 @@ const SidePanelEditor = ({
       : await updateColumn({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
-          id: columnId as string,
+          originalColumn: selectedColumnToEdit as PostgresColumn,
           payload: payload as UpdateColumnPayload,
           selectedTable,
           primaryKey,
@@ -312,67 +312,72 @@ const SidePanelEditor = ({
     })
   }
 
-  const updateTableRealtime = async (table: PostgresTable, enabled: boolean) => {
+  const updateTableRealtime = async (table: RetrieveTableResult, enabled: boolean) => {
     if (!project) return console.error('Project is required')
-    let realtimePublication = (publications ?? []).find((pub) => pub.name === 'supabase_realtime')
-    const publicTables = await queryClient.fetchQuery({
-      queryKey: tableKeys.list(project.ref, 'public', includeColumns),
-      queryFn: ({ signal }) =>
-        getTables(
-          { projectRef: project.ref, connectionString: project.connectionString, schema: 'public' },
-          signal
-        ),
-    })
+    const realtimePublication = publications?.find((pub) => pub.name === 'supabase_realtime')
 
     try {
       if (realtimePublication === undefined) {
-        realtimePublication = await createPublication({
+        const realtimeTables = enabled ? [`${table.schema}.${table.name}`] : []
+        await createPublication({
           projectRef: project.ref,
-          connectionString: project?.connectionString,
+          connectionString: project.connectionString,
           name: 'supabase_realtime',
           publish_insert: true,
           publish_update: true,
           publish_delete: true,
+          tables: realtimeTables,
         })
+        return
       }
-      const { id, tables: publicationTables } = realtimePublication
-      if (publicationTables === null) {
+      if (realtimePublication.tables === null) {
         // UI doesn't have support for toggling realtime for ALL tables
         // Switch it to individual tables via an array of strings
         // Refer to PublicationStore for more information about this
+        const publicTables = await queryClient.fetchQuery({
+          queryKey: tableKeys.list(project.ref, 'public', includeColumns),
+          queryFn: ({ signal }) =>
+            getTables(
+              {
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                schema: 'public',
+              },
+              signal
+            ),
+        })
+        // TODO: support tables in non-public schemas
         const realtimeTables = enabled
-          ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
-          : publicTables
-              .filter((t: any) => t.id !== table.id)
-              .map((t: any) => `${t.schema}.${t.name}`)
+          ? publicTables.map((t) => `${t.schema}.${t.name}`)
+          : publicTables.filter((t) => t.id !== table.id).map((t) => `${t.schema}.${t.name}`)
         await updatePublication({
-          id,
+          id: realtimePublication.id,
           projectRef: project.ref,
-          connectionString: project?.connectionString,
+          connectionString: project.connectionString,
           tables: realtimeTables,
         })
-      } else {
-        const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
-        const realtimeTables =
-          isAlreadyEnabled && !enabled
-            ? // Toggle realtime off
-              publicationTables
-                .filter((t: any) => t.id !== table.id)
-                .map((t: any) => `${t.schema}.${t.name}`)
-            : !isAlreadyEnabled && enabled
-              ? // Toggle realtime on
-                [`${table.schema}.${table.name}`].concat(
-                  publicationTables.map((t: any) => `${t.schema}.${t.name}`)
-                )
-              : null
-        if (realtimeTables === null) return
-        await updatePublication({
-          id,
-          projectRef: project.ref,
-          connectionString: project?.connectionString,
-          tables: realtimeTables,
-        })
+        return
       }
+      const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id == table.id)
+      const realtimeTables =
+        isAlreadyEnabled && !enabled
+          ? // Toggle realtime off
+            realtimePublication.tables
+              .filter((t) => t.id !== table.id)
+              .map((t) => `${t.schema}.${t.name}`)
+          : !isAlreadyEnabled && enabled
+            ? // Toggle realtime on
+              realtimePublication.tables
+                .map((t) => `${t.schema}.${t.name}`)
+                .concat([`${table.schema}.${table.name}`])
+            : null
+      if (realtimeTables === null) return
+      await updatePublication({
+        id: realtimePublication.id,
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        tables: realtimeTables,
+      })
     } catch (error: any) {
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
     }
@@ -486,10 +491,10 @@ const SidePanelEditor = ({
             `Table ${table.name} has been updated but there were some errors. Please check these errors separately.`
           )
         } else {
-          if (isTableEditorTabsEnabled && ref && payload.name) {
+          if (ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            renameTab(ref, tabId, payload.name)
+            tabsSnap.updateTab(tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
@@ -623,7 +628,11 @@ const SidePanelEditor = ({
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
-      <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
+      <SchemaEditor
+        visible={snap.sidePanel?.type === 'schema'}
+        onSuccess={onClosePanel}
+        closePanel={onClosePanel}
+      />
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}

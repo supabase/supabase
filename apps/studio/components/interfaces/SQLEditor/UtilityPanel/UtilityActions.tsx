@@ -1,12 +1,11 @@
 import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
+import { IS_PLATFORM } from 'lib/constants'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -27,7 +26,7 @@ export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
+  hasSelection?: boolean
   prettifyQuery: () => void
   executeQuery: () => void
 }
@@ -36,11 +35,10 @@ const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
-  hasSelection,
+  hasSelection = false,
   prettifyQuery,
   executeQuery,
 }: UtilityActionsProps) => {
-  const os = detectOS()
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
@@ -80,6 +78,7 @@ const UtilityActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            data-testId="sql-editor-utility-actions"
             type="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
             icon={<MoreVertical className="text-foreground-light" />}
@@ -188,6 +187,7 @@ const UtilityActions = ({
             variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
           <SqlRunButton
+            hasSelection={hasSelection}
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}
             className="rounded-l-none min-w-[82px]"

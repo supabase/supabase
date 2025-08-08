@@ -27,8 +27,8 @@ interface FileExplorerAndEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
-    includeSchemaMetadata?: boolean
+    connectionString?: string | null
+    orgSlug?: string
   }
 }
 
@@ -82,7 +82,7 @@ const FileExplorerAndEditor = ({
   }
 
   const addNewFile = () => {
-    const newId = Math.max(...files.map((f) => f.id)) + 1
+    const newId = Math.max(0, ...files.map((f) => f.id)) + 1
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
     onFilesChange([
       ...updatedFiles,
@@ -251,7 +251,7 @@ const FileExplorerAndEditor = ({
           aiMetadata={aiMetadata}
           options={{
             tabSize: 2,
-            fontSize: 12,
+            fontSize: 13,
             minimap: { enabled: false },
             wordWrap: 'on',
             lineNumbers: 'on',

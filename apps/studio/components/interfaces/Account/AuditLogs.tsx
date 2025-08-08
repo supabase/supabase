@@ -38,23 +38,6 @@ const AuditLogs = () => {
       iso_timestamp_end: dateRange.to,
     })
 
-  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
-  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
-  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
-  // higher tiers (7 days of logs).The user will see a loading shimmer.
-  useEffect(() => {
-    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
-    const interval = setInterval(() => {
-      const currentTime = dayjs().utc().set('millisecond', 0)
-      setDateRange({
-        from: currentTime.add(duration).toISOString(),
-        to: currentTime.toISOString(),
-      })
-    }, 5 * 60000)
-
-    return () => clearInterval(interval)
-  }, [dateRange.from, dateRange.to])
-
   const retentionPeriod = data?.retention_period ?? 0
   const logs = data?.result ?? []
   const sortedLogs = logs
@@ -73,6 +56,23 @@ const AuditLogs = () => {
 
   const minDate = dayjs().subtract(retentionPeriod, 'days')
   const maxDate = dayjs()
+
+  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
+  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
+  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  useEffect(() => {
+    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
+    const interval = setInterval(() => {
+      const currentTime = dayjs().utc().set('millisecond', 0)
+      setDateRange({
+        from: currentTime.add(duration).toISOString(),
+        to: currentTime.toISOString(),
+      })
+    }, 5 * 60000)
+
+    return () => clearInterval(interval)
+  }, [dateRange.from, dateRange.to])
 
   return (
     <>

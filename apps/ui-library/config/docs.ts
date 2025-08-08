@@ -36,6 +36,18 @@ export const aiEditorsRules: SidebarNavGroup = {
   ],
 }
 
+export const platformBlocks: SidebarNavGroup = {
+  title: 'Platform',
+  items: [
+    {
+      title: 'Platform Kit',
+      href: '/docs/platform/platform-kit',
+      items: [],
+      commandItemLabel: 'Platform Kit',
+    },
+  ],
+}
+
 // Component definitions with supported frameworks
 export const componentPages: SidebarNavGroup = {
   title: 'Components',
@@ -53,6 +65,14 @@ export const componentPages: SidebarNavGroup = {
       href: '/docs/nextjs/password-based-auth',
       items: [],
       commandItemLabel: 'Password-Based Auth',
+    },
+    {
+      title: 'Social Auth',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/social-auth',
+      items: [],
+      new: true,
+      commandItemLabel: 'Social Auth',
     },
     {
       title: 'Dropzone',
@@ -88,6 +108,14 @@ export const componentPages: SidebarNavGroup = {
       href: '/docs/nextjs/realtime-chat',
       items: [],
       commandItemLabel: 'Realtime Chat',
+    },
+    {
+      title: 'Infinite Query Hook',
+      supportedFrameworks: [],
+      href: '/docs/infinite-query-hook',
+      new: true,
+      items: [],
+      commandItemLabel: 'Infinite Query Hook',
     },
   ],
 }

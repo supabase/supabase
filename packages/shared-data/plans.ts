@@ -1,5 +1,8 @@
+export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
+
 export interface PricingInformation {
   id: string
+  planId: PlanId
   name: string
   nameBadge?: string
   costUnit?: string
@@ -18,6 +21,7 @@ export interface PricingInformation {
 export const plans: PricingInformation[] = [
   {
     id: 'tier_free',
+    planId: 'free',
     name: 'Free',
     nameBadge: '',
     costUnit: '/ month',
@@ -63,6 +67,7 @@ export const plans: PricingInformation[] = [
   },
   {
     id: 'tier_pro',
+    planId: 'pro',
     name: 'Pro',
     nameBadge: 'Most Popular',
     costUnit: '/ month',
@@ -100,6 +105,7 @@ export const plans: PricingInformation[] = [
   },
   {
     id: 'tier_team',
+    planId: 'team',
     name: 'Team',
     nameBadge: '',
     costUnit: '/ month',
@@ -113,8 +119,8 @@ export const plans: PricingInformation[] = [
         partners: [],
         features: [
           'SOC2',
+          'Project-scoped and read-only access',
           'HIPAA available as paid add-on',
-          'Read-only and Billing member roles',
           'SSO for Supabase Dashboard',
           'Priority email support & SLAs',
           'Daily backups stored for 14 days',
@@ -127,6 +133,7 @@ export const plans: PricingInformation[] = [
   },
   {
     id: 'tier_enterprise',
+    planId: 'enterprise',
     name: 'Enterprise',
     href: 'https://forms.supabase.com/enterprise',
     description: 'For large-scale applications running Internet scale workloads.',
@@ -148,7 +155,7 @@ export const plans: PricingInformation[] = [
     preface: '',
     cta: 'Contact Us',
   },
-]
+] as const
 
 export function pickFeatures(plan: PricingInformation, billingPartner: string = '') {
   return (

@@ -1,10 +1,10 @@
 ---
 title: 'Connect to your database'
 description: 'Connect to Postgres from your frontend, backend, or serverless environment'
-subtitle: 'Connect to Postgres from your frontend, backend, or serverless environment'
+subtitle: 'Supabase provides multiple methods to connect to your Postgres database, whether you’re working on the frontend, backend, or utilizing serverless functions.'
 ---
 
-## Quick summary
+## How to connect to your Postgres databases
 
 How you connect to your database depends on where you're connecting from:
 
@@ -52,7 +52,7 @@ The Data APIs allow you to interact with your database using REST or GraphQL req
 - [REST](/docs/guides/api)
 - [GraphQL](/docs/guides/graphql/api)
 
-For convenience, you can also use the Supabase client libraries, which wrap the Data APIs with a developer-friendly interface and automatically handle authentication:
+For convenience, you can also use the [Supabase client libraries](/docs/reference), which wrap the Data APIs with a developer-friendly interface and automatically handle authentication:
 
 - [JavaScript](/docs/reference/javascript)
 - [Flutter](/docs/reference/dart)
@@ -77,11 +77,7 @@ The connection string looks like this:
 postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
 ```
 
-Get your project's direct string from the [Database Settings](/dashboard/project/_/settings/database) page:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is unchecked. Copy the URI.
+Get your project's direct connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 ## Shared pooler
 
@@ -97,11 +93,7 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-Get your project's session mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Session mode` is selected. Copy the URI.
+Get your project's Session pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 ### Supavisor transaction mode
 
@@ -119,17 +111,15 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
-Get your project's transaction mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Transaction mode` is selected. Copy the URI.
+Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 ## Dedicated pooler
 
 For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
+
+Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 <Admonition type="note">
 
@@ -177,3 +167,43 @@ You can obtain your connection info and Server root certificate from your applic
 ## Resources
 
 - [Connection management](/docs/guides/database/connection-management)
+- [Connecting with psql](/docs/guides/database/psql)
+- [Importing data into Supabase](/docs/guides/database/import-data)
+
+## Troubleshooting and Postgres connection string FAQs
+
+Below are answers to common challenges and queries.
+
+### What is a “connection refused” error?
+
+A “Connection refused” error typically means your database isn’t reachable. Ensure your Supabase project is running, confirm your database’s connection string, check firewall settings, and validate network permissions.
+
+### What is the “FATAL: Password authentication failed” error?
+
+This error occurs when your credentials are incorrect. Double-check your username and password from the Supabase dashboard. If the problem persists, reset your database password from the project settings.
+
+### How do you connect using IPv4?
+
+Supabase’s default direct connection supports IPv6 only. To connect over IPv4, consider using the Supavisor session or transaction modes, or a connection pooler (shared or dedicated), which support both IPv4 and IPv6.
+
+### How do you choose a connection method?
+
+- Direct connection: Persistent backend services (IPv6 only)
+- Supavisor session mode: Persistent backend needing IPv4
+- Supavisor transaction mode: Serverless functions
+- Shared pooler: General-purpose connections with IPv4 and IPv6
+- Dedicated pooler: High-performance apps requiring dedicated resources (paid tier)
+
+### Where is the Postgres connection string in Supabase?
+
+Your connection string is located in the Supabase Dashboard. Click the "Connect" button at the top of the page.
+
+### Can you use `psql` with a Supabase database?
+
+Yes. Use the following command structure, replacing `your_connection_string` with the string from your Supabase dashboard:
+
+```
+psql "your_connection_string"
+```
+
+Ensure you have `psql` installed locally before running this command.

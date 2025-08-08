@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
@@ -24,8 +23,9 @@ import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -48,8 +48,8 @@ export interface GridHeaderActionsProps {
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
@@ -60,7 +60,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isMaterializedView = isTableLikeMaterializedView(table)
 
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  const isLocked = PROTECTED_SCHEMAS.includes(table.schema)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
@@ -177,7 +177,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: table.id,
+      name: table.name,
       schema: table.schema,
       payload: payload,
     })
@@ -199,10 +200,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </TooltipContent>
             </Tooltip>
           )}
-          {isTable && !isLocked ? (
+          {isTable && !isSchemaLocked ? (
             table.rls_enabled ? (
               <>
-                {policies.length < 1 && !isLocked ? (
+                {policies.length < 1 && !isSchemaLocked ? (
                   <ButtonTooltip
                     asChild
                     type="default"
@@ -226,10 +227,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 ) : (
                   <Button
                     asChild
-                    type={policies.length < 1 && !isLocked ? 'warning' : 'default'}
+                    type={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
                     className="group"
                     icon={
-                      isLocked || policies.length > 0 ? (
+                      isSchemaLocked || policies.length > 0 ? (
                         <div
                           className={cn(
                             'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
@@ -250,7 +251,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       passHref
                       href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
                     >
-                      Auth {policies.length > 1 ? 'policies' : 'policy'}
+                      RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
                   </Button>
                 )}
@@ -262,7 +263,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     RLS disabled
                   </Button>
                 </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+                <PopoverContent_Shadcn_
+                  // using `portal` for a safari fix. issue with rendering outside of body element
+                  portal
+                  className="min-w-[395px] text-sm"
+                  align="end"
+                >
                   <h3 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
                   </h3>
@@ -275,7 +281,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       With RLS enabled, anonymous users will not be able to read/write data in the
                       table.
                     </p>
-                    {!isLocked && (
+                    {!isSchemaLocked && (
                       <div className="mt-2">
                         <Button
                           type="default"
@@ -297,7 +303,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -342,7 +353,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -376,17 +392,23 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             <Popover_Shadcn_ modal={false}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                  Foreign table is accessible via your project's APIs
+                  Unprotected Data API access
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
                 </h3>
                 <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                   <p>
-                    Foreign tables do not enforce RLS. Move them to a private schema not exposed to
-                    Postgrest or disable Postgrest.
+                    Foreign tables do not enforce RLS, which may allow unrestricted access. To
+                    secure them, either move foreign tables to a private schema not exposed by
+                    PostgREST, or <a href="">disable PostgREST access</a> entirely.
                   </p>
 
                   <div className="mt-2">

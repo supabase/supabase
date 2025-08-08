@@ -1,12 +1,14 @@
 export type projectKeys = {
   apiUrl: string | null
   anonKey: string | null
+  publishableKey: string | null
 }
 
 export interface ContentFileProps {
   projectKeys: {
     apiUrl: string
-    anonKey: string
+    anonKey?: string
+    publishableKey?: string
   }
   connectionStringPooler: {
     transactionShared: string
@@ -14,5 +16,6 @@ export interface ContentFileProps {
     transactionDedicated?: string
     sessionDedicated?: string
     ipv4SupportedForDedicatedPooler: boolean
+    direct?: string
   }
 }

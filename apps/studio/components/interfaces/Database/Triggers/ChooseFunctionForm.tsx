@@ -9,27 +9,33 @@ import { Button, SidePanel } from 'ui'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import SqlEditor from 'components/ui/SqlEditor'
-import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { HelpCircle, Terminal, ChevronDown } from 'lucide-react'
+import {
+  useDatabaseFunctionsQuery,
+  type DatabaseFunction,
+} from 'data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ChevronDown, HelpCircle, Terminal } from 'lucide-react'
 
 export interface ChooseFunctionFormProps {
-  triggerFunctions: DatabaseFunction[]
   visible: boolean
-  onChange: (id: number) => void
   setVisible: (value: boolean) => void
+  onChange: (fn: DatabaseFunction) => void
 }
 
-const ChooseFunctionForm = ({
-  triggerFunctions,
-  visible,
-  onChange,
-  setVisible,
-}: ChooseFunctionFormProps) => {
+const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFormProps) => {
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data = [] } = useDatabaseFunctionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const triggerFunctions = data.filter((fn) => fn.return_type === 'trigger')
   const hasPublicSchemaFunctions = triggerFunctions.length >= 1
   const functionSchemas = lodashMap(uniqBy(triggerFunctions, 'schema'), 'schema')
 
-  function selectFunction(id: number) {
-    onChange(id)
+  const selectFunction = (id: number) => {
+    const fn = triggerFunctions.find((x) => x.id === id)
+    if (!!fn) onChange(fn)
     setVisible(!visible)
   }
 

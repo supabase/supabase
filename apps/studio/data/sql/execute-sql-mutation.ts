@@ -1,15 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { databaseExtensionsKeys } from 'data/database-extensions/keys'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { databaseRoleKeys } from 'data/database-roles/keys'
-import { databaseTriggerKeys } from 'data/database-triggers/keys'
-import { databaseKeys } from 'data/database/keys'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
-import { tableKeys } from 'data/tables/keys'
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
+
+// [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
+// So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
+// actually to not make this too hacky here
+const INVALIDATION_KEYS_IGNORE = ['branches', 'settings-v2', 'addons', 'custom-domains', 'content']
 
 export type QueryResponseError = {
   code: string
@@ -41,9 +38,16 @@ export const useExecuteSqlMutation = ({
         const { contextualInvalidation, sql, projectRef } = variables
 
         // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
-        if (contextualInvalidation && projectRef) {
-          const invalidationKeys = inferInvalidationKeys(projectRef, sql)
-          await Promise.all(invalidationKeys.map((key) => queryClient.invalidateQueries(key)))
+        const sqlLower = sql.toLowerCase()
+        const isMutationSQL =
+          sqlLower.includes('create ') || sqlLower.includes('alter ') || sqlLower.includes('drop ')
+        if (contextualInvalidation && projectRef && isMutationSQL) {
+          const databaseRelatedKeys = queryClient
+            .getQueryCache()
+            .findAll(['projects', projectRef])
+            .map((x) => x.queryKey)
+            .filter((x) => !INVALIDATION_KEYS_IGNORE.some((a) => x.includes(a)))
+          await Promise.all(databaseRelatedKeys.map((key) => queryClient.invalidateQueries(key)))
         }
         await onSuccess?.(data, variables, context)
       },
@@ -57,69 +61,4 @@ export const useExecuteSqlMutation = ({
       ...options,
     }
   )
-}
-
-// [Joshen] Can expand this further eventually, but just covering certain easy cases for now
-const inferInvalidationKeys = (ref: string, sql: string) => {
-  const keys = []
-  const sqlLower = sql.toLowerCase()
-
-  if (
-    sqlLower.includes('create table') ||
-    sqlLower.includes('alter table') ||
-    sqlLower.includes('drop table')
-  ) {
-    keys.push(entityTypeKeys.list(ref))
-    keys.push(tableKeys.list(ref))
-  }
-  if (
-    sqlLower.includes('create schema') ||
-    sqlLower.includes('alter schema') ||
-    sqlLower.includes('drop schema')
-  ) {
-    keys.push(databaseKeys.schemas(ref))
-  }
-  if (
-    sqlLower.includes('create function') ||
-    sqlLower.includes('alter function') ||
-    sqlLower.includes('drop function')
-  ) {
-    keys.push(databaseKeys.databaseFunctions(ref))
-  }
-  if (
-    sqlLower.includes('create trigger') ||
-    sqlLower.includes('alter trigger') ||
-    sqlLower.includes('drop trigger')
-  ) {
-    keys.push(databaseTriggerKeys.list(ref))
-  }
-  if (
-    sqlLower.includes('create policy') ||
-    sqlLower.includes('alter policy') ||
-    sqlLower.includes('drop policy')
-  ) {
-    keys.push(databasePoliciesKeys.list(ref))
-  }
-  if (
-    sqlLower.includes('create type') ||
-    sqlLower.includes('alter type') ||
-    sqlLower.includes('drop type')
-  ) {
-    keys.push(enumeratedTypesKeys.list(ref))
-  }
-  if (
-    sqlLower.includes('create role') ||
-    sqlLower.includes('alter role') ||
-    sqlLower.includes('drop role')
-  ) {
-    keys.push(databaseRoleKeys.databaseRoles(ref))
-  }
-  if (sqlLower.includes('create index') || sqlLower.includes('drop index')) {
-    keys.push(databaseKeys.indexes(ref))
-  }
-  if (sqlLower.includes('create extension') || sqlLower.includes('drop extension')) {
-    keys.push(databaseExtensionsKeys.list(ref))
-  }
-
-  return keys
 }

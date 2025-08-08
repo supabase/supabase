@@ -2,19 +2,10 @@
 id: 'custom-domains'
 title: 'Custom Domains'
 description: 'Use a custom domain instead of the default Supabase domain for your project.'
-video: 'https://www.youtube.com/v/6rcGnW_Mh-0'
+tocVideo: '6rcGnW_Mh-0'
 ---
 
 Custom domains allow you to present a branded experience to your users. These are available as an [add-on for projects on a paid plan](/dashboard/project/_/settings/addons?panel=customDomain).
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/6rcGnW_Mh-0"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
 
 There are two types of domains supported by Supabase:
 
@@ -136,6 +127,8 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://api.example.com', 'public-anon-key')
 ```
 
+Similarly, your Edge Functions will now be available at `https://api.example.com/functions/v1/your_function_name`, and your Storage objects at `https://api.example.com/storage/v1/object/public/your_file_path.ext`.
+
 ### Remove a custom domain
 
 Removing a custom domain may cause some issues when using Supabase Auth with OAuth or SAML. You may have to reverse the changes made in the _[Prepare to activate your domain](#prepare-to-activate-your-domain)_ step above.
@@ -200,7 +193,7 @@ Once you've chosen an available subdomain and have done all the necessary prepar
 Use the [`vanity-subdomains activate`](/docs/reference/cli/supabase-vanity-subdomains-activate) command to activate and claim your subdomain:
 
 ```bash
-supabase vanity-subdomains --project-ref abcdefghijklmnopqrst activate --desired-subdomain my-example-brand
+supabase vanity-subdomains --project-ref abcdefghijklmnopqrst activate --desired-subdomain my-example-brand --experimental
 ```
 
 If you wish to use the new domain in client code, you can set it up like so:

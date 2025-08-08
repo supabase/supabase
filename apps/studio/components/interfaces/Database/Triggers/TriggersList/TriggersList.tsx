@@ -1,9 +1,9 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
-import { Search } from 'lucide-react'
+import { noop } from 'lodash'
+import { Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
@@ -12,19 +12,20 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
-import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
 
 interface TriggersListProps {
   createTrigger: () => void
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggersList = ({
@@ -32,20 +33,20 @@ const TriggersList = ({
   editTrigger = noop,
   deleteTrigger = noop,
 }: TriggersListProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: protectedSchemas } = useProtectedSchemas()
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  const { data = [], isSuccess } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const hasTables =
+    data.filter((a) => !protectedSchemas.find((s) => s.name === a.schema)).length > 0
 
   const {
     data: triggers,
@@ -107,58 +108,74 @@ const TriggersList = ({
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
-            {!isLocked && (
+            {!isSchemaLocked && (
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
-                  disabled={!canCreateTriggers}
+                  disabled={!hasTables || !canCreateTriggers}
+                  icon={<Plus />}
                   onClick={() => createTrigger()}
                   className="flex-grow"
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : undefined,
+                      text: !hasTables
+                        ? 'Create a table first before creating triggers'
+                        : !canCreateTriggers
+                          ? 'You need additional permissions to create triggers'
+                          : undefined,
                     },
                   }}
                 >
-                  Create a new trigger
+                  New trigger
                 </ButtonTooltip>
-                <ButtonTooltip
-                  type="default"
-                  disabled={!canCreateTriggers}
-                  className="px-1 pointer-events-auto"
-                  icon={<AiIconAnimation size={16} />}
-                  onClick={() =>
-                    aiSnap.newChat({
-                      name: 'Create new trigger',
-                      open: true,
-                      initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
-                      suggestions: {
-                        title:
-                          'I can help you create a new trigger, here are a few example prompts to get you started:',
-                        prompts: [
-                          'Create a trigger that logs changes to the users table',
-                          'Create a trigger that updates updated_at timestamp',
-                          'Create a trigger that validates email format before insert',
-                        ],
+
+                {hasTables && (
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!hasTables || !canCreateTriggers}
+                    className="px-1 pointer-events-auto"
+                    icon={<AiIconAnimation size={16} />}
+                    onClick={() =>
+                      aiSnap.newChat({
+                        name: 'Create new trigger',
+                        open: true,
+                        initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
+                        suggestions: {
+                          title:
+                            'I can help you create a new trigger, here are a few example prompts to get you started:',
+                          prompts: [
+                            {
+                              label: 'Log Changes',
+                              description: 'Create a trigger that logs changes to the users table',
+                            },
+                            {
+                              label: 'Update Timestamp',
+                              description: 'Create a trigger that updates updated_at timestamp',
+                            },
+                            {
+                              label: 'Validate Email',
+                              description:
+                                'Create a trigger that validates email format before insert',
+                            },
+                          ],
+                        },
+                      })
+                    }
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canCreateTriggers
+                          ? 'You need additional permissions to create triggers'
+                          : 'Create with Supabase Assistant',
                       },
-                    })
-                  }
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : 'Create with Supabase Assistant',
-                    },
-                  }}
-                />
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <div className="w-full overflow-hidden overflow-x-auto">
             <Table
@@ -179,7 +196,7 @@ const TriggersList = ({
                 <TriggerList
                   schema={selectedSchema}
                   filterString={filterString}
-                  isLocked={isLocked}
+                  isLocked={isSchemaLocked}
                   editTrigger={editTrigger}
                   deleteTrigger={deleteTrigger}
                 />

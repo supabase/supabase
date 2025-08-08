@@ -73,8 +73,8 @@ export const ResourceExhaustionWarningBanner = () => {
     null: '/project/[ref]/settings/[infra-path]',
     disk_space: '/project/[ref]/settings/compute-and-disk',
     read_only: '/project/[ref]/settings/compute-and-disk',
-    auth_email_rate_limit: '/project/[ref]/settings/auth',
-    auth_restricted_email_sending: '/project/[ref]/settings/auth',
+    auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
+    auth_restricted_email_sending: '/project/[ref]/auth/smtp',
     default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
   }
 

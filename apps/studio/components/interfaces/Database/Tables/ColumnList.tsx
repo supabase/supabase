@@ -1,11 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
+import { Check, ChevronLeft, Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -14,7 +13,8 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   DropdownMenu,
@@ -26,7 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
   onAddColumn: () => void
@@ -42,7 +42,7 @@ const ColumnList = ({
   const { id: _id, ref } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: selectedTable,
     error,
@@ -63,7 +63,7 @@ const ColumnList = ({
       ? selectedTable?.columns ?? []
       : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
@@ -81,7 +81,7 @@ const ColumnList = ({
             icon={<Search size={12} />}
           />
         </div>
-        {!isLocked && isTableEntity && (
+        {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
             disabled={!canUpdateColumns}
@@ -100,7 +100,9 @@ const ColumnList = ({
         )}
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />}
+      {isSchemaLocked && (
+        <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />
+      )}
 
       {isLoading && <GenericSkeletonLoader />}
 
@@ -125,6 +127,9 @@ const ColumnList = ({
                   </Table.th>,
                   <Table.th key="type">Data Type</Table.th>,
                   <Table.th key="format">Format</Table.th>,
+                  <Table.th key="format" className="text-center">
+                    Nullable
+                  </Table.th>,
                   <Table.th key="buttons"></Table.th>,
                 ]}
                 body={columns.map((x) => (
@@ -145,8 +150,15 @@ const ColumnList = ({
                     <Table.td className="font-mono text-xs">
                       <code className="text-xs">{x.format}</code>
                     </Table.td>
+                    <Table.td className="font-mono text-xs">
+                      {x.is_nullable ? (
+                        <Check size={16} className="mx-auto" />
+                      ) : (
+                        <X size={16} className="mx-auto" />
+                      )}
+                    </Table.td>
                     <Table.td className="text-right">
-                      {!isLocked && isTableEntity && (
+                      {!isSchemaLocked && isTableEntity && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="default" className="px-1" icon={<MoreVertical />} />
@@ -173,7 +185,7 @@ const ColumnList = ({
                             <Tooltip>
                               <TooltipTrigger>
                                 <DropdownMenuItem
-                                  disabled={!canUpdateColumns || isLocked}
+                                  disabled={!canUpdateColumns || isSchemaLocked}
                                   onClick={() => onDeleteColumn(x)}
                                   className="space-x-2"
                                 >

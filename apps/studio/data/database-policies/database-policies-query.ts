@@ -1,14 +1,15 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { get, handleError } from 'data/fetchers'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
 export type DatabasePoliciesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 
@@ -24,7 +25,10 @@ export async function getDatabasePolicies(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/policies', {
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
       query: {
         included_schemas: schema || '',
@@ -49,7 +53,7 @@ export const useDatabasePoliciesQuery = <TData = DatabasePoliciesData>(
     ...options
   }: UseQueryOptions<DatabasePoliciesData, DatabasePoliciesError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<DatabasePoliciesData, DatabasePoliciesError, TData>(

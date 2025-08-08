@@ -1,9 +1,9 @@
-import { QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
 import { Query } from '@supabase/pg-meta/src/query'
+import { QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
@@ -97,9 +97,9 @@ export type TableRowsCount = {
 export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
   queryClient: QueryClient
   tableId?: number
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type TableRowsCountData = TableRowsCount
@@ -112,7 +112,7 @@ export async function getTableRowsCount(
     connectionString,
     tableId,
     filters,
-    impersonatedRole,
+    roleImpersonationState,
     enforceExactCount,
   }: TableRowsCountVariables,
   signal?: AbortSignal
@@ -130,10 +130,7 @@ export async function getTableRowsCount(
 
   const sql = wrapWithRoleImpersonation(
     getTableRowsCountSql({ table, filters, enforceExactCount }),
-    {
-      projectRef: projectRef ?? 'ref',
-      role: impersonatedRole,
-    }
+    roleImpersonationState
   )
   const { result } = await executeSql(
     {
@@ -141,7 +138,7 @@ export async function getTableRowsCount(
       connectionString,
       sql,
       queryKey: ['table-rows-count', table.id],
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     },
     signal
   )

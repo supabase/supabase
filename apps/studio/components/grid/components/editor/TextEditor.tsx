@@ -4,11 +4,11 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Popover, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -33,7 +33,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const snap = useTableEditorTableStateSnapshot()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -50,10 +50,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
-  const isTruncated =
-    typeof initialValue === 'string' &&
-    initialValue.endsWith('...') &&
-    initialValue.length > MAX_CHARACTERS
+  const isTruncated = isValueTruncated(initialValue)
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return

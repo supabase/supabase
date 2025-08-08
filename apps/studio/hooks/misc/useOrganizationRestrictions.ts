@@ -1,10 +1,9 @@
 import dayjs from 'dayjs'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 export type WarningBannerProps = {
   type: 'danger' | 'warning' | 'note'
@@ -14,8 +13,7 @@ export type WarningBannerProps = {
 }
 
 export function useOrganizationRestrictions() {
-  const org = useSelectedOrganization()
-  const isNewLayout = useNewLayout()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { data: overdueInvoices } = useOverdueInvoicesQuery()
   const { data: organizations } = useOrganizationsQuery()
@@ -34,16 +32,16 @@ export function useOrganizationRestrictions() {
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES.message,
-      link: `/org/${org?.slug}/settings/invoices`,
+      link: `/org/${org?.slug}/billing#invoices`,
     })
   }
 
-  if (overdueInvoicesFromOtherOrgs?.length && isNewLayout) {
+  if (overdueInvoicesFromOtherOrgs?.length) {
     warnings.push({
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.message,
-      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/settings/invoices`,
+      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/billing#invoices`,
     })
   }
 
@@ -54,7 +52,7 @@ export function useOrganizationRestrictions() {
       message: RESTRICTION_MESSAGES.GRACE_PERIOD.message(
         dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')
       ),
-      link: `/org/${org?.slug}/settings/billing`,
+      link: `/org/${org?.slug}/billing`,
     })
   }
 
@@ -63,7 +61,7 @@ export function useOrganizationRestrictions() {
       type: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.title,
       message: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.message,
-      link: `/org/${org?.slug}/settings/billing`,
+      link: `/org/${org?.slug}/billing`,
     })
   }
 
@@ -72,7 +70,7 @@ export function useOrganizationRestrictions() {
       type: 'danger',
       title: RESTRICTION_MESSAGES.RESTRICTED.title,
       message: RESTRICTION_MESSAGES.RESTRICTED.message,
-      link: `/org/${org?.slug}/settings/billing`,
+      link: `/org/${org?.slug}/billing`,
     })
   }
 

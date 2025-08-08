@@ -129,6 +129,9 @@ const uiConfig = ui({
         // https://github.com/tailwindlabs/tailwindcss-typography/issues/135
         DEFAULT: {
           css: {
+            'code::before': {
+              content: '""',
+            },
             'code::after': {
               content: '""',
             },

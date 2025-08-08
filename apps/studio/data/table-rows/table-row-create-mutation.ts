@@ -3,19 +3,19 @@ import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
 
 export type TableRowCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { id: number; name: string; schema?: string }
   payload: any
   enumArrayColumns: string[]
   returning?: boolean
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function getTableRowCreateSql({
@@ -37,21 +37,18 @@ export async function createTableRow({
   payload,
   enumArrayColumns,
   returning,
-  impersonatedRole,
+  roleImpersonationState,
 }: TableRowCreateVariables) {
   const sql = wrapWithRoleImpersonation(
     getTableRowCreateSql({ table, payload, enumArrayColumns, returning }),
-    {
-      projectRef,
-      role: impersonatedRole,
-    }
+    roleImpersonationState
   )
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
   })
 
   return result

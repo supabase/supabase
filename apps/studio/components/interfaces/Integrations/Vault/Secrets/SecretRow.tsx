@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
@@ -15,9 +14,9 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
 
@@ -29,7 +28,7 @@ interface SecretRowProps {
 
 const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [revealSecret, setRevealSecret] = useState(false)
   const name = secret?.name ?? 'No name provided'
@@ -61,18 +60,10 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           )}
         </div>
         <div className="flex items-center space-x-2 group">
-          <Key
-            size={14}
-            strokeWidth={2}
-            className="text-foreground-light transition group-hover:text-brand"
-          />
-          <Link
-            href={`/project/${ref}/integrations/vault/keys?search=${secret.key_id}`}
-            className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
-            title={secret.key_id}
-          >
-            {secret.key_id}
-          </Link>
+          <Key size={14} strokeWidth={2} className="text-foreground-light transition" />
+          <p className="text-foreground-light font-mono text-xs transition" title={secret.id}>
+            {secret.id}
+          </p>
         </div>
       </div>
       <div className="flex items-center space-x-2 w-[40%]">

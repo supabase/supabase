@@ -194,6 +194,10 @@ To initiate a sign-in request from your application's user interface (i.e. the S
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<your-anon-key>')
+
+// ---cut---
 supabase.auth.signInWithSSO({
   domain: 'company.com',
 })
@@ -431,12 +435,16 @@ This setup allows you to implement multi-tenant SSO for multiple clients or orga
 Yes, also referred to as [cross-origin authentication within the same site](https://web.dev/articles/same-site-same-origin). To redirect to a URL other than the [Site URL](https://supabase.com/docs/guides/auth/redirect-urls), following the SAML response from the IdP, the `redirectTo` option can be added to [`signInWithSSO`](https://supabase.com/docs/reference/javascript/auth-signinwithsso).
 
 ```ts
-  const { data, error } = await supabase.auth.signInWithSSO({
-    domain: 'company.com'
-      options: {
-        redirectTo: `https://app.company.com/callback`,
-      },
-  })
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
+const { data, error } = await supabase.auth.signInWithSSO({
+  domain: 'company.com',
+  options: {
+    redirectTo: `https://app.company.com/callback`,
+  },
+})
 ```
 
 When redirecting to a URL other than the Site URL, a `/callback` endpoint is necessary to process the auth code from the IdP and exchange it for a session. This assumes the [Supabase SSR client](https://supabase.com/docs/guides/auth/server-side/creating-a-client) has already been configured.

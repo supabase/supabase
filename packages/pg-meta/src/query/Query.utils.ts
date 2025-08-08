@@ -1,5 +1,5 @@
-import { ident, literal, format } from '../pg-format'
-import type { Filter, QueryPagination, QueryTable, Sort, Dictionary } from './types'
+import { format, ident, literal } from '../pg-format'
+import type { Dictionary, Filter, QueryPagination, QueryTable, Sort } from './types'
 
 export function countQuery(
   table: QueryTable,
@@ -39,7 +39,7 @@ export function deleteQuery(
   }
 ) {
   if (!filters || filters.length === 0) {
-    throw { message: 'no filters for this delete query' }
+    throw new Error('no filters for this delete query')
   }
   let query = `delete from ${queryTable(table)}`
   const { returning, enumArrayColumns } = options ?? {}
@@ -64,7 +64,7 @@ export function insertQuery(
   }
 ) {
   if (!values || values.length === 0) {
-    throw { message: 'no value to insert' }
+    throw new Error('no value to insert')
   }
   const { returning, enumArrayColumns } = options ?? {}
   const queryColumns = Object.keys(values[0])
@@ -101,11 +101,13 @@ export function selectQuery(
     filters?: Filter[]
     pagination?: QueryPagination
     sorts?: Sort[]
-  }
+  },
+  isFinal = true,
+  isCTE = false
 ) {
   let query = ''
   const queryColumn = columns ?? '*'
-  query += `select ${queryColumn} from ${queryTable(table)}`
+  query += `select ${queryColumn} from ${isCTE ? queryCTE(table) : queryTable(table)}`
 
   const { filters, pagination, sorts } = options ?? {}
   if (filters) {
@@ -118,7 +120,7 @@ export function selectQuery(
     const { limit, offset } = pagination ?? {}
     query += ` limit ${literal(limit)} offset ${literal(offset)}`
   }
-  return query + ';'
+  return `${query}${isFinal ? ';' : ''}`
 }
 
 export function updateQuery(
@@ -132,7 +134,7 @@ export function updateQuery(
 ) {
   const { filters, returning, enumArrayColumns } = options ?? {}
   if (!filters || filters.length === 0) {
-    throw { message: 'no filters for this update query' }
+    throw new Error('no filters for this update query')
   }
   const queryColumns = Object.keys(value)
     .map((x) => ident(x))
@@ -169,6 +171,11 @@ function applyFilters(query: string, filters: Filter[]) {
           return inFilterSql(filter)
         case 'is':
           return isFilterSql(filter)
+        case '~~':
+        case '~~*':
+        case '!~~':
+        case '!~~*':
+          return castColumnToText(filter)
         default:
           return `${ident(filter.column)} ${filter.operator} ${filterLiteral(filter.value)}`
       }
@@ -199,6 +206,10 @@ function isFilterSql(filter: Filter) {
     default:
       return `${ident(filter.column)} ${filter.operator} ${filterLiteral(filter.value)}`
   }
+}
+
+function castColumnToText(filter: Filter) {
+  return `${ident(filter.column)}::text ${filter.operator} ${filterLiteral(filter.value)}`
 }
 
 function filterLiteral(value: any) {
@@ -235,4 +246,8 @@ function applySorts(query: string, sorts: Sort[]) {
 
 function queryTable(table: QueryTable) {
   return `${ident(table.schema)}.${ident(table.name)}`
+}
+
+function queryCTE(table: QueryTable) {
+  return `${ident(table.name)}`
 }

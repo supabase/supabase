@@ -7,9 +7,10 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobToggleVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   jobId: number
   active: boolean
+  searchTerm?: string
 }
 
 export async function toggleDatabaseCronJob({
@@ -44,8 +45,10 @@ export const useDatabaseCronJobToggleMutation = ({
     (vars) => toggleDatabaseCronJob(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseCronJobsKeys.list(projectRef))
+        const { projectRef, searchTerm } = variables
+        await queryClient.invalidateQueries(
+          databaseCronJobsKeys.listInfinite(projectRef, searchTerm)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

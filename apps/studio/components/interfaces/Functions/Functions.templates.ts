@@ -140,26 +140,32 @@ app.listen(8000);`,
     name: 'OpenAI Text Completion',
     description: 'Generate text completions using OpenAI GPT-3',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { Configuration, OpenAIApi } from 'npm:openai@3.3.0'
+import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+import { OpenAI } from "npm:openai@4.8.0"
 
-const openAi = new OpenAIApi(
-  new Configuration({
-    apiKey: Deno.env.get('OPENAI_API_KEY')
-  })
-)
+const openai = new OpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY')
+})
 
-Deno.serve(async (req) => {
+Deno.serve(async (req)=>{
   const { prompt } = await req.json()
-  const completion = await openAi.createCompletion({
-    model: 'text-davinci-003',
-    prompt,
-    max_tokens: 200
+  const response = await openai.chat.completions.create({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "user",
+        content: prompt
+      }
+    ]
   })
-  return new Response(
-    JSON.stringify({ text: completion.data.choices[0].text }),
-    { headers: { 'Content-Type': 'application/json' }}
-  )
+  return new Response(JSON.stringify({
+    text: response.choices[0].message.content
+  }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Connection': 'keep-alive'
+    }
+  })
 })`,
   },
   {

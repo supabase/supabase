@@ -4,10 +4,9 @@ import { PropsWithChildren, useEffect } from 'react'
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateSettingsMenu } from './SettingsMenu.utils'
@@ -19,8 +18,8 @@ interface SettingsLayoutProps {
 const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   useEffect(() => {
     if (!IS_PLATFORM) {
@@ -46,14 +45,11 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     'billing:invoices',
   ])
 
-  const newApiKeys = useFlag('newApiKeys')
-
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
-    newApiKeys,
   })
 
   return (

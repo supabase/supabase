@@ -1,7 +1,9 @@
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { useEffect, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { onErrorChat } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
@@ -34,35 +36,30 @@ export const SchemaGenerator = ({
   const [promptIntendSent, setPromptIntendSent] = useState(false)
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const {
-    messages,
-    setMessages,
-    handleInputChange,
-    append,
-    isLoading: isMessagesLoading,
-  } = useChat({
-    api: `${BASE_PATH}/api/ai/onboarding/design`,
+  const { messages, setMessages, sendMessage, status, addToolResult } = useChat({
     id: 'schema-generator',
-    maxSteps: 7,
+    onError: onErrorChat,
     onFinish: () => {
       setInput('')
     },
     async onToolCall({ toolCall }) {
       if (toolCall.toolName === 'executeSql') {
         try {
-          const sql = (toolCall.args as { sql: string }).sql
+          const sql = (toolCall.input as { sql: string }).sql
           setHasSql(true)
           onSqlGenerated(sql)
-          return {
-            success: true,
-            message: 'Database successfully updated. Respond with next steps.',
-          }
+          addToolResult({
+            tool: toolCall.toolName,
+            toolCallId: toolCall.toolCallId,
+            output: 'Database successfully updated. Respond with next steps.',
+          })
         } catch (error) {
           console.error('Failed to execute SQL:', error)
-          return {
-            success: false,
-            error: `SQL execution failed: ${error instanceof Error ? error.message : String(error)}`,
-          }
+          addToolResult({
+            tool: toolCall.toolName,
+            toolCallId: toolCall.toolCallId,
+            output: `SQL execution failed: ${error instanceof Error ? error.message : String(error)}`,
+          })
         }
       }
 
@@ -73,44 +70,79 @@ export const SchemaGenerator = ({
           if (onReset) {
             onReset()
           }
-          return {
-            success: true,
-            message: 'Database successfully reset',
-          }
+          addToolResult({
+            tool: toolCall.toolName,
+            toolCallId: toolCall.toolCallId,
+            output: 'Database successfully reset',
+          })
         } catch (error) {
           console.error('Failed to reset the database', error)
-          return {
-            success: false,
-            error: `Resetting the database failed: ${error instanceof Error ? error.message : String(error)}`,
-          }
+          addToolResult({
+            tool: toolCall.toolName,
+            toolCallId: toolCall.toolCallId,
+            output: `Resetting the database failed: ${error instanceof Error ? error.message : String(error)}`,
+          })
         }
       }
 
       if (toolCall.toolName === 'setServices') {
-        const newServices = (toolCall.args as { services: SupabaseService[] }).services
+        const newServices = (toolCall.input as { services: SupabaseService[] }).services
         onServicesUpdated(newServices)
-        return 'Services updated successfully'
+        addToolResult({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          output: 'Services updated successfully',
+        })
       }
 
       if (toolCall.toolName === 'setTitle') {
-        const newTitle = (toolCall.args as { title: string }).title
+        const newTitle = (toolCall.input as { title: string }).title
         onTitleUpdated(newTitle)
-        return 'Title updated successfully'
+        addToolResult({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          output: 'Title updated successfully',
+        })
       }
     },
+    transport: new DefaultChatTransport({
+      api: `${BASE_PATH}/api/ai/onboarding/design`,
+    }),
   })
+
+  const isMessagesLoading = status === 'submitted' || status === 'streaming'
 
   useEffect(() => {
     if (isOneOff) {
       setMessages([])
       setInput('')
     }
-  }, [isOneOff, setMessages, setInput])
+  }, [isOneOff, setMessages])
+
+  const sendUserMessage = (content: string) => {
+    const payload = {
+      role: 'user' as const,
+      createdAt: new Date(),
+      parts: [{ type: 'text' as const, text: content }],
+      id: `msg-${Date.now()}`,
+    }
+    sendMessage(payload)
+  }
+
+  const getLastAssistantMessage = () => {
+    const lastAssistantMessage = messages.filter((m) => m.role === 'assistant').slice(-1)[0]
+    if (!lastAssistantMessage?.parts) return ''
+
+    const textPart = lastAssistantMessage.parts.find((part: any) => part.type === 'text') as
+      | { text: string }
+      | undefined
+    return textPart?.text || ''
+  }
 
   return (
     <div>
       {!isOneOff && (
-        <div className="flex justify-between w-full block items-center mb-4">
+        <div className="flex justify-between w-full items-center mb-4">
           <Label_Shadcn_ className="text-foreground-light flex-1">
             Generate a starting schema
           </Label_Shadcn_>
@@ -120,10 +152,7 @@ export const SchemaGenerator = ({
               size="tiny"
               onClick={() => {
                 setInput('Reset the database, services and start over')
-                append({
-                  role: 'user',
-                  content: 'Reset the database, services and start over',
-                })
+                sendUserMessage('Reset the database, services and start over')
               }}
             >
               Reset
@@ -134,16 +163,11 @@ export const SchemaGenerator = ({
       <div className="rounded-md border bg-surface-100">
         {messages.length > 0 &&
           messages[messages.length - 1].role === 'assistant' &&
-          messages[messages.length - 1].content.length > 0 &&
+          getLastAssistantMessage() &&
           ((isOneOff && !hasSql) || !isOneOff) && (
             <div className="px-4 py-3 border-b space-y-1">
               <p>
-                <Markdown
-                  className="text-foreground-light"
-                  content={
-                    messages.filter((m) => m.role === 'assistant').slice(-1)[0]?.content || ''
-                  }
-                />
+                <Markdown className="text-foreground-light" content={getLastAssistantMessage()} />
               </p>
             </div>
           )}
@@ -156,7 +180,6 @@ export const SchemaGenerator = ({
             value={input}
             disabled={isMessagesLoading}
             onChange={(e) => {
-              handleInputChange(e)
               setInput(e.target.value)
             }}
             placeholder={messages.length > 0 ? 'Make an edit...' : 'Describe your application...'}
@@ -189,7 +212,7 @@ export const SchemaGenerator = ({
               if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault()
                 setHasSql(false)
-                append({ role: 'user', content: input })
+                sendUserMessage(input)
               }
             }}
           />
@@ -197,7 +220,7 @@ export const SchemaGenerator = ({
             onClick={(e) => {
               e.preventDefault()
               setHasSql(false)
-              append({ role: 'user', content: input })
+              sendUserMessage(input)
             }}
             disabled={isMessagesLoading}
             loading={isMessagesLoading}

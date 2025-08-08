@@ -39,7 +39,7 @@ For this guide, we'll create a table called `employees` and see how we can make 
 
     <StepHikeCompact.Code>
 
-```bash
+```bash name=Terminal
 supabase migration new create_employees_table
 ```
 
@@ -59,25 +59,20 @@ supabase migration new create_employees_table
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```sql
 
-create table
-employees (
-id bigint primary key generated always as identity,
-name text,
-email text,
-created_at timestamptz default now()
+```sql name=20250101000000_create_employees_table.sql
+create table employees (
+  id bigint primary key generated always as identity,
+  name text,
+  email text,
+  created_at timestamptz default now()
 );
-
-````
+```
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
-
-
-
 
 <StepHikeCompact>
 
@@ -89,9 +84,10 @@ created_at timestamptz default now()
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash
+
+```bash name=Terminal
 supabase db reset
-````
+```
 
     </StepHikeCompact.Code>
 
@@ -108,16 +104,15 @@ supabase db reset
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash
-      supabase migration new add_department_to_employees_table
 
-````
+```bash name=Terminal
+supabase migration new add_department_to_employees_table
+```
+
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
-
-
 
 <StepHikeCompact>
 
@@ -130,10 +125,11 @@ supabase db reset
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```sql
-alter table
-  if exists public.employees add department text default 'Hooli';
-````
+
+```sql name=20250101000001_add_department_to_employees_table.sql
+alter table if exists public.employees
+add department text default 'Hooli';
+```
 
     </StepHikeCompact.Code>
 
@@ -154,22 +150,20 @@ For this, you can create a seed script in `supabase/seed.sql`.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```sql
 
--- in supabase/seed.sql
-insert into
-public.employees (name)
+```sql name=supabase/seed.sql
+insert into public.employees
+  (name)
 values
-('Erlich Bachman'),
-('Richard Hendricks'),
-('Monica Hall');
+  ('Erlich Bachman'),
+  ('Richard Hendricks'),
+  ('Monica Hall');
+```
 
-````
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
-
 
 <StepHikeCompact>
 
@@ -179,9 +173,10 @@ values
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash
+
+```bash name=Terminal
 supabase db reset
-````
+```
 
     </StepHikeCompact.Code>
 

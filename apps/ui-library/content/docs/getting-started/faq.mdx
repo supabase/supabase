@@ -66,5 +66,29 @@ description: Frequently asked questions
         that if it's working well for you.
       </AccordionContent>
     </AccordionItem>
+    <AccordionItem value="react-only">
+      <AccordionTrigger>Why is this library React-only?</AccordionTrigger>
+      <AccordionContent>
+        Several reasons.
+
+        First, we use React ourselves and know the ecosystem really well. That makes this ui library easy for us to build and maintain.
+
+        Second, this library is really just stitching together a bunch of existing shadcn/ui and internal components into Supabase-specific workflows. It's not technically a brand new, from the ground up ui library—it's using an established tool in shadcn/ui.
+
+        Last, it's a way for us to better distribute components that we already had out there in different places (our docs and guides, different framework quickstarts, etc)
+
+        TL;DR:  shadcn/ui + our internal React experience make this easy to do well. Doing it for other ecosystems would be much more challenging.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="other-frameworks">
+      <AccordionTrigger>Any plans for other, non-React frameworks?</AccordionTrigger>
+      <AccordionContent>
+        Not at the moment, but we're not ruling it out.
+
+        Our expertise is predominantly in React—that's the ecosystem in which we think we can provide the highest quality tools for our users. But we've heard from lots of people in the Vue and Svelte communities in particular, and agree something like this would be really beneficial for them.
+
+        This isn't a situation like "we will never do it", but instead more of a "we don't want to reinvent the wheel". If the right opportunity comes up for supporting Vue, Svelte, etc like this, we're very open to supporting it.
+      </AccordionContent>
+    </AccordionItem>
 
 </Accordion>
