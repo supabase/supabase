@@ -258,7 +258,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       // Activate editing mode
       setEditingMessageId(messageId)
-      setValue(messageToEdit.content ?? '')
+      const textContent =
+        messageToEdit.parts
+          ?.filter((part) => part.type === 'text')
+          .map((part) => part.text)
+          .join('') ?? ''
+      setValue(textContent)
 
       if (inputRef.current) {
         inputRef.current.focus()
