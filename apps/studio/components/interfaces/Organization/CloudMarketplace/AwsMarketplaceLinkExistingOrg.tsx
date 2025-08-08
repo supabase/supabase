@@ -191,40 +191,49 @@ const AwsMarketplaceLinkExistingOrg = ({
                             ))
                         ) : (
                           <>
-                            <p className="text-default font-bold text-foreground-light">
+                            <p className="font-bold text-foreground-light">
                               Organizations that can be linked
                             </p>
-                            {orgsLinkable.map((org) => {
-                              const numProjects = projects.filter(
-                                (p) => p.organization_slug === org.slug
-                              ).length
-                              return (
-                                <RadioGroupCardItem
-                                  id={org.slug}
-                                  key={org.slug}
-                                  showIndicator={false}
-                                  value={org.slug}
-                                  className={cn(
-                                    'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group] w-full'
-                                  )}
-                                  label={
-                                    <ActionCard
-                                      className="[&>div]:items-center border-0 bg-surface-0 group-data-[state=checked]:opacity-100"
-                                      key={org.id}
-                                      icon={
-                                        <Boxes
-                                          size={18}
-                                          strokeWidth={1}
-                                          className="text-foreground"
+                            {orgsLinkable.length === 0 ? (
+                              <p className="text-sm text-foreground-light">
+                                None of your organizations can be linked to your AWS Marketplace
+                                subscription at the moment.
+                              </p>
+                            ) : (
+                              <>
+                                {orgsLinkable.map((org) => {
+                                  const numProjects = projects.filter(
+                                    (p) => p.organization_slug === org.slug
+                                  ).length
+                                  return (
+                                    <RadioGroupCardItem
+                                      id={org.slug}
+                                      key={org.slug}
+                                      showIndicator={false}
+                                      value={org.slug}
+                                      className={cn(
+                                        'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group] w-full'
+                                      )}
+                                      label={
+                                        <ActionCard
+                                          className="[&>div]:items-center border-0 bg-surface-0 group-data-[state=checked]:opacity-100"
+                                          key={org.id}
+                                          icon={
+                                            <Boxes
+                                              size={18}
+                                              strokeWidth={1}
+                                              className="text-foreground"
+                                            />
+                                          }
+                                          title={org.name}
+                                          description={`${org.plan.name} Plan • ${numProjects > 0 ? `${numProjects} Project${numProjects > 1 ? 's' : ''}` : '0 Projects'}`}
                                         />
                                       }
-                                      title={org.name}
-                                      description={`${org.plan.name} Plan • ${numProjects > 0 ? `${numProjects} Project${numProjects > 1 ? 's' : ''}` : '0 Projects'}`}
                                     />
-                                  }
-                                />
-                              )
-                            })}
+                                  )
+                                })}
+                              </>
+                            )}
                           </>
                         )}
                       </div>
@@ -238,7 +247,7 @@ const AwsMarketplaceLinkExistingOrg = ({
           {orgsNotLinkable.length > 0 && !isLoadingOnboardingInfo && (
             <Collapsible_Shadcn_
               className="-space-y-px"
-              open={isNotLinkableOrgListOpen}
+              open={isNotLinkableOrgListOpen || orgsLinkable.length === 0}
               onOpenChange={() => setIsNotLinkableOrgListOpen((prev) => !prev)}
             >
               <CollapsibleTrigger_Shadcn_ className="py-2 w-full flex items-center group justify-between">
