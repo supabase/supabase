@@ -88,14 +88,14 @@ language plpgsql
 as $$
 begin
     perform realtime.broadcast_changes(
-	    'topic:' || new.id::text,   -- topic
-		   tg_op,                          -- event
-		   tg_op,                          -- operation
-		   tg_table_name,                  -- table
-		   tg_table_schema,                -- schema
-		   new,                            -- new record
-		   old                             -- old record
-		);
+      'topic:' || coalesce(NEW.topic, OLD.topic) ::text, -- topic - the topic to which we're broadcasting
+      TG_OP,                                             -- event - the event that triggered the function
+      TG_OP,                                             -- operation - the operation that triggered the function
+      TG_TABLE_NAME,                                     -- table - the table that caused the trigger
+      TG_TABLE_SCHEMA,                                   -- schema - the schema of the table that caused the trigger
+      NEW,                                               -- new record - the record after the change
+      OLD                                                -- old record - the record before the change
+    );
     return null;
 end;
 $$;

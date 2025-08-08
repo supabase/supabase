@@ -22,7 +22,7 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Form_Shadcn_,
@@ -38,7 +38,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
 export const QueuesSettings = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'

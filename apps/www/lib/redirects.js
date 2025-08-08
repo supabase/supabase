@@ -2023,6 +2023,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/deployment/branching/branching-2',
+    destination: '/docs/guides/deployment/branching/dashboard',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/resources/postgres/dropping-all-tables-in-schema',
     destination: '/docs/guides/database/postgres/dropping-all-tables-in-schema',
   },

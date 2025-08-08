@@ -10,7 +10,7 @@ import FormBoxEmpty from 'components/ui/FormBoxEmpty'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -80,7 +80,7 @@ interface TriggerSheetProps {
 }
 
 export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 

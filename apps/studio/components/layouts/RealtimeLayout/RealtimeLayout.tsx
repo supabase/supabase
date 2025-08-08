@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { useIsRealtimeSettingsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
@@ -14,7 +14,7 @@ export interface RealtimeLayoutProps {
 }
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const enableRealtimeSettingsFF = useIsRealtimeSettingsFFEnabled()
   const enableRealtimeSettingsFP = useIsRealtimeSettingsEnabled()
 

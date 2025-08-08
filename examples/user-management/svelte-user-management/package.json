@@ -1,25 +1,23 @@
 {
-	"name": "svelte-user-management",
-	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-check --tsconfig ./tsconfig.json"
-	},
-	"devDependencies": {
-		"@sveltejs/vite-plugin-svelte": "^1.0.1",
-		"@tsconfig/svelte": "^3.0.0",
-		"svelte": "^3.49.0",
-		"svelte-check": "^2.8.0",
-		"svelte-preprocess": "^4.10.7",
-		"tslib": "^2.4.0",
-		"typescript": "^4.6.4",
-		"vite": "^4.3.9"
-	},
-	"dependencies": {
-		"@supabase/supabase-js": "^2.0.4"
-	}
+  "name": "supabase-svelte",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.1.0",
+    "@tsconfig/svelte": "^5.0.4",
+    "svelte": "^5.37.3",
+    "svelte-check": "^4.3.1",
+    "typescript": "~5.9.2",
+    "vite": "^7.0.6"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.53.0"
+  }
 }
