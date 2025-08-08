@@ -191,7 +191,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
               {isChangingBucketVisibility && (
                 <Admonition
                   type="warning"
-                  className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                  className="rounded-none border-x-0 border-b-0 mb-0 pb-0 px-0 [&>svg]:left-0 [&>div>p]:!leading-normal"
                   title={
                     isMakingBucketPublic
                       ? 'Warning: Making bucket public'

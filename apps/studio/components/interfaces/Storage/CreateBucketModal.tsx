@@ -328,7 +328,7 @@ const CreateBucketModal = () => {
                   {isPublicBucket && (
                     <Admonition
                       type="warning"
-                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                      className="rounded-none border-x-0 border-b-0 mb-0 pb-0 px-0 [&>svg]:left-0 [&>div>p]:!leading-normal"
                       title="Public buckets are not protected"
                       description={
                         <>
@@ -343,7 +343,6 @@ const CreateBucketModal = () => {
                       }
                     />
                   )}
-                  <DialogSectionSeparator />
                   <Collapsible_Shadcn_
                     open={showConfiguration}
                     onOpenChange={() => setShowConfiguration(!showConfiguration)}
