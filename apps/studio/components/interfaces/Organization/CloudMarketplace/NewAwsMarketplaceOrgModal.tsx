@@ -20,15 +20,16 @@ import { SubmitHandler } from 'react-hook-form'
 interface Props {
   buyerId: string
   visible: boolean
-  onSuccess: () => void
+  onSuccess: (newlyCreatedOrgSlug: string) => void
   onClose: () => void
 }
 
 const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose }: Props) => {
   const { mutate: createOrganization, isLoading: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
-      onSuccess: (_) => {
-        //TODO(thomas): send tracking event
+      onSuccess: (org) => {
+        //TODO(thomas): send tracking event?
+        onSuccess(org.slug)
       },
       onError: (res) => {
         toast.error(res.message, {

@@ -2,7 +2,6 @@ import { get, handleError } from '../../../../data/fetchers'
 import type { ResponseError } from '../../../../types'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { useProfile } from '../../../../lib/profile'
-import { OrganizationsError } from '../../../../data/organizations/organizations-query'
 import { cloudMarketplaceKeys } from './keys'
 
 export type CloudMarketplaceOnboardingInfoVariables = {
@@ -36,7 +35,11 @@ export const useCloudMarketplaceOnboardingInfoQuery = <TData = CloudMarketplaceO
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<CloudMarketplaceOnboardingInfo, OrganizationsError, TData> = {}
+  }: UseQueryOptions<
+    CloudMarketplaceOnboardingInfo,
+    CloudMarketplaceOnboardingInfoError,
+    TData
+  > = {}
 ) => {
   const { profile } = useProfile()
   return useQuery<CloudMarketplaceOnboardingInfo, CloudMarketplaceOnboardingInfoError, TData>(

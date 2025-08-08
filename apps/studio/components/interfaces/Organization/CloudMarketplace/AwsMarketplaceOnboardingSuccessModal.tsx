@@ -6,7 +6,7 @@ interface Props {
   onClose: () => void
 }
 
-const AwsMarketplaceLinkingSuccess = ({ visible, onClose }: Props) => {
+const AwsMarketplaceOnboardingSuccessModal = ({ visible, onClose }: Props) => {
   return (
     <Dialog
       open={visible}
@@ -25,8 +25,7 @@ const AwsMarketplaceLinkingSuccess = ({ visible, onClose }: Props) => {
           <div className="p-4 flex flex-col">
             <h1 className="text-xl mb-4">AWS Marketplace Setup completed</h1>
             <p className="text-foreground-light text-sm">
-              The organization is now being managed and billed through AWS Marketplace. Billing for
-              this organization will appear on your AWS invoice.
+              The organization is now being managed and billed through AWS Marketplace.
             </p>
           </div>
         </DialogSection>
@@ -40,4 +39,4 @@ const AwsMarketplaceLinkingSuccess = ({ visible, onClose }: Props) => {
   )
 }
 
-export default AwsMarketplaceLinkingSuccess
+export default AwsMarketplaceOnboardingSuccessModal

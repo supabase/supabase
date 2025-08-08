@@ -11,16 +11,14 @@ import AwsMarketplaceLinkExistingOrg from '../components/interfaces/Organization
 import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
 import { useCloudMarketplaceOnboardingInfoQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import { useRouter } from 'next/router'
+import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
 
-const LinkAwsMarketplace: NextPageWithLayout = () => {
-  const existingOrgs = true
-
-  const router = useRouter()
+const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   const {
     query: { buyer_id: buyerId },
-  } = router
+  } = useRouter()
 
-  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+  const { data: organizations, isFetched: isOrganizationsFetched } = useOrganizationsQuery()
   const { data: onboardingInfo, isLoading: isLoadingOnboardingInfo } =
     useCloudMarketplaceOnboardingInfoQuery({
       buyerId: buyerId as string,
@@ -32,10 +30,11 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
         <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
       </ScaffoldHeader>
       <ScaffoldDivider />
-      {existingOrgs ? (
+      {!isOrganizationsFetched ? (
+        <AwsMarketplaceOnboardingPlaceholder />
+      ) : organizations?.length ? (
         <AwsMarketplaceLinkExistingOrg
           organizations={organizations}
-          isLoadingOrganizations={isLoadingOrganizations}
           onboardingInfo={onboardingInfo}
           isLoadingOnboardingInfo={isLoadingOnboardingInfo}
         />
@@ -46,6 +45,8 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
   )
 }
 
-LinkAwsMarketplace.getLayout = (page) => <LinkAwsMarketplaceLayout>{page}</LinkAwsMarketplaceLayout>
+AwsMarketplaceOnboarding.getLayout = (page) => (
+  <LinkAwsMarketplaceLayout>{page}</LinkAwsMarketplaceLayout>
+)
 
-export default LinkAwsMarketplace
+export default AwsMarketplaceOnboarding

@@ -13,9 +13,7 @@ import {
 import Link from 'next/link'
 import { Button } from 'ui'
 import { useRouter } from 'next/router'
-import AwsMarketplaceOrgCreationSuccess from './AwsMarketplaceOrgCreationSuccess'
-import { useState } from 'react'
-import AutoRenewalWarning from './AutoRenewalWarning'
+import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
 import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
 
 interface Props {
@@ -31,9 +29,8 @@ const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
   const { mutate: createOrganization, isLoading: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
       onSuccess: (org) => {
-        //TODO(thomas): send tracking event
-        setOrgCreatedSuccessfully(true)
-        setNewlyCreatedOrgSlug(org.slug)
+        //TODO(thomas): send tracking event?
+        router.push(`/org/${org.slug}`)
       },
       onError: (res) => {
         toast.error(res.message, {
@@ -46,15 +43,12 @@ const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
     createOrganization({ ...values, buyerId: buyerId as string })
   }
 
-  const [orgCreatedSuccessfully, setOrgCreatedSuccessfully] = useState(false)
-  const [newlyCreatedOrgSlug, setNewlyCreatedOrgSlug] = useState('')
-
   return (
     <>
       {onboardingInfo && !onboardingInfo.aws_contract_auto_renewal && (
-        <AutoRenewalWarning
+        <AwsMarketplaceAutoRenewalWarning
           awsContractEndDate={onboardingInfo.aws_contract_end_date}
-          awsContractSetupPageUrl={onboardingInfo.aws_contract_setup_page_url}
+          awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
         />
       )}
       <ScaffoldSection>
@@ -66,12 +60,13 @@ const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
             <br />
             <br />
             You can read more on billing through AWS in our {''}
+            {/*TODO(thomas): Update docs link once the new docs exist*/}
             <Link
               href="https://supabase.com/docs/guides/platform"
               target="_blank"
               className="underline"
             >
-              docs.
+              Billing Docs.
             </Link>
           </p>
         </ScaffoldSectionDetail>
@@ -92,13 +87,6 @@ const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
           </div>
         </ScaffoldSectionContent>
       </ScaffoldSection>
-
-      <AwsMarketplaceOrgCreationSuccess
-        visible={orgCreatedSuccessfully}
-        onClose={() => {
-          router.push(`/org/${newlyCreatedOrgSlug}`)
-        }}
-      />
     </>
   )
 }

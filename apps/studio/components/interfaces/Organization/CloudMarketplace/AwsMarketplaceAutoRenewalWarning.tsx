@@ -4,15 +4,18 @@ import Link from 'next/link'
 
 interface Props {
   awsContractEndDate: string
-  awsContractSetupPageUrl: string
+  awsContractSettingsUrl: string
 }
 
-const AutoRenewalWarning = ({ awsContractEndDate, awsContractSetupPageUrl }: Props) => {
+const AwsMarketplaceAutoRenewalWarning = ({
+  awsContractEndDate,
+  awsContractSettingsUrl,
+}: Props) => {
   return (
     <div className="mt-5 mb-10">
       <Alert_Shadcn_ variant="warning">
         <AlertTitle_Shadcn_ className="text-foreground font-bold text-orange-1000">
-          “Auto Renewal” is currently turned OFF for your AWS Marketplace subscription
+          “Auto Renewal” is turned OFF for your AWS Marketplace subscription
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
           <div>
@@ -20,7 +23,7 @@ const AutoRenewalWarning = ({ awsContractEndDate, awsContractSetupPageUrl }: Pro
             {dayjs(awsContractEndDate).format('MMMM DD')}. If you have more than 2 projects running,
             all your projects will be paused. To ensure uninterrupted service, enable “Auto Renewal”
             in your {''}
-            <Link href={awsContractSetupPageUrl} target="_blank" className="underline">
+            <Link href={awsContractSettingsUrl} target="_blank" className="underline">
               AWS Marketplace subscription settings
             </Link>
             .
@@ -31,4 +34,4 @@ const AutoRenewalWarning = ({ awsContractEndDate, awsContractSetupPageUrl }: Pro
   )
 }
 
-export default AutoRenewalWarning
+export default AwsMarketplaceAutoRenewalWarning

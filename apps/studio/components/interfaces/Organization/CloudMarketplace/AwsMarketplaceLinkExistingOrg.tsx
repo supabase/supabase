@@ -5,10 +5,10 @@ import {
   CollapsibleTrigger_Shadcn_,
   Form_Shadcn_,
   FormField_Shadcn_,
+  Skeleton,
 } from 'ui'
 import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Skeleton } from '@ui/components/shadcn/ui/skeleton'
 import { cn } from '@ui/lib/utils'
 import { ActionCard } from '../../../ui/ActionCard'
 import { Boxes, ChevronRight } from 'lucide-react'
@@ -26,16 +26,15 @@ import { Organization } from '../../../../types'
 import { useProjectsQuery } from '../../../../data/projects/projects-query'
 import { useOrganizationLinkAwsMarketplaceMutation } from '../../../../data/organizations/organization-link-aws-marketplace-mutation'
 import { toast } from 'sonner'
-import AwsMarketplaceLinkingSuccess from './AwsMarketplaceLinkingSuccess'
+import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
 import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
 import { useRouter } from 'next/router'
-import AutoRenewalWarning from './AutoRenewalWarning'
+import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
 import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
 import Link from 'next/link'
 
 interface Props {
   organizations?: Organization[] | undefined
-  isLoadingOrganizations: boolean
   onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
   isLoadingOnboardingInfo: boolean
 }
@@ -48,7 +47,6 @@ export type LinkExistingOrgForm = z.infer<typeof FormSchema>
 
 const AwsMarketplaceLinkExistingOrg = ({
   organizations,
-  isLoadingOrganizations,
   onboardingInfo,
   isLoadingOnboardingInfo,
 }: Props) => {
@@ -99,13 +97,14 @@ const AwsMarketplaceLinkExistingOrg = ({
   const [isNotLinkableOrgListOpen, setIsNotLinkableOrgListOpen] = useState(false)
   const [orgLinkedSuccessfully, setOrgLinkedSuccessfully] = useState(false)
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
+  const [orgToRedirectTo, setOrgToRedirectTo] = useState('')
 
   const { mutate: linkOrganization, isLoading: isLinkingOrganization } =
     useOrganizationLinkAwsMarketplaceMutation({
       onSuccess: (_) => {
-        //TODO(thomas): send tracking event
+        //TODO(thomas): send tracking event?
         setOrgLinkedSuccessfully(true)
-        setTimeout(() => form.reset(), 0)
+        setOrgToRedirectTo(form.getValues('orgSlug'))
       },
       onError: (res) => {
         toast.error(res.message, {
@@ -121,53 +120,48 @@ const AwsMarketplaceLinkExistingOrg = ({
   return (
     <>
       {onboardingInfo && !onboardingInfo.aws_contract_auto_renewal && (
-        <AutoRenewalWarning
+        <AwsMarketplaceAutoRenewalWarning
           awsContractEndDate={onboardingInfo.aws_contract_end_date}
-          awsContractSetupPageUrl={onboardingInfo.aws_contract_setup_page_url}
+          awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
         />
       )}
       <ScaffoldSection>
         <ScaffoldSectionDetail>
-          {isLoadingOnboardingInfo ? (
-            Array(1)
-              .fill(0)
-              .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
-          ) : (
-            <>
-              <p className="mb-6 text-base">
-                You’ve subscribed to the Supabase{' '}
-                {onboardingInfo?.plan_name_selected_on_marketplace} Plan via the AWS Marketplace. As
-                a final step, you need to link a Supabase organization to that subscription. Choose
-                the organization you want to be managed and billed through AWS.
-                <br />
-                <br />
-                You can read more on billing through AWS in our {''}
-                <Link
-                  href="https://supabase.com/docs/guides/platform"
-                  target="_blank"
-                  className="underline"
-                >
-                  docs.
-                </Link>
-              </p>
-
-              <p className="mt-10 text-base">
-                <span className="font-bold text-foreground-light">Want to start fresh?</span> Create
-                a new organization and it will be linked automatically.
-              </p>
-              <Button
-                size="tiny"
-                htmlType="submit"
-                type="primary"
-                onClick={async (e) => {
-                  e.preventDefault()
-                  setShowOrgCreationDialog(true)
-                }}
+          <>
+            <p className="mb-6 text-base">
+              You’ve subscribed to the Supabase {onboardingInfo?.plan_name_selected_on_marketplace}{' '}
+              Plan via the AWS Marketplace. As a final step, you need to link a Supabase
+              organization to that subscription. Select the organization you want to be managed and
+              billed through AWS.
+              <br />
+              <br />
+              You can read more on billing through AWS in our {''}
+              {/*TODO(thomas): Update docs link once the new docs exist*/}
+              <Link
+                href="https://supabase.com/docs/guides/platform"
+                target="_blank"
+                className="underline"
               >
-                Create organization
-              </Button>
-            </>
-          )}
+                Billing Docs.
+              </Link>
+            </p>
+
+            <p className="mt-10 text-base">
+              <span className="font-bold text-foreground-light">Want to start fresh?</span> Create a
+              new organization and it will be linked automatically.
+            </p>
+            <Button
+              size="tiny"
+              htmlType="submit"
+              type="primary"
+              onClick={async (e) => {
+                e.preventDefault()
+                setShowOrgCreationDialog(true)
+              }}
+            >
+              Create organization
+            </Button>
+          </>
         </ScaffoldSectionDetail>
 
         <ScaffoldSectionContent className="lg:ml-10">
@@ -189,7 +183,7 @@ const AwsMarketplaceLinkExistingOrg = ({
                   >
                     <FormItemLayout id={field.name}>
                       <div className={'grid gap-4 grid-cols-1'}>
-                        {isLoadingOrganizations || isLoadingOnboardingInfo ? (
+                        {isLoadingOnboardingInfo ? (
                           Array(3)
                             .fill(0)
                             .map((_, i) => (
@@ -197,6 +191,9 @@ const AwsMarketplaceLinkExistingOrg = ({
                             ))
                         ) : (
                           <>
+                            <p className="text-default font-bold text-foreground-light">
+                              Organizations that can be linked
+                            </p>
                             {orgsLinkable.map((org) => {
                               const numProjects = projects.filter(
                                 (p) => p.organization_slug === org.slug
@@ -296,7 +293,7 @@ const AwsMarketplaceLinkExistingOrg = ({
                 await onSubmit(form.getValues())
               }}
               loading={isLinkingOrganization}
-              disabled={!isDirty || isLinkingOrganization || isLoadingOrganizations}
+              disabled={!isDirty || isLinkingOrganization || isLoadingOnboardingInfo}
               tooltip={{
                 content: {
                   side: 'top',
@@ -310,10 +307,11 @@ const AwsMarketplaceLinkExistingOrg = ({
         </ScaffoldSectionContent>
       </ScaffoldSection>
 
-      <AwsMarketplaceLinkingSuccess
+      <AwsMarketplaceOnboardingSuccessModal
         visible={orgLinkedSuccessfully}
         onClose={() => {
-          router.push(`/org/${form.getValues('orgSlug')}`)
+          setOrgLinkedSuccessfully(false)
+          router.push(`/org/${orgToRedirectTo}`)
         }}
       />
 
@@ -321,8 +319,10 @@ const AwsMarketplaceLinkExistingOrg = ({
         visible={showOrgCreationDialog}
         onClose={() => setShowOrgCreationDialog(false)}
         buyerId={buyerId as string}
-        onSuccess={() => {
+        onSuccess={(newlyCreatedOrgSlug) => {
           setShowOrgCreationDialog(false)
+          setOrgToRedirectTo(newlyCreatedOrgSlug)
+          setOrgLinkedSuccessfully(true)
         }}
       />
     </>

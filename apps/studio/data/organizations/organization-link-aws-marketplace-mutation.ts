@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from '../fetchers'
@@ -22,18 +22,17 @@ export async function linkOrganization({ buyerId, slug }: OrganizationLinkAwsMar
   return data
 }
 
-type ClazarConnectData = Awaited<ReturnType<typeof linkOrganization>>
+type LinkOrganizationData = Awaited<ReturnType<typeof linkOrganization>>
 
 export const useOrganizationLinkAwsMarketplaceMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ClazarConnectData, ResponseError, OrganizationLinkAwsMarketplaceVariables>,
+  UseMutationOptions<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
-  return useMutation<ClazarConnectData, ResponseError, OrganizationLinkAwsMarketplaceVariables>(
+  return useMutation<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>(
     (vars) => linkOrganization(vars),
     {
       async onSuccess(data, variables, context) {
@@ -41,7 +40,7 @@ export const useOrganizationLinkAwsMarketplaceMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to link organization to AWS marketplace: ${data.message}`)
+          toast.error(`Failed to link organization to AWS Marketplace: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
