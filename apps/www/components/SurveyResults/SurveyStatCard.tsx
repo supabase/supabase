@@ -73,7 +73,7 @@ export function SurveyStatCard({
       {/* Progress bar */}
       {progressValue !== undefined && (
         <div
-          className="h-[6px] flex items-center mr-12"
+          className="h-[6px] flex items-center md:mr-12"
           style={
             {
               background: `repeating-linear-gradient(
@@ -98,10 +98,10 @@ export function SurveyStatCard({
       )}
       <div className="flex flex-col gap-2">
         <p
-          className={`md:-ml-1 md:mt-8 text:2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-foreground' : 'text-foreground-muted'} transition-colors duration-1000`}
+          className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-foreground' : 'text-foreground-muted'} transition-colors duration-1000`}
         >
           {formattedValue}
-          <span className="text-sm md:text-4xl">{unit}</span>
+          <span className="md:text-4xl">{unit}</span>
         </p>
         <p className="text-foreground-light text-sm text-balance md:mr-6">{label}</p>
       </div>

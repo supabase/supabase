@@ -126,10 +126,13 @@ export function SurveyWordCloud({
   }, [isRotating, answers, scramblingTexts, currentItems])
 
   return (
-    <aside className="flex flex-col gap-4 px-6 py-8">
+    <aside className="flex flex-col gap-4 px-3 md:px-6">
       <ol className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
         {currentItems.map(({ text, count }, index) => (
-          <li key={`${text}-${index}`} className="py-4 border-t border-muted border-opacity-50">
+          <li
+            key={`${text}-${index}`}
+            className={`py-4 border-t border-muted border-opacity-50 [&:nth-child(-n+2)]:border-t-0 sm:[&:nth-child(-n+3)]:border-t-0 md:[&:nth-child(-n+4)]:border-t-0`}
+          >
             <span className="font-mono md:text-lg text-center text-foreground">
               {scramblingTexts[index].toUpperCase() || text.toUpperCase()}
             </span>

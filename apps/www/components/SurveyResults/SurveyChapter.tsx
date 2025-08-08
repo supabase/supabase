@@ -29,7 +29,7 @@ export function SurveyChapter({
     >
       <div className="flex flex-col container max-w-[60rem] mx-auto px-6 lg:px-0">
         <header className="mx-auto flex flex-col gap-4 text-center text-balance">
-          <h2 className="text-3xl xl:text-6xl text-balance leading-tight">{title}</h2>
+          <h2 className="text-3xl md:text-4xl xl:text-6xl text-balance leading-tight">{title}</h2>
           <p className="text-lg xl:text-xl text-foreground-light text-balance">{description}</p>
         </header>
         <div className="flex flex-col pb-32">{children}</div>
