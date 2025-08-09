@@ -10,13 +10,18 @@ import { Result } from '~/features/helpers.fn'
 
 type Embedding = Array<number>
 
+export interface EmbeddingWithTokens {
+  embedding: Embedding
+  token_count: number
+}
+
 interface ModerationFlaggedDetails {
   flagged: boolean
   categories: OpenAI.Moderations.Moderation.Categories
 }
 
 export interface OpenAIClientInterface {
-  createContentEmbedding(text: string): Promise<Result<Embedding, ApiErrorGeneric>>
+  createContentEmbedding(text: string): Promise<Result<EmbeddingWithTokens, ApiErrorGeneric>>
 }
 
 let openAIClient: OpenAIClientInterface | null
@@ -26,7 +31,9 @@ class OpenAIClient implements OpenAIClientInterface {
 
   constructor(private client: OpenAI) {}
 
-  async createContentEmbedding(text: string): Promise<Result<Embedding, ApiErrorGeneric>> {
+  async createContentEmbedding(
+    text: string
+  ): Promise<Result<EmbeddingWithTokens, ApiErrorGeneric>> {
     return await Result.tryCatchFlat(
       this.createContentEmbeddingImpl.bind(this),
       convertUnknownToApiError,
@@ -36,7 +43,7 @@ class OpenAIClient implements OpenAIClientInterface {
 
   private async createContentEmbeddingImpl(
     text: string
-  ): Promise<Result<Embedding, ApiError<ModerationFlaggedDetails>>> {
+  ): Promise<Result<EmbeddingWithTokens, ApiError<ModerationFlaggedDetails>>> {
     const query = text.trim()
 
     const moderationResponse = await this.client.moderations.create({ input: query })
@@ -55,7 +62,12 @@ class OpenAIClient implements OpenAIClientInterface {
       input: query,
     })
     const [{ embedding: queryEmbedding }] = embeddingsResponse.data
-    return Result.ok(queryEmbedding)
+    const tokenCount = embeddingsResponse.usage.total_tokens
+
+    return Result.ok({
+      embedding: queryEmbedding,
+      token_count: tokenCount,
+    })
   }
 }
 

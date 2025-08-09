@@ -12,7 +12,6 @@ import { getApiEndpointById } from '../../../features/docs/Reference.generated.s
 import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec.js'
 import { flattenSections } from '../../../lib/helpers.js'
 import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers.js'
-import type { Json } from '../../helpers.mdx.js'
 import { BaseLoader, BaseSource } from './base.js'
 
 export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
@@ -24,7 +23,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
   constructor(
     source: string,
     path: string,
-    public meta: Json,
+    public meta: Record<string, unknown>,
     public specFilePath: string,
     public sectionsFilePath: string
   ) {
@@ -68,7 +67,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
     specSections: SpecSection[],
     id: string
   ): SpecSection | undefined | Promise<SpecSection | undefined>
-  enhanceMeta(_section: SpecSection): Json {
+  enhanceMeta(_section: SpecSection): Record<string, unknown> {
     return this.meta
   }
 }
@@ -81,12 +80,12 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
     path: string,
     public refSection: ICommonSection,
     public specSection: SpecSection,
-    public meta: Json
+    public meta: Record<string, unknown>
   ) {
     super(source, path)
   }
 
-  process() {
+  async process() {
     const checksum = createHash('sha256')
       .update(JSON.stringify(this.refSection) + JSON.stringify(this.specSection))
       .digest('base64')
@@ -125,7 +124,7 @@ export class OpenApiReferenceLoader extends ReferenceLoader<Partial<enrichedOper
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {
@@ -251,7 +250,7 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {
@@ -272,7 +271,7 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
   }
 
-  enhanceMeta(section: IFunctionDefinition): Json {
+  enhanceMeta(section: IFunctionDefinition): Record<string, unknown> {
     return { ...this.meta, slug: section.id, methodName: section.title }
   }
 }
@@ -311,7 +310,7 @@ export class CliReferenceLoader extends ReferenceLoader<CliCommand> {
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {
