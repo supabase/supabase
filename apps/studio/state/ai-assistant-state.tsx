@@ -304,6 +304,32 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
+    deleteMessagesBefore: (id: string, { includeSelf = true } = {}) => {
+      const chat = state.activeChat
+      if (!chat) return
+
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
+      if (messageIndex === -1) return
+
+      // Delete all messages from start up to (and optionally including) the target message
+      const deleteCount = includeSelf ? messageIndex + 1 : messageIndex
+      chat.messages.splice(0, deleteCount)
+      chat.updatedAt = new Date()
+    },
+
+    deleteMessagesAfter: (id: string, { includeSelf = true } = {}) => {
+      const chat = state.activeChat
+      if (!chat) return
+
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
+      if (messageIndex === -1) return
+
+      // Delete all messages from the target message (optionally including) to the end
+      const startIndex = includeSelf ? messageIndex : messageIndex + 1
+      chat.messages.splice(startIndex)
+      chat.updatedAt = new Date()
+    },
+
     saveMessage: (message: MessageType | MessageType[]) => {
       const chat = state.activeChat
       if (!chat) return
@@ -420,6 +446,8 @@ export type AiAssistantState = AiAssistantData & {
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
   clearMessages: () => void
+  deleteMessagesBefore: (id: string, options?: { includeSelf?: boolean }) => void
+  deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
   saveMessage: (message: MessageType | MessageType[]) => void
   updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
