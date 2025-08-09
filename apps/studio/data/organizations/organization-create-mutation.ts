@@ -93,3 +93,82 @@ export const useOrganizationCreateMutation = ({
     }
   )
 }
+
+export type AwsManagedOrganizationCreateVariables = {
+  name: string
+  kind?: string
+  size?: string
+  buyerId: string
+}
+
+export async function createAwsManagedOrganization({
+  name,
+  kind,
+  size,
+  buyerId,
+}: AwsManagedOrganizationCreateVariables) {
+  const { data, error } = await post('/platform/organizations/cloud-marketplace', {
+    body: {
+      name,
+      kind,
+      size,
+      buyer_id: buyerId,
+    },
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+type AwsManagedOrganizationCreateData = Awaited<ReturnType<typeof createAwsManagedOrganization>>
+
+export const useAwsManagedOrganizationCreateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<
+    AwsManagedOrganizationCreateData,
+    ResponseError,
+    AwsManagedOrganizationCreateVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    AwsManagedOrganizationCreateData,
+    ResponseError,
+    AwsManagedOrganizationCreateVariables
+  >((vars) => createAwsManagedOrganization(vars), {
+    async onSuccess(data, variables, context) {
+      if (data) {
+        // [Joshen] We're manually updating the query client here as the org's subscription is
+        // created async, and the invalidation will happen too quick where the GET organizations
+        // endpoint will error out with a 500 since the subscription isn't created yet.
+        queryClient.setQueriesData(
+          {
+            queryKey: organizationKeys.list(),
+            exact: true,
+          },
+          (prev: any) => {
+            if (!prev) return prev
+            return [...prev, castOrganizationResponseToOrganization(data)]
+          }
+        )
+
+        await queryClient.invalidateQueries(permissionKeys.list())
+      }
+
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create organization: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}
