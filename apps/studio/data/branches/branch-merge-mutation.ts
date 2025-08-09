@@ -21,7 +21,7 @@ export async function mergeBranch({
   migration_version,
 }: BranchMergeVariables) {
   // Step 1: Get the diff output from the branch
-  const diffContent = await getBranchDiff({ branchId: id, includedSchemas: 'public' })
+  const diffContent = await getBranchDiff({ branchId: id })
 
   let migrationCreated = false
 
