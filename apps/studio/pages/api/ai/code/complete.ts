@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { ModelMessage, stepCountIs, streamText } from 'ai'
+import { ModelMessage, stepCountIs, generateText } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -148,14 +148,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
+    const { text } = await generateText({
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,
     })
 
-    return result.pipeUIMessageStreamToResponse(res)
+    return res.status(200).json(text)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({
