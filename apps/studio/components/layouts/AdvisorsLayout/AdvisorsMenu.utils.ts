@@ -30,6 +30,12 @@ export const generateAdvisorsMenu = (
           url: `/project/${ref}/advisors/query-performance`,
           items: [],
         },
+        {
+          name: 'Query Insights',
+          key: 'query-insights',
+          url: `/project/${ref}/advisors/query`,
+          items: [],
+        },
       ],
     },
     ...(IS_PLATFORM && features?.advisorRules
