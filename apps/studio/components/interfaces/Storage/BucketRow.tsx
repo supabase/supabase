@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import { Columns3, Edit2, MoreVertical, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
 
 import type { Bucket } from 'data/storage/buckets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
+import DeleteBucketModal from 'components/interfaces/Storage/DeleteBucketModal'
+import EmptyBucketModal from 'components/interfaces/Storage/EmptyBucketModal'
 import {
   Badge,
   Button,
@@ -23,20 +26,15 @@ export interface BucketRowProps {
   bucket: Bucket
   projectRef?: string
   isSelected: boolean
-  onSelectEmptyBucket: () => void
-  onSelectDeleteBucket: () => void
-  onSelectEditBucket: () => void
 }
 
-const BucketRow = ({
-  bucket,
-  projectRef = '',
-  isSelected = false,
-  onSelectEmptyBucket = noop,
-  onSelectDeleteBucket = noop,
-  onSelectEditBucket = noop,
-}: BucketRowProps) => {
-  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
+  const { can: canUpdateBuckets } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
+  const [modal, setModal] = useState<string | null>(null)
+  const onClose = () => setModal(null)
 
   return (
     <div
@@ -84,7 +82,7 @@ const BucketRow = ({
                 <DropdownMenuItem
                   key="toggle-private"
                   className="space-x-2"
-                  onClick={() => onSelectEditBucket()}
+                  onClick={() => setModal(`edit`)}
                 >
                   <Edit2 size={14} />
                   <p>Edit bucket</p>
@@ -93,7 +91,7 @@ const BucketRow = ({
                 <DropdownMenuItem
                   key="empty-bucket"
                   className="space-x-2"
-                  onClick={() => onSelectEmptyBucket()}
+                  onClick={() => setModal(`empty`)}
                 >
                   <XCircle size={14} />
                   <p>Empty bucket</p>
@@ -103,7 +101,7 @@ const BucketRow = ({
             <DropdownMenuItem
               key="delete-bucket"
               className="space-x-2"
-              onClick={() => onSelectDeleteBucket()}
+              onClick={() => setModal(`delete`)}
             >
               <Trash size={14} />
               <p>Delete bucket</p>
@@ -113,6 +111,10 @@ const BucketRow = ({
       ) : (
         <div className="w-7 mr-1" />
       )}
+
+      <EditBucketModal visible={modal === `edit`} bucket={bucket} onClose={onClose} />
+      <EmptyBucketModal visible={modal === `empty`} bucket={bucket} onClose={onClose} />
+      <DeleteBucketModal visible={modal === `delete`} bucket={bucket} onClose={onClose} />
     </div>
   )
 }
