@@ -12,7 +12,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -69,18 +69,25 @@ const schema = object({
 
 const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading,
-    isError,
-  } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const [isUpdatingProtection, setIsUpdatingProtection] = useState(false)
+  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update settings: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated settings')
+    },
+  })
   const [hidden, setHidden] = useState(true)
 
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   const protectionForm = useForm({
     resolver: yupResolver(schema),
@@ -102,7 +109,7 @@ const ProtectionAuthSettingsForm = () => {
   })
 
   useEffect(() => {
-    if (authConfig && !isUpdatingProtection) {
+    if (authConfig && !isUpdatingConfig) {
       protectionForm.reset({
         DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
         EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
@@ -120,11 +127,9 @@ const ProtectionAuthSettingsForm = () => {
         PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
       })
     }
-  }, [authConfig, isUpdatingProtection])
+  }, [authConfig, isUpdatingConfig])
 
   const onSubmitProtection = (values: any) => {
-    setIsUpdatingProtection(true)
-
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
     // The backend uses empty string to represent no required characters in the password
@@ -132,19 +137,7 @@ const ProtectionAuthSettingsForm = () => {
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
 
-    updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
-      {
-        onError: (error) => {
-          toast.error(`Failed to update settings: ${error?.message}`)
-          setIsUpdatingProtection(false)
-        },
-        onSuccess: () => {
-          toast.success('Successfully updated settings')
-          setIsUpdatingProtection(false)
-        },
-      }
-    )
+    updateAuthConfig({ projectRef: projectRef!, config: payload })
   }
 
   if (isError) {
@@ -282,10 +275,8 @@ const ProtectionAuthSettingsForm = () => {
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={
-                  !canUpdateConfig || isUpdatingProtection || !protectionForm.formState.isDirty
-                }
-                loading={isUpdatingProtection}
+                disabled={!canUpdateConfig || isUpdatingConfig || !protectionForm.formState.isDirty}
+                loading={isUpdatingConfig}
               >
                 Save changes
               </Button>

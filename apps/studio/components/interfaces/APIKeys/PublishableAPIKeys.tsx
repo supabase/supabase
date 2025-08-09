@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
 
 // to add in later with follow up PR
@@ -27,8 +27,10 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
-  const isPermissionsLoading = !usePermissionsLoaded()
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    '*'
+  )
 
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
@@ -46,12 +48,12 @@ export const PublishableAPIKeys = () => {
             <div className="flex items-center gap-2">
               <ApiKeyInput />
               <CopyButton
-                disabled={isPermissionsLoading || isLoadingApiKeys || !canReadAPIKeys}
-                type="default"
-                text={apiKey?.api_key}
                 iconOnly
-                size={'tiny'}
+                size="tiny"
+                type="default"
                 className="px-2 rounded-full"
+                disabled={isPermissionsLoading || isLoadingApiKeys || !canReadAPIKeys}
+                text={apiKey?.api_key}
               />
             </div>
           </div>
@@ -65,31 +67,29 @@ export const PublishableAPIKeys = () => {
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-2 max-w-64">
-          {/* <Separator /> */}
-          {/* @mildtomato - To add in later with follow up PR */}
-          {/* <ShowPublicJWTsDialogComposer /> */}
-        </div>
-
-        {/* <CreatePublishableAPIKeyModal /> */}
       </div>
     </div>
   )
 }
 
-function ApiKeyInput() {
+const ApiKeyInput = () => {
   const { ref: projectRef } = useParams()
+
   const {
     data: apiKeysData,
     isLoading: isApiKeysLoading,
     error,
   } = useAPIKeysQuery({ projectRef, reveal: false })
+
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
     [apiKeysData]
   )
-  const isPermissionsLoading = !usePermissionsLoaded()
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+
+  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    '*'
+  )
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
 

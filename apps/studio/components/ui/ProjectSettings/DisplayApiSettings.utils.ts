@@ -1,12 +1,7 @@
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRef } from 'react'
 
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-
-dayjs.extend(duration)
-dayjs.extend(relativeTime)
 
 export function useLastUsedAPIKeysLogQuery(projectRef: string) {
   const now = useRef(new Date()).current

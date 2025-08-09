@@ -134,7 +134,10 @@ export function useGetProjectPermissions(
 }
 
 /**
- * @deprecated Use useAsyncCheckProjectPermissions instead
+ * @deprecated If checking for project permissions, use useAsyncCheckProjectPermissions instead so that we can always
+ * check for loading states to not prematurely show "no perms" UIs. We'll also need a separate async check for org perms too
+ *
+ * Use `import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'` instead
  */
 export function useCheckPermissions(
   action: string,

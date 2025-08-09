@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -8,8 +7,6 @@ import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-
-dayjs.extend(relativeTime)
 
 export function RecentItems() {
   const { ref } = useParams()
