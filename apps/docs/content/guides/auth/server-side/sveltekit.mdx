@@ -420,6 +420,24 @@ export const actions: Actions = {
       redirect(303, '/private')
     }
   },
+oauth: async ({ request, locals: { supabase } }) => {
+    const formData = await request.formData()
+    const provider = formData.get('provider') as 'github' | 'google'
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: 'http://localhost:5173/auth/callback', // change this to your site URL
+      },
+    })
+    
+    if (error) {
+      console.error(error)
+      return redirect(303, '/auth/error')
+    } else {
+      return redirect(303, data.url)
+    }
+  },
 }
 ```
 
@@ -435,6 +453,16 @@ export const actions: Actions = {
   </label>
   <button>Login</button>
   <button formaction="?/signup">Sign up</button>
+</form>
+
+<form method="POST" action="?/oauth">
+  <input type="hidden" name="provider" value="github" />
+  <button type="submit">Login with GitHub</button>
+</form>
+
+<form method="POST" action="?/oauth">
+  <input type="hidden" name="provider" value="google" />
+  <button type="submit">Login with Google</button>
 </form>
 ```
 
