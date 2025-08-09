@@ -2,9 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { OrganizationBase } from 'data/organizations/organizations-query'
 import { PlanId } from 'data/subscriptions/types'
 import jsonLogic from 'json-logic-js'
+import { BillingManagedBy } from 'lib/constants'
 
 export interface Organization extends OrganizationBase {
-  managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
+  managed_by: BillingManagedBy
   partner_id?: string
   plan: { id: PlanId; name: string }
 }
