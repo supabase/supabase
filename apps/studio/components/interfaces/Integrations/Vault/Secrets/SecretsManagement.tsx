@@ -4,10 +4,9 @@ import { Loader, Search, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -29,11 +28,13 @@ export const SecretsManagement = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
   const [selectedSort, setSelectedSort] = useState('updated_at')
 
-  const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   useEffect(() => {
     if (search !== undefined) setSearchValue(search)
@@ -106,21 +107,7 @@ export const SecretsManagement = () => {
           </div>
           <div className="flex items-center gap-x-2">
             <DocsButton href="https://supabase.com/docs/guides/database/vault" />
-            <ButtonTooltip
-              type="primary"
-              disabled={!canManageSecrets}
-              onClick={() => setShowAddSecretModal(true)}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canManageSecrets
-                    ? 'You need additional permissions to add secrets'
-                    : undefined,
-                },
-              }}
-            >
-              Add new secret
-            </ButtonTooltip>
+            <AddNewSecretModal disabled={!canManageSecrets} />
           </div>
         </div>
 
@@ -168,10 +155,6 @@ export const SecretsManagement = () => {
       <DeleteSecretModal
         selectedSecret={selectedSecretToRemove}
         onClose={() => setSelectedSecretToRemove(undefined)}
-      />
-      <AddNewSecretModal
-        visible={showAddSecretModal}
-        onClose={() => setShowAddSecretModal(false)}
       />
     </>
   )
