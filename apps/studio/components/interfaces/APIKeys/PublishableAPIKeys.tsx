@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useMemo } from 'react'
+
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useMemo } from 'react'
 import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
+
 // to add in later with follow up PR
 // import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
 // to add in later with follow up PR
@@ -38,7 +40,7 @@ export const PublishableAPIKeys = () => {
         description="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
       />
       <div className="flex flex-col gap-8">
-        <div className="-space-y-px w-content w-fit">
+        <div className="-space-y-px w-full lg:w-content lg:w-fit">
           <div className="bg-surface-100 px-5 py-2 flex items-center gap-5 first:rounded-t-md border">
             <span className="text-sm">Publishable key</span>
             <div className="flex items-center gap-2">
@@ -59,7 +61,7 @@ export const PublishableAPIKeys = () => {
             </div>
           ) : (
             <div className="text-xs bg-200 last:rounded-b-md border px-5 text-foreground-lighter py-1">
-              Publishable key can be safely shared in public
+              The publishable key can be safely shared publicly
             </div>
           )}
         </div>
@@ -91,7 +93,8 @@ function ApiKeyInput() {
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
 
-  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-[32em]'
+  const baseClasses =
+    'flex-1 grow gap-1 rounded-full min-w-0 max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:min-w-[24rem]'
   const size = 'tiny'
 
   if (isApiKeysLoading || isPermissionsLoading) {

@@ -1,6 +1,6 @@
-import { expect, test, describe, afterAll } from 'vitest'
+import { afterAll, describe, expect, test } from 'vitest'
 import { Query } from '../../src/query/Query'
-import { createTestDatabase, cleanupRoot } from '../db/utils'
+import { cleanupRoot, createTestDatabase } from '../db/utils'
 
 type TestDb = Awaited<ReturnType<typeof createTestDatabase>>
 
@@ -343,7 +343,7 @@ describe('Advanced Query Tests', () => {
           .toSql()
 
         expect(sql).toMatchInlineSnapshot(
-          `"select id, name from public.normal_table where id > 10 and name ~~ '%John%' order by normal_table.name asc nulls last limit 10 offset 0;"`
+          `"select id, name from public.normal_table where id > 10 and name::text ~~ '%John%' order by normal_table.name asc nulls last limit 10 offset 0;"`
         )
 
         const result = await validateSql(db, sql)
@@ -444,7 +444,7 @@ describe('Advanced Query Tests', () => {
         .toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select count(*) from public.normal_table where name ~~ \'%John%\';"'
+        '"select count(*) from public.normal_table where name::text ~~ \'%John%\';"'
       )
 
       const result = await validateSql(db, sql)

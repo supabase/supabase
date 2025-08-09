@@ -26,6 +26,11 @@ const SUPABASE_CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL
   ? new URL(process.env.NEXT_PUBLIC_CONTENT_API_URL).origin
   : ''
 
+const isDevOrStaging =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
@@ -41,7 +46,6 @@ const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
 const STRIPE_JS_URL = 'https://js.stripe.com'
 const STRIPE_NETWORK_URL = 'https://*.stripe.network'
 const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one'
 const VERCEL_URL = 'https://vercel.com'
 const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
 const GITHUB_API_URL = 'https://api.github.com'
@@ -59,6 +63,7 @@ const SUPABASE_ASSETS_URL =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? 'https://frontend-assets.supabase.green'
     : 'https://frontend-assets.supabase.com'
+const POSTHOG_URL = isDevOrStaging ? 'https://ph.supabase.green' : 'https://ph.supabase.com'
 
 const USERCENTRICS_URLS = 'https://*.usercentrics.eu'
 const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
@@ -66,6 +71,8 @@ const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
+
+const GOOGLE_MAPS_API_URL = 'https://maps.googleapis.com'
 
 module.exports.getCSP = function getCSP() {
   const DEFAULT_SRC_URLS = [
@@ -81,13 +88,14 @@ module.exports.getCSP = function getCSP() {
     STRIPE_SUBDOMAINS_URL,
     STRIPE_NETWORK_URL,
     CLOUDFLARE_URL,
-    ONE_ONE_ONE_ONE_URL,
     VERCEL_INSIGHTS_URL,
     GITHUB_API_URL,
     GITHUB_USER_CONTENT_URL,
     SUPABASE_ASSETS_URL,
     USERCENTRICS_URLS,
     STAPE_URL,
+    GOOGLE_MAPS_API_URL,
+    POSTHOG_URL,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -95,6 +103,7 @@ module.exports.getCSP = function getCSP() {
     STRIPE_JS_URL,
     SUPABASE_ASSETS_URL,
     STAPE_URL,
+    POSTHOG_URL,
   ]
   const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
   const IMG_SRC_URLS = [
@@ -109,11 +118,6 @@ module.exports.getCSP = function getCSP() {
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
-
-  const isDevOrStaging =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const defaultSrcDirective = [
     `default-src 'self'`,
@@ -146,6 +150,7 @@ module.exports.getCSP = function getCSP() {
     ...SCRIPT_SRC_URLS,
     VERCEL_LIVE_URL,
     PUSHER_URL,
+    GOOGLE_MAPS_API_URL,
   ].join(' ')
 
   const frameSrcDirective = [`frame-src 'self'`, ...FRAME_SRC_URLS, VERCEL_LIVE_URL].join(' ')

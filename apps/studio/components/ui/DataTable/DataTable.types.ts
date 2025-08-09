@@ -30,10 +30,13 @@ export type Slider = {
   options?: Option[]
 }
 
+export type DateRangeDisabled = { before?: Date; after?: Date }
+
 export type Timerange = {
   type: 'timerange'
   options?: Option[] // required for TS
   presets?: DatePreset[]
+  dateRangeDisabled?: DateRangeDisabled
 }
 
 export type Base<TData> = {
@@ -47,6 +50,8 @@ export type Base<TData> = {
    * Defines if the command input is disabled for this field
    */
   commandDisabled?: boolean
+  hasDynamicOptions?: boolean
+  hasAsyncSearch?: boolean
 }
 
 export type DataTableCheckboxFilterField<TData> = Base<TData> & Checkbox

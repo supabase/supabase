@@ -6,7 +6,6 @@ import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import WizardLayout from 'components/layouts/WizardLayout'
 import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import type { NextPageWithLayout } from 'types'
 
 /**
@@ -14,7 +13,6 @@ import type { NextPageWithLayout } from 'types'
  */
 const Wizard: NextPageWithLayout = () => {
   const [intent, setIntent] = useState<SetupIntentResponse>()
-  const captchaLoaded = useIsHCaptchaLoaded()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -40,7 +38,7 @@ const Wizard: NextPageWithLayout = () => {
     if (selectedPlan == null || selectedPlan === 'FREE') return
     if (intent != null && !force) return
 
-    if (captchaRef && captchaLoaded) {
+    if (captchaRef) {
       let token = captchaToken
 
       try {
@@ -59,7 +57,7 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     loadPaymentForm()
-  }, [captchaRef, captchaLoaded, selectedPlan])
+  }, [captchaRef, selectedPlan])
 
   const resetSetupIntent = () => {
     setIntent(undefined)

@@ -4,187 +4,315 @@ title: 'Realtime Protocol'
 description: 'Understanding Realtime Protocol'
 ---
 
-The Realtime Protocol is a set of message formats used for communication over a WebSocket connection between a Realtime client and server. These messages are used to initiate a connection, update access tokens, receive system status updates, and receive real-time updates from the Postgres database.
+## WebSocket connection setup
 
-## Connection
+To start the connection we use the WebSocket URL, which for:
 
-In the initial message, the client sends a message specifying the features they want to use (Broadcast, Presence, Postgres Changes).
+- Supabase projects: `wss://<PROJECT_REF>.supabase.co/realtime/v1/websocket?apikey=<API_KEY>`
+- self-hosted projects: `wss://<HOST>:<PORT>/socket/websocket?apikey=<API_KEY>`
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+As an example, using the [websocat](https://github.com/vi/websocat), you would run the following command in your terminal:
+
+```bash
+# With Supabase
+websocat "wss://<PROJECT_REF>.supabase.co/realtime/v1/websocket?apikey=<API_KEY>"
+
+# With self-hosted
+websocat "wss://<HOST>:<PORT>/socket/websocket?apikey=<API_KEY>"
+```
+
+During this stage you can also set other URL params:
+
+- `log_level`: sets the log level to be used by this connection to help you debug potential issues
+
+After this you would need to send the `phx_join` event to the server to join the Channel.
+
+## Protocol messages
+
+### Payload format
+
+All messages sent to the server or received from the server follow the same structure:
 
 ```ts
 {
-   "event": "phx_join",
+   "event": string,
    "topic": string,
-   "payload": {
-      "config": {
-         "broadcast": {
+   "payload": any,
+   "ref": string
+}
+```
+
+- `event`: The type of event being sent or received. This can be a specific event like `phx_join`, `postgres_changes`, etc.
+- `topic`: The topic to which the message belongs. This is usually a string that identifies the channel or context of the message.
+- `payload`: The data associated with the event. This can be any JSON-serializable data structure, such as an object or an array.
+- `ref`: A unique reference ID for the message. This is used to track the message and its response on the client side when a reply is needed to proceed.
+
+### Event types
+
+The following are the event types from the Realtime protocol:
+| Event Type | Description | Client Sent | Server Sent | Requires Ref |
+|------------|-------------|--------------|-------------|--------------|
+| `phx_join` | Initial message to join a channel and configure features | ✅ | ⛔ | ✅ |
+| `phx_close` | Message from server to signal channel closed | ⛔ | ✅ | ⛔ |
+| `phx_leave` | Message to leave a channel | ✅ | ⛔ | ✅ |
+| `phx_error` | Error message sent by the server when an error occurs | ⛔ | ✅ | ⛔ |
+| `phx_reply` | Response to a `phx_join` or other requests | ⛔ | ✅ | ⛔ |
+| `heartbeat` | Heartbeat message to keep the connection alive | ✅ | ✅ | ✅ |
+| `access_token` | Message to update the access token | ✅ | ⛔ | ⛔ |
+| `system` | System messages to inform about the status of the Postgres subscription | ⛔ | ✅ | ⛔ |
+| `broadcast` | Broadcast message sent to all clients in a channel | ✅ | ✅ | ⛔ |
+| `presence` | Presence state update sent after joining a channel | ✅ | ⛔ | ⛔ |
+| `presence_state` | Presence state sent by the server on join | ⛔ | ✅ | ⛔ |
+| `presence_diff` | Presence state diff update sent after a change in presence state | ⛔ | ✅ | ⛔ |
+| `postgres_changes` | Postgres CDC message containing changes to the database | ⛔ | ✅ | ⛔ |
+
+Each one of these events has a specific payload field structure that defines the data it carries. Below are the details for each event type payload.
+
+#### Payload of phx_join
+
+This is the initial message required to join a channel. The client sends this message to the server to join a specific topic and configure the features it wants to use, such as Postgres changes, presence, and broadcasting.
+
+```ts
+{
+   "config": {
+      "broadcast": {
+            "ack": boolean,
             "self": boolean
+            },
+      "presence": {
+         "enabled": boolean,
+         "key": string
          },
-         "presence": {
-            "key": string
-         },
-         "postgres_changes": [
-            {
-               "event": "*" | "INSERT" | "UPDATE" | "DELETE",
-               "schema": string,
-               "table": string,
-               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "in" +  '.' + string
-            }
-         ]
+      "postgres_changes": [
+                  {
+                     "event": string,
+                     "schema": string,
+                     "table": string,
+                     "filter": string
+                  }
+            ]
+      "private": boolean
+
+   },
+   "access_token": string
+}
+```
+
+- `config`:
+  - `private`: Whether the channel is private
+  - `broadcast`: Configuration options for broadcasting messages
+    - `ack`: Acknowledge broadcast messages
+    - `self`: Include the sender in broadcast messages
+  - `presence`: Configuration options for presence tracking
+    - `enabled`: Whether presence tracking is enabled for this channel
+    - `key`: Key to be used for presence tracking, if not specified or empty, a UUID will be generated and used
+  - `postgres_changes`: Array of configurations for Postgres changes
+    - `event`: Database change event to listen to, accepts `INSERT`, `UPDATE`, `DELETE`, or `*` to listen to all events.
+    - `schema`: Schema of the table to listen to, accepts `*` wildcard to listen to all schemas
+    - `table`: Table of the database to listen to, accepts `*` wildcard to listen to all tables
+    - `filter`: Filter to be used when pulling changes from database. Read more about filters in the usage docs for [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes)
+- `access_token`: Optional access token for authentication, if not provided, the server will use the default access token.
+
+#### Payload of phx_close
+
+This message is sent by the server to signal that the channel has been closed. Payload will be empty object.
+
+#### Payload of phx_leave
+
+This message is sent by the client to leave a channel. It can be used to clean up resources or stop listening for events on that channel. Payload should be empty object.
+
+#### Payload of phx_error
+
+This message is sent by the server when an unexpected error occurs in the channel. Payload will be an empty object
+
+#### Payload of phx_reply
+
+These messages are sent by the server on messages that expect a response. Their response can vary with the type of usage.
+
+```ts
+{
+   "status": string,
+   "response": any,
+}
+```
+
+- `status`: The status of the response, can be `ok` or `error`.
+- `response`: The response data, which can vary based on the event that was replied to
+
+##### Payload of phx_reply response to phx_join
+
+Contains the status of the join request and any additional information requested in the `phx_join` payload.
+
+```ts
+{
+   "postgres_changes": [
+      {
+         "id": number,
+         "event": string,
+         "schema": string,
+         "table": string
       }
-   },
-   "ref": string
+   ]
 }
 ```
 
-<Admonition type="note">
+- `postgres_changes`: Array of Postgres changes that the client is subscribed to, each object contains:
+  - `id`: Unique identifier for the Postgres changes subscription
+  - `event`: The type of event the client is subscribed to, such as `INSERT`, `UPDATE`, `DELETE`, or `*`
+  - `schema`: The schema of the table the client is subscribed to
+  - `table`: The table the client is subscribed to
 
-The `in` filter has the format `COLUMN_NAME=in.(value1,value2,value3)`. However, other filters use the format `COLUMN_NAME=FILTER_NAME.value`.
+##### Payload of phx_reply response to presence
 
-</Admonition>
+When replying to presence events, it returns an empty object.
 
-In response, the server sends the Postgres configuration with a unique ID. With this ID, the client should route incoming changes to the appropriate callback.
+##### Payload of phx_reply response on heartbeat
+
+When replying to heartbeat events, it returns an empty object.
+
+#### Payload of system
+
+System messages are sent by the server to inform the client about the status of Realtime channel subscriptions.
 
 ```ts
 {
-   "event": "phx_reply",
-   "topic": string,
-   "payload": {
-      "response": {
-         "postgres_changes": [
-            {
-               "id": number,
-               "event": "*" | "INSERT" | "UPDATE" | "DELETE",
-               "schema": string,
-               "table": string,
-               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "in" +  '.' + string
-            }
-         ]
+   "message": string,
+   "status": string,
+   "extension": string,
+   "channel": string
+}
+```
+
+- `message`: A human-readable message describing the status of the subscription.
+- `status`: The status of the subscription, can be `ok`, `error`, or `timeout`.
+- `extension`: The extension that sent the message.
+- `channel`: The channel to which the message belongs, such as `realtime:room1`.
+
+#### Payload of heartbeat
+
+The heartbeat message should be sent at least every 30 seconds to avoid a connection timeout. Payload should be empty object.
+
+#### Payload of access_token
+
+Used to setup a new token to be used by Realtime for authentication and to refresh the token to prevent the channel from closing.
+
+```ts
+{
+   "access_token": string
+}
+```
+
+- `access_token`: The new access token to be used for authentication. Either to change it or to refresh it.
+
+#### Payload of postgres_changes
+
+Server sent message with a change from a listened schema and table. This message is sent when a change occurs in the database that the client is subscribed to. The payload contains the details of the change, including the schema, table, event type, and the new and old values.
+
+```ts
+{
+   ,
+   "ids": [
+      number
+   ],
+   "data": {
+      "schema": string,
+      "table": string,
+      "commit_timestamp": string,
+      "eventType": "*" | "INSERT" | "UPDATE" | "DELETE",
+      "new": {
+         [key: string]: boolean | number | string | null
       },
-      "status": "ok" | "error"
-   },
-   "ref": string
-}
-```
-
-## System messages
-
-System message are used to inform a client about the status of the Postgres subscription. The `payload.status` indicates if the subscription successful or not.
-The body of the `payload.message` can be "Subscribed to Postgres" or "Subscribing to Postgres failed" with subscription params.
-
-```ts
-{
-   "event": "system",
-   "topic": string,
-   "payload":{
-      "channel": string,
-      "extension": "postgres_changes",
-      "message": "Subscribed to PostgreSQL" | "Subscribing to PostgreSQL failed",
-      "status": "ok" | "error"
-   },
-   "ref": null,
-}
-```
-
-## Heartbeat
-
-The heartbeat message should be sent every 30 seconds to avoid a connection timeout.
-
-```ts
-{
-   "event": "heartbeat",
-   "topic": "phoenix",
-   "payload": {},
-   "ref": string
-}
-```
-
-## Access token
-
-To update the access token, you need to send to the server a message specifying a new token in the `payload.access_token` value.
-
-```ts
-{
-   "event": "access_token",
-   "topic": string,
-   "payload":{
-      "access_token": string
-   },
-   "ref": string
-}
-```
-
-## Postgres CDC message
-
-Realtime sends a message with the following structure. By default, the payload only includes new record changes, and the `old` entry includes the changed row's primary id. If you want to receive old records, you can set the replicate identity of your table to full. Check out [this section of the guide](/docs/guides/realtime/postgres-changes#receiving-old-records).
-
-```ts
-{
-   "event": "postgres_changes",
-   "topic": string,
-   "payload": {
-      "data": {
-         schema: string,
-         table: string,
-         commit_timestamp: string,
-         eventType: "*" | "INSERT" | "UPDATE" | "DELETE",
-         new: {[key: string]: boolean | number | string | null},
-         old: {[key: string]: number | string},
-         errors: string | null
+      "old": {
+         [key: string]: boolean | number | string | null
       },
-      "ids": Array<number>
-   },
-   "ref": null
+      "errors": string | null,
+      "latency": number
+   }
 }
 ```
 
-## Broadcast message
+- `ids`: An array of unique identifiers for the changes that occurred.
+- `data`: An object containing the details of the change:
+  - `schema`: The schema of the table where the change occurred.
+  - `table`: The table where the change occurred.
+  - `commit_timestamp`: The timestamp when the change was committed to the database.
+  - `eventType`: The type of event that occurred, such as `INSERT`, `UPDATE`, `DELETE`, or `*` for all events.
+  - `new`: An object representing the new values after the change, with keys as column names and values as their corresponding values.
+  - `old`: An object representing the old values before the change, with keys as column names and values as their corresponding values.
+  - `errors`: Any errors that occurred during the change, if applicable.
+  - `latency`: The latency of the change event, in milliseconds.
 
-Structure of the broadcast event
+### Payload of broadcast
+
+Structure of the broadcast event to be sent to all clients in a channel. The `payload` field contains the event name and the data to broadcast.
 
 ```ts
 {
-   "event": "broadcast",
-   "topic": string,
-   "payload": {
-      "event": string,
-      "payload": {[key: string]: boolean | number | string | null | undefined},
-      "type": "broadcast"
-   },
-   "ref": null
+   "event": string,
+   "payload": json,
+   "type": "broadcast"
 }
 ```
 
-## Presence message
+- `event`: The name of the event to broadcast.
+- `payload`: The data associated with the event, which can be any JSON-serializable data structure.
+- `type`: The type of message, which is always `broadcast` for broadcast messages.
 
-The Presence events allow clients to monitor the online status of other clients in real-time.
+### Payload of presence
 
-### State update
+Presence messages are used to track the online status of clients in a channel. When a client joins or leaves a channel, a presence message is sent to all clients in that channel.
+
+### Payload of presence_state
 
 After joining, the server sends a `presence_state` message to a client with presence information. The payload field contains keys in UUID format, where each key represents a client and its value is a JSON object containing information about that client.
 
 ```ts
 {
-   "event": "presence_state",
-   "topic": string,
-   "payload": {
-      [key: string]: {metas: Array<{phx_ref: string, name: string, t: float}>}
-   },
-   "ref": null
+   [key: string]: {
+      metas: [
+         {
+            phx_ref: string,
+            name: string,
+            t: float
+         }
+      ]
+   }
 }
 ```
 
-### Diff update
+- `key`: The UUID of the client.
+- `metas`: An array of metadata objects for the client, each containing:
+  - `phx_ref`: A unique reference ID for the metadata.
+  - `name`: The name of the client.
+  - `t`: A timestamp indicating when the client joined or last updated its presence state.
+
+### Payload of presence_diff
 
 After a change to the presence state, such as a client joining or leaving, the server sends a presence_diff message to update the client's view of the presence state. The payload field contains two keys, `joins` and `leaves`, which represent clients that have joined and left, respectively. The values associated with each key are UUIDs of the clients.
 
 ```ts
 {
-   "event": "presence_diff",
-   "topic": string,
-   "payload": {
-      "joins": {metas: Array<{phx_ref: string, name: string, t: float}>},
-      "leaves": {metas: Array<{phx_ref: string, name: string, t: float}>}
+   "joins": {
+      metas: [{
+         phx_ref: string,
+         name: string,
+         t: float
+      }]
    },
-   "ref": null
+   "leaves": {
+      metas: [{
+         phx_ref: string,
+         name: string,
+         t: float
+      }]
+   }
 }
 ```
+
+- `joins`: An object containing metadata for clients that have joined the channel, with keys as UUIDs and values as metadata objects.
+- `leaves`: An object containing metadata for clients that have left the channel, with keys as UUIDs and values as metadata objects.
+
+## REST API
+
+The Realtime protocol is primarily designed for WebSocket communication, but it can also be accessed via a REST API. This allows you to interact with the Realtime service using standard HTTP methods.

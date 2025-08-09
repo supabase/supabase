@@ -19,8 +19,13 @@ export type CreateDestinationPipelineParams = {
     bigQuery: BigQueryDestinationConfig
   }
   sourceId: number
-  publicationName: string
-  pipelinConfig: { config: { maxSize: number; maxFillSecs: number } }
+  pipelineConfig: {
+    publicationName: string
+    batch: {
+      maxSize: number
+      maxFillMs: number
+    }
+  }
 }
 
 async function createDestinationPipeline(
@@ -30,10 +35,10 @@ async function createDestinationPipeline(
     destinationConfig: {
       bigQuery: { projectId, datasetId, serviceAccountKey, maxStalenessMins },
     },
-    pipelinConfig: {
-      config: { maxSize, maxFillSecs },
+    pipelineConfig: {
+      publicationName,
+      batch: { maxSize, maxFillMs },
     },
-    publicationName,
     sourceId,
   }: CreateDestinationPipelineParams,
   signal?: AbortSignal
@@ -53,12 +58,12 @@ async function createDestinationPipeline(
         },
       },
       pipeline_config: {
-        config: {
+        publication_name: publicationName,
+        batch: {
           max_size: maxSize,
-          max_fill_secs: maxFillSecs,
+          max_fill_ms: maxFillMs,
         },
       },
-      publication_name: publicationName,
       source_id: sourceId,
     },
     signal,

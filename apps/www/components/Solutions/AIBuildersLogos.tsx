@@ -21,7 +21,12 @@ const logos = [
     name: 'v0',
     href: 'https://v0.dev',
   },
-
+  {
+    image: `/images/logos/publicity/figma.svg`,
+    alt: 'figma',
+    name: 'figma',
+    href: 'https://www.figma.com/make/',
+  },
   {
     image: `/images/logos/publicity/tempo.svg`,
     alt: 'tempo',
@@ -50,7 +55,7 @@ const EnterpriseLogos: React.FC<Props> = ({ className }) => {
   return (
     <div
       className={cn(
-        'flex lg:grid grid-cols-2 xl:flex flex-nowrap gap-4 md:gap-8 lg:gap-4 2xl:gap-8',
+        'flex lg:grid grid-cols-2 xl:flex flex-nowrap gap-4 md:gap-8 lg:gap-4 2xl:gap-4',
         className
       )}
     >

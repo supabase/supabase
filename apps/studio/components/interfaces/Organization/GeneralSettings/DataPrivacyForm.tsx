@@ -4,12 +4,10 @@ import { useEffect } from 'react'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Card, CardContent, CardFooter, Form_Shadcn_ } from 'ui'
 import { AIOptInLevelSelector } from './AIOptInLevelSelector'
 
 export const DataPrivacyForm = () => {
-  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -28,7 +26,7 @@ export const DataPrivacyForm = () => {
           <CardContent className="pt-6">
             <AIOptInLevelSelector
               control={form.control}
-              disabled={!canUpdateOrganization || !newOrgAiOptIn || isUpdating}
+              disabled={!canUpdateOrganization || isUpdating}
               layout="flex-row-reverse"
               label="Supabase Assistant Opt-in Level"
             />

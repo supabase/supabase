@@ -127,44 +127,59 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           <Fragment>
             {renderLiveRow?.()}
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                {isLoading ? 'Retrieving logs...' : 'No results'}
+              <TableCell colSpan={columns.length} className="h-[32vh] text-center">
+                <div className="flex flex-col items-center justify-center h-full gap-3">
+                  {isLoading ? (
+                    <>
+                      <LoaderCircle className="h-6 w-6 animate-spin text-foreground-muted" />
+                      <p className="text-foreground-light text-sm">Retrieving logs...</p>
+                    </>
+                  ) : (
+                    <p className="text-foreground-light text-sm">No results found</p>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           </Fragment>
         )}
-        <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
-          <TableCell colSpan={columns.length} className="text-center !py-2">
-            {hasNextPage || isFetching || isLoading ? (
-              <div className="flex flex-col items-center gap-2">
-                <Button
-                  disabled={isFetching || isLoading}
-                  onClick={() => fetchNextPage()}
-                  size="small"
-                  type="outline"
-                  icon={isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null}
-                >
-                  Load more
-                </Button>
+        {/* Only show load more section if we have rows OR if we're not in initial loading state */}
+        {(rows.length > 0 || (!isLoading && !rows.length)) && (
+          <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
+            <TableCell colSpan={columns.length} className="text-center !py-2">
+              {hasNextPage || isFetching ? (
+                <div className="flex flex-col items-center gap-2">
+                  <Button
+                    disabled={isFetching}
+                    onClick={() => fetchNextPage()}
+                    size="small"
+                    type="outline"
+                    icon={
+                      isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
+                    }
+                  >
+                    Load more
+                  </Button>
+                  <p className="text-xs text-foreground-lighter">
+                    Showing{' '}
+                    <span className="font-mono font-medium">
+                      {formatCompactNumber(totalRowsFetched)}
+                    </span>{' '}
+                    of{' '}
+                    <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
+                    rows
+                  </p>
+                </div>
+              ) : (
                 <p className="text-xs text-foreground-lighter">
-                  Showing{' '}
-                  <span className="font-mono font-medium">
-                    {formatCompactNumber(totalRowsFetched)}
-                  </span>{' '}
+                  No more data to load (
+                  <span className="font-mono font-medium">{formatCompactNumber(filterRows)}</span>{' '}
                   of <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
-                  rows
+                  rows)
                 </p>
-              </div>
-            ) : (
-              <p className="text-xs text-foreground-lighter">
-                No more data to load (
-                <span className="font-mono font-medium">{formatCompactNumber(filterRows)}</span> of{' '}
-                <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
-                rows)
-              </p>
-            )}
-          </TableCell>
-        </TableRow>
+              )}
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   )

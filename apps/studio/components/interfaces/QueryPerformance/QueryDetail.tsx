@@ -76,10 +76,17 @@ export const QueryDetail = ({
         {report
           .filter((x) => x.id !== 'query')
           .map((x) => {
+            const rawValue = selectedRow?.[x.id]
             const isTime = x.name.includes('time')
+
             const formattedValue = isTime
-              ? `${selectedRow?.[x.id].toFixed(2)}ms`
-              : String(selectedRow?.[x.id])
+              ? typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue)
+                ? `${rawValue.toFixed(2)}ms`
+                : 'N/A'
+              : rawValue != null
+                ? String(rawValue)
+                : 'N/A'
+
             return (
               <div key={x.id} className="flex gap-x-2">
                 <p className="text-foreground-lighter text-sm w-32">{x.name}</p>

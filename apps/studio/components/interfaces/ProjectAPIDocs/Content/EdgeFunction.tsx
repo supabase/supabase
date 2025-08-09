@@ -21,7 +21,7 @@ const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
     <div className="divide-y">
       <div className="space-y-1 px-4 py-4">
         <div className="flex items-center space-x-2">
-          <h2 className="text-xl">{edgeFunction.name}</h2>
+          <h2>{edgeFunction.name}</h2>
         </div>
       </div>
 

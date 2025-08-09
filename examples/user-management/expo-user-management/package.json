@@ -7,7 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "format": "prettier --write \"**/*.{js,json,md,ts,tsx,jsx,css}\""
+    "format": "prettier --cache --write \"**/*.{js,json,md,ts,tsx,jsx,css}\""
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",

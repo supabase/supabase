@@ -4,12 +4,12 @@ import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 
 const OrgTeamSettings: NextPageWithLayout = () => {
   const { isLoading: isLoadingPermissions } = usePermissionsQuery()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   return selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <TeamSettings />
 }

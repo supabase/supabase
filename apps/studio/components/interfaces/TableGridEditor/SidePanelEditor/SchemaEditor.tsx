@@ -2,22 +2,22 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Input, SidePanel } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import ActionBar from './ActionBar'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 interface SchemaEditorProps {
   visible: boolean
+  onSuccess: (schema: string) => void
   closePanel: () => void
 }
 
-const SchemaEditor = ({ visible, closePanel }: SchemaEditorProps) => {
-  const { project } = useProjectContext()
+const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
+  const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })
   const [name, setName] = useState('')
 
-  const { mutate: createSchema } = useSchemaCreateMutation()
+  const { mutateAsync: createSchema, isLoading } = useSchemaCreateMutation()
 
   useEffect(() => {
     if (visible) {
@@ -26,51 +26,46 @@ const SchemaEditor = ({ visible, closePanel }: SchemaEditorProps) => {
     }
   }, [visible])
 
-  const onSaveChanges = (resolve: any) => {
+  const onSaveChanges = async () => {
     const errors: any = {}
     if (name.length === 0) errors.name = 'Please provide a name for your schema'
     if (Object.keys(errors).length > 0) {
-      resolve()
       return setErrors(errors)
     }
 
     if (project === undefined) return console.error('Project is required')
-    createSchema(
-      { projectRef: project.ref, connectionString: project.connectionString, name },
-      {
-        onSuccess: () => {
-          resolve()
-          closePanel()
-          toast.success(`Successfully created schema "${name}"`)
-        },
-      }
-    )
+    try {
+      await createSchema({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        name,
+      })
+      onSuccess(name)
+      toast.success(`Successfully created schema "${name}"`)
+    } catch (error) {
+      toast.error(`Failed to create schema: ${error}`)
+    }
   }
 
   return (
     <SidePanel
-      size="large"
+      size="medium"
       key="SchemaEditor"
       visible={visible}
       header={'Create a new schema'}
       className="transition-all duration-100 ease-in"
       onCancel={closePanel}
-      onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
-      customFooter={
-        <ActionBar
-          backButtonLabel="Cancel"
-          applyButtonLabel="Save"
-          closePanel={closePanel}
-          applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
-        />
-      }
+      onConfirm={onSaveChanges}
+      loading={isLoading}
+      cancelText="Cancel"
+      confirmText="Save"
     >
       <>
         <SidePanel.Content>
           <div className="space-y-10 py-6">
             <Input
-              label="Name"
-              layout="horizontal"
+              label="Schema name"
+              layout="vertical"
               type="text"
               error={errors?.name}
               value={name}

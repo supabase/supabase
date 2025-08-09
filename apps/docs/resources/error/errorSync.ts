@@ -52,7 +52,10 @@ async function doFetchErrorCodes(
 }
 
 async function fetchErrorCodes(): Promise<Result<Array<ErrorCodeUploadParameters>, MultiError>> {
-  const arrayOfResults = await Promise.all([doFetchErrorCodes('authErrorCodes.toml', Service.Auth)])
+  const arrayOfResults = await Promise.all([
+    doFetchErrorCodes('authErrorCodes.toml', Service.Auth),
+    doFetchErrorCodes('realtimeErrorCodes.toml', Service.Realtime),
+  ])
   return Result.transposeArray(arrayOfResults).map((result) => result.flat())
 }
 

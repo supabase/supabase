@@ -2,11 +2,13 @@ import { uniqBy } from 'lodash'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 import {
   DatabaseFunctionsData,
   useDatabaseFunctionsQuery,
 } from 'data/database-functions/database-functions-query'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,9 +26,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
-import { useParams } from 'common'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -56,7 +56,7 @@ const FunctionSelector = ({
 }: FunctionSelectorProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
 
   const { data, error, isLoading, isError, isSuccess, refetch } = useDatabaseFunctionsQuery({

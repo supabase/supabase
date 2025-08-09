@@ -403,6 +403,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "platform-kit-nextjs": {
+      name: "platform-kit-nextjs",
+      type: "registry:block",
+      registryDependencies: ["alert","badge","button","card","chart","command","dialog","drawer","form","hover-card","input","label","popover","select","skeleton","switch","table","toggle","toggle-group","tooltip"],
+      component: React.lazy(() => import("@/registry/default/platform/platform-kit-nextjs/components/dynamic-form.tsx")),
+      source: "",
+      files: ["registry/default/platform/platform-kit-nextjs/app/api/ai/sql/route.ts","registry/default/platform/platform-kit-nextjs/app/api/supabase-proxy/[...path]/route.ts","registry/default/platform/platform-kit-nextjs/components/dynamic-form.tsx","registry/default/platform/platform-kit-nextjs/components/logo-supabase.tsx","registry/default/platform/platform-kit-nextjs/components/results-table.tsx","registry/default/platform/platform-kit-nextjs/components/sql-editor.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/auth.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/database.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/index.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/logs.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/secrets.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/storage.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/suggestions.tsx","registry/default/platform/platform-kit-nextjs/components/supabase-manager/users.tsx","registry/default/platform/platform-kit-nextjs/components/users-growth-chart.tsx","registry/default/platform/platform-kit-nextjs/hooks/use-auth.ts","registry/default/platform/platform-kit-nextjs/hooks/use-logs.ts","registry/default/platform/platform-kit-nextjs/hooks/use-run-query.ts","registry/default/platform/platform-kit-nextjs/hooks/use-secrets.ts","registry/default/platform/platform-kit-nextjs/hooks/use-storage.ts","registry/default/platform/platform-kit-nextjs/hooks/use-suggestions.ts","registry/default/platform/platform-kit-nextjs/hooks/use-tables.ts","registry/default/platform/platform-kit-nextjs/hooks/use-user-counts.ts","registry/default/platform/platform-kit-nextjs/lib/logs.ts","registry/default/platform/platform-kit-nextjs/lib/management-api-schema.d.ts","registry/default/platform/platform-kit-nextjs/lib/management-api.ts","registry/default/platform/platform-kit-nextjs/lib/pg-meta/sql.ts","registry/default/platform/platform-kit-nextjs/lib/pg-meta/index.ts","registry/default/platform/platform-kit-nextjs/lib/pg-meta/types.ts","registry/default/platform/platform-kit-nextjs/lib/schemas/auth.ts","registry/default/platform/platform-kit-nextjs/lib/schemas/secrets.ts","registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "ai-editor-rules": {
       name: "ai-editor-rules",
       type: "registry:file",

@@ -10,71 +10,62 @@ export interface AlgorithmDetail {
 
 export const algorithmDetails: Record<string, AlgorithmDetail> = {
   HS256: {
-    label: 'HS256 (Symmetric)',
+    label: 'HS256 (Shared Secret)',
     name: 'HMAC with SHA-256',
-    description: 'Symmetric algorithm using a shared secret key',
-    pros: [
-      'Fast and simple to use',
-      'Requires less computational power',
-      'Suitable for server-to-server communication',
-    ],
+    description: 'JWT signatures are produced by a shared secret.',
+    pros: ['Simple to use', 'Verifying and creating JWTs is very fast and not resource intensive'],
     cons: [
+      'Usually not compatible with SOC2 and other security compliance frameworks',
       'Requires secure key exchange',
       "Not suitable when the verifier shouldn't be able to sign tokens",
       'Key needs to be kept secret on both sides',
     ],
     shortDescription: 'HMAC with SHA-256: Fast, simple, requires secure key exchange',
     links: [
-      { url: 'https://jwt.io/introduction', label: 'JWT.io Introduction' },
       {
         url: 'https://datatracker.ietf.org/doc/html/rfc7518#section-3.2',
-        label: 'RFC 7518 Specification',
+        label: 'RFC 7518 Specification Section 3.2',
       },
     ],
   },
   RS256: {
     label: 'RSA 2048',
     name: 'RSA with SHA-256',
-    description: 'Asymmetric algorithm using a public/private key pair',
+    description: 'JWT is signed with a private and verified with a public RSA key.',
     pros: [
-      'Allows public key to be distributed freely',
-      'Private key can be kept secret on the signing side',
-      "Suitable for scenarios where the verifier shouldn't be able to sign tokens",
+      'Compatible with SOC2 and other security compliance frameworks',
+      'RSA is widely adopted and easier to work with',
+      'Public key does not need to be kept secret',
     ],
     cons: [
-      'Slower than HS256',
-      'Requires more computational power',
-      'Keys are larger than ECDSA keys',
+      'Larger JWT sizes than other choices',
+      'Slower to create and verify JWT than other choices',
     ],
-    shortDescription: 'RSA with SHA-256: Allows public key distribution, slower',
+    shortDescription: 'RSA with SHA-256: Widely adopted, has public key, slower',
     links: [
-      { url: 'https://jwt.io/introduction', label: 'JWT.io Introduction' },
       {
         url: 'https://datatracker.ietf.org/doc/html/rfc7518#section-3.3',
-        label: 'RFC 7518 Specification',
+        label: 'RFC 7518 Specification Section 3.3',
       },
     ],
   },
   ES256: {
     label: 'ECC (P-256)',
     name: 'ECDSA with SHA-256',
-    description: 'Asymmetric algorithm using elliptic curve cryptography',
+    description:
+      'JWT is signed with a private and verified with a public ECC key using the NIST P-256 curve.',
     pros: [
-      'Faster than RSA',
-      'Smaller key and signature sizes compared to RSA',
-      'Provides forward secrecy',
+      'Compatible with SOC2 and other security compliance frameworks',
+      'Faster to create and verify signatures than RSA',
+      'Ideal tradeoff between JWT size and efficiency',
+      'Public key does not need to be kept secret',
     ],
-    cons: [
-      'Less widely supported than RSA',
-      'More complex to implement correctly',
-      'Requires careful implementation to avoid timing attacks',
-    ],
-    shortDescription: 'ECDSA with SHA-256: Compact keys, fast, modern alternative to RSA',
+    cons: ['Wide support but some libraries might make it harder to work with than RSA'],
+    shortDescription: 'ECDSA with SHA-256: Faster, more efficient alternative to RSA',
     links: [
-      { url: 'https://jwt.io/introduction', label: 'JWT.io Introduction' },
       {
         url: 'https://datatracker.ietf.org/doc/html/rfc7518#section-3.4',
-        label: 'RFC 7518 Specification',
+        label: 'RFC 7518 Specification Section 3.4',
       },
     ],
   },

@@ -10,6 +10,7 @@ interface JWTSigningKeyCreateVariables {
   projectRef?: string
   algorithm: JWTAlgorithm
   status: 'in_use' | 'standby'
+  private_jwk: any
 }
 
 export async function createJWTSigningKey(payload: JWTSigningKeyCreateVariables) {
@@ -22,6 +23,7 @@ export async function createJWTSigningKey(payload: JWTSigningKeyCreateVariables)
     body: {
       algorithm: payload.algorithm,
       status: payload.status,
+      ...(payload.private_jwk ? { private_jwk: payload.private_jwk } : null),
     },
   })
 

@@ -9,7 +9,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import {
@@ -23,6 +22,7 @@ import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-pos
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -79,7 +79,7 @@ const formSchema = z
 
 export const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [showModal, setShowModal] = useState(false)
 

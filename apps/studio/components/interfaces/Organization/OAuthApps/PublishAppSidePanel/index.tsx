@@ -26,7 +26,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
+import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { ScopesPanel } from './Scopes'
 

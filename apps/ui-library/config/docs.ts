@@ -36,6 +36,18 @@ export const aiEditorsRules: SidebarNavGroup = {
   ],
 }
 
+export const platformBlocks: SidebarNavGroup = {
+  title: 'Platform',
+  items: [
+    {
+      title: 'Platform Kit',
+      href: '/docs/platform/platform-kit',
+      items: [],
+      commandItemLabel: 'Platform Kit',
+    },
+  ],
+}
+
 // Component definitions with supported frameworks
 export const componentPages: SidebarNavGroup = {
   title: 'Components',

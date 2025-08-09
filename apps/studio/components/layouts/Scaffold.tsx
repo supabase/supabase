@@ -66,7 +66,7 @@ export const ScaffoldHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
  */
 export const ScaffoldTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => {
-    return <h1 ref={ref} {...props} className={cn('text-2xl', className)} />
+    return <h1 ref={ref} {...props} className={cn(className)} />
   }
 )
 

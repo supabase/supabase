@@ -1,11 +1,11 @@
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Admonition } from 'ui-patterns'
 import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 
 const OrganizationDeletePanel = () => {
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   return (
     <ScaffoldSection isFullWidth>

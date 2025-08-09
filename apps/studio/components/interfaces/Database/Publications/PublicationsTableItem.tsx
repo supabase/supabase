@@ -3,10 +3,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { Badge, Toggle } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { toast } from 'sonner'
 
 interface PublicationsTableItemProps {
@@ -15,7 +15,7 @@ interface PublicationsTableItemProps {
 }
 
 const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTableItemProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const enabledForAllTables = selectedPublication.tables == null
 
   const [checked, setChecked] = useState(

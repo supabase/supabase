@@ -63,7 +63,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       )}
-
       <ScaffoldTitle>Your Organizations</ScaffoldTitle>
 
       {organizations.length === 0 && orgNotFound && (

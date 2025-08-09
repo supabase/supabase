@@ -5,21 +5,21 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
 
-import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
+import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
   convertToBytes,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
-import type { StorageBucket } from './Storage.types'
+import { Bucket } from 'data/storage/buckets-query'
 
 export interface EditBucketModalProps {
   visible: boolean
-  bucket?: StorageBucket
+  bucket?: Bucket
   onClose: () => void
 }
 
@@ -228,7 +228,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                               <p className="text-foreground-light text-sm">
                                 Note: Individual bucket upload will still be capped at the{' '}
                                 <Link
-                                  href={`/project/${ref}/settings/storage`}
+                                  href={`/project/${ref}/storage/settings`}
                                   className="font-bold underline"
                                 >
                                   global upload limit

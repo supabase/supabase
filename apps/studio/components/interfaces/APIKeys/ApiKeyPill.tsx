@@ -1,10 +1,10 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eye } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
@@ -35,7 +35,6 @@ export function ApiKeyPill({
   // It fetches the fully revealed API key when needed
   const {
     data,
-    isLoading: isLoadingApiKey,
     error,
     refetch: refetchApiKey,
   } = useAPIKeyIdQuery(
@@ -106,7 +105,6 @@ export function ApiKeyPill({
 
   // States for disabling buttons/showing tooltips
   const isRestricted = isSecret && !canManageSecretKeys
-  const isLoading = isLoadingPermission
 
   return (
     <>
@@ -118,7 +116,7 @@ export function ApiKeyPill({
             isSecret ? 'overflow-hidden' : '',
             show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
             'transition-all',
-            'max-w-[340px]',
+            'max-w-[100px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[340px]',
             'cursor-text',
             'relative'
           )}

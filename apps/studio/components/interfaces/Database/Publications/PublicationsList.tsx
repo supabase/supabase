@@ -5,15 +5,15 @@ import { toast } from 'sonner'
 import { Button, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { AlertCircle, Search } from 'lucide-react'
 import PublicationSkeleton from './PublicationSkeleton'
-import { Search, AlertCircle } from 'lucide-react'
 
 interface PublicationEvent {
   event: string
@@ -25,7 +25,7 @@ interface PublicationsListProps {
 }
 
 const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
   const { data, isLoading } = useDatabasePublicationsQuery({

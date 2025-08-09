@@ -101,7 +101,10 @@ export class CollectionQueryError extends Error {
   ): CollectionQueryError {
     const fetchFailedFor =
       countError && dataError ? 'count and collection' : countError ? 'count' : 'collection'
-    return new CollectionQueryError(`Failed to fetch ${fetchFailedFor}`, {
+    let message = `Failed to fetch ${fetchFailedFor}`
+    if (countError) message += `: CountError: ${countError.message}`
+    if (dataError) message += `: CollectionError: ${dataError.message}`
+    return new CollectionQueryError(message, {
       count: countError,
       data: dataError,
     })

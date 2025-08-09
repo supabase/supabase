@@ -6,9 +6,9 @@ import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import CopyButton from 'components/ui/CopyButton'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -26,7 +26,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
   ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
-    const organization = useSelectedOrganization()
+    const { data: organization } = useSelectedOrganizationQuery()
     const snapV2 = useSqlEditorV2StateSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 

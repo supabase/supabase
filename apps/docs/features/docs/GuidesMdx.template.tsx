@@ -92,6 +92,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
 
             {content && <MDXRemoteBase source={content} options={mdxOptions} />}
             {children}
+
             <footer className="mt-16 not-prose">
               <a
                 href={
@@ -135,3 +136,4 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
 }
 
 export { GuideTemplate, newEditLink }
+export type { EditLink }

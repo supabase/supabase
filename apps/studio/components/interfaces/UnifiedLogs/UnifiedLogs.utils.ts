@@ -45,9 +45,19 @@ export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
       return '4xx'
     case 'error':
       return '5xx'
-    default:
-      return 'Unknown'
   }
+}
+
+// Helper function to determine level from HTTP status code
+export const getStatusLevel = (status?: number | string): string => {
+  if (!status) return 'success'
+  const statusNum = Number(status)
+  if (statusNum >= 500) return 'error'
+  if (statusNum >= 400) return 'warning'
+  if (statusNum >= 300) return 'info' // 3xx redirects are informational
+  if (statusNum >= 200) return 'success'
+  if (statusNum >= 100) return 'info'
+  return 'success'
 }
 
 export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
@@ -64,12 +74,27 @@ export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
         'bg-destructive/5 hover:bg-destructive/10 data-[state=selected]:bg-destructive/20 focus-visible:bg-destructive/10',
         'dark:bg-error/10 dark:hover:bg-destructive/20 dark:data-[state=selected]:bg-destructive/30 dark:focus-visible:bg-destructive/20'
       )
-    case 'info':
-      return cn(
-        'bg-info/5 hover:bg-info/10 data-[state=selected]:bg-info/20 focus-visible:bg-info/10',
-        'dark:bg-info/10 dark:hover:bg-info/20 dark:data-[state=selected]:bg-info/30 dark:focus-visible:bg-info/20'
-      )
     default:
       return ''
   }
+}
+
+/**
+ * Formats service type strings for display purposes
+ * Handles special cases like "edge function" -> "Edge Function"
+ * and applies proper capitalization to other service types
+ */
+export function formatServiceTypeForDisplay(serviceType: string): string {
+  if (!serviceType) return ''
+
+  // Handle special cases
+  const specialCases: Record<string, string> = {
+    'edge function': 'Edge Function',
+    postgrest: 'PostgREST',
+    postgres: 'Postgres',
+    auth: 'Auth',
+    storage: 'Storage',
+  }
+
+  return specialCases[serviceType.toLowerCase()] || serviceType
 }

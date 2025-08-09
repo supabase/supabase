@@ -11,7 +11,6 @@ import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queri
 import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
 import { useChartHighlight } from './useChartHighlight'
-import { getMockDataForAttribute } from 'data/reports/auth-charts'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
@@ -113,23 +112,6 @@ const LogChartHandler = ({
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const chartHighlight = useChartHighlight()
 
-  if (isLoading) {
-    return (
-      <Panel
-        className={cn(
-          'flex min-h-[320px] w-full flex-col items-center justify-center gap-y-2',
-          className
-        )}
-        wrapWithLoading={false}
-        noMargin
-        noHideOverflow
-      >
-        <Loader2 size={18} className="animate-spin text-border-strong" />
-        <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
-      </Panel>
-    )
-  }
-
   if (!data) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
@@ -144,10 +126,16 @@ const LogChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full scroll-mt-16', className)}
+      className={cn('relative w-full overflow-hidden scroll-mt-16', className)}
       wrapWithLoading={false}
       id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
+      {isLoading && (
+        <div className="absolute inset-0 rounded-md flex w-full flex-col items-center justify-center gap-y-2 bg-surface-100 backdrop z-20">
+          <Loader2 size={18} className="animate-spin text-border-strong" />
+          <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
+        </div>
+      )}
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
@@ -187,12 +175,8 @@ export const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  const projectRef = typeof ref === 'string' ? ref : Array.isArray(ref) ? ref[0] : ''
-
   const infraAttributes = attributes.filter((attr) => attr.provider === 'infra-monitoring')
   const dailyStatsAttributes = attributes.filter((attr) => attr.provider === 'daily-stats')
-  const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
-  const referenceLineAttributes = attributes.filter((attr) => attr.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
     infraAttributes.map((attr) => attr.attribute as InfraMonitoringAttribute),
@@ -229,12 +213,6 @@ export const useAttributeQueries = (
         return {
           ...dailyStatsQueries[dailyStatsIdx++],
           data: { ...dailyStatsQueries[dailyStatsIdx - 1]?.data, provider: 'daily-stats' },
-        }
-      } else if (attr.provider === 'mock') {
-        const mockData = getMockDataForAttribute(attr.attribute)
-        return {
-          isLoading: false,
-          data: { ...mockData, provider: 'mock', attribute: attr.attribute },
         }
       } else if (attr.provider === 'reference-line') {
         let value = attr.value || 0

@@ -7,17 +7,24 @@ import type { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import type { SubscriptionTier } from './types'
 import { organizationKeys } from 'data/organizations/keys'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
   paymentMethod?: string
   tier: SubscriptionTier
+  address?: CustomerAddress | null
+  tax_id?: CustomerTaxId | null
+  billing_name?: string
 }
 
 export async function updateOrgSubscription({
   slug,
   tier,
   paymentMethod,
+  address,
+  tax_id,
+  billing_name,
 }: OrgSubscriptionUpdateVariables) {
   if (!slug) throw new Error('slug is required')
   if (!tier) throw new Error('tier is required')
@@ -29,6 +36,9 @@ export async function updateOrgSubscription({
     body: {
       payment_method: payload.payment_method,
       tier: payload.tier,
+      address: address ?? undefined,
+      tax_id: tax_id ?? undefined,
+      billing_name,
     },
     params: { path: { slug } },
   })

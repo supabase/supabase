@@ -5,12 +5,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -43,7 +43,7 @@ export const QueryPerformance = ({
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [{ preset }, setSearchParams] = useQueryStates({

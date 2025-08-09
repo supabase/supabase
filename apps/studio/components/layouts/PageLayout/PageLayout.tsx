@@ -14,11 +14,12 @@ export interface NavigationItem {
   icon?: ReactNode
   onClick?: () => void
   badge?: string
+  active?: boolean
 }
 
 interface PageLayoutProps {
   children?: ReactNode
-  title?: string
+  title?: string | ReactNode
   subtitle?: string
   icon?: ReactNode
   breadcrumbs?: Array<{
@@ -80,8 +81,8 @@ export const PageLayout = ({
         className={cn(
           'w-full mx-auto',
           size === 'full' &&
-            (isCompact ? 'max-w-none !px-6 border-b' : 'max-w-none p!x-8 border-b'),
-          isCompact ? 'pt-4' : 'pt-12',
+            (isCompact ? 'max-w-none !px-6 border-b pt-4' : 'max-w-none pt-6 border-b'),
+          size !== 'full' && (isCompact ? 'pt-4' : 'pt-12'),
           navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
           className
         )}
@@ -102,38 +103,42 @@ export const PageLayout = ({
         {/* Navigation section */}
         {navigationItems.length > 0 && (
           <NavMenu className={cn(isCompact ? 'mt-2' : 'mt-4', size === 'full' && 'border-none')}>
-            {navigationItems.map((item) => (
-              <NavMenuItem key={item.label} active={router.asPath.split('?')[0] === item.href}>
-                {item.href ? (
-                  <Link
-                    href={
-                      item.href.includes('[ref]') && !!ref
-                        ? item.href.replace('[ref]', ref)
-                        : item.href
-                    }
-                    className={cn(
-                      'inline-flex items-center gap-2',
-                      router.asPath === item.href && 'text-foreground'
-                    )}
-                    onClick={item.onClick}
-                  >
-                    {item.icon && <span>{item.icon}</span>}
-                    {item.label}
-                    {item.badge && <Badge variant="default">{item.badge}</Badge>}
-                  </Link>
-                ) : (
-                  <Button
-                    type="link"
-                    onClick={item.onClick}
-                    className={cn(router.pathname === item.href && 'text-foreground font-medium')}
-                  >
-                    {item.icon && <span className="mr-2">{item.icon}</span>}
-                    {item.label}
-                    {item.badge && <Badge variant="default">{item.badge}</Badge>}
-                  </Button>
-                )}
-              </NavMenuItem>
-            ))}
+            {navigationItems.map((item) => {
+              const isActive =
+                item.active !== undefined ? item.active : router.asPath.split('?')[0] === item.href
+              return (
+                <NavMenuItem key={item.label} active={isActive}>
+                  {item.href ? (
+                    <Link
+                      href={
+                        item.href.includes('[ref]') && !!ref
+                          ? item.href.replace('[ref]', ref)
+                          : item.href
+                      }
+                      className={cn(
+                        'inline-flex items-center gap-2',
+                        isActive && 'text-foreground'
+                      )}
+                      onClick={item.onClick}
+                    >
+                      {item.icon && <span>{item.icon}</span>}
+                      {item.label}
+                      {item.badge && <Badge variant="default">{item.badge}</Badge>}
+                    </Link>
+                  ) : (
+                    <Button
+                      type="link"
+                      onClick={item.onClick}
+                      className={cn(isActive && 'text-foreground font-medium')}
+                    >
+                      {item.icon && <span className="mr-2">{item.icon}</span>}
+                      {item.label}
+                      {item.badge && <Badge variant="default">{item.badge}</Badge>}
+                    </Button>
+                  )}
+                </NavMenuItem>
+              )
+            })}
           </NavMenu>
         )}
       </ScaffoldContainer>

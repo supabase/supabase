@@ -9,7 +9,6 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import {
@@ -27,7 +26,12 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsAwsK8sCloudProvider,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
@@ -53,15 +57,18 @@ import { IOPSField } from './fields/IOPSField'
 import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
-import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
+import {
+  DISK_LIMITS,
+  DiskType,
+  RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
+} from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 
 export function DiskManagementForm() {
   // isLoading is used to avoid a useCheckPermissions() race condition
-  const { project, isLoading: isProjectLoading } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
 
@@ -142,6 +149,10 @@ export function DiskManagementForm() {
   /**
    * Handle default values
    */
+  const computeSize = project?.infra_compute_size
+    ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+    : undefined
+
   // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
   const { growth_percent, max_size_gb, min_increment_gb } = diskAutoscaleConfig ?? {}
@@ -150,9 +161,7 @@ export function DiskManagementForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize: project?.infra_compute_size
-      ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
-      : undefined,
+    computeSize,
     growthPercent: growth_percent,
     minIncrementGb: min_increment_gb,
     maxSizeGb: max_size_gb,
@@ -166,6 +175,20 @@ export function DiskManagementForm() {
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
+
+  const { computeSize: modifiedComputeSize } = form.watch()
+
+  // We only support disk configurations for >=Large instances
+  // If a customer downgrades back to <Large, we should reset the storage settings to avoid incurring unnecessary costs
+  useEffect(() => {
+    if (modifiedComputeSize && project?.infra_compute_size && isDialogOpen) {
+      if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)) {
+        form.setValue('storageType', DiskType.GP3)
+        form.setValue('throughput', DISK_LIMITS['gp3'].minThroughput)
+        form.setValue('provisionedIOPS', DISK_LIMITS['gp3'].minIops)
+      }
+    }
+  }, [modifiedComputeSize, isDialogOpen, project])
 
   /**
    * State handling

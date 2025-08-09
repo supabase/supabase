@@ -1,10 +1,10 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
@@ -22,6 +22,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
+import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps/OAuthApps.constants'
 import { ProjectClaimLayout } from './layout'
 
 export const ProjectClaimConfirm = ({
@@ -188,57 +189,57 @@ export const ProjectClaimConfirm = ({
               >
                 <div>
                   <ScopeSection
-                    description="access to analytics logs."
+                    description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
                     hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_WRITE)}
                   />
                   <ScopeSection
-                    description="access to auth configurations and SSO providers."
+                    description={PERMISSIONS_DESCRIPTIONS.AUTH}
                     hasReadScope={requester.scopes.includes(OAuthScope.AUTH_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.AUTH_WRITE)}
                   />
                   <ScopeSection
-                    description="access to Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
+                    description={PERMISSIONS_DESCRIPTIONS.DATABASE}
                     hasReadScope={requester.scopes.includes(OAuthScope.DATABASE_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.DATABASE_WRITE)}
                   />
                   <ScopeSection
-                    description="access to custom domains and vanity subdomains."
+                    description={PERMISSIONS_DESCRIPTIONS.DOMAINS}
                     hasReadScope={requester.scopes.includes(OAuthScope.DOMAINS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.DOMAINS_WRITE)}
                   />
                   <ScopeSection
-                    description="access to edge functions."
+                    description={PERMISSIONS_DESCRIPTIONS.EDGE_FUNCTIONS}
                     hasReadScope={requester.scopes.includes(OAuthScope.EDGE_FUNCTIONS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.EDGE_FUNCTIONS_WRITE)}
                   />
                   <ScopeSection
-                    description="access to environments/branches."
+                    description={PERMISSIONS_DESCRIPTIONS.ENVIRONMENT}
                     hasReadScope={requester.scopes.includes(OAuthScope.ENVIRONMENT_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.ENVIRONMENT_WRITE)}
                   />
                   <ScopeSection
-                    description="access to the organization and all its members."
+                    description={PERMISSIONS_DESCRIPTIONS.ORGANIZATIONS}
                     hasReadScope={requester.scopes.includes(OAuthScope.ORGANIZATIONS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.ORGANIZATIONS_WRITE)}
                   />
                   <ScopeSection
-                    description="access to metadata, its upgrade status, network restrictions and network bans."
+                    description={PERMISSIONS_DESCRIPTIONS.PROJECTS}
                     hasReadScope={requester.scopes.includes(OAuthScope.PROJECTS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.PROJECTS_WRITE)}
                   />
                   <ScopeSection
-                    description="access to PostgREST configurations."
+                    description={PERMISSIONS_DESCRIPTIONS.REST}
                     hasReadScope={requester.scopes.includes(OAuthScope.REST_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.REST_WRITE)}
                   />
                   <ScopeSection
-                    description="access to API keys, secrets and pgsodium configurations."
+                    description={PERMISSIONS_DESCRIPTIONS.SECRETS}
                     hasReadScope={requester.scopes.includes(OAuthScope.SECRETS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.SECRETS_WRITE)}
                   />
                   <ScopeSection
-                    description="access to storage buckets and files."
+                    description={PERMISSIONS_DESCRIPTIONS.STORAGE}
                     hasReadScope={requester.scopes.includes(OAuthScope.STORAGE_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.STORAGE_WRITE)}
                   />

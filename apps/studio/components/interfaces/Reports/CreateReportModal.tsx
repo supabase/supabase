@@ -1,8 +1,9 @@
 import { useRouter } from 'next/router'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Button, Form, Input, Modal } from 'ui'
@@ -17,14 +18,28 @@ export interface CreateReportModal {
 export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
   const router = useRouter()
   const { profile } = useProfile()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref ?? 'default'
+
+  // Preserve date range query parameters when navigating to new report
+  const preservedQueryParams = useMemo(() => {
+    const { its, ite, isHelper, helperText } = router.query
+    const params = new URLSearchParams()
+
+    if (its && typeof its === 'string') params.set('its', its)
+    if (ite && typeof ite === 'string') params.set('ite', ite)
+    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
+    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
+
+    const queryString = params.toString()
+    return queryString ? `?${queryString}` : ''
+  }, [router.query])
 
   const { mutate: upsertContent, isLoading: isCreating } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       toast.success('Successfully created new report')
       const newReportId = vars.payload.id
-      router.push(`/project/${ref}/reports/${newReportId}`)
+      router.push(`/project/${ref}/reports/${newReportId}${preservedQueryParams}`)
       afterSubmit()
     },
     onError: (error) => {

@@ -514,6 +514,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/branches/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a database branch
+     * @description Fetches the specified database branch by its name.
+     */
+    get: operations['v1-get-a-branch']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/claim-token': {
     parameters: {
       query?: never
@@ -901,6 +921,70 @@ export interface paths {
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-database-metadata']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/jit': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get user-id to role mappings for JIT access
+     * @description Mappings of roles a user can assume in the project database
+     */
+    get: operations['v1-get-jit-access']
+    /**
+     * Updates a user mapping for JIT access
+     * @description Modifies the roles that can be assumed and for how long
+     */
+    put: operations['v1-update-jit-access']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/jit/{user_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Delete JIT access by user-id
+     * @description Remove JIT mappings of a user, revoking all JIT database access
+     */
+    delete: operations['v1-delete-jit-access']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/jit/list': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all user-id to role mappings for JIT access
+     * @description Mappings of roles a user can assume in the project database
+     */
+    get: operations['v1-list-jit-access']
     put?: never
     post?: never
     delete?: never
@@ -1580,10 +1664,10 @@ export interface components {
       name: string
       prefix?: string | null
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
       /** @enum {string|null} */
-      type?: 'publishable' | 'secret' | 'legacy' | null
+      type?: 'legacy' | 'publishable' | 'secret' | null
       /** Format: date-time */
       updated_at?: string | null
     }
@@ -1799,6 +1883,7 @@ export interface components {
       sms_vonage_api_key: string | null
       sms_vonage_api_secret: string | null
       sms_vonage_from: string | null
+      /** Format: email */
       smtp_admin_email: string | null
       smtp_host: string | null
       smtp_max_frequency: number | null
@@ -1844,8 +1929,10 @@ export interface components {
         | 'RESIZING'
     }
     BranchResponse: {
+      /** Format: date-time */
       created_at: string
       git_branch?: string
+      /** Format: uuid */
       id: string
       is_default: boolean
       /**
@@ -1859,6 +1946,8 @@ export interface components {
       /** Format: int32 */
       pr_number?: number
       project_ref: string
+      /** Format: date-time */
+      review_requested_at?: string
       /** @enum {string} */
       status:
         | 'CREATING_PROJECT'
@@ -1867,6 +1956,7 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+      /** Format: date-time */
       updated_at: string
     }
     BranchUpdateResponse: {
@@ -1912,7 +2002,7 @@ export interface components {
       description?: string | null
       name: string
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
       /** @enum {string} */
       type: 'publishable' | 'secret'
@@ -1942,6 +2032,7 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       git_branch?: string
+      is_default?: boolean
       persistent?: boolean
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
@@ -1957,6 +2048,7 @@ export interface components {
       secrets?: {
         [key: string]: string
       }
+      with_data?: boolean
     }
     CreateOrganizationV1: {
       name: string
@@ -2134,6 +2226,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2237,6 +2330,24 @@ export interface components {
         metadata_xml?: string
       }
       updated_at?: string
+    }
+    JitAccessResponse: {
+      /** Format: uuid */
+      user_id: string
+      user_roles: {
+        expires_at?: string
+        role: string
+      }[]
+    }
+    JitListAccessResponse: {
+      items: {
+        /** Format: uuid */
+        user_id: string
+        user_roles: {
+          expires_at?: string
+          role: string
+        }[]
+      }[]
     }
     LegacyApiKeysResponse: {
       enabled: boolean
@@ -2421,6 +2532,11 @@ export interface components {
       grant_type?: 'authorization_code' | 'refresh_token'
       redirect_uri?: string
       refresh_token?: string
+      /**
+       * @description Resource indicator for MCP (Model Context Protocol) clients
+       * @enum {string}
+       */
+      resource?: 'http://localhost:8080/mcp'
     }
     OAuthTokenResponse: {
       access_token: string
@@ -2530,7 +2646,7 @@ export interface components {
       target_upgrade_versions: {
         app_version: string
         /** @enum {string} */
-        postgres_version: '15' | '17' | '17-oriole'
+        postgres_version: '13' | '14' | '15' | '17' | '17-oriole'
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
@@ -2677,7 +2793,18 @@ export interface components {
       }
     }
     StorageConfigResponse: {
+      capabilities: {
+        iceberg_catalog: boolean
+        list_v2: boolean
+      }
+      external: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -2728,7 +2855,7 @@ export interface components {
       description?: string | null
       name?: string
       secret_jwt_template?: {
-        role: string
+        [key: string]: unknown
       } | null
     }
     UpdateAuthConfigBody: {
@@ -2907,6 +3034,7 @@ export interface components {
       sms_vonage_api_key?: string | null
       sms_vonage_api_secret?: string | null
       sms_vonage_from?: string | null
+      /** Format: email */
       smtp_admin_email?: string | null
       smtp_host?: string | null
       smtp_max_frequency?: number | null
@@ -2920,6 +3048,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       persistent?: boolean
+      request_review?: boolean
       /**
        * @deprecated
        * @description This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.
@@ -2973,6 +3102,14 @@ export interface components {
         | '3_challenge_verified'
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
+    }
+    UpdateJitAccessBody: {
+      roles: {
+        expires_at?: string
+        role: string
+      }[]
+      /** Format: uuid */
+      user_id: string
     }
     UpdatePgsodiumConfigBody: {
       root_key: string
@@ -3051,7 +3188,14 @@ export interface components {
       status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
     }
     UpdateStorageConfigBody: {
+      external?: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features?: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -3174,6 +3318,49 @@ export interface components {
        */
       template_url?: string
     }
+    V1GetUsageApiCountResponse: {
+      error?:
+        | string
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: {
+        /** Format: date-time */
+        timestamp: string
+        total_auth_requests: number
+        total_realtime_requests: number
+        total_rest_requests: number
+        total_storage_requests: number
+      }[]
+    }
+    V1GetUsageApiRequestsCountResponse: {
+      error?:
+        | string
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: {
+        count: number
+      }[]
+    }
     V1ListMigrationsResponse: {
       name?: string
       version: string
@@ -3204,6 +3391,10 @@ export interface components {
       max_client_conn?: number
       /** @enum {string} */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     V1PostgrestConfigResponse: {
       db_extra_search_path: string
@@ -3656,7 +3847,11 @@ export interface operations {
         client_id: string
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
+        /** @description Organization slug */
+        organization_slug?: string
         redirect_uri: string
+        /** @description Resource indicator for MCP (Model Context Protocol) clients */
+        resource?: 'http://localhost:8080/mcp'
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
@@ -4129,7 +4324,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['V1GetUsageApiCountResponse']
         }
       }
       403: {
@@ -4164,8 +4359,14 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['V1GetUsageApiRequestsCountResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get project's usage api requests count */
       500: {
@@ -4609,6 +4810,42 @@ export interface operations {
         content?: never
       }
       /** @description Failed to disable preview branching */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch database branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -5889,6 +6126,149 @@ export interface operations {
         }
       }
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list database jit access */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateJitAccessBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to upsert database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        user_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove JIT access */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-list-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitListAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list database jit access */
+      500: {
         headers: {
           [name: string]: unknown
         }

@@ -8,7 +8,7 @@ import {
   IntegrationConnectionsCreateVariables,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
@@ -83,7 +83,7 @@ const ProjectLinker = ({
   const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
   const foreignProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
 
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
     defaultSupabaseProjectRef
@@ -164,8 +164,8 @@ const ProjectLinker = ({
   const oppositeMissingEntity = noSupabaseProjects ? mode : 'Supabase'
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative border rounded-lg p-12 bg shadow">
+    <div className="flex flex-col bg border shadow rounded-lg overflow-hidden">
+      <div className="relative p-12 border-b border-muted">
         <div
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
@@ -374,7 +374,7 @@ const ProjectLinker = ({
         )}
       </div>
 
-      <div className="flex w-full justify-end gap-2">
+      <div className="flex w-full justify-end gap-2 p-4 bg-surface-75">
         {onSkip !== undefined && (
           <Button
             size="medium"

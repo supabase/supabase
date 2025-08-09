@@ -11,15 +11,22 @@ import { DataTableFilterResetButton } from './DataTableFilterResetButton'
 import { DataTableFilterSlider } from './DataTableFilterSlider'
 import { DataTableFilterTimerange } from './DataTableFilterTimerange'
 
+import { DateRangeDisabled } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
+import { DataTableFilterCheckboxAsync } from './DataTableFilterCheckboxAsync'
+import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 
 // FIXME: use @container (especially for the slider element) to restructure elements
 
 // TODO: only pass the columns to generate the filters!
 // https://tanstack.com/table/v8/docs/framework/react/examples/filters
 
-export function DataTableFilterControls() {
-  const { filterFields } = useDataTable()
+interface DataTableFilterControls {
+  dateRangeDisabled?: DateRangeDisabled
+}
+
+export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterControls) {
+  const { filterFields, isLoadingCounts } = useDataTable()
   return (
     <Accordion
       type="multiple"
@@ -34,12 +41,7 @@ export function DataTableFilterControls() {
             <AccordionTrigger className="w-full px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-[state=open]:text-foreground focus-within:data-[state=closed]:text-foreground hover:data-[state=closed]:text-foreground">
               <div className="flex w-full items-center justify-between gap-2 truncate py-2 pr-2">
                 <div className="flex items-center gap-2 truncate">
-                  <p className="text-sm font-medium">{field.label}</p>
-                  {value !== field.label.toLowerCase() && !field.commandDisabled ? (
-                    <p className="mt-px truncate font-mono text-[10px] text-muted-foreground">
-                      {value}
-                    </p>
-                  ) : null}
+                  <p className="text-sm">{field.label}</p>
                 </div>
                 <DataTableFilterResetButton {...field} />
               </div>
@@ -51,7 +53,15 @@ export function DataTableFilterControls() {
                 {(() => {
                   switch (field.type) {
                     case 'checkbox': {
-                      return <DataTableFilterCheckbox {...field} />
+                      // [Joshen] Loader here so that CheckboxAsync can retrieve the data
+                      // immediately to be set in its react query state
+                      if (field.hasDynamicOptions && isLoadingCounts) {
+                        return <DataTableFilterCheckboxLoader />
+                      } else if (field.hasAsyncSearch) {
+                        return <DataTableFilterCheckboxAsync {...field} />
+                      } else {
+                        return <DataTableFilterCheckbox {...field} />
+                      }
                     }
                     case 'slider': {
                       return <DataTableFilterSlider {...field} />
@@ -60,7 +70,12 @@ export function DataTableFilterControls() {
                       return <DataTableFilterInput {...field} />
                     }
                     case 'timerange': {
-                      return <DataTableFilterTimerange {...field} />
+                      return (
+                        <DataTableFilterTimerange
+                          dateRangeDisabled={dateRangeDisabled}
+                          {...field}
+                        />
+                      )
                     }
                   }
                 })()}

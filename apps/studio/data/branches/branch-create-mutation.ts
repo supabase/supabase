@@ -6,26 +6,32 @@ import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchCreateVariables = {
+  is_default?: boolean
   projectRef: string
   branchName: string
   gitBranch?: string
   region?: string
+  withData?: boolean
 }
 
 export async function createBranch({
+  is_default,
   projectRef,
   branchName,
   gitBranch,
   region,
+  withData,
 }: BranchCreateVariables) {
   const { data, error } = await post('/v1/projects/{ref}/branches', {
     params: {
       path: { ref: projectRef },
     },
     body: {
+      is_default,
       branch_name: branchName,
       git_branch: gitBranch,
       region: region,
+      with_data: withData,
     },
   })
 

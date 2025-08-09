@@ -1570,7 +1570,7 @@ supabase
         schema: 'public',
         table: 'colors',
         filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.lte,
+          type: PostgresChangeFilterType.inFilter,
           column: 'name',
           value: ['red', 'blue', 'yellow'],
         ),

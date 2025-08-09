@@ -4,6 +4,7 @@ import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
@@ -23,7 +24,10 @@ export async function getEnumeratedTypes(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/types', {
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
     },
     headers: Object.fromEntries(headers),

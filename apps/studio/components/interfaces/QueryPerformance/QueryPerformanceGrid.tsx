@@ -91,11 +91,12 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         }
 
         const isTime = col.name.includes('time')
-        const formattedValue = !!value
-          ? isTime
-            ? `${value.toFixed(0)}ms`
-            : value.toLocaleString()
-          : ''
+        const formattedValue =
+          !!value && typeof value === 'number' && !isNaN(value) && isFinite(value)
+            ? isTime
+              ? `${value.toFixed(0)}ms`
+              : value.toLocaleString()
+            : ''
         return (
           <div
             className={cn(
@@ -104,7 +105,9 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             )}
           >
             <p>{formattedValue}</p>
-            {isTime && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>}
+            {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
+              <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>
+            )}
           </div>
         )
       },

@@ -1542,6 +1542,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/local-quickstart',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
@@ -2015,6 +2020,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/database-usage',
     destination: '/docs/guides/platform/database-size',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/deployment/branching/branching-2',
+    destination: '/docs/guides/deployment/branching/dashboard',
   },
   {
     permanent: true,

@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DeleteProjectModal } from './DeleteProjectModal'
 
 export interface DeleteProjectButtonProps {
@@ -11,7 +11,7 @@ export interface DeleteProjectButtonProps {
 }
 
 const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isOpen, setIsOpen] = useState(false)
 
   const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {

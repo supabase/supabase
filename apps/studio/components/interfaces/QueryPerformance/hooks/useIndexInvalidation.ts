@@ -7,9 +7,9 @@ import {
   QueryPerformanceSort,
   useQueryPerformanceQuery,
 } from 'components/interfaces/Reports/Reports.queries'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { databaseKeys } from 'data/database/keys'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
@@ -19,7 +19,7 @@ import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
 export function useIndexInvalidation() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({

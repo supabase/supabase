@@ -6,11 +6,11 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			supabase: SupabaseClient
-			safeGetSession(): Promise<{ session: Session | null; user: User | null }>
+			safeGetSession(): Promise<{ session: Session | null; user?: Session["user"] | null }>
 		}
 		interface PageData {
 			session: Session | null
-			user: User | null
+			user?: Session["user"] | null
 		}
 		// interface PageState {}
 		// interface Platform {}

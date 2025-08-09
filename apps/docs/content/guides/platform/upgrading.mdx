@@ -23,8 +23,9 @@ The Migrating and Upgrading guide has been divided into two sections. To migrate
 ## In-place upgrades
 
 <Admonition type="note">
-  For security purposes, passwords for custom roles are not backed up and, following a restore, they
-  would need to be reset. See [here](/docs/guides/platform/backups#daily-backups) for more details
+
+For security purposes, passwords for custom roles are not backed up and, following a restore, they would need to be reset. See [here](/docs/guides/platform/backups#daily-backups) for more details
+
 </Admonition>
 
 In-place upgrades uses `pg_upgrade`. For projects larger than 1GB, this method is generally faster than a pause and restore cycle, and the speed advantage grows with the size of the database.

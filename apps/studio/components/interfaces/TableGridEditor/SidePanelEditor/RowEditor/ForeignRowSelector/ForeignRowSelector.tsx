@@ -8,9 +8,9 @@ import RefreshButton from 'components/grid/components/header/RefreshButton'
 import { FilterPopoverPrimitive } from 'components/grid/components/header/filter/FilterPopoverPrimitive'
 import { SortPopoverPrimitive } from 'components/grid/components/header/sort/SortPopoverPrimitive'
 import type { Filter, Sort } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   RoleImpersonationState,
   useRoleImpersonationStateSnapshot,
@@ -37,7 +37,7 @@ const ForeignRowSelector = ({
   closePanel,
 }: ForeignRowSelectorProps) => {
   const { id } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,

@@ -3,9 +3,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useDatabaseQueueMessageSendMutation } from 'data/database-queues/database-queue-messages-send-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input, Modal } from 'ui'
@@ -38,7 +38,7 @@ const FORM_ID = 'QUEUES_SEND_MESSAGE_FORM'
 
 export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) => {
   const { childId: queueName } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const form = useForm<SendMessageForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

@@ -24,17 +24,29 @@ export const QueryCosts = ({
           <div className="flex flex-col items-end gap-y-1">
             <div className="flex items-center gap-x-4">
               <p className="text-sm text-foreground-light">Currently:</p>
-              <p className="font-mono text-sm">{currentCost.toFixed(2)}</p>
+              <p className="font-mono text-sm">
+                {typeof currentCost === 'number' && !isNaN(currentCost) && isFinite(currentCost)
+                  ? currentCost.toFixed(2)
+                  : 'N/A'}
+              </p>
             </div>
-            {improvedCost && (
-              <div className="flex items-center gap-x-4">
-                <p className="text-sm text-foreground-light">With index:</p>
-                <div className="flex items-center gap-x-2">
-                  <p className="font-mono text-sm">{improvedCost.toFixed(2)}</p>
-                  {improvement && <p className="text-sm text-brand">↓ {improvement.toFixed(1)}%</p>}
+            {improvedCost &&
+              typeof improvedCost === 'number' &&
+              !isNaN(improvedCost) &&
+              isFinite(improvedCost) && (
+                <div className="flex items-center gap-x-4">
+                  <p className="text-sm text-foreground-light">With index:</p>
+                  <div className="flex items-center gap-x-2">
+                    <p className="font-mono text-sm">{improvedCost.toFixed(2)}</p>
+                    {improvement &&
+                      typeof improvement === 'number' &&
+                      !isNaN(improvement) &&
+                      isFinite(improvement) && (
+                        <p className="text-sm text-brand">↓ {improvement.toFixed(1)}%</p>
+                      )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
         <button className="text-sm text-brand hover:text-brand-600 transition">View more</button>

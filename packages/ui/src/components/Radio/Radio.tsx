@@ -34,7 +34,7 @@ interface GroupProps {
 }
 
 /**
- * @deprecated Use ./RadioGroup_Shadcn_ instead
+ * @deprecated Use `import { RadioGroup_Shadcn_ } from "ui"` instead
  */
 function RadioGroup({
   id,

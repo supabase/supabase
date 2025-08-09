@@ -14,8 +14,14 @@ export type ProjectsVariables = {
 
 export type ProjectInfo = components['schemas']['ProjectInfo']
 
-export async function getProjects(signal?: AbortSignal) {
-  const { data, error } = await get('/platform/projects', { signal })
+export async function getProjects({
+  signal,
+  headers,
+}: {
+  signal?: AbortSignal
+  headers?: Record<string, string>
+}) {
+  const { data, error } = await get('/platform/projects', { signal, headers })
 
   if (error) handleError(error)
   return data as ProjectInfo[]
@@ -31,7 +37,7 @@ export const useProjectsQuery = <TData = ProjectsData>({
   const { profile } = useProfile()
   return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
-    ({ signal }) => getProjects(signal),
+    ({ signal }) => getProjects({ signal }),
     {
       enabled: enabled && profile !== undefined,
       staleTime: 30 * 60 * 1000, // 30 minutes
@@ -41,7 +47,7 @@ export const useProjectsQuery = <TData = ProjectsData>({
 }
 
 export function prefetchProjects(client: QueryClient) {
-  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects(signal))
+  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal }))
 }
 
 export function useProjectsPrefetch() {

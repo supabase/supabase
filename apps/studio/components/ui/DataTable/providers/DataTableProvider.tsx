@@ -9,6 +9,7 @@ import type {
 } from '@tanstack/react-table'
 import { createContext, ReactNode, useContext, useMemo } from 'react'
 
+import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { DataTableFilterField } from '../DataTable.types'
 import { ControlsProvider } from './ControlsProvider'
 
@@ -23,6 +24,7 @@ interface DataTableStateContextType {
   columnVisibility: VisibilityState
   pagination: PaginationState
   enableColumnOrdering: boolean
+  searchParameters: QuerySearchParamsType
 }
 
 interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
@@ -59,6 +61,7 @@ export function DataTableProvider<TData, TValue>({
       columnVisibility: props.columnVisibility ?? {},
       pagination: props.pagination ?? { pageIndex: 0, pageSize: 10 },
       enableColumnOrdering: props.enableColumnOrdering ?? false,
+      searchParameters: props.searchParameters ?? ({} as any),
     }),
     [props]
   )

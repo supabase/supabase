@@ -7,17 +7,17 @@ import {
 } from 'components/interfaces/Settings/General'
 import { DeleteProjectPanel } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])

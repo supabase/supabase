@@ -9,10 +9,12 @@ import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
+  titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
+  availableIn?: string[]
   hideChartType?: boolean
   format?: string
   className?: string
@@ -53,6 +55,7 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   customValue?: number
+  [key: string]: any
   /**
    * Manipulate the value of the attribute before it is displayed on the chart.
    * @param value - The value of the attribute.
@@ -104,6 +107,7 @@ interface TooltipProps {
   label?: string | number
   attributes?: MultiAttribute[]
   isPercentage?: boolean
+  format?: string | ((value: unknown) => string)
   valuePrecision?: number
   showMaxValue?: boolean
   showTotal?: boolean
@@ -128,8 +132,10 @@ export const calculateTotalChartAggregate = (
 const CustomTooltip = ({
   active,
   payload,
+  label,
   attributes,
   isPercentage,
+  format,
   valuePrecision,
   showTotal,
   isActiveHoveredChart,
@@ -140,13 +146,14 @@ const CustomTooltip = ({
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
-    const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
-    const isDiskSpaceChart = payload?.some((p: any) =>
-      p.dataKey.toLowerCase().includes('disk_space_')
-    )
-    const isDBSizeChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_'))
+    const isRamChart =
+      !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isDBSizeChart =
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+    const shouldFormatBytes = isRamChart || isDBSizeChart || isNetworkChart
 
     const attributesToIgnore =
       attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
@@ -168,7 +175,7 @@ const CustomTooltip = ({
 
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
-      const percentage = ((entry.value / maxValue) * 100).toFixed(1)
+      const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
       const isMax = entry.dataKey === maxValueAttribute?.attribute
 
       return (
@@ -182,6 +189,7 @@ const CustomTooltip = ({
               ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
+            {format === 'ms' ? 'ms' : ''}
 
             {/* Show percentage if max value is set */}
             {!!maxValueData && !isMax && !isPercentage && (
@@ -213,12 +221,10 @@ const CustomTooltip = ({
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {shouldFormatBytes
-                    ? formatBytes(
-                        isDBSizeChart ? (total as number) * 1024 * 1024 : (total as number),
-                        valuePrecision
-                      )
+                    ? formatBytes(total as number, valuePrecision)
                     : numberFormatter(total as number, valuePrecision)}
                   {isPercentage ? '%' : ''}
+                  {format === 'ms' ? 'ms' : ''}
                 </span>
                 {maxValueAttribute &&
                   !isPercentage &&

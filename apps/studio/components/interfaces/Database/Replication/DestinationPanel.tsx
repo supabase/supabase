@@ -105,7 +105,7 @@ const DestinationPanel = ({
     serviceAccountKey: z.string().min(1, 'Service account key is required'),
     publicationName: z.string().min(1, 'Publication is required'),
     maxSize: z.number().min(1, 'Max Size must be greater than 0').int(),
-    maxFillSecs: z.number().min(1, 'Max Fill seconds should be greater than 0').int(),
+    maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int(),
     maxStalenessMins: z.number().nonnegative(),
     enabled: z.boolean(),
   })
@@ -115,10 +115,11 @@ const DestinationPanel = ({
       name: destinationData?.name ?? '',
       projectId: destinationData?.config?.big_query?.project_id ?? '',
       datasetId: destinationData?.config?.big_query?.dataset_id ?? '',
+      // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
-      publicationName: pipelineData?.publication_name ?? '',
-      maxSize: pipelineData?.config?.config?.max_size ?? 1000,
-      maxFillSecs: pipelineData?.config?.config?.max_fill_secs ?? 10,
+      publicationName: pipelineData?.config.publication_name ?? '',
+      maxSize: pipelineData?.config?.batch?.max_size ?? 1000,
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? 10,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins ?? 5,
       enabled: existingDestination?.enabled ?? true,
     }),
@@ -156,10 +157,10 @@ const DestinationPanel = ({
               maxStalenessMins: data.maxStalenessMins,
             },
           },
-          pipelinConfig: {
-            config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs },
+          pipelineConfig: {
+            publicationName: data.publicationName,
+            batch: { maxSize: data.maxSize, maxFillMs: data.maxFillMs },
           },
-          publicationName: data.publicationName,
           sourceId,
         })
         if (data.enabled) {
@@ -187,9 +188,9 @@ const DestinationPanel = ({
             },
           },
           sourceId,
-          publicationName: data.publicationName,
-          pipelinConfig: {
-            config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs },
+          pipelineConfig: {
+            publicationName: data.publicationName,
+            batch: { maxSize: data.maxSize, maxFillMs: data.maxFillMs },
           },
         })
         if (data.enabled) {
@@ -392,7 +393,7 @@ const DestinationPanel = ({
                             />
                             <FormField_Shadcn_
                               control={form.control}
-                              name="maxFillSecs"
+                              name="maxFillMs"
                               render={({ field }) => (
                                 <FormItemLayout
                                   className="mb-4"
@@ -404,7 +405,7 @@ const DestinationPanel = ({
                                     <Input_Shadcn_
                                       {...field}
                                       type="number"
-                                      {...form.register('maxFillSecs', {
+                                      {...form.register('maxFillMs', {
                                         valueAsNumber: true, // Ensure the value is handled as a number
                                       })}
                                       placeholder="Max fill seconds"

@@ -3,6 +3,7 @@
 import React, { useRef, KeyboardEvent, useMemo, useState, useCallback, useEffect } from 'react'
 import { Search, Sparkles } from 'lucide-react'
 import {
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -69,6 +70,7 @@ export type FilterBarProps = {
   onFreeformTextChange: (freeformText: string) => void
   filters: FilterGroup
   aiApiUrl?: string
+  className?: string
 }
 
 export function FilterBar({
@@ -78,6 +80,7 @@ export function FilterBar({
   freeformText,
   onFreeformTextChange,
   aiApiUrl,
+  className,
 }: FilterBarProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -353,7 +356,7 @@ export function FilterBar({
           ...group,
           conditions: [
             ...group.conditions,
-            { propertyName: property.name, value: null, operator: '=' },
+            { propertyName: property.name, value: '', operator: '=' },
           ],
         }
       }
@@ -643,7 +646,7 @@ export function FilterBar({
       activeInput?.type === 'group'
         ? freeformText
         : activeInput?.type === 'value'
-          ? findConditionByPath(activeFilters, activeInput.path)?.value?.toString() || ''
+          ? (findConditionByPath(activeFilters, activeInput.path)?.value ?? '').toString()
           : ''
 
     const items: CommandItem[] = []
@@ -987,7 +990,7 @@ export function FilterBar({
   )
 
   return (
-    <div className="w-full space-y-2 relative">
+    <div className={cn('w-full space-y-2 relative', className)}>
       <div className="relative flex items-center w-full">
         <Search className="absolute left-1 top-1/2 transform -translate-y-1/2 text-foreground-muted w-4 h-4" />
         <div className="flex-1 flex flex-wrap items-center pl-6 pr-1 py-0 gap-1 h-full">
