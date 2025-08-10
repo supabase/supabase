@@ -19,15 +19,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  // Allow-list of permitted edge function names and their URLs
+  const EDGE_FUNCTION_URLS: Record<string, string> = {
+    // Example: 'myFunction': 'https://<project-ref>.functions.supabase.co/myFunction'
+    // Add allowed function names and their URLs here
+  }
   try {
-    const { url, method, body: requestBody, headers: customHeaders } = req.body
+    const { functionName, method, body: requestBody, headers: customHeaders } = req.body
 
-    const validEdgeFnUrl = isValidEdgeFunctionURL(url)
+    const url = EDGE_FUNCTION_URLS[functionName]
 
-    if (!validEdgeFnUrl) {
+    if (!url) {
       return res.status(400).json({
         status: 400,
-        error: { message: 'Provided URL is not a valid Supabase edge function URL' },
+        error: { message: 'Provided functionName is not allowed or does not exist' },
       })
     }
 
