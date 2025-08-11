@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+// import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
 import dayjs from 'dayjs'
@@ -46,7 +46,7 @@ const METRICS: { id: MetricType; label: string; description: string }[] = [
 export const QueryInsights = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  // const { project } = useProjectContext()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
