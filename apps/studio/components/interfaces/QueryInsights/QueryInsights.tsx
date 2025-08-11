@@ -16,6 +16,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatMetricValue } from './QueryInsights.utils'
 
+
 export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits'
 
 
@@ -209,13 +210,10 @@ export const QueryInsights = () => {
   }, [selectedTimeRange])
 
   return (
-    <div className="flex flex-col gap-6 flex-grow">
-      <div className="flex items-center justify-between px-5 pt-5">
+    <div className="flex flex-col flex-grow">
+      <div className="flex items-center justify-between px-6 py-4">
         <div>
           <h3 className="text-xl text-foreground">Query Insights</h3>
-          <p className="text-sm text-foreground-light">
-            Monitor and analyze query performance over time
-          </p>
         </div>
         <DateRangePicker
           value={selectedTimeRange}
