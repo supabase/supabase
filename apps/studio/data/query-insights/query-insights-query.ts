@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-query'
 import { queryInsightsKeys } from './keys'
+import { useEffect, useCallback } from 'react'
 
 export type QueryInsightsMetric = {
   timestamp: string
@@ -249,6 +250,7 @@ export function useQueryInsightsMetrics(
 
       return result as QueryInsightsMetric[]
     },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     ...options,
   })
 }
@@ -271,6 +273,103 @@ export function useQueryInsightsQueries(
 
       return result as QueryInsightsQuery[]
     },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     ...options,
   })
+}
+
+// Hook to pre-fetch all metrics data for the current time range
+export function usePreFetchQueryInsightsData(
+  projectRef: string | undefined,
+  startTime: string,
+  endTime: string
+) {
+  const queryClient = useQueryClient()
+  
+  useEffect(() => {
+    if (!projectRef) return
+
+    // Pre-fetch all metric types
+    const metricTypes: Array<{ id: string; label: string }> = [
+      { id: 'query_latency', label: 'Query latency' },
+      { id: 'rows_read', label: 'Rows read' },
+      { id: 'calls', label: 'Calls' },
+      { id: 'cache_hits', label: 'Cache hits' },
+    ]
+
+    // Pre-fetch metrics data
+    metricTypes.forEach(metric => {
+      queryClient.prefetchQuery({
+        queryKey: queryInsightsKeys.metrics(projectRef, metric.id, startTime, endTime),
+        queryFn: async () => {
+          const { result } = await executeSql({
+            projectRef,
+            sql: getMetricsSql(metric.id, startTime, endTime),
+          })
+          return result as QueryInsightsMetric[]
+        },
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      })
+    })
+
+    // Pre-fetch queries data
+    queryClient.prefetchQuery({
+      queryKey: queryInsightsKeys.queries(projectRef, startTime, endTime),
+      queryFn: async () => {
+        const { result } = await executeSql({
+          projectRef,
+          sql: getQueriesSql(startTime, endTime),
+        })
+        return result as QueryInsightsQuery[]
+      },
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    })
+  }, [projectRef, startTime, endTime, queryClient])
+}
+
+// Hook for better cache management and manual refresh control
+export function useQueryInsightsCacheManager(
+  projectRef: string | undefined,
+  startTime: string,
+  endTime: string
+) {
+  const queryClient = useQueryClient()
+  
+  const refreshAllData = useCallback(async () => {
+    if (!projectRef) return
+
+    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits']
+    
+    // Invalidate and refetch all metrics
+    await Promise.all([
+      ...metricTypes.map(metric => 
+        queryClient.invalidateQueries({
+          queryKey: queryInsightsKeys.metrics(projectRef, metric, startTime, endTime)
+        })
+      ),
+      queryClient.invalidateQueries({
+        queryKey: queryInsightsKeys.queries(projectRef, startTime, endTime)
+      })
+    ])
+  }, [projectRef, startTime, endTime, queryClient])
+
+  const isAnyDataStale = useCallback(() => {
+    if (!projectRef) return false
+    
+    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits']
+    
+    return metricTypes.some(metric => {
+      const query = queryClient.getQueryData(
+        queryInsightsKeys.metrics(projectRef, metric, startTime, endTime)
+      )
+      return !query
+    }) || !queryClient.getQueryData(
+      queryInsightsKeys.queries(projectRef, startTime, endTime)
+    )
+  }, [projectRef, startTime, endTime, queryClient])
+
+  return {
+    refreshAllData,
+    isAnyDataStale,
+  }
 }

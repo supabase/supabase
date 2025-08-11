@@ -185,24 +185,37 @@ export function useRowsReadChart({
 
   // Get metrics for the selected query badge
   const metricBadges = useMemo(() => {
-    if (!isActive || !selectedQuery || !chartConfig) return []
+    console.log('🔍 [useRowsReadChart] metricBadges useMemo triggered, isActive:', isActive, 'selectedQuery:', selectedQuery?.query_id, 'chartConfig:', !!chartConfig)
+    console.log('🔍 [useRowsReadChart] Conditions check:', {
+      isActive,
+      hasSelectedQuery: !!selectedQuery,
+      hasChartConfig: !!chartConfig,
+      willReturnEarly: !isActive || !selectedQuery || !chartConfig
+    })
+    if (!isActive || !selectedQuery || !chartConfig) {
+      console.log('🔍 [useRowsReadChart] Returning early due to conditions not met')
+      return []
+    }
 
     const { chartData, config } = chartConfig
 
     // Calculate total rows for display - sum across all data points
     const totalQueryRows = chartData.reduce((sum, point) => sum + (point.query_rows ?? 0), 0)
 
-    console.log('[useRowsReadChart] Calculating metric badge:', {
+    console.log('🏷️ [useRowsReadChart] PILL metric badge calculation:', {
       totalQueryRows,
       chartDataPoints: chartData.length,
       hasQueryRows: chartData.some((point) => point.query_rows > 0),
     })
 
     // Show the total rows rather than just the latest point
+    const formattedValue = formatMetricValue(totalQueryRows)
+    console.log('🏷️ [useRowsReadChart] PILL Final formatted value:', formattedValue, typeof formattedValue)
+    
     return [
       {
         label: 'Rows',
-        value: formatMetricValue(totalQueryRows),
+        value: formattedValue,
         color: config.query_rows?.color || 'hsl(var(--chart-2))',
       },
     ]

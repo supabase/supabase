@@ -1,44 +1,27 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'common'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
-import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
+import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import dayjs from 'dayjs'
 import { MetricsChart } from './components/MetricsChart'
 import { QueryList } from './components/QueryList'
 import {
   useQueryInsightsMetrics,
   useQueryInsightsQueries,
+  usePreFetchQueryInsightsData,
   QueryInsightsQuery,
 } from 'data/query-insights/query-insights-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatMetricValue } from './QueryInsights.utils'
 
 export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits'
 
-const METRICS: { id: MetricType; label: string; description: string }[] = [
-  {
-    id: 'query_latency',
-    label: 'Query Latency',
-    description: 'Average query execution time in milliseconds',
-  },
-  {
-    id: 'rows_read',
-    label: 'Rows Read',
-    description: 'Number of rows read by queries',
-  },
-  {
-    id: 'calls',
-    label: 'Calls',
-    description: 'Number of query executions over time',
-  },
-  {
-    id: 'cache_hits',
-    label: 'Cache Hits',
-    description: 'Statistics for shared buffer cache usage',
-  },
-]
+
 
 export const QueryInsights = () => {
+  console.log('🚀 [QueryInsights] Component rendered - START')
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
@@ -65,13 +48,90 @@ export const QueryInsights = () => {
     timeRange.period_end.date
   )
 
+  // Always fetch query latency data for p95 calculation
+  const { data: latencyData } = useQueryInsightsMetrics(
+    ref,
+    'query_latency',
+    timeRange.period_start.date,
+    timeRange.period_end.date
+  )
+
+  // Always fetch rows read data for total calculation
+  const { data: rowsReadData } = useQueryInsightsMetrics(
+    ref,
+    'rows_read',
+    timeRange.period_start.date,
+    timeRange.period_end.date
+  )
+  
+
+
   const { data: queriesData, isLoading: isLoadingQueries } = useQueryInsightsQueries(
     ref,
     timeRange.period_start.date,
     timeRange.period_end.date
   )
 
+  // Pre-fetch all metrics data for the current time range
+  usePreFetchQueryInsightsData(
+    ref,
+    timeRange.period_start.date,
+    timeRange.period_end.date
+  )
+
+  // Calculate p95 latency for the query latency tab
+  const p95Latency = useMemo(() => {
+    if (latencyData && latencyData.length > 0) {
+      // Calculate average p95 across all data points in the current timeframe
+      const validP95Values = latencyData
+        .map(point => point.p95)
+        .filter((p95Value): p95Value is number => p95Value !== undefined && !isNaN(p95Value))
+      
+      if (validP95Values.length > 0) {
+        const averageP95 = validP95Values.reduce((sum, value) => sum + value, 0) / validP95Values.length
+        return `${averageP95.toFixed(2)}ms`
+      }
+    }
+    return null
+  }, [latencyData])
+
+  // Calculate rows read for the rows read tab (simplified for now)
+  const rowsRead = useMemo(() => {
+    if (rowsReadData && rowsReadData.length > 0) {
+      return 'Data available'
+    }
+    return null
+  }, [rowsReadData])
+
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
+
+  // Define metrics with dynamic descriptions
+  const METRICS: { id: MetricType; label: string; description: string; tooltip: string }[] = [
+    {
+      id: 'query_latency',
+      label: 'Query latency',
+      description: `p95 in ${p95Latency}`,
+      tooltip: 'Shows the latency of each query execution.',
+    },
+    {
+      id: 'rows_read',
+      label: 'Rows read',
+      description: '0 rows',
+      tooltip: 'Displays the total number of rows read by queries over time',
+    },
+    {
+      id: 'calls',
+      label: 'Calls',
+      description: '0 calls',
+      tooltip: 'Shows the frequency of query executions and their distribution over time',
+    },
+    {
+      id: 'cache_hits',
+      label: 'Cache hits',
+      description: '0%',
+      tooltip: 'Displays cache hit rates and shared buffer cache performance statistics',
+    },
+      ]
 
   // Event listener for clearing the selected query
   useEffect(() => {
@@ -225,10 +285,39 @@ export const QueryInsights = () => {
         onValueChange={(value) => setSelectedMetric(value as MetricType)}
         className="space-y-4"
       >
-        <TabsList_Shadcn_ className="w-full flex justify-start gap-5 px-5">
+        <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
           {METRICS.map((metric) => (
-            <TabsTrigger_Shadcn_ key={metric.id} value={metric.id}>
-              {metric.label}
+            <TabsTrigger_Shadcn_
+              key={metric.id}
+              value={metric.id}
+              className={cn(
+                'group relative',
+                'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
+                'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
+                metric.id === selectedMetric ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                'hover:!bg-surface-100',
+                'data-[state=active]:!bg-surface-200',
+                'hover:text-foreground-light',
+                'transition'
+              )}
+            >
+              {metric.id === selectedMetric && (
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
+              )}
+
+              <div className="flex items-center gap-x-2">
+                <span className="">{metric.label}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{metric.tooltip}</TooltipContent>
+                </Tooltip>
+              </div>
+
+              <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                {metric.description}
+              </span>
             </TabsTrigger_Shadcn_>
           ))}
         </TabsList_Shadcn_>
@@ -261,4 +350,6 @@ export const QueryInsights = () => {
       />
     </div>
   )
+  
+  console.log('🚀 [QueryInsights] Component rendered - END')
 }
