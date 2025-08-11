@@ -8,8 +8,8 @@ tags:
 date: '2025-08-12:10:00'
 toc_depth: 2
 author: prashant
-image: supabase-auth-build-vs-buy/og.png
-thumb: supabase-auth-build-vs-buy/thumb.png
+image: supabase-auth-build-vs-buy/supabase-auth-build-vs-buy-og.png
+thumb: supabase-auth-build-vs-buy/supabase-auth-build-vs-buy-og.png
 ---
 
 Authentication appears in nearly every application but is rarely the core value proposition. Yet development teams often spend weeks or months building, testing, and maintaining auth systems. Let's explore the real costs of building authentication from scratch versus using a solution like Supabase Auth.
@@ -95,13 +95,13 @@ This represents a 90-95% reduction in time-to-production compared to building fr
 
 Beyond the direct engineering time, there's the opportunity cost of resources diverted from your core product:
 
-| Activity | Build (hours) | Supabase Auth (hours) |
-| --- | --- | --- |
-| Initial implementation | 160-320 | 4-16 |
-| Adding social providers | 40-80 per provider | 0.5-1 per provider |
-| Security updates (yearly) | 40-120 | 0 |
-| User management features | 80-160 | 0-8 |
-| Total first year (est.) | 320-680 | 4-24 |
+| Activity                  | Build (hours)      | Supabase Auth (hours) |
+| ------------------------- | ------------------ | --------------------- |
+| Initial implementation    | 160-320            | 4-16                  |
+| Adding social providers   | 40-80 per provider | 0.5-1 per provider    |
+| Security updates (yearly) | 40-120             | 0                     |
+| User management features  | 80-160             | 0-8                   |
+| Total first year (est.)   | 320-680            | 4-24                  |
 
 At an average engineering cost of $150/hour, that's $47,400-$98,700 saved in the first year alone. For most companies, the 320-680 hours invested in building their own auth system could be channeled towards, at minimum, one category-defining feature.
 
@@ -124,15 +124,15 @@ All without writing the underlying authentication code yourself.
 
 Many teams evaluate Supabase Auth against Auth0, another popular authentication service. Here's how they compare:
 
-| Feature | Supabase Auth | Auth0 |
-| --- | --- | --- |
-| **Architecture** | Postgres-native, self-hostable | Cloud-only SaaS, proprietary |
-| **Pricing Model** | Based on compute and storage | Per monthly active user (MAU) |
-| **Database Integration** | Direct Postgres RLS | Separate system from your database |
-| **Enterprise Features** | Self-hosting for compliance | Built-in SAML, LDAP, compliance tools |
+| Feature                  | Supabase Auth                                  | Auth0                                     |
+| ------------------------ | ---------------------------------------------- | ----------------------------------------- |
+| **Architecture**         | Postgres-native, self-hostable                 | Cloud-only SaaS, proprietary              |
+| **Pricing Model**        | Based on compute and storage                   | Per monthly active user (MAU)             |
+| **Database Integration** | Direct Postgres RLS                            | Separate system from your database        |
+| **Enterprise Features**  | Self-hosting for compliance                    | Built-in SAML, LDAP, compliance tools     |
 | **Developer Experience** | Code-first, flexible APIs, Supabase UI Library | Dashboard-driven, extensive UI components |
-| Open Source | Fully open source | Closed source |
-| **Customization** | Full source code access | Rules, Actions, and Hooks |
+| Open Source              | Fully open source                              | Closed source                             |
+| **Customization**        | Full source code access                        | Rules, Actions, and Hooks                 |
 
 **Choose Supabase Auth when:**
 
