@@ -126,15 +126,16 @@ const AwsMarketplaceLinkExistingOrg = ({
         />
       )}
       <ScaffoldSection>
-        <ScaffoldSectionDetail>
+        <ScaffoldSectionDetail className="text-base">
           <>
-            <p className="mb-6 text-base">
+            <p>
               You’ve subscribed to the Supabase {onboardingInfo?.plan_name_selected_on_marketplace}{' '}
               Plan via the AWS Marketplace. As a final step, you need to link a Supabase
               organization to that subscription. Select the organization you want to be managed and
               billed through AWS.
-              <br />
-              <br />
+            </p>
+
+            <p>
               You can read more on billing through AWS in our {''}
               {/*TODO(thomas): Update docs link once the new docs exist*/}
               <Link
@@ -146,7 +147,7 @@ const AwsMarketplaceLinkExistingOrg = ({
               </Link>
             </p>
 
-            <p className="mt-10 text-base">
+            <p className="mt-10">
               <span className="font-bold text-foreground-light">Want to start fresh?</span> Create a
               new organization and it will be linked automatically.
             </p>
