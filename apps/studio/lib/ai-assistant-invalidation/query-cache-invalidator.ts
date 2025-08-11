@@ -3,10 +3,11 @@ import { tableKeys } from 'data/tables/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { databaseKeys } from 'data/database/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
 
 const DEFAULT_SCHEMA = 'public' as const
 
-export type EntityType = 'table' | 'function' | 'procedure' | 'trigger'
+export type EntityType = 'table' | 'function' | 'procedure' | 'trigger' | 'policy'
 
 export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
 
@@ -28,6 +29,7 @@ const SQL_PATTERNS = {
   table: /table\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
   function: /(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
   trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+"?(?:(\w+)\.)?"?(\w+)"?)?/i,
+  policy: /policy\s+(?:"([^"]+)"|(\w+))\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?/i,
 } as const
 
 // Entity types that require entity list invalidation
@@ -98,6 +100,10 @@ export class QueryCacheInvalidator {
       return this.extractFunctionInfo(sql, sqlLower, action)
     }
 
+    if (sqlLower.includes(' policy ')) {
+      return this.extractPolicyInfo(sql, action)
+    }
+
     return null
   }
 
@@ -155,6 +161,22 @@ export class QueryCacheInvalidator {
     }
   }
 
+  private extractPolicyInfo(
+    sql: string,
+    action: ActionType
+  ): Omit<InvalidationEvent, 'projectRef'> | null {
+    const match = sql.match(SQL_PATTERNS.policy)
+    if (!match) return null
+
+    return {
+      entityType: 'policy',
+      action,
+      schema: match[3] || DEFAULT_SCHEMA,
+      table: match[4],
+      entityName: match[1] || match[2], // match[1] for quoted names, match[2] for unquoted
+    }
+  }
+
   /**
    * Get invalidation strategy for each entity type
    */
@@ -166,6 +188,7 @@ export class QueryCacheInvalidator {
       function: () => this.invalidateFunctionQueries(projectRef),
       procedure: () => this.invalidateFunctionQueries(projectRef),
       trigger: () => this.invalidateTriggerQueries(projectRef),
+      policy: () => this.invalidatePolicyQueries(projectRef, schema, table),
     }
 
     const strategy = invalidationMap[entityType]
@@ -256,6 +279,33 @@ export class QueryCacheInvalidator {
       queryKey: databaseTriggerKeys.list(projectRef),
       refetchType: 'active',
     })
+  }
+
+  private async invalidatePolicyQueries(
+    projectRef: string,
+    schema?: string,
+    table?: string
+  ): Promise<void> {
+    const promises: Promise<void>[] = []
+
+    promises.push(
+      this.queryClient.invalidateQueries({
+        queryKey: databasePoliciesKeys.list(projectRef),
+        refetchType: 'active',
+      })
+    )
+
+    // Also invalidate table's RLS status
+    if (table && schema) {
+      promises.push(
+        this.queryClient.invalidateQueries({
+          queryKey: tableKeys.retrieve(projectRef, table, schema),
+          refetchType: 'active',
+        })
+      )
+    }
+
+    await Promise.all(promises)
   }
 
   /**
