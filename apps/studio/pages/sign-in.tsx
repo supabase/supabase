@@ -47,6 +47,13 @@ const SignInPage: NextPageWithLayout = () => {
           </div>
         </div>
 
+        <button
+          onClick={() => {
+            throw new Error('jordi test sentry')
+          }}
+        >
+          delete me later
+        </button>
         <SignInForm />
       </div>
 
