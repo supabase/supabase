@@ -1,8 +1,9 @@
 import { type QueryClient } from '@tanstack/react-query'
 import { tableKeys } from 'data/tables/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { databaseKeys } from 'data/database/keys'
 
-export type EntityType = 'table'
+export type EntityType = 'table' | 'function' | 'procedure'
 
 export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
 
@@ -22,12 +23,14 @@ export type InvalidationConfig = {
 // SQL pattern matchers for different entity types
 const SQL_PATTERNS = {
   table: /(?:create|alter|drop)\s+table\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
+  function:
+    /(?:create|alter|drop)\s+(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
 } as const
 
 const DEFAULT_SCHEMA = 'public' as const
 
 // Entity types that require entity list invalidation
-const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table']
+const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
 
 /**
  * QueryCacheInvalidator handles smart cache invalidation for database schema changes
@@ -52,6 +55,7 @@ export class QueryCacheInvalidator {
     if (!action) return null
 
     const entityInfo = this.extractEntityInfo(sql, sqlLower, action)
+
     if (!entityInfo) return null
 
     return {
@@ -85,6 +89,10 @@ export class QueryCacheInvalidator {
       return this.extractTableInfo(sql, action)
     }
 
+    if (sqlLower.includes(' function ') || sqlLower.includes(' procedure ')) {
+      return this.extractFunctionInfo(sql, sqlLower, action)
+    }
+
     return null
   }
 
@@ -104,6 +112,25 @@ export class QueryCacheInvalidator {
     }
   }
 
+  private extractFunctionInfo(
+    sql: string,
+    sqlLower: string,
+    action: ActionType
+  ): Omit<InvalidationEvent, 'projectRef'> | null {
+    console.log({ sql })
+
+    const match = sql.match(SQL_PATTERNS.function)
+    console.log({ match })
+    if (!match) return null
+
+    return {
+      entityType: sqlLower.includes('function') ? 'function' : 'procedure',
+      action,
+      schema: match[1] || DEFAULT_SCHEMA,
+      entityName: match[2],
+    }
+  }
+
   /**
    * Get invalidation strategy for each entity type
    */
@@ -112,6 +139,8 @@ export class QueryCacheInvalidator {
 
     const invalidationMap: Record<EntityType, () => Promise<void>> = {
       table: () => this.invalidateTableQueries(projectRef, schema, table),
+      function: () => this.invalidateFunctionQueries(projectRef),
+      procedure: () => this.invalidateFunctionQueries(projectRef),
     }
 
     const strategy = invalidationMap[entityType]
@@ -188,6 +217,13 @@ export class QueryCacheInvalidator {
     }
 
     await Promise.all(promises)
+  }
+
+  private async invalidateFunctionQueries(projectRef: string): Promise<void> {
+    await this.queryClient.invalidateQueries({
+      queryKey: databaseKeys.databaseFunctions(projectRef),
+      refetchType: 'active',
+    })
   }
 
   /**
