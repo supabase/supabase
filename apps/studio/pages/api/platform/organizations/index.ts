@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
+import { IS_VELA_PLATFORM } from '../../constants.js'
+import { getVelaClient } from '../../../../data/vela/vela.js'
+
+const name2slug = (name: string) => name.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -10,25 +14,67 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case 'GET':
       return handleGetAll(req, res)
+    case 'POST':
+      return handleCreate(req, res)
     default:
       res.setHeader('Allow', ['GET'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
+const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (!IS_VELA_PLATFORM) {
+    return res.status(405).send("Not implemented")
+  }
+
+  const client = getVelaClient()
+  const response = await client.POST("/organizations/", {
+    body: {
+      name: req.body.name
+    }
+  })
+
+  if (response.response.status !== 201) {
+    return res.status(response.response.status).send(response.error)
+  }
+
+  const location = response.response.headers.get("location");
+  return res.status(303).setHeader("Location", location!).send("Created")
+}
+
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const response = [
-    {
-      id: 1,
-      name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
-      slug: 'default-org-slug',
-      billing_email: 'billing@supabase.co',
-      plan: {
-        id: 'enterprise',
-        name: 'Enterprise',
+  if (!IS_VELA_PLATFORM) {
+    // Platform specific endpoint
+    const response = [
+      {
+        id: 1,
+        name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
+        slug: 'default-org-slug',
+        billing_email: 'billing@supabase.co',
+        plan: {
+          id: 'enterprise',
+          name: 'Enterprise',
+        },
       },
-    },
-  ]
-  return res.status(200).json(response)
+    ]
+    return res.status(200).json(response)
+  }
+
+  const client = getVelaClient()
+  const response = await client.GET("/organizations/")
+  if (response.response.status !== 200 || !response.data) {
+    return res.status(response.response.status).send(response.error)
+  }
+  return res.status(200).json(response.data.map(org => {
+    return {
+      id: org.id!,
+      name: org.name!,
+      slug: name2slug(org.name!),
+      billing_email: "",
+      plan: {
+        id: "enterprise",
+        name: "Enterprise",
+      },
+    }
+  }));
 }
