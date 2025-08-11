@@ -126,7 +126,7 @@ export function useQueryLatencyChart({
     yAxisTickCount: 5,
     keyMappings: {
       p50: 'latency_p50',
-      p95: 'latency_p90',
+      p95: 'latency_p95',
       p99: 'latency_p99',
     },
   }

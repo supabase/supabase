@@ -7,15 +7,9 @@ import { MetricPill } from './MetricPill'
 
 // Define the exact shape of the visibleMetrics state
 export interface VisibleMetricsState {
-  // Old keys for backward compatibility
-  p50?: boolean
-  p95?: boolean
-  p99?: boolean
-  p99_9?: boolean
-
-  // New latency keys
+  // Latency keys (mapped)
   latency_p50?: boolean
-  latency_p90?: boolean
+  latency_p95?: boolean
   latency_p99?: boolean
 
   // Common keys
@@ -30,6 +24,8 @@ export interface VisibleMetricsState {
   cache_miss_ratio: boolean
   calls: boolean
   query_calls: boolean
+  issues: boolean
+  query_issues: boolean
   [key: string]: boolean | undefined // Allow string indexing with optional values
 }
 
@@ -39,6 +35,7 @@ interface MetricToggleButtonsProps {
   setVisibleMetrics: (value: React.SetStateAction<VisibleMetricsState>) => void
   metric: MetricType
   selectedQuery: QueryInsightsQuery | null
+  keyMappings?: Record<string, string> // Add keyMappings prop
 }
 
 export const MetricToggleButtons = ({
@@ -47,6 +44,7 @@ export const MetricToggleButtons = ({
   setVisibleMetrics,
   metric,
   selectedQuery,
+  keyMappings = {},
 }: MetricToggleButtonsProps) => {
   if (!chartConfig) return null
 
@@ -58,7 +56,7 @@ export const MetricToggleButtons = ({
         // If we have a selected query, hide the query-specific metrics since they'll
         // be shown inside the Selected Query pill
         if (
-          (key === 'query_rows' || key === 'query_latency' || key === 'query_calls') &&
+          (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') &&
           selectedQuery
         ) {
           return null
@@ -66,7 +64,7 @@ export const MetricToggleButtons = ({
 
         // Only show query-specific metrics when a query is selected
         if (
-          (key === 'query_rows' || key === 'query_latency' || key === 'query_calls') &&
+          (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') &&
           !selectedQuery
         ) {
           return null
@@ -143,13 +141,20 @@ export const MetricToggleButtons = ({
               value={formattedValue}
               color={(value as any).color}
               metricType={metric}
-              isActive={visibleMetrics[key]}
-              onClick={() =>
+              isActive={visibleMetrics[keyMappings[key] || key]}
+              onClick={() => {
+                const targetKey = keyMappings[key] || key
+                console.log(`[MetricToggleButtons] Toggle clicked for ${key}:`, {
+                  targetKey,
+                  currentValue: visibleMetrics[targetKey],
+                  keyMappings: keyMappings,
+                  allVisibleMetrics: visibleMetrics
+                })
                 setVisibleMetrics((prev) => ({
                   ...prev,
-                  [key]: !prev[key],
+                  [targetKey]: !prev[targetKey],
                 }))
-              }
+              }}
             />
           </motion.div>
         )

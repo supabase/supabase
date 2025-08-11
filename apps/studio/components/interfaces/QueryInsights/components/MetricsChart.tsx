@@ -37,14 +37,9 @@ export function MetricsChart(props: MetricsChartProps) {
   const { data, metric, isLoading, startTime, endTime, selectedQuery, hoveredQuery } = props
 
   const [visibleMetrics, setVisibleMetrics] = useState<VisibleMetricsState>({
-    // Old keys for backward compatibility
-    p50: true,
-    p95: true,
-    p99: true,
-    p99_9: true,
-    // Latency
+    // Latency (using mapped keys)
     latency_p50: true,
-    latency_p90: true,
+    latency_p95: true,
     latency_p99: true,
     query_latency: true,
     // Rows
@@ -158,21 +153,6 @@ export function MetricsChart(props: MetricsChartProps) {
 
   const { config, chartData } = chartConfig
 
-  // Debug logging to identify why query_rows isn't rendering
-  console.log('[MetricsChart] Rendering chart with:', {
-    metric,
-    selectedQuery: selectedQuery?.query_id,
-    chartDataLength: chartData.length,
-    configKeys: Object.keys(config),
-    querySpecificData: chartData.filter(
-      (point) => point.query_rows > 0 || point.query_latency > 0 || point.query_calls > 0
-    ),
-    visibleMetrics: {
-      query_rows: visibleMetrics.query_rows,
-      rows: visibleMetrics.rows,
-    },
-  })
-
   return (
     <div className="h-[320px] flex flex-col">
       <div className="flex flex-col flex-1 min-h-0">
@@ -184,6 +164,7 @@ export function MetricsChart(props: MetricsChartProps) {
               setVisibleMetrics={setVisibleMetrics}
               metric={metric}
               selectedQuery={selectedQuery}
+              keyMappings={keyMappings}
             />
           </div>
 
@@ -249,8 +230,23 @@ export function MetricsChart(props: MetricsChartProps) {
                 // Map the key to the corresponding visibleMetrics key
                 const visibleMetricsKey = (keyMappings as Record<string, string>)[key] || key
 
+                // Debug logging for toggle button troubleshooting
+                console.log(`[MetricsChart] Rendering series ${key}:`, {
+                  visibleMetricsKey,
+                  visibleMetricsValue: visibleMetrics[visibleMetricsKey],
+                  directValue: visibleMetrics[key],
+                  shouldRender: visibleMetrics[visibleMetricsKey] || visibleMetrics[key],
+                  keyMappings: keyMappings
+                })
+
                 // Skip series not enabled in visible metrics
-                if (!visibleMetrics[visibleMetricsKey] && !visibleMetrics[key]) return null
+                // If we have keyMappings, only check the mapped key
+                // Otherwise, check both mapped and direct keys for backward compatibility
+                const shouldRender = keyMappings && Object.keys(keyMappings).length > 0
+                  ? visibleMetrics[visibleMetricsKey]
+                  : (visibleMetrics[visibleMetricsKey] || visibleMetrics[key])
+                
+                if (!shouldRender) return null
 
                 // Skip query-specific metrics when not needed
                 if (
@@ -258,16 +254,11 @@ export function MetricsChart(props: MetricsChartProps) {
                   !selectedQuery &&
                   !hoveredQuery
                 ) {
-                  console.log(`[MetricsChart] Skipping ${key} - no selected or hovered query`)
                   return null
                 }
 
                 // Skip showing full series data for query-specific metrics
                 if (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') {
-                  console.log(
-                    `[MetricsChart] Rendering ${key} with selectedQuery=${!!selectedQuery}`
-                  )
-
                   // If hovering and not selected, show hover style
                   if (hoveredQuery && !selectedQuery) {
                     return (
@@ -304,7 +295,6 @@ export function MetricsChart(props: MetricsChartProps) {
                       />
                     )
                   }
-                  console.log(`[MetricsChart] Not rendering ${key} - conditions not met`)
                   return null
                 }
 
