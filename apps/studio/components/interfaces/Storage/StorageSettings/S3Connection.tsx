@@ -38,6 +38,12 @@ import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
 import { StorageCredItem } from './StorageCredItem'
 import { getConnectionURL } from './StorageSettings.utils'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()
@@ -102,126 +108,133 @@ export const S3Connection = () => {
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
-        <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
-          <FormHeader
-            title="S3 Connection"
-            description="Connect to your bucket using any S3-compatible service via the S3 protocol"
-            docsUrl="https://supabase.com/docs/guides/storage/s3/authentication"
-          />
-          {projectIsLoading ? (
-            <GenericSkeletonLoader />
-          ) : isProjectActive ? (
-            <Panel className="!mb-0">
-              <FormField_Shadcn_
-                name="s3ConnectionEnabled"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    className="px-8 py-8 [&>*>label]:text-foreground"
-                    label="Enable connection via S3 protocol"
-                    description="Allow clients to connect to Supabase Storage via the S3 protocol"
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        size="large"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={!isSuccessStorageConfig || field.disabled}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
+      <ScaffoldSection isFullWidth>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <ScaffoldSectionTitle>S3 Connection</ScaffoldSectionTitle>
+            <ScaffoldSectionDescription>
+              Connect to your bucket using any S3-compatible service via the S3 protocol
+            </ScaffoldSectionDescription>
+          </div>
+          <DocsButton href="https://supabase.com/docs/guides/storage/s3/authentication" />
+        </div>
+        <Form_Shadcn_ {...form}>
+          <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
+            {projectIsLoading ? (
+              <GenericSkeletonLoader />
+            ) : isProjectActive ? (
+              <Panel className="!mb-0">
+                <FormField_Shadcn_
+                  name="s3ConnectionEnabled"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="horizontal"
+                      className="px-8 py-8 [&>*>label]:text-foreground"
+                      label="Enable connection via S3 protocol"
+                      description="Allow clients to connect to Supabase Storage via the S3 protocol"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          size="large"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={!isSuccessStorageConfig || field.disabled}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+
+                {isErrorStorageConfig && (
+                  <div className="px-8 pb-8">
+                    <AlertError
+                      subject="Failed to retrieve storage configuration"
+                      error={configError}
+                    />
+                  </div>
                 )}
-              />
 
-              {isErrorStorageConfig && (
-                <div className="px-8 pb-8">
-                  <AlertError
-                    subject="Failed to retrieve storage configuration"
-                    error={configError}
-                  />
-                </div>
-              )}
+                <Separator className="bg-border" />
 
-              <Separator className="bg-border" />
-
-              <div className="flex flex-col gap-y-4 py-8">
-                <FormItemLayout
-                  layout="horizontal"
-                  className="px-8"
-                  label="Endpoint"
-                  isReactForm={false}
-                >
-                  <Input readOnly copy disabled value={s3connectionUrl} />
-                </FormItemLayout>
-                {!projectIsLoading && (
+                <div className="flex flex-col gap-y-4 py-8">
                   <FormItemLayout
                     layout="horizontal"
                     className="px-8"
-                    label="Region"
+                    label="Endpoint"
                     isReactForm={false}
                   >
-                    <Input className="input-mono" copy disabled value={project?.region} />
+                    <Input readOnly copy disabled value={s3connectionUrl} />
                   </FormItemLayout>
-                )}
-              </div>
+                  {!projectIsLoading && (
+                    <FormItemLayout
+                      layout="horizontal"
+                      className="px-8"
+                      label="Region"
+                      isReactForm={false}
+                    >
+                      <Input className="input-mono" copy disabled value={project?.region} />
+                    </FormItemLayout>
+                  )}
+                </div>
 
-              <Separator />
+                <Separator />
 
-              <div className="flex items-center justify-between w-full gap-2 px-8 py-4">
-                {!canUpdateStorageSettings ? (
-                  <p className="text-sm text-foreground-light">
-                    You need additional permissions to update storage settings
-                  </p>
-                ) : (
-                  <div />
-                )}
-                <div className="flex gap-2">
-                  <Button
-                    type="default"
-                    htmlType="reset"
-                    onClick={() => form.reset()}
-                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isUpdating}
-                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
-                  >
-                    Save
+                <div className="flex items-center justify-between w-full gap-2 px-8 py-4">
+                  {!canUpdateStorageSettings ? (
+                    <p className="text-sm text-foreground-light">
+                      You need additional permissions to update storage settings
+                    </p>
+                  ) : (
+                    <div />
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      type="default"
+                      htmlType="reset"
+                      onClick={() => form.reset()}
+                      disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={isUpdating}
+                      disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              </Panel>
+            ) : (
+              <Alert_Shadcn_ variant="warning">
+                <WarningIcon />
+                <AlertTitle>Project is paused</AlertTitle>
+                <AlertDescription_Shadcn_>
+                  To connect to your S3 bucket, you need to restore your project.
+                </AlertDescription_Shadcn_>
+                <div className="mt-3 flex items-center space-x-2">
+                  <Button asChild type="default">
+                    <Link href={`/project/${projectRef}`}>Restore project</Link>
                   </Button>
                 </div>
-              </div>
-            </Panel>
-          ) : (
-            <Alert_Shadcn_ variant="warning">
-              <WarningIcon />
-              <AlertTitle>Project is paused</AlertTitle>
-              <AlertDescription_Shadcn_>
-                To connect to your S3 bucket, you need to restore your project.
-              </AlertDescription_Shadcn_>
-              <div className="mt-3 flex items-center space-x-2">
-                <Button asChild type="default">
-                  <Link href={`/project/${projectRef}`}>Restore project</Link>
-                </Button>
-              </div>
-            </Alert_Shadcn_>
-          )}
-        </form>
-      </Form_Shadcn_>
-
-      <div>
-        <FormHeader
-          title="S3 Access Keys"
-          description="Manage your access keys for this project."
-          actions={
-            <CreateCredentialModal visible={openCreateCred} onOpenChange={setOpenCreateCred} />
-          }
-        />
+              </Alert_Shadcn_>
+            )}
+          </form>
+        </Form_Shadcn_>
+      </ScaffoldSection>
+      <ScaffoldSection isFullWidth>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <ScaffoldSectionTitle>S3 Access Keys</ScaffoldSectionTitle>
+            <ScaffoldSectionDescription>
+              Manage your access keys for this project.
+            </ScaffoldSectionDescription>
+          </div>
+          <CreateCredentialModal visible={openCreateCred} onOpenChange={setOpenCreateCred} />
+        </div>
 
         {!canReadS3Credentials ? (
           <NoPermission resourceText="view this project's S3 access keys" />
@@ -286,7 +299,7 @@ export const S3Connection = () => {
             )}
           </>
         )}
-      </div>
+      </ScaffoldSection>
 
       <RevokeCredentialModal
         visible={openDeleteDialog}

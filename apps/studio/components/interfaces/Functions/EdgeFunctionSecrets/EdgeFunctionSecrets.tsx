@@ -4,14 +4,23 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Badge, Separator } from 'ui'
+import {
+  Badge,
+  Separator,
+  Table,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell,
+  TableBody,
+  Card,
+} from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretForm from './AddNewSecretForm'
@@ -43,15 +52,15 @@ const EdgeFunctionSecrets = () => {
       : data ?? []
 
   const headers = [
-    <Table.th key="secret-name">Name</Table.th>,
-    <Table.th key="secret-value" className="flex items-center gap-x-2">
+    <TableHead key="secret-name">Name</TableHead>,
+    <TableHead key="secret-value" className="flex items-center gap-x-2">
       Digest{' '}
       <Badge color="scale" className="font-mono">
         SHA256
       </Badge>
-    </Table.th>,
-    <Table.th key="secret-updated-at">Updated at</Table.th>,
-    <Table.th key="actions" />,
+    </TableHead>,
+    <TableHead key="secret-updated-at">Updated at</TableHead>,
+    <TableHead key="actions" />,
   ]
 
   return (
@@ -60,14 +69,13 @@ const EdgeFunctionSecrets = () => {
       {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
       {isSuccess && (
         <>
-          {!canUpdateSecrets ? (
-            <NoPermission resourceText="manage this project's edge function secrets" />
-          ) : (
-            <div className="grid gap-5">
+          <div className="mb-6">
+            {!canUpdateSecrets ? (
+              <NoPermission resourceText="manage this project's edge function secrets" />
+            ) : (
               <AddNewSecretForm />
-              <Separator />
-            </div>
-          )}
+            )}
+          </div>
           {canUpdateSecrets && !canReadSecrets ? (
             <NoPermission resourceText="view this project's edge function secrets" />
           ) : canReadSecrets ? (
@@ -83,11 +91,13 @@ const EdgeFunctionSecrets = () => {
                 />
               </div>
 
-              <div className="w-full overflow-hidden overflow-x-auto">
-                <Table
-                  head={headers}
-                  body={
-                    secrets.length > 0 ? (
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>{headers}</TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {secrets.length > 0 ? (
                       secrets.map((secret) => (
                         <EdgeFunctionSecret
                           key={secret.name}
@@ -96,27 +106,27 @@ const EdgeFunctionSecrets = () => {
                         />
                       ))
                     ) : secrets.length === 0 && searchString.length > 0 ? (
-                      <Table.tr>
-                        <Table.td colSpan={headers.length}>
+                      <TableRow>
+                        <TableCell colSpan={headers.length}>
                           <p className="text-sm text-foreground">No results found</p>
                           <p className="text-sm text-foreground-light">
                             Your search for "{searchString}" did not return any results
                           </p>
-                        </Table.td>
-                      </Table.tr>
+                        </TableCell>
+                      </TableRow>
                     ) : (
-                      <Table.tr>
-                        <Table.td colSpan={headers.length}>
+                      <TableRow>
+                        <TableCell colSpan={headers.length}>
                           <p className="text-sm text-foreground">No secrets created</p>
                           <p className="text-sm text-foreground-light">
                             There are no secrets associated with your project yet
                           </p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  }
-                />
-              </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
           ) : null}
         </>
