@@ -46,14 +46,6 @@ const SignInPage: NextPageWithLayout = () => {
             <span className="px-2 text-sm bg-studio text-foreground">or</span>
           </div>
         </div>
-
-        <button
-          onClick={() => {
-            throw new Error('jordi test sentry')
-          }}
-        >
-          delete me later
-        </button>
         <SignInForm />
       </div>
 
