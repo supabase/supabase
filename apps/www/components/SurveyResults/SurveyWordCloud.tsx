@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+const TIMER_DURATION = 3000
+
 export function SurveyWordCloud({
   answers,
   label,
@@ -30,7 +32,7 @@ export function SurveyWordCloud({
 
     const timer = setTimeout(() => {
       setIsRotating(true)
-    }, 3000)
+    }, TIMER_DURATION)
 
     return () => clearTimeout(timer)
   }, [answers.length])
@@ -45,7 +47,7 @@ export function SurveyWordCloud({
     const rotateItems = () => {
       const newItems = currentItems.map((item, index) => {
         // Calculate next item index with wrapping
-        const nextItemIndex = (index + Math.floor(Date.now() / 3000)) % answers.length
+        const nextItemIndex = (index + Math.floor(Date.now() / TIMER_DURATION)) % answers.length
         return answers[nextItemIndex]
       })
 
@@ -120,27 +122,49 @@ export function SurveyWordCloud({
     }
 
     // Rotate every 3 seconds
-    const interval = setInterval(rotateItems, 3000)
+    const interval = setInterval(rotateItems, TIMER_DURATION)
 
     return () => clearInterval(interval)
   }, [isRotating, answers, scramblingTexts, currentItems])
 
   return (
-    <aside className="flex flex-col gap-4 px-3 md:px-6">
-      <ol className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+    <aside className="flex flex-col gap-8 px-3 md:px-6">
+      <p className="text-foreground-lighter text-sm">{label}</p>
+      <ol className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-16 gap-y-10">
         {currentItems.map(({ text, count }, index) => (
-          <li
-            key={`${text}-${index}`}
-            className={`py-4 border-t border-muted border-opacity-50 [&:nth-child(-n+2)]:border-t-0 sm:[&:nth-child(-n+3)]:border-t-0 md:[&:nth-child(-n+4)]:border-t-0`}
-          >
+          <li key={`${text}-${index}`} className={`flex flex-col gap-2 items-start`}>
+            {/* Progress bar */}
+            {count && (
+              <div
+                className="h-[2px] flex items-center w-full"
+                style={
+                  {
+                    background: `repeating-linear-gradient(
+                  45deg,
+                  transparent,
+                  transparent 3px,
+                  color-mix(in srgb, hsl(var(--foreground-muted)) 50%, transparent) 3px,
+                  color-mix(in srgb, hsl(var(--foreground-muted)) 50%, transparent) 4px
+                )`,
+                  } as React.CSSProperties
+                }
+              >
+                <div
+                  className="h-full bg-brand origin-left"
+                  style={{
+                    width: `calc(max(0.5%, (${count} / ${maxCount}) * 100%))`,
+                    transform: isRotating ? 'scaleX(1)' : 'scaleX(0)',
+                    transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  }}
+                />
+              </div>
+            )}
             <span className="font-mono md:text-lg text-center text-foreground">
               {scramblingTexts[index].toUpperCase() || text.toUpperCase()}
             </span>
           </li>
         ))}
       </ol>
-
-      <p className="text-foreground-lighter text-sm">{label}</p>
     </aside>
   )
 }

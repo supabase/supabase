@@ -65,9 +65,6 @@ export function SurveyStatCard({
     }
   }, [progressValue, hasAnimated])
 
-  // Format display value to always show two digits
-  const formattedValue = displayValue.toString().padStart(2, '0')
-
   return (
     <div ref={cardRef} className="flex-1 px-6 py-8 flex flex-col gap-4">
       {/* Progress bar */}
@@ -100,7 +97,7 @@ export function SurveyStatCard({
         <p
           className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-foreground' : 'text-foreground-muted'} transition-colors duration-1000`}
         >
-          {formattedValue}
+          {displayValue}
           <span className="md:text-4xl">{unit}</span>
         </p>
         <p className="text-foreground-light text-sm text-balance md:mr-6">{label}</p>
