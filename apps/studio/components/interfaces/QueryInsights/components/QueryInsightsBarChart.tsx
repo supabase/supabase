@@ -61,7 +61,7 @@ export const QueryInsightsLineChart = ({
       >
         <ComposedChart
           data={data}
-          onMouseMove={(e: { activeTooltipIndex: number | null }) => {
+          onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }

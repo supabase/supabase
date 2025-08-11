@@ -168,26 +168,28 @@ export function MetricsChart(props: MetricsChartProps) {
   return (
     <div className="h-[320px] flex flex-col">
       <div className="flex flex-col flex-1 min-h-0">
-        <div className="flex flex-wrap items-center gap-2 px-5 mb-4">
-          <MetricToggleButtons
-            chartConfig={chartConfig}
-            visibleMetrics={visibleMetrics}
-            setVisibleMetrics={setVisibleMetrics}
-            metric={metric}
-            selectedQuery={selectedQuery}
-          />
-
-          {selectedQuery && (
-            <SelectedQueryBadge
-              selectedQuery={selectedQuery}
-              onClear={handleClearSelectedQuery}
+        <div className="flex flex-wrap items-center gap-2 mb-4 px-6 py-2 bg-surface-200 border-t border-b -mt-px justify-between">
+          <div className="flex items-center gap-2">
+            <MetricToggleButtons
+              chartConfig={chartConfig}
+              visibleMetrics={visibleMetrics}
+              setVisibleMetrics={setVisibleMetrics}
               metric={metric}
-              metrics={metricBadges}
+              selectedQuery={selectedQuery}
             />
-          )}
+
+            {selectedQuery && (
+              <SelectedQueryBadge
+                selectedQuery={selectedQuery}
+                onClear={handleClearSelectedQuery}
+                metric={metric}
+                metrics={metricBadges}
+              />
+            )}
+          </div>
         </div>
 
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 pt-4 pr-4">
           <ChartContainer className="h-full w-full" config={config}>
             <AreaChart
               data={chartData}

@@ -111,7 +111,7 @@ export const QueryInsights = () => {
     {
       id: 'query_latency',
       label: 'Query latency',
-      description: `p95 in ${p95Latency}`,
+      description: `p95: ${p95Latency}`,
       tooltip: 'Shows the latency of each query execution.',
     },
     {
@@ -281,7 +281,7 @@ export const QueryInsights = () => {
       <Tabs_Shadcn_
         value={selectedMetric}
         onValueChange={(value) => setSelectedMetric(value as MetricType)}
-        className="space-y-4"
+        className="pb-4"
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
           {METRICS.map((metric) => (
@@ -332,7 +332,6 @@ export const QueryInsights = () => {
           />
         </div>
       </Tabs_Shadcn_>
-
 
 
       <QueryList
