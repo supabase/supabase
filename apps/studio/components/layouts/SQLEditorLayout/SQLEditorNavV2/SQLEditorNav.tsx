@@ -47,9 +47,10 @@ import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
 interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
+  search?: string
 }
 
-export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
+export const SQLEditorNav = ({ sort = 'inserted_at', search }: SQLEditorNavProps) => {
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
 
@@ -94,7 +95,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useSQLSnippetFoldersQuery({ projectRef, sort }, { keepPreviousData: true })
+  } = useSQLSnippetFoldersQuery({ projectRef, sort, name: search }, { keepPreviousData: true })
 
   const [subResults, setSubResults] = useState<{
     [id: string]: { snippets?: Snippet[]; isLoading: boolean }
@@ -154,15 +155,26 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const { data: snippetCountData } = useContentCountQuery({
     projectRef,
     type: 'sql',
+    name: search,
   })
   const numPrivateSnippets = snippetCountData?.private ?? 0
 
   const privateSnippetsTreeState = useMemo(
-    () =>
-      folders.length === 0 && privateSnippets.length === 0
-        ? [ROOT_NODE]
-        : formatFolderResponseForTreeView({ folders, contents: privateSnippets }),
-    [folders, privateSnippets]
+    () => {
+      if (folders.length === 0 && privateSnippets.length === 0) {
+        return [ROOT_NODE]
+      }
+      
+      // When searching, only show folders that contain matching snippets
+      const filteredFolders = search 
+        ? folders.filter(folder => 
+            privateSnippets.some(snippet => snippet.folder_id === folder.id)
+          )
+        : folders
+      
+      return formatFolderResponseForTreeView({ folders: filteredFolders, contents: privateSnippets })
+    },
+    [folders, privateSnippets, search]
   )
 
   const privateSnippetsLastItemIds = useMemo(
@@ -185,6 +197,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       projectRef,
       favorite: true,
       sort,
+      name: search,
     },
     { enabled: showFavoriteSnippets, keepPreviousData: true }
   )
@@ -236,6 +249,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       projectRef,
       visibility: 'project',
       sort,
+      name: search,
     },
     { enabled: showSharedSnippets, keepPreviousData: true }
   )
