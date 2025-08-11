@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
-// import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
 import dayjs from 'dayjs'
-import { InformationCircleIcon } from '@heroicons/react/16/solid'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { MetricsChart } from './components/MetricsChart'
 import { QueryList } from './components/QueryList'
 import {
@@ -16,7 +13,6 @@ import {
 } from 'data/query-insights/query-insights-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { SelectedQueryBadge } from './components/SelectedQueryBadge'
 
 export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits'
 
@@ -44,9 +40,7 @@ const METRICS: { id: MetricType; label: string; description: string }[] = [
 ]
 
 export const QueryInsights = () => {
-  const router = useRouter()
   const { ref } = useParams()
-  // const { project } = useProjectContext()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
