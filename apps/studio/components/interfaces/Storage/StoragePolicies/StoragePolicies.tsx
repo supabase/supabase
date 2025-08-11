@@ -188,6 +188,10 @@ const StoragePolicies = () => {
       ) : (
         <div>
           <ScaffoldSection isFullWidth>
+            <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
+            <ScaffoldSectionDescription className="mb-6">
+              Write policies for each bucket to control access to the bucket and its contents
+            </ScaffoldSectionDescription>
             {buckets.length === 0 && <StoragePoliciesPlaceholder />}
 
             {/* Sections for policies grouped by buckets */}
@@ -214,7 +218,7 @@ const StoragePolicies = () => {
           </ScaffoldSection>
 
           <ScaffoldSection isFullWidth>
-            <ScaffoldSectionTitle>Storage schema policies</ScaffoldSectionTitle>
+            <ScaffoldSectionTitle>Schema</ScaffoldSectionTitle>
             <ScaffoldSectionDescription className="mb-6">
               You may also write policies for the tables under the storage schema directly for
               greater control
