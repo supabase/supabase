@@ -73,9 +73,6 @@
     },
     "neverBuiltDependencies": [
       "libpg-query"
-    ],
-    "onlyBuiltDependencies": [
-      "esbuild"
     ]
   },
   "engines": {

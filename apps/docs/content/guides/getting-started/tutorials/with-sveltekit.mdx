@@ -453,7 +453,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 
 ### Authentication error page
 
-If there is an error with confirming the token, redirect the user to ana error page.
+If there is an error with confirming the token, redirect the user to an error page.
 
 <$CodeTabs>
 
@@ -465,7 +465,7 @@ If there is an error with confirming the token, redirect the user to ana error p
 
 ### Account page
 
-After a user signs in, they need to be able to edit their profile details+page.
+After a user signs in, they need to be able to edit their profile details page.
 Create a new `src/routes/account/+page.svelte` file with the content below.
 
 <$CodeTabs>
@@ -551,7 +551,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 
 </$CodeTabs>
 
-Now create the associated `src/routes/account/+page.server.ts` file that handles loading data from the server through the `load` function
+Now, create the associated `src/routes/account/+page.server.ts` file that handles loading data from the server through the `load` function
 and handle all form actions through the `actions` object.
 
 ```ts name=src/routes/account/+page.server.ts
@@ -621,7 +621,7 @@ export const actions: Actions = {
 
 ### Launch!
 
-Now that you have all the pages in place, run this command in a terminal:
+With all the pages in place, run this command in a terminal:
 
 ```bash
 npm run dev
@@ -637,7 +637,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 ### Create an upload widget
 
-Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component called `Avatar.svelte` in the `src/routes/account` directory:
+Create an avatar for the user so that they can upload a profile photo. Start by creating a new component called `Avatar.svelte` in the `src/routes/account` directory:
 
 <$CodeTabs>
 
@@ -645,20 +645,18 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 <!-- src/routes/account/Avatar.svelte -->
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
-	import { createEventDispatcher } from 'svelte'
 
 	interface Props {
 		size?: number
-		url: string
+		url?: string
 		supabase: SupabaseClient
+		onupload?: () => void
 	}
-	let { size = 10, url = $bindable(), supabase }: Props = $props()
+	let { size = 10, url = $bindable(), supabase, onupload }: Props = $props()
 
 	let avatarUrl: string | null = $state(null)
 	let uploading = $state(false)
 	let files: FileList = $state()
-
-	const dispatch = createEventDispatcher()
 
 	const downloadImage = async (path: string) => {
 		try {
@@ -697,7 +695,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 			url = filePath
 			setTimeout(() => {
-				dispatch('upload')
+				onupload?.()
 			}, 100)
 		} catch (error) {
 			if (error instanceof Error) {
@@ -747,7 +745,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 ### Add the new widget
 
-And then we can add the widget to the Account page:
+Add the widget to the Account page:
 
 <$CodeTabs>
 
@@ -771,8 +769,8 @@ And then we can add the widget to the Account page:
         {supabase}
         bind:url={avatarUrl}
         size={10}
-        on:upload={() => {
-          profileForm.requestSubmit();
+        onupload={() => {
+            profileForm.requestSubmit();
         }}
       />
 
