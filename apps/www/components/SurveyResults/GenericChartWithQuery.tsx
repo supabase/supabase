@@ -314,6 +314,28 @@ export function GenericChartWithQuery({
       <div
         className={`${view === 'chart' ? 'bg-surface-100' : 'bg-surface-75'} border-b last:border-none`}
       >
+        {/* Filters and toggle */}
+        <div className="flex flex-row flex-wrap gap-4 p-4 justify-between">
+          {filters && activeFilters && setFilterValue && (
+            <div className="flex flex-wrap gap-4">
+              {Object.entries(filters).map(([filterKey, filterConfig]) => (
+                <FilterDropdown
+                  key={filterKey}
+                  filterKey={filterKey}
+                  filterConfig={filterConfig}
+                  selectedValue={activeFilters[filterKey]}
+                  setFilterValue={setFilterValue}
+                />
+              ))}
+            </div>
+          )}
+          <TwoOptionToggle
+            options={['SQL', 'chart']}
+            activeOption={view}
+            onClickOption={setView}
+            borderOverride="border-overlay"
+          />
+        </div>
         <div
           className="overflow-hidden relative"
           style={{
@@ -349,32 +371,46 @@ export function GenericChartWithQuery({
 
                     {/* Entire bar (including background) */}
                     <div
-                      className="h-[14px] flex items-center"
+                      className="h-4 relative overflow-hidden"
                       style={
                         {
-                          background: `repeating-linear-gradient(
-                            45deg,
-                            transparent,
-                            transparent 4px,
-                            color-mix(in srgb, hsl(var(--foreground-muted)) 30%, transparent) 4px,
-                            color-mix(in srgb, hsl(var(--foreground-muted)) 30%, transparent) 6px
-                          )`,
+                          '--bar-value': item.value,
                           '--reference': maxValue,
-                          '--bar-value': item.rawValue || item.value,
-                          '--index': index,
                         } as React.CSSProperties
                       }
                     >
+                      {/* Background pattern for the entire bar */}
+                      <div
+                        className="absolute inset-0 pointer-events-none bg-foreground-muted"
+                        style={{
+                          maskImage: 'url("/survey/pattern-back.svg")',
+                          maskSize: '15px 15px',
+                          maskRepeat: 'repeat',
+                          maskPosition: 'center',
+                        }}
+                      />
+
                       {/* Filled portion of the bar */}
                       <div
-                        className={`h-full ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-muted'}`}
+                        className={`h-full relative bg-surface-100`}
                         style={{
                           width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
                           transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
                           transformOrigin: 'left',
                           transition: `transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${index * 0.1}s`,
                         }}
-                      />
+                      >
+                        {/* Foreground pattern for the filled portion */}
+                        <div
+                          className={`absolute inset-0 pointer-events-none ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-light'}`}
+                          style={{
+                            maskImage: 'url("/survey/pattern-front.svg")',
+                            maskSize: '14.5px 15px',
+                            maskRepeat: 'repeat',
+                            maskPosition: 'top left',
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -402,29 +438,6 @@ export function GenericChartWithQuery({
             </div>
           )}
         </div>
-      </div>
-
-      {/* Filters and toggle */}
-      <div className="flex flex-row flex-wrap gap-4 p-4 justify-between">
-        {filters && activeFilters && setFilterValue && (
-          <div className="flex flex-wrap gap-4">
-            {Object.entries(filters).map(([filterKey, filterConfig]) => (
-              <FilterDropdown
-                key={filterKey}
-                filterKey={filterKey}
-                filterConfig={filterConfig}
-                selectedValue={activeFilters[filterKey]}
-                setFilterValue={setFilterValue}
-              />
-            ))}
-          </div>
-        )}
-        <TwoOptionToggle
-          options={['SQL', 'chart']}
-          activeOption={view}
-          onClickOption={setView}
-          borderOverride="border-overlay"
-        />
       </div>
     </div>
   )
