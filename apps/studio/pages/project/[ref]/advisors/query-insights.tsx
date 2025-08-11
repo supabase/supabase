@@ -19,4 +19,4 @@ QueryInsightsPage.getLayout = (page) => (
   </DefaultLayout>
 )
 
-export default QueryInsightsPage
+export default QueryInsightsPage 

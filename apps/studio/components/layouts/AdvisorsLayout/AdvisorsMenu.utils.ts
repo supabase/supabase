@@ -33,7 +33,7 @@ export const generateAdvisorsMenu = (
         {
           name: 'Query Insights',
           key: 'query-insights',
-          url: `/project/${ref}/advisors/query`,
+          url: `/project/${ref}/advisors/query-insights`,
           items: [],
         },
       ],
