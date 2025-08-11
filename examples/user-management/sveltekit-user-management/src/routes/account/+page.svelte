@@ -43,7 +43,7 @@
             {supabase}
             bind:url={avatarUrl}
             size={10}
-            on:upload={() => {
+            onupload={() => {
                 profileForm.requestSubmit();
             }}
         />
