@@ -2,8 +2,9 @@ import { type QueryClient } from '@tanstack/react-query'
 import { tableKeys } from 'data/tables/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { databaseKeys } from 'data/database/keys'
+import { databaseTriggerKeys } from 'data/database-triggers/keys'
 
-export type EntityType = 'table' | 'function' | 'procedure'
+export type EntityType = 'table' | 'function' | 'procedure' | 'trigger'
 
 export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
 
@@ -26,6 +27,7 @@ const SQL_PATTERNS = {
     /(?:create(?:\s+or\s+replace)?|alter|drop)\s+table\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
   function:
     /(?:create(?:\s+or\s+replace)?|alter|drop)\s+(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
+  trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+(?:(\w+)\.)?(\w+))?/i,
 } as const
 
 const DEFAULT_SCHEMA = 'public' as const
@@ -85,7 +87,11 @@ export class QueryCacheInvalidator {
     sqlLower: string,
     action: ActionType
   ): Omit<InvalidationEvent, 'projectRef'> | null {
-    // Check each entity type
+    // Check trigger first since it might contain 'function' in EXECUTE FUNCTION clause
+    if (sqlLower.includes(' trigger ')) {
+      return this.extractTriggerInfo(sql, action)
+    }
+
     if (sqlLower.includes(' table ')) {
       return this.extractTableInfo(sql, action)
     }
@@ -129,6 +135,28 @@ export class QueryCacheInvalidator {
     }
   }
 
+  private extractTriggerInfo(
+    sql: string,
+    action: ActionType
+  ): Omit<InvalidationEvent, 'projectRef'> | null {
+    const match = sql.match(SQL_PATTERNS.trigger)
+    if (!match) return null
+
+    // match[1] is the trigger name
+    // match[2] is schema (optional)
+    // match[3] is table name
+    const schema = match[2] || DEFAULT_SCHEMA
+    const table = match[3]
+
+    return {
+      entityType: 'trigger',
+      action,
+      schema,
+      table,
+      entityName: match[1],
+    }
+  }
+
   /**
    * Get invalidation strategy for each entity type
    */
@@ -139,6 +167,7 @@ export class QueryCacheInvalidator {
       table: () => this.invalidateTableQueries(projectRef, schema, table),
       function: () => this.invalidateFunctionQueries(projectRef),
       procedure: () => this.invalidateFunctionQueries(projectRef),
+      trigger: () => this.invalidateTriggerQueries(projectRef),
     }
 
     const strategy = invalidationMap[entityType]
@@ -220,6 +249,13 @@ export class QueryCacheInvalidator {
   private async invalidateFunctionQueries(projectRef: string): Promise<void> {
     await this.queryClient.invalidateQueries({
       queryKey: databaseKeys.databaseFunctions(projectRef),
+      refetchType: 'active',
+    })
+  }
+
+  private async invalidateTriggerQueries(projectRef: string): Promise<void> {
+    return this.queryClient.invalidateQueries({
+      queryKey: databaseTriggerKeys.list(projectRef),
       refetchType: 'active',
     })
   }
