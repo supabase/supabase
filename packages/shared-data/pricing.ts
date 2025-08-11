@@ -193,7 +193,7 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
-        {
+      {
         key: 'database.egress',
         title: 'Cached Egress',
         plans: {
@@ -601,11 +601,7 @@ export const pricing: Pricing = {
         plans: {
           free: false,
           pro: false,
-          team: [
-            '$60 per drain per month',
-            '+ $0.20 per million events',
-            '+ $0.09 per GB egress',
-          ],
+          team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
         usage_based: true,

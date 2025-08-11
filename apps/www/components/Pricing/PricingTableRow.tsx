@@ -36,7 +36,7 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard.',
   },
 
-  'database.bandwidth': {
+  'database.egress': {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period.',
   },
   'auth.totalUsers': {
@@ -84,7 +84,7 @@ export const pricingTooltips: PricingTooltips = {
     main: "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
   },
   'security.logDrain': {
-    main: 'Only events processed and sent to destinations are counted. Bandwidth required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
+    main: 'Only events processed and sent to destinations are counted. Egress required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
