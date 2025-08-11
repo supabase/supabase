@@ -397,7 +397,7 @@ export function GenericChartWithQuery({
                           width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
                           transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
                           transformOrigin: 'left',
-                          transition: `transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${index * 0.1}s`,
+                          transition: `transform 0.4s steps(${Math.max(2, Math.floor((item.value / maxValue) * 12))}, end) ${index * 0.05}s`,
                         }}
                       >
                         {/* Foreground pattern for the filled portion */}
