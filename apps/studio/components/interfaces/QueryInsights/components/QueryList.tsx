@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import dayjs from 'dayjs'
-import { cn, CodeBlock } from 'ui'
+import { cn, CodeBlock, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TextSearch } from 'lucide-react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
