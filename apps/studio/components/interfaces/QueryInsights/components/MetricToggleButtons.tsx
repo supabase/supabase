@@ -144,12 +144,7 @@ export const MetricToggleButtons = ({
               isActive={visibleMetrics[keyMappings[key] || key]}
               onClick={() => {
                 const targetKey = keyMappings[key] || key
-                console.log(`[MetricToggleButtons] Toggle clicked for ${key}:`, {
-                  targetKey,
-                  currentValue: visibleMetrics[targetKey],
-                  keyMappings: keyMappings,
-                  allVisibleMetrics: visibleMetrics
-                })
+
                 setVisibleMetrics((prev) => ({
                   ...prev,
                   [targetKey]: !prev[targetKey],

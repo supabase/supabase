@@ -63,12 +63,7 @@ export function useQueryLatencyChart({
   const { ref } = useParams()
   const isActive = metric === 'query_latency'
 
-  console.log(
-    '[useQueryLatencyChart] selectedQuery:',
-    selectedQuery?.query_id,
-    'hoveredQuery:',
-    hoveredQuery?.query_id
-  )
+
 
   // Fetch single query latency data
   const { data: queryLatencyData } = useSingleQueryLatency(
@@ -104,11 +99,7 @@ export function useQueryLatencyChart({
           queryLatencyPoints.length
         : 0
 
-    console.log('[useQueryLatencyChart] Calculating metric badge:', {
-      avgLatency,
-      pointsWithLatency: queryLatencyPoints.length,
-      totalPoints: chartData.length,
-    })
+
 
     return [
       {
@@ -148,12 +139,7 @@ export function useRowsReadChart({
   const { ref } = useParams()
   const isActive = metric === 'rows_read'
 
-  console.log(
-    '[useRowsReadChart] selectedQuery:',
-    selectedQuery?.query_id,
-    'hoveredQuery:',
-    hoveredQuery?.query_id
-  )
+
 
   // Fetch single query rows data
   const { data: queryRowsData } = useSingleQueryRows(
@@ -167,7 +153,7 @@ export function useRowsReadChart({
     }
   )
 
-  console.log('[useRowsReadChart] queryRowsData:', queryRowsData)
+
 
   // Generate chart configuration
   const chartConfig = useMemo(() => {
@@ -175,26 +161,13 @@ export function useRowsReadChart({
       return null
     }
     const config = getRowsReadConfig(data, queryRowsData)
-    console.log('[useRowsReadChart] chartConfig result:', {
-      chartDataLength: config.chartData.length,
-      hasQueryRows: config.chartData.some((point) => point.query_rows > 0),
-      firstFewPoints: config.chartData.slice(0, 3),
-      queryRowsPoints: config.chartData.filter((point) => point.query_rows > 0),
-    })
+
     return config
   }, [data, queryRowsData, isActive])
 
   // Get metrics for the selected query badge
   const metricBadges = useMemo(() => {
-    console.log('🔍 [useRowsReadChart] metricBadges useMemo triggered, isActive:', isActive, 'selectedQuery:', selectedQuery?.query_id, 'chartConfig:', !!chartConfig)
-    console.log('🔍 [useRowsReadChart] Conditions check:', {
-      isActive,
-      hasSelectedQuery: !!selectedQuery,
-      hasChartConfig: !!chartConfig,
-      willReturnEarly: !isActive || !selectedQuery || !chartConfig
-    })
     if (!isActive || !selectedQuery || !chartConfig) {
-      console.log('🔍 [useRowsReadChart] Returning early due to conditions not met')
       return []
     }
 
@@ -203,15 +176,8 @@ export function useRowsReadChart({
     // Calculate total rows for display - sum across all data points
     const totalQueryRows = chartData.reduce((sum, point) => sum + (point.query_rows ?? 0), 0)
 
-    console.log('🏷️ [useRowsReadChart] PILL metric badge calculation:', {
-      totalQueryRows,
-      chartDataPoints: chartData.length,
-      hasQueryRows: chartData.some((point) => point.query_rows > 0),
-    })
-
     // Show the total rows rather than just the latest point
     const formattedValue = formatMetricValue(totalQueryRows)
-    console.log('🏷️ [useRowsReadChart] PILL Final formatted value:', formattedValue, typeof formattedValue)
     
     return [
       {
@@ -245,12 +211,7 @@ export function useCallsChart({
   const { ref } = useParams()
   const isActive = metric === 'calls'
 
-  console.log(
-    '[useCallsChart] selectedQuery:',
-    selectedQuery?.query_id,
-    'hoveredQuery:',
-    hoveredQuery?.query_id
-  )
+
 
   // Fetch single query calls data
   const { data: queryCallsData } = useSingleQueryCalls(

@@ -229,14 +229,7 @@ export function MetricsChart(props: MetricsChartProps) {
                 // Map the key to the corresponding visibleMetrics key
                 const visibleMetricsKey = (keyMappings as Record<string, string>)[key] || key
 
-                // Debug logging for toggle button troubleshooting
-                console.log(`[MetricsChart] Rendering series ${key}:`, {
-                  visibleMetricsKey,
-                  visibleMetricsValue: visibleMetrics[visibleMetricsKey],
-                  directValue: visibleMetrics[key],
-                  shouldRender: visibleMetrics[visibleMetricsKey] || visibleMetrics[key],
-                  keyMappings: keyMappings,
-                })
+
 
                 // Skip series not enabled in visible metrics
                 // If we have keyMappings, only check the mapped key

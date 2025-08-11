@@ -15,7 +15,7 @@ import {
 } from 'data/query-insights/query-insights-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatMetricValue } from './QueryInsights.utils'
+
 
 
 export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits' | 'issues'
@@ -141,7 +141,7 @@ export const QueryInsights = () => {
     errorCount: errorCount
   })
 
-  const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
+
 
   // Define metrics with dynamic descriptions
   const METRICS: { id: MetricType; label: string; description: string; tooltip: string }[] = [
@@ -387,6 +387,4 @@ export const QueryInsights = () => {
       />
     </div>
   )
-  
-  console.log('🚀 [QueryInsights] Component rendered - END')
 }

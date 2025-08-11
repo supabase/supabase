@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import dayjs from 'dayjs'
-import { cn, CodeBlock } from 'ui'
+import { cn, CodeBlock, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TextSearch } from 'lucide-react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -94,16 +94,6 @@ export const QueryList = ({
   }
 
   const columns: Column<QueryInsightsQuery>[] = [
-    // {
-    //   key: 'timestamp',
-    //   name: 'Time',
-    //   resizable: true,
-    //   minWidth: 120,
-    //   headerCellClass: 'first:pl-6',
-    //   renderCell: (props) => (
-    //     <div className="font-mono text-xs">{dayjs(props.row.timestamp).format('HH:mm:ss')}</div>
-    //   ),
-    // },
     {
       key: 'query',
       name: 'Query',
@@ -371,14 +361,6 @@ export const QueryList = ({
         )
       },
     },
-    // {
-    //   key: 'database',
-    //   name: 'Database',
-    //   resizable: true,
-    //   minWidth: 120,
-    //   headerCellClass: '',
-    //   renderCell: (props) => <div className="font-mono text-xs">{props.row.database}</div>,
-    // },
   ]
 
   return (
@@ -394,7 +376,6 @@ export const QueryList = ({
         rowClass={(row, idx) => {
           // Use the query_id for comparison instead of row index
           const isSelected = selectedQuery?.query_id === row.query_id
-          // const isHovered = hoveredQuery?.query_id === row.query_id && !selectedQuery
           return [
             rowClassRender(row),
             `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
@@ -434,4 +415,4 @@ export const QueryList = ({
       />
     </div>
   )
-}
+} 
