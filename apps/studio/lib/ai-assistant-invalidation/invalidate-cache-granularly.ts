@@ -1,11 +1,7 @@
 import { type QueryClient } from '@tanstack/react-query'
 
-import { tableKeys } from 'data/tables/keys'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { databaseKeys } from 'data/database/keys'
-import { databaseTriggerKeys } from 'data/database-triggers/keys'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { extractEntityInfo } from './extract-entity-info'
+import { handleInvalidation } from './handle-invalidation'
 
 export type EntityType = 'table' | 'function' | 'procedure' | 'trigger' | 'policy'
 
@@ -18,9 +14,6 @@ export type InvalidationEvent = {
   table?: string
   entityName?: string
 }
-
-// Entity types that require entity list invalidation
-const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
 
 /**
  * Extract the action type from SQL statement
@@ -50,173 +43,6 @@ export function parseSqlStatement(sql: string, projectRef: string): Invalidation
     ...entityInfo,
     projectRef,
   }
-}
-
-/**
- * Invalidate table-related queries
- */
-export async function invalidateTableQueries(
-  queryClient: QueryClient,
-  projectRef: string,
-  schema?: string,
-  table?: string
-): Promise<void> {
-  const promises: Promise<void>[] = []
-
-  if (schema) {
-    // Targeted invalidation for specific schema
-    promises.push(
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.list(projectRef, schema, true),
-        exact: true,
-      }),
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.list(projectRef, schema, false),
-        exact: true,
-      })
-    )
-  } else {
-    // Broader invalidation if no schema specified
-    promises.push(
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.list(projectRef),
-        exact: false,
-      })
-    )
-  }
-
-  // Invalidate specific table if provided
-  if (table && schema) {
-    promises.push(
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.retrieve(projectRef, table, schema),
-        refetchType: 'active',
-      })
-    )
-  }
-
-  await Promise.all(promises)
-}
-
-/**
- * Invalidate function/procedure queries
- */
-export async function invalidateFunctionQueries(
-  queryClient: QueryClient,
-  projectRef: string
-): Promise<void> {
-  return queryClient.invalidateQueries({
-    queryKey: databaseKeys.databaseFunctions(projectRef),
-    refetchType: 'active',
-  })
-}
-
-/**
- * Invalidate trigger queries
- */
-export async function invalidateTriggerQueries(
-  queryClient: QueryClient,
-  projectRef: string
-): Promise<void> {
-  return queryClient.invalidateQueries({
-    queryKey: databaseTriggerKeys.list(projectRef),
-    refetchType: 'active',
-  })
-}
-
-/**
- * Invalidate policy queries
- */
-export async function invalidatePolicyQueries(
-  queryClient: QueryClient,
-  projectRef: string,
-  schema?: string,
-  table?: string
-): Promise<void> {
-  const promises: Promise<void>[] = []
-
-  promises.push(
-    queryClient.invalidateQueries({
-      queryKey: databasePoliciesKeys.list(projectRef),
-      refetchType: 'active',
-    })
-  )
-
-  // Also invalidate table's RLS status
-  if (table && schema) {
-    promises.push(
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.retrieve(projectRef, table, schema),
-        refetchType: 'active',
-      })
-    )
-  }
-
-  await Promise.all(promises)
-}
-
-/**
- * Invalidate entity types list for certain entity types
- */
-async function invalidateEntityTypesList(
-  queryClient: QueryClient,
-  projectRef: string,
-  entityType: EntityType
-): Promise<void> {
-  if (ENTITY_TYPES_REQUIRING_LIST_INVALIDATION.includes(entityType)) {
-    await queryClient.invalidateQueries({
-      queryKey: entityTypeKeys.list(projectRef),
-      exact: false,
-    })
-  }
-}
-
-/**
- * Execute invalidation strategy for each entity type
- */
-async function executeInvalidationStrategy(
-  queryClient: QueryClient,
-  event: InvalidationEvent
-): Promise<void> {
-  const { projectRef, entityType, schema, table } = event
-
-  const invalidationMap: Record<EntityType, () => Promise<void>> = {
-    table: () => invalidateTableQueries(queryClient, projectRef, schema, table),
-    function: () => invalidateFunctionQueries(queryClient, projectRef),
-    procedure: () => invalidateFunctionQueries(queryClient, projectRef),
-    trigger: () => invalidateTriggerQueries(queryClient, projectRef),
-    policy: () => invalidatePolicyQueries(queryClient, projectRef, schema, table),
-  }
-
-  const strategy = invalidationMap[entityType]
-  if (strategy) await strategy()
-}
-
-/**
- * Execute invalidation for an event
- */
-async function executeInvalidation(
-  queryClient: QueryClient,
-  event: InvalidationEvent
-): Promise<void> {
-  // Execute invalidation strategy
-  await executeInvalidationStrategy(queryClient, event)
-
-  // Invalidate entity types list for certain entity types
-  const { projectRef, entityType } = event
-  await invalidateEntityTypesList(queryClient, projectRef, entityType)
-}
-
-/**
- * Handle invalidation event and update appropriate caches
- */
-async function handleInvalidation(
-  queryClient: QueryClient,
-  event: InvalidationEvent
-): Promise<void> {
-  setTimeout(async () => {
-    await executeInvalidation(queryClient, event)
-  }, 0)
 }
 
 /**
