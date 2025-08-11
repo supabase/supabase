@@ -29,6 +29,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     if (!slug) {
       return res.status(400).json({ error: 'slug is required' })
     }
+    // Validate projectRef and slug to prevent SSRF and path traversal
+    const safePattern = /^[a-zA-Z0-9_-]+$/
+    if (!safePattern.test(projectRef)) {
+      return res.status(400).json({ error: 'Invalid projectRef format' })
+    }
+    if (!safePattern.test(slug)) {
+      return res.status(400).json({ error: 'Invalid slug format' })
+    }
 
     // Get authorization token from the request
     const authToken = req.headers.authorization
