@@ -1,28 +1,48 @@
-import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { CheckCircle, Eye, EyeOff } from 'lucide-react'
-import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
-import { toast } from 'sonner'
-import * as yup from 'yup'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
+import { CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { toast } from 'sonner'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
-import { passwordSchema } from 'lib/schemas'
 import { buildPathWithParams } from 'lib/gotrue'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  Form,
-  Input,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
 } from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const signUpSchema = passwordSchema.shape({
-  email: yup.string().email().required().label('Email'),
+const schema = z.object({
+  email: z.string({ required_error: 'Email is required' }).email('Must be a valid email'),
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    .max(72, 'Password cannot exceed 72 characters')
+    .refine((password) => {
+      // Basic password validation - you can enhance this based on your requirements
+      const hasUppercase = /[A-Z]/.test(password)
+      const hasLowercase = /[a-z]/.test(password)
+      const hasNumber = /[0-9]/.test(password)
+      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password)
+      const isLongEnough = password.length >= 8
+
+      return hasUppercase && hasLowercase && hasNumber && hasSpecialChar && isLongEnough
+    }, 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character'),
 })
+
+const formId = 'sign-up-form'
 
 const SignUpForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
@@ -31,6 +51,10 @@ const SignUpForm = () => {
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const router = useRouter()
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', password: '' },
+  })
 
   const [searchParams] = useQueryStates({
     auth_id: parseAsString.withDefault(''),
@@ -49,7 +73,7 @@ const SignUpForm = () => {
     },
   })
 
-  const onSignUp = async ({ email, password }: { email: string; password: string }) => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email, password }) => {
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
@@ -84,6 +108,8 @@ const SignUpForm = () => {
     })
   }
 
+  const password = form.watch('password')
+
   return (
     <div className="relative">
       <div
@@ -100,84 +126,100 @@ const SignUpForm = () => {
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       </div>
-      <Form
-        validateOnBlur
-        id="signUp-form"
+      <div
         className={`w-full py-1 transition-all overflow-y-hidden duration-500 ${
           isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
         }`}
-        initialValues={{ email: '', password: '' }}
-        validationSchema={signUpSchema}
-        onSubmit={onSignUp}
       >
-        {({ values }: { values: any }) => {
-          return (
-            <div className="flex flex-col gap-4">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                label="Email"
-                placeholder="you@example.com"
-                disabled={isSigningUp}
-                autoComplete="email"
-              />
+        <Form_Shadcn_ {...form}>
+          <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField_Shadcn_
+              key="email"
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItemLayout name="email" label="Email">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      disabled={isSigningUp}
+                      {...field}
+                      placeholder="you@example.com"
+                    />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
 
-              <Input
-                id="password"
-                name="password"
-                type={passwordHidden ? 'password' : 'text'}
-                label="Password"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                disabled={isSigningUp}
-                autoComplete="new-password"
-                onFocus={() => setShowConditions(true)}
-                actions={
-                  <Button
-                    icon={passwordHidden ? <Eye /> : <EyeOff />}
-                    type="default"
-                    className="!mr-1"
-                    onClick={() => setPasswordHidden((prev) => !prev)}
-                  />
-                }
-              />
+            <FormField_Shadcn_
+              key="password"
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItemLayout name="password" label="Password">
+                  <FormControl_Shadcn_>
+                    <div className="relative">
+                      <Input_Shadcn_
+                        id="password"
+                        type={passwordHidden ? 'password' : 'text'}
+                        autoComplete="new-password"
+                        placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                        {...field}
+                        onFocus={() => setShowConditions(true)}
+                        disabled={isSigningUp}
+                      />
+                      <Button
+                        type="default"
+                        title={passwordHidden ? `Hide password` : `Show password`}
+                        aria-label={passwordHidden ? `Hide password` : `Show password`}
+                        className="absolute right-2 top-1 px-3 py-2"
+                        icon={passwordHidden ? <Eye /> : <EyeOff />}
+                        disabled={isSigningUp}
+                        onClick={() => setPasswordHidden((prev) => !prev)}
+                      />
+                    </div>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
 
-              <div
-                className={`${
-                  showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
-                } transition-all duration-400 overflow-y-hidden`}
-              >
-                <PasswordConditionsHelper password={values.password} />
-              </div>
-
-              <div className="self-center">
-                <HCaptcha
-                  ref={captchaRef}
-                  sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                  size="invisible"
-                  onVerify={(token) => {
-                    setCaptchaToken(token)
-                  }}
-                  onExpire={() => {
-                    setCaptchaToken(null)
-                  }}
-                />
-              </div>
-
-              <Button
-                block
-                form="signUp-form"
-                htmlType="submit"
-                size="large"
-                disabled={values.password.length === 0 || isSigningUp}
-                loading={isSigningUp}
-              >
-                Sign Up
-              </Button>
+            <div
+              className={`${
+                showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
+              } transition-all duration-400 overflow-y-hidden`}
+            >
+              <PasswordConditionsHelper password={password} />
             </div>
-          )
-        }}
-      </Form>
+
+            <div className="self-center">
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
+            </div>
+
+            <Button
+              block
+              form={formId}
+              htmlType="submit"
+              size="large"
+              disabled={password.length === 0 || isSigningUp}
+              loading={isSigningUp}
+            >
+              Sign Up
+            </Button>
+          </form>
+        </Form_Shadcn_>
+      </div>
     </div>
   )
 }
