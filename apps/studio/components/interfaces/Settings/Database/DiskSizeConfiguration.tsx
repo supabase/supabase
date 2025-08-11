@@ -1,23 +1,16 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
-import { SetStateAction } from 'react'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
-import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useUrlState } from 'hooks/ui/useUrlState'
 import { formatBytes } from 'lib/helpers'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
+import { DiskSizeConfigurationModal } from './DiskSizeConfigurationModal'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -27,27 +20,6 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-
-  const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
-  const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
-  const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
-    const show = typeof value === 'function' ? value(showIncreaseDiskSizeModal) : value
-    setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
-  }
-
-  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
-
-  const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
-    onSuccess: (_, variables) => {
-      toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
-      setShowIncreaseDiskSizeModal(false)
-    },
-  })
-
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
   const { data } = useDatabaseSizeQuery({
@@ -76,21 +48,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       adjustments when necessary
                     </p>
                     <div className="flex items-end justify-end">
-                      <ButtonTooltip
-                        type="default"
-                        disabled={!canUpdateDiskSizeConfig || disabled}
-                        onClick={() => setShowIncreaseDiskSizeModal(true)}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: !canUpdateDiskSizeConfig
-                              ? 'You need additional permissions to increase the disk size'
-                              : undefined,
-                          },
-                        }}
-                      >
-                        Increase disk size
-                      </ButtonTooltip>
+                      <DiskSizeConfigurationModal disabled={disabled} />
                     </div>
                   </div>
 
@@ -176,12 +134,6 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       )}
-
-      <DiskSizeConfigurationModal
-        visible={showIncreaseDiskSizeModal}
-        loading={isUpdatingDiskSize}
-        hideModal={setShowIncreaseDiskSizeModal}
-      />
     </div>
   )
 }
