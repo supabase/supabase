@@ -1,6 +1,5 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
 
 export const generateDatabaseMenu = (
@@ -111,18 +110,14 @@ export const generateDatabaseMenu = (
     {
       title: 'Platform',
       items: [
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Backups',
-                key: 'backups',
-                url: pitrEnabled
-                  ? `/project/${ref}/database/backups/pitr`
-                  : `/project/${ref}/database/backups/scheduled`,
-                items: [],
-              },
-            ]
-          : []),
+        { // FIXME: Backups are only enabled for now
+          name: 'Backups',
+          key: 'backups',
+          url: pitrEnabled
+            ? `/project/${ref}/database/backups/pitr`
+            : `/project/${ref}/database/backups/scheduled`,
+          items: [],
+        },
         {
           name: 'Migrations',
           key: 'migrations',
