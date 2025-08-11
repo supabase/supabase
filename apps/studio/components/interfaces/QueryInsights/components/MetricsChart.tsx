@@ -17,8 +17,8 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import dayjs from 'dayjs'
 import {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
+  // ChartLegend,
+  // ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from 'ui'
@@ -223,7 +223,6 @@ export function MetricsChart(props: MetricsChartProps) {
                 cursor={false}
                 content={<ChartTooltipContent indicator="dot" hideLabel />}
               />
-              <ChartLegend content={<ChartLegendContent />} />
 
               {/* Render data series based on configuration */}
               {Object.entries(config).map(([key, value]) => {
@@ -236,21 +235,25 @@ export function MetricsChart(props: MetricsChartProps) {
                   visibleMetricsValue: visibleMetrics[visibleMetricsKey],
                   directValue: visibleMetrics[key],
                   shouldRender: visibleMetrics[visibleMetricsKey] || visibleMetrics[key],
-                  keyMappings: keyMappings
+                  keyMappings: keyMappings,
                 })
 
                 // Skip series not enabled in visible metrics
                 // If we have keyMappings, only check the mapped key
                 // Otherwise, check both mapped and direct keys for backward compatibility
-                const shouldRender = keyMappings && Object.keys(keyMappings).length > 0
-                  ? visibleMetrics[visibleMetricsKey]
-                  : (visibleMetrics[visibleMetricsKey] || visibleMetrics[key])
-                
+                const shouldRender =
+                  keyMappings && Object.keys(keyMappings).length > 0
+                    ? visibleMetrics[visibleMetricsKey]
+                    : visibleMetrics[visibleMetricsKey] || visibleMetrics[key]
+
                 if (!shouldRender) return null
 
                 // Skip query-specific metrics when not needed
                 if (
-                  (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') &&
+                  (key === 'query_rows' ||
+                    key === 'query_latency' ||
+                    key === 'query_calls' ||
+                    key === 'query_issues') &&
                   !selectedQuery &&
                   !hoveredQuery
                 ) {
@@ -258,7 +261,12 @@ export function MetricsChart(props: MetricsChartProps) {
                 }
 
                 // Skip showing full series data for query-specific metrics
-                if (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') {
+                if (
+                  key === 'query_rows' ||
+                  key === 'query_latency' ||
+                  key === 'query_calls' ||
+                  key === 'query_issues'
+                ) {
                   // If hovering and not selected, show hover style
                   if (hoveredQuery && !selectedQuery) {
                     return (

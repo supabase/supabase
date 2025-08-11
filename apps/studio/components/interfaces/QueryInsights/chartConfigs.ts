@@ -299,7 +299,7 @@ export function getCallsConfig(
   // Sort chart data by timestamp
   chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
 
-  // If we have query calls data, add it to the chart
+  // If we have query-specific call data, add it to the chart
   if (queryCallsData && queryCallsData.length > 0) {
     // Create a map of timestamps to query calls values
     const queryCallsMap = new Map<string, number>()
@@ -329,7 +329,7 @@ export function getCallsConfig(
     chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
   }
 
-  const config: ChartConfigType = {
+    const config: ChartConfigType = {
     calls: {
       label: 'Total Calls',
       color: '#3b82f6',
