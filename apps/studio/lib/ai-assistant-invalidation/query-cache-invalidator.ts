@@ -22,9 +22,10 @@ export type InvalidationConfig = {
 
 // SQL pattern matchers for different entity types
 const SQL_PATTERNS = {
-  table: /(?:create|alter|drop)\s+table\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
+  table:
+    /(?:create(?:\s+or\s+replace)?|alter|drop)\s+table\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
   function:
-    /(?:create|alter|drop)\s+(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
+    /(?:create(?:\s+or\s+replace)?|alter|drop)\s+(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
 } as const
 
 const DEFAULT_SCHEMA = 'public' as const
@@ -117,10 +118,7 @@ export class QueryCacheInvalidator {
     sqlLower: string,
     action: ActionType
   ): Omit<InvalidationEvent, 'projectRef'> | null {
-    console.log({ sql })
-
     const match = sql.match(SQL_PATTERNS.function)
-    console.log({ match })
     if (!match) return null
 
     return {
