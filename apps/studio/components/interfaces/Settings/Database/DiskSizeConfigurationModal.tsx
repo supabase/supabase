@@ -54,7 +54,7 @@ export const DiskSizeConfigurationModal = ({ disabled = false }) => {
     parseAsBoolean.withDefault(false)
   )
 
-  const canUpdateDiskSizeConfig = useAsyncCheckProjectPermissions(
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
