@@ -22,7 +22,8 @@
     "prettier:write": "prettier --cache --write .",
     "build:deno-types": "tsx scripts/deno-types.ts",
     "build:graphql-types": "tsx scripts/download-graphql-schema.mts && pnpm graphql-codegen --config scripts/codegen.ts",
-    "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch"
+    "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch",
+    "build:vela-openapi": "npx openapi-typescript ./data/vela/openapi.json -o ./data/vela/vela-schema.d.ts --default-non-nullable false"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^2.2.10",
@@ -192,6 +193,7 @@
     "jsdom-testing-mocks": "^1.13.1",
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",
+    "openapi-typescript": "^7.4.3",
     "postcss": "^8.5.3",
     "prettier": "3.2.4",
     "raw-loader": "^4.0.2",
