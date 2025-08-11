@@ -11,9 +11,6 @@ import { databaseIndexesKeys } from 'data/database-indexes/keys'
 // Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
 
-/**
- * Invalidate table-related queries
- */
 export async function invalidateTableQueries(
   queryClient: QueryClient,
   projectRef: string,
@@ -57,35 +54,26 @@ export async function invalidateTableQueries(
   await Promise.all(promises)
 }
 
-/**
- * Invalidate function/procedure queries
- */
 export async function invalidateFunctionQueries(
   queryClient: QueryClient,
   projectRef: string
 ): Promise<void> {
-  return queryClient.invalidateQueries({
+  await queryClient.invalidateQueries({
     queryKey: databaseKeys.databaseFunctions(projectRef),
     refetchType: 'active',
   })
 }
 
-/**
- * Invalidate trigger queries
- */
 export async function invalidateTriggerQueries(
   queryClient: QueryClient,
   projectRef: string
 ): Promise<void> {
-  return queryClient.invalidateQueries({
+  await queryClient.invalidateQueries({
     queryKey: databaseTriggerKeys.list(projectRef),
     refetchType: 'active',
   })
 }
 
-/**
- * Invalidate policy queries
- */
 export async function invalidatePolicyQueries(
   queryClient: QueryClient,
   projectRef: string,
@@ -101,7 +89,7 @@ export async function invalidatePolicyQueries(
     })
   )
 
-  // Also invalidate table's RLS status
+  // Also invalidate table's RLS status if active
   if (table && schema) {
     promises.push(
       queryClient.invalidateQueries({
@@ -112,22 +100,6 @@ export async function invalidatePolicyQueries(
   }
 
   await Promise.all(promises)
-}
-
-/**
- * Invalidate entity types list for certain entity types
- */
-async function invalidateEntityTypesList(
-  queryClient: QueryClient,
-  projectRef: string,
-  entityType: EntityType
-): Promise<void> {
-  if (ENTITY_TYPES_REQUIRING_LIST_INVALIDATION.includes(entityType)) {
-    await queryClient.invalidateQueries({
-      queryKey: entityTypeKeys.list(projectRef),
-      exact: false,
-    })
-  }
 }
 
 async function invalidateIndexQueries(
@@ -162,9 +134,19 @@ async function invalidateIndexQueries(
   await Promise.all(promises)
 }
 
-/**
- * Execute invalidation strategy for each entity type
- */
+async function invalidateEntityTypesList(
+  queryClient: QueryClient,
+  projectRef: string,
+  entityType: EntityType
+): Promise<void> {
+  if (ENTITY_TYPES_REQUIRING_LIST_INVALIDATION.includes(entityType)) {
+    await queryClient.invalidateQueries({
+      queryKey: entityTypeKeys.list(projectRef),
+      exact: false,
+    })
+  }
+}
+
 async function executeInvalidationStrategy(
   queryClient: QueryClient,
   event: InvalidationEvent
