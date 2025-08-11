@@ -110,8 +110,13 @@ export const QueryList = ({
       resizable: true,
       minWidth: 400,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Query</p>
+        </div>
+      ),
       renderCell: (props) => (
-        <div className="font-mono text-xs truncate w-full overflow-hidden">
+        <div className="font-mono text-xs truncate w-full overflow-hidden flex items-center">
           <CodeBlock
             language="sql"
             className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap !overflow-visible"
@@ -129,8 +134,15 @@ export const QueryList = ({
       resizable: true,
       minWidth: 100,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Calls</p>
+        </div>
+      ),
       renderCell: (props) => (
-        <div className="font-mono text-xs text-right">{props.row.calls.toLocaleString()}</div>
+        <div className="font-mono text-xs text-right flex items-center justify-end h-full w-full">
+          {props.row.calls.toLocaleString()}
+        </div>
       ),
     },
     {
@@ -139,8 +151,13 @@ export const QueryList = ({
       resizable: true,
       minWidth: 120,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Total Time</p>
+        </div>
+      ),
       renderCell: (props) => (
-        <div className="font-mono text-xs text-right">
+        <div className="font-mono text-xs text-right flex flex-col justify-center h-full w-full">
           <p>{props.row.total_time.toFixed(0)}ms</p>
           <p className="text-foreground-lighter">{(props.row.total_time / 1000).toFixed(2)}s</p>
         </div>
@@ -152,8 +169,13 @@ export const QueryList = ({
       resizable: true,
       minWidth: 120,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Mean Time</p>
+        </div>
+      ),
       renderCell: (props) => (
-        <div className="font-mono text-xs text-right">
+        <div className="font-mono text-xs text-right flex flex-col justify-center h-full w-full">
           <p>{props.row.mean_exec_time.toFixed(0)}ms</p>
           <p className="text-foreground-lighter">{(props.row.mean_exec_time / 1000).toFixed(2)}s</p>
         </div>
@@ -165,10 +187,15 @@ export const QueryList = ({
       resizable: true,
       minWidth: 100,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Rows Read</p>
+        </div>
+      ),
       renderCell: (props) => (
         <div
           className={cn(
-            'font-mono text-xs text-right',
+            'font-mono text-xs text-right flex items-center justify-end h-full w-full',
             selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
           )}
         >
@@ -182,10 +209,15 @@ export const QueryList = ({
       resizable: true,
       minWidth: 100,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Rows Insert</p>
+        </div>
+      ),
       renderCell: (props) => (
         <div
           className={cn(
-            'font-mono text-xs text-right',
+            'font-mono text-xs text-right flex items-center justify-end h-full w-full',
             selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
           )}
         >
@@ -199,10 +231,15 @@ export const QueryList = ({
       resizable: true,
       minWidth: 100,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Rows Update</p>
+        </div>
+      ),
       renderCell: (props) => (
         <div
           className={cn(
-            'font-mono text-xs text-right',
+            'font-mono text-xs text-right flex items-center justify-end h-full w-full',
             selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
           )}
         >
@@ -216,10 +253,15 @@ export const QueryList = ({
       resizable: true,
       minWidth: 100,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Rows Delete</p>
+        </div>
+      ),
       renderCell: (props) => (
         <div
           className={cn(
-            'font-mono text-xs text-right',
+            'font-mono text-xs text-right flex items-center justify-end h-full w-full',
             selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
           )}
         >
@@ -233,8 +275,15 @@ export const QueryList = ({
       resizable: true,
       minWidth: 120,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Application</p>
+        </div>
+      ),
       renderCell: (props) => (
-        <div className="font-mono text-xs">{props.row.application_name || 'Unknown'}</div>
+        <div className="font-mono text-xs flex items-center h-full">
+          {props.row.application_name || 'Unknown'}
+        </div>
       ),
     },
     {
@@ -243,8 +292,13 @@ export const QueryList = ({
       resizable: true,
       minWidth: 120,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Badness Score</p>
+        </div>
+      ),
       renderCell: (props) => (
-        <div className="font-mono text-xs text-right">
+        <div className="font-mono text-xs text-right flex items-center justify-end h-full w-full">
           {(props.row.badness_score ?? 0).toFixed(2)}
         </div>
       ),
@@ -255,6 +309,11 @@ export const QueryList = ({
       resizable: true,
       minWidth: 160,
       headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Index Recommendations</p>
+        </div>
+      ),
       renderCell: (props) => {
         const indexStatements = props.row.index_statements
         const hasRecommendations =
@@ -263,7 +322,7 @@ export const QueryList = ({
           indexStatements.length > 0
 
         return (
-          <div className="font-mono text-xs">
+          <div className="font-mono text-xs flex items-center justify-end h-full w-full">
             {hasRecommendations ? (
               <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-100 rounded">
                 {indexStatements.length} suggestions
