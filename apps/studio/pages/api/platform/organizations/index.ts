@@ -3,8 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
 import { IS_VELA_PLATFORM } from '../../constants.js'
 import { getVelaClient } from '../../../../data/vela/vela.js'
-
-const name2slug = (name: string) => name.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')
+import { Organization } from '../../../../types/index.js'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -17,7 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     case 'POST':
       return handleCreate(req, res)
     default:
-      res.setHeader('Allow', ['GET'])
+      res.setHeader('Allow', ['GET', 'POST'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
@@ -28,18 +27,51 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = getVelaClient()
-  const response = await client.POST("/organizations/", {
+  const createResponse = await client.POST("/organizations/", {
     body: {
       name: req.body.name
+    },
+    headers: {
+      Authorization: req.headers.authorization
     }
   })
 
-  if (response.response.status !== 201) {
-    return res.status(response.response.status).send(response.error)
+  if (createResponse.response.status !== 201) {
+    return res.status(createResponse.response.status).send(createResponse.error)
   }
 
-  const location = response.response.headers.get("location");
-  return res.status(303).setHeader("Location", location!).send("Created")
+  const location = createResponse.response.headers.get("location");
+  if (!location) {
+    return res.status(500).send("No location header")
+  }
+
+  const orgId = location.split("/").pop()
+  const orgResponse = await client.GET("/organizations/{organization_id}/", {
+    params: {
+      path: {
+        organization_id: parseInt(orgId!)
+      }
+    },
+    headers: {
+      Authorization: req.headers.authorization
+    }
+  })
+
+  if (orgResponse.response.status !== 200 || !orgResponse.data) {
+    return res.status(orgResponse.response.status).send(orgResponse.error)
+  }
+
+  const org = orgResponse.data
+  return res.status(303).json({
+    id: org.id!,
+    name: org.name!,
+    slug: org.name!,
+    billing_email: "",
+    plan: {
+      id: "enterprise",
+      name: "Enterprise",
+    },
+  } as Organization)
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -61,20 +93,26 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = getVelaClient()
-  const response = await client.GET("/organizations/")
+  const response = await client.GET("/organizations/", {
+    headers: {
+      Authorization: req.headers.authorization
+    }
+  })
+
   if (response.response.status !== 200 || !response.data) {
     return res.status(response.response.status).send(response.error)
   }
+
   return res.status(200).json(response.data.map(org => {
     return {
       id: org.id!,
       name: org.name!,
-      slug: name2slug(org.name!),
+      slug: org.name!,
       billing_email: "",
       plan: {
         id: "enterprise",
         name: "Enterprise",
       },
-    }
+    } as Organization // Type marker for Organizations
   }));
 }
