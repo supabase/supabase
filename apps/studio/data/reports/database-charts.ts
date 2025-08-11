@@ -612,7 +612,7 @@ export const getConnectionLimits = (computeSize: string = 'medium') => {
     small: { direct: 90, pooler: 400 },
     medium: { direct: 120, pooler: 600 },
     large: { direct: 160, pooler: 800 },
-    xl: { direct: 240, pooler: 1000 },
+    xlarge: { direct: 240, pooler: 1000 },
     '2xlarge': { direct: 380, pooler: 1500 },
     '4xlarge': { direct: 480, pooler: 3000 },
     '8xlarge': { direct: 490, pooler: 6000 },
