@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check } from 'lucide-react'
+import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
@@ -13,9 +14,8 @@ import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import { useQueryState } from 'nuqs'
 import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
@@ -23,11 +23,13 @@ import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
-export interface ProviderFormProps {
+interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
   isActive: boolean
 }
+
+const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
 
 export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
   const { ref: projectRef } = useParams()
@@ -36,8 +38,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const [open, setOpen] = useState(false)
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
-  const canUpdateConfig: boolean = useCheckPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )

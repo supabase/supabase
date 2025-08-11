@@ -3434,7 +3434,8 @@ export interface paths {
     put?: never
     /** Update a replication destination and pipeline. */
     post: operations['ReplicationDestinationsPipelinesController_updateDestinationPipeline']
-    delete?: never
+    /** Delete a replication destination and pipeline. */
+    delete: operations['ReplicationDestinationsPipelinesController_deleteDestinationPipeline']
     options?: never
     head?: never
     patch?: never
@@ -4819,6 +4820,8 @@ export interface components {
         }
       | {
           billing_email: string | null
+          /** @enum {string|null} */
+          billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -19132,6 +19135,44 @@ export interface operations {
         content?: never
       }
       /** @description Returned when the API fails to update the replication destination or pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsPipelinesController_deleteDestinationPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project reference */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returned when the replication destination and pipeline are deleted. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to delete the replication destination or pipeline. */
       500: {
         headers: {
           [name: string]: unknown

@@ -1,12 +1,12 @@
 {
-  "id": "b20fdabe-061b-43a4-8abf-b401ef5818d1",
+  "id": "46141a51-8524-466d-9e94-70fe5c73221c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "cms-payload.authors": {
+    "public.authors": {
       "name": "authors",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -117,7 +117,6 @@
           "name": "authors_author_image_url_id_media_id_fk",
           "tableFrom": "authors",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "author_image_url_id"
           ],
@@ -134,9 +133,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.categories_breadcrumbs": {
+    "public.categories_breadcrumbs": {
       "name": "categories_breadcrumbs",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "_order": {
           "name": "_order",
@@ -227,7 +226,6 @@
           "name": "categories_breadcrumbs_doc_id_categories_id_fk",
           "tableFrom": "categories_breadcrumbs",
           "tableTo": "categories",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "doc_id"
           ],
@@ -241,7 +239,6 @@
           "name": "categories_breadcrumbs_parent_id_fk",
           "tableFrom": "categories_breadcrumbs",
           "tableTo": "categories",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -258,9 +255,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.categories": {
+    "public.categories": {
       "name": "categories",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -347,7 +344,6 @@
           "name": "categories_parent_id_categories_id_fk",
           "tableFrom": "categories",
           "tableTo": "categories",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -364,9 +360,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.customers_stats": {
+    "public.customers_stats": {
       "name": "customers_stats",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "_order": {
           "name": "_order",
@@ -436,7 +432,6 @@
           "name": "customers_stats_parent_id_fk",
           "tableFrom": "customers_stats",
           "tableTo": "customers",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -453,9 +448,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.customers_misc": {
+    "public.customers_misc": {
       "name": "customers_misc",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "_order": {
           "name": "_order",
@@ -525,7 +520,6 @@
           "name": "customers_misc_parent_id_fk",
           "tableFrom": "customers_misc",
           "tableTo": "customers",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -542,9 +536,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.customers_industry": {
+    "public.customers_industry": {
       "name": "customers_industry",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "order": {
           "name": "order",
@@ -561,7 +555,7 @@
         "value": {
           "name": "value",
           "type": "enum_customers_industry",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -609,7 +603,6 @@
           "name": "customers_industry_parent_fk",
           "tableFrom": "customers_industry",
           "tableTo": "customers",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -626,9 +619,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.customers_supabase_products": {
+    "public.customers_supabase_products": {
       "name": "customers_supabase_products",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "order": {
           "name": "order",
@@ -645,7 +638,7 @@
         "value": {
           "name": "value",
           "type": "enum_customers_supabase_products",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -693,7 +686,6 @@
           "name": "customers_supabase_products_parent_fk",
           "tableFrom": "customers_supabase_products",
           "tableTo": "customers",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -710,9 +702,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.customers": {
+    "public.customers": {
       "name": "customers",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -772,14 +764,14 @@
         "company_size": {
           "name": "company_size",
           "type": "enum_customers_company_size",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
         "region": {
           "name": "region",
           "type": "enum_customers_region",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -836,7 +828,7 @@
         "_status": {
           "name": "_status",
           "type": "enum_customers_status",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'draft'"
@@ -954,7 +946,6 @@
           "name": "customers_meta_image_id_media_id_fk",
           "tableFrom": "customers",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "meta_image_id"
           ],
@@ -968,7 +959,6 @@
           "name": "customers_logo_id_media_id_fk",
           "tableFrom": "customers",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "logo_id"
           ],
@@ -982,7 +972,6 @@
           "name": "customers_logo_inverse_id_media_id_fk",
           "tableFrom": "customers",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "logo_inverse_id"
           ],
@@ -999,9 +988,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._customers_v_version_stats": {
+    "public._customers_v_version_stats": {
       "name": "_customers_v_version_stats",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "_order": {
           "name": "_order",
@@ -1077,7 +1066,6 @@
           "name": "_customers_v_version_stats_parent_id_fk",
           "tableFrom": "_customers_v_version_stats",
           "tableTo": "_customers_v",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -1094,9 +1082,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._customers_v_version_misc": {
+    "public._customers_v_version_misc": {
       "name": "_customers_v_version_misc",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "_order": {
           "name": "_order",
@@ -1172,7 +1160,6 @@
           "name": "_customers_v_version_misc_parent_id_fk",
           "tableFrom": "_customers_v_version_misc",
           "tableTo": "_customers_v",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -1189,9 +1176,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._customers_v_version_industry": {
+    "public._customers_v_version_industry": {
       "name": "_customers_v_version_industry",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "order": {
           "name": "order",
@@ -1208,7 +1195,7 @@
         "value": {
           "name": "value",
           "type": "enum__customers_v_version_industry",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -1256,7 +1243,6 @@
           "name": "_customers_v_version_industry_parent_fk",
           "tableFrom": "_customers_v_version_industry",
           "tableTo": "_customers_v",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -1273,9 +1259,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._customers_v_version_supabase_products": {
+    "public._customers_v_version_supabase_products": {
       "name": "_customers_v_version_supabase_products",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "order": {
           "name": "order",
@@ -1292,7 +1278,7 @@
         "value": {
           "name": "value",
           "type": "enum__customers_v_version_supabase_products",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -1340,7 +1326,6 @@
           "name": "_customers_v_version_supabase_products_parent_fk",
           "tableFrom": "_customers_v_version_supabase_products",
           "tableTo": "_customers_v",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -1357,9 +1342,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._customers_v": {
+    "public._customers_v": {
       "name": "_customers_v",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -1425,14 +1410,14 @@
         "version_company_size": {
           "name": "version_company_size",
           "type": "enum__customers_v_version_company_size",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
         "version_region": {
           "name": "version_region",
           "type": "enum__customers_v_version_region",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -1487,7 +1472,7 @@
         "version__status": {
           "name": "version__status",
           "type": "enum__customers_v_version_status",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'draft'"
@@ -1706,7 +1691,6 @@
           "name": "_customers_v_parent_id_customers_id_fk",
           "tableFrom": "_customers_v",
           "tableTo": "customers",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -1720,7 +1704,6 @@
           "name": "_customers_v_version_meta_image_id_media_id_fk",
           "tableFrom": "_customers_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_meta_image_id"
           ],
@@ -1734,7 +1717,6 @@
           "name": "_customers_v_version_logo_id_media_id_fk",
           "tableFrom": "_customers_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_logo_id"
           ],
@@ -1748,7 +1730,6 @@
           "name": "_customers_v_version_logo_inverse_id_media_id_fk",
           "tableFrom": "_customers_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_logo_inverse_id"
           ],
@@ -1765,9 +1746,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.events_type": {
+    "public.events_type": {
       "name": "events_type",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "order": {
           "name": "order",
@@ -1784,7 +1765,7 @@
         "value": {
           "name": "value",
           "type": "enum_events_type",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -1832,7 +1813,6 @@
           "name": "events_type_parent_fk",
           "tableFrom": "events_type",
           "tableTo": "events",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -1849,9 +1829,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.events": {
+    "public.events": {
       "name": "events",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -1911,7 +1891,7 @@
         "timezone": {
           "name": "timezone",
           "type": "enum_events_timezone",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -1957,7 +1937,7 @@
         "link_target": {
           "name": "link_target",
           "type": "enum_events_link_target",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'_blank'"
@@ -1971,7 +1951,7 @@
         "main_cta_target": {
           "name": "main_cta_target",
           "type": "enum_events_main_cta_target",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'_blank'"
@@ -2074,7 +2054,7 @@
         "_status": {
           "name": "_status",
           "type": "enum_events_status",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'draft'"
@@ -2222,7 +2202,6 @@
           "name": "events_thumb_id_media_id_fk",
           "tableFrom": "events",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "thumb_id"
           ],
@@ -2236,7 +2215,6 @@
           "name": "events_image_id_media_id_fk",
           "tableFrom": "events",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "image_id"
           ],
@@ -2250,7 +2228,6 @@
           "name": "events_company_logo_id_media_id_fk",
           "tableFrom": "events",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "company_logo_id"
           ],
@@ -2264,7 +2241,6 @@
           "name": "events_company_logo_light_id_media_id_fk",
           "tableFrom": "events",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "company_logo_light_id"
           ],
@@ -2278,7 +2254,6 @@
           "name": "events_meta_image_id_media_id_fk",
           "tableFrom": "events",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "meta_image_id"
           ],
@@ -2295,9 +2270,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.events_rels": {
+    "public.events_rels": {
       "name": "events_rels",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -2397,7 +2372,6 @@
           "name": "events_rels_parent_fk",
           "tableFrom": "events_rels",
           "tableTo": "events",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -2411,7 +2385,6 @@
           "name": "events_rels_authors_fk",
           "tableFrom": "events_rels",
           "tableTo": "authors",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "authors_id"
           ],
@@ -2428,9 +2401,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._events_v_version_type": {
+    "public._events_v_version_type": {
       "name": "_events_v_version_type",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "order": {
           "name": "order",
@@ -2447,7 +2420,7 @@
         "value": {
           "name": "value",
           "type": "enum__events_v_version_type",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -2495,7 +2468,6 @@
           "name": "_events_v_version_type_parent_fk",
           "tableFrom": "_events_v_version_type",
           "tableTo": "_events_v",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -2512,9 +2484,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._events_v": {
+    "public._events_v": {
       "name": "_events_v",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -2580,7 +2552,7 @@
         "version_timezone": {
           "name": "version_timezone",
           "type": "enum__events_v_version_timezone",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -2626,7 +2598,7 @@
         "version_link_target": {
           "name": "version_link_target",
           "type": "enum__events_v_version_link_target",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'_blank'"
@@ -2640,7 +2612,7 @@
         "version_main_cta_target": {
           "name": "version_main_cta_target",
           "type": "enum__events_v_version_main_cta_target",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'_blank'"
@@ -2741,7 +2713,7 @@
         "version__status": {
           "name": "version__status",
           "type": "enum__events_v_version_status",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'draft'"
@@ -2990,7 +2962,6 @@
           "name": "_events_v_parent_id_events_id_fk",
           "tableFrom": "_events_v",
           "tableTo": "events",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -3004,7 +2975,6 @@
           "name": "_events_v_version_thumb_id_media_id_fk",
           "tableFrom": "_events_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_thumb_id"
           ],
@@ -3018,7 +2988,6 @@
           "name": "_events_v_version_image_id_media_id_fk",
           "tableFrom": "_events_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_image_id"
           ],
@@ -3032,7 +3001,6 @@
           "name": "_events_v_version_company_logo_id_media_id_fk",
           "tableFrom": "_events_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_company_logo_id"
           ],
@@ -3046,7 +3014,6 @@
           "name": "_events_v_version_company_logo_light_id_media_id_fk",
           "tableFrom": "_events_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_company_logo_light_id"
           ],
@@ -3060,7 +3027,6 @@
           "name": "_events_v_version_meta_image_id_media_id_fk",
           "tableFrom": "_events_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_meta_image_id"
           ],
@@ -3077,9 +3043,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._events_v_rels": {
+    "public._events_v_rels": {
       "name": "_events_v_rels",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -3179,7 +3145,6 @@
           "name": "_events_v_rels_parent_fk",
           "tableFrom": "_events_v_rels",
           "tableTo": "_events_v",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -3193,7 +3158,6 @@
           "name": "_events_v_rels_authors_fk",
           "tableFrom": "_events_v_rels",
           "tableTo": "authors",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "authors_id"
           ],
@@ -3210,9 +3174,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.media": {
+    "public.media": {
       "name": "media",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -3719,9 +3683,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.posts": {
+    "public.posts": {
       "name": "posts",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -3769,7 +3733,7 @@
         "launchweek": {
           "name": "launchweek",
           "type": "enum_posts_launchweek",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -3839,7 +3803,7 @@
         "_status": {
           "name": "_status",
           "type": "enum_posts_status",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'draft'"
@@ -3957,7 +3921,6 @@
           "name": "posts_thumb_id_media_id_fk",
           "tableFrom": "posts",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "thumb_id"
           ],
@@ -3971,7 +3934,6 @@
           "name": "posts_image_id_media_id_fk",
           "tableFrom": "posts",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "image_id"
           ],
@@ -3985,7 +3947,6 @@
           "name": "posts_meta_image_id_media_id_fk",
           "tableFrom": "posts",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "meta_image_id"
           ],
@@ -4002,9 +3963,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.posts_rels": {
+    "public.posts_rels": {
       "name": "posts_rels",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -4146,7 +4107,6 @@
           "name": "posts_rels_parent_fk",
           "tableFrom": "posts_rels",
           "tableTo": "posts",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -4160,7 +4120,6 @@
           "name": "posts_rels_categories_fk",
           "tableFrom": "posts_rels",
           "tableTo": "categories",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "categories_id"
           ],
@@ -4174,7 +4133,6 @@
           "name": "posts_rels_authors_fk",
           "tableFrom": "posts_rels",
           "tableTo": "authors",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "authors_id"
           ],
@@ -4188,7 +4146,6 @@
           "name": "posts_rels_tags_fk",
           "tableFrom": "posts_rels",
           "tableTo": "tags",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "tags_id"
           ],
@@ -4205,9 +4162,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._posts_v": {
+    "public._posts_v": {
       "name": "_posts_v",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -4261,7 +4218,7 @@
         "version_launchweek": {
           "name": "version_launchweek",
           "type": "enum__posts_v_version_launchweek",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -4329,7 +4286,7 @@
         "version__status": {
           "name": "version__status",
           "type": "enum__posts_v_version_status",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'draft'"
@@ -4548,7 +4505,6 @@
           "name": "_posts_v_parent_id_posts_id_fk",
           "tableFrom": "_posts_v",
           "tableTo": "posts",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -4562,7 +4518,6 @@
           "name": "_posts_v_version_thumb_id_media_id_fk",
           "tableFrom": "_posts_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_thumb_id"
           ],
@@ -4576,7 +4531,6 @@
           "name": "_posts_v_version_image_id_media_id_fk",
           "tableFrom": "_posts_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_image_id"
           ],
@@ -4590,7 +4544,6 @@
           "name": "_posts_v_version_meta_image_id_media_id_fk",
           "tableFrom": "_posts_v",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "version_meta_image_id"
           ],
@@ -4607,9 +4560,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload._posts_v_rels": {
+    "public._posts_v_rels": {
       "name": "_posts_v_rels",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -4751,7 +4704,6 @@
           "name": "_posts_v_rels_parent_fk",
           "tableFrom": "_posts_v_rels",
           "tableTo": "_posts_v",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -4765,7 +4717,6 @@
           "name": "_posts_v_rels_categories_fk",
           "tableFrom": "_posts_v_rels",
           "tableTo": "categories",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "categories_id"
           ],
@@ -4779,7 +4730,6 @@
           "name": "_posts_v_rels_authors_fk",
           "tableFrom": "_posts_v_rels",
           "tableTo": "authors",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "authors_id"
           ],
@@ -4793,7 +4743,6 @@
           "name": "_posts_v_rels_tags_fk",
           "tableFrom": "_posts_v_rels",
           "tableTo": "tags",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "tags_id"
           ],
@@ -4810,9 +4759,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.tags": {
+    "public.tags": {
       "name": "tags",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -4880,9 +4829,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.users_roles": {
+    "public.users_roles": {
       "name": "users_roles",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "order": {
           "name": "order",
@@ -4899,7 +4848,7 @@
         "value": {
           "name": "value",
           "type": "enum_users_roles",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -4947,7 +4896,6 @@
           "name": "users_roles_parent_fk",
           "tableFrom": "users_roles",
           "tableTo": "users",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -4964,9 +4912,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.users": {
+    "public.users": {
       "name": "users",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -5086,9 +5034,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.payload_jobs_log": {
+    "public.payload_jobs_log": {
       "name": "payload_jobs_log",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5123,7 +5071,7 @@
         "task_slug": {
           "name": "task_slug",
           "type": "enum_payload_jobs_log_task_slug",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -5148,7 +5096,7 @@
         "state": {
           "name": "state",
           "type": "enum_payload_jobs_log_state",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -5196,7 +5144,6 @@
           "name": "payload_jobs_log_parent_id_fk",
           "tableFrom": "payload_jobs_log",
           "tableTo": "payload_jobs",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -5213,9 +5160,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.payload_jobs": {
+    "public.payload_jobs": {
       "name": "payload_jobs",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -5258,7 +5205,7 @@
         "task_slug": {
           "name": "task_slug",
           "type": "enum_payload_jobs_task_slug",
-          "typeSchema": "cms-payload",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -5441,9 +5388,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.payload_locked_documents": {
+    "public.payload_locked_documents": {
       "name": "payload_locked_documents",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -5526,9 +5473,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.payload_locked_documents_rels": {
+    "public.payload_locked_documents_rels": {
       "name": "payload_locked_documents_rels",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -5796,7 +5743,6 @@
           "name": "payload_locked_documents_rels_parent_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "payload_locked_documents",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -5810,7 +5756,6 @@
           "name": "payload_locked_documents_rels_authors_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "authors",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "authors_id"
           ],
@@ -5824,7 +5769,6 @@
           "name": "payload_locked_documents_rels_categories_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "categories",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "categories_id"
           ],
@@ -5838,7 +5782,6 @@
           "name": "payload_locked_documents_rels_customers_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "customers",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "customers_id"
           ],
@@ -5852,7 +5795,6 @@
           "name": "payload_locked_documents_rels_events_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "events",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "events_id"
           ],
@@ -5866,7 +5808,6 @@
           "name": "payload_locked_documents_rels_media_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "media",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "media_id"
           ],
@@ -5880,7 +5821,6 @@
           "name": "payload_locked_documents_rels_posts_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "posts",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "posts_id"
           ],
@@ -5894,7 +5834,6 @@
           "name": "payload_locked_documents_rels_tags_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "tags",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "tags_id"
           ],
@@ -5908,7 +5847,6 @@
           "name": "payload_locked_documents_rels_users_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "users",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "users_id"
           ],
@@ -5922,7 +5860,6 @@
           "name": "payload_locked_documents_rels_payload_jobs_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "payload_jobs",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "payload_jobs_id"
           ],
@@ -5939,9 +5876,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.payload_preferences": {
+    "public.payload_preferences": {
       "name": "payload_preferences",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -6030,9 +5967,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.payload_preferences_rels": {
+    "public.payload_preferences_rels": {
       "name": "payload_preferences_rels",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -6132,7 +6069,6 @@
           "name": "payload_preferences_rels_parent_fk",
           "tableFrom": "payload_preferences_rels",
           "tableTo": "payload_preferences",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "parent_id"
           ],
@@ -6146,7 +6082,6 @@
           "name": "payload_preferences_rels_users_fk",
           "tableFrom": "payload_preferences_rels",
           "tableTo": "users",
-          "schemaTo": "cms-payload",
           "columnsFrom": [
             "users_id"
           ],
@@ -6163,9 +6098,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "cms-payload.payload_migrations": {
+    "public.payload_migrations": {
       "name": "payload_migrations",
-      "schema": "cms-payload",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -6241,9 +6176,9 @@
     }
   },
   "enums": {
-    "cms-payload.enum_customers_industry": {
+    "public.enum_customers_industry": {
       "name": "enum_customers_industry",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "healthcare",
         "fintech",
@@ -6259,9 +6194,9 @@
         "developer-tools"
       ]
     },
-    "cms-payload.enum_customers_supabase_products": {
+    "public.enum_customers_supabase_products": {
       "name": "enum_customers_supabase_products",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "database",
         "auth",
@@ -6271,18 +6206,18 @@
         "vector"
       ]
     },
-    "cms-payload.enum_customers_company_size": {
+    "public.enum_customers_company_size": {
       "name": "enum_customers_company_size",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "startup",
         "enterprise",
         "indie_dev"
       ]
     },
-    "cms-payload.enum_customers_region": {
+    "public.enum_customers_region": {
       "name": "enum_customers_region",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "Asia",
         "Europe",
@@ -6292,17 +6227,17 @@
         "Oceania"
       ]
     },
-    "cms-payload.enum_customers_status": {
+    "public.enum_customers_status": {
       "name": "enum_customers_status",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "draft",
         "published"
       ]
     },
-    "cms-payload.enum__customers_v_version_industry": {
+    "public.enum__customers_v_version_industry": {
       "name": "enum__customers_v_version_industry",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "healthcare",
         "fintech",
@@ -6318,9 +6253,9 @@
         "developer-tools"
       ]
     },
-    "cms-payload.enum__customers_v_version_supabase_products": {
+    "public.enum__customers_v_version_supabase_products": {
       "name": "enum__customers_v_version_supabase_products",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "database",
         "auth",
@@ -6330,18 +6265,18 @@
         "vector"
       ]
     },
-    "cms-payload.enum__customers_v_version_company_size": {
+    "public.enum__customers_v_version_company_size": {
       "name": "enum__customers_v_version_company_size",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "startup",
         "enterprise",
         "indie_dev"
       ]
     },
-    "cms-payload.enum__customers_v_version_region": {
+    "public.enum__customers_v_version_region": {
       "name": "enum__customers_v_version_region",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "Asia",
         "Europe",
@@ -6351,17 +6286,17 @@
         "Oceania"
       ]
     },
-    "cms-payload.enum__customers_v_version_status": {
+    "public.enum__customers_v_version_status": {
       "name": "enum__customers_v_version_status",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "draft",
         "published"
       ]
     },
-    "cms-payload.enum_events_type": {
+    "public.enum_events_type": {
       "name": "enum_events_type",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "conference",
         "hackathon",
@@ -6374,9 +6309,9 @@
         "other"
       ]
     },
-    "cms-payload.enum_events_timezone": {
+    "public.enum_events_timezone": {
       "name": "enum_events_timezone",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "Africa/Abidjan",
         "Africa/Accra",
@@ -6807,33 +6742,33 @@
         "UTC"
       ]
     },
-    "cms-payload.enum_events_link_target": {
+    "public.enum_events_link_target": {
       "name": "enum_events_link_target",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "_self",
         "_blank"
       ]
     },
-    "cms-payload.enum_events_main_cta_target": {
+    "public.enum_events_main_cta_target": {
       "name": "enum_events_main_cta_target",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "_self",
         "_blank"
       ]
     },
-    "cms-payload.enum_events_status": {
+    "public.enum_events_status": {
       "name": "enum_events_status",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "draft",
         "published"
       ]
     },
-    "cms-payload.enum__events_v_version_type": {
+    "public.enum__events_v_version_type": {
       "name": "enum__events_v_version_type",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "conference",
         "hackathon",
@@ -6846,9 +6781,9 @@
         "other"
       ]
     },
-    "cms-payload.enum__events_v_version_timezone": {
+    "public.enum__events_v_version_timezone": {
       "name": "enum__events_v_version_timezone",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "Africa/Abidjan",
         "Africa/Accra",
@@ -7279,33 +7214,33 @@
         "UTC"
       ]
     },
-    "cms-payload.enum__events_v_version_link_target": {
+    "public.enum__events_v_version_link_target": {
       "name": "enum__events_v_version_link_target",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "_self",
         "_blank"
       ]
     },
-    "cms-payload.enum__events_v_version_main_cta_target": {
+    "public.enum__events_v_version_main_cta_target": {
       "name": "enum__events_v_version_main_cta_target",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "_self",
         "_blank"
       ]
     },
-    "cms-payload.enum__events_v_version_status": {
+    "public.enum__events_v_version_status": {
       "name": "enum__events_v_version_status",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "draft",
         "published"
       ]
     },
-    "cms-payload.enum_posts_launchweek": {
+    "public.enum_posts_launchweek": {
       "name": "enum_posts_launchweek",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "6",
         "7",
@@ -7318,17 +7253,17 @@
         "15"
       ]
     },
-    "cms-payload.enum_posts_status": {
+    "public.enum_posts_status": {
       "name": "enum_posts_status",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "draft",
         "published"
       ]
     },
-    "cms-payload.enum__posts_v_version_launchweek": {
+    "public.enum__posts_v_version_launchweek": {
       "name": "enum__posts_v_version_launchweek",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "6",
         "7",
@@ -7341,50 +7276,48 @@
         "15"
       ]
     },
-    "cms-payload.enum__posts_v_version_status": {
+    "public.enum__posts_v_version_status": {
       "name": "enum__posts_v_version_status",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "draft",
         "published"
       ]
     },
-    "cms-payload.enum_users_roles": {
+    "public.enum_users_roles": {
       "name": "enum_users_roles",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "admin",
         "editor"
       ]
     },
-    "cms-payload.enum_payload_jobs_log_task_slug": {
+    "public.enum_payload_jobs_log_task_slug": {
       "name": "enum_payload_jobs_log_task_slug",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "inline",
         "schedulePublish"
       ]
     },
-    "cms-payload.enum_payload_jobs_log_state": {
+    "public.enum_payload_jobs_log_state": {
       "name": "enum_payload_jobs_log_state",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "failed",
         "succeeded"
       ]
     },
-    "cms-payload.enum_payload_jobs_task_slug": {
+    "public.enum_payload_jobs_task_slug": {
       "name": "enum_payload_jobs_task_slug",
-      "schema": "cms-payload",
+      "schema": "public",
       "values": [
         "inline",
         "schedulePublish"
       ]
     }
   },
-  "schemas": {
-    "cms-payload": "cms-payload"
-  },
+  "schemas": {},
   "sequences": {},
   "roles": {},
   "policies": {},
