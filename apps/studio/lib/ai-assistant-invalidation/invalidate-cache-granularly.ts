@@ -43,9 +43,6 @@ function extractAction(sqlLower: string): ActionType | null {
   return null
 }
 
-/**
- * Extract table information from SQL statement
- */
 function extractTableInfo(
   sql: string,
   action: ActionType
@@ -62,9 +59,6 @@ function extractTableInfo(
   }
 }
 
-/**
- * Extract function/procedure information from SQL statement
- */
 function extractFunctionInfo(
   sql: string,
   sqlLower: string,
@@ -81,9 +75,6 @@ function extractFunctionInfo(
   }
 }
 
-/**
- * Extract trigger information from SQL statement
- */
 function extractTriggerInfo(
   sql: string,
   action: ActionType
@@ -106,9 +97,6 @@ function extractTriggerInfo(
   }
 }
 
-/**
- * Extract policy information from SQL statement
- */
 function extractPolicyInfo(
   sql: string,
   action: ActionType
