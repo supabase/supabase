@@ -54,7 +54,7 @@ const withQueryParams =
             !new URLSearchParams(window.location.search).has(queryGroupRef.current)
           ) {
             try {
-              const storedValues = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '')
+              const storedValues = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? 'null')
               if (storedValues === null || typeof storedValues !== 'object') return
 
               let storedValue: any = null
@@ -83,7 +83,7 @@ const withQueryParams =
       if (queryGroupRef.current && queryTab) {
         let updatedValues: Record<string, unknown> = {}
         try {
-          const oldValues = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '')
+          const oldValues = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '{}')
           if (oldValues && typeof oldValues === 'object') {
             updatedValues = oldValues
           }

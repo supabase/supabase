@@ -3,7 +3,7 @@ const path = require('path')
 
 // Read the JSON file
 try {
-  const rawData = fs.readFileSync('./tokens/design-tokens.tokens.json')
+  const rawData = fs.readFileSync('./tokens/design-tokens.tokens.json', 'utf8')
   const jsonData = JSON.parse(rawData)
 
   // Extract "core"

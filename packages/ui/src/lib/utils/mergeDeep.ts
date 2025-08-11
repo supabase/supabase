@@ -14,7 +14,7 @@ export function mergeDeep(target: any, ...sources: any[]): any {
   const source = sources.shift()
 
   if (isObject(target) && isObject(source)) {
-    for (const key in source) {
+    for (const key of Object.keys(source)) {
       if (isObject(source[key])) {
         if (!target[key]) Object.assign(target, { [key]: {} })
         mergeDeep(target[key], source[key])
