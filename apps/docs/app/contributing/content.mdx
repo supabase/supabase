@@ -181,6 +181,8 @@ Line numbers are 1-indexed and inclusive.
 lines={[[1, 3], [5, -1]]}
 {/* Optional, displays as a file name on the code block */}
 meta="name=display/path.js"
+{/* Optional, strips TypeScript types to produce JavaScript, which you also include with another <CodeSample /> */}
+convertToJs={true}
 />
 ```
 
@@ -195,10 +197,30 @@ commit="1623aa9b95ec90e21c5bae5a0d50dcf272abe92f"
 path="/relative/path/from/root.js"
 lines={[[1, 3], [5, -1]]}
 meta="name=display/path.js"
+convertToJs={true}
 />
 ```
 
 The repo must be public, the org must be on the allow list, and the commit must be an immutable SHA (not a mutable tag or branch name).
+
+#### Converting TypeScript to JavaScript
+
+You can automatically strip TypeScript types from code samples to produce JavaScript using the `convertToJs` option:
+
+```mdx
+<$CodeSample
+path="/path/to/typescript-file.ts"
+lines={[[1, -1]]}
+convertToJs={true}
+/>
+```
+
+This is useful when you want to show JavaScript examples from TypeScript source files. The conversion:
+
+- Removes all TypeScript type annotations, interfaces, and type definitions
+- Converts the language identifier from `typescript` to `javascript` (or `tsx` to `jsx`)
+- Happens before any line selection or elision processing
+- Defaults to `false` to preserve TypeScript code when not specified
 
 #### Multi-file code samples
 

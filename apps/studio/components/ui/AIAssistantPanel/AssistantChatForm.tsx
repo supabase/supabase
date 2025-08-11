@@ -1,12 +1,12 @@
-'use client'
+import { ArrowUp, Loader2, Square } from 'lucide-react'
+import React, { ChangeEvent, memo, useRef } from 'react'
 
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2 } from 'lucide-react'
-import React, { ChangeEvent, memo, useRef } from 'react'
-import { Button, ExpandingTextArea } from 'ui'
+import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
-import { SnippetRow, getSnippetContent } from './SnippetRow'
+import { ButtonTooltip } from '../ButtonTooltip'
 import { type SqlSnippet } from './AIAssistant.types'
+import { SnippetRow, getSnippetContent } from './SnippetRow'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -27,6 +27,10 @@ export interface FormProps {
    * The function to handle the form submission
    */
   onSubmit: (message: string) => void
+  /**
+   * The function to handle stopping the stream
+   */
+  onStop?: () => void
   /* The placeholder of the textarea */
   placeholder?: string
   /* SQL snippets to display above the form - can be strings or objects with label and content */
@@ -48,6 +52,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       textAreaRef,
       onValueChange,
       onSubmit,
+      onStop,
       placeholder,
       sqlSnippets,
       onRemoveSnippet,
@@ -117,20 +122,32 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             onKeyDown={handleKeyDown}
           />
           <div className="absolute right-1.5 bottom-1.5 flex gap-3 items-center">
-            {loading && (
-              <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
+            {loading ? (
+              onStop ? (
+                <ButtonTooltip
+                  type="outline"
+                  aria-label="Stop response"
+                  icon={<Square fill="currentColor" className="scale-75" />}
+                  onClick={onStop}
+                  className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
+                  tooltip={{ content: { side: 'top', text: 'Stop response' } }}
+                />
+              ) : (
+                <Loader2 size={22} className="animate-spin size-7 text-muted" strokeWidth={1} />
+              )
+            ) : (
+              <ButtonTooltip
+                htmlType="submit"
+                aria-label="Send message"
+                icon={<ArrowUp />}
+                disabled={!canSubmit}
+                className={cn(
+                  'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
+                  !canSubmit ? 'opacity-50' : 'opacity-100'
+                )}
+                tooltip={{ content: { side: 'top', text: 'Send message' } }}
+              />
             )}
-            <Button
-              htmlType="submit"
-              aria-label="Send message"
-              icon={<ArrowUp />}
-              disabled={!canSubmit}
-              className={cn(
-                'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
-                !canSubmit ? 'opacity-50' : 'opacity-100',
-                loading && 'hidden'
-              )}
-            />
           </div>
         </form>
       </div>
