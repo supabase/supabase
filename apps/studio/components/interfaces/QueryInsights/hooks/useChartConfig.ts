@@ -5,6 +5,7 @@ import {
   getRowsReadConfig,
   getCallsConfig,
   getCacheHitsConfig,
+  getIssuesConfig,
   ChartConfigResult,
 } from '../chartConfigs'
 import { QueryInsightsMetric, QueryInsightsQuery } from 'data/query-insights/query-insights-query'
@@ -315,13 +316,93 @@ export function useCacheHitsChart({
     return getCacheHitsConfig(data)
   }, [data, isActive])
 
-  // Provide rendering configuration
-  const renderConfig = {
-    yAxisDomain: [0, 100] as [number, string | number],
-    yAxisFormatter: (value: number) => `${value}%`,
-    keyMappings: {},
-  }
+  // Get metrics for the selected query badge
+  const metricBadges = useMemo(() => {
+    if (!isActive || !chartConfig) return []
 
-  // Cache hits don't have query-specific metrics
-  return { chartConfig, metricBadges: [], renderConfig }
+    const { chartData } = chartConfig
+
+    // Calculate cache hit ratio
+    const totalHits = chartData.reduce((sum, point) => sum + point.shared_blks_hit, 0)
+    const totalReads = chartData.reduce((sum, point) => sum + point.shared_blks_read, 0)
+    const cacheHitRatio = totalReads > 0 ? (totalHits / totalReads) * 100 : 0
+
+    return [
+      {
+        label: 'Cache Hit Ratio',
+        value: `${cacheHitRatio.toFixed(1)}%`,
+        color: '#10b981',
+      },
+    ]
+  }, [chartConfig, isActive])
+
+  return {
+    chartConfig,
+    metricBadges,
+    renderConfig: {
+      yAxisDomain: [0, 100],
+      yAxisFormatter: (value: number) => `${value.toFixed(0)}%`,
+      yAxisWidth: 60,
+      yAxisTickCount: 6,
+      keyMappings: {
+        cache_hit_ratio: 'cache_hit_ratio',
+        cache_miss_ratio: 'cache_miss_ratio',
+        shared_blks_hit: 'shared_blks_hit',
+        shared_blks_read: 'shared_blks_read',
+        shared_blks_dirtied: 'shared_blks_dirtied',
+        shared_blks_written: 'shared_blks_written',
+      },
+    },
+  }
+}
+
+/**
+ * Hook for Issues chart configuration
+ */
+export function useIssuesChart({
+  data,
+  metric,
+}: ChartHookOptions & { metric: MetricType }): ChartHookResult {
+  const isActive = metric === 'issues'
+
+  // Generate chart configuration
+  const chartConfig = useMemo(() => {
+    if (!isActive || !Array.isArray(data) || data.length === 0) {
+      return null
+    }
+    return getIssuesConfig(data)
+  }, [data, isActive])
+
+  // Get metrics for the selected query badge
+  const metricBadges = useMemo(() => {
+    if (!isActive || !chartConfig) return []
+
+    const { chartData } = chartConfig
+
+    // Calculate total issues
+    const totalIssues = chartData.reduce((sum, point) => sum + point.issues, 0)
+
+    return [
+      {
+        label: 'Total Issues',
+        value: totalIssues.toString(),
+        color: '#ef4444',
+      },
+    ]
+  }, [chartConfig, isActive])
+
+  return {
+    chartConfig,
+    metricBadges,
+    renderConfig: {
+      yAxisDomain: [0, 'auto'],
+      yAxisFormatter: (value: number) => value.toString(),
+      yAxisWidth: 60,
+      yAxisTickCount: 6,
+      keyMappings: {
+        issues: 'issues',
+        query_issues: 'query_issues',
+      },
+    },
+  }
 }

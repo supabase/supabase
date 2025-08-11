@@ -338,6 +338,39 @@ export const QueryList = ({
         )
       },
     },
+    {
+      key: 'errors',
+      name: 'Slow Queries',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: '',
+      renderHeaderCell: () => (
+        <div className="flex items-center font-mono font-normal text-xs w-full">
+          <p className="!text-foreground">Slow Queries</p>
+        </div>
+      ),
+      renderCell: (props) => {
+        const errorCount = props.row.error_count || 0
+
+        if (errorCount === 0) {
+          return (
+            <div className="font-mono text-xs flex items-center justify-end h-full w-full">
+              <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded">
+                No issues
+              </span>
+            </div>
+          )
+        }
+
+        return (
+          <div className="font-mono text-xs flex items-center justify-end h-full w-full">
+            <span className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 rounded">
+              {errorCount} slow query{errorCount !== 1 ? 's' : ''}
+            </span>
+          </div>
+        )
+      },
+    },
     // {
     //   key: 'database',
     //   name: 'Database',

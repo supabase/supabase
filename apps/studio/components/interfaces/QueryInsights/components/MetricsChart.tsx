@@ -10,6 +10,7 @@ import {
   useRowsReadChart,
   useCallsChart,
   useCacheHitsChart,
+  useIssuesChart,
   CHART_OPACITY,
 } from '../hooks/useChartConfig'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
@@ -59,6 +60,9 @@ export function MetricsChart(props: MetricsChartProps) {
     // Calls
     calls: true,
     query_calls: true,
+    // Issues
+    issues: true,
+    query_issues: true,
   })
 
   // Handler for clearing the selected query
@@ -77,6 +81,7 @@ export function MetricsChart(props: MetricsChartProps) {
   const rowsReadResult = useRowsReadChart(chartHookOptions)
   const callsResult = useCallsChart(chartHookOptions)
   const cacheHitsResult = useCacheHitsChart(chartHookOptions)
+  const issuesResult = useIssuesChart(chartHookOptions)
 
   // Get the appropriate result based on metric type
   let chartConfig = null
@@ -96,6 +101,9 @@ export function MetricsChart(props: MetricsChartProps) {
       break
     case 'cache_hits':
       currentHookResult = cacheHitsResult
+      break
+    case 'issues':
+      currentHookResult = issuesResult
       break
     default:
       currentHookResult = {
@@ -246,7 +254,7 @@ export function MetricsChart(props: MetricsChartProps) {
 
                 // Skip query-specific metrics when not needed
                 if (
-                  (key === 'query_rows' || key === 'query_latency' || key === 'query_calls') &&
+                  (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') &&
                   !selectedQuery &&
                   !hoveredQuery
                 ) {
@@ -255,7 +263,7 @@ export function MetricsChart(props: MetricsChartProps) {
                 }
 
                 // Skip showing full series data for query-specific metrics
-                if (key === 'query_rows' || key === 'query_latency' || key === 'query_calls') {
+                if (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') {
                   console.log(
                     `[MetricsChart] Rendering ${key} with selectedQuery=${!!selectedQuery}`
                   )

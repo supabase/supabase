@@ -45,6 +45,8 @@ export type QueryInsightsQuery = {
   total_cost_after?: number
   index_statements?: string[]
   errors?: string[]
+  // Error tracking fields
+  error_count?: number
 }
 
 export type QueryInsightsMetrics = {
@@ -151,6 +153,19 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
         GROUP BY bucket_start_time, datname
         ORDER BY timestamp ASC
       `
+    case 'issues':
+      return /* SQL */ `
+        SELECT
+          bucket_start_time as timestamp,
+          COUNT(CASE WHEN mean_exec_time > 1000 AND calls > 1 THEN 1 END) as value,
+          datname as database
+        FROM pg_stat_monitor
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
+        GROUP BY bucket_start_time, datname
+        ORDER BY timestamp ASC
+      `
     default:
       return /* SQL */ `
         SELECT
@@ -199,6 +214,8 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
         SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
         SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END)
       ) AS rows_total,
+      -- Error information (using available columns)
+      COUNT(CASE WHEN mean_exec_time > 1000 AND calls > 1 THEN 1 END) AS error_count,
       -- Heuristic "badness score":
       -- Penalizes queries that are slow, frequent, and touch few rows
       (
@@ -228,6 +245,73 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
       FROM index_advisor(q.query)
     ) ia ON q.query ILIKE 'SELECT%' OR q.query ILIKE 'WITH%'
   ORDER BY badness_score DESC
+  LIMIT 9999;
+`
+
+const getQueriesWithErrorsSql = (startTime: string, endTime: string) => /* SQL */ `
+  WITH base_queries AS (
+    SELECT 
+      queryid AS query_id,
+      -- Prefer top-level query if available, else fallback to normalized form
+      COALESCE(MAX(top_query), MAX(query)) AS query,
+      -- Total time spent executing this query across all calls
+      SUM(total_exec_time) AS total_time,
+      -- Number of times this query was executed
+      SUM(calls) AS calls,
+      -- Total rows affected or returned depending on command type
+      SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END) AS rows_read,   -- SELECT
+      SUM(CASE WHEN cmd_type = 2 THEN rows ELSE 0 END) AS rows_insert, -- INSERT
+      SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) AS rows_update, -- UPDATE
+      SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END) AS rows_delete, -- DELETE
+      -- Buffer activity: disk reads vs cache hits
+      SUM(shared_blks_read) AS shared_blks_read,
+      SUM(shared_blks_hit) AS shared_blks_hit,
+      -- Mean execution time per call
+      SUM(total_exec_time) / NULLIF(SUM(calls), 0) AS mean_exec_time,
+      -- Metadata
+      STRING_AGG(DISTINCT datname, ', ') AS database,
+      MAX(bucket_start_time) AS timestamp,
+      MAX(get_cmd_type(cmd_type)) AS cmd_type_text,
+      STRING_AGG(DISTINCT COALESCE(application_name, 'Unknown'), ', ') AS application_name,
+      -- Total number of rows affected or returned across all executions
+      (
+        SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END) + 
+        SUM(CASE WHEN cmd_type = 2 THEN rows ELSE 0 END) + 
+        SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
+        SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END)
+      ) AS rows_total,
+      -- Error information (using available columns)
+      COUNT(CASE WHEN mean_exec_time > 1000 AND calls > 1 THEN 1 END) AS error_count,
+      -- Heuristic "badness score":
+      -- Penalizes queries that are slow, frequent, and touch few rows
+      (
+        (SUM(total_exec_time) / NULLIF(SUM(calls), 1)) *  -- mean execution time
+        LOG(GREATEST(SUM(calls), 1)) /                    -- scaled by frequency
+        GREATEST(                                         -- penalize low-row queries
+          SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END) + 
+          SUM(CASE WHEN cmd_type = 2 THEN rows ELSE 0 END) + 
+          SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
+          SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END),
+        1)
+      ) AS badness_score
+    FROM pg_stat_monitor
+    WHERE bucket_start_time >= '${startTime}'
+      AND bucket_start_time <= '${endTime}'
+      AND bucket_done = true
+      AND mean_exec_time > 1000 
+      AND calls > 1  -- Only include queries that are slow and called multiple times
+    GROUP BY queryid
+  )
+  SELECT 
+    q.*,
+    ia.*
+  FROM 
+    base_queries q
+    LEFT JOIN LATERAL (
+      SELECT * 
+      FROM index_advisor(q.query)
+    ) ia ON q.query ILIKE 'SELECT%' OR q.query ILIKE 'WITH%'
+  ORDER BY error_count DESC, badness_score DESC
   LIMIT 9999;
 `
 
@@ -278,6 +362,29 @@ export function useQueryInsightsQueries(
   })
 }
 
+export function useQueryInsightsQueriesWithErrors(
+  projectRef: string | undefined,
+  startTime: string,
+  endTime: string,
+  options?: UseQueryOptions<QueryInsightsQuery[]>
+) {
+  return useQuery({
+    queryKey: queryInsightsKeys.queriesWithErrors(projectRef, startTime, endTime),
+    queryFn: async () => {
+      if (!projectRef) throw new Error('Project ref is required')
+
+      const { result } = await executeSql({
+        projectRef,
+        sql: getQueriesWithErrorsSql(startTime, endTime),
+      })
+
+      return result as QueryInsightsQuery[]
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    ...options,
+  })
+}
+
 // Hook to pre-fetch all metrics data for the current time range
 export function usePreFetchQueryInsightsData(
   projectRef: string | undefined,
@@ -295,6 +402,7 @@ export function usePreFetchQueryInsightsData(
       { id: 'rows_read', label: 'Rows read' },
       { id: 'calls', label: 'Calls' },
       { id: 'cache_hits', label: 'Cache hits' },
+      { id: 'issues', label: 'Issues' },
     ]
 
     // Pre-fetch metrics data
@@ -324,6 +432,19 @@ export function usePreFetchQueryInsightsData(
       },
       staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     })
+
+    // Pre-fetch queries with errors data
+    queryClient.prefetchQuery({
+      queryKey: queryInsightsKeys.queriesWithErrors(projectRef, startTime, endTime),
+      queryFn: async () => {
+        const { result } = await executeSql({
+          projectRef,
+          sql: getQueriesWithErrorsSql(startTime, endTime),
+        })
+        return result as QueryInsightsQuery[]
+      },
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    })
   }, [projectRef, startTime, endTime, queryClient])
 }
 
@@ -338,7 +459,7 @@ export function useQueryInsightsCacheManager(
   const refreshAllData = useCallback(async () => {
     if (!projectRef) return
 
-    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits']
+    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits', 'issues']
     
     // Invalidate and refetch all metrics
     await Promise.all([
@@ -349,6 +470,9 @@ export function useQueryInsightsCacheManager(
       ),
       queryClient.invalidateQueries({
         queryKey: queryInsightsKeys.queries(projectRef, startTime, endTime)
+      }),
+      queryClient.invalidateQueries({
+        queryKey: queryInsightsKeys.queriesWithErrors(projectRef, startTime, endTime)
       })
     ])
   }, [projectRef, startTime, endTime, queryClient])
@@ -356,7 +480,7 @@ export function useQueryInsightsCacheManager(
   const isAnyDataStale = useCallback(() => {
     if (!projectRef) return false
     
-    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits']
+    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits', 'issues']
     
     return metricTypes.some(metric => {
       const query = queryClient.getQueryData(
@@ -365,6 +489,8 @@ export function useQueryInsightsCacheManager(
       return !query
     }) || !queryClient.getQueryData(
       queryInsightsKeys.queries(projectRef, startTime, endTime)
+    ) || !queryClient.getQueryData(
+      queryInsightsKeys.queriesWithErrors(projectRef, startTime, endTime)
     )
   }, [projectRef, startTime, endTime, queryClient])
 

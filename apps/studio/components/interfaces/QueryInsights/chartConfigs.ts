@@ -49,6 +49,12 @@ export interface CallsChartData {
   query_calls?: number
 }
 
+export interface IssuesChartData {
+  timestamp: string
+  issues: number
+  query_issues?: number
+}
+
 export interface ChartConfigResult<T> {
   chartData: T[]
   config: ChartConfigType
@@ -293,7 +299,7 @@ export function getCallsConfig(
   // Sort chart data by timestamp
   chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
 
-  // If we have query-specific call data, add it to the chart
+  // If we have query calls data, add it to the chart
   if (queryCallsData && queryCallsData.length > 0) {
     // Create a map of timestamps to query calls values
     const queryCallsMap = new Map<string, number>()
@@ -326,12 +332,75 @@ export function getCallsConfig(
   const config: ChartConfigType = {
     calls: {
       label: 'Total Calls',
-      color: 'hsl(var(--chart-1))', // Chart color 1
+      color: '#3b82f6',
       formatter: formatMetricValue,
     },
     query_calls: {
-      label: 'Query Calls',
-      color: 'hsl(var(--chart-2))', // Chart color 2
+      label: 'Selected Query Calls',
+      color: '#ef4444',
+      formatter: formatMetricValue,
+    },
+  }
+
+  return { chartData, config }
+}
+
+/**
+ * Prepares data and configuration for the Issues chart
+ */
+export function getIssuesConfig(
+  data: QueryInsightsMetric[],
+  queryIssuesData?: QueryInsightsMetric[]
+): ChartConfigResult<IssuesChartData> {
+  // Create the baseline chart data from the metrics
+  const chartData = data.map((point) => ({
+    timestamp: point.timestamp,
+    issues: Number(point.value) ?? 0,
+    query_issues: 0,
+  }))
+
+  // Sort chart data by timestamp
+  chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
+
+  // If we have query issues data, add it to the chart
+  if (queryIssuesData && queryIssuesData.length > 0) {
+    // Create a map of timestamps to query issues values
+    const queryIssuesMap = new Map<string, number>()
+    queryIssuesData.forEach((point) => {
+      queryIssuesMap.set(point.timestamp, Number(point.value) || 0)
+    })
+
+    // Add query issues data to each chart data point
+    chartData.forEach((point) => {
+      if (queryIssuesMap.has(point.timestamp)) {
+        point.query_issues = queryIssuesMap.get(point.timestamp)!
+      }
+    })
+
+    // Add any missing query issues points
+    queryIssuesData.forEach((point) => {
+      if (!chartData.find((d) => d.timestamp === point.timestamp)) {
+        chartData.push({
+          timestamp: point.timestamp,
+          issues: 0,
+          query_issues: Number(point.value) || 0,
+        })
+      }
+    })
+
+    // Re-sort chart data by timestamp
+    chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
+  }
+
+  const config: ChartConfigType = {
+    issues: {
+      label: 'Total Issues',
+      color: '#ef4444',
+      formatter: formatMetricValue,
+    },
+    query_issues: {
+      label: 'Selected Query Issues',
+      color: '#dc2626',
       formatter: formatMetricValue,
     },
   }

@@ -9,6 +9,7 @@ import { QueryList } from './components/QueryList'
 import {
   useQueryInsightsMetrics,
   useQueryInsightsQueries,
+  useQueryInsightsQueriesWithErrors,
   usePreFetchQueryInsightsData,
   QueryInsightsQuery,
 } from 'data/query-insights/query-insights-query'
@@ -17,7 +18,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatMetricValue } from './QueryInsights.utils'
 
 
-export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits'
+export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits' | 'issues'
 
 
 
@@ -64,10 +65,25 @@ export const QueryInsights = () => {
     timeRange.period_start.date,
     timeRange.period_end.date
   )
+
+  // Always fetch issues data for issues calculation
+  const { data: issuesData } = useQueryInsightsMetrics(
+    ref,
+    'issues',
+    timeRange.period_start.date,
+    timeRange.period_end.date
+  )
   
 
 
   const { data: queriesData, isLoading: isLoadingQueries } = useQueryInsightsQueries(
+    ref,
+    timeRange.period_start.date,
+    timeRange.period_end.date
+  )
+
+  // Fetch queries with errors for the errors tab
+  const { data: queriesWithErrorsData, isLoading: isLoadingQueriesWithErrors } = useQueryInsightsQueriesWithErrors(
     ref,
     timeRange.period_start.date,
     timeRange.period_end.date
@@ -104,6 +120,27 @@ export const QueryInsights = () => {
     return null
   }, [rowsReadData])
 
+  // Calculate error count for the errors tab
+  const errorCount = useMemo(() => {
+    if (issuesData && issuesData.length > 0) {
+      const totalIssues = issuesData.reduce((sum, point) => sum + (point.value || 0), 0)
+      return `${totalIssues} slow queries`
+    }
+    return '0 slow queries'
+  }, [issuesData])
+
+  // Debug logging
+  console.log('🔍 [QueryInsights] Debug info:', {
+    selectedMetric,
+    queriesDataLength: queriesData?.length || 0,
+    queriesWithErrorsDataLength: queriesWithErrorsData?.length || 0,
+    issuesDataLength: issuesData?.length || 0,
+    issuesDataSample: issuesData?.slice(0, 3) || [],
+    isLoadingQueries,
+    isLoadingQueriesWithErrors,
+    errorCount: errorCount
+  })
+
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
 
   // Define metrics with dynamic descriptions
@@ -132,7 +169,13 @@ export const QueryInsights = () => {
       description: '0%',
       tooltip: 'Displays cache hit rates and shared buffer cache performance statistics',
     },
-      ]
+    {
+      id: 'issues',
+      label: 'Issues',
+      description: errorCount,
+      tooltip: 'Shows queries with potential performance issues (slow queries)',
+    },
+  ]
 
   // Event listener for clearing the selected query
   useEffect(() => {
@@ -335,8 +378,8 @@ export const QueryInsights = () => {
 
 
       <QueryList
-        queries={queriesData || []}
-        isLoading={isLoadingQueries}
+        queries={selectedMetric === 'issues' ? (queriesWithErrorsData || []) : (queriesData || [])}
+        isLoading={selectedMetric === 'issues' ? isLoadingQueriesWithErrors : isLoadingQueries}
         onQuerySelect={setSelectedQuery}
         onQueryHover={setHoveredQuery}
         selectedQuery={selectedQuery}
