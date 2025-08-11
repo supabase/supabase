@@ -36,7 +36,8 @@ export type FeatureKey =
   | 'database.pitr'
   | 'database.pausing'
   | 'database.branching'
-  | 'database.bandwidth'
+  | 'database.egress'
+  | 'database.cachedEgress'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -182,12 +183,23 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
-        key: 'database.bandwidth',
-        title: 'Bandwidth',
+        key: 'database.egress',
+        title: 'Egress',
         plans: {
           free: '5 GB included',
           pro: ['250 GB included', 'then $0.09 per GB'],
           team: ['250 GB included', 'then $0.09 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+        {
+        key: 'database.egress',
+        title: 'Cached Egress',
+        plans: {
+          free: '5 GB included',
+          pro: ['250 GB included', 'then $0.03 per GB'],
+          team: ['250 GB included', 'then $0.03 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -592,7 +604,7 @@ export const pricing: Pricing = {
           team: [
             '$60 per drain per month',
             '+ $0.20 per million events',
-            '+ $0.09 per GB bandwidth',
+            '+ $0.09 per GB egress',
           ],
           enterprise: 'Custom',
         },

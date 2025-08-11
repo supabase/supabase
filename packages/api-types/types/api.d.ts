@@ -1773,6 +1773,7 @@ export interface components {
       external_twitter_client_id: string | null
       external_twitter_enabled: boolean | null
       external_twitter_secret: string | null
+      external_web3_ethereum_enabled: boolean | null
       external_web3_solana_enabled: boolean | null
       external_workos_client_id: string | null
       external_workos_enabled: boolean | null
@@ -2925,6 +2926,7 @@ export interface components {
       external_twitter_client_id?: string | null
       external_twitter_enabled?: boolean | null
       external_twitter_secret?: string | null
+      external_web3_ethereum_enabled?: boolean | null
       external_web3_solana_enabled?: boolean | null
       external_workos_client_id?: string | null
       external_workos_enabled?: boolean | null
