@@ -14,7 +14,6 @@ export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
 export type InvalidationEvent = {
   projectRef: string
   entityType: EntityType
-  action: ActionType
   schema?: string
   table?: string
   entityName?: string
@@ -43,16 +42,12 @@ function extractAction(sqlLower: string): ActionType | null {
   return null
 }
 
-function extractTableInfo(
-  sql: string,
-  action: ActionType
-): Omit<InvalidationEvent, 'projectRef'> | null {
+function extractTableInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
   const match = sql.match(SQL_PATTERNS.table)
   if (!match) return null
 
   return {
     entityType: 'table',
-    action,
     schema: match[1] || DEFAULT_SCHEMA,
     table: match[2],
     entityName: match[2],
@@ -61,24 +56,19 @@ function extractTableInfo(
 
 function extractFunctionInfo(
   sql: string,
-  sqlLower: string,
-  action: ActionType
+  sqlLower: string
 ): Omit<InvalidationEvent, 'projectRef'> | null {
   const match = sql.match(SQL_PATTERNS.function)
   if (!match) return null
 
   return {
     entityType: sqlLower.includes('function') ? 'function' : 'procedure',
-    action,
     schema: match[1] || DEFAULT_SCHEMA,
     entityName: match[2],
   }
 }
 
-function extractTriggerInfo(
-  sql: string,
-  action: ActionType
-): Omit<InvalidationEvent, 'projectRef'> | null {
+function extractTriggerInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
   const match = sql.match(SQL_PATTERNS.trigger)
   if (!match) return null
 
@@ -90,23 +80,18 @@ function extractTriggerInfo(
 
   return {
     entityType: 'trigger',
-    action,
     schema,
     table,
     entityName: match[1],
   }
 }
 
-function extractPolicyInfo(
-  sql: string,
-  action: ActionType
-): Omit<InvalidationEvent, 'projectRef'> | null {
+function extractPolicyInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
   const match = sql.match(SQL_PATTERNS.policy)
   if (!match) return null
 
   return {
     entityType: 'policy',
-    action,
     schema: match[3] || DEFAULT_SCHEMA,
     table: match[4],
     entityName: match[1] || match[2], // match[1] for quoted names, match[2] for unquoted
@@ -118,24 +103,23 @@ function extractPolicyInfo(
  */
 function extractEntityInfo(
   sql: string,
-  sqlLower: string,
-  action: ActionType
+  sqlLower: string
 ): Omit<InvalidationEvent, 'projectRef'> | null {
   // Check trigger first since it might contain 'function' in EXECUTE FUNCTION clause
   if (sqlLower.includes(' trigger ')) {
-    return extractTriggerInfo(sql, action)
+    return extractTriggerInfo(sql)
   }
 
   if (sqlLower.includes(' table ')) {
-    return extractTableInfo(sql, action)
+    return extractTableInfo(sql)
   }
 
   if (sqlLower.includes(' function ') || sqlLower.includes(' procedure ')) {
-    return extractFunctionInfo(sql, sqlLower, action)
+    return extractFunctionInfo(sql, sqlLower)
   }
 
   if (sqlLower.includes(' policy ')) {
-    return extractPolicyInfo(sql, action)
+    return extractPolicyInfo(sql)
   }
 
   return null
@@ -149,7 +133,7 @@ export function parseSqlStatement(sql: string, projectRef: string): Invalidation
 
   if (!action) return null
 
-  const entityInfo = extractEntityInfo(sql, sqlLower, action)
+  const entityInfo = extractEntityInfo(sql, sqlLower)
 
   if (!entityInfo) return null
 
