@@ -49,7 +49,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
           items: [],
         },
-        ...(IS_PLATFORM
+        ...(!IS_PLATFORM
           ? [
               {
                 name: 'Integrations',
