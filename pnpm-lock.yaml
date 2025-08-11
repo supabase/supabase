@@ -1450,11 +1450,7 @@ importers:
         version: 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start':
         specifier: ^1.114.25
-<<<<<<< HEAD
-        version: 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
-=======
-        version: 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
->>>>>>> master
+        version: 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
@@ -25825,11 +25821,7 @@ snapshots:
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
 
-<<<<<<< HEAD
-  '@tanstack/react-start-client@1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
-=======
-  '@tanstack/react-start-client@1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
->>>>>>> master
+  '@tanstack/react-start-client@1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
     dependencies:
       '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/router-core': 1.114.25
@@ -25840,11 +25832,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
-<<<<<<< HEAD
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-=======
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
->>>>>>> master
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -25888,11 +25876,7 @@ snapshots:
       - xml2js
       - yaml
 
-<<<<<<< HEAD
-  '@tanstack/react-start-config@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
-=======
-  '@tanstack/react-start-config@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
->>>>>>> master
+  '@tanstack/react-start-config@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
     dependencies:
       '@tanstack/react-start-plugin': 1.114.12(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       '@tanstack/router-core': 1.114.25
@@ -25902,19 +25886,11 @@ snapshots:
       '@tanstack/start-server-functions-handler': 1.114.25
       '@vitejs/plugin-react': 4.3.4(supports-color@8.1.1)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))
       import-meta-resolve: 4.1.0
-<<<<<<< HEAD
-      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
+      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
       ofetch: 1.4.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-=======
-      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
-      ofetch: 1.4.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
->>>>>>> master
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
       vite: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       zod: 3.25.76
     transitivePeerDependencies:
@@ -25992,19 +25968,11 @@ snapshots:
       - tsx
       - yaml
 
-<<<<<<< HEAD
-  '@tanstack/react-start-router-manifest@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
+  '@tanstack/react-start-router-manifest@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
     dependencies:
       '@tanstack/router-core': 1.114.25
       tiny-invariant: 1.3.3
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-=======
-  '@tanstack/react-start-router-manifest@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
-    dependencies:
-      '@tanstack/router-core': 1.114.25
-      tiny-invariant: 1.3.3
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
->>>>>>> master
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -26063,23 +26031,13 @@ snapshots:
       tiny-warning: 1.0.3
       unctx: 2.4.1
 
-<<<<<<< HEAD
-  '@tanstack/react-start@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
+  '@tanstack/react-start@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
     dependencies:
-      '@tanstack/react-start-client': 1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-      '@tanstack/react-start-config': 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
-      '@tanstack/react-start-router-manifest': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      '@tanstack/react-start-client': 1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      '@tanstack/react-start-config': 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
+      '@tanstack/react-start-router-manifest': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
       '@tanstack/react-start-server': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tanstack/start-api-routes': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-=======
-  '@tanstack/react-start@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
-    dependencies:
-      '@tanstack/react-start-client': 1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-      '@tanstack/react-start-config': 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
-      '@tanstack/react-start-router-manifest': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-      '@tanstack/react-start-server': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tanstack/start-api-routes': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
->>>>>>> master
+      '@tanstack/start-api-routes': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
       '@tanstack/start-server-functions-client': 1.114.25(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       '@tanstack/start-server-functions-handler': 1.114.25
       '@tanstack/start-server-functions-server': 1.114.12(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
@@ -26230,19 +26188,11 @@ snapshots:
       - tsx
       - yaml
 
-<<<<<<< HEAD
-  '@tanstack/start-api-routes@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
+  '@tanstack/start-api-routes@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
     dependencies:
       '@tanstack/router-core': 1.114.25
       '@tanstack/start-server-core': 1.114.25
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-=======
-  '@tanstack/start-api-routes@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
-    dependencies:
-      '@tanstack/router-core': 1.114.25
-      '@tanstack/start-server-core': 1.114.25
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
->>>>>>> master
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -26817,11 +26767,7 @@ snapshots:
 
   '@types/pg-pool@2.0.6':
     dependencies:
-<<<<<<< HEAD
-      '@types/pg': 8.11.11
-=======
       '@types/pg': 8.15.4
->>>>>>> master
 
   '@types/pg@8.10.2':
     dependencies:
@@ -28858,17 +28804,10 @@ snapshots:
 
   dayjs@1.11.13: {}
 
-<<<<<<< HEAD
-  db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)):
+  db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)):
     optionalDependencies:
       '@electric-sql/pglite': 0.2.15
-      drizzle-orm: 0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)
-=======
-  db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)):
-    optionalDependencies:
-      '@electric-sql/pglite': 0.2.15
-      drizzle-orm: 0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)
->>>>>>> master
+      drizzle-orm: 0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)
 
   debounce-promise@3.1.2: {}
 
@@ -29111,23 +29050,12 @@ snapshots:
       '@types/pg': 8.10.2
       pg: 8.16.3
 
-<<<<<<< HEAD
-  drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3):
-    optionalDependencies:
-      '@electric-sql/pglite': 0.2.15
-      '@opentelemetry/api': 1.9.0
-      '@types/pg': 8.11.11
-      pg: 8.16.3
-=======
-  drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1):
+  drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3):
     optionalDependencies:
       '@electric-sql/pglite': 0.2.15
       '@opentelemetry/api': 1.9.0
       '@types/pg': 8.15.4
-      '@types/react': 18.3.3
-      pg: 8.13.1
-      react: 18.3.1
->>>>>>> master
+      pg: 8.16.3
     optional: true
 
   dset@3.1.4: {}
@@ -32469,7 +32397,7 @@ snapshots:
 
   mdast-util-gfm@3.0.0(supports-color@8.1.1):
     dependencies:
-      mdast-util-from-markdown: 2.0.0(supports-color@8.1.1)
+      mdast-util-from-markdown: 2.0.2(supports-color@8.1.1)
       mdast-util-gfm-autolink-literal: 2.0.0
       mdast-util-gfm-footnote: 2.0.0(supports-color@8.1.1)
       mdast-util-gfm-strikethrough: 2.0.0(supports-color@8.1.1)
@@ -33628,11 +33556,7 @@ snapshots:
 
   nice-try@1.0.5: {}
 
-<<<<<<< HEAD
-  nitropack@2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2):
-=======
-  nitropack@2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2):
->>>>>>> master
+  nitropack@2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
       '@netlify/functions': 3.0.4
@@ -33654,11 +33578,7 @@ snapshots:
       cookie-es: 2.0.0
       croner: 9.0.0
       crossws: 0.3.4
-<<<<<<< HEAD
-      db0: 0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))
-=======
-      db0: 0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))
->>>>>>> master
+      db0: 0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))
       defu: 6.1.4
       destr: 2.0.3
       dot-prop: 9.0.0
@@ -33705,11 +33625,7 @@ snapshots:
       unenv: 2.0.0-rc.15
       unimport: 4.1.2
       unplugin-utils: 0.2.4
-<<<<<<< HEAD
-      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(ioredis@5.6.0(supports-color@8.1.1))
-=======
-      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1))
->>>>>>> master
+      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(ioredis@5.6.0(supports-color@8.1.1))
       untyped: 2.0.0
       unwasm: 0.3.9
       youch: 4.1.0-beta.6
@@ -37822,11 +37738,7 @@ snapshots:
       acorn: 8.14.1
       webpack-virtual-modules: 0.6.2
 
-<<<<<<< HEAD
-  unstorage@1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(ioredis@5.6.0(supports-color@8.1.1)):
-=======
-  unstorage@1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1)):
->>>>>>> master
+  unstorage@1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(ioredis@5.6.0(supports-color@8.1.1)):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -37838,11 +37750,7 @@ snapshots:
       ufo: 1.5.4
     optionalDependencies:
       aws4fetch: 1.0.20
-<<<<<<< HEAD
-      db0: 0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))
-=======
-      db0: 0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))
->>>>>>> master
+      db0: 0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))
       ioredis: 5.6.0(supports-color@8.1.1)
 
   untun@0.1.3:
@@ -38075,11 +37983,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-<<<<<<< HEAD
-  vinxi@0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5):
-=======
-  vinxi@0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5):
->>>>>>> master
+  vinxi@0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5):
     dependencies:
       '@babel/core': 7.26.10(supports-color@8.1.1)
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10(supports-color@8.1.1))
@@ -38101,11 +38005,7 @@ snapshots:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-<<<<<<< HEAD
-      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
-=======
-      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
->>>>>>> master
+      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
       node-fetch-native: 1.6.6
       path-to-regexp: 6.3.0
       pathe: 1.1.2
@@ -38116,11 +38016,7 @@ snapshots:
       ufo: 1.5.4
       unctx: 2.4.1
       unenv: 1.10.0
-<<<<<<< HEAD
-      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(pg@8.16.3)))(ioredis@5.6.0(supports-color@8.1.1))
-=======
-      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1))
->>>>>>> master
+      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(ioredis@5.6.0(supports-color@8.1.1))
       vite: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       zod: 3.25.76
     transitivePeerDependencies:
