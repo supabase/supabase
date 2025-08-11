@@ -20,310 +20,344 @@ export type InvalidationEvent = {
   entityName?: string
 }
 
-export type InvalidationConfig = {
-  queryClient: QueryClient
-}
-
 // SQL pattern matchers for different entity types
 const SQL_PATTERNS = {
   table: /table\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
   function: /(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
   trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+"?(?:(\w+)\.)?"?(\w+)"?)?/i,
-  policy: /policy\s+(?:"([^"]+)"|(\w+))\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?/i,
+  policy: /policy\s+(?:"([^"]+)"|(\w+))\s+on\s+(?:"?(\w+)"?\.)??"?(\w+)"?/i,
 } as const
 
 // Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
 
 /**
- * QueryCacheInvalidator handles smart cache invalidation for database schema changes
- * It parses SQL statements, determines affected entities, and invalidates the appropriate React Query caches
+ * Extract the action type from SQL statement
  */
-export class QueryCacheInvalidator {
-  private readonly queryClient: QueryClient
+function extractAction(sqlLower: string): ActionType | null {
+  if (sqlLower.startsWith('create')) return 'create'
+  if (sqlLower.startsWith('alter')) return 'alter'
+  if (sqlLower.startsWith('drop')) return 'drop'
+  if (sqlLower.includes('enable')) return 'enable'
+  if (sqlLower.includes('disable')) return 'disable'
+  return null
+}
 
-  constructor(config: InvalidationConfig) {
-    this.queryClient = config.queryClient
+/**
+ * Extract table information from SQL statement
+ */
+function extractTableInfo(
+  sql: string,
+  action: ActionType
+): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.table)
+  if (!match) return null
+
+  return {
+    entityType: 'table',
+    action,
+    schema: match[1] || DEFAULT_SCHEMA,
+    table: match[2],
+    entityName: match[2],
+  }
+}
+
+/**
+ * Extract function/procedure information from SQL statement
+ */
+function extractFunctionInfo(
+  sql: string,
+  sqlLower: string,
+  action: ActionType
+): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.function)
+  if (!match) return null
+
+  return {
+    entityType: sqlLower.includes('function') ? 'function' : 'procedure',
+    action,
+    schema: match[1] || DEFAULT_SCHEMA,
+    entityName: match[2],
+  }
+}
+
+/**
+ * Extract trigger information from SQL statement
+ */
+function extractTriggerInfo(
+  sql: string,
+  action: ActionType
+): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.trigger)
+  if (!match) return null
+
+  // match[1] is the trigger name
+  // match[2] is schema (optional)
+  // match[3] is table name
+  const schema = match[2] || DEFAULT_SCHEMA
+  const table = match[3]
+
+  return {
+    entityType: 'trigger',
+    action,
+    schema,
+    table,
+    entityName: match[1],
+  }
+}
+
+/**
+ * Extract policy information from SQL statement
+ */
+function extractPolicyInfo(
+  sql: string,
+  action: ActionType
+): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.policy)
+  if (!match) return null
+
+  return {
+    entityType: 'policy',
+    action,
+    schema: match[3] || DEFAULT_SCHEMA,
+    table: match[4],
+    entityName: match[1] || match[2], // match[1] for quoted names, match[2] for unquoted
+  }
+}
+
+/**
+ * Extract entity information from SQL statement
+ */
+function extractEntityInfo(
+  sql: string,
+  sqlLower: string,
+  action: ActionType
+): Omit<InvalidationEvent, 'projectRef'> | null {
+  // Check trigger first since it might contain 'function' in EXECUTE FUNCTION clause
+  if (sqlLower.includes(' trigger ')) {
+    return extractTriggerInfo(sql, action)
   }
 
-  /**
-   * Parse SQL statement to extract entity information
-   */
-  private parseSqlStatement(sql: string, projectRef: string): InvalidationEvent | null {
-    if (!sql || !projectRef) return null
-
-    const sqlLower = sql.toLowerCase().trim()
-    const action = this.extractAction(sqlLower)
-
-    if (!action) return null
-
-    const entityInfo = this.extractEntityInfo(sql, sqlLower, action)
-
-    if (!entityInfo) return null
-
-    return {
-      ...entityInfo,
-      projectRef,
-    }
+  if (sqlLower.includes(' table ')) {
+    return extractTableInfo(sql, action)
   }
 
-  /**
-   * Extract the action type from SQL statement
-   */
-  private extractAction(sqlLower: string): ActionType | null {
-    if (sqlLower.startsWith('create')) return 'create'
-    if (sqlLower.startsWith('alter')) return 'alter'
-    if (sqlLower.startsWith('drop')) return 'drop'
-    if (sqlLower.includes('enable')) return 'enable'
-    if (sqlLower.includes('disable')) return 'disable'
-    return null
+  if (sqlLower.includes(' function ') || sqlLower.includes(' procedure ')) {
+    return extractFunctionInfo(sql, sqlLower, action)
   }
 
-  /**
-   * Extract entity information from SQL statement
-   */
-  private extractEntityInfo(
-    sql: string,
-    sqlLower: string,
-    action: ActionType
-  ): Omit<InvalidationEvent, 'projectRef'> | null {
-    // Check trigger first since it might contain 'function' in EXECUTE FUNCTION clause
-    if (sqlLower.includes(' trigger ')) {
-      return this.extractTriggerInfo(sql, action)
-    }
-
-    if (sqlLower.includes(' table ')) {
-      return this.extractTableInfo(sql, action)
-    }
-
-    if (sqlLower.includes(' function ') || sqlLower.includes(' procedure ')) {
-      return this.extractFunctionInfo(sql, sqlLower, action)
-    }
-
-    if (sqlLower.includes(' policy ')) {
-      return this.extractPolicyInfo(sql, action)
-    }
-
-    return null
+  if (sqlLower.includes(' policy ')) {
+    return extractPolicyInfo(sql, action)
   }
 
-  private extractTableInfo(
-    sql: string,
-    action: ActionType
-  ): Omit<InvalidationEvent, 'projectRef'> | null {
-    const match = sql.match(SQL_PATTERNS.table)
-    if (!match) return null
+  return null
+}
 
-    return {
-      entityType: 'table',
-      action,
-      schema: match[1] || DEFAULT_SCHEMA,
-      table: match[2],
-      entityName: match[2],
-    }
+export function parseSqlStatement(sql: string, projectRef: string): InvalidationEvent | null {
+  if (!sql || !projectRef) return null
+
+  const sqlLower = sql.toLowerCase().trim()
+  const action = extractAction(sqlLower)
+
+  if (!action) return null
+
+  const entityInfo = extractEntityInfo(sql, sqlLower, action)
+
+  if (!entityInfo) return null
+
+  return {
+    ...entityInfo,
+    projectRef,
   }
+}
 
-  private extractFunctionInfo(
-    sql: string,
-    sqlLower: string,
-    action: ActionType
-  ): Omit<InvalidationEvent, 'projectRef'> | null {
-    const match = sql.match(SQL_PATTERNS.function)
-    if (!match) return null
+/**
+ * Invalidate table-related queries
+ */
+export async function invalidateTableQueries(
+  queryClient: QueryClient,
+  projectRef: string,
+  schema?: string,
+  table?: string
+): Promise<void> {
+  const promises: Promise<void>[] = []
 
-    return {
-      entityType: sqlLower.includes('function') ? 'function' : 'procedure',
-      action,
-      schema: match[1] || DEFAULT_SCHEMA,
-      entityName: match[2],
-    }
-  }
-
-  private extractTriggerInfo(
-    sql: string,
-    action: ActionType
-  ): Omit<InvalidationEvent, 'projectRef'> | null {
-    const match = sql.match(SQL_PATTERNS.trigger)
-    if (!match) return null
-
-    // match[1] is the trigger name
-    // match[2] is schema (optional)
-    // match[3] is table name
-    const schema = match[2] || DEFAULT_SCHEMA
-    const table = match[3]
-
-    return {
-      entityType: 'trigger',
-      action,
-      schema,
-      table,
-      entityName: match[1],
-    }
-  }
-
-  private extractPolicyInfo(
-    sql: string,
-    action: ActionType
-  ): Omit<InvalidationEvent, 'projectRef'> | null {
-    const match = sql.match(SQL_PATTERNS.policy)
-    if (!match) return null
-
-    return {
-      entityType: 'policy',
-      action,
-      schema: match[3] || DEFAULT_SCHEMA,
-      table: match[4],
-      entityName: match[1] || match[2], // match[1] for quoted names, match[2] for unquoted
-    }
-  }
-
-  /**
-   * Get invalidation strategy for each entity type
-   */
-  private async executeInvalidationStrategy(event: InvalidationEvent): Promise<void> {
-    const { projectRef, entityType, schema, table } = event
-
-    const invalidationMap: Record<EntityType, () => Promise<void>> = {
-      table: () => this.invalidateTableQueries(projectRef, schema, table),
-      function: () => this.invalidateFunctionQueries(projectRef),
-      procedure: () => this.invalidateFunctionQueries(projectRef),
-      trigger: () => this.invalidateTriggerQueries(projectRef),
-      policy: () => this.invalidatePolicyQueries(projectRef, schema, table),
-    }
-
-    const strategy = invalidationMap[entityType]
-    if (strategy) await strategy()
-  }
-
-  /**
-   * Handle invalidation event and update appropriate caches
-   */
-  private async handleInvalidation(event: InvalidationEvent): Promise<void> {
-    setTimeout(async () => {
-      await this.executeInvalidation(event)
-    }, 0)
-  }
-
-  private async executeInvalidation(event: InvalidationEvent): Promise<void> {
-    // Execute invalidation strategy
-    await this.executeInvalidationStrategy(event)
-
-    // Invalidate entity types list for certain entity types
-    const { projectRef, entityType } = event
-    await this.invalidateEntityTypesList(projectRef, entityType)
-  }
-
-  private async invalidateEntityTypesList(
-    projectRef: string,
-    entityType: EntityType
-  ): Promise<void> {
-    if (ENTITY_TYPES_REQUIRING_LIST_INVALIDATION.includes(entityType)) {
-      await this.queryClient.invalidateQueries({
-        queryKey: entityTypeKeys.list(projectRef),
+  if (schema) {
+    // Targeted invalidation for specific schema
+    promises.push(
+      queryClient.invalidateQueries({
+        queryKey: tableKeys.list(projectRef, schema, true),
+        exact: true,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: tableKeys.list(projectRef, schema, false),
+        exact: true,
+      })
+    )
+  } else {
+    // Broader invalidation if no schema specified
+    promises.push(
+      queryClient.invalidateQueries({
+        queryKey: tableKeys.list(projectRef),
         exact: false,
       })
-    }
+    )
   }
 
-  private async invalidateTableQueries(
-    projectRef: string,
-    schema?: string,
-    table?: string
-  ): Promise<void> {
-    const promises: Promise<void>[] = []
-
-    if (schema) {
-      // Targeted invalidation for specific schema
-      promises.push(
-        this.queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, schema, true),
-          exact: true,
-        }),
-        this.queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, schema, false),
-          exact: true,
-        })
-      )
-    } else {
-      // Broader invalidation if no schema specified
-      promises.push(
-        this.queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef),
-          exact: false,
-        })
-      )
-    }
-
-    // Invalidate specific table if provided
-    if (table && schema) {
-      promises.push(
-        this.queryClient.invalidateQueries({
-          queryKey: tableKeys.retrieve(projectRef, table, schema),
-          refetchType: 'active',
-        })
-      )
-    }
-
-    await Promise.all(promises)
-  }
-
-  private async invalidateFunctionQueries(projectRef: string): Promise<void> {
-    return this.queryClient.invalidateQueries({
-      queryKey: databaseKeys.databaseFunctions(projectRef),
-      refetchType: 'active',
-    })
-  }
-
-  private async invalidateTriggerQueries(projectRef: string): Promise<void> {
-    return this.queryClient.invalidateQueries({
-      queryKey: databaseTriggerKeys.list(projectRef),
-      refetchType: 'active',
-    })
-  }
-
-  private async invalidatePolicyQueries(
-    projectRef: string,
-    schema?: string,
-    table?: string
-  ): Promise<void> {
-    const promises: Promise<void>[] = []
-
+  // Invalidate specific table if provided
+  if (table && schema) {
     promises.push(
-      this.queryClient.invalidateQueries({
-        queryKey: databasePoliciesKeys.list(projectRef),
+      queryClient.invalidateQueries({
+        queryKey: tableKeys.retrieve(projectRef, table, schema),
         refetchType: 'active',
       })
     )
-
-    // Also invalidate table's RLS status
-    if (table && schema) {
-      promises.push(
-        this.queryClient.invalidateQueries({
-          queryKey: tableKeys.retrieve(projectRef, table, schema),
-          refetchType: 'active',
-        })
-      )
-    }
-
-    await Promise.all(promises)
   }
 
-  /**
-   * Process SQL and handle invalidation automatically
-   */
-  async processSql(sql: string, projectRef: string): Promise<void> {
-    if (!sql || !projectRef) {
-      console.warn('QueryCacheInvalidator: Invalid input - SQL and projectRef are required')
-      return
-    }
+  await Promise.all(promises)
+}
 
-    try {
-      const event = this.parseSqlStatement(sql, projectRef)
-      if (event) {
-        await this.handleInvalidation(event)
-      }
-    } catch (error) {
-      console.error('QueryCacheInvalidator: Error processing SQL', error)
+/**
+ * Invalidate function/procedure queries
+ */
+export async function invalidateFunctionQueries(
+  queryClient: QueryClient,
+  projectRef: string
+): Promise<void> {
+  return queryClient.invalidateQueries({
+    queryKey: databaseKeys.databaseFunctions(projectRef),
+    refetchType: 'active',
+  })
+}
+
+/**
+ * Invalidate trigger queries
+ */
+export async function invalidateTriggerQueries(
+  queryClient: QueryClient,
+  projectRef: string
+): Promise<void> {
+  return queryClient.invalidateQueries({
+    queryKey: databaseTriggerKeys.list(projectRef),
+    refetchType: 'active',
+  })
+}
+
+/**
+ * Invalidate policy queries
+ */
+export async function invalidatePolicyQueries(
+  queryClient: QueryClient,
+  projectRef: string,
+  schema?: string,
+  table?: string
+): Promise<void> {
+  const promises: Promise<void>[] = []
+
+  promises.push(
+    queryClient.invalidateQueries({
+      queryKey: databasePoliciesKeys.list(projectRef),
+      refetchType: 'active',
+    })
+  )
+
+  // Also invalidate table's RLS status
+  if (table && schema) {
+    promises.push(
+      queryClient.invalidateQueries({
+        queryKey: tableKeys.retrieve(projectRef, table, schema),
+        refetchType: 'active',
+      })
+    )
+  }
+
+  await Promise.all(promises)
+}
+
+/**
+ * Invalidate entity types list for certain entity types
+ */
+async function invalidateEntityTypesList(
+  queryClient: QueryClient,
+  projectRef: string,
+  entityType: EntityType
+): Promise<void> {
+  if (ENTITY_TYPES_REQUIRING_LIST_INVALIDATION.includes(entityType)) {
+    await queryClient.invalidateQueries({
+      queryKey: entityTypeKeys.list(projectRef),
+      exact: false,
+    })
+  }
+}
+
+/**
+ * Execute invalidation strategy for each entity type
+ */
+async function executeInvalidationStrategy(
+  queryClient: QueryClient,
+  event: InvalidationEvent
+): Promise<void> {
+  const { projectRef, entityType, schema, table } = event
+
+  const invalidationMap: Record<EntityType, () => Promise<void>> = {
+    table: () => invalidateTableQueries(queryClient, projectRef, schema, table),
+    function: () => invalidateFunctionQueries(queryClient, projectRef),
+    procedure: () => invalidateFunctionQueries(queryClient, projectRef),
+    trigger: () => invalidateTriggerQueries(queryClient, projectRef),
+    policy: () => invalidatePolicyQueries(queryClient, projectRef, schema, table),
+  }
+
+  const strategy = invalidationMap[entityType]
+  if (strategy) await strategy()
+}
+
+/**
+ * Execute invalidation for an event
+ */
+async function executeInvalidation(
+  queryClient: QueryClient,
+  event: InvalidationEvent
+): Promise<void> {
+  // Execute invalidation strategy
+  await executeInvalidationStrategy(queryClient, event)
+
+  // Invalidate entity types list for certain entity types
+  const { projectRef, entityType } = event
+  await invalidateEntityTypesList(queryClient, projectRef, entityType)
+}
+
+/**
+ * Handle invalidation event and update appropriate caches
+ */
+async function handleInvalidation(
+  queryClient: QueryClient,
+  event: InvalidationEvent
+): Promise<void> {
+  setTimeout(async () => {
+    await executeInvalidation(queryClient, event)
+  }, 0)
+}
+
+/**
+ * Process SQL and handle invalidation automatically
+ * This is the main entry point for processing SQL statements
+ */
+export async function invalidateCacheGranularly(
+  queryClient: QueryClient,
+  sql: string,
+  projectRef: string
+): Promise<void> {
+  if (!sql || !projectRef) {
+    console.warn('invalidateCacheGranularly: Invalid input - SQL and projectRef are required')
+    return
+  }
+
+  try {
+    const event = parseSqlStatement(sql, projectRef)
+    if (event) {
+      await handleInvalidation(queryClient, event)
     }
+  } catch (error) {
+    console.error('invalidateCacheGranularly: Error processing SQL', error)
   }
 }
