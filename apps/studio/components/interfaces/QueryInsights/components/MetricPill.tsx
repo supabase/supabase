@@ -40,18 +40,18 @@ export const MetricPill = ({
     <button
       type="button"
       className={cn(
-        'text-xs px-2 py-0.5 rounded-full transition-colors inline-flex items-center gap-1.5 border',
-        isActive ? 'bg-surface-300' : 'hover:bg-surface-100 border-transparent'
+        'text-xs px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1.5 border',
+        isActive ? 'border' : 'hover:bg-surface-100 border-dashed'
       )}
       onClick={onClick}
     >
       <div
-        className={cn('w-2 h-2 rounded-full', !isActive && 'opacity-50')}
+        className={cn('w-1.5 h-1.5 rounded-full', !isActive && 'opacity-50')}
         style={{
           backgroundColor: getDotColor(),
         }}
       ></div>
-      <span className="text-foreground">
+      <span className={cn('text-foreground', !isActive && 'text-foreground-light')}>
         {label}: {value}
       </span>
     </button>

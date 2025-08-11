@@ -30,7 +30,7 @@ export const SelectedQueryBadge = ({
   return (
     <div
       className={cn(
-        'inline-flex items-center px-3 pr-2 py-0.5 rounded-full text-xs border',
+        'inline-flex items-center p-0 rounded-md text-xs',
         'border-surface-300 dark:border-surface-400',
         'shadow-sm',
         className

@@ -177,6 +177,7 @@ export function MetricsChart(props: MetricsChartProps) {
               metric={metric}
               selectedQuery={selectedQuery}
             />
+            </div>
 
             {selectedQuery && (
               <SelectedQueryBadge
@@ -186,7 +187,7 @@ export function MetricsChart(props: MetricsChartProps) {
                 metrics={metricBadges}
               />
             )}
-          </div>
+          
         </div>
 
         <div className="flex-1 min-h-0 pt-4 pr-4">
