@@ -4,6 +4,8 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { databaseKeys } from 'data/database/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
 
+const DEFAULT_SCHEMA = 'public' as const
+
 export type EntityType = 'table' | 'function' | 'procedure' | 'trigger'
 
 export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
@@ -29,8 +31,6 @@ const SQL_PATTERNS = {
     /(?:create(?:\s+or\s+replace)?|alter|drop)\s+(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
   trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+(?:(\w+)\.)?(\w+))?/i,
 } as const
-
-const DEFAULT_SCHEMA = 'public' as const
 
 // Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
@@ -247,7 +247,7 @@ export class QueryCacheInvalidator {
   }
 
   private async invalidateFunctionQueries(projectRef: string): Promise<void> {
-    await this.queryClient.invalidateQueries({
+    return this.queryClient.invalidateQueries({
       queryKey: databaseKeys.databaseFunctions(projectRef),
       refetchType: 'active',
     })
