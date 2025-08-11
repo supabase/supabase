@@ -25,11 +25,9 @@ export type InvalidationConfig = {
 
 // SQL pattern matchers for different entity types
 const SQL_PATTERNS = {
-  table:
-    /(?:create(?:\s+or\s+replace)?|alter|drop)\s+table\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
-  function:
-    /(?:create(?:\s+or\s+replace)?|alter|drop)\s+(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)?"?(\w+)"?/i,
-  trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+(?:(\w+)\.)?(\w+))?/i,
+  table: /table\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
+  function: /(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
+  trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+"?(?:(\w+)\.)?"?(\w+)"?)?/i,
 } as const
 
 // Entity types that require entity list invalidation
