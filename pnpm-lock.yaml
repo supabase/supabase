@@ -45,7 +45,6 @@ overrides:
   '@tanstack/directive-functions-plugin>vite': ^6.2.7
   '@tanstack/react-start-plugin>vite': ^6.2.7
   esbuild: ^0.25.2
-  payload>image-size: 2.0.2
   '@redocly/respect-core>form-data': ^4.0.4
 
 importers:
