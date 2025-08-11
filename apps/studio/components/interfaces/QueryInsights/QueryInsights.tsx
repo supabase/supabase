@@ -333,10 +333,7 @@ export const QueryInsights = () => {
         </div>
       </Tabs_Shadcn_>
 
-      <div className="px-5">
-        <h3 className="text-xl text-foreground">Recent Queries</h3>
-        <p className="text-sm text-foreground-light">Detailed view of recent query executions</p>
-      </div>
+
 
       <QueryList
         queries={queriesData || []}
