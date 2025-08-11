@@ -56,7 +56,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     'showWarning',
     parseAsBoolean.withDefault(false)
   )
-  console.log({ showWarning })
 
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
