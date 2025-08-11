@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
@@ -153,7 +152,7 @@ export const QueryInsights = () => {
     <div className="flex flex-col gap-6 flex-grow">
       <div className="flex items-center justify-between px-5 pt-5">
         <div>
-          <h3 className="text-xl text-foreground">Query Metrics</h3>
+          <h3 className="text-xl text-foreground">Query Insights</h3>
           <p className="text-sm text-foreground-light">
             Monitor and analyze query performance over time
           </p>
