@@ -3,7 +3,7 @@ import { type QueryClient } from '@tanstack/react-query'
 import { extractEntityInfo } from './extract-entity-info'
 import { handleInvalidation } from './handle-invalidation'
 
-export type EntityType = 'table' | 'function' | 'procedure' | 'trigger' | 'policy'
+export type EntityType = 'table' | 'function' | 'procedure' | 'trigger' | 'policy' | 'index'
 
 export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
 

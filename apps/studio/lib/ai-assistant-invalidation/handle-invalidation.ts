@@ -6,6 +6,7 @@ import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { tableKeys } from 'data/tables/keys'
+import { databaseIndexesKeys } from 'data/database-indexes/keys'
 
 // Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
@@ -129,6 +130,38 @@ async function invalidateEntityTypesList(
   }
 }
 
+async function invalidateIndexQueries(
+  queryClient: QueryClient,
+  projectRef: string,
+  schema?: string,
+  table?: string
+): Promise<void> {
+  const promises: Promise<void>[] = []
+
+  const queryKey = schema
+    ? databaseIndexesKeys.list(projectRef, schema)
+    : databaseIndexesKeys.list(projectRef)
+
+  promises.push(
+    queryClient.invalidateQueries({
+      queryKey,
+      refetchType: 'active',
+    })
+  )
+
+  // Also invalidate the specific table's indexes if active
+  if (table && schema) {
+    promises.push(
+      queryClient.invalidateQueries({
+        queryKey: ['projects', projectRef, 'table', `${schema}.${table}`, 'indexes'],
+        refetchType: 'active',
+      })
+    )
+  }
+
+  await Promise.all(promises)
+}
+
 /**
  * Execute invalidation strategy for each entity type
  */
@@ -144,15 +177,13 @@ async function executeInvalidationStrategy(
     procedure: () => invalidateFunctionQueries(queryClient, projectRef),
     trigger: () => invalidateTriggerQueries(queryClient, projectRef),
     policy: () => invalidatePolicyQueries(queryClient, projectRef, schema, table),
+    index: () => invalidateIndexQueries(queryClient, projectRef, schema, table),
   }
 
   const strategy = invalidationMap[entityType]
   if (strategy) await strategy()
 }
 
-/**
- * Execute invalidation for an event
- */
 async function executeInvalidation(
   queryClient: QueryClient,
   event: InvalidationEvent

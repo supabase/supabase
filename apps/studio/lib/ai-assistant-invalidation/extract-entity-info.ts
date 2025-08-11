@@ -8,6 +8,8 @@ const SQL_PATTERNS = {
   function: /(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
   trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+"?(?:(\w+)\.)?"?(\w+)"?)?/i,
   policy: /policy\s+(?:"([^"]+)"|(\w+))\s+on\s+(?:"?(\w+)"?\.)??"?(\w+)"?/i,
+  index:
+    /(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+(?:not\s+)?exists\s+)?"?(\w+)"?\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?/i,
 } as const
 
 function extractTableInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
@@ -66,6 +68,18 @@ function extractPolicyInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> |
   }
 }
 
+function extractIndexInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.index)
+  if (!match) return null
+
+  return {
+    entityType: 'index',
+    schema: match[2] || DEFAULT_SCHEMA,
+    table: match[3],
+    entityName: match[1],
+  }
+}
+
 /**
  * Extract entity information from SQL statement
  */
@@ -88,6 +102,10 @@ export function extractEntityInfo(
 
   if (sqlLower.includes(' policy ')) {
     return extractPolicyInfo(sql)
+  }
+
+  if (sqlLower.includes(' index ')) {
+    return extractIndexInfo(sql)
   }
 
   return null
