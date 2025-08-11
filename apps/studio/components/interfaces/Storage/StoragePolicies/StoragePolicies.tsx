@@ -220,8 +220,7 @@ const StoragePolicies = () => {
           <ScaffoldSection isFullWidth>
             <ScaffoldSectionTitle>Schema</ScaffoldSectionTitle>
             <ScaffoldSectionDescription className="mb-6">
-              You may also write policies for the tables under the storage schema directly for
-              greater control
+              Write policies for the tables under the storage schema directly for greater control
             </ScaffoldSectionDescription>
 
             <div className="space-y-6">
