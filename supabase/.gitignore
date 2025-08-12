@@ -1,4 +1,5 @@
 # Supabase
 .branches
 .temp
-snippets
+snippets/*
+!snippets/seed
