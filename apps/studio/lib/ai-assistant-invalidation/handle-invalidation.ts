@@ -7,7 +7,6 @@ import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { tableKeys } from 'data/tables/keys'
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databaseCronJobsKeys } from 'data/database-cron-jobs/keys'
 
 // Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
@@ -135,6 +134,16 @@ async function invalidateIndexQueries(
   await Promise.all(promises)
 }
 
+async function invalidateCronQueries(queryClient: QueryClient, projectRef: string): Promise<void> {
+  await queryClient.invalidateQueries({
+    // Use generic query key with `exact:false` to invalidate all cron job queries
+    // regardless of `searchTerm` (which we can't access from here)
+    queryKey: ['projects', projectRef, 'cron-jobs'],
+    exact: false,
+    refetchType: 'active',
+  })
+}
+
 async function invalidateEntityTypesList(
   queryClient: QueryClient,
   projectRef: string,
@@ -146,14 +155,6 @@ async function invalidateEntityTypesList(
       exact: false,
     })
   }
-}
-
-async function invalidateCronQueries(queryClient: QueryClient, projectRef: string): Promise<void> {
-  await queryClient.invalidateQueries({
-    queryKey: databaseCronJobsKeys.listInfinite(projectRef, ''),
-    refetchType: 'active',
-    exact: false,
-  })
 }
 
 async function executeInvalidationStrategy(
