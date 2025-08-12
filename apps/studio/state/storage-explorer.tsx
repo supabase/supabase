@@ -9,6 +9,10 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
+  inverseValidObjectKeyRegex,
+  validObjectKeyRegex,
+} from 'components/interfaces/Storage/CreateBucketModal.utils'
+import {
   STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
@@ -260,6 +264,17 @@ function createStorageExplorerState({
         .join('/')
     },
 
+    validateFolderName: (name: string) => {
+      if (!validObjectKeyRegex.test(name)) {
+        const [match] = name.match(inverseValidObjectKeyRegex) ?? []
+        return !!match
+          ? `Folder name cannot contain the "${match}" character`
+          : 'Folder name contains an invalid special character'
+      }
+
+      return null
+    },
+
     addNewFolderPlaceholder: (columnIndex: number) => {
       const isPrepend = true
       const folderName = 'Untitled folder'
@@ -292,20 +307,20 @@ function createStorageExplorerState({
         autofix,
         columnIndex,
       })
+
       if (formattedName === null) {
         onError?.()
         return
       }
 
-      if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
-        onError?.()
-        return toast.error(
-          'Only alphanumeric characters, hyphens, and underscores are allowed for folder names.'
-        )
-      }
-
       if (formattedName.length === 0) {
         return state.removeTempRows(columnIndex)
+      }
+
+      const folderNameError = state.validateFolderName(formattedName)
+      if (folderNameError) {
+        onError?.()
+        return toast.error(folderNameError)
       }
 
       state.updateFolderAfterEdit({ folderName: formattedName, columnIndex })
@@ -602,7 +617,17 @@ function createStorageExplorerState({
       }
     },
 
-    renameFolder: async (folder: StorageItemWithColumn, newName: string, columnIndex: number) => {
+    renameFolder: async ({
+      folder,
+      newName,
+      columnIndex,
+      onError,
+    }: {
+      folder: StorageItemWithColumn
+      newName: string
+      columnIndex: number
+      onError?: () => void
+    }) => {
       const originalName = folder.name
       if (originalName === newName) {
         return state.updateRowStatus({
@@ -612,24 +637,18 @@ function createStorageExplorerState({
         })
       }
 
+      const folderNameError = state.validateFolderName(newName)
+      if (folderNameError) {
+        onError?.()
+        return toast.error(folderNameError)
+      }
+
       const toastId = toast(
         <SonnerProgress progress={0} message={`Renaming folder to ${newName}`} />,
         { closeButton: false, position: 'top-right' }
       )
 
       try {
-        /**
-         * Catch any folder names that contain slash or backslash
-         *
-         * this is because slashes are used to denote
-         * children/parent relationships in bucket
-         *
-         * todo: move this to a util file, as createFolder() uses same logic
-         */
-        if (newName.includes('/') || newName.includes('\\')) {
-          return toast.error(`Folder name cannot contain forward or back slashes.`)
-        }
-
         state.updateRowStatus({
           name: originalName,
           status: STORAGE_ROW_STATUS.LOADING,
