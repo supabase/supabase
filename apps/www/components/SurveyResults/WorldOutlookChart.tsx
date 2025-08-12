@@ -1,7 +1,7 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
 // Generate SQL query for team count chart
-function generateWorldOutlookSQL(activeFilters) {
+function generateWorldOutlookSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.role !== 'unset') {
