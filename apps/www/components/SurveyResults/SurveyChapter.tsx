@@ -25,7 +25,7 @@ export function SurveyChapter({
   return (
     <section
       id={`chapter-${number}`}
-      className="flex flex-col bg-200 border-t last-of-type:border-b pt-40"
+      className="flex flex-col bg-alternative border-t last-of-type:border-b pt-40"
     >
       <div className="flex flex-col container max-w-[60rem] mx-auto px-6 lg:px-0">
         <header className="mx-auto flex flex-col gap-4 text-center text-balance">
