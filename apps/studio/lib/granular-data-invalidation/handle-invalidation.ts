@@ -8,9 +8,15 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { tableKeys } from 'data/tables/keys'
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { viewKeys } from 'data/views/keys'
+import { materializedViewKeys } from 'data/materialized-views/keys'
 
 // Entity types that require entity list invalidation
-const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function', 'view']
+const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = [
+  'table',
+  'function',
+  'view',
+  'materialized_view',
+]
 
 export async function invalidateTableQueries(
   queryClient: QueryClient,
@@ -151,6 +157,21 @@ async function invalidateSchemaQueries(
   })
 }
 
+async function invalidateMaterializedViewQueries(
+  queryClient: QueryClient,
+  projectRef: string,
+  schema?: string
+): Promise<void> {
+  const queryKey = schema
+    ? materializedViewKeys.listBySchema(projectRef, schema)
+    : materializedViewKeys.list(projectRef)
+
+  await queryClient.invalidateQueries({
+    queryKey,
+    refetchType: 'active',
+  })
+}
+
 async function invalidateEntityTypesList(
   queryClient: QueryClient,
   projectRef: string,
@@ -179,6 +200,7 @@ async function executeInvalidationStrategy(
     index: () => invalidateIndexQueries(queryClient, projectRef, schema),
     cron: () => invalidateCronQueries(queryClient, projectRef),
     view: () => invalidateViewQueries(queryClient, projectRef, schema),
+    materialized_view: () => invalidateMaterializedViewQueries(queryClient, projectRef, schema),
     schema: () => invalidateSchemaQueries(queryClient, projectRef),
   }
 

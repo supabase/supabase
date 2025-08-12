@@ -82,12 +82,17 @@ function extractIndexInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | 
   }
 }
 
-function extractViewInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
+function extractViewInfo(
+  sql: string,
+  sqlLower: string
+): Omit<InvalidationEvent, 'projectRef'> | null {
   const match = sql.match(SQL_PATTERNS.view)
   if (!match) return null
 
+  const isMaterialized = sqlLower.includes('materialized')
+
   return {
-    entityType: 'view',
+    entityType: isMaterialized ? 'materialized_view' : 'view',
     schema: match[1] || DEFAULT_SCHEMA,
     entityName: match[2],
   }
@@ -146,7 +151,7 @@ export function extractEntityInfo(
   }
 
   if (sqlLower.includes(' view ')) {
-    return extractViewInfo(sql)
+    return extractViewInfo(sql, sqlLower)
   }
 
   if (sqlLower.includes(' schema ')) {
