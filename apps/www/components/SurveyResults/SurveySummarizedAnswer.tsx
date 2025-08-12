@@ -35,7 +35,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
   }, [currentIndex])
 
   return (
-    <div className="flex flex-col gap-3 px-3 py-8 sm:items-center sm:text-center">
+    <div className="flex flex-col gap-6 px-8 py-16 sm:items-center sm:text-center">
       <p className="text-foreground text-xl transition-opacity duration-500">
         {answers[currentIndex]}
       </p>

@@ -4,16 +4,16 @@ export function SurveyRankedAnswersPair({
   rankedAnswersPair: Array<{ label: string; answers: string[] }>
 }) {
   return (
-    <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-muted divide-opacity-50">
+    <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-y divide-muted divide-opacity-50">
       {rankedAnswersPair.map((item, index) => (
         <div
           key={index}
-          className={`flex gap-3 flex-1 px-6 py-8 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
+          className={`flex gap-3 flex-1 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
         >
           {/* Decorative progress bar */}
           <div
             aria-hidden="true"
-            className={`flex flex-row ${index % 2 === 0 ? 'items-start' : 'items-end'}`}
+            className={`flex flex-row ${index % 2 === 0 ? 'items-start' : 'sm:items-end'}`}
           >
             {item.answers.map((answer, answerIndex) => (
               <div
@@ -29,15 +29,18 @@ export function SurveyRankedAnswersPair({
             ))}
           </div>
 
-          <ol className="flex flex-col gap-3">
-            {item.answers.map((answer, answerIndex) => (
-              <li key={answerIndex} className="flex flex-col gap-2">
-                <span className="text-sm font-mono text-brand">#{answerIndex + 1}</span>
-                <span className="text-lg text-foreground">{answer}</span>
-              </li>
-            ))}
-          </ol>
-          <p className="text-foreground-light text-sm">{item.label}</p>
+          {/* Text content */}
+          <div className=" px-6 py-8">
+            <ol className="flex flex-col gap-3">
+              {item.answers.map((answer, answerIndex) => (
+                <li key={answerIndex} className="flex flex-col gap-2">
+                  <span className="text-sm font-mono text-brand">#{answerIndex + 1}</span>
+                  <span className="text-lg text-foreground">{answer}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="text-foreground-light text-sm">{item.label}</p>
+          </div>
         </div>
       ))}
     </aside>
