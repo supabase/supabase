@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'common'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
@@ -30,7 +31,15 @@ export const QueryInsights = () => {
   const state = useDatabaseSelectorStateSnapshot()
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
-  const [selectedMetric, setSelectedMetric] = useState<MetricType>('query_latency')
+  // Use URL state for metric persistence, similar to QueryPerformance
+  const [{ metric }, setSearchParams] = useQueryStates({
+    metric: parseAsString.withDefault('query_latency' as MetricType),
+  })
+
+  // Validate that the metric is a valid MetricType, fallback to default if not
+  const selectedMetric: MetricType = (['rows_read', 'query_latency', 'calls', 'cache_hits', 'issues'].includes(metric || '') 
+    ? metric 
+    : 'query_latency') as MetricType
   const [selectedTimeRange, setSelectedTimeRange] = useState('3h')
   const [selectedQuery, setSelectedQuery] = useState<QueryInsightsQuery | null>(null)
   const [hoveredQuery, setHoveredQuery] = useState<QueryInsightsQuery | null>(null)
@@ -325,7 +334,8 @@ export const QueryInsights = () => {
 
       <Tabs_Shadcn_
         value={selectedMetric}
-        onValueChange={(value) => setSelectedMetric(value as MetricType)}
+        defaultValue={selectedMetric}
+        onValueChange={(value) => setSearchParams({ metric: value as MetricType })}
         className="pb-4"
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
