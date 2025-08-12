@@ -61,7 +61,7 @@ export function parseSqlStatement(sql: string, projectRef: string): Invalidation
  * Process SQL and handle invalidation automatically
  * This is the main entry point for processing SQL statements
  */
-export async function invalidateCacheGranularly(
+export async function invalidateDataGranularly(
   queryClient: QueryClient,
   sql: string,
   projectRef: string

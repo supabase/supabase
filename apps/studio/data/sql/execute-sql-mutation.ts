@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
-import { invalidateCacheGranularly } from 'lib/ai-assistant-invalidation/invalidate-cache-granularly'
+import { invalidateDataGranularly } from 'lib/granular-data-invalidation/invalidate-cache-granularly'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
@@ -42,7 +42,7 @@ export const useExecuteSqlMutation = ({
       const { granularInvalidation, contextualInvalidation, sql, projectRef } = variables
 
       if (granularInvalidation && projectRef) {
-        await invalidateCacheGranularly(queryClient, sql, projectRef)
+        await invalidateDataGranularly(queryClient, sql, projectRef)
       } else {
         // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
         const sqlLower = sql.toLowerCase()
