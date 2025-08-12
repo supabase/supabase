@@ -230,7 +230,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     onFinish: handleChatFinish,
   })
 
-  const formattedError = tryParseJson(error?.message ?? {})
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
 
   const updateMessage = useCallback(
@@ -507,10 +506,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <p>
                         Sorry, I'm having trouble responding right now. If the error persists while
                         retrying, you may try clearing the conversation's messages and try again.
-                      </p>
-
-                      <p className="text-foreground-lighter text-xs mt-1">
-                        Error: {formattedError.message}
                       </p>
                     </div>
                   </div>

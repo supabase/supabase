@@ -90,18 +90,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const sizes: DesiredInstanceSize[] = [
-  'micro',
-  'small',
-  'medium',
-  'large',
-  'xlarge',
-  '2xlarge',
-  '4xlarge',
-  '8xlarge',
-  '12xlarge',
-  '16xlarge',
-]
+const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -783,7 +772,7 @@ const Wizard: NextPageWithLayout = () => {
                                                   CPU
                                                 </span>
                                                 <p
-                                                  className="text-xs text-muted instance-details"
+                                                  className="text-xs text-foreground-light instance-details"
                                                   translate="no"
                                                 >
                                                   ${instanceSizeSpecs[option].priceHourly}/hour (~$
@@ -794,6 +783,15 @@ const Wizard: NextPageWithLayout = () => {
                                           </SelectItem_Shadcn_>
                                         )
                                       })}
+                                    <SelectItem_Shadcn_
+                                      key={'disabled'}
+                                      value={'disabled'}
+                                      disabled
+                                    >
+                                      <div className="flex items-center justify-center w-full">
+                                        <span>Larger instance sizes available after creation</span>
+                                      </div>
+                                    </SelectItem_Shadcn_>
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>

@@ -27,7 +27,7 @@ functions:
           ```swift
           import Supabase
 
-          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
+          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
@@ -35,7 +35,7 @@ functions:
           ```swift
           import Supabase
 
-          let client = SupabaseClient(
+          let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
             options: SupabaseClientOptions(
@@ -65,7 +65,7 @@ functions:
             }
           }
 
-          let client = SupabaseClient(
+          let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
             options: SupabaseClientOptions(
