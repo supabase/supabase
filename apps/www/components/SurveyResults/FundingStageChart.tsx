@@ -1,6 +1,6 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
-function generateFundingStageSQL(activeFilters) {
+function generateFundingStageSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.headquarters !== 'unset') {

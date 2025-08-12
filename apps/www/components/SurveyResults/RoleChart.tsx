@@ -1,7 +1,7 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
 // Generate SQL query for team count chart
-function generateRoleSQL(activeFilters) {
+function generateRoleSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.person_age !== 'unset') {

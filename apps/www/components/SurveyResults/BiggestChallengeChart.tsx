@@ -1,7 +1,7 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
 // Generate SQL query for team count chart
-function generateBiggestChallengeSQL(activeFilters) {
+function generateBiggestChallengeSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   // Always filter out NULL values
