@@ -56,7 +56,10 @@ export const MetricToggleButtons = ({
         // If we have a selected query, hide the query-specific metrics since they'll
         // be shown inside the Selected Query pill
         if (
-          (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') &&
+          (key === 'query_rows' ||
+            key === 'query_latency' ||
+            key === 'query_calls' ||
+            key === 'query_issues') &&
           selectedQuery
         ) {
           return null
@@ -64,7 +67,10 @@ export const MetricToggleButtons = ({
 
         // Only show query-specific metrics when a query is selected
         if (
-          (key === 'query_rows' || key === 'query_latency' || key === 'query_calls' || key === 'query_issues') &&
+          (key === 'query_rows' ||
+            key === 'query_latency' ||
+            key === 'query_calls' ||
+            key === 'query_issues') &&
           !selectedQuery
         ) {
           return null
@@ -129,13 +135,7 @@ export const MetricToggleButtons = ({
         const formattedValue = !isNaN(metricValue) ? (value as any).formatter(metricValue) : '0'
 
         return (
-          <motion.div
-            key={key}
-            initial={{ opacity: 0, scale: 0.95, x: -8 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.95, x: -8 }}
-            transition={{ duration: 0.15 }}
-          >
+          <div key={key}>
             <MetricPill
               label={(value as any).label}
               value={formattedValue}
@@ -151,7 +151,7 @@ export const MetricToggleButtons = ({
                 }))
               }}
             />
-          </motion.div>
+          </div>
         )
       })}
     </AnimatePresence>
