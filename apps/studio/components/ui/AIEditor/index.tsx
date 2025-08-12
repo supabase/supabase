@@ -1,5 +1,4 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
-import { useCompletion } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'
@@ -71,26 +70,64 @@ const AIEditor = ({
   })
   const [promptInput, setPromptInput] = useState(initialPrompt || '')
 
-  const {
-    complete,
-    completion,
-    isLoading: isCompletionLoading,
-    setCompletion,
-  } = useCompletion({
-    api: aiEndpoint || '',
-    body: aiMetadata,
-    onError: (error) => {
-      toast.error(`Failed to generate: ${error.message}`)
+  const [isCompletionLoading, setIsCompletionLoading] = useState(false)
+
+  const complete = useCallback(
+    async (
+      prompt: string,
+      options?: {
+        headers?: Record<string, string>
+        body?: { completionMetadata?: any }
+      }
+    ) => {
+      try {
+        if (!aiEndpoint) throw new Error('AI endpoint is not configured')
+        setIsCompletionLoading(true)
+
+        const response = await fetch(aiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(options?.headers ?? {}),
+          },
+          body: JSON.stringify({
+            ...(aiMetadata ?? {}),
+            ...(options?.body ?? {}),
+          }),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Failed to generate completion')
+        }
+
+        const text: string = await response.json()
+
+        const meta = options?.body?.completionMetadata ?? {}
+        const beforeSelection: string = meta.textBeforeCursor ?? ''
+        const afterSelection: string = meta.textAfterCursor ?? ''
+        const selection: string = meta.selection ?? ''
+
+        const original = beforeSelection + selection + afterSelection
+        const modified = beforeSelection + text + afterSelection
+
+        setDiffValue({ original, modified })
+        setIsDiffMode(true)
+      } catch (error: any) {
+        toast.error(`Failed to generate: ${error?.message ?? 'Unknown error'}`)
+      } finally {
+        setIsCompletionLoading(false)
+      }
     },
-  })
+    [aiEndpoint, aiMetadata]
+  )
 
   const handleReset = useCallback(() => {
-    setCompletion('')
     setIsDiffMode(false)
     setPromptState((prev) => ({ ...prev, isOpen: false }))
     setPromptInput('')
     editorRef.current?.focus()
-  }, [setCompletion])
+  }, [])
 
   const handleAcceptDiff = useCallback(() => {
     if (diffValue.modified) {
@@ -268,20 +305,6 @@ const AIEditor = ({
       setIsDiffEditorMounted(false)
     }
   }, [isDiffMode])
-
-  useEffect(() => {
-    if (!completion) {
-      setIsDiffMode(false)
-      return
-    }
-
-    const original =
-      promptState.beforeSelection + promptState.selection + promptState.afterSelection
-    const modified = promptState.beforeSelection + completion + promptState.afterSelection
-
-    setDiffValue({ original, modified })
-    setIsDiffMode(true)
-  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
 
   useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {
