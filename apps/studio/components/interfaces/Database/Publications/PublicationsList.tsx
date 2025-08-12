@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+import { AlertCircle, Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Input, Toggle } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { AlertCircle, Search } from 'lucide-react'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import PublicationSkeleton from './PublicationSkeleton'
 
 interface PublicationEvent {
@@ -24,7 +24,7 @@ interface PublicationsListProps {
   onSelectPublication: (id: number) => void
 }
 
-const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
+export const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
@@ -39,11 +39,8 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     },
   })
 
-  const canUpdatePublications = useCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'publications'
-  )
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'publications')
 
   const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
@@ -183,5 +180,3 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     </>
   )
 }
-
-export default PublicationsList

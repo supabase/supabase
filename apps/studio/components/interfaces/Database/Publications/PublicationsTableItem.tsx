@@ -1,13 +1,13 @@
 import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
-import { Badge, Toggle } from 'ui'
+import { toast } from 'sonner'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { toast } from 'sonner'
+import { Badge, Toggle } from 'ui'
 
 interface PublicationsTableItemProps {
   table: PostgresTable
@@ -22,7 +22,7 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
     selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
   )
 
-  const canUpdatePublications = useCheckPermissions(
+  const { can: canUpdatePublications } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )

@@ -23,6 +23,7 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -32,7 +33,7 @@ import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-
 import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -64,7 +65,7 @@ interface TableListProps {
   onDuplicateTable: (table: PostgresTable) => void
 }
 
-const TableList = ({
+export const TableList = ({
   onDuplicateTable,
   onAddTable = noop,
   onEditTable = noop,
@@ -80,7 +81,11 @@ const TableList = ({
 
   const [filterString, setFilterString] = useState<string>('')
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
-  const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+
+  const { can: canUpdateTables } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const {
     data: tables,
@@ -484,62 +489,58 @@ const TableList = ({
                                 {x.type === ENTITY_TYPE.TABLE && (
                                   <>
                                     <DropdownMenuSeparator />
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <DropdownMenuItem
-                                          className="!pointer-events-auto gap-x-2"
-                                          disabled={!canUpdateTables}
-                                          onClick={() => {
-                                            if (canUpdateTables) onEditTable(x)
-                                          }}
-                                        >
-                                          <Edit size={12} />
-                                          <p>Edit table</p>
-                                        </DropdownMenuItem>
-                                      </TooltipTrigger>
-                                      {!canUpdateTables && (
-                                        <TooltipContent side="left">
-                                          You need additional permissions to edit this table
-                                        </TooltipContent>
-                                      )}
-                                    </Tooltip>
-                                    <DropdownMenuItem
+                                    <DropdownMenuItemTooltip
+                                      className="gap-x-2"
+                                      disabled={!canUpdateTables}
+                                      onClick={() => {
+                                        if (canUpdateTables) onEditTable(x)
+                                      }}
+                                      tooltip={{
+                                        content: {
+                                          side: 'left',
+                                          text: 'You need additional permissions to edit this table',
+                                        },
+                                      }}
+                                    >
+                                      <Edit size={12} />
+                                      <p>Edit table</p>
+                                    </DropdownMenuItemTooltip>
+                                    <DropdownMenuItemTooltip
                                       key="duplicate-table"
-                                      className="space-x-2"
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        if (canUpdateTables) {
-                                          onDuplicateTable(x)
-                                        }
+                                      className="gap-x-2"
+                                      disabled={!canUpdateTables}
+                                      onClick={() => {
+                                        if (canUpdateTables) onDuplicateTable(x)
+                                      }}
+                                      tooltip={{
+                                        content: {
+                                          side: 'left',
+                                          text: 'You need additional permissions to duplicate tables',
+                                        },
                                       }}
                                     >
                                       <Copy size={12} />
                                       <span>Duplicate Table</span>
-                                    </DropdownMenuItem>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <DropdownMenuItem
-                                          disabled={!canUpdateTables || isSchemaLocked}
-                                          className="!pointer-events-auto gap-x-2"
-                                          onClick={() => {
-                                            if (canUpdateTables && !isSchemaLocked) {
-                                              onDeleteTable({
-                                                ...x,
-                                                schema: selectedSchema,
-                                              })
-                                            }
-                                          }}
-                                        >
-                                          <Trash stroke="red" size={12} />
-                                          <p>Delete table</p>
-                                        </DropdownMenuItem>
-                                      </TooltipTrigger>
-                                      {!canUpdateTables && (
-                                        <TooltipContent side="left">
-                                          You need additional permissions to delete tables
-                                        </TooltipContent>
-                                      )}
-                                    </Tooltip>
+                                    </DropdownMenuItemTooltip>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItemTooltip
+                                      disabled={!canUpdateTables || isSchemaLocked}
+                                      className="gap-x-2"
+                                      onClick={() => {
+                                        if (canUpdateTables && !isSchemaLocked) {
+                                          onDeleteTable({ ...x, schema: selectedSchema })
+                                        }
+                                      }}
+                                      tooltip={{
+                                        content: {
+                                          side: 'left',
+                                          text: 'You need additional permissions to delete tables',
+                                        },
+                                      }}
+                                    >
+                                      <Trash size={12} />
+                                      <p>Delete table</p>
+                                    </DropdownMenuItemTooltip>
                                   </>
                                 )}
                               </DropdownMenuContent>
@@ -557,5 +558,3 @@ const TableList = ({
     </div>
   )
 }
-
-export default TableList
