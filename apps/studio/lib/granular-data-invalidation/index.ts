@@ -12,6 +12,7 @@ export type EntityType =
   | 'index'
   | 'cron'
   | 'view'
+  | 'schema'
 
 export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
 

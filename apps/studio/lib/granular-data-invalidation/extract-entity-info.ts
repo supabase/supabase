@@ -11,6 +11,7 @@ const SQL_PATTERNS = {
     /(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+(?:not\s+)?exists\s+)?"?(\w+)"?\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?/i,
   cron: /(?:select\s+)?cron\.(?:schedule|unschedule)\s*\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))/i,
   view: /view\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
+  schema: /schema\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"([^"]+)"|(\w+))/i,
 } as const
 
 function extractTableInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
@@ -102,6 +103,16 @@ function extractCronInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | n
   }
 }
 
+function extractSchemaInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.schema)
+  if (!match) return null
+
+  return {
+    entityType: 'schema',
+    entityName: match[1] || match[2], // match[1] for quoted names, match[2] for unquoted
+  }
+}
+
 /**
  * Extract entity information from SQL statement
  */
@@ -136,6 +147,10 @@ export function extractEntityInfo(
 
   if (sqlLower.includes(' view ')) {
     return extractViewInfo(sql)
+  }
+
+  if (sqlLower.includes(' schema ')) {
+    return extractSchemaInfo(sql)
   }
 
   return null

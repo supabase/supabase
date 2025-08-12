@@ -141,6 +141,16 @@ async function invalidateViewQueries(
   })
 }
 
+async function invalidateSchemaQueries(
+  queryClient: QueryClient,
+  projectRef: string
+): Promise<void> {
+  await queryClient.invalidateQueries({
+    queryKey: databaseKeys.schemas(projectRef),
+    refetchType: 'active',
+  })
+}
+
 async function invalidateEntityTypesList(
   queryClient: QueryClient,
   projectRef: string,
@@ -169,6 +179,7 @@ async function executeInvalidationStrategy(
     index: () => invalidateIndexQueries(queryClient, projectRef, schema),
     cron: () => invalidateCronQueries(queryClient, projectRef),
     view: () => invalidateViewQueries(queryClient, projectRef, schema),
+    schema: () => invalidateSchemaQueries(queryClient, projectRef),
   }
 
   const strategy = invalidationMap[entityType]
