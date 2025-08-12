@@ -102,44 +102,48 @@ export function SurveyChapterSection({
   }
 
   return (
-    <div
-      id={title.toLowerCase().replace(/\s+/g, '-')}
-      className="flex flex-col gap-12 border-t border-muted pt-24 mt-24"
-    >
-      <header className="flex flex-col gap-3  text-balance max-w-[48rem] mx-auto pb-12">
-        <h3 className="text-brand-link dark:text-brand font-mono uppercase tracking-widest text-sm">
-          {title}
-        </h3>
-        <p className="text-foreground text-xl leading-relaxed">{description}</p>
-      </header>
+    <div id={title.toLowerCase().replace(/\s+/g, '-')} className="">
+      <div className="max-w-[60rem] mx-auto flex flex-col border-x border-muted">
+        <header className="grid grid-cols-1 md:grid-cols-3 text-balance">
+          <h3 className="py-8 px-8 md:border-r border-muted text-brand-link dark:text-brand font-mono uppercase tracking-widest text-sm">
+            {title}
+          </h3>
+          <p className="py-8 px-8 md:col-span-2 text-foreground-light text-xl leading-relaxed">
+            {description}
+          </p>
+        </header>
 
-      {stats && (
-        <aside className="flex flex-row flex-wrap divide-x divide-muted divide-opacity-50">
-          {stats.map((stat, index) => (
-            <SurveyStatCard
-              key={index}
-              progressValue={stat.number}
-              unit={stat.unit}
-              label={stat.label}
-            />
-          ))}
-        </aside>
-      )}
+        {stats && (
+          <aside className="border-t border-muted flex flex-row flex-wrap divide-x divide-muted">
+            {stats.map((stat, index) => (
+              <SurveyStatCard
+                key={index}
+                progressValue={stat.number}
+                unit={stat.unit}
+                label={stat.label}
+              />
+            ))}
+          </aside>
+        )}
 
-      {charts?.map((chartName, index) => {
-        const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
-        return ChartComponent ? <ChartComponent key={index} /> : null
-      })}
+        {charts?.map((chartName, index) => {
+          const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
+          return ChartComponent ? <ChartComponent key={index} /> : null
+        })}
 
-      {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
+        {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
 
-      {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
+        {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
 
-      {summarizedAnswer && (
-        <SurveySummarizedAnswer label={summarizedAnswer.label} answers={summarizedAnswer.answers} />
-      )}
+        {summarizedAnswer && (
+          <SurveySummarizedAnswer
+            label={summarizedAnswer.label}
+            answers={summarizedAnswer.answers}
+          />
+        )}
 
-      {children}
+        {children}
+      </div>
 
       <SurveySectionBreak />
     </div>

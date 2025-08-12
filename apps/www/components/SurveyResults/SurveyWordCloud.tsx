@@ -128,7 +128,7 @@ export function SurveyWordCloud({
   }, [isRotating, answers, scramblingTexts, currentItems])
 
   return (
-    <aside className="flex flex-col gap-12 px-3 md:px-6">
+    <aside className="flex flex-col gap-12 px-8 border-y border-muted py-12">
       <ol className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-16 gap-y-10">
         {currentItems.map(({ text, count }, index) => (
           <li key={`${text}-${index}`} className={`flex flex-col gap-2 items-start`}>
