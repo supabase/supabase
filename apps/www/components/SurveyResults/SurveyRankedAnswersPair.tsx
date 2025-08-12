@@ -4,14 +4,38 @@ export function SurveyRankedAnswersPair({
   rankedAnswersPair: Array<{ label: string; answers: string[] }>
 }) {
   return (
-    <aside className="flex flex-row flex-wrap divide-x divide-muted divide-opacity-50">
-      {/* <div className="flex flex-row bg-surface-100 border border-default rounded-md divide-x"> */}
+    <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-muted divide-opacity-50">
       {rankedAnswersPair.map((item, index) => (
-        <div key={index} className="flex flex-col gap-3 flex-1 px-6 py-8">
+        <div
+          key={index}
+          className={`flex gap-3 flex-1 px-6 py-8 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
+        >
+          {/* Progress bar */}
+          {/* Filled portion of the bar */}
+          <div className={`flex flex-row ${index % 2 === 0 ? 'items-start' : 'items-end'}`}>
+            {item.answers.map((answer, answerIndex) => (
+              <div
+                key={answerIndex}
+                className={`h-${(answerIndex + 1) * 4} w-full relative bg-surface-100`}
+              >
+                <div
+                  className={`absolute inset-0 pointer-events-none ${answerIndex === 0 ? 'bg-brand' : answerIndex === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
+                  style={{
+                    maskImage: 'url("/survey/pattern-front.svg")',
+                    maskSize: '14.5px 15px',
+                    maskRepeat: 'repeat',
+                    maskPosition: 'top left',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
           <ol className="flex flex-col gap-3">
             {item.answers.map((answer, answerIndex) => (
-              <li key={answerIndex} className="font-mono text-brand">
-                #{answerIndex + 1}. {answer}
+              <li key={answerIndex} className="flex flex-col gap-2">
+                <span className="text-sm font-mono text-brand">#{answerIndex + 1}</span>
+                <span className="text-lg text-foreground">{answer}</span>
               </li>
             ))}
           </ol>

@@ -128,43 +128,65 @@ export function SurveyWordCloud({
   }, [isRotating, answers, scramblingTexts, currentItems])
 
   return (
-    <aside className="flex flex-col gap-8 px-3 md:px-6">
-      <p className="text-foreground-lighter text-sm">{label}</p>
+    <aside className="flex flex-col gap-12 px-3 md:px-6">
       <ol className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-16 gap-y-10">
         {currentItems.map(({ text, count }, index) => (
           <li key={`${text}-${index}`} className={`flex flex-col gap-2 items-start`}>
             {/* Progress bar */}
+            {/* Entire bar (including background) */}
             {count && (
               <div
-                className="h-[2px] flex items-center w-full"
+                className="w-full h-1 relative overflow-hidden"
                 style={
                   {
-                    background: `repeating-linear-gradient(
-                  45deg,
-                  transparent,
-                  transparent 3px,
-                  color-mix(in srgb, hsl(var(--foreground-muted)) 50%, transparent) 3px,
-                  color-mix(in srgb, hsl(var(--foreground-muted)) 50%, transparent) 4px
-                )`,
+                    '--bar-value': count,
+                    '--reference': maxCount,
                   } as React.CSSProperties
                 }
               >
+                {/* Background pattern for the entire bar */}
                 <div
-                  className="h-full bg-brand origin-left"
+                  className="absolute inset-0 pointer-events-none bg-foreground-muted"
+                  style={{
+                    maskImage: 'url("/survey/pattern-back.svg")',
+                    maskSize: '15px 15px',
+                    maskRepeat: 'repeat',
+                    maskPosition: 'center',
+                  }}
+                />
+
+                {/* Filled portion of the bar */}
+                <div
+                  className={`h-full relative bg-surface-100`}
                   style={{
                     width: `calc(max(0.5%, (${count} / ${maxCount}) * 100%))`,
                     transform: isRotating ? 'scaleX(1)' : 'scaleX(0)',
-                    transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    transformOrigin: 'left',
+                    transition: `transform 0.5s steps(${Math.max(2, Math.floor((count / maxCount) * 12))}, end)`,
                   }}
-                />
+                >
+                  {/* Foreground pattern for the filled portion */}
+                  <div
+                    className={`absolute inset-0 pointer-events-none bg-brand`}
+                    style={{
+                      maskImage: 'url("/survey/pattern-front.svg")',
+                      maskSize: '14.5px 15px',
+                      maskRepeat: 'repeat',
+                      maskPosition: 'top left',
+                    }}
+                  />
+                </div>
               </div>
             )}
-            <span className="font-mono md:text-lg text-center text-foreground">
+            <span className="font-mono md:text-lg text-foreground">
               {scramblingTexts[index].toUpperCase() || text.toUpperCase()}
             </span>
           </li>
         ))}
       </ol>
+      <p className="w-full text-foreground-lighter text-sm font-mono uppercase sm:text-center">
+        {label}
+      </p>
     </aside>
   )
 }
