@@ -39,7 +39,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 export interface CreateBucketModalProps {
@@ -47,42 +46,29 @@ export interface CreateBucketModalProps {
   onClose: () => void
 }
 
-const FormSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, 'Please provide a name for your bucket')
-      .max(100, 'Bucket name should be below 100 characters')
-      .refine(
-        (value) => !value.endsWith(' '),
-        'The name of the bucket cannot end with a whitespace'
-      )
-      .refine(
-        (value) => value !== 'public',
-        '"public" is a reserved name. Please choose another name'
-      ),
-    type: z.enum(['STANDARD', 'ANALYTICS']).default('STANDARD'),
-    public: z.boolean().default(false),
-    has_file_size_limit: z.boolean().default(false),
-    formatted_size_limit: z.coerce
-      .number()
-      .min(0, 'File size upload limit has to be at least 0')
-      .default(0),
-    allowed_mime_types: z.string().trim().default(''),
-  })
-  .superRefine((data, ctx) => {
-    if (!validBucketNameRegex.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
-        path: ['name'],
-        code: z.ZodIssueCode.custom,
-        message: !!match
-          ? `Bucket name cannot contain the "${match}" character`
-          : 'Bucket name contains an invalid special character',
-      })
-    }
-  })
+const FormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Please provide a name for your bucket')
+    .regex(
+      /^[a-z0-9.-]+$/,
+      'The name of the bucket must only contain lowercase letters, numbers, dots, and hyphens'
+    )
+    .refine((value) => !value.endsWith(' '), 'The name of the bucket cannot end with a whitespace')
+    .refine(
+      (value) => value !== 'public',
+      '"public" is a reserved name. Please choose another name'
+    ),
+  type: z.enum(['STANDARD', 'ANALYTICS']).default('STANDARD'),
+  public: z.boolean().default(false),
+  has_file_size_limit: z.boolean().default(false),
+  formatted_size_limit: z.coerce
+    .number()
+    .min(0, 'File size upload limit has to be at least 0')
+    .default(0),
+  allowed_mime_types: z.string().trim().default(''),
+})
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
@@ -196,9 +182,10 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               name="name"
               render={({ field }) => (
                 <FormItemLayout
-                  layout="vertical"
                   label="Name of bucket"
                   labelOptional="Buckets cannot be renamed once created."
+                  description="Only lowercase letters, numbers, dots, and hyphens"
+                  layout="vertical"
                 >
                   <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} placeholder="Enter bucket name" />
@@ -207,12 +194,12 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               )}
             />
 
-            <div className="flex flex-col gap-y-2 mt-2">
+            <div className="flex flex-col gap-y-2 mt-6">
               <FormField_Shadcn_
                 control={form.control}
                 name="type"
                 render={({ field }) => (
-                  <FormItemLayout label="Bucket type">
+                  <FormItemLayout>
                     <FormControl_Shadcn_>
                       <RadioGroupStacked
                         id="type"

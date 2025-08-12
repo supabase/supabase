@@ -2,7 +2,7 @@ import { has } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
-import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
+import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { RowIcon } from './FileExplorerRow'
 
@@ -13,8 +13,7 @@ export interface FileExplorerRowEditingProps {
 }
 
 const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEditingProps) => {
-  const { renameFile, renameFolder, addNewFolder, updateRowStatus } =
-    useStorageExplorerStateSnapshot()
+  const { renameFile, renameFolder, addNewFolder } = useStorageExplorerStateSnapshot()
 
   const inputRef = useRef<any>(null)
   const [itemName, setItemName] = useState(item.name)
@@ -29,22 +28,7 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
       await renameFile(item, name, columnIndex)
     } else if (has(item, 'id')) {
       const itemWithColumnIndex = { ...item, columnIndex }
-      renameFolder({
-        folder: itemWithColumnIndex,
-        newName: name,
-        columnIndex,
-        onError: () => {
-          if (event.type === 'blur') {
-            updateRowStatus({
-              name: itemWithColumnIndex.name,
-              status: STORAGE_ROW_STATUS.READY,
-              columnIndex,
-            })
-          } else {
-            inputRef.current.select()
-          }
-        },
-      })
+      renameFolder(itemWithColumnIndex, name, columnIndex)
     } else {
       addNewFolder({
         folderName: name,
