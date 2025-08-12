@@ -52,7 +52,7 @@ This method works for all PostgreSQL versions using CLI tools.
 ### Pre-Migration Checklist
 ```sql
 -- Check database size
-SELECT pg_database_size(current_database())/1024/1024/1024 AS size_gb;
+SELECT pg_size_pretty(pg_database_size(current_database())) AS size;
 
 -- Check PostgreSQL version
 SELECT version();
