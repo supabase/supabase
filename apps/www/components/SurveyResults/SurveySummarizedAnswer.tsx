@@ -1,35 +1,80 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export function SurveySummarizedAnswer({ label, answers }: { label: string; answers: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
     if (answers.length <= 1) return
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % answers.length)
-    }, 3000)
+    }, 4000)
 
     return () => clearInterval(interval)
   }, [answers.length])
 
-  if (answers.length <= 1) {
-    return (
-      <div className="flex flex-col gap-3 px-6 py-8">
-        <p className="font-mono text-brand text-2xl">{answers[0]}</p>
-        <p className="text-foreground-light text-sm">{label}</p>
-      </div>
-    )
-  }
+  useEffect(() => {
+    // First, reset the bar to 0%
+    setIsAnimating(false)
+
+    // Then start the animation after a brief delay to ensure the reset is applied
+    const startTimer = setTimeout(() => {
+      setIsAnimating(true)
+    }, 50)
+
+    // Stop the animation after 3 seconds
+    const stopTimer = setTimeout(() => {
+      setIsAnimating(false)
+    }, 4050)
+
+    return () => {
+      clearTimeout(startTimer)
+      clearTimeout(stopTimer)
+    }
+  }, [currentIndex])
 
   return (
-    <div className="flex flex-col gap-3 px-6 py-8">
-      <div className="min-h-[1.5rem] flex items-center">
-        <p className="font-mono text-brand text-2xl transition-opacity duration-500">
-          {answers[currentIndex]}
-        </p>
+    <div className="flex flex-col gap-3 px-3 py-8 sm:items-center sm:text-center">
+      <p className="text-foreground text-xl transition-opacity duration-500">
+        {answers[currentIndex]}
+      </p>
+      <div className="w-24 h-1 relative overflow-hidden">
+        {/* Background pattern for the entire bar */}
+        <div
+          className="absolute inset-0 pointer-events-none bg-foreground-muted"
+          style={{
+            maskImage: 'url("/survey/pattern-back.svg")',
+            maskSize: '15px 15px',
+            maskRepeat: 'repeat',
+            maskPosition: 'center',
+          }}
+        />
+
+        {/* Filled portion of the bar - timer-based */}
+        <div
+          key={currentIndex}
+          className={`h-full relative bg-surface-100`}
+          style={{
+            width: '100%',
+            transform: isAnimating ? 'scaleX(1)' : 'scaleX(0)',
+            transformOrigin: 'left',
+            transition: isAnimating ? 'transform 3s steps(3, end)' : 'transform 0s',
+          }}
+        >
+          {/* Foreground pattern for the filled portion */}
+          <div
+            className={`absolute inset-0 pointer-events-none bg-brand`}
+            style={{
+              maskImage: 'url("/survey/pattern-front.svg")',
+              maskSize: '14.5px 15px',
+              maskRepeat: 'repeat',
+              maskPosition: 'top left',
+            }}
+          />
+        </div>
       </div>
-      <p className="text-foreground-light text-sm">{label}</p>
+      <p className="w-full text-foreground-lighter text-sm font-mono uppercase">{label}</p>
     </div>
   )
 }

@@ -307,13 +307,11 @@ export function GenericChartWithQuery({
   const displayData = isLoading ? skeletonData : chartData || []
 
   return (
-    <div ref={chartRef} className="w-full bg-surface-100 border-y">
+    <div ref={chartRef} className="w-full bg-200 border-y">
       <header className="px-6 py-5">
         <h3 className="text-foreground-light text-sm">{title}</h3>
       </header>
-      <div
-        className={`${view === 'chart' ? 'bg-surface-100' : 'bg-surface-75'} border-b last:border-none`}
-      >
+      <div className={`${view === 'chart' ? 'bg-200' : 'bg-surface-75'} border-b last:border-none`}>
         {/* Filters and toggle */}
         <div className="flex flex-row flex-wrap gap-4 p-4 justify-between">
           {filters && activeFilters && setFilterValue && (
@@ -397,7 +395,7 @@ export function GenericChartWithQuery({
                           width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
                           transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
                           transformOrigin: 'left',
-                          transition: `transform 0.4s steps(${Math.max(2, Math.floor((item.value / maxValue) * 12))}, end) ${index * 0.05}s`,
+                          transition: `transform 0.5s steps(${Math.max(2, Math.floor((item.value / maxValue) * 12))}, end) ${index * 0.05}s`,
                         }}
                       >
                         {/* Foreground pattern for the filled portion */}

@@ -8,7 +8,7 @@ export function SurveyStatCard({
 }: {
   unit?: string
   label: string
-  progressValue?: number
+  progressValue: number
   maxValue?: number
 }) {
   const [displayValue, setDisplayValue] = useState(0)
@@ -68,34 +68,53 @@ export function SurveyStatCard({
   return (
     <div ref={cardRef} className="flex-1 px-6 py-8 flex flex-col gap-4">
       {/* Progress bar */}
-      {progressValue !== undefined && (
+      {/* Entire bar (including background) */}
+      <div
+        className="h-2 relative overflow-hidden"
+        style={
+          {
+            '--bar-value': progressValue,
+            '--reference': maxValue,
+          } as React.CSSProperties
+        }
+      >
+        {/* Background pattern for the entire bar */}
         <div
-          className="h-[6px] flex items-center md:mr-12"
-          style={
-            {
-              background: `repeating-linear-gradient(
-                  45deg,
-                  transparent,
-                  transparent 3px,
-                  color-mix(in srgb, hsl(var(--foreground-muted)) 50%, transparent) 3px,
-                  color-mix(in srgb, hsl(var(--foreground-muted)) 50%, transparent) 4px
-                )`,
-            } as React.CSSProperties
-          }
+          className="absolute inset-0 pointer-events-none bg-foreground-muted"
+          style={{
+            maskImage: 'url("/survey/pattern-back.svg")',
+            maskSize: '15px 15px',
+            maskRepeat: 'repeat',
+            maskPosition: 'center',
+          }}
+        />
+
+        {/* Filled portion of the bar */}
+        <div
+          className={`h-full relative bg-surface-100`}
+          style={{
+            width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
+            transform: shouldAnimateBar ? 'scaleX(1)' : 'scaleX(0)',
+            transformOrigin: 'left',
+            transition: `transform 0.5s steps(${Math.max(2, Math.floor((progressValue / maxValue) * 12))}, end)`,
+          }}
         >
+          {/* Foreground pattern for the filled portion */}
           <div
-            className="h-full bg-brand origin-left"
+            className={`absolute inset-0 pointer-events-none bg-brand`}
             style={{
-              width: `calc(max(0.5%, (${progressValue} / ${maxValue}) * 100%))`,
-              transform: shouldAnimateBar ? 'scaleX(1)' : 'scaleX(0)',
-              transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              maskImage: 'url("/survey/pattern-front.svg")',
+              maskSize: '14.5px 15px',
+              maskRepeat: 'repeat',
+              maskPosition: 'top left',
             }}
           />
         </div>
-      )}
+      </div>
+      {/* Text */}
       <div className="flex flex-col gap-2">
         <p
-          className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-foreground' : 'text-foreground-muted'} transition-colors duration-1000`}
+          className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-brand' : 'text-foreground-muted'} transition-colors duration-1000`}
         >
           {displayValue}
           <span className="md:text-4xl">{unit}</span>
