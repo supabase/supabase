@@ -7,9 +7,10 @@ import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { tableKeys } from 'data/tables/keys'
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
+import { viewKeys } from 'data/views/keys'
 
 // Entity types that require entity list invalidation
-const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
+const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function', 'view']
 
 export async function invalidateTableQueries(
   queryClient: QueryClient,
@@ -127,6 +128,19 @@ async function invalidateCronQueries(queryClient: QueryClient, projectRef: strin
   })
 }
 
+async function invalidateViewQueries(
+  queryClient: QueryClient,
+  projectRef: string,
+  schema?: string
+): Promise<void> {
+  const queryKey = schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef)
+
+  await queryClient.invalidateQueries({
+    queryKey,
+    refetchType: 'active',
+  })
+}
+
 async function invalidateEntityTypesList(
   queryClient: QueryClient,
   projectRef: string,
@@ -154,6 +168,7 @@ async function executeInvalidationStrategy(
     policy: () => invalidatePolicyQueries(queryClient, projectRef, schema, table),
     index: () => invalidateIndexQueries(queryClient, projectRef, schema),
     cron: () => invalidateCronQueries(queryClient, projectRef),
+    view: () => invalidateViewQueries(queryClient, projectRef, schema),
   }
 
   const strategy = invalidationMap[entityType]

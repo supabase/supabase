@@ -11,6 +11,7 @@ export type EntityType =
   | 'policy'
   | 'index'
   | 'cron'
+  | 'view'
 
 export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
 

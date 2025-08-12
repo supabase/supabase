@@ -10,6 +10,7 @@ const SQL_PATTERNS = {
   index:
     /(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+(?:not\s+)?exists\s+)?"?(\w+)"?\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?/i,
   cron: /(?:select\s+)?cron\.(?:schedule|unschedule)\s*\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))/i,
+  view: /view\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
 } as const
 
 function extractTableInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
@@ -80,6 +81,17 @@ function extractIndexInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | 
   }
 }
 
+function extractViewInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.view)
+  if (!match) return null
+
+  return {
+    entityType: 'view',
+    schema: match[1] || DEFAULT_SCHEMA,
+    entityName: match[2],
+  }
+}
+
 function extractCronInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
   const match = sql.match(SQL_PATTERNS.cron)
   if (!match) return null
@@ -118,9 +130,12 @@ export function extractEntityInfo(
     return extractIndexInfo(sql)
   }
 
-  // The specific 'cron.' prefix prevents conflicts with other patterns
   if (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule')) {
     return extractCronInfo(sql)
+  }
+
+  if (sqlLower.includes(' view ')) {
+    return extractViewInfo(sql)
   }
 
   return null
