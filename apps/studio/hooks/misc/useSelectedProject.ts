@@ -54,21 +54,26 @@ export function useSelectedProjectQuery({ enabled = true } = {}) {
  * ```
  */
 export function useProjectByRef(
-  ref?: string
+  ref?: string,
+  enabled: boolean = true
 ): Omit<ProjectInfo, 'organization_slug' | 'preview_branch_refs'> | undefined {
   const isLoggedIn = useIsLoggedIn()
-
-  const { data: project } = useProjectDetailQuery({ ref }, { enabled: isLoggedIn })
-
   // [Alaister]: This is here for the purpose of improving performance.
   // Chances are, the user will already have the list of projects in the cache.
   // We can't exclusively rely on this method, as useProjectsQuery does not return branch projects.
-  const { data: projects } = useProjectsQuery({ enabled: isLoggedIn })
+  const { data: project } = useProjectDetailQuery(
+    { ref },
+    { enabled: !!ref && isLoggedIn && enabled }
+  )
+
+  const { data: projects } = useProjectsQuery({
+    enabled: isLoggedIn && enabled,
+  })
 
   return useMemo(() => {
     if (!ref) return undefined
     if (project) return project
-    return projects?.find((project) => project.ref === ref)
+    return projects?.find((p) => p.ref === ref)
   }, [project, projects, ref])
 }
 

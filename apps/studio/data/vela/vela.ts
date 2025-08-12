@@ -1,6 +1,6 @@
 import createClient, { Client } from 'openapi-fetch'
 import { paths } from './vela-schema'
-import { VELA_PLATFORM_URL } from '../../pages/api/constants.js'
+import { VELA_PLATFORM_URL } from '../../pages/api/constants'
 
 
 const velaClient = createClient<paths>({

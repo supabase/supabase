@@ -13,7 +13,7 @@ import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-
 import { useChartHighlight } from './useChartHighlight'
 
 import type { ChartData } from './Charts.types'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { UpdateDateRange } from 'pages/org/[slug]/project/[ref]/reports/database'
 import type { MultiAttribute } from './ComposedChart.utils'
 
 interface LogChartHandlerProps {

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ChartHighlight } from './useChartHighlight'
-import { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import { UpdateDateRange } from 'pages/org/[slug]/project/[ref]/reports/database'
 
 const ChartHighlightActions = ({
   chartHighlight,

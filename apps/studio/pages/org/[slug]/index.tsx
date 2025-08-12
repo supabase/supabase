@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { useIsMFAEnabled } from 'common'
+import { useIsMFAEnabled, useParams } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -15,6 +15,7 @@ import { Admonition } from 'ui-patterns'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const { data } = useSelectedOrganizationQuery()
+  const {slug} = useParams()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = data?.organization_requires_mfa && !isUserMFAEnabled
 
@@ -50,6 +51,7 @@ const ProjectsPage: NextPageWithLayout = () => {
               search={search}
               filterStatus={filterStatus}
               resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
+              rewriteHref={(projectRef) => `${slug}/project/${projectRef}`}
             />
           </div>
         </div>

@@ -62,11 +62,13 @@ const ProjectLink = ({
   setOpen: (value: boolean) => void
 }) => {
   const router = useRouter()
-  const { ref } = useParams()
-  const sanitizedRoute = sanitizeRoute(router.route, router.query)
+  const { ref, slug } = useParams()
+  // const sanitizedRoute = sanitizeRoute(router.route, router.query)
 
   // [Joshen] Temp while we're interim between v1 and v2 billing
-  let href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+  // let href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+
+  let href = `/org/${slug}/project/${project.ref}`
 
   return (
     <CommandItem_Shadcn_
@@ -89,7 +91,7 @@ const ProjectLink = ({
 
 export const ProjectDropdown = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const project = useSelectedProject()
@@ -115,7 +117,7 @@ export const ProjectDropdown = () => {
   return (
     <>
       <Link
-        href={`/project/${project?.ref}`}
+        href={`/org/${slug}/project/${project?.ref}`}
         className="flex items-center gap-2 flex-shrink-0 text-sm"
       >
         <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />

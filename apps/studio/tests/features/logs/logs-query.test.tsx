@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
-import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
+import { LogsExplorerPage } from 'pages/org/[slug]/project/[ref]/logs/explorer/index'
 import { clickDropdown } from 'tests/helpers'
 import { customRender as render } from 'tests/lib/custom-render'
 import { routerMock } from 'tests/lib/route-mock'

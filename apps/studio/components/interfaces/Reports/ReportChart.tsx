@@ -18,7 +18,7 @@ import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useChartData } from 'hooks/useChartData'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { UpdateDateRange } from 'pages/org/[slug]/project/[ref]/reports/database'
 import { Button, cn } from 'ui'
 
 const ReportChart = ({

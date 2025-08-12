@@ -32,7 +32,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     ''
   )
 
-  const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
+  const DEFAULT_HOME = '/organizations'
 
   /**
    * Array of urls/routes that should be ignored

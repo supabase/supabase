@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
-import { IS_VELA_PLATFORM } from '../../constants.js'
-import { getVelaClient } from '../../../../data/vela/vela.js'
+import { IS_VELA_PLATFORM } from '../../constants'
+import { getVelaClient } from '../../../../data/vela/vela'
 import { Organization } from '../../../../types/index.js'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)

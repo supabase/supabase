@@ -20,9 +20,9 @@ export function useSelectedOrganization({ enabled = true } = {}) {
   const isLoggedIn = useIsLoggedIn()
 
   const { ref, slug } = useParams()
-  const { data } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
+  const { data = [] } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
 
-  const selectedProject = useProjectByRef(ref)
+  const selectedProject = useProjectByRef(ref,!slug) || { organization_id: undefined }
 
   return useMemo(() => {
     return data?.find((org) => {

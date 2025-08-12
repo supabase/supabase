@@ -25,7 +25,7 @@ export const HomeIcon = () => {
     return '/organizations'
   }
 
-  const href = IS_PLATFORM ? getDefaultOrgRedirect() : '/project/default'
+  const href = '/organizations'
 
   return (
     <Link href={href} className="items-center justify-center flex-shrink-0 hidden md:flex">
