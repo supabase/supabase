@@ -5,10 +5,10 @@ const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
 }
 
-const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
+const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#' as const
 
 export interface Provider {
-  $schema: string
+  $schema: typeof JSON_SCHEMA_VERSION
   type: 'object'
   key?: string
   title: string

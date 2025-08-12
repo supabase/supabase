@@ -12,7 +12,6 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import type { FormSchema } from 'types'
 import {
   Button,
   CardContent,
@@ -32,10 +31,11 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import type { Template } from './EmailTemplatesValidation'
 import { SpamValidation } from './SpamValidation'
 
 interface TemplateEditorProps {
-  template: FormSchema
+  template: Template
 }
 
 const TemplateEditor = ({ template }: TemplateEditorProps) => {
