@@ -1,6 +1,7 @@
 import { ChevronRight, Clipboard, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu, Separator, Submenu } from 'react-contexify'
+import { toast } from 'sonner'
 
 import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -48,6 +49,7 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       const text = formatClipboardValue(value)
 
       copyToClipboard(text)
+      toast.success('Copied cell value to clipboard')
     },
     [rows, snap.gridColumns, snap.selectedCellPosition]
   )
@@ -58,6 +60,7 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       const { rowIdx } = props
       const row = rows[rowIdx]
       copyToClipboard(JSON.stringify(row))
+      toast.success('Copied row to clipboard')
     },
     [rows]
   )
