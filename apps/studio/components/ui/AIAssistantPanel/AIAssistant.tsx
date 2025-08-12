@@ -18,13 +18,13 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { tryParseJson } from 'lib/helpers'
 import uuidv4 from 'lib/uuid'
 import type { AssistantMessageType } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, cn } from 'ui'
+import { AiIconAnimation, Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary'
@@ -92,6 +92,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
+
+  useHotKey(() => cancelEdit(), 'Escape')
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -614,7 +616,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <Pencil size={14} />
                       <span>Editing message</span>
                     </div>
-                    <Button
+                    <ButtonTooltip
                       type="outline"
                       size="tiny"
                       icon={<X size={14} />}
@@ -622,6 +624,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       className="w-6 h-6 p-0"
                       title="Cancel editing"
                       aria-label="Cancel editing"
+                      tooltip={{
+                        content: { side: 'top', text: <KeyboardShortcut keys={['Meta', 'Esc']} /> },
+                      }}
                     />
                   </div>
                 </motion.div>

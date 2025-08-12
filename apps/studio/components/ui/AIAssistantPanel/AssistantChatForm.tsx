@@ -91,7 +91,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
     const canSubmit = !loading && !!value
 
     return (
-      <div className="w-full relative z-30">
+      <div className="w-full">
         <form
           id="assistant-chat"
           ref={formRef}

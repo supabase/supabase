@@ -8,9 +8,9 @@ import remarkGfm from 'remark-gfm'
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
+import { ButtonTooltip } from '../ButtonTooltip'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
-import { ButtonTooltip } from '../ButtonTooltip'
 import {
   Heading3,
   Hyperlink,
@@ -104,8 +104,8 @@ export const Message = function Message({
     <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
         className={cn(
-          'text-foreground-light text-sm',
-          isUser ? 'text-foreground first:mt-0 mt-6' : 'first:mt-0 mt-2',
+          'text-foreground-light text-sm first:mt-0',
+          isUser ? 'text-foreground mt-6' : '',
           variant === 'warning' && 'bg-warning-200',
           isAfterEditedMessage && 'opacity-50 cursor-pointer transition-opacity'
         )}
@@ -124,7 +124,7 @@ export const Message = function Message({
             />
           )}
 
-          <div className="flex-1 min-w-0 space-y-2">
+          <div className="flex-1 min-w-0">
             {shouldUsePartsRendering ? (
               (() => {
                 const shownLoadingTools = new Set<string>()
