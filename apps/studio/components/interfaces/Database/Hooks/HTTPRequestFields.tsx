@@ -2,11 +2,11 @@ import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
@@ -48,7 +48,7 @@ const HTTPRequestFields = ({
   onRemoveParameter,
 }: HTTPRequestFieldsProps) => {
   const { ref } = useParams()
-  const { project: selectedProject } = useProjectContext()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })

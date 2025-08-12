@@ -1,7 +1,6 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Link from 'next/link'
-import React from 'react'
 
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, NavMenu, NavMenuItem } from 'ui'
 
 type Props = {
@@ -9,7 +8,7 @@ type Props = {
 }
 
 function DatabaseBackupsNav({ active }: Props) {
-  const { ref, cloud_provider } = useProjectContext()?.project || {}
+  const { ref, cloud_provider } = useSelectedProjectQuery()?.data || {}
 
   const navMenuItems = [
     {

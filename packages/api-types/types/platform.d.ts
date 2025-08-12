@@ -1114,6 +1114,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/cloud-marketplace/link': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Makes an existing organization being billed by AWS Marketplace */
+    put: operations['ClazarController_link']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/customer': {
     parameters: {
       query?: never
@@ -1160,6 +1177,23 @@ export interface paths {
     get: operations['OrgDailyStatsController_getDailyStatsCompute']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/documents/dpa': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create DPA document using PandaDoc */
+    post: operations['OrgDocumentsController_createDpaDocument']
     delete?: never
     options?: never
     head?: never
@@ -1533,6 +1567,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/sso': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the organization's SSO Provider */
+    get: operations['SSOProvidersController_getSSOProvider']
+    /** Update the organization's SSO Provider */
+    put: operations['SSOProvidersController_updateSSOProvider']
+    /** Create the organization's SSO Provider */
+    post: operations['SSOProvidersController_createSSOProvider']
+    /** Delete the organization's SSO Provider */
+    delete: operations['SSOProvidersController_deleteSSOProvider']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/tax-ids': {
     parameters: {
       query?: never
@@ -1561,6 +1615,40 @@ export interface paths {
     }
     /** Gets usage stats */
     get: operations['OrgUsageController_getOrgUsage']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/cloud-marketplace': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates organization billed by AWS Marketplace */
+    post: operations['OrganizationsController_createAwsBilledOrganization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/cloud-marketplace/check-eligibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether given organizations are eligible for AWS billing */
+    get: operations['OrganizationsController_checkCloudMarketplaceEligibility']
     put?: never
     post?: never
     delete?: never
@@ -2410,6 +2498,23 @@ export interface paths {
     get: operations['TenantController_getTenant']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/api-keys/temporary': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create a temporary API key */
+    post: operations['ApiKeysController_createTemporaryApiKey']
     delete?: never
     options?: never
     head?: never
@@ -3329,7 +3434,8 @@ export interface paths {
     put?: never
     /** Update a replication destination and pipeline. */
     post: operations['ReplicationDestinationsPipelinesController_updateDestinationPipeline']
-    delete?: never
+    /** Delete a replication destination and pipeline. */
+    delete: operations['ReplicationDestinationsPipelinesController_deleteDestinationPipeline']
     options?: never
     head?: never
     patch?: never
@@ -3361,10 +3467,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get all replication pipelines. */
+    /** Retrieves all replication pipelines. */
     get: operations['ReplicationPipelinesController_getPipelines']
     put?: never
-    /** Create a replication pipeline. */
+    /** Creates a replication pipeline. */
     post: operations['ReplicationPipelinesController_createPipeline']
     delete?: never
     options?: never
@@ -3379,12 +3485,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get a replication pipeline by ID. */
+    /** Retrieves a replication pipeline by ID. */
     get: operations['ReplicationPipelinesController_getPipeline']
     put?: never
-    /** Update a replication pipeline. */
+    /** Updates a replication pipeline. */
     post: operations['ReplicationPipelinesController_updatePipeline']
-    /** Delete a replication pipeline. */
+    /** Deletes a replication pipeline. */
     delete: operations['ReplicationPipelinesController_deletePipeline']
     options?: never
     head?: never
@@ -3398,10 +3504,27 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the status of a replication pipeline. */
+    /** Retrieves the replication status of a pipeline. */
     get: operations['ReplicationPipelinesController_getPipelineReplicationStatus']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-table-state': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Rolls back the state of a table in the pipeline. */
+    post: operations['ReplicationPipelinesController_rollbackTableState']
     delete?: never
     options?: never
     head?: never
@@ -3417,7 +3540,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Start a replication pipeline. */
+    /** Starts a replication pipeline. */
     post: operations['ReplicationPipelinesController_startPipeline']
     delete?: never
     options?: never
@@ -3432,7 +3555,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Get the status of a replication pipeline. */
+    /** Retrieves the status of a replication pipeline. */
     get: operations['ReplicationPipelinesController_getPipelineStatus']
     put?: never
     post?: never
@@ -3451,7 +3574,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Stop a replication pipeline. */
+    /** Stops a replication pipeline. */
     post: operations['ReplicationPipelinesController_stopPipeline']
     delete?: never
     options?: never
@@ -4315,6 +4438,11 @@ export interface components {
     ChangeMFAEnforcementStateRequest: {
       enforced: boolean
     }
+    CheckCloudMarketplaceEligibilityResponse: {
+      is_eligible: boolean
+      reasons: string[]
+      slug: string
+    }[]
     CloneBackupsResponse: {
       backups: {
         id: number
@@ -4372,6 +4500,12 @@ export interface components {
       scope?: 'V0'
       token: string
       token_alias: string
+    }
+    CreateAwsBilledOrganizationBody: {
+      buyer_id: string
+      kind?: string
+      name: string
+      size?: string
     }
     CreateBackendParamsOpenapi: {
       config:
@@ -4473,6 +4607,17 @@ export interface components {
     CreateDestinationResponse: {
       /** @description Destination id */
       id: number
+    }
+    CreateDpaDocumentRequest: {
+      /** Format: email */
+      recipient_email: string
+    }
+    CreateDpaDocumentResponse: {
+      date_created: string
+      document_id: string
+      download_url?: string
+      name: string
+      status: string
     }
     CreateExtensionBody: {
       cascade: boolean
@@ -4664,6 +4809,8 @@ export interface components {
         }
       | {
           billing_email: string | null
+          /** @enum {string|null} */
+          billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -4908,6 +5055,62 @@ export interface components {
       /** @description Source id */
       id: number
     }
+    CreateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    CreateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     CreateStorageBucketBody: {
       allowed_mime_types?: string[]
       file_size_limit?: number
@@ -5552,6 +5755,34 @@ export interface components {
       }
       path: string[]
     }
+    GetSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     GetStorageCredentialsResponse: {
       data: {
         created_at: string
@@ -5781,6 +6012,7 @@ export interface components {
     }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
+      AUDIT_LOG_DISABLE_POSTGRES: boolean | null
       DB_MAX_POOL_SIZE: number | null
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
@@ -6096,6 +6328,9 @@ export interface components {
       phone: string | null
       token: string
     }
+    LinkClazarBuyerBody: {
+      buyer_id: string
+    }
     ListGitHubConnectionsResponse: {
       connections: {
         branch_limit: number
@@ -6350,6 +6585,8 @@ export interface components {
     }
     OrganizationResponse: {
       billing_email: string | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -6402,9 +6639,8 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata: {
-        [key: string]: unknown
-      } | null
+      /** @enum {string|null} */
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -7225,6 +7461,7 @@ export interface components {
       app_config?: {
         db_schema: string
         endpoint: string
+        storage_endpoint: string
       }
       cloud_provider: string
       db_dns_name: string
@@ -7393,9 +7630,25 @@ export interface components {
               name: 'following_wal'
             }
           | {
-              message: string
               /** @enum {string} */
               name: 'error'
+              reason: string
+              retry_policy:
+                | {
+                    /** @enum {string} */
+                    policy: 'no_retry'
+                  }
+                | {
+                    /** @enum {string} */
+                    policy: 'manual_retry'
+                  }
+                | {
+                    /** @description The time of the next retry (RFC3339 format) */
+                    next_retry: string
+                    /** @enum {string} */
+                    policy: 'timed_retry'
+                  }
+              solution?: string
             }
         /** @description Table id (internal Postgres OID) */
         table_id: number
@@ -7466,34 +7719,10 @@ export interface components {
       /** @description Pipeline id */
       pipeline_id: number
       /** @description Pipeline status */
-      status:
-        | {
-            /** @enum {string} */
-            name: 'stopped'
-          }
-        | {
-            /** @enum {string} */
-            name: 'starting'
-          }
-        | {
-            /** @enum {string} */
-            name: 'started'
-          }
-        | {
-            /** @enum {string} */
-            name: 'stopping'
-          }
-        | {
-            /** @enum {string} */
-            name: 'unknown'
-          }
-        | {
-            exit_code?: number | null
-            message?: string | null
-            /** @enum {string} */
-            name: 'failed'
-            reason?: string | null
-          }
+      status: {
+        /** @enum {string} */
+        name: 'stopped' | 'starting' | 'started' | 'stopping' | 'unknown' | 'failed'
+      }
     }
     ReplicationPublicationsResponse: {
       /** @description List of publications */
@@ -7596,6 +7825,61 @@ export interface components {
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
     }[]
+    RollbackTableStateBody: {
+      /**
+       * @description Rollback type
+       * @enum {string}
+       */
+      rollback_type: 'individual' | 'full'
+      /** @description Table id (internal Postgres OID) */
+      table_id: number
+    }
+    RollbackTableStateResponse: {
+      /** @description Table replication state */
+      new_state:
+        | {
+            /** @enum {string} */
+            name: 'queued'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copying_table'
+          }
+        | {
+            /** @enum {string} */
+            name: 'copied_table'
+          }
+        | {
+            lag: number
+            /** @enum {string} */
+            name: 'following_wal'
+          }
+        | {
+            /** @enum {string} */
+            name: 'error'
+            reason: string
+            retry_policy:
+              | {
+                  /** @enum {string} */
+                  policy: 'no_retry'
+                }
+              | {
+                  /** @enum {string} */
+                  policy: 'manual_retry'
+                }
+              | {
+                  /** @description The time of the next retry (RFC3339 format) */
+                  next_retry: string
+                  /** @enum {string} */
+                  policy: 'timed_retry'
+                }
+            solution?: string
+          }
+      /** @description Pipeline id */
+      pipeline_id: number
+      /** @description Table id (internal Postgres OID) */
+      table_id: number
+    }
     RunLintByNameResponse: {
       lints: {
         cache_key: string
@@ -7739,6 +8023,14 @@ export interface components {
       updated_at: string
     }
     StorageConfigResponse: {
+      capabilities: {
+        iceberg_catalog: boolean
+        list_v2: boolean
+      }
+      external: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features: {
         icebergCatalog?: {
           enabled: boolean
@@ -7847,6 +8139,10 @@ export interface components {
       feature_flags?: {
         [key: string]: unknown
       }
+      groups?: {
+        organization?: string
+        project?: string
+      }
       page_title: string
       page_url: string
       pathname: string
@@ -7866,6 +8162,9 @@ export interface components {
       page_title: string
       page_url: string
       pathname: string
+    }
+    TemporaryApiKeyResponse: {
+      api_key: string
     }
     TransferProjectBody: {
       target_organization_slug: string
@@ -8174,6 +8473,7 @@ export interface components {
     }
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
+      AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
       DB_MAX_POOL_SIZE?: number | null
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
@@ -8613,9 +8913,9 @@ export interface components {
         publication_name: string
       }
       /** @description Destination id */
-      destination_id?: number
+      destination_id: number
       /** @description Source id */
-      source_id?: number
+      source_id: number
     }
     UpdateSchemaBody: {
       name?: string
@@ -8628,12 +8928,72 @@ export interface components {
     UpdateSecretsResponse: {
       message: string
     }
+    UpdateSSOProviderBody:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
+    UpdateSSOProviderResponse:
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file: string
+          /** Format: uri */
+          metadata_xml_url?: string
+          user_name_mapping?: string[]
+        }
+      | {
+          domains: string[]
+          email_mapping: string[]
+          enabled: boolean
+          first_name_mapping?: string[]
+          join_org_on_signup_enabled: boolean
+          /** @enum {string} */
+          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          last_name_mapping?: string[]
+          metadata_xml_file?: string
+          metadata_xml_url: string
+          user_name_mapping?: string[]
+        }
     UpdateStorageBucketBody: {
       allowed_mime_types?: string[] | null
       file_size_limit?: number | null
       public: boolean
     }
     UpdateStorageConfigBody: {
+      external?: {
+        /** @enum {string} */
+        upstreamTarget: 'main' | 'canary'
+      }
       features?: {
         icebergCatalog?: {
           enabled: boolean
@@ -10816,6 +11176,12 @@ export interface operations {
           'application/json': components['schemas']['OrganizationSlugResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   OrganizationSlugController_deleteOrganization: {
@@ -10874,6 +11240,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdateOrganizationResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update organization */
       500: {
@@ -11366,6 +11738,43 @@ export interface operations {
       }
     }
   }
+  ClazarController_link: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkClazarBuyerBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to make organization being billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   CustomerController_getCustomer: {
     parameters: {
       query?: never
@@ -11558,6 +11967,35 @@ export interface operations {
       }
     }
   }
+  OrgDocumentsController_createDpaDocument: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDpaDocumentRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateDpaDocumentResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgDocumentsController_getSoc2Type2ReportUrl: {
     parameters: {
       query?: never
@@ -11577,6 +12015,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -11599,6 +12043,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -11805,12 +12255,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12514,8 +12958,132 @@ export interface operations {
           'application/json': components['schemas']['OrganizationRoleResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve the organization's roles */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_getSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_updateSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSSOProviderBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_createSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSSOProviderBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSSOProviderResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SSOProvidersController_deleteSSOProvider: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12662,6 +13230,62 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get usage stats */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_createAwsBilledOrganization: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAwsBilledOrganizationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      /** @description Failed to create organization billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_checkCloudMarketplaceEligibility: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CheckCloudMarketplaceEligibilityResponse']
+        }
+      }
+      /** @description Failed to check whether organizations are eligible for AWS billing */
       500: {
         headers: {
           [name: string]: unknown
@@ -15927,6 +16551,38 @@ export interface operations {
       }
     }
   }
+  ApiKeysController_createTemporaryApiKey: {
+    parameters: {
+      query: {
+        authorization_exp: string
+        claims: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Temporary API key */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TemporaryApiKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ProjectsApiController_projectGraphql: {
     parameters: {
       query?: never
@@ -18474,6 +19130,44 @@ export interface operations {
       }
     }
   }
+  ReplicationDestinationsPipelinesController_deleteDestinationPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project reference */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returned when the replication destination and pipeline are deleted. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to delete the replication destination or pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationDestinationsController_getDestination: {
     parameters: {
       query?: never
@@ -18600,7 +19294,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns all pipelines. */
+      /** @description Returns all replication pipelines. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18615,7 +19309,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get replication pipelines. */
+      /** @description Fails to retrieve replication pipelines. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18640,7 +19334,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returns the created replication pipeline ID. */
+      /** @description Returns the ID of the created replication pipeline. */
       201: {
         headers: {
           [name: string]: unknown
@@ -18655,7 +19349,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to create pipeline. */
+      /** @description Fails to create replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18678,7 +19372,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline. */
+      /** @description Returns the details of the specified replication pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18693,7 +19387,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline. */
+      /** @description Fails to retrieve replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18720,7 +19414,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Returned when the pipeline is updated. */
+      /** @description Returns when the replication pipeline is successfully updated. */
       201: {
         headers: {
           [name: string]: unknown
@@ -18733,7 +19427,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update pipeline. */
+      /** @description Fails to update replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18756,7 +19450,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is deleted. */
+      /** @description Returns when the replication pipeline is successfully deleted. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18769,7 +19463,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to delete pipeline. */
+      /** @description Fails to delete replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18792,7 +19486,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline replication status. */
+      /** @description Returns the replication status of the pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18807,7 +19501,49 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline replication status. */
+      /** @description Fails to retrieve pipeline replication status. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_rollbackTableState: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RollbackTableStateBody']
+      }
+    }
+    responses: {
+      /** @description Returns the table state after the rollback. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RollbackTableStateResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Fails to roll back table state. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18830,7 +19566,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is started. */
+      /** @description Returns when the replication pipeline is successfully started. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18843,7 +19579,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to start pipeline. */
+      /** @description Fails to start replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18866,7 +19602,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returns the pipeline status. */
+      /** @description Returns the current status of the replication pipeline. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18881,7 +19617,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to get pipeline status. */
+      /** @description Fails to retrieve pipeline status. */
       500: {
         headers: {
           [name: string]: unknown
@@ -18904,7 +19640,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Returned when the pipeline is stopped. */
+      /** @description Returns when the replication pipeline is successfully stopped. */
       200: {
         headers: {
           [name: string]: unknown
@@ -18917,7 +19653,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to stop pipeline. */
+      /** @description Fails to stop replication pipeline. */
       500: {
         headers: {
           [name: string]: unknown

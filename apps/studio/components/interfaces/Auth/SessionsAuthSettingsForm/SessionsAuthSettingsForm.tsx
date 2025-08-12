@@ -11,8 +11,8 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -62,16 +62,22 @@ const UserSessionsSchema = z.object({
 const SessionsAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
   const [isUpdatingRefreshTokens, setIsUpdatingRefreshTokens] = useState(false)
   const [isUpdatingUserSessions, setIsUpdatingUserSessions] = useState(false)
 
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 

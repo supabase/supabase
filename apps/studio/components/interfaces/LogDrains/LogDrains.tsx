@@ -10,7 +10,7 @@ import Panel from 'components/ui/Panel'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -35,7 +35,7 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
   const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')

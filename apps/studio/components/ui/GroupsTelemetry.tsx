@@ -7,7 +7,7 @@ import { LOCAL_STORAGE_KEYS, useParams, useTelemetryCookie, useUser } from 'comm
 import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
 import { usePrevious } from 'hooks/deprecated'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 
 const getAnonId = async (id: string) => {
@@ -28,7 +28,7 @@ const GroupsTelemetry = ({ hasAcceptedConsent }: { hasAcceptedConsent: boolean }
   const user = useUser()
   const router = useRouter()
   const { ref, slug } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const previousPathname = usePrevious(router.pathname)
 

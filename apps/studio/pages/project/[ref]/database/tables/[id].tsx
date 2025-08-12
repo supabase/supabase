@@ -1,15 +1,16 @@
+import { ChevronRight } from 'lucide-react'
+
 import { useParams } from 'common'
-import { ColumnList } from 'components/interfaces/Database'
+import { ColumnList } from 'components/interfaces/Database/Tables/ColumnList'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
-import { ChevronRight } from 'lucide-react'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
@@ -21,7 +22,7 @@ const DatabaseTables: NextPageWithLayout = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: selectedTable, isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,

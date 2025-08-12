@@ -5,7 +5,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
@@ -20,6 +19,7 @@ import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { GridProps } from './types'
 
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 
@@ -35,8 +35,7 @@ export const SupabaseGrid = ({
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const { project } = useProjectContext()
-
+  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 

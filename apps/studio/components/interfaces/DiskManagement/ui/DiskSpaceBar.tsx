@@ -7,7 +7,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { useParams } from 'common'
 import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useMemo } from 'react'
@@ -24,7 +24,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
   const { resolvedTheme } = useTheme()
   const { formState, watch } = form
   const isDarkMode = resolvedTheme?.includes('dark')
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     data: diskUtil,

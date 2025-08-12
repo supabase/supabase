@@ -1,9 +1,9 @@
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const useIcebergWrapperExtension = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: extensionsData, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,

@@ -228,7 +228,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                               <p className="text-foreground-light text-sm">
                                 Note: Individual bucket upload will still be capped at the{' '}
                                 <Link
-                                  href={`/project/${ref}/settings/storage`}
+                                  href={`/project/${ref}/storage/settings`}
                                   className="font-bold underline"
                                 >
                                   global upload limit

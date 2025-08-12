@@ -104,7 +104,7 @@ Read Replicas offer the following features:
 
 Each Read Replica has its own dedicated database and API endpoints.
 
-- Find the database endpoint on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection Info**
+- Find the database endpoint on the [Database Settings page](/dashboard/project/_/database/settings) under **Connection Info**
 - Find the API endpoint on the [API Settings page](/dashboard/project/_/settings/api) under **Project URL**
 
 Read Replicas only support `GET` requests from the [REST API](/docs/guides/api). If you are calling a read-only Postgres function through the REST API, make sure to set the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
@@ -115,7 +115,7 @@ If you're using an [IPv4 add-on](/docs/guides/platform/ipv4-address#read-replica
 
 ### Dedicated connection pool
 
-A connection pool through Supavisor is also available for each Read Replica. Find the connection string on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection String**.
+A connection pool through Supavisor is also available for each Read Replica. Find the connection string on the [Database Settings page](/dashboard/project/_/database/settings) under **Connection String**.
 
 ### API load balancer
 

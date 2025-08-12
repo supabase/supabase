@@ -1,5 +1,4 @@
 import { ExternalLink } from 'lucide-react'
-import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
@@ -17,17 +16,12 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const snap = useAiAssistantStateSnapshot()
-  const router = useRouter()
   const {
     data: functions,
     error,
@@ -35,8 +29,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
 
   const hasFunctions = (functions ?? []).length > 0
 

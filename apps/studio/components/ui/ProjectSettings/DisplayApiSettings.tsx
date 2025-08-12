@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { AlertCircle, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
@@ -9,8 +10,6 @@ import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
-import Link from 'next/link'
 import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
@@ -25,8 +24,6 @@ export const DisplayApiSettings = ({
   showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
-
-  const newApiKeysInRollOut = useFlag('basicApiKeys')
 
   const {
     data: settings,
@@ -217,31 +214,20 @@ export const DisplayApiSettings = ({
           ))
         )}
         {showNotice ? (
-          newApiKeysInRollOut ? (
-            <Panel.Notice
-              className="border-t"
-              title="API keys have moved"
-              badgeLabel={'Changelog'}
-              description={`
+          <Panel.Notice
+            className="border-t"
+            title="API keys have moved"
+            badgeLabel="Changelog"
+            description={`
   \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.
   `}
-              href="https://github.com/orgs/supabase/discussions/29260"
-              buttonText="Read the announcement"
-            />
-          ) : (
-            <Panel.Notice
-              className="border-t"
-              title="New API keys coming Q2 2025"
-              description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
-`}
-              href="https://github.com/orgs/supabase/discussions/29260"
-              buttonText="Read the announcement"
-            />
-          )
-        ) : null}
+            href="https://github.com/orgs/supabase/discussions/29260"
+            buttonText="Read the announcement"
+          />
+        ) : (
+          <ToggleLegacyApiKeysPanel />
+        )}
       </Panel>
-      {newApiKeysInRollOut && !showNotice && <ToggleLegacyApiKeysPanel />}
     </>
   )
 }

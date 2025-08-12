@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
 import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
-import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
+import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import ColumnContextMenu from './ColumnContextMenu'
 import FileExplorerColumn from './FileExplorerColumn'
 import FolderContextMenu from './FolderContextMenu'
@@ -12,7 +12,6 @@ import ItemContextMenu from './ItemContextMenu'
 
 export interface FileExplorerProps {
   columns: StorageColumn[]
-  openedFolders: StorageItem[]
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
@@ -23,7 +22,6 @@ export interface FileExplorerProps {
 
 const FileExplorer = ({
   columns = [],
-  openedFolders = [],
   selectedItems = [],
   itemSearchString,
   onFilesUpload = noop,
@@ -61,7 +59,6 @@ const FileExplorer = ({
               key={`column-${index}`}
               index={index}
               column={column}
-              openedFolders={openedFolders}
               selectedItems={selectedItems}
               itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
