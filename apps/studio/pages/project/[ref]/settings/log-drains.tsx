@@ -22,9 +22,10 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
-  const { can: canManageLogDrains, isSuccess: isPermissionsLoaded } =
+  const { can: canManageLogDrains, isLoading: isLoadingPermissions } =
     useAsyncCheckProjectPermissions(PermissionAction.ANALYTICS_ADMIN_WRITE, 'logflare')
 
   const [open, setOpen] = useState(false)
@@ -140,7 +141,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
           }}
         />
-        {isPermissionsLoaded && !canManageLogDrains ? (
+
+        {isLoadingPermissions ? (
+          <GenericSkeletonLoader />
+        ) : !canManageLogDrains ? (
           <Alert_Shadcn_ variant="default">
             You do not have permission to manage log drains
           </Alert_Shadcn_>
