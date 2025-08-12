@@ -1,8 +1,9 @@
-import { forwardRef, memo, Ref, useRef } from 'react'
+import { type DragEvent, forwardRef, memo, Ref, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
+import { flagInvalidFileImport } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport'
 import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -53,6 +54,7 @@ export const Grid = memo(
     ) => {
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
+      const [isDraggedOver, setIsDraggedOver] = useState(false)
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
@@ -72,6 +74,7 @@ export const Grid = memo(
 
       const table = snap.table
       const tableEntityType = snap.originalTable?.entity_type
+      const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
 
       const { mutate: sendEvent } = useSendEventMutation()
       const { data } = useForeignKeyConstraintsQuery({
@@ -113,10 +116,64 @@ export const Grid = memo(
         onApplyFilters([])
       }
 
+      const isTableEmpty = (rows ?? []).length === 0
+
+      // Drag and drop handlers for CSV import
+      const onDragOver = (event: DragEvent<HTMLDivElement>) => {
+        // Only handle drag events when table is empty and not foreign table
+        if (!isTableEmpty || isForeignTable) return
+
+        if (event.type === 'dragover' && !isDraggedOver) {
+          setIsDraggedOver(true)
+        } else if (event.type === 'dragleave' || event.type === 'drop') {
+          setIsDraggedOver(false)
+        }
+        event.stopPropagation()
+        event.preventDefault()
+      }
+
+      const onFileDrop = (event: DragEvent<HTMLDivElement>) => {
+        // Only handle drop events when table is empty and not foreign table
+        if (!isTableEmpty || isForeignTable) return
+
+        onDragOver(event)
+        const [file] = event.dataTransfer.files
+
+        if (flagInvalidFileImport(file)) return
+
+        // Open the SpreadsheetImport side panel first
+        tableEditorSnap.onImportData()
+
+        // Process the file directly in the next tick to avoid state issues
+        // accessing attributes on File object
+        setTimeout(() => {
+          const spreadsheetImportEvent = new CustomEvent('processDroppedFile', {
+            detail: { file },
+          })
+          window.dispatchEvent(spreadsheetImportEvent)
+        })
+
+        sendEvent({
+          action: 'import_data_file_dropped',
+          properties: { tableType: 'Existing Table' },
+          groups: {
+            project: project?.ref ?? 'Unknown',
+            organization: org?.slug ?? 'Unknown',
+          },
+        })
+      }
+
       return (
         <div
-          className={cn(`flex flex-col relative`, containerClass)}
+          className={cn(
+            `flex flex-col relative`,
+            containerClass,
+            isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand-600'
+          )}
           style={{ width: width || '100%', height: height || '50vh' }}
+          onDragOver={onDragOver}
+          onDragLeave={onDragOver}
+          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
@@ -142,8 +199,10 @@ export const Grid = memo(
               {isSuccess && (
                 <>
                   {(filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">This table is empty</p>
+                    <div className="flex flex-col items-center justify-center col-span-full h-full transition-colors">
+                      <p className="text-sm text-light">
+                        {isDraggedOver ? 'Drop your CSV file here' : 'This table is empty'}
+                      </p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
                           <p className="text-sm text-light">
@@ -152,25 +211,32 @@ export const Grid = memo(
                           </p>
                         </div>
                       ) : (
-                        <div className="flex items-center space-x-2 mt-4">
-                          <Button
-                            type="default"
-                            className="pointer-events-auto"
-                            onClick={() => {
-                              tableEditorSnap.onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: project?.ref ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
-                            }}
-                          >
-                            Import data from CSV
-                          </Button>
-                        </div>
+                        !isDraggedOver && (
+                          <div className="flex flex-col items-center gap-4 mt-4">
+                            <Button
+                              type="default"
+                              className="pointer-events-auto"
+                              onClick={() => {
+                                tableEditorSnap.onImportData()
+                                sendEvent({
+                                  action: 'import_data_button_clicked',
+                                  properties: { tableType: 'Existing Table' },
+                                  groups: {
+                                    project: project?.ref ?? 'Unknown',
+                                    organization: org?.slug ?? 'Unknown',
+                                  },
+                                })
+                              }}
+                            >
+                              Import data from CSV
+                            </Button>
+                            {!isDraggedOver && (
+                              <p className="text-xs text-foreground-light">
+                                or drag and drop a CSV file here
+                              </p>
+                            )}
+                          </div>
+                        )
                       )}
                     </div>
                   ) : (

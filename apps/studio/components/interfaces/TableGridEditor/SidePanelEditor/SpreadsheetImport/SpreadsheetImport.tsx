@@ -1,7 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { debounce, includes, noop } from 'lodash'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import { debounce, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -23,7 +21,21 @@ import {
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
 
-const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
+const MAX_TABLE_EDITOR_IMPORT_CSV_SIZE = 1024 * 1024 * 100 // 100 MiB
+
+export function flagInvalidFileImport(file: File): boolean {
+  if (!file || !UPLOAD_FILE_TYPES.includes(file.type) || !acceptedFileExtension(file)) {
+    toast.error("Couldn't import file: only CSV files are accepted")
+    return true
+  } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
+    toast.error(
+      'The dashboard currently only supports importing of CSVs below 100MB. For bulk data loading, we recommend doing so directly through the database.'
+    )
+    return true
+  }
+
+  return false
+}
 
 interface SpreadsheetImportProps {
   debounceDuration?: number
@@ -74,38 +86,18 @@ const SpreadsheetImport = ({
     setParseProgress(progress)
   }
 
-  const onFileUpload = async (event: any) => {
-    setParseProgress(0)
-    event.persist()
-    const [file] = event.target.files || event.dataTransfer.files
-
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
-      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
-    } else if (file.size > MAX_CSV_SIZE) {
-      event.target.value = ''
-      return toast(
-        <div className="space-y-1">
-          <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
-          <p>For bulk data loading, we recommend doing so directly through the database.</p>
-          <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
-            <Link
-              href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Learn more
-            </Link>
-          </Button>
-        </div>,
-        { duration: Infinity }
-      )
-    } else {
+  // Process a file object directly (used for both upload and drop)
+  const processFile = useCallback(
+    async (file: File) => {
       updateEditorDirty(true)
       setUploadedFile(file)
+      setParseProgress(0)
+
       const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
         file,
         onProgressUpdate
       )
+
       if (errors.length > 0) {
         toast.error(
           `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
@@ -115,9 +107,22 @@ const SpreadsheetImport = ({
       setErrors(errors)
       setSelectedHeaders(headers)
       setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
-    }
-    event.target.value = ''
-  }
+    },
+    [updateEditorDirty]
+  )
+
+  // Handle file upload events from file input
+  const onFileUpload = useCallback(
+    async (event: any) => {
+      event.persist()
+      const [file] = event.target.files || event.dataTransfer.files
+      if (file && !flagInvalidFileImport(file)) {
+        await processFile(file)
+      }
+      event.target.value = ''
+    },
+    [processFile]
+  )
 
   const resetSpreadsheetImport = () => {
     setInput('')
@@ -180,6 +185,20 @@ const SpreadsheetImport = ({
   useEffect(() => {
     if (visible && headers.length === 0) resetSpreadsheetImport()
   }, [visible])
+
+  // Handle dropped file from custom event
+  useEffect(() => {
+    const handleDroppedFile = (event: CustomEvent) => {
+      if (visible && event.detail?.file) {
+        processFile(event.detail.file)
+      }
+    }
+
+    window.addEventListener('processDroppedFile', handleDroppedFile as EventListener)
+    return () => {
+      window.removeEventListener('processDroppedFile', handleDroppedFile as EventListener)
+    }
+  }, [visible, processFile])
 
   return (
     <SidePanel

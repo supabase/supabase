@@ -907,6 +907,26 @@ export interface ImportDataButtonClickedEvent {
 }
 
 /**
+ * User dropped a file into the import data dropzone on an empty table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface ImportDataFileDroppedEvent {
+  action: 'import_data_file_dropped'
+  properties: {
+    /**
+     * The type of table the data is imported to.
+     * New Table means added when creating new table by clicking from New table sidebar,
+     * Existing Table means added to an existing table by going to the table and clicking from the green Insert button..
+     */
+    tableType: 'New Table' | 'Existing Table'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User added data from the import data via CSV/spreadsheet successfully.
  *
  * @group Events
@@ -1511,6 +1531,7 @@ export type TelemetryEvent =
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
+  | ImportDataFileDroppedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
