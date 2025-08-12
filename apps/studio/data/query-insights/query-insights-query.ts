@@ -82,19 +82,7 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
         GROUP BY bucket_start_time, datname
         ORDER BY timestamp ASC
       `
-    // case 'rows_written':
-    //   return /* SQL */ `
-    //     SELECT
-    //       bucket_start_time as timestamp,
-    //       SUM(rows) / 300 as value, -- Convert to per-second rate (5 mins = 300 seconds)
-    //       datname as database
-    //     FROM pg_stat_monitor
-    //     WHERE bucket_start_time >= '${startTime}'::timestamptz
-    //       AND bucket_start_time <= '${endTime}'::timestamptz
-    //       AND bucket_done = true -- Only include completed buckets
-    //     GROUP BY bucket_start_time, datname
-    //     ORDER BY timestamp ASC
-    //   `
+
     case 'query_latency':
       return /* SQL */ `
         SELECT
@@ -327,11 +315,18 @@ export function useQueryInsightsMetrics(
     queryFn: async () => {
       if (!projectRef) throw new Error('Project ref is required')
 
+      const sql = getMetricsSql(metric, startTime, endTime)
+      console.log(`[useQueryInsightsMetrics] Executing SQL for ${metric}:`, sql)
+
       const { result } = await executeSql({
         projectRef,
-        sql: getMetricsSql(metric, startTime, endTime),
+        sql,
       })
 
+      console.log(`[useQueryInsightsMetrics] Result for ${metric}:`, result)
+      
+
+      
       return result as QueryInsightsMetric[]
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
@@ -400,6 +395,7 @@ export function usePreFetchQueryInsightsData(
     const metricTypes: Array<{ id: string; label: string }> = [
       { id: 'query_latency', label: 'Query latency' },
       { id: 'rows_read', label: 'Rows read' },
+
       { id: 'calls', label: 'Calls' },
       { id: 'cache_hits', label: 'Cache hits' },
       { id: 'issues', label: 'Issues' },
@@ -410,10 +406,15 @@ export function usePreFetchQueryInsightsData(
       queryClient.prefetchQuery({
         queryKey: queryInsightsKeys.metrics(projectRef, metric.id, startTime, endTime),
         queryFn: async () => {
+          const sql = getMetricsSql(metric.id, startTime, endTime)
+          console.log(`[usePreFetchQueryInsightsData] Executing SQL for ${metric.id}:`, sql)
+          
           const { result } = await executeSql({
             projectRef,
-            sql: getMetricsSql(metric.id, startTime, endTime),
+            sql,
           })
+          
+          console.log(`[usePreFetchQueryInsightsData] Result for ${metric.id}:`, result)
           return result as QueryInsightsMetric[]
         },
         staleTime: 5 * 60 * 1000, // Cache for 5 minutes

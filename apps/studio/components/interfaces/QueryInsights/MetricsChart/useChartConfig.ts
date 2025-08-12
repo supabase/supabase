@@ -7,7 +7,7 @@ import {
   getCacheHitsConfig,
   getIssuesConfig,
   ChartConfigResult,
-} from '../chartConfigs'
+} from './MetricsChart.config'
 import { QueryInsightsMetric, QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import {
   useSingleQueryLatency,
@@ -125,6 +125,8 @@ export function useQueryLatencyChart({
   return { chartConfig, metricBadges, renderConfig }
 }
 
+
+
 /**
  * Hook for Rows Read chart configuration
  */
@@ -191,7 +193,10 @@ export function useRowsReadChart({
   // Provide rendering configuration
   const renderConfig = {
     yAxisDomain: [0, 'auto'] as [number, string | number],
-    keyMappings: {},
+    keyMappings: {
+      rows: 'rows',
+      query_rows: 'query_rows',
+    },
   }
 
   return { chartConfig, metricBadges, renderConfig }

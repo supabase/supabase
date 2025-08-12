@@ -52,7 +52,7 @@ export const MetricPill = ({
         }}
       ></div>
       <span className={cn('text-foreground', !isActive && 'text-foreground-light')}>
-        {label}: {value}
+        <span className="text-foreground-light">{label}:</span> {value}
       </span>
     </button>
   )

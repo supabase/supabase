@@ -1,5 +1,5 @@
 import { QueryInsightsMetric } from 'data/query-insights/query-insights-query'
-import { formatLatency, formatMetricValue } from './QueryInsights.utils'
+import { formatLatency, formatMetricValue } from './../QueryInsights.utils'
 import dayjs from 'dayjs'
 
 export interface ChartConfigType {
@@ -16,6 +16,8 @@ export interface RowsReadChartData {
   rows: number
   query_rows: number
 }
+
+
 
 export interface QueryLatencyChartData {
   timestamp: string
@@ -122,6 +124,8 @@ export function getRowsReadConfig(
 
   return { chartData, config }
 }
+
+
 
 /**
  * Prepares data and configuration for the Query Latency chart

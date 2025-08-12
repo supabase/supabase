@@ -12,7 +12,7 @@ import {
   useCacheHitsChart,
   useIssuesChart,
   CHART_OPACITY,
-} from '../hooks/useChartConfig'
+} from './useChartConfig'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import dayjs from 'dayjs'
 import {
@@ -35,6 +35,15 @@ interface MetricsChartProps {
 
 export function MetricsChart(props: MetricsChartProps) {
   const { data, metric, isLoading, startTime, endTime, selectedQuery, hoveredQuery } = props
+
+  console.log('[MetricsChart] Props:', {
+    metric,
+    dataLength: data?.length || 0,
+    dataSample: data?.slice(0, 3) || [],
+    isLoading,
+    selectedQuery: selectedQuery?.query_id,
+    hoveredQuery: hoveredQuery?.query_id,
+  })
 
   const [visibleMetrics, setVisibleMetrics] = useState<VisibleMetricsState>({
     // Latency (using mapped keys)
@@ -74,6 +83,7 @@ export function MetricsChart(props: MetricsChartProps) {
   // Call all hooks unconditionally to avoid React Hook rules violations
   const queryLatencyResult = useQueryLatencyChart(chartHookOptions)
   const rowsReadResult = useRowsReadChart(chartHookOptions)
+
   const callsResult = useCallsChart(chartHookOptions)
   const cacheHitsResult = useCacheHitsChart(chartHookOptions)
   const issuesResult = useIssuesChart(chartHookOptions)
@@ -91,6 +101,7 @@ export function MetricsChart(props: MetricsChartProps) {
     case 'rows_read':
       currentHookResult = rowsReadResult
       break
+
     case 'calls':
       currentHookResult = callsResult
       break
@@ -117,6 +128,24 @@ export function MetricsChart(props: MetricsChartProps) {
   const yAxisTickCount = currentHookResult.renderConfig.yAxisTickCount
   const keyMappings = currentHookResult.renderConfig.keyMappings
 
+  console.log('[MetricsChart] Extracted values:', {
+    metric,
+    chartConfig: chartConfig
+      ? {
+          hasConfig: !!chartConfig.config,
+          hasChartData: !!chartConfig.chartData,
+          chartDataLength: chartConfig.chartData?.length || 0,
+          configKeys: Object.keys(chartConfig.config || {}),
+        }
+      : null,
+    metricBadges,
+    keyMappings,
+    currentHookResult: {
+      hasChartConfig: !!currentHookResult.chartConfig,
+      renderConfig: currentHookResult.renderConfig,
+    },
+  })
+
   // Loading state
   if (isLoading) {
     return (
@@ -136,6 +165,11 @@ export function MetricsChart(props: MetricsChartProps) {
 
   // No data state
   if (!chartConfig) {
+    console.log('[MetricsChart] No chart config available:', {
+      metric,
+      currentHookResult,
+      chartConfig,
+    })
     return (
       <div className="flex-1 flex items-center justify-center">
         <motion.div
@@ -154,7 +188,7 @@ export function MetricsChart(props: MetricsChartProps) {
   const { config, chartData } = chartConfig
 
   return (
-    <div className="h-[320px] flex flex-col">
+    <div className="h-[320px] flex flex-col bg-surface-200">
       <div className="flex flex-col flex-1 min-h-0">
         <div className="flex flex-wrap items-center gap-2 mb-4 px-6 py-2 bg-surface-200 border-t border-b -mt-px justify-between">
           <div className="flex items-center gap-2 flex-wrap">
@@ -176,7 +210,7 @@ export function MetricsChart(props: MetricsChartProps) {
           />
         </div>
 
-        <div className="flex-1 min-h-0 pt-4 pr-4">
+        <div className="flex-1 min-h-0 py-4 pr-4">
           <ChartContainer className="h-full w-full" config={config}>
             <AreaChart
               data={chartData}
@@ -227,7 +261,13 @@ export function MetricsChart(props: MetricsChartProps) {
                 // Map the key to the corresponding visibleMetrics key
                 const visibleMetricsKey = (keyMappings as Record<string, string>)[key] || key
 
-
+                console.log('[MetricsChart] Rendering series:', {
+                  key,
+                  visibleMetricsKey,
+                  shouldRender: visibleMetrics[visibleMetricsKey],
+                  keyMappings,
+                  visibleMetrics: Object.keys(visibleMetrics).filter((k) => visibleMetrics[k]),
+                })
 
                 // Skip series not enabled in visible metrics
                 // If we have keyMappings, only check the mapped key

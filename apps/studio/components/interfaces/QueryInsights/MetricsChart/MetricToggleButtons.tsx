@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from 'ui'
-import { ChartConfigType, ChartConfigResult } from '../chartConfigs'
+import { ChartConfigType, ChartConfigResult } from './MetricsChart.config'
 import { QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import { MetricType } from '../QueryInsights'
 import { MetricPill } from './MetricPill'

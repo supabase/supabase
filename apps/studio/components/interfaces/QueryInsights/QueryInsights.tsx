@@ -2,11 +2,19 @@ import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'common'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
-import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import dayjs from 'dayjs'
-import { MetricsChart } from './components/MetricsChart'
-import { QueryList } from './components/QueryList'
+import { MetricsChart } from './MetricsChart/MetricsChart'
+import { QueryList } from './QueryList/QueryList'
 import {
   useQueryInsightsMetrics,
   useQueryInsightsQueries,
@@ -17,15 +25,11 @@ import {
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
-
-
 export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits' | 'issues'
-
-
 
 export const QueryInsights = () => {
   console.log('🚀 [QueryInsights] Component rendered - START')
-  // Queries with error_count > 0 (slow queries with mean_exec_time > 1000ms and calls > 1) 
+  // Queries with error_count > 0 (slow queries with mean_exec_time > 1000ms and calls > 1)
   // are highlighted in red in the QueryList component
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
@@ -37,9 +41,11 @@ export const QueryInsights = () => {
   })
 
   // Validate that the metric is a valid MetricType, fallback to default if not
-  const selectedMetric: MetricType = (['rows_read', 'query_latency', 'calls', 'cache_hits', 'issues'].includes(metric || '') 
-    ? metric 
-    : 'query_latency') as MetricType
+  const selectedMetric: MetricType = (
+    ['rows_read', 'query_latency', 'calls', 'cache_hits', 'issues'].includes(metric || '')
+      ? metric
+      : 'query_latency'
+  ) as MetricType
   const [selectedTimeRange, setSelectedTimeRange] = useState('3h')
   const [selectedQuery, setSelectedQuery] = useState<QueryInsightsQuery | null>(null)
   const [hoveredQuery, setHoveredQuery] = useState<QueryInsightsQuery | null>(null)
@@ -84,8 +90,6 @@ export const QueryInsights = () => {
     timeRange.period_start.date,
     timeRange.period_end.date
   )
-  
-
 
   const { data: queriesData, isLoading: isLoadingQueries } = useQueryInsightsQueries(
     ref,
@@ -94,29 +98,23 @@ export const QueryInsights = () => {
   )
 
   // Fetch queries with errors for the errors tab
-  const { data: queriesWithErrorsData, isLoading: isLoadingQueriesWithErrors } = useQueryInsightsQueriesWithErrors(
-    ref,
-    timeRange.period_start.date,
-    timeRange.period_end.date
-  )
+  const { data: queriesWithErrorsData, isLoading: isLoadingQueriesWithErrors } =
+    useQueryInsightsQueriesWithErrors(ref, timeRange.period_start.date, timeRange.period_end.date)
 
   // Pre-fetch all metrics data for the current time range
-  usePreFetchQueryInsightsData(
-    ref,
-    timeRange.period_start.date,
-    timeRange.period_end.date
-  )
+  usePreFetchQueryInsightsData(ref, timeRange.period_start.date, timeRange.period_end.date)
 
   // Calculate p95 latency for the query latency tab
   const p95Latency = useMemo(() => {
     if (latencyData && latencyData.length > 0) {
       // Calculate average p95 across all data points in the current timeframe
       const validP95Values = latencyData
-        .map(point => point.p95)
+        .map((point) => point.p95)
         .filter((p95Value): p95Value is number => p95Value !== undefined && !isNaN(p95Value))
-      
+
       if (validP95Values.length > 0) {
-        const averageP95 = validP95Values.reduce((sum, value) => sum + value, 0) / validP95Values.length
+        const averageP95 =
+          validP95Values.reduce((sum, value) => sum + value, 0) / validP95Values.length
         return `${averageP95.toFixed(2)}ms`
       }
     }
@@ -143,16 +141,15 @@ export const QueryInsights = () => {
   // Debug logging
   console.log('🔍 [QueryInsights] Debug info:', {
     selectedMetric,
+    metricsDataLength: metricsData?.length || 0,
     queriesDataLength: queriesData?.length || 0,
     queriesWithErrorsDataLength: queriesWithErrorsData?.length || 0,
     issuesDataLength: issuesData?.length || 0,
     issuesDataSample: issuesData?.slice(0, 3) || [],
     isLoadingQueries,
     isLoadingQueriesWithErrors,
-    errorCount: errorCount
+    errorCount: errorCount,
   })
-
-
 
   // Define metrics with dynamic descriptions
   const METRICS: { id: MetricType; label: string; description: string; tooltip: string }[] = [
@@ -168,6 +165,7 @@ export const QueryInsights = () => {
       description: '0 rows',
       tooltip: 'Displays the total number of rows read by queries over time',
     },
+
     {
       id: 'calls',
       label: 'Calls',
@@ -336,7 +334,7 @@ export const QueryInsights = () => {
         value={selectedMetric}
         defaultValue={selectedMetric}
         onValueChange={(value) => setSearchParams({ metric: value as MetricType })}
-        className="pb-4"
+        // className="pb-4"
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
           {METRICS.map((metric) => (
@@ -388,9 +386,8 @@ export const QueryInsights = () => {
         </div>
       </Tabs_Shadcn_>
 
-
       <QueryList
-        queries={selectedMetric === 'issues' ? (queriesWithErrorsData || []) : (queriesData || [])}
+        queries={selectedMetric === 'issues' ? queriesWithErrorsData || [] : queriesData || []}
         isLoading={selectedMetric === 'issues' ? isLoadingQueriesWithErrors : isLoadingQueries}
         onQuerySelect={setSelectedQuery}
         onQueryHover={setHoveredQuery}
