@@ -11,6 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import dayjs from 'dayjs'
 import { MetricsChart } from './MetricsChart/MetricsChart'
@@ -68,7 +69,7 @@ export const QueryInsights = () => {
   )
 
   // Always fetch query latency data for p95 calculation
-  const { data: latencyData } = useQueryInsightsMetrics(
+  const { data: latencyData, isLoading: isLoadingLatency } = useQueryInsightsMetrics(
     ref,
     'query_latency',
     timeRange.period_start.date,
@@ -76,7 +77,7 @@ export const QueryInsights = () => {
   )
 
   // Always fetch rows read data for total calculation
-  const { data: rowsReadData } = useQueryInsightsMetrics(
+  const { data: rowsReadData, isLoading: isLoadingRowsRead } = useQueryInsightsMetrics(
     ref,
     'rows_read',
     timeRange.period_start.date,
@@ -84,7 +85,7 @@ export const QueryInsights = () => {
   )
 
   // Always fetch issues data for issues calculation
-  const { data: issuesData } = useQueryInsightsMetrics(
+  const { data: issuesData, isLoading: isLoadingIssues } = useQueryInsightsMetrics(
     ref,
     'issues',
     timeRange.period_start.date,
@@ -92,7 +93,7 @@ export const QueryInsights = () => {
   )
 
   // Always fetch cache hits data for hit ratio calculation
-  const { data: cacheHitsData } = useQueryInsightsMetrics(
+  const { data: cacheHitsData, isLoading: isLoadingCacheHits } = useQueryInsightsMetrics(
     ref,
     'cache_hits',
     timeRange.period_start.date,
@@ -100,7 +101,7 @@ export const QueryInsights = () => {
   )
 
   // Always fetch calls data for total calculation
-  const { data: callsData } = useQueryInsightsMetrics(
+  const { data: callsData, isLoading: isLoadingCalls } = useQueryInsightsMetrics(
     ref,
     'calls',
     timeRange.period_start.date,
@@ -122,6 +123,7 @@ export const QueryInsights = () => {
 
   // Calculate p95 latency for the query latency tab
   const p95Latency = useMemo(() => {
+    if (isLoadingLatency) return null
     if (latencyData && latencyData.length > 0) {
       // Calculate average p95 across all data points in the current timeframe
       const validP95Values = latencyData
@@ -134,11 +136,12 @@ export const QueryInsights = () => {
         return `${averageP95.toFixed(2)}ms`
       }
     }
-    return null
-  }, [latencyData])
+    return '0ms'
+  }, [latencyData, isLoadingLatency])
 
   // Calculate total rows read for the rows read tab
   const totalRowsRead = useMemo(() => {
+    if (isLoadingRowsRead) return null
     if (rowsReadData && rowsReadData.length > 0) {
       const total = rowsReadData.reduce((sum, point) => {
         const value = Number(point.value) || 0
@@ -147,19 +150,21 @@ export const QueryInsights = () => {
       return total.toLocaleString()
     }
     return '0'
-  }, [rowsReadData])
+  }, [rowsReadData, isLoadingRowsRead])
 
   // Calculate error count for the errors tab
   const errorCount = useMemo(() => {
+    if (isLoadingIssues) return null
     if (issuesData && issuesData.length > 0) {
       const totalIssues = issuesData.reduce((sum, point) => sum + (point.value || 0), 0)
       return `${totalIssues} slow queries`
     }
     return '0 slow queries'
-  }, [issuesData])
+  }, [issuesData, isLoadingIssues])
 
   // Calculate total calls for the calls tab
   const totalCalls = useMemo(() => {
+    if (isLoadingCalls) return null
     if (callsData && callsData.length > 0) {
       const total = callsData.reduce((sum, point) => {
         const value = Number(point.value) || 0
@@ -168,10 +173,11 @@ export const QueryInsights = () => {
       return total.toLocaleString()
     }
     return '0'
-  }, [callsData])
+  }, [callsData, isLoadingCalls])
 
   // Calculate cache hit ratio for the cache hits tab
   const cacheHitRatio = useMemo(() => {
+    if (isLoadingCacheHits) return null
     if (cacheHitsData && cacheHitsData.length > 0) {
       // Calculate cache hit ratio using the same logic as the chart
       const lastPoint = cacheHitsData[cacheHitsData.length - 1]
@@ -185,7 +191,7 @@ export const QueryInsights = () => {
       }
     }
     return '0%'
-  }, [cacheHitsData])
+  }, [cacheHitsData, isLoadingCacheHits])
 
   // Debug logging
   console.log('🔍 [QueryInsights] Debug info:', {
@@ -201,39 +207,43 @@ export const QueryInsights = () => {
   })
 
   // Define metrics with dynamic descriptions
-  const METRICS: { id: MetricType; label: string; description: string; tooltip: string }[] = [
+  const METRICS = useMemo((): { id: MetricType; label: string; description: string | null; tooltip: string; isLoading: boolean }[] => [
     {
       id: 'query_latency',
       label: 'Query latency',
       description: `p95: ${p95Latency}`,
       tooltip: 'Shows the latency of each query execution.',
+      isLoading: isLoadingLatency,
     },
     {
       id: 'rows_read',
       label: 'Rows read',
       description: `${totalRowsRead}`,
       tooltip: 'Displays the total number of rows read by queries over time',
+      isLoading: isLoadingRowsRead,
     },
-
     {
       id: 'calls',
       label: 'Calls',
       description: `${totalCalls}`,
       tooltip: 'Shows the frequency of query executions and their distribution over time',
+      isLoading: isLoadingCalls,
     },
     {
       id: 'cache_hits',
       label: 'Cache hits',
       description: cacheHitRatio,
       tooltip: 'Displays cache hit rates and shared buffer cache performance statistics',
+      isLoading: isLoadingCacheHits,
     },
     {
       id: 'issues',
       label: 'Issues',
       description: errorCount,
       tooltip: 'Shows queries with potential performance issues (slow queries)',
+      isLoading: isLoadingIssues,
     },
-  ]
+  ], [p95Latency, totalRowsRead, totalCalls, cacheHitRatio, errorCount, isLoadingLatency, isLoadingRowsRead, isLoadingCalls, isLoadingCacheHits, isLoadingIssues])
 
   // Event listener for clearing the selected query
   useEffect(() => {
@@ -415,9 +425,17 @@ export const QueryInsights = () => {
                 </Tooltip>
               </div>
 
-              <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                {metric.description}
-              </span>
+              {metric.isLoading || metric.description === null ? (
+                <ShimmeringLoader className="w-32 pt-1" />
+              ) : metric.description === '0' || metric.description === '0%' || metric.description === '0 slow queries' ? (
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                  No data yet
+                </span>
+              ) : (
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                  {metric.description}
+                </span>
+              )}
             </TabsTrigger_Shadcn_>
           ))}
         </TabsList_Shadcn_>
