@@ -57,10 +57,11 @@ const SiteUrl = () => {
   }, [authConfig, isUpdatingSiteUrl])
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
+    if (!projectRef) return console.error('Project ref is required')
     setIsUpdatingSiteUrl(true)
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: values },
+      { projectRef, config: values },
       {
         onError: (error) => {
           toast.error(`Failed to update site URL: ${error?.message}`)
