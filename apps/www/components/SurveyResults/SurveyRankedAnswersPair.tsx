@@ -10,24 +10,22 @@ export function SurveyRankedAnswersPair({
           key={index}
           className={`flex gap-3 flex-1 px-6 py-8 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
         >
-          {/* Progress bar */}
-          {/* Filled portion of the bar */}
-          <div className={`flex flex-row ${index % 2 === 0 ? 'items-start' : 'items-end'}`}>
+          {/* Decorative progress bar */}
+          <div
+            aria-hidden="true"
+            className={`flex flex-row ${index % 2 === 0 ? 'items-start' : 'items-end'}`}
+          >
             {item.answers.map((answer, answerIndex) => (
               <div
                 key={answerIndex}
-                className={`h-${(answerIndex + 1) * 4} w-full relative bg-surface-100`}
-              >
-                <div
-                  className={`absolute inset-0 pointer-events-none ${answerIndex === 0 ? 'bg-brand' : answerIndex === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
-                  style={{
-                    maskImage: 'url("/survey/pattern-front.svg")',
-                    maskSize: '14.5px 15px',
-                    maskRepeat: 'repeat',
-                    maskPosition: 'top left',
-                  }}
-                />
-              </div>
+                className={`h-${(answerIndex + 1) * 4} w-full pointer-events-none ${answerIndex === 0 ? 'bg-brand' : answerIndex === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
+                style={{
+                  maskImage: 'url("/survey/pattern-front.svg")',
+                  maskSize: '14.5px 15px',
+                  maskRepeat: 'repeat',
+                  maskPosition: 'top left',
+                }}
+              ></div>
             ))}
           </div>
 

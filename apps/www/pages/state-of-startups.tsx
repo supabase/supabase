@@ -12,6 +12,7 @@ import { Label } from 'ui/src/components/shadcn/ui/label'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
 
 import data from '~/data/surveys/state-of-startups-2025'
 
@@ -182,13 +183,13 @@ function StateOfStartupsPage() {
   // Inline Table of Contents component (expanded only)
   const InlineTableOfContents = () => {
     return (
-      <div className="bg-background/75 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden min-w-[280px]">
-        <ol className="max-h-[60vh] overflow-y-auto p-1 flex flex-col gap-1">
+      <div className="">
+        <ol className="p-1 flex flex-col gap-1">
           {pageData.pageChapters.map((chapter, chapterIndex) => (
             <li key={chapterIndex + 1}>
               <Link
                 href={`#chapter-${chapterIndex + 1}`}
-                className="block py-2 rounded-lg text-sm transition-colors text-balance text-center text-foreground-light hover:text-foreground hover:bg-surface-300"
+                className="block py-2 rounded-lg text-sm transition-colors text-balance text-foreground-light hover:text-foreground hover:bg-surface-300"
               >
                 {chapter.title}
               </Link>
@@ -202,127 +203,67 @@ function StateOfStartupsPage() {
   return (
     <>
       {/* <NextSeo {...pageData.seo} /> */}
-      <DefaultLayout className="!bg-alternative overflow-hidden">
+      <DefaultLayout className="bg-alternative overflow-hidden">
         {/* Floating version */}
         <FloatingTableOfContents />
 
         {/* Previously <Hero /> */}
         <section ref={heroRef} className="relative w-full">
-          {/* SVG shapes container */}
-          <div className="absolute inset-0 -top-[30rem] xs:w-[calc(100%+50vw)] xs:-mx-[25vw]">
-            <svg
-              width="558"
-              height="392"
-              viewBox="0 0 558 392"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute w-full h-full inset-0 -top-40 animate-pulse"
-              style={{
-                animationDuration: '20000ms',
-              }}
-            >
-              <circle
-                cx="278.831"
-                cy="112.952"
-                r="278.5"
-                transform="rotate(75 278.831 112.952)"
-                fill="url(#paint0_radial_183_1691)"
-                fillOpacity="0.2"
-              />
-              <defs>
-                <radialGradient
-                  id="paint0_radial_183_1691"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(349.764 247.245) rotate(47.821) scale(202.74 202.839)"
-                >
-                  <stop stopColor="hsl(var(--brand-200))" />
-                  <stop offset="1" stopColor="hsl(var(--brand-200))" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-            </svg>
-            {/* <div className="sm:w-full sm_h-full sm:flex sm:justify-center"></div> */}
-            <div className="w-full h-full flex justify-center">
-              <svg
-                width="1119"
-                height="1119"
-                viewBox="0 0 1119 1119"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                // className="sm:w-auto -mb-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
-                className="animate-spinner !ease-linear transform"
+          {/* Text container */}
+          <header className="container w-full flex flex-col md:flex-col px-4 pb-16 mx-auto">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Left side */}
+              <div>
+                {/* Decorative progress bar */}
+                <div aria-hidden="true" className="flex flex-col">
+                  {[0, 1, 2, 3].map((item, index) => (
+                    <div
+                      key={index}
+                      className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand' : index === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
+                      style={{
+                        maskImage: 'url("/survey/pattern-front.svg")',
+                        maskSize: '14.5px 15px',
+                        maskRepeat: 'repeat',
+                        maskPosition: 'top left',
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="text-brand-link text-sm font-mono uppercase ">
+                  Supabase presents the 2025
+                </p>
+              </div>
+
+              {/* Right side */}
+              <div
+                className=""
                 style={{
-                  animationDuration: '20000ms',
+                  background: `radial-gradient(ellipse at 5% -40%, hsl(var(--brand-500)), transparent 65%), radial-gradient(ellipse at 85% 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+                  // background:
+                  // 'linear-gradient(217deg, rgb(255 0 0 / 0.8), transparent 70.71%), linear-gradient(127deg, rgb(0 255 0 / 0.8), transparent 70.71%), linear-gradient(336deg, rgb(0 0 255 / 0.8), transparent 70.71%)',
                 }}
               >
-                <g clipPath="url(#clip0_183_1690)">
-                  <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
-                  <path
-                    d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
-                    stroke="url(#paint2_radial_183_1690)"
-                    strokeWidth="1.15887"
-                  />
-                </g>
-                <defs>
-                  <radialGradient
-                    id="paint1_radial_183_1690"
-                    cx="0"
-                    cy="0"
-                    r="1"
-                    gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(571.212 539.13) rotate(-57.818) scale(542.117 690.275)"
-                  >
-                    {/* Inner core */}
-                    <stop stopColor="hsl(var(--brand-200))" />
-                    {/* Inner band */}
-                    <stop offset="0.675" stopColor="hsl(var(--brand-200))" />
-                    {/* Outer band */}
-                    <stop offset="0.75" stopColor="hsl(var(--brand-300))" />
-                    {/* Outermost band */}
-                    <stop offset="1" stopColor="hsl(var(--brand-500))" />
-                  </radialGradient>
-                  <radialGradient
-                    id="paint2_radial_183_1690"
-                    cx="0"
-                    cy="0"
-                    r="1"
-                    gradientUnits="userSpaceOnUse"
-                    gradientTransform="translate(814.301 944.97) rotate(141.0399) scale(142.974 294.371)"
-                  >
-                    {/* Outer slither ring */}
-                    <stop stopColor="hsl(var(--brand-600))" />
-                    <stop offset="1" stopColor="hsl(var(--brand-600))" stopOpacity="0" />
-                  </radialGradient>
-                  <clipPath id="clip0_183_1690">
-                    <rect width="1119" height="1119" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
+                <h1 className="!leading-[90%] tracking-[-0.025em] text-7xl md:text-[14vw] lg:text-[12vw] xl:text-[10vw]">
+                  State of
+                  <br /> Startups
+                </h1>
+              </div>
             </div>
-          </div>
-          {/* Text container */}
-          <header className="container relative mt-[8rem] gap-[8rem] sm:gap-[14rem] w-full z-10 flex flex-col text-center justify-center items-center px-4 pb-16 mx-auto">
-            <h1 className="flex flex-col gap-4 items-center">
-              <span className="!leading-[90%] tracking-[-0.025em] text-8xl md:text-[14vw] lg:text-[12vw] xl:text-[10vw]">
-                State of
-                <br /> Startups
-              </span>
-              <span className="text-foreground text-2xl md:text-4xl leading-[100%]">2025</span>
-            </h1>
 
-            <div className="flex flex-col gap-4 max-w-prose">
-              <p className="p md:text-2xl">{pageData.heroSection.subheader}</p>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col gap-4 max-w-prose">
+                <p className="p md:text-2xl">{pageData.heroSection.subheader}</p>
+                <p className="p md:text-2xl">{pageData.heroSection.cta}</p>
+              </div>
 
               {/* Inline version - always expanded */}
               <div className="relative flex justify-center mb-4">
                 <InlineTableOfContents />
               </div>
-
-              <p className="p md:text-2xl">{pageData.heroSection.cta}</p>
             </div>
           </header>
+
+          <SurveySectionBreak />
         </section>
 
         {pageData.pageChapters.map((chapter, chapterIndex) => (

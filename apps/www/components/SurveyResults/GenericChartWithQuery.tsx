@@ -307,11 +307,18 @@ export function GenericChartWithQuery({
   const displayData = isLoading ? skeletonData : chartData || []
 
   return (
-    <div ref={chartRef} className="w-full bg-200 border-y">
+    <div
+      ref={chartRef}
+      className="w-full bg-200 border-y"
+      style={{
+        background: `radial-gradient(circle at center -100%, hsl(var(--brand-500)), transparent 70%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+      }}
+    >
       <header className="px-6 py-5">
         <h3 className="text-foreground-light text-sm">{title}</h3>
       </header>
-      <div className={`${view === 'chart' ? 'bg-200' : 'bg-surface-75'} border-b last:border-none`}>
+      {/* <div className={`${view === 'chart' ? 'bg-200' : 'bg-surface-75'} border-b last:border-none`}> */}
+      <div className={`border-b last:border-none`}>
         {/* Filters and toggle */}
         <div className="flex flex-row flex-wrap gap-4 p-4 justify-between">
           {filters && activeFilters && setFilterValue && (
