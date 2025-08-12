@@ -4,23 +4,23 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Loader } from 'lucide-react'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 
 const StoragePolicies = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -195,26 +195,28 @@ const StoragePolicies = () => {
             {buckets.length === 0 && <StoragePoliciesPlaceholder />}
 
             {/* Sections for policies grouped by buckets */}
-            {buckets.map((bucket) => {
-              const bucketPolicies = get(
-                find(formattedStorageObjectPolicies, { name: bucket.name }),
-                ['policies'],
-                []
-              ).sort((a: any, b: any) => a.name.localeCompare(b.name))
+            <div className="flex flex-col gap-y-4">
+              {buckets.map((bucket) => {
+                const bucketPolicies = get(
+                  find(formattedStorageObjectPolicies, { name: bucket.name }),
+                  ['policies'],
+                  []
+                ).sort((a: any, b: any) => a.name.localeCompare(b.name))
 
-              return (
-                <StoragePoliciesBucketRow
-                  key={bucket.name}
-                  table="objects"
-                  label={bucket.name}
-                  bucket={bucket}
-                  policies={bucketPolicies}
-                  onSelectPolicyAdd={onSelectPolicyAdd}
-                  onSelectPolicyEdit={onSelectPolicyEdit}
-                  onSelectPolicyDelete={onSelectPolicyDelete}
-                />
-              )
-            })}
+                return (
+                  <StoragePoliciesBucketRow
+                    key={bucket.name}
+                    table="objects"
+                    label={bucket.name}
+                    bucket={bucket}
+                    policies={bucketPolicies}
+                    onSelectPolicyAdd={onSelectPolicyAdd}
+                    onSelectPolicyEdit={onSelectPolicyEdit}
+                    onSelectPolicyDelete={onSelectPolicyDelete}
+                  />
+                )
+              })}
+            </div>
           </ScaffoldSection>
 
           <ScaffoldSection isFullWidth>
@@ -223,7 +225,7 @@ const StoragePolicies = () => {
               Write policies for the tables under the storage schema directly for greater control
             </ScaffoldSectionDescription>
 
-            <div className="space-y-6">
+            <div className="flex flex-col gap-y-4">
               {/* Section for policies under storage.objects that are not tied to any buckets */}
               <StoragePoliciesBucketRow
                 table="objects"
