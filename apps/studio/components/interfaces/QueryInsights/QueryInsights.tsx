@@ -91,6 +91,22 @@ export const QueryInsights = () => {
     timeRange.period_end.date
   )
 
+  // Always fetch cache hits data for hit ratio calculation
+  const { data: cacheHitsData } = useQueryInsightsMetrics(
+    ref,
+    'cache_hits',
+    timeRange.period_start.date,
+    timeRange.period_end.date
+  )
+
+  // Always fetch calls data for total calculation
+  const { data: callsData } = useQueryInsightsMetrics(
+    ref,
+    'calls',
+    timeRange.period_start.date,
+    timeRange.period_end.date
+  )
+
   const { data: queriesData, isLoading: isLoadingQueries } = useQueryInsightsQueries(
     ref,
     timeRange.period_start.date,
@@ -121,12 +137,16 @@ export const QueryInsights = () => {
     return null
   }, [latencyData])
 
-  // Calculate rows read for the rows read tab (simplified for now)
-  const rowsRead = useMemo(() => {
+  // Calculate total rows read for the rows read tab
+  const totalRowsRead = useMemo(() => {
     if (rowsReadData && rowsReadData.length > 0) {
-      return 'Data available'
+      const total = rowsReadData.reduce((sum, point) => {
+        const value = Number(point.value) || 0
+        return sum + value
+      }, 0)
+      return total.toLocaleString()
     }
-    return null
+    return '0'
   }, [rowsReadData])
 
   // Calculate error count for the errors tab
@@ -137,6 +157,35 @@ export const QueryInsights = () => {
     }
     return '0 slow queries'
   }, [issuesData])
+
+  // Calculate total calls for the calls tab
+  const totalCalls = useMemo(() => {
+    if (callsData && callsData.length > 0) {
+      const total = callsData.reduce((sum, point) => {
+        const value = Number(point.value) || 0
+        return sum + value
+      }, 0)
+      return total.toLocaleString()
+    }
+    return '0'
+  }, [callsData])
+
+  // Calculate cache hit ratio for the cache hits tab
+  const cacheHitRatio = useMemo(() => {
+    if (cacheHitsData && cacheHitsData.length > 0) {
+      // Calculate cache hit ratio using the same logic as the chart
+      const lastPoint = cacheHitsData[cacheHitsData.length - 1]
+      const hits = Number(lastPoint.shared_blks_hit) || 0
+      const reads = Number(lastPoint.shared_blks_read) || 0
+      const total = hits + reads
+      
+      if (total > 0) {
+        const ratio = (hits / total) * 100
+        return `${ratio.toFixed(1)}%`
+      }
+    }
+    return '0%'
+  }, [cacheHitsData])
 
   // Debug logging
   console.log('🔍 [QueryInsights] Debug info:', {
@@ -162,20 +211,20 @@ export const QueryInsights = () => {
     {
       id: 'rows_read',
       label: 'Rows read',
-      description: '0 rows',
+      description: `${totalRowsRead}`,
       tooltip: 'Displays the total number of rows read by queries over time',
     },
 
     {
       id: 'calls',
       label: 'Calls',
-      description: '0 calls',
+      description: `${totalCalls}`,
       tooltip: 'Shows the frequency of query executions and their distribution over time',
     },
     {
       id: 'cache_hits',
       label: 'Cache hits',
-      description: '0%',
+      description: cacheHitRatio,
       tooltip: 'Displays cache hit rates and shared buffer cache performance statistics',
     },
     {
