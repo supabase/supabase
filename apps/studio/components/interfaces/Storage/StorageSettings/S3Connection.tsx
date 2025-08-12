@@ -9,11 +9,15 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
-import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
@@ -24,10 +28,12 @@ import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
   Button,
+  Card,
+  CardContent,
+  CardFooter,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
-  Separator,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -38,12 +44,6 @@ import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
 import { StorageCredItem } from './StorageCredItem'
 import { getConnectionURL } from './StorageSettings.utils'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
 
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()
@@ -123,72 +123,63 @@ export const S3Connection = () => {
             {projectIsLoading ? (
               <GenericSkeletonLoader />
             ) : isProjectActive ? (
-              <Panel className="!mb-0">
-                <FormField_Shadcn_
-                  name="s3ConnectionEnabled"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      className="px-8 py-8 [&>*>label]:text-foreground"
-                      label="Enable connection via S3 protocol"
-                      description="Allow clients to connect to Supabase Storage via the S3 protocol"
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          size="large"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!isSuccessStorageConfig || field.disabled}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
+              <Card>
+                <CardContent className="pt-6">
+                  <FormField_Shadcn_
+                    name="s3ConnectionEnabled"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        className="[&>*>label]:text-foreground"
+                        label="Enable connection via S3 protocol"
+                        description="Allow clients to connect to Supabase Storage via the S3 protocol"
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            size="large"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!isSuccessStorageConfig || field.disabled}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
 
-                {isErrorStorageConfig && (
-                  <div className="px-8 pb-8">
-                    <AlertError
-                      subject="Failed to retrieve storage configuration"
-                      error={configError}
-                    />
+                  {isErrorStorageConfig && (
+                    <div className="px-8 pb-8">
+                      <AlertError
+                        subject="Failed to retrieve storage configuration"
+                        error={configError}
+                      />
+                    </div>
+                  )}
+                </CardContent>
+
+                <CardContent className="py-6">
+                  <div className="flex flex-col gap-y-4">
+                    <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
+                      <Input readOnly copy disabled value={s3connectionUrl} />
+                    </FormItemLayout>
+                    {!projectIsLoading && (
+                      <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
+                        <Input className="input-mono" copy disabled value={project?.region} />
+                      </FormItemLayout>
+                    )}
                   </div>
-                )}
+                </CardContent>
 
-                <Separator className="bg-border" />
-
-                <div className="flex flex-col gap-y-4 py-8">
-                  <FormItemLayout
-                    layout="horizontal"
-                    className="px-8"
-                    label="Endpoint"
-                    isReactForm={false}
-                  >
-                    <Input readOnly copy disabled value={s3connectionUrl} />
-                  </FormItemLayout>
-                  {!projectIsLoading && (
-                    <FormItemLayout
-                      layout="horizontal"
-                      className="px-8"
-                      label="Region"
-                      isReactForm={false}
-                    >
-                      <Input className="input-mono" copy disabled value={project?.region} />
-                    </FormItemLayout>
-                  )}
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between w-full gap-2 px-8 py-4">
-                  {!canUpdateStorageSettings ? (
+                {!canUpdateStorageSettings && (
+                  <CardContent className="pt-0">
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update storage settings
                     </p>
-                  ) : (
-                    <div />
-                  )}
-                  <div className="flex gap-2">
+                  </CardContent>
+                )}
+
+                <CardFooter className="justify-end space-x-2">
+                  {form.formState.isDirty && (
                     <Button
                       type="default"
                       htmlType="reset"
@@ -197,17 +188,17 @@ export const S3Connection = () => {
                     >
                       Cancel
                     </Button>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      loading={isUpdating}
-                      disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </div>
-              </Panel>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
+                  >
+                    Save
+                  </Button>
+                </CardFooter>
+              </Card>
             ) : (
               <Alert_Shadcn_ variant="warning">
                 <WarningIcon />

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
@@ -40,7 +41,6 @@ import {
   StorageSizeUnits,
 } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
 
 interface StorageSettingsState {
   fileSizeLimit: number
