@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 
-import type { EntityType, InvalidationEvent } from './invalidate-cache-granularly'
+import type { EntityType, InvalidationEvent } from '.'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'

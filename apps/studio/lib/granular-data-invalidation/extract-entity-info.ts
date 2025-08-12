@@ -1,4 +1,4 @@
-import type { InvalidationEvent } from './invalidate-cache-granularly'
+import type { InvalidationEvent } from '.'
 
 const DEFAULT_SCHEMA = 'public' as const
 
