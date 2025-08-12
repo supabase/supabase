@@ -1,8 +1,7 @@
-import { X } from 'lucide-react'
+
 import { QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import { Button, cn } from 'ui'
 import { MetricType } from '../QueryInsights'
-import { MetricPill } from './MetricPill'
 
 interface MetricInfo {
   label: string
@@ -36,29 +35,14 @@ export const SelectedQueryBadge = ({
         className
       )}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-foreground-light">Selected Query</span>
-        <div className="flex items-center gap-2">
-          {metrics.map((metricInfo, index) => (
-            <MetricPill
-              key={index}
-              label={metricInfo.label}
-              value={metricInfo.value}
-              color={metricInfo.color}
-              metricType={metric}
-              isActive={true}
-            />
-          ))}
-        </div>
-      </div>
-
-      <button
+      <Button
+        type="default"
+        size="tiny"
         onClick={onClear}
-        className="text-foreground-lighter hover:text-foreground-light ml-1"
-        title="Clear selected query filter"
+
       >
-        <X size={12} strokeWidth={2.5} />
-      </button>
+        Clear query
+      </Button>
     </div>
   )
 }

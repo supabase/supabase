@@ -86,10 +86,12 @@ export const QueryList = ({
   const rowClassRender = (row: QueryInsightsQuery) => {
     const isSelected = selectedQuery?.query_id === row.query_id
     const isHovered = hoveredQuery?.query_id === row.query_id && !selectedQuery
+    const hasIssues = (row.error_count || 0) > 0
 
     return cn(
       'cursor-pointer transition-colors',
-      isSelected ? 'bg-surface-300' : isHovered ? 'bg-surface-200' : ''
+      isSelected ? 'bg-surface-300' : isHovered ? 'bg-surface-200' : '',
+      hasIssues && !isSelected && !isHovered ? 'bg-red-50 dark:bg-red-950/20 border-l-4 border-l-red-500' : ''
     )
   }
 
@@ -364,7 +366,7 @@ export const QueryList = ({
 
         return (
           <div className="font-mono text-xs flex items-center justify-end h-full w-full">
-            <span className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 rounded">
+            <span className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 rounded font-semibold">
               {errorCount} slow query{errorCount !== 1 ? 's' : ''}
             </span>
           </div>
@@ -394,10 +396,13 @@ export const QueryList = ({
         rowClass={(row, idx) => {
           // Use the query_id for comparison instead of row index
           const isSelected = selectedQuery?.query_id === row.query_id
-          // const isHovered = hoveredQuery?.query_id === row.query_id && !selectedQuery
+          const isHovered = hoveredQuery?.query_id === row.query_id && !selectedQuery
+          const hasIssues = (row.error_count || 0) > 0
+          
           return [
             rowClassRender(row),
             `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+            hasIssues && !isSelected && !isHovered ? '[&>.rdg-cell]:bg-red-50 dark:[&>.rdg-cell]:bg-red-950/20' : '',
             '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-4',
           ].join(' ')

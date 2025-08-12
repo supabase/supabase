@@ -24,18 +24,20 @@ export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits' 
 
 export const QueryInsights = () => {
   console.log('🚀 [QueryInsights] Component rendered - START')
+  // Queries with error_count > 0 (slow queries with mean_exec_time > 1000ms and calls > 1) 
+  // are highlighted in red in the QueryList component
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('query_latency')
-  const [selectedTimeRange, setSelectedTimeRange] = useState('1d')
+  const [selectedTimeRange, setSelectedTimeRange] = useState('3h')
   const [selectedQuery, setSelectedQuery] = useState<QueryInsightsQuery | null>(null)
   const [hoveredQuery, setHoveredQuery] = useState<QueryInsightsQuery | null>(null)
   const [timeRange, setTimeRange] = useState({
     period_start: {
-      date: dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ssZ'),
-      time_period: '1d',
+      date: dayjs().subtract(3, 'hour').format('YYYY-MM-DD HH:mm:ssZ'),
+      time_period: '3h',
     },
     period_end: {
       date: dayjs().format('YYYY-MM-DD HH:mm:ssZ'),

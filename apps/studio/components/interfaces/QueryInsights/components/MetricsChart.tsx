@@ -168,14 +168,12 @@ export function MetricsChart(props: MetricsChartProps) {
             />
           </div>
 
-          {selectedQuery && (
-            <SelectedQueryBadge
-              selectedQuery={selectedQuery}
-              onClear={handleClearSelectedQuery}
-              metric={metric}
-              metrics={metricBadges}
-            />
-          )}
+          <SelectedQueryBadge
+            selectedQuery={selectedQuery}
+            onClear={handleClearSelectedQuery}
+            metric={metric}
+            metrics={metricBadges}
+          />
         </div>
 
         <div className="flex-1 min-h-0 pt-4 pr-4">
