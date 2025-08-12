@@ -51,7 +51,7 @@
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-collapsible": "^1.0.3",
-    "@sentry/nextjs": "^9.15.0",
+    "@sentry/nextjs": "^10.3.0",
     "@supabase/supabase-js": "catalog:",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tanstack/react-query": "^5.13.4",
@@ -92,7 +92,7 @@
     "next-plugin-yaml": "^1.0.1",
     "next-themes": "^0.3.0",
     "nuqs": "^1.19.1",
-    "openai": "^4.20.1",
+    "openai": "^4.75.1",
     "openapi-fetch": "0.12.4",
     "react": "catalog:",
     "react-copy-to-clipboard": "^5.1.0",
@@ -118,7 +118,7 @@
     "uuid": "^9.0.1",
     "valtio": "catalog:",
     "yaml": "^2.4.5",
-    "zod": "^3.22.4"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@graphiql/toolkit": "^0.9.1",

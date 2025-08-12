@@ -1,11 +1,10 @@
-import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { getPipelineStateMessages, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { getPipelineStateMessages } from './Pipeline.utils'
 
 export enum PipelineStatusName {
   FAILED = 'failed',
@@ -14,9 +13,6 @@ export enum PipelineStatusName {
   STOPPED = 'stopped',
   UNKNOWN = 'unknown',
 }
-
-// Type alias for better readability
-type FailedStatus = Extract<ReplicationPipelineStatusData['status'], { name: 'failed' }>
 
 interface PipelineStatusProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
@@ -35,32 +31,6 @@ export const PipelineStatus = ({
   isSuccess,
   requestStatus,
 }: PipelineStatusProps) => {
-  const isFailedStatus = (
-    status: ReplicationPipelineStatusData['status'] | undefined
-  ): status is FailedStatus => {
-    return (
-      status !== null &&
-      status !== undefined &&
-      typeof status === 'object' &&
-      status.name === PipelineStatusName.FAILED
-    )
-  }
-
-  const renderFailedStatus = () => {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center gap-2 text-sm text-destructive">
-            <AlertTriangle className="w-3 h-3" />
-            <span>Failed</span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          {getPipelineStateMessages(requestStatus, 'failed').message}
-        </TooltipContent>
-      </Tooltip>
-    )
-  }
   // Map backend statuses to UX-friendly display
   const getStatusConfig = () => {
     const statusName =
@@ -89,15 +59,15 @@ export const PipelineStatus = ({
       }
     }
 
-    // Handle Failed status object
-    if (isFailedStatus(pipelineStatus)) {
-      return {
-        isFailedStatus: true,
-      }
-    }
-
     if (pipelineStatus && typeof pipelineStatus === 'object' && 'name' in pipelineStatus) {
       switch (pipelineStatus.name) {
+        case PipelineStatusName.FAILED:
+          return {
+            label: 'Failed',
+            dot: <AlertTriangle className="w-3 h-3 text-destructive-600" />,
+            color: 'text-destructive-600',
+            tooltip: stateMessages.message,
+          }
         case PipelineStatusName.STARTING:
           return {
             label: 'Starting',
@@ -151,24 +121,25 @@ export const PipelineStatus = ({
     <>
       {isLoading && <ShimmeringLoader />}
       {isError && (
-        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
+        <Tooltip>
+          <TooltipTrigger>
+            <WarningIcon />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="w-64 text-center">
+            Unable to retrieve status: {error?.message}
+          </TooltipContent>
+        </Tooltip>
       )}
       {isSuccess && (
-        <>
-          {statusConfig.isFailedStatus ? (
-            <div className="relative">{renderFailedStatus()}</div>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className={cn('flex items-center gap-2 text-sm w-min', statusConfig.color)}>
-                  {statusConfig.dot}
-                  <span>{statusConfig.label}</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">{statusConfig.tooltip}</TooltipContent>
-            </Tooltip>
-          )}
-        </>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className={cn('flex items-center gap-2 text-sm w-min', statusConfig.color)}>
+              {statusConfig.dot}
+              <span>{statusConfig.label}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{statusConfig.tooltip}</TooltipContent>
+        </Tooltip>
       )}
     </>
   )
