@@ -105,33 +105,16 @@ export async function invalidatePolicyQueries(
 async function invalidateIndexQueries(
   queryClient: QueryClient,
   projectRef: string,
-  schema?: string,
-  table?: string
+  schema?: string
 ): Promise<void> {
-  const promises: Promise<void>[] = []
-
   const queryKey = schema
     ? databaseIndexesKeys.list(projectRef, schema)
     : databaseIndexesKeys.list(projectRef)
 
-  promises.push(
-    queryClient.invalidateQueries({
-      queryKey,
-      refetchType: 'active',
-    })
-  )
-
-  // Also invalidate the specific table's indexes if active
-  if (table && schema) {
-    promises.push(
-      queryClient.invalidateQueries({
-        queryKey: ['projects', projectRef, 'table', `${schema}.${table}`, 'indexes'],
-        refetchType: 'active',
-      })
-    )
-  }
-
-  await Promise.all(promises)
+  await queryClient.invalidateQueries({
+    queryKey,
+    refetchType: 'active',
+  })
 }
 
 async function invalidateCronQueries(queryClient: QueryClient, projectRef: string): Promise<void> {
@@ -169,7 +152,7 @@ async function executeInvalidationStrategy(
     procedure: () => invalidateFunctionQueries(queryClient, projectRef),
     trigger: () => invalidateTriggerQueries(queryClient, projectRef),
     policy: () => invalidatePolicyQueries(queryClient, projectRef, schema, table),
-    index: () => invalidateIndexQueries(queryClient, projectRef, schema, table),
+    index: () => invalidateIndexQueries(queryClient, projectRef, schema),
     cron: () => invalidateCronQueries(queryClient, projectRef),
   }
 
