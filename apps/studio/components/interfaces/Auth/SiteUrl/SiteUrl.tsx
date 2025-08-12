@@ -10,8 +10,7 @@ import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,6 +24,7 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = z.object({
   SITE_URL: z.string().url('Must have a Site URL'),
@@ -36,9 +36,12 @@ const SiteUrl = () => {
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
-  const siteUrlForm = useForm<z.infer<typeof schema>>({
+  const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       SITE_URL: '',
@@ -47,7 +50,7 @@ const SiteUrl = () => {
 
   useEffect(() => {
     if (authConfig && !isUpdatingSiteUrl) {
-      siteUrlForm.reset({
+      form.reset({
         SITE_URL: authConfig.SITE_URL || '',
       })
     }
@@ -85,12 +88,12 @@ const SiteUrl = () => {
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle className="mb-4">Site URL</ScaffoldSectionTitle>
 
-      <Form_Shadcn_ {...siteUrlForm}>
-        <form onSubmit={siteUrlForm.handleSubmit(onSubmit)} className="space-y-4">
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Card>
             <CardContent className="pt-6">
               <FormField_Shadcn_
-                control={siteUrlForm.control}
+                control={form.control}
                 name="SITE_URL"
                 render={({ field }) => (
                   <FormItemLayout
@@ -107,15 +110,15 @@ const SiteUrl = () => {
             </CardContent>
 
             <CardFooter className="justify-end space-x-2">
-              {siteUrlForm.formState.isDirty && (
-                <Button type="default" onClick={() => siteUrlForm.reset()}>
+              {form.formState.isDirty && (
+                <Button type="default" onClick={() => form.reset()}>
                   Cancel
                 </Button>
               )}
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={!canUpdateConfig || isUpdatingSiteUrl || !siteUrlForm.formState.isDirty}
+                disabled={!canUpdateConfig || isUpdatingSiteUrl || !form.formState.isDirty}
                 loading={isUpdatingSiteUrl}
               >
                 Save changes

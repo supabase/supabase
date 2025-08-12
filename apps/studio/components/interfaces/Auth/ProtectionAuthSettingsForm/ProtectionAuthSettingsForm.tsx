@@ -12,7 +12,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -72,14 +72,26 @@ const schema = z.intersection(
 const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const [isUpdatingProtection, setIsUpdatingProtection] = useState(false)
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update settings: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated settings')
+    },
+  })
   const [hidden, setHidden] = useState(true)
 
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
-  const protectionForm = useForm<z.infer<typeof schema>>({
+  const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,
@@ -97,9 +109,9 @@ const ProtectionAuthSettingsForm = () => {
   })
 
   useEffect(() => {
-    if (authConfig && !isUpdatingProtection) {
+    if (authConfig && !isUpdatingConfig) {
       // @ts-expect-error
-      protectionForm.reset({
+      form.reset({
         DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
         EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
         SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
@@ -116,35 +128,24 @@ const ProtectionAuthSettingsForm = () => {
         PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
       })
     }
-  }, [authConfig, isUpdatingProtection])
+  }, [authConfig, isUpdatingConfig])
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
-    setIsUpdatingProtection(true)
-    updateAuthConfig(
-      {
-        projectRef: projectRef!,
-        config: {
-          ...values,
-          DISABLE_SIGNUP: !values.DISABLE_SIGNUP,
-          // The backend uses empty string to represent no required characters in the password
-          // @ts-expect-error the expected type is narrower than `string`
-          PASSWORD_REQUIRED_CHARACTERS:
-            values.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS
-              ? ''
-              : values.PASSWORD_REQUIRED_CHARACTERS,
-        },
+    if (!projectRef) return console.error('Project ref is required')
+
+    updateAuthConfig({
+      projectRef,
+      config: {
+        ...values,
+        DISABLE_SIGNUP: !values.DISABLE_SIGNUP,
+        // The backend uses empty string to represent no required characters in the password
+        // @ts-expect-error the expected type is narrower than `string`
+        PASSWORD_REQUIRED_CHARACTERS:
+          values.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS
+            ? ''
+            : values.PASSWORD_REQUIRED_CHARACTERS,
       },
-      {
-        onError: (error) => {
-          toast.error(`Failed to update settings: ${error?.message}`)
-          setIsUpdatingProtection(false)
-        },
-        onSuccess: () => {
-          toast.success('Successfully updated settings')
-          setIsUpdatingProtection(false)
-        },
-      }
-    )
+    })
   }
 
   if (isError) {
@@ -165,12 +166,12 @@ const ProtectionAuthSettingsForm = () => {
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle className="mb-4">Bot and Abuse Protection</ScaffoldSectionTitle>
 
-      <Form_Shadcn_ {...protectionForm}>
-        <form onSubmit={protectionForm.handleSubmit(onSubmit)} className="space-y-4">
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Card>
             <CardContent>
               <FormField_Shadcn_
-                control={protectionForm.control}
+                control={form.control}
                 name="SECURITY_CAPTCHA_ENABLED"
                 render={({ field }) => (
                   <FormItemLayout
@@ -190,11 +191,11 @@ const ProtectionAuthSettingsForm = () => {
               />
             </CardContent>
 
-            {protectionForm.watch('SECURITY_CAPTCHA_ENABLED') && (
+            {form.watch('SECURITY_CAPTCHA_ENABLED') && (
               <>
                 <CardContent>
                   <FormField_Shadcn_
-                    control={protectionForm.control}
+                    control={form.control}
                     name="SECURITY_CAPTCHA_PROVIDER"
                     render={({ field }) => {
                       const selectedProvider = CAPTCHA_PROVIDERS.find((x) => x.key === field.value)
@@ -238,7 +239,7 @@ const ProtectionAuthSettingsForm = () => {
 
                 <CardContent>
                   <FormField_Shadcn_
-                    control={protectionForm.control}
+                    control={form.control}
                     name="SECURITY_CAPTCHA_SECRET"
                     render={({ field }) => (
                       <FormItemLayout
@@ -274,18 +275,16 @@ const ProtectionAuthSettingsForm = () => {
             )}
 
             <CardFooter className="justify-end space-x-2">
-              {protectionForm.formState.isDirty && (
-                <Button type="default" onClick={() => protectionForm.reset()}>
+              {form.formState.isDirty && (
+                <Button type="default" onClick={() => form.reset()}>
                   Cancel
                 </Button>
               )}
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={
-                  !canUpdateConfig || isUpdatingProtection || !protectionForm.formState.isDirty
-                }
-                loading={isUpdatingProtection}
+                disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                loading={isUpdatingConfig}
               >
                 Save changes
               </Button>

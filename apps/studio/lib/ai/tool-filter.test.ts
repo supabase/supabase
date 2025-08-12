@@ -1,4 +1,4 @@
-import { Tool, ToolSet, ToolExecutionOptions } from 'ai'
+import { Tool, ToolSet } from 'ai'
 import { describe, expect, it, vitest } from 'vitest'
 import { z } from 'zod'
 
@@ -32,6 +32,7 @@ describe('tool allowance by opt-in level', () => {
       list_extensions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_edge_functions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_branches: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      list_policies: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Log tools
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
@@ -72,6 +73,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
+    expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).not.toContain('get_advisors')
     expect(tools).not.toContain('execute_sql')
@@ -86,6 +88,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
+    expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
     expect(tools).not.toContain('execute_sql')
@@ -100,6 +103,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
+    expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
     expect(tools).not.toContain('execute_sql')
@@ -117,6 +121,7 @@ describe('filterToolsByOptInLevel', () => {
     list_extensions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     list_edge_functions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     list_branches: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    list_policies: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Log tools
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
@@ -173,6 +178,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
+      'list_policies',
       'get_advisors',
     ])
   })
@@ -185,6 +191,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
+      'list_policies',
       'get_advisors',
     ])
   })
@@ -208,7 +215,7 @@ describe('createPrivacyMessageTool', () => {
   it('should create a privacy message tool', async () => {
     const originalTool = {
       description: 'Original description',
-      parameters: z.object({}),
+      inputSchema: z.object({}),
       execute: vitest.fn(),
     }
 
@@ -242,7 +249,7 @@ describe('transformToolResult', () => {
 
     // Execute the transformed tool
     const args = { key: 'value' }
-    const options = {} as ToolExecutionOptions
+    const options = {} as any
 
     if (!transformedTool.execute) {
       throw new Error('Transformed tool does not have an execute function')
@@ -275,8 +282,8 @@ describe('transformToolResult', () => {
 describe('toolSetValidationSchema', () => {
   it('should accept subset of known tools', () => {
     const validSubset = {
-      list_tables: { parameters: z.object({}), execute: vitest.fn() },
-      display_query: { parameters: z.object({}), execute: vitest.fn() },
+      list_tables: { inputSchema: z.object({}), execute: vitest.fn() },
+      display_query: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const result = toolSetValidationSchema.safeParse(validSubset)
@@ -285,9 +292,9 @@ describe('toolSetValidationSchema', () => {
 
   it('should reject unknown tools', () => {
     const toolsWithUnknown = {
-      list_tables: { parameters: z.object({}), execute: vitest.fn() },
-      unknown_tool: { parameters: z.object({}), execute: vitest.fn() },
-      another_unknown: { parameters: z.object({}), execute: vitest.fn() },
+      list_tables: { inputSchema: z.object({}), execute: vitest.fn() },
+      unknown_tool: { inputSchema: z.object({}), execute: vitest.fn() },
+      another_unknown: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const result = toolSetValidationSchema.safeParse(toolsWithUnknown)
@@ -305,15 +312,16 @@ describe('toolSetValidationSchema', () => {
 
   it('should validate all expected tools from the old schema', () => {
     const allExpectedTools = {
-      list_tables: { parameters: z.object({}), execute: vitest.fn() },
-      list_extensions: { parameters: z.object({}), execute: vitest.fn() },
-      list_edge_functions: { parameters: z.object({}), execute: vitest.fn() },
-      list_branches: { parameters: z.object({}), execute: vitest.fn() },
-      search_docs: { parameters: z.object({}), execute: vitest.fn() },
-      get_advisors: { parameters: z.object({}), execute: vitest.fn() },
-      display_query: { parameters: z.object({}), execute: vitest.fn() },
-      display_edge_function: { parameters: z.object({}), execute: vitest.fn() },
-      rename_chat: { parameters: z.object({}), execute: vitest.fn() },
+      list_tables: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_extensions: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_edge_functions: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_branches: { inputSchema: z.object({}), execute: vitest.fn() },
+      list_policies: { inputSchema: z.object({}), execute: vitest.fn() },
+      search_docs: { inputSchema: z.object({}), execute: vitest.fn() },
+      get_advisors: { inputSchema: z.object({}), execute: vitest.fn() },
+      display_query: { inputSchema: z.object({}), execute: vitest.fn() },
+      display_edge_function: { inputSchema: z.object({}), execute: vitest.fn() },
+      rename_chat: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const validationResult = toolSetValidationSchema.safeParse(allExpectedTools)

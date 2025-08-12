@@ -1,5 +1,5 @@
-import { Message as VercelMessage } from 'ai/react'
-import { Loader2, User } from 'lucide-react'
+import { UIMessage as VercelMessage } from '@ai-sdk/react'
+import { Loader2 } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
@@ -80,7 +80,11 @@ export const Message = function Message({
     return null
   }
 
-  const { role, content, parts } = message
+  // For backwards compatibility: some stored messages may have a 'content' property
+  const { role, parts } = message
+  const hasContent = (msg: VercelMessage): msg is VercelMessage & { content: string } =>
+    'content' in msg && typeof msg.content === 'string'
+  const content = hasContent(message) ? message.content : undefined
   const isUser = role === 'user'
 
   const shouldUsePartsRendering = parts && parts.length > 0
@@ -131,61 +135,76 @@ export const Message = function Message({
                           </ReactMarkdown>
                         )
 
-                      case 'tool-invocation': {
-                        const { toolCallId, toolName, args, state } = part.toolInvocation
-                        if (state === 'call' || state === 'partial-call') {
-                          if (shownLoadingTools.has(toolName)) {
+                      case 'tool-display_query': {
+                        const { toolCallId, state, input } = part
+                        if (state === 'input-streaming' || state === 'input-available') {
+                          if (shownLoadingTools.has('display_query')) {
                             return null
                           }
-                          shownLoadingTools.add(toolName)
+                          shownLoadingTools.add('display_query')
                           return (
                             <div
-                              key={`${id}-tool-loading-${toolName}`}
+                              key={`${id}-tool-loading-display_query`}
                               className="rounded-lg border bg-surface-75 text-xs font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
                             >
                               <Loader2 className="w-4 h-4 animate-spin" />
-                              {`Calling ${toolName}...`}
+                              {`Calling display_query...`}
                             </div>
                           )
                         }
-                        // Only render the result UI for known tools when state is 'result'
-                        switch (toolName) {
-                          case 'display_query': {
-                            return (
-                              <DisplayBlockRenderer
-                                key={`${id}-tool-${toolCallId}`}
-                                messageId={id}
-                                toolCallId={toolCallId}
-                                manualId={args.manualToolCallId}
-                                initialArgs={args}
-                                messageParts={parts}
-                                isLoading={false}
-                                onResults={onResults}
-                              />
-                            )
-                          }
-                          case 'display_edge_function': {
-                            return (
-                              <div
-                                key={`${id}-tool-${toolCallId}`}
-                                className="w-auto overflow-x-hidden"
-                              >
-                                <EdgeFunctionBlock
-                                  label={args.name || 'Edge Function'}
-                                  code={args.code}
-                                  functionName={args.name || 'my-function'}
-                                  showCode={!readOnly}
-                                />
-                              </div>
-                            )
-                          }
-                          default:
-                            // For unknown tools, just show nothing for result
-                            return null
+                        if (state === 'output-available') {
+                          return (
+                            <DisplayBlockRenderer
+                              key={`${id}-tool-${toolCallId}`}
+                              messageId={id}
+                              toolCallId={toolCallId}
+                              manualId={(input as any).manualToolCallId}
+                              initialArgs={input as any}
+                              messageParts={parts}
+                              isLoading={false}
+                              onResults={onResults}
+                            />
+                          )
                         }
+                        return null
+                      }
+                      case 'tool-display_edge_function': {
+                        const { toolCallId, state, input } = part
+                        if (state === 'input-streaming' || state === 'input-available') {
+                          if (shownLoadingTools.has('display_edge_function')) {
+                            return null
+                          }
+                          shownLoadingTools.add('display_edge_function')
+                          return (
+                            <div
+                              key={`${id}-tool-loading-display_edge_function`}
+                              className="rounded-lg border bg-surface-75 text-xs font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                            >
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              {`Calling display_edge_function...`}
+                            </div>
+                          )
+                        }
+                        if (state === 'output-available') {
+                          return (
+                            <div
+                              key={`${id}-tool-${toolCallId}`}
+                              className="w-auto overflow-x-hidden"
+                            >
+                              <EdgeFunctionBlock
+                                label={(input as any).name || 'Edge Function'}
+                                code={(input as any).code}
+                                functionName={(input as any).name || 'my-function'}
+                                showCode={!readOnly}
+                              />
+                            </div>
+                          )
+                        }
+                        return null
                       }
                       case 'reasoning':
-                      case 'source':
+                      case 'source-url':
+                      case 'source-document':
                       case 'file':
                         return null
                       default:
