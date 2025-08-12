@@ -9,7 +9,7 @@ import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Input } from 'ui'
 import ExtensionCard from './ExtensionCard'
@@ -42,11 +42,8 @@ const Extensions = () => {
     (ext) => !isNull(ext.installed_version)
   )
 
-  const canUpdateExtensions = useCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
-  )
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
   useEffect(() => {
     if (filter !== undefined) setFilterString(filter as string)
