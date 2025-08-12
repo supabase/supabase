@@ -27,9 +27,8 @@ export const PublicationsTables = ({
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { can: canUpdatePublicationss, isLoading: isLoadingPermissions } =
+  const { can: canUpdatePublications, isLoading: isLoadingPermissions } =
     useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'publications')
-  const canUpdatePublications = false
 
   const { data: protectedSchemas } = useProtectedSchemas()
 
