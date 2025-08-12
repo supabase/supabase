@@ -1,18 +1,18 @@
 import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronLeft, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
 import { Loading } from 'components/ui/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { AlertCircle, ChevronLeft, Search } from 'lucide-react'
 import { Button, Input } from 'ui'
+import { Admonition } from 'ui-patterns'
 import PublicationsTableItem from './PublicationsTableItem'
 
 interface PublicationsTablesProps {
@@ -20,14 +20,15 @@ interface PublicationsTablesProps {
   onSelectBack: () => void
 }
 
-const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsTablesProps) => {
+export const PublicationsTables = ({
+  selectedPublication,
+  onSelectBack,
+}: PublicationsTablesProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const canUpdatePublications = useCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'publications'
-  )
+  const { can: canUpdatePublications, isLoading: isLoadingPermissions } =
+    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'publications')
 
   const { data: protectedSchemas } = useProtectedSchemas()
 
@@ -71,17 +72,17 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
               />
             </div>
           </div>
-          {!canUpdatePublications && (
-            <div className="w-[500px]">
-              <InformationBox
-                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database replications"
-              />
-            </div>
+          {!isLoadingPermissions && !canUpdatePublications && (
+            <Admonition
+              type="note"
+              className="w-[500px] m-0"
+              title="You need additional permissions to update database replications"
+            />
           )}
         </div>
       </div>
-      {isLoading && (
+
+      {(isLoading || isLoadingPermissions) && (
         <div className="mt-8">
           <Loading />
         </div>
@@ -131,5 +132,3 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
     </>
   )
 }
-
-export default PublicationsTables

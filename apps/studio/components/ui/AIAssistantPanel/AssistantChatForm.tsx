@@ -1,12 +1,12 @@
 import { ArrowUp, Loader2, Square } from 'lucide-react'
-import React, { ChangeEvent, memo, useRef } from 'react'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
 
 import { useBreakpoint } from 'common'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { type SqlSnippet } from './AIAssistant.types'
-import { SnippetRow, getSnippetContent } from './SnippetRow'
+import { getSnippetContent, SnippetRow } from './SnippetRow'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -43,7 +43,7 @@ export interface FormProps {
   className?: string
 }
 
-const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
+const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
   (
     {
       loading = false,
@@ -66,7 +66,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
     const formRef = useRef<HTMLFormElement>(null)
     const isMobile = useBreakpoint('md')
 
-    const handleSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
       if (!value || loading) return
 
@@ -81,7 +81,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       onSubmit(finalMessage)
     }
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
