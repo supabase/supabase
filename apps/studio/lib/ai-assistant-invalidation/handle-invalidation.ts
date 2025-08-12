@@ -7,6 +7,7 @@ import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { tableKeys } from 'data/tables/keys'
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
+import { databaseCronJobsKeys } from 'data/database-cron-jobs/keys'
 
 // Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table', 'function']
@@ -147,6 +148,14 @@ async function invalidateEntityTypesList(
   }
 }
 
+async function invalidateCronQueries(queryClient: QueryClient, projectRef: string): Promise<void> {
+  await queryClient.invalidateQueries({
+    queryKey: databaseCronJobsKeys.listInfinite(projectRef, ''),
+    refetchType: 'active',
+    exact: false,
+  })
+}
+
 async function executeInvalidationStrategy(
   queryClient: QueryClient,
   event: InvalidationEvent
@@ -160,6 +169,7 @@ async function executeInvalidationStrategy(
     trigger: () => invalidateTriggerQueries(queryClient, projectRef),
     policy: () => invalidatePolicyQueries(queryClient, projectRef, schema, table),
     index: () => invalidateIndexQueries(queryClient, projectRef, schema, table),
+    cron: () => invalidateCronQueries(queryClient, projectRef),
   }
 
   const strategy = invalidationMap[entityType]

@@ -2,7 +2,6 @@ import type { InvalidationEvent } from './invalidate-cache-granularly'
 
 const DEFAULT_SCHEMA = 'public' as const
 
-// SQL pattern matchers for different entity types
 const SQL_PATTERNS = {
   table: /table\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
   function: /(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
@@ -10,6 +9,7 @@ const SQL_PATTERNS = {
   policy: /policy\s+(?:"([^"]+)"|(\w+))\s+on\s+(?:"?(\w+)"?\.)??"?(\w+)"?/i,
   index:
     /(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+(?:not\s+)?exists\s+)?"?(\w+)"?\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?/i,
+  cron: /(?:select\s+)?cron\.(?:schedule|unschedule)\s*\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))/i,
 } as const
 
 function extractTableInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
@@ -80,6 +80,16 @@ function extractIndexInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | 
   }
 }
 
+function extractCronInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
+  const match = sql.match(SQL_PATTERNS.cron)
+  if (!match) return null
+
+  return {
+    entityType: 'cron',
+    entityName: match[1] || match[2] || match[3], // match[1] for single quotes, match[2] for double quotes, match[3] for numeric ID
+  }
+}
+
 /**
  * Extract entity information from SQL statement
  */
@@ -106,6 +116,11 @@ export function extractEntityInfo(
 
   if (sqlLower.includes(' index ')) {
     return extractIndexInfo(sql)
+  }
+
+  // The specific 'cron.' prefix prevents conflicts with other patterns
+  if (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule')) {
+    return extractCronInfo(sql)
   }
 
   return null
