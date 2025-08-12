@@ -39,7 +39,8 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
       <p className="text-foreground text-xl transition-opacity duration-500">
         {answers[currentIndex]}
       </p>
-      <div className="w-24 h-1 relative overflow-hidden">
+      {/* Decorative progress bar */}
+      <div aria-hidden="true" className="w-24 h-1 relative overflow-hidden">
         {/* Background pattern for the entire bar */}
         <div
           className="absolute inset-0 pointer-events-none bg-foreground-muted"

@@ -46,6 +46,8 @@ import { InitialPayingCustomersChart } from '~/components/SurveyResults/InitialP
 import { WorldOutlookChart } from '~/components/SurveyResults/WorldOutlookChart'
 import { BiggestChallengeChart } from '~/components/SurveyResults/BiggestChallengeChart'
 
+import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
+
 interface SurveyChapterSectionProps {
   number: string
   title: string
@@ -104,7 +106,7 @@ export function SurveyChapterSection({
       id={title.toLowerCase().replace(/\s+/g, '-')}
       className="flex flex-col gap-12 border-t border-muted pt-24 mt-24"
     >
-      <header className="flex flex-col gap-3 text-center text-balance max-w-[48rem] mx-auto pb-12">
+      <header className="flex flex-col gap-3  text-balance max-w-[48rem] mx-auto pb-12">
         <h3 className="text-brand-link dark:text-brand font-mono uppercase tracking-widest text-sm">
           {title}
         </h3>
@@ -138,6 +140,8 @@ export function SurveyChapterSection({
       )}
 
       {children}
+
+      <SurveySectionBreak />
     </div>
   )
 }
