@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
-import { Maximize2, X } from 'lucide-react'
 
 import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
 import { Input } from 'ui/src/components/shadcn/ui/input'
@@ -30,7 +27,6 @@ function StateOfStartupsPage() {
   // Scroll detection to show floating ToC
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY
       const heroElement = heroRef.current
 
       if (heroElement) {
@@ -88,7 +84,7 @@ function StateOfStartupsPage() {
     }
   }, [isTocOpen])
 
-  // Floating Table of Contents component
+  // Floating Table of Contents
   const FloatingTableOfContents = () => {
     const currentChapter = pageData.pageChapters[activeChapter - 1]
 
@@ -100,7 +96,7 @@ function StateOfStartupsPage() {
         className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300"
       >
         <div className="relative">
-          {/* Closed state - shows current chapter */}
+          {/* Closed ToC */}
           <Button
             type="default"
             size="small"
@@ -111,15 +107,6 @@ function StateOfStartupsPage() {
             )}
           >
             <div className={cn('flex items-center gap-2 font-mono uppercase text-xs')}>
-              {/* <motion.span
-                className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.1 }}
-              >
-                {activeChapter}
-              </motion.span> */}
               <span className="bg-surface-100 border border-surface-200 rounded-xl w-5 h-5 flex items-center justify-center text-foreground-light">
                 {activeChapter}
               </span>
@@ -136,15 +123,15 @@ function StateOfStartupsPage() {
             </div>
           </Button>
 
-          {/* Open state - shows full table of contents */}
+          {/* Open ToC */}
           {isTocOpen && (
             <motion.div
               initial={{ opacity: 0, scale: 0.86, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.1, ease: 'easeOut' }}
-              className="origin-[50%_25%] bg-background/75 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden min-w-[280px]"
+              className="origin-[50%_25%] bg-background/80 backdrop-blur-lg border border-default rounded-xl shadow-xl overflow-hidden"
             >
-              <ol className="max-h-[60vh] overflow-y-auto p-1 flex flex-col gap-1">
+              <ol className="max-h-[60vh] overflow-y-auto py-2 flex flex-col">
                 {pageData.pageChapters.map((chapter, chapterIndex) => (
                   <motion.li
                     key={chapterIndex + 1}
@@ -162,13 +149,12 @@ function StateOfStartupsPage() {
                       href={`#chapter-${chapterIndex + 1}`}
                       onClick={() => setIsTocOpen(false)}
                       className={cn(
-                        'block py-2 rounded-lg text-sm transition-colors text-balance text-center',
-                        chapterIndex + 1 === activeChapter
-                          ? 'bg-brand/10 text-brand-link dark:text-brand'
-                          : 'text-foreground-light hover:text-foreground hover:bg-surface-300'
+                        'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-widest text-center text-foreground-light hover:text-brand-link hover:bg-brand-300/25',
+                        chapterIndex + 1 === activeChapter &&
+                          'bg-brand-300/40 text-brand-link dark:text-brand'
                       )}
                     >
-                      {chapter.title}
+                      {chapter.shortTitle}
                     </Link>
                   </motion.li>
                 ))}
@@ -180,36 +166,14 @@ function StateOfStartupsPage() {
     )
   }
 
-  // Inline Table of Contents component (expanded only)
-  const InlineTableOfContents = () => {
-    return (
-      <div className="">
-        <ol className="p-1 flex flex-col gap-1">
-          {pageData.pageChapters.map((chapter, chapterIndex) => (
-            <li key={chapterIndex + 1}>
-              <Link
-                href={`#chapter-${chapterIndex + 1}`}
-                className="block py-2 rounded-lg text-sm transition-colors text-balance text-foreground-light hover:text-foreground hover:bg-surface-300"
-              >
-                {chapter.title}
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </div>
-    )
-  }
-
   return (
     <>
       {/* <NextSeo {...pageData.seo} /> */}
       <DefaultLayout className="bg-alternative overflow-hidden">
-        {/* Floating version */}
         <FloatingTableOfContents />
-
-        {/* Previously <Hero /> */}
+        {/* Intro section */}
         <section ref={heroRef} className="w-full">
-          {/* Text container */}
+          {/* Text contents */}
           <header className="w-full flex flex-col md:flex-col">
             <div className="flex flex-col md:flex-row">
               {/* Left side - spans from left edge to end of second grid column */}
@@ -256,19 +220,30 @@ function StateOfStartupsPage() {
             </div>
             <SurveySectionBreak />
 
-            {/* Intro and ToC */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[60rem] mx-auto border-x border-muted">
+            <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto border-x border-muted">
+              {/* Intro text */}
               <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground md:text-2xl">
                 <p>{pageData.heroSection.subheader}</p>
                 <p>{pageData.heroSection.cta}</p>
               </div>
 
-              {/* Inline version - always expanded */}
-              <div className="">
-                <InlineTableOfContents />
-              </div>
+              {/* Table of contents */}
+              <ol className="flex flex-col py-5">
+                {pageData.pageChapters.map((chapter, chapterIndex) => (
+                  <li key={chapterIndex + 1}>
+                    <Link
+                      href={`#chapter-${chapterIndex + 1}`}
+                      className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
+                    >
+                      <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
+                        {chapterIndex + 1}
+                      </span>{' '}
+                      {chapter.shortTitle}
+                    </Link>
+                  </li>
+                ))}
+              </ol>
             </div>
-            {/* </div> */}
           </header>
 
           <SurveySectionBreak />
@@ -296,15 +271,67 @@ function StateOfStartupsPage() {
                   wordCloud={section.wordCloud}
                   summarizedAnswer={section.summarizedAnswer}
                   rankedAnswersPair={section.rankedAnswersPair}
-                  // pullQuote={section.pullQuote}
                 />
               ))}
             </SurveyChapter>
           </>
         ))}
+        <CTABanner />
       </DefaultLayout>
     </>
   )
 }
 
 export default StateOfStartupsPage
+
+const CTABanner = () => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  return (
+    <section
+      className="flex flex-col items-center gap-4 py-32 text-center border-b border-muted"
+      style={{
+        background:
+          'radial-gradient(circle at center 280%, hsl(var(--brand-500)), transparent 70%)',
+      }}
+    >
+      <div className="flex flex-col items-center gap-4 max-w-prose">
+        <h2 className="text-foreground-light text-5xl text-balance">
+          The majority of builders <span className="text-foreground">choose Supabase</span>
+        </h2>
+        <p className="text-foreground-light text-lg">
+          Supabase is the Postgres development platform. Build your startup with a Postgres
+          database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage,
+          and Vector embeddings.
+        </p>
+      </div>
+      <div className="flex items-center justify-center gap-2 mt-4">
+        <Button asChild size="medium">
+          <Link
+            href="https://supabase.com/dashboard"
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'start_project_button_clicked',
+                properties: { buttonLocation: 'CTA Banner' },
+              })
+            }
+          >
+            Start your project
+          </Link>
+        </Button>
+        <Button asChild size="medium" type="default">
+          <Link
+            href="/contact/sales"
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'request_demo_button_clicked',
+                properties: { buttonLocation: 'CTA Banner' },
+              })
+            }
+          >
+            Request a demo
+          </Link>
+        </Button>
+      </div>
+    </section>
+  )
+}

@@ -1,12 +1,12 @@
 export function SurveySectionBreak() {
   return (
     <div aria-hidden="true" className="border-y border-muted">
-      <div className="max-w-[60rem] mx-auto border-x border-muted">
+      <div className="max-w-[60rem] mx-auto md:border-x border-muted">
         <div
-          className="h-14 bg-surface-75"
+          className="h-14 md:h-18 lg:h-20 xl:h-24 bg-surface-400 dark:bg-surface-75"
           style={{
-            maskImage: 'url("/survey/pattern-front.svg")',
-            maskSize: '14.5px 15px',
+            maskImage: 'url("/survey/pattern-back.svg")',
+            maskSize: '15px 15px',
             maskRepeat: 'repeat',
             maskPosition: 'top left',
           }}

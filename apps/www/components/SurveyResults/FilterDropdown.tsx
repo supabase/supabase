@@ -61,7 +61,7 @@ export function FilterDropdown({
               onClick={() => setFilterValue(filterKey, 'unset')}
               className="text-foreground-lighter"
             >
-              Clear filter
+              Clear
             </DropdownMenuItem>
           </div>
         )}
