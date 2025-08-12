@@ -859,7 +859,7 @@ functions:
   - id: verify-otp
     title: 'verifyOtp()'
     notes: |
-      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up or sign in a user.
     params:
       - name: token
