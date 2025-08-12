@@ -196,10 +196,9 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               name="name"
               render={({ field }) => (
                 <FormItemLayout
+                  layout="vertical"
                   label="Name of bucket"
                   labelOptional="Buckets cannot be renamed once created."
-                  description="Only lowercase letters, numbers, dots, and hyphens"
-                  layout="vertical"
                 >
                   <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} placeholder="Enter bucket name" />
@@ -208,12 +207,12 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               )}
             />
 
-            <div className="flex flex-col gap-y-2 mt-6">
+            <div className="flex flex-col gap-y-2 mt-2">
               <FormField_Shadcn_
                 control={form.control}
                 name="type"
                 render={({ field }) => (
-                  <FormItemLayout>
+                  <FormItemLayout label="Bucket type">
                     <FormControl_Shadcn_>
                       <RadioGroupStacked
                         id="type"
