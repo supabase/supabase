@@ -1,5 +1,4 @@
 import { NO_REQUIRED_CHARACTERS } from 'components/interfaces/Auth/Auth.constants'
-import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
 import z from 'zod'
 
 const parseBase64URL = (b64url: string) => {
@@ -7,6 +6,57 @@ const parseBase64URL = (b64url: string) => {
 }
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
+
+export interface Provider {
+  $schema: string
+  type: 'object'
+  key?: string
+  title: string
+  link: string
+  properties: Record<
+    string,
+    {
+      title: string
+      type: string
+      description?: string
+      descriptionOptional?: string
+      show?: {
+        key: string
+        matches?: string[] | string
+      }
+    } & (
+      | {
+          type: 'boolean' | 'datetime' | 'multiline-string'
+        }
+      | {
+          type: 'string'
+          isSecret?: true
+        }
+      | {
+          type: 'number'
+          units: string
+        }
+      | {
+          type: 'select'
+          enum: {
+            label: string
+            value: string
+            icon?: string
+          }[]
+        }
+    )
+  >
+  validationSchema: ((smsEnabled: boolean) => z.ZodSchema) | z.ZodSchema
+  misc: {
+    iconKey: string
+    requiresRedirect?: true
+    helper?: string
+    alert?: {
+      title: string
+      description: string
+    }
+  }
+}
 
 const PROVIDER_EMAIL = {
   $schema: JSON_SCHEMA_VERSION,
@@ -39,15 +89,15 @@ const PROVIDER_EMAIL = {
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Minimum password length',
-      type: 'number',
       description:
         'Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.',
+      type: 'number',
       units: 'characters',
     },
     PASSWORD_REQUIRED_CHARACTERS: {
-      type: 'select',
       title: 'Password Requirements',
       description: 'Passwords that do not have at least one of each will be rejected as weak.',
+      type: 'select',
       enum: [
         {
           label: 'No required characters (default)',
@@ -68,17 +118,16 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
-
     MAILER_OTP_EXP: {
       title: 'Email OTP Expiration',
-      type: 'number',
       description: 'Duration before an email otp / link expires.',
+      type: 'number',
       units: 'seconds',
     },
     MAILER_OTP_LENGTH: {
       title: 'Email OTP Length',
-      type: 'number',
       description: 'Number of digits in the email OTP',
+      type: 'number',
       units: 'number',
     },
   },
@@ -100,19 +149,11 @@ const PROVIDER_EMAIL = {
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
-
-const smsProviderValidation = (config: ProjectAuthConfigData, provider: string) => {
-  return {
-    is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-      return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === provider && !config.HOOK_SEND_SMS_ENABLED
-    },
-  }
-}
+} as const satisfies Provider
 
 // getPhoneProviderValidationSchema generate the validation schema for the SMS providers
 // based on whether the SMS hook is enabled
-export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
+export const getPhoneProviderValidationSchema = (smsEnabled: boolean) => {
   const smsDisabledSchema = z.object({
     EXTERNAL_PHONE_ENABLED: z.literal(false),
     SMS_PROVIDER: z.undefined(),
@@ -193,7 +234,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
       SMS_TEMPLATE: z.string({ required_error: 'SMS template is required.' }),
     }),
     z.union([
-      config.HOOK_SEND_SMS_ENABLED
+      smsEnabled
         ? z.discriminatedUnion(`SMS_PROVIDER`, [
             smsDisabledSchema,
             twilioSchema,
@@ -220,9 +261,9 @@ export const PROVIDER_PHONE = {
       type: 'boolean',
     },
     SMS_PROVIDER: {
-      type: 'select',
       title: 'SMS provider',
       description: 'External provider that will handle sending SMS messages',
+      type: 'select',
       enum: [
         { label: 'Twilio', value: 'twilio', icon: 'twilio-icon.svg' },
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
@@ -234,188 +275,187 @@ export const PROVIDER_PHONE = {
 
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
-      type: 'string',
       title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
       },
+      type: 'string',
     },
     SMS_TWILIO_AUTH_TOKEN: {
-      type: 'string',
       title: 'Twilio Auth Token',
-      isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
       },
+      type: 'string',
+      isSecret: true,
     },
     SMS_TWILIO_MESSAGE_SERVICE_SID: {
-      type: 'string',
       title: 'Twilio Message Service SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
       },
+      type: 'string',
     },
     SMS_TWILIO_CONTENT_SID: {
-      type: 'string',
       title: 'Twilio Content SID (Optional, For WhatsApp Only)',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
       },
+      type: 'string',
     },
 
     // Twilio Verify
     SMS_TWILIO_VERIFY_ACCOUNT_SID: {
-      type: 'string',
       title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
       },
+      type: 'string',
     },
     SMS_TWILIO_VERIFY_AUTH_TOKEN: {
-      type: 'string',
       title: 'Twilio Auth Token',
-      isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
       },
+      type: 'string',
+      isSecret: true,
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
-      type: 'string',
       title: 'Twilio Verify Service SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
       },
+      type: 'string',
     },
 
     // Messagebird
     SMS_MESSAGEBIRD_ACCESS_KEY: {
-      type: 'string',
       title: 'Messagebird Access Key',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['messagebird'],
       },
+      type: 'string',
     },
     SMS_MESSAGEBIRD_ORIGINATOR: {
-      type: 'string',
       title: 'Messagebird Originator',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['messagebird'],
       },
+      type: 'string',
     },
 
     // Textloczl
     SMS_TEXTLOCAL_API_KEY: {
-      type: 'string',
       title: 'Textlocal API Key',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['textlocal'],
       },
+      type: 'string',
     },
     SMS_TEXTLOCAL_SENDER: {
-      type: 'string',
       title: 'Textlocal Sender',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['textlocal'],
       },
+      type: 'string',
     },
 
     // Vonage
     SMS_VONAGE_API_KEY: {
-      type: 'string',
       title: 'Vonage API Key',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['vonage'],
       },
+      type: 'string',
     },
     SMS_VONAGE_API_SECRET: {
-      type: 'string',
       title: 'Vonage API Secret',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['vonage'],
       },
+      type: 'string',
     },
     // [TODO] verify what this is?
     SMS_VONAGE_FROM: {
-      type: 'string',
       title: 'Vonage From',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['vonage'],
       },
+      type: 'string',
     },
 
     // SMS Confirm settings
     SMS_AUTOCONFIRM: {
       title: 'Enable phone confirmations',
-      type: 'boolean',
       description: 'Users will need to confirm their phone number before signing in.',
+      type: 'boolean',
     },
-
     SMS_OTP_EXP: {
       title: 'SMS OTP Expiry',
-      type: 'number',
       description: 'Duration before an SMS OTP expires',
-      units: 'seconds',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
       },
+      type: 'number',
+      units: 'seconds',
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
-      type: 'number',
       description: 'Number of digits in OTP',
-      units: 'digits',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
       },
+      type: 'number',
+      units: 'digits',
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
-      type: 'multiline-string',
       description: 'To format the OTP code use `{{ .Code }}`',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
       },
+      type: 'multiline-string',
     },
     SMS_TEST_OTP: {
-      type: 'string',
       title: 'Test Phone Numbers and OTPs',
       description:
         'Register phone number and OTP combinations for testing as a comma separated list of <phone number>=<otp> pairs. Example: `18005550123=789012`',
+      type: 'string',
     },
     SMS_TEST_OTP_VALID_UNTIL: {
-      type: 'datetime',
       title: 'Test OTPs Valid Until',
       description:
         "Test phone number and OTP combinations won't be active past this date and time (local time zone).",
       show: {
         key: 'SMS_TEST_OTP',
       },
+      type: 'datetime',
     },
   },
-  validationSchema: null,
+  validationSchema: getPhoneProviderValidationSchema,
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
@@ -515,7 +555,7 @@ const EXTERNAL_PROVIDER_APPLE = {
       description: `A new secret should be generated every 6 months, otherwise users on the web will not be able to sign in.`,
     },
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
@@ -563,7 +603,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     iconKey: 'microsoft-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
@@ -599,7 +639,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
     iconKey: 'bitbucket-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
@@ -635,7 +675,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
     iconKey: 'discord-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
@@ -671,7 +711,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
     iconKey: 'facebook-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_FIGMA = {
   $schema: JSON_SCHEMA_VERSION,
@@ -707,7 +747,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
     iconKey: 'figma-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
@@ -743,7 +783,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
     iconKey: 'github-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
@@ -787,7 +827,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
     iconKey: 'gitlab-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
@@ -850,7 +890,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
@@ -888,7 +928,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
     iconKey: 'kakao-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 // [TODO]: clarify the EXTERNAL_KEYCLOAK_URL property
 const EXTERNAL_PROVIDER_KEYCLOAK = {
@@ -912,7 +952,6 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     },
     EXTERNAL_KEYCLOAK_URL: {
       title: 'Realm URL',
-      description: '',
       type: 'string',
     },
   },
@@ -933,7 +972,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     iconKey: 'keycloak-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
@@ -970,7 +1009,7 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
     iconKey: 'linkedin-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1006,7 +1045,7 @@ const EXTERNAL_PROVIDER_NOTION = {
     iconKey: 'notion-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1042,7 +1081,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
     iconKey: 'twitch-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1078,7 +1117,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
     iconKey: 'twitter-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1114,7 +1153,7 @@ const EXTERNAL_PROVIDER_SLACK = {
     iconKey: 'slack-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_SLACK_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1151,7 +1190,7 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
     iconKey: 'slack-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1187,7 +1226,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
     iconKey: 'spotify-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1230,7 +1269,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
     iconKey: 'workos-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1266,7 +1305,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
     iconKey: 'zoom-icon',
     requiresRedirect: true,
   },
-}
+} as const satisfies Provider
 
 const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1303,7 +1342,7 @@ const PROVIDER_SAML = {
   misc: {
     iconKey: 'saml-icon',
   },
-}
+} as const satisfies Provider
 
 const PROVIDER_WEB3 = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1324,7 +1363,7 @@ const PROVIDER_WEB3 = {
   misc: {
     iconKey: 'web3-icon',
   },
-}
+} as const satisfies Provider
 
 export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
@@ -1351,4 +1390,4 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_SPOTIFY,
   EXTERNAL_PROVIDER_WORKOS,
   EXTERNAL_PROVIDER_ZOOM,
-]
+] as const
