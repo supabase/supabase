@@ -1,7 +1,7 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
 // Generate SQL query for team count chart
-function generateIndustrySQL(activeFilters) {
+function generateIndustrySQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   // Always filter out NULL values
