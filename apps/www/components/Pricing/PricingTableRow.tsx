@@ -35,9 +35,11 @@ export const pricingTooltips: PricingTooltips = {
   'database.pausing': {
     main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard.',
   },
-
   'database.egress': {
-    main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period.',
+    main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
+  },
+  'database.cachedEgress': {
+    main: 'Billing is based on the total sum of any outgoing traffic (includes Database, Storage, API, Edge Functions) in GB throughout your billing period that is served from our CDN cache.'
   },
   'auth.totalUsers': {
     main: 'The maximum number of users your project can have',

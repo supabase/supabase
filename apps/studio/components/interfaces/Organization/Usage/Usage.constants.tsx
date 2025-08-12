@@ -86,7 +86,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         { key: EgressType.SUPAVISOR, name: 'Shared Pooler Egress', color: 'red' },
         { key: EgressType.LOGDRAIN, name: 'Logdrain Egress', color: 'teal' },
       ],
-      name: 'Total Egress',
+      name: 'Egress',
       unit: 'bytes',
       description:
         subscription?.cached_egress_enabled === true

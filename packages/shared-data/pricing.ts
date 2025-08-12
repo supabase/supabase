@@ -194,7 +194,7 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
-        key: 'database.egress',
+        key: 'database.cachedEgress',
         title: 'Cached Egress',
         plans: {
           free: '5 GB included',
