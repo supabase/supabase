@@ -795,7 +795,7 @@ Supabase's Email Login feature enables secure email-based authentication for you
 - Secure authentication: Implement industry-standard security practices.
 - Customizable workflows: Tailor the signup and login processes to your needs.
 - Seamless integration: Works with Supabase's other auth providers and features.
-- Local development support: Test email flows using built-in tools like Inbucket.
+- Local development support: Test email flows using built-in tools like Mailpit.
 
 ## Email login is valuable for:
 - SaaS applications requiring user accounts

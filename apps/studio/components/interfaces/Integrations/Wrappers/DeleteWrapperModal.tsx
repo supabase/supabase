@@ -1,9 +1,9 @@
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import type { FDW } from 'data/fdw/fdws-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getWrapperMetaForWrapper } from './Wrappers.utils'
 
 interface DeleteWrapperModalProps {
@@ -12,7 +12,7 @@ interface DeleteWrapperModalProps {
 }
 
 const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { mutate: deleteFDW, isLoading: isDeleting } = useFDWDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled ${selectedWrapper?.name} foreign data wrapper`)

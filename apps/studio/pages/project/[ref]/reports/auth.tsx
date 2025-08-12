@@ -1,26 +1,26 @@
-import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useParams } from 'common'
+import { useState } from 'react'
 
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 
-import { getAuthReportAttributes } from 'data/reports/auth-charts'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import type { NextPageWithLayout } from 'types'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { getAuthReportAttributes } from 'data/reports/auth-charts'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import type { NextPageWithLayout } from 'types'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -47,8 +47,6 @@ const AuthUsage = () => {
     updateDateRange,
     datePickerValue,
     datePickerHelpers,
-    isOrgPlanLoading,
-    orgPlan,
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
@@ -73,8 +71,7 @@ const AuthUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-  const AUTH_REPORT_ATTRIBUTES = getAuthReportAttributes(isFreePlan)
+  const AUTH_REPORT_ATTRIBUTES = getAuthReportAttributes()
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
@@ -142,7 +139,6 @@ const AuthUsage = () => {
               startDate={selectedDateRange?.period_start?.date}
               endDate={selectedDateRange?.period_end?.date}
               updateDateRange={updateDateRange}
-              orgPlanId={orgPlan?.id}
               isLoading={isRefreshing}
             />
           ))}

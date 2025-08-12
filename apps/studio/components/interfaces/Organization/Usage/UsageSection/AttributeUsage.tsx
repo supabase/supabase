@@ -224,7 +224,7 @@ const AttributeUsage = ({
                   </div>
                 ) : chartData.length > 0 && notAllValuesZero ? (
                   <UsageBarChart
-                    name={`${attribute.chartPrefix || ''}${attribute.name}`}
+                    name={`${attribute.chartPrefix || ''} ${attribute.name}`}
                     unit={attribute.unit}
                     attributes={attribute.attributes}
                     data={chartData}

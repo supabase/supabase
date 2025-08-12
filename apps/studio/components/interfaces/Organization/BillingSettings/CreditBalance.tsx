@@ -69,7 +69,7 @@ const CreditBalance = () => {
                     <div className="flex items-center space-x-1">
                       {isDebt && <h4 className="opacity-50">-</h4>}
                       <h4 className="opacity-50">$</h4>
-                      <h2 className="text-2xl relative">{balance}</h2>
+                      <h1 className="relative">{balance}</h1>
                       {isCredit && <h4 className="opacity-50">/credits</h4>}
                     </div>
                   </div>

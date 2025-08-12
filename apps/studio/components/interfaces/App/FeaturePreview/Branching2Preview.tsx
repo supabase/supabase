@@ -14,9 +14,8 @@ export const Branching2Preview = () => {
         className="rounded border mb-4"
       />
       <p className="text-sm text-foreground-light mb-4">
-        Branching 2.0 introduces a new workflow for managing database branches without having to use
-        Git. Create branches, review changes and merge back into production all through the
-        dashboard. Read the below limitations and our{' '}
+        Create branches, review changes, and merge back into production all through the dashboard.
+        Read the below limitations and our{' '}
         <InlineLink href="https://supabase.com/docs/guides/platform/branching">
           branching documentation
         </InlineLink>{' '}
@@ -26,10 +25,6 @@ export const Branching2Preview = () => {
         <p className="text-sm text-foreground mb-2 font-medium">Limitations:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>Custom roles created through the dashboard are not captured on branch creation.</li>
-          <li>
-            Only <code>public</code> schema changes are supported right now.
-          </li>
-          <li>Extensions are not included in the diff process</li>
           <li>
             Branches can only be merged to <code>main</code>; merging between preview branches is
             not supported.
@@ -52,11 +47,10 @@ export const Branching2Preview = () => {
       <div className="space-y-2 !mt-4">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
-          <li>Enable the new Branching 2.0 workflow for your project.</li>
           <li>
-            Allow you to create, manage, and merge database branches with improved UI and features.
+            Allow you to create, manage, review, and merge database branches directly via the
+            branches page within the dashboard
           </li>
-          <li>Access new merge request and deployment management tools.</li>
         </ul>
       </div>
     </div>

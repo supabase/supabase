@@ -16,10 +16,9 @@ import {
 } from 'components/interfaces/Database/Privileges/Privileges.utils'
 import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
-import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -30,7 +29,8 @@ import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
@@ -38,7 +38,7 @@ const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
 const PrivilegesPage: NextPageWithLayout = () => {
   const { ref, table: paramTable } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const isEnabled = useIsColumnLevelPrivilegesEnabled()
 
@@ -132,7 +132,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const table = tableList?.find(
     (table) => table.schema === selectedSchema && table.name === selectedTable
   )
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const {
     tableCheckedStates,
@@ -286,7 +286,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
               )}
 
               <PrivilegesHead
-                disabled={isLocked}
+                disabled={isSchemaLocked}
                 selectedSchema={selectedSchema}
                 selectedRole={selectedRole}
                 selectedTable={table}
@@ -300,7 +300,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 hasChanges={hasChanges}
                 isApplyingChanges={isApplyingChanges}
               />
-              {isLocked && (
+              {isSchemaLocked && (
                 <ProtectedSchemaWarning schema={selectedSchema} entity="column privileges" />
               )}
               {isLoading ? (
@@ -310,7 +310,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
               ) : table && tablePrivilege ? (
                 <div>
                   <PrivilegesTable
-                    disabled={isLocked}
+                    disabled={isSchemaLocked}
                     columnPrivileges={columnPrivileges}
                     tableCheckedStates={tableCheckedStates}
                     columnCheckedStates={columnCheckedStates}

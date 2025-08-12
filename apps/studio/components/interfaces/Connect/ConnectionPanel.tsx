@@ -144,7 +144,7 @@ export const ConnectionPanel = ({
             >
               <Button asChild type="default" className="mt-2">
                 <Link
-                  href={`/project/${projectRef}/settings/database#connection-pooler`}
+                  href={`/project/${projectRef}/database/settings#connection-pooler`}
                   className="text-xs text-light hover:text-foreground"
                 >
                   Database Settings

@@ -1,13 +1,15 @@
-import Table from 'components/to-be-cleaned/Table'
 import { motion } from 'framer-motion'
-import { BASE_PATH } from 'lib/constants'
 import { ArrowUpRight, Circle, Database, MoreVertical, Plus, Search } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { Button, Input } from 'ui'
+
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import Table from 'components/to-be-cleaned/Table'
+import { BASE_PATH } from 'lib/constants'
+import { Button, Input_Shadcn_ } from 'ui'
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -62,6 +64,14 @@ const STATIC_EDGES = [
   { id: 'e1-4', source: '1', target: '4', type: 'smoothstep', animated: true },
 ]
 
+export const ReplicationComingSoon = () => {
+  return (
+    <ReactFlowProvider>
+      <ReplicationStaticMockup />
+    </ReactFlowProvider>
+  )
+}
+
 const ReplicationStaticMockup = () => {
   const nodes = useMemo(() => STATIC_NODES, [])
   const edges = useMemo(() => STATIC_EDGES, [])
@@ -107,16 +117,6 @@ const ReplicationStaticMockup = () => {
     </div>
   )
 }
-
-const ReplicationComingSoon = () => {
-  return (
-    <ReactFlowProvider>
-      <ReplicationStaticMockup />
-    </ReactFlowProvider>
-  )
-}
-
-export default ReplicationComingSoon
 
 const PrimaryNode = ({
   data,
@@ -251,58 +251,68 @@ const StaticDestinations = () => {
 
   return (
     <>
-      <div className="flex flex-col bg-surface-100  px-6 pt-6 border-t relative h-full">
-        <div className="bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30"></div>
-        <div className="flex items-center justify-between">
-          <Input
-            size="small"
-            className="w-52 bg-transparent"
-            iconContainerClassName="pl-2"
-            icon={<Search size={14} className="text-foreground-lighter" />}
-            placeholder="Search..."
-          />
-          <Button
-            icon={<Plus size={16} />}
-            type="primary"
-            className="flex items-center"
-            onClick={() => {}}
-          >
-            New destination
-          </Button>
-        </div>
-        <Table
-          head={[
-            <Table.th key="name">Name</Table.th>,
-            <Table.th key="publication">Publication</Table.th>,
-            <Table.th key="lag">Lag</Table.th>,
-            <Table.th key="status">Status</Table.th>,
-            <Table.th key="actions"></Table.th>,
-          ]}
-          className="mt-4"
-          body={mockRows.map((row, i) => (
-            <Table.tr key={i}>
-              <Table.td>{row.name}</Table.td>
-              <Table.td>
-                <span className="flex items-center gap-2">
-                  <span className="font-bold">All</span>
-                  <span className="text-sm text-foreground-lighter">{row.tables} tables</span>
-                </span>
-              </Table.td>
-              <Table.td>{row.lag}</Table.td>
-              <Table.td>
-                <span className="flex items-center gap-3">
-                  <Circle size={10} className="bg-brand-500 stroke-none rounded-full" />
-                  {row.status}
-                </span>
-              </Table.td>
-              <Table.td className="text-right">
-                <button className="p-1">
-                  <MoreVertical size={18} />
-                </button>
-              </Table.td>
-            </Table.tr>
-          ))}
-        />
+      <div className="flex flex-col bg-surface-100 px-6 py-6 border-t relative ">
+        <div className="z-10 bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30" />
+
+        <ScaffoldContainer>
+          <ScaffoldSection className="!py-0">
+            <div className="col-span-12">
+              <div className="flex items-center justify-between">
+                <div className="relative w-52">
+                  <Search
+                    size={14}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
+                  />
+                  <Input_Shadcn_
+                    className="pl-9 bg-transparent h-8 pointer-events-none"
+                    placeholder="Search..."
+                  />
+                </div>
+                <Button
+                  disabled
+                  type="primary"
+                  icon={<Plus size={16} />}
+                  className="flex items-center pointer-events-none"
+                >
+                  New destination
+                </Button>
+              </div>
+              <Table
+                head={[
+                  <Table.th key="name">Name</Table.th>,
+                  <Table.th key="publication">Publication</Table.th>,
+                  <Table.th key="lag">Lag</Table.th>,
+                  <Table.th key="status">Status</Table.th>,
+                  <Table.th key="actions"></Table.th>,
+                ]}
+                className="mt-4"
+                body={mockRows.map((row, i) => (
+                  <Table.tr key={i}>
+                    <Table.td>{row.name}</Table.td>
+                    <Table.td>
+                      <span className="flex items-center gap-2">
+                        <span className="font-bold">All</span>
+                        <span className="text-sm text-foreground-lighter">{row.tables} tables</span>
+                      </span>
+                    </Table.td>
+                    <Table.td>{row.lag}</Table.td>
+                    <Table.td>
+                      <span className="flex items-center gap-3">
+                        <Circle size={10} className="bg-brand-500 stroke-none rounded-full" />
+                        {row.status}
+                      </span>
+                    </Table.td>
+                    <Table.td className="text-right">
+                      <button className="p-1">
+                        <MoreVertical size={18} />
+                      </button>
+                    </Table.td>
+                  </Table.tr>
+                ))}
+              />
+            </div>
+          </ScaffoldSection>
+        </ScaffoldContainer>
       </div>
     </>
   )

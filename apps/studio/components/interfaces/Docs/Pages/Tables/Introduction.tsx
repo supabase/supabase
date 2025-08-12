@@ -68,7 +68,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
             If you still want to use GraphQL, you can. Supabase provides you with a full Postgres
             database, so as long as your middleware can connect to the database then you can still
             use the tools you love. You can find the database connection details{' '}
-            <Link href={`/project/${projectRef}/settings/database`}>in the settings.</Link>
+            <Link href={`/project/${projectRef}/database/settings`}>in the settings.</Link>
           </p>
         </article>
         <article className="code">

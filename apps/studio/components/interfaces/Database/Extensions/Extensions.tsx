@@ -4,13 +4,13 @@ import { AlertCircle, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Input } from 'ui'
 import ExtensionCard from './ExtensionCard'
 import ExtensionCardSkeleton from './ExtensionCardSkeleton'
@@ -18,7 +18,7 @@ import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 
 const Extensions = () => {
   const { filter } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
   const { data, isLoading } = useDatabaseExtensionsQuery({
@@ -42,11 +42,8 @@ const Extensions = () => {
     (ext) => !isNull(ext.installed_version)
   )
 
-  const canUpdateExtensions = useCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
-  )
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
   useEffect(() => {
     if (filter !== undefined) setFilterString(filter as string)

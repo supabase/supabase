@@ -20,7 +20,7 @@ import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-del
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import {
@@ -30,7 +30,7 @@ import {
 } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { SqlSnippets } from 'types'
-import { Separator, TreeView } from 'ui'
+import { TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -39,7 +39,9 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { CommunitySnippetsSection } from './CommunitySnippetsSection'
 import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
+import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
@@ -47,18 +49,14 @@ interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
 }
 
-type SectionState = { shared: boolean; favorite: boolean; private: boolean }
-const DEFAULT_SECTION_STATE: SectionState = { shared: false, favorite: false, private: true }
-
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
 
   const { profile } = useProfile()
-  const project = useSelectedProject()
-  const snapV2 = useSqlEditorV2StateSnapshot()
-
+  const { data: project } = useSelectedProjectQuery()
   const tabs = useTabsStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
@@ -545,6 +543,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   return (
     <>
+      <InnerSideMenuSeparator />
+
       <InnerSideMenuCollapsible
         className="px-0"
         open={showSharedSnippets}
@@ -833,7 +833,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         </InnerSideMenuCollapsibleContent>
       </InnerSideMenuCollapsible>
 
-      <Separator />
+      <InnerSideMenuSeparator />
+
+      <CommunitySnippetsSection />
+
+      <InnerSideMenuSeparator />
 
       <RenameQueryModal
         snippet={selectedSnippetToRename}
