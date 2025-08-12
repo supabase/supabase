@@ -14,7 +14,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -57,8 +57,8 @@ const PITR = () => {
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.READ, 'physical_backups')
 
   if (isPermissionsLoaded && !canReadPhysicalBackups) {
     return <NoPermission resourceText="view PITR backups" />

@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -27,12 +27,13 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     projectRef: config.projectRef,
     reveal: true,
   })
-  const { anonKey, serviceKey, publishableKey } = getKeys(apiKeys)
+  const { anonKey, publishableKey } = getKeys(apiKeys)
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     { projectRef: config.projectRef },
     { enabled: IS_PLATFORM }
   )
+
   const jwtSecret = postgrestConfig?.jwt_secret
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -62,12 +63,17 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         snap.role !== undefined &&
         snap.role.type === 'postgrest'
       ) {
-        token = anonKey?.api_key
+        token = publishableKey?.api_key ?? anonKey?.api_key
         await getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
           .then((b) => (bearer = b))
           .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
       } else {
-        token = serviceKey?.api_key ?? publishableKey?.api_key
+        try {
+          const data = await getTemporaryAPIKey({ projectRef: config.projectRef })
+          token = data.api_key
+        } catch (error) {
+          token = publishableKey?.api_key
+        }
       }
       if (token) {
         onChangeConfig({ ...config, token, bearer })
@@ -76,24 +82,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
 
     triggerUpdateTokenBearer()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snap.role, anonKey, serviceKey])
+  }, [snap.role, anonKey])
 
-  return (
-    <RoleImpersonationPopover
-      serviceRoleLabel={!serviceKey ? 'anon' : undefined}
-      disabled={!serviceKey}
-      disabledTooltip={
-        !serviceKey ? (
-          <>
-            Role impersonation for the Realtime Inspector is currently unavailable temporarily due
-            to the new API keys. Please re-enable{' '}
-            <InlineLink href={`/project/${ref}/settings/api-keys`}>legacy JWT keys</InlineLink> if
-            you'd like to use role impersonation with the Realtime Inspector.
-          </>
-        ) : undefined
-      }
-      align="start"
-      variant="connected-on-both"
-    />
-  )
+  return <RoleImpersonationPopover align="start" variant="connected-on-both" />
 }

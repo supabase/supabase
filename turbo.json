@@ -90,6 +90,7 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "NEXT_PUBLIC_SENTRY_DSN",
         "AWS_BEDROCK_PROFILE",
         "AWS_BEDROCK_ROLE_ARN",
         "AWS_ACCESS_KEY_ID",
