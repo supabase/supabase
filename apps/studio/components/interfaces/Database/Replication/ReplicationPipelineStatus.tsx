@@ -2,7 +2,7 @@
 // it's cause the API types are conflicting a bit - API types have probably been updated for the UI here
 // but the UI hasn't been updated yet to fit the new API types
 
-import { Activity, AlertTriangle, ChevronLeft, ,Copy ExternalLink, Search, X } from 'lucide-react'
+import { Activity, AlertTriangle, ChevronLeft, Copy, ExternalLink, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
