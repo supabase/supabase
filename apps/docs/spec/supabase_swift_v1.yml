@@ -25,13 +25,13 @@ functions:
         name: Initialize Client
         code: |
           ```swift
-          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
+          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
         code: |
           ```swift
-          let client = SupabaseClient(
+          let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
             options: SupabaseClientOptions(

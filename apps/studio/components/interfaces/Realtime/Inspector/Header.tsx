@@ -1,9 +1,11 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
@@ -20,6 +22,11 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
+  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
+
   return (
     <div className="flex flex-row h-14 gap-2.5 items-center px-4">
       <div className="flex flex-row">
@@ -29,7 +36,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           size="tiny"
           type={config.enabled ? 'warning' : 'primary'}
           className="rounded-l-none border-l-0"
-          disabled={config.channelName.length === 0}
+          disabled={!canReadAPIKeys || config.channelName.length === 0}
           icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
           onClick={() => {
             onChangeConfig({ ...config, enabled: !config.enabled })
@@ -47,8 +54,11 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           tooltip={{
             content: {
               side: 'bottom',
-              text:
-                config.channelName.length === 0 ? 'You need to join a channel first' : undefined,
+              text: !canReadAPIKeys
+                ? 'You need additional permissions to use the realtime inspector'
+                : config.channelName.length === 0
+                  ? 'You need to join a channel first'
+                  : undefined,
             },
           }}
         >

@@ -14,8 +14,8 @@ import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
 export const RealtimeInspector = () => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const [sendMessageShown, setSendMessageShown] = useState(false)
 
+  const [sendMessageShown, setSendMessageShown] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
     projectRef: ref!,
