@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
+import { useParams } from 'common'
 import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
@@ -21,26 +21,24 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { formatBytes } from 'lib/helpers'
-
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -99,11 +97,15 @@ const DatabaseUsage = () => {
   const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
-  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const REPORT_ATTRIBUTES = getReportAttributes(org!, project!)
   const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)

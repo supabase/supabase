@@ -42,7 +42,7 @@ export function useCheckLatestDeploy() {
 
   const { data: commit } = useDeploymentCommitQuery({
     enabled: IS_PLATFORM && showRefreshToast,
-    staleTime: 10000, // 10 seconds
+    staleTime: 1000 * 60 * 10, // 10 minutes
   })
 
   useEffect(() => {
