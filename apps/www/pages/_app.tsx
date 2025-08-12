@@ -26,6 +26,7 @@ import MetaFaviconsPagesRouter, {
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import { RefreshRouteOnSave as PayloadLivePreview } from '@payloadcms/live-preview-react'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -102,6 +103,10 @@ export default function App({ Component, pageProps }: AppProps) {
                   API_URL={API_URL}
                   hasAcceptedConsent={hasAcceptedConsent}
                   enabled={IS_PLATFORM}
+                />
+                <PayloadLivePreview
+                  refresh={() => router.replace(router.asPath)}
+                  serverURL={process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'}
                 />
               </CommandProvider>
             </TooltipProvider>

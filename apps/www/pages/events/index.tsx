@@ -4,6 +4,7 @@ import { NextSeo } from 'next-seo'
 
 import { getSortedPosts } from 'lib/posts'
 import supabase from 'lib/supabase'
+import { getAllCMSEvents } from 'lib/get-cms-events'
 
 import { cn } from 'ui'
 import DefaultLayout from 'components/Layouts/Default'
@@ -20,14 +21,11 @@ interface Props {
   categories: { [key: string]: number }
 }
 
-export default function Events({
-  events: staticEvents,
-  onDemandEvents,
-  categories: staticCategories,
-}: Props) {
+function Events({ events: staticEvents, onDemandEvents, categories: staticCategories }: Props) {
   const [lumaEvents, setLumaEvents] = useState<BlogPost[]>([])
   const [isLoadingLuma, setIsLoadingLuma] = useState(true)
   const [filteredEvents, setFilteredEvents] = useState<BlogPost[]>([])
+  const [events, setEvents] = useState(staticEvents)
   const router = useRouter()
 
   // Fetch Luma events on client-side to avoid serverless maximum size limit error: https://vercel.com/guides/troubleshooting-function-250mb-limit
@@ -141,19 +139,19 @@ export default function Events({
         <SectionContainer className="!py-0">
           <EventsFilters
             allEvents={allEvents}
-            onDemandEvents={onDemandEvents}
-            events={filteredEvents}
-            setEvents={setFilteredEvents}
+            events={events}
+            setEvents={setEvents}
             categories={categories}
           />
-          <div
+
+          <ol
             className={cn(
               'grid -mx-2 sm:-mx-4 py-6 lg:py-6 grid-cols-1',
-              !filteredEvents?.length && 'mx-0 sm:mx-0'
+              !events?.length && 'mx-0 sm:mx-0'
             )}
           >
-            {filteredEvents?.length ? (
-              filteredEvents
+            {events?.length ? (
+              events
                 ?.sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())
                 .map((event: BlogPost, idx: number) => (
                   <div
@@ -164,19 +162,13 @@ export default function Events({
                   </div>
                 ))
             ) : (
-              <div className="flex flex-col items-center justify-center py-12">
-                {isLoadingLuma ? (
-                  <div className="text-center">
-                    <p className="text-foreground-muted">Loading events...</p>
-                  </div>
-                ) : (
-                  <p className="text-foreground-muted">No results found.</p>
-                )}
-              </div>
+              <p className="text-sm py-2 sm:py-4 text-lighter col-span-full italic opacity-0 !scale-100 animate-fade-in">
+                No results found
+              </p>
             )}
-          </div>
+          </ol>
         </SectionContainer>
-        <SectionContainer id="on-demand">
+        <SectionContainer>
           <div className="pt-8 border-t">
             <h2 className="h3">On Demand</h2>
             <p className="text-foreground-light">Replay selected events on your schedule</p>
@@ -242,19 +234,29 @@ export async function getStaticProps() {
     runner: '** EVENTS PAGE **',
   }) as BlogPost[]
 
-  const allEvents = [...staticEvents, ...meetupEvents]
-  const upcomingEvents = allEvents.filter((event: BlogPost) =>
+  // Get CMS blog posts
+  const cmsEventsData = await getAllCMSEvents()
+
+  const allEvents = [...staticEvents, ...meetupEvents, ...cmsEventsData].sort((a: any, b: any) => {
+    const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
+    const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
+    return dateB - dateA
+  })
+
+  const upcomingEvents = allEvents.filter((event: any) =>
     event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
   )
   const onDemandEvents = allEvents.filter(
-    (event: BlogPost) => new Date(event.date!) < new Date() && event.onDemand === true
+    (event: any) => new Date(event.date!) < new Date() && event.onDemand === true
   )
 
   const categories = upcomingEvents.reduce(
-    (acc: { [key: string]: number }, event: BlogPost) => {
+    (acc: { [key: string]: number }, event: any) => {
+      // Increment the 'all' counter
       acc.all = (acc.all || 0) + 1
 
-      event.categories?.forEach((category) => {
+      // Increment the counter for each category
+      event.categories?.forEach((category: string) => {
         acc[category] = (acc[category] || 0) + 1
       })
 
@@ -269,5 +271,8 @@ export async function getStaticProps() {
       onDemandEvents,
       categories,
     },
+    revalidate: 60 * 10, // Revalidate every 10 minutes
   }
 }
+
+export default Events

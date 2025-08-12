@@ -177,9 +177,12 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
-                {allCategories.map((category: string) => (
+                {allCategories.map((category: string, i: number) => (
                   <DropdownMenuItem
-                    key={`item-${category}`}
+                    key={`item-${category}-${
+                      // biome-ignore lint/suspicious/noArrayIndexKey: to disambiguate emtpy values
+                      i
+                    }`}
                     onClick={() => handleSetCategory(category)}
                     className={cn(
                       (category === 'all' && !activeCategory) || category === activeCategory

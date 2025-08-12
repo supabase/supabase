@@ -14,7 +14,7 @@ export const generatePreviewPath = ({ collection, slug }: Props) => {
   if (collection === 'posts') {
     const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
     // Use our preview API route for post previews
-    return `${baseUrl}/api/preview?slug=${slug}`
+    return `${baseUrl}/api-v2/cms/preview?slug=${slug}`
   }
 
   const encodedParams = new URLSearchParams({

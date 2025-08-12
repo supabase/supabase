@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
+import { getAllCMSPosts } from '~/lib/get-cms-posts'
 
 import type PostTypes from '~/types/post'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -53,8 +54,8 @@ function Blog(props: any) {
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
         <div className="md:container mx-auto py-4 lg:py-10 px-4 sm:px-12 xl:px-16">
-          {props.blogs.slice(0, 1).map((blog: any, i: number) => (
-            <FeaturedThumb key={i} {...blog} />
+          {props.blogs.slice(0, 1).map((blog: any) => (
+            <FeaturedThumb key={blog.slug} {...blog} />
           ))}
         </div>
 
@@ -76,13 +77,16 @@ function Blog(props: any) {
               {blogs?.length ? (
                 blogs?.map((blog: PostTypes, idx: number) =>
                   isList ? (
-                    <div className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none" key={idx}>
+                    <div
+                      className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none"
+                      key={`list-${idx}-${blog.slug}`}
+                    >
                       <BlogListItem post={blog} />
                     </div>
                   ) : (
                     <div
                       className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
-                      key={idx}
+                      key={`grid-${idx}-${blog.slug}`}
                     >
                       <BlogGridItem post={blog} />
                     </div>
@@ -100,7 +104,20 @@ function Blog(props: any) {
 }
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
+  // Get static blog posts
+  const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
+
+  // Get CMS blog posts
+  const cmsPostsData = await getAllCMSPosts()
+
+  // Combine both data sources
+  const allPostsData = [...staticPostsData, ...cmsPostsData].sort((a: any, b: any) => {
+    const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
+    const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
+    return dateB - dateA
+  })
+
+  // Generate RSS feed from combined posts
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -124,6 +141,7 @@ export async function getStaticProps() {
     props: {
       blogs: allPostsData,
     },
+    revalidate: 60 * 10, // Revalidate every 10 minutes
   }
 }
 
