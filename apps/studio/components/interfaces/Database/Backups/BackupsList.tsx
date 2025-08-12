@@ -14,9 +14,9 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import BackupItem from './BackupItem'
-import BackupsEmpty from './BackupsEmpty'
-import BackupsStorageAlert from './BackupsStorageAlert'
+import { BackupItem } from './BackupItem'
+import { BackupsEmpty } from './BackupsEmpty'
+import { BackupsStorageAlert } from './BackupsStorageAlert'
 
 const BackupsList = () => {
   const router = useRouter()

@@ -3,7 +3,7 @@ import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
@@ -50,7 +50,10 @@ const SchemaSelector = ({
   portal = true,
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
-  const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
+  const { can: canCreateSchemas } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'schemas'
+  )
 
   const { data: project } = useSelectedProjectQuery()
   const {
