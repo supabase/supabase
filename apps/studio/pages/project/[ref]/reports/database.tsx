@@ -22,6 +22,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -193,7 +194,7 @@ const DatabaseUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-  }, [db, chart])
+  }, [db, chart, state])
 
   return (
     <>
@@ -210,6 +211,7 @@ const DatabaseUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
+            <ReportSettings chartId="database-charts" />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
@@ -253,6 +255,7 @@ const DatabaseUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  syncId="database-charts"
                   showMaxValue={
                     chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                       ? true
@@ -273,12 +276,12 @@ const DatabaseUsage = () => {
                     defaultChartStyle={
                       chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
                     }
+                    syncId="database-charts"
                     showMaxValue={
                       chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                         ? true
                         : chart.showMaxValue
                     }
-                    syncId={chart.syncId}
                   />
                 ) : (
                   <ReportChart
@@ -303,6 +306,7 @@ const DatabaseUsage = () => {
                   label="Replication lag"
                   interval={selectedDateRange.interval}
                   provider="infra-monitoring"
+                  syncId="database-charts"
                 />
               </div>
             </Panel.Content>
