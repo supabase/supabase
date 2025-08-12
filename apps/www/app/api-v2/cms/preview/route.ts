@@ -6,6 +6,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const secret = searchParams.get('secret')
   const slug = searchParams.get('slug')
+  const path = searchParams.get('path') || 'blog'
 
   if (secret !== process.env.PREVIEW_SECRET) {
     return new Response('Invalid token', { status: 401 })
@@ -19,5 +20,5 @@ export async function GET(request: Request) {
   draft.enable()
 
   // Redirect to the path from the fetched post
-  redirect(`/blog/${slug}`)
+  redirect(`/${path}/${slug}`)
 }

@@ -48,8 +48,8 @@ export const Events: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     preview: (data) => {
       const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-      const isDraft = data?._status === 'draft'
-      return `${baseUrl}/events/${data?.slug}${isDraft ? '?preview=true' : ''}`
+      // Always use the preview route to ensure draft mode is enabled
+      return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&path=events&secret=${process.env.PREVIEW_SECRET || 'secret'}`
     },
   },
   access: {

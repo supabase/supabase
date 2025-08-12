@@ -84,6 +84,7 @@ interface EventData {
   meta_title?: string
   meta_description?: string
   video?: string
+  isCMS?: boolean
 }
 
 type EventPageProps = {
@@ -356,8 +357,6 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const sendTelemetryEvent = useSendTelemetryEvent()
 
-  console.log('BASE_PATH', CMS_SITE_ORIGIN)
-
   return (
     <>
       <NextSeo
@@ -485,10 +484,11 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <div className="relative w-full aspect-[5/3] lg:aspect-[3/2] overflow-hidden border shadow-lg rounded-lg z-10">
                   <Image
                     src={{
-                      dark: `/images/events/` + event.thumb,
-                      light:
-                        `/images/events/` +
-                        (!!event.thumb_light ? event.thumb_light! : event.thumb),
+                      dark: event.isCMS ? event.thumb : `/images/events/` + event.thumb,
+                      light: event.isCMS
+                        ? event.thumb
+                        : `/images/events/` +
+                          (!!event.thumb_light ? event.thumb_light! : event.thumb),
                     }}
                     fill
                     sizes="100%"
