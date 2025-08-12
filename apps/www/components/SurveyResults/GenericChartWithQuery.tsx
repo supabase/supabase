@@ -309,18 +309,19 @@ export function GenericChartWithQuery({
   return (
     <div
       ref={chartRef}
-      className="w-full bg-200 border-y"
+      className="w-full bg-200 border-t border-muted"
       style={{
         background: `radial-gradient(circle at center -100%, hsl(var(--brand-500)), transparent 70%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
       }}
     >
-      <header className="px-6 py-5">
-        <h3 className="text-foreground-light text-sm">{title}</h3>
+      <header className="px-8 py-8">
+        <p className="text-foreground/30 text-sm font-mono uppercase tracking-widest">Q&A</p>
+        <h3 className="text-foreground text-xl">{title}</h3>
       </header>
-      {/* <div className={`${view === 'chart' ? 'bg-200' : 'bg-surface-75'} border-b last:border-none`}> */}
-      <div className={`border-b last:border-none`}>
+
+      <div className={``}>
         {/* Filters and toggle */}
-        <div className="flex flex-row flex-wrap gap-4 p-4 justify-between">
+        <div className="flex flex-row flex-wrap gap-4 px-8 pb-4 justify-between">
           {filters && activeFilters && setFilterValue && (
             <div className="flex flex-wrap gap-4">
               {Object.entries(filters).map(([filterKey, filterConfig]) => (
@@ -352,7 +353,7 @@ export function GenericChartWithQuery({
               <p className="text-danger">Error: {error}</p>
             </div>
           ) : view === 'chart' ? (
-            <div className="flex flex-col h-full w-full justify-between px-6 pt-4 pb-10">
+            <div className="flex flex-col h-full w-full justify-between px-8 pt-4 pb-12">
               {/* Each bar as a vertical stack: label above, bar below */}
               <div
                 className="flex flex-col gap-10"
@@ -422,9 +423,9 @@ export function GenericChartWithQuery({
               </div>
             </div>
           ) : (
-            <CodeBlock lang="sql" showLineNumbers={true} className="rounded-none border-none">
-              {sqlQuery}
-            </CodeBlock>
+            <div className="px-8 pt-4 pb-8">
+              <CodeBlock lang="sql">{sqlQuery}</CodeBlock>
+            </div>
           )}
 
           {/* Expand button overlay */}
