@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
 import { Button, cn, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -28,7 +28,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const canUpdateExtensions = useCheckPermissions(
+  const { can: canUpdateExtensions } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )

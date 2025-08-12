@@ -24,7 +24,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -114,7 +114,10 @@ export const CreateBranchModal = () => {
     },
   })
 
-  const canCreateBranch = useCheckPermissions(PermissionAction.CREATE, 'preview_branches')
+  const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'preview_branches'
+  )
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
 
