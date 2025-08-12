@@ -66,7 +66,7 @@ export function SurveyStatCard({
   }, [progressValue, hasAnimated])
 
   return (
-    <div ref={cardRef} className="flex-1 px-6 py-8 flex flex-col gap-4">
+    <div ref={cardRef} className="flex-1 px-8 py-8 flex flex-col gap-4">
       {/* Progress bar */}
       {/* Entire bar (including background) */}
       <div

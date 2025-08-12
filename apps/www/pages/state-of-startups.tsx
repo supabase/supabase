@@ -208,12 +208,19 @@ function StateOfStartupsPage() {
         <FloatingTableOfContents />
 
         {/* Previously <Hero /> */}
-        <section ref={heroRef} className="relative w-full">
+        <section ref={heroRef} className="w-full">
           {/* Text container */}
-          <header className="container w-full flex flex-col md:flex-col px-4 pb-16 mx-auto">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Left side */}
-              <div>
+          <header className="w-full flex flex-col md:flex-col">
+            <div className="flex flex-col md:flex-row">
+              {/* Left side - spans from left edge to end of second grid column */}
+              <div
+                style={
+                  {
+                    '--left-width': 'calc((50% - 60rem / 2) + (60rem * 1/3))',
+                  } as React.CSSProperties
+                }
+                className="border-b md:border-b-0 md:border-r border-muted border-opacity-50 md:text-right flex-1 md:max-w-[var(--left-width)]"
+              >
                 {/* Decorative progress bar */}
                 <div aria-hidden="true" className="flex flex-col">
                   {[0, 1, 2, 3].map((item, index) => (
@@ -229,38 +236,39 @@ function StateOfStartupsPage() {
                     />
                   ))}
                 </div>
-                <p className="text-brand-link text-sm font-mono uppercase ">
+                <p className="text-brand-link text-sm font-mono uppercase py-4 px-8">
                   Supabase presents the 2025
                 </p>
               </div>
 
-              {/* Right side */}
+              {/* Right side - takes up remaining space */}
               <div
-                className=""
+                className="px-8 py-12 md:pt-36 pb-28 flex-1"
                 style={{
                   background: `radial-gradient(ellipse at 5% -40%, hsl(var(--brand-500)), transparent 65%), radial-gradient(ellipse at 85% 230%, hsl(var(--background-surface-200)), transparent 75%)`,
-                  // background:
-                  // 'linear-gradient(217deg, rgb(255 0 0 / 0.8), transparent 70.71%), linear-gradient(127deg, rgb(0 255 0 / 0.8), transparent 70.71%), linear-gradient(336deg, rgb(0 0 255 / 0.8), transparent 70.71%)',
                 }}
               >
-                <h1 className="!leading-[90%] tracking-[-0.025em] text-7xl md:text-[14vw] lg:text-[12vw] xl:text-[10vw]">
+                <h1 className="text-7xl sm:text-8xl lg:text-9xl tracking-tight">
                   State of
                   <br /> Startups
                 </h1>
               </div>
             </div>
+            <SurveySectionBreak />
 
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex flex-col gap-4 max-w-prose">
-                <p className="p md:text-2xl">{pageData.heroSection.subheader}</p>
-                <p className="p md:text-2xl">{pageData.heroSection.cta}</p>
+            {/* Intro and ToC */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[60rem] mx-auto border-x border-muted">
+              <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground md:text-2xl">
+                <p>{pageData.heroSection.subheader}</p>
+                <p>{pageData.heroSection.cta}</p>
               </div>
 
               {/* Inline version - always expanded */}
-              <div className="relative flex justify-center mb-4">
+              <div className="">
                 <InlineTableOfContents />
               </div>
             </div>
+            {/* </div> */}
           </header>
 
           <SurveySectionBreak />
