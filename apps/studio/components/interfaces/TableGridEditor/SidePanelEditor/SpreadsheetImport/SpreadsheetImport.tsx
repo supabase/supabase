@@ -6,36 +6,22 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button, SidePanel, Tabs } from 'ui'
+import { SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
 import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
-import { EMPTY_SPREADSHEET_DATA, UPLOAD_FILE_TYPES } from './SpreadsheetImport.constants'
+import { EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import {
-  acceptedFileExtension,
+  addProcessDroppedFileListener,
+  flagInvalidFileImport,
   parseSpreadsheet,
   parseSpreadsheetText,
+  type ProcessDroppedFileEvent,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
-
-const MAX_TABLE_EDITOR_IMPORT_CSV_SIZE = 1024 * 1024 * 100 // 100 MiB
-
-export function flagInvalidFileImport(file: File): boolean {
-  if (!file || !UPLOAD_FILE_TYPES.includes(file.type) || !acceptedFileExtension(file)) {
-    toast.error("Couldn't import file: only CSV files are accepted")
-    return true
-  } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
-    toast.error(
-      'The dashboard currently only supports importing of CSVs below 100MB. For bulk data loading, we recommend doing so directly through the database.'
-    )
-    return true
-  }
-
-  return false
-}
 
 interface SpreadsheetImportProps {
   debounceDuration?: number
@@ -188,16 +174,13 @@ const SpreadsheetImport = ({
 
   // Handle dropped file from custom event
   useEffect(() => {
-    const handleDroppedFile = (event: CustomEvent) => {
-      if (visible && event.detail?.file) {
+    const handleDroppedFile = (event: ProcessDroppedFileEvent) => {
+      if (visible) {
         processFile(event.detail.file)
       }
     }
 
-    window.addEventListener('processDroppedFile', handleDroppedFile as EventListener)
-    return () => {
-      window.removeEventListener('processDroppedFile', handleDroppedFile as EventListener)
-    }
+    return addProcessDroppedFileListener(handleDroppedFile)
   }, [visible, processFile])
 
   return (

@@ -1,8 +1,14 @@
 import dayjs from 'dayjs'
-import Papa from 'papaparse'
 import { has, includes } from 'lodash'
+import Papa from 'papaparse'
+import { toast } from 'sonner'
+
 import { tryParseJson } from 'lib/helpers'
-import { UPLOAD_FILE_EXTENSIONS } from './SpreadsheetImport.constants'
+import {
+  UPLOAD_FILE_EXTENSIONS,
+  UPLOAD_FILE_TYPES,
+  MAX_TABLE_EDITOR_IMPORT_CSV_SIZE,
+} from './SpreadsheetImport.constants'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
@@ -160,4 +166,45 @@ export const inferColumnType = (column: string, rows: object[]) => {
 export const acceptedFileExtension = (file: any) => {
   const ext = file?.name.split('.').pop().toLowerCase()
   return UPLOAD_FILE_EXTENSIONS.includes(ext)
+}
+
+export function flagInvalidFileImport(file: File): boolean {
+  if (!file || !UPLOAD_FILE_TYPES.includes(file.type) || !acceptedFileExtension(file)) {
+    toast.error("Couldn't import file: only CSV files are accepted")
+    return true
+  } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
+    toast.error(
+      'The dashboard currently only supports importing of CSVs below 100MB. For bulk data loading, we recommend doing so directly through the database.'
+    )
+    return true
+  }
+
+  return false
+}
+
+// Custom event type for file drop processing
+const PROCESS_DROPPED_FILE_EVENT = 'supa::tableEditor::processDroppedFile' as const
+export interface ProcessDroppedFileEventDetail {
+  file: File
+}
+
+export interface ProcessDroppedFileEvent extends CustomEvent<ProcessDroppedFileEventDetail> {
+  type: typeof PROCESS_DROPPED_FILE_EVENT
+}
+
+// Helper function to dispatch the custom event
+export function dispatchProcessDroppedFileEvent(file: File): void {
+  const event = new CustomEvent(PROCESS_DROPPED_FILE_EVENT, {
+    detail: { file },
+  }) as ProcessDroppedFileEvent
+  window.dispatchEvent(event)
+}
+
+// Helper function to listen for the custom event
+export function addProcessDroppedFileListener(
+  handler: (event: ProcessDroppedFileEvent) => void
+): () => void {
+  const listener = handler as EventListener
+  window.addEventListener(PROCESS_DROPPED_FILE_EVENT, listener)
+  return () => window.removeEventListener(PROCESS_DROPPED_FILE_EVENT, listener)
 }
