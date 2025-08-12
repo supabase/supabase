@@ -14,17 +14,17 @@ export function SurveyPullQuote({
 }) {
   return (
     <>
-      <aside className="border-y border-muted bg-alternative relative">
+      <aside className="relative">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 pointer-events-none bg-surface-400 dark:bg-surface-75"
           style={{
-            backgroundImage: 'url("/survey/pattern-front.svg")',
-            backgroundSize: '14.5px 15px',
-            backgroundRepeat: 'repeat',
-            backgroundPosition: 'top left',
+            maskImage: 'url("/survey/pattern-back.svg")',
+            maskSize: '15px 15px',
+            maskRepeat: 'repeat',
+            maskPosition: 'top left',
           }}
         />
-        <div className="relative max-w-[60rem] mx-auto border-x border-muted flex flex-col gap-4 text-center items-center px-6 py-24 bg-alternative">
+        <div className="relative max-w-[60rem] mx-auto md:border-x border-muted flex flex-col gap-4 text-center items-center px-6 py-24 bg-alternative">
           <p className="text-foreground-lighter text-2xl text-balance max-w-prose">“{quote}”</p>
           <Image
             src={authorAvatar || '/images/twitter-profiles/qhvO9V6x_400x400.jpg'}

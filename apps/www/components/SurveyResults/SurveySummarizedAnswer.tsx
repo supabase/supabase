@@ -35,7 +35,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
   }, [currentIndex])
 
   return (
-    <div className="flex flex-col gap-6 px-8 py-16 sm:items-center sm:text-center">
+    <div className="border-t border-muted flex flex-col gap-6 px-8 py-16 sm:items-center sm:text-center">
       <p className="text-foreground text-xl transition-opacity duration-500">
         {answers[currentIndex]}
       </p>
@@ -45,8 +45,8 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
         <div
           className="absolute inset-0 pointer-events-none bg-foreground-muted"
           style={{
-            maskImage: 'url("/survey/pattern-back.svg")',
-            maskSize: '15px 15px',
+            maskImage: 'url("/survey/pattern-checker.svg")',
+            maskSize: '8px 8px',
             maskRepeat: 'repeat',
             maskPosition: 'center',
           }}
@@ -58,19 +58,18 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
           className={`h-full relative bg-surface-100`}
           style={{
             width: '100%',
-            transform: isAnimating ? 'scaleX(1)' : 'scaleX(0)',
-            transformOrigin: 'left',
-            transition: isAnimating ? 'transform 3s steps(3, end)' : 'transform 0s',
+            clipPath: isAnimating ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
+            transition: isAnimating ? 'clip-path 3s steps(3, end)' : 'clip-path 0s',
           }}
         >
           {/* Foreground pattern for the filled portion */}
           <div
             className={`absolute inset-0 pointer-events-none bg-brand`}
             style={{
-              maskImage: 'url("/survey/pattern-front.svg")',
-              maskSize: '14.5px 15px',
+              maskImage: 'url("/survey/pattern-checker.svg")',
+              maskSize: '8px 8px',
               maskRepeat: 'repeat',
-              maskPosition: 'top left',
+              maskPosition: 'center',
             }}
           />
         </div>

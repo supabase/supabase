@@ -69,7 +69,7 @@ export function SurveyChapter({
                 {title}
               </h2>
             </div>
-            <p className="md:col-span-2 md:col-start-2 text-lg xl:text-xl text-foreground text-balance">
+            <p className="md:col-span-2 md:col-start-2 text-lg xl:text-xl text-foreground text-balance md:px-4">
               {description}
             </p>
           </div>

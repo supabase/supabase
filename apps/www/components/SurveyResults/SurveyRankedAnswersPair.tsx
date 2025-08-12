@@ -30,7 +30,9 @@ export function SurveyRankedAnswersPair({
           </div>
 
           {/* Text content */}
-          <div className=" px-6 py-8">
+          <div
+            className={`px-6 py-8 flex  ${index % 2 === 0 ? 'flex-col' : 'flex-col-reverse'}  gap-12`}
+          >
             <ol className="flex flex-col gap-3">
               {item.answers.map((answer, answerIndex) => (
                 <li key={answerIndex} className="flex flex-col gap-2">
@@ -39,7 +41,9 @@ export function SurveyRankedAnswersPair({
                 </li>
               ))}
             </ol>
-            <p className="text-foreground-light text-sm">{item.label}</p>
+            <p className="text-foreground-lighter text-sm font-mono uppercase tracking-wide">
+              {item.label}
+            </p>
           </div>
         </div>
       ))}
