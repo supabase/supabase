@@ -63,7 +63,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         snap.role !== undefined &&
         snap.role.type === 'postgrest'
       ) {
-        token = anonKey?.api_key
+        token = publishableKey?.api_key ?? anonKey?.api_key
         await getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
           .then((b) => (bearer = b))
           .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
