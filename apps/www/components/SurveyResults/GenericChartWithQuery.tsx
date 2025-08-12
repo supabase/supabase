@@ -400,10 +400,10 @@ export function GenericChartWithQuery({
                       <div
                         className={`h-full relative bg-surface-100`}
                         style={{
-                          width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
+                          width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
                           transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
                           transformOrigin: 'left',
-                          transition: `transform 0.5s steps(${Math.max(2, Math.floor((item.value / maxValue) * 12))}, end) ${index * 0.05}s`,
+                          transition: `transform 0.5s steps(${Math.max(2, Math.floor((item.value / 100) * 12))}, end) ${index * 0.05}s`,
                         }}
                       >
                         {/* Foreground pattern for the filled portion */}
