@@ -72,7 +72,7 @@ const SpreadsheetImport = ({
     setParseProgress(progress)
   }
 
-  // Process a file object directly (used for both upload and drop)
+  // Process a file into table rows and columns (used for both upload and drop)
   const processFile = useCallback(
     async (file: File) => {
       updateEditorDirty(true)
@@ -104,11 +104,23 @@ const SpreadsheetImport = ({
       const [file] = event.target.files || event.dataTransfer.files
       if (file && !flagInvalidFileImport(file)) {
         await processFile(file)
+      } else {
+        event.target.value = ''
       }
-      event.target.value = ''
     },
     [processFile]
   )
+
+  // Handle dropped file from custom event
+  useEffect(() => {
+    const handleDroppedFile = (event: ProcessDroppedFileEvent) => {
+      if (visible) {
+        processFile(event.detail.file)
+      }
+    }
+
+    return addProcessDroppedFileListener(handleDroppedFile)
+  }, [visible, processFile])
 
   const resetSpreadsheetImport = () => {
     setInput('')
@@ -171,17 +183,6 @@ const SpreadsheetImport = ({
   useEffect(() => {
     if (visible && headers.length === 0) resetSpreadsheetImport()
   }, [visible])
-
-  // Handle dropped file from custom event
-  useEffect(() => {
-    const handleDroppedFile = (event: ProcessDroppedFileEvent) => {
-      if (visible) {
-        processFile(event.detail.file)
-      }
-    }
-
-    return addProcessDroppedFileListener(handleDroppedFile)
-  }, [visible, processFile])
 
   return (
     <SidePanel

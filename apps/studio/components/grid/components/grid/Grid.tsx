@@ -86,8 +86,8 @@ export const Grid = memo(
             action: eventName,
             properties,
             groups: {
-              project: project!.ref,
-              organization: org!.slug,
+              project: project?.ref ?? 'Unknown',
+              organization: org?.slug ?? 'Unknown',
             },
           })
         },
@@ -199,11 +199,9 @@ export const Grid = memo(
                             >
                               Import data from CSV
                             </Button>
-                            {!isDraggedOver && (
-                              <p className="text-xs text-foreground-light">
-                                or drag and drop a CSV file here
-                              </p>
-                            )}
+                            <p className="text-xs text-foreground-light">
+                              or drag and drop a CSV file here
+                            </p>
                           </div>
                         )
                       )}
