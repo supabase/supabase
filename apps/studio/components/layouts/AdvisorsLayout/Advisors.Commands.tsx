@@ -22,6 +22,18 @@ export function useAdvisorsGoToCommands(options?: CommandOptions) {
         route: `/project/${ref}/advisors/performance`,
         defaultHidden: true,
       },
+      {
+        id: 'nav-advisors-query-performance',
+        name: 'Query Performance',
+        route: `/project/${ref}/advisors/query-performance`,
+        defaultHidden: true,
+      },
+      {
+        id: 'nav-advisors-query',
+        name: 'Query Insights',
+        route: `/project/${ref}/advisors/query-insights`,
+        defaultHidden: true,
+      },
     ],
     { ...options, deps: [ref] }
   )
