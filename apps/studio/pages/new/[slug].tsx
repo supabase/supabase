@@ -23,6 +23,7 @@ import {
   PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { smartRegionToExactRegion } from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
@@ -35,9 +36,9 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
@@ -221,18 +222,22 @@ const Wizard: NextPageWithLayout = () => {
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
-    {
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
-    },
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchInterval: false,
-      refetchOnReconnect: false,
-      retry: false,
-    }
-  )
+
+  const { data: availableRegionsData, error: defaultRegionError } =
+    useOrganizationAvailableRegionsQuery(
+      {
+        slug: slug,
+        cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      },
+      {
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchInterval: false,
+        refetchOnReconnect: false,
+      }
+    )
+
+  const defaultRegion = availableRegionsData?.recommendations.specific[0]?.name
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
@@ -296,11 +301,12 @@ const Wizard: NextPageWithLayout = () => {
   })
 
   const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion,
+      dbRegion: dbRegionExact,
       organizationSlug: organization,
     },
     { enabled: currentOrg != null && !isManagedByVercel }
@@ -860,6 +866,7 @@ const Wizard: NextPageWithLayout = () => {
                             field={field}
                             form={form}
                             cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                            organizationSlug={slug}
                           />
                         )}
                       />
