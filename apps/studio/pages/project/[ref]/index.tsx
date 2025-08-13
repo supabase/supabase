@@ -94,7 +94,7 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <div className="w-full">
-      <div className={cn('py-16 px-8', !isPaused && 'border-b border-muted ')}>
+      <div className={cn('py-16 ', !isPaused && 'border-b border-muted ')}>
         <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
             <div className="flex flex-col md:flex-row md:items-end gap-3 w-full">
@@ -205,7 +205,7 @@ const Home: NextPageWithLayout = () => {
 
       {!isPaused && (
         <>
-          <div className="py-16 border-b border-muted px-8">
+          <div className="py-16 border-b border-muted">
             <div className="mx-auto max-w-7xl space-y-16">
               {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
                 <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
