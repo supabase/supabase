@@ -2546,17 +2546,18 @@ export const integrations: NavMenuConstant = {
     },
     {
       name: 'Build Your Own',
-      url: undefined,
       items: [
         {
           name: 'Build a Supabase integration',
           url: '/guides/integrations/build-a-supabase-integration',
-          items: [
-            {
-              name: 'OAuth scopes',
-              url: '/guides/integrations/build-a-supabase-integration/oauth-scopes',
-            },
-          ],
+        },
+        {
+          name: 'OAuth scopes',
+          url: '/guides/integrations/build-a-supabase-integration/oauth-scopes',
+        },
+        {
+          name: 'Supabase as a Service',
+          url: '/guides/integrations/platform-as-a-service',
         },
       ],
     },
