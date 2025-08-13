@@ -220,9 +220,9 @@ export const PolicyEditorPanel = memo(function ({
 
       if (selectedPolicy.command === 'INSERT') {
         // [Joshen] Cause editorOneRef will be the check statement in this scenario
-        if (selectedPolicy.check !== null && selectedPolicy.check !== using) payload.check = using
+        if (selectedPolicy.check !== using) payload.check = using
       } else {
-        if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+        if (selectedPolicy.check !== check) payload.check = check
       }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
