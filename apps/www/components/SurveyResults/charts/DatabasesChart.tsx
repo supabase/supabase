@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -27,7 +27,7 @@ ORDER BY total DESC;`
 
 export function DatabasesChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="Which database(s) is your startup using?"
       targetColumn="databases"
       filterColumns={['team_count', 'ai_models_used', 'backend_stack']}

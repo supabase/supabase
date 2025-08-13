@@ -1,20 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
-
-import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
-import { Input } from 'ui/src/components/shadcn/ui/input'
-import { Label } from 'ui/src/components/shadcn/ui/label'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Button, cn } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
-
-import data from '~/data/surveys/state-of-startups-2025'
-
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import data from '~/data/surveys/state-of-startups-2025'
 
 function StateOfStartupsPage() {
   const pageData = data()
