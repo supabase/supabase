@@ -46,12 +46,12 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
-  const onDeleteToken = async (tokenId: number) => deleteToken({ id: tokenId })
+  const onDeleteToken = async (tokenId: string) => deleteToken({ id: tokenId })
 
   const filteredTokens = useMemo(() => {
     return !searchString
-      ? tokens
-      : tokens?.filter((token) => {
+      ? tokens?.tokens
+      : tokens?.tokens?.filter((token) => {
           return token.name.toLowerCase().includes(searchString.toLowerCase())
         })
   }, [tokens, searchString])

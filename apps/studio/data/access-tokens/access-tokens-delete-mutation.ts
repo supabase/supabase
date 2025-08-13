@@ -6,11 +6,11 @@ import type { ResponseError } from 'types'
 import { accessTokenKeys } from './keys'
 
 export type AccessTokenDeleteVariables = {
-  id: number
+  id: string
 }
 
 export async function deleteAccessToken({ id }: AccessTokenDeleteVariables) {
-  const { data, error } = await del('/platform/profile/access-tokens/{id}', {
+  const { data, error } = await del('/platform/profile/scoped-access-tokens/{id}', {
     params: { path: { id } },
   })
 

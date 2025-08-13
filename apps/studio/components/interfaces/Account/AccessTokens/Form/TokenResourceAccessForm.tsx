@@ -24,6 +24,9 @@ export const TokenResourceAccessForm = ({
   const { data: organizations = [], isLoading: isLoadingOrgs } = useOrganizationsQuery()
   const { data: projects = [], isLoading: isLoadingProjects } = useProjectsQuery()
 
+  console.log('Projects', projects)
+  console.log('Organizations', organizations)
+
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
       <FormField_Shadcn_

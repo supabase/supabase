@@ -5578,6 +5578,12 @@ export interface operations {
           'application/json': components['schemas']['SupavisorConfigResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's supavisor config */
       500: {
         headers: {
@@ -6074,6 +6080,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1RestorePointResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

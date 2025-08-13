@@ -6,10 +6,17 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { accessTokenKeys } from './keys'
 
-export type AccessTokenCreateVariables = components['schemas']['CreateAccessTokenBody']
+export type AccessTokenCreateVariables = components['schemas']['CreateScopedAccessTokenBody']
 
-export async function createAccessToken({ name, scope }: AccessTokenCreateVariables) {
-  const { data, error } = await post('/platform/profile/access-tokens', { body: { name, scope } })
+export async function createAccessToken({
+  name,
+  permissions,
+  project_refs,
+  organization_slugs,
+}: AccessTokenCreateVariables) {
+  const { data, error } = await post('/platform/profile/scoped-access-tokens', {
+    body: { name, permissions, project_refs, organization_slugs },
+  })
 
   if (error) handleError(error)
 

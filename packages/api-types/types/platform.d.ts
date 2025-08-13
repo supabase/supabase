@@ -2112,6 +2112,42 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/profile/scoped-access-tokens': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the user's scoped access tokens */
+    get: operations['ScopedAccessTokensController_getAccessTokens']
+    put?: never
+    /** Creates a new scoped access token */
+    post: operations['ScopedAccessTokensController_createAccessToken']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/scoped-access-tokens/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the scoped access token with the given ID */
+    get: operations['ScopedAccessTokensController_getAccessToken']
+    put?: never
+    post?: never
+    /** Deletes the scoped access token with the given ID */
+    delete: operations['ScopedAccessTokensController_deleteAccessToken']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/profile/search': {
     parameters: {
       query?: never
@@ -5062,6 +5098,20 @@ export interface components {
       name: string
       owner: string
     }
+    CreateScopedAccessTokenBody: {
+      name: string
+      organization_slugs?: string[]
+      permissions: string[]
+      project_refs?: string[]
+    }
+    CreateScopedAccessTokenResponse: {
+      created_at: string
+      id: string
+      last_used_at: string | null
+      name: string
+      token: string
+      token_alias: string
+    }
     CreateSourceResponse: {
       /** @description Source id */
       id: number
@@ -5740,6 +5790,22 @@ export interface components {
         }
       }
       path: string
+    }
+    GetScopedAccessTokenResponse: {
+      created_at: string
+      id: string
+      last_used_at: string | null
+      name: string
+      token_alias: string
+    }
+    GetScopedAccessTokensResponse: {
+      tokens: {
+        created_at: string
+        id: string
+        last_used_at: string | null
+        name: string
+        token_alias: string
+      }[]
     }
     GetSignedUrlBody: {
       expiresIn: number
@@ -9284,6 +9350,12 @@ export interface operations {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve GoTrue config */
       500: {
         headers: {
@@ -9316,6 +9388,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update GoTrue config */
       500: {
@@ -9836,6 +9914,12 @@ export interface operations {
           'application/json': components['schemas']['BackupsResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project backups */
       500: {
         headers: {
@@ -9869,6 +9953,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadBackupResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to download project backup */
       500: {
         headers: {
@@ -9898,6 +9988,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadableBackupsResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project backups */
       500: {
         headers: {
@@ -9920,6 +10016,12 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -9956,6 +10058,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project to a previous point in time */
       500: {
         headers: {
@@ -9987,6 +10095,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project backup */
       500: {
         headers: {
@@ -10013,6 +10127,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12300,6 +12420,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -15418,6 +15544,116 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve permissions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ScopedAccessTokensController_getAccessTokens: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetScopedAccessTokensResponse']
+        }
+      }
+      /** @description Failed to get user's scoped access tokens */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ScopedAccessTokensController_createAccessToken: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateScopedAccessTokenBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateScopedAccessTokenResponse']
+        }
+      }
+      /** @description Failed to create scoped access token */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ScopedAccessTokensController_getAccessToken: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetScopedAccessTokenResponse']
+        }
+      }
+      /** @description Failed to get scoped access token */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ScopedAccessTokensController_deleteAccessToken: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete scoped access token */
       500: {
         headers: {
           [name: string]: unknown

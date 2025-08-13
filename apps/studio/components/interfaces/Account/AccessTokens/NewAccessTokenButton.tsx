@@ -88,7 +88,12 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
     }
 
     createAccessToken(
-      { name: values.tokenName, scope: tokenScope },
+      {
+        name: values.tokenName,
+        permissions: [],
+        project_refs: values.selectedProjects,
+        organization_slugs: values.selectedOrganizations,
+      },
       {
         onSuccess: (data) => {
           toast.success('Access token created successfully')
