@@ -16,9 +16,10 @@ import {
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -31,9 +32,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
@@ -62,7 +60,10 @@ const MapView = ({
     y: number
     region: { key: string; country?: string; name?: string }
   }>()
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'projects'
+  )
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
@@ -325,22 +326,20 @@ const MapView = ({
                             >
                               Restart replica
                             </DropdownMenuItem>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <DropdownMenuItem
-                                  className="gap-x-2 !pointer-events-auto"
-                                  disabled={!canManageReplicas}
-                                  onClick={() => onSelectDropReplica(database)}
-                                >
-                                  Drop replica
-                                </DropdownMenuItem>
-                              </TooltipTrigger>
-                              {!canManageReplicas && (
-                                <TooltipContent side="left">
-                                  You need additional permissions to drop replicas
-                                </TooltipContent>
-                              )}
-                            </Tooltip>
+
+                            <DropdownMenuItemTooltip
+                              className="gap-x-2 !pointer-events-auto"
+                              disabled={!canManageReplicas}
+                              onClick={() => onSelectDropReplica(database)}
+                              tooltip={{
+                                content: {
+                                  side: 'left',
+                                  text: 'You need additional permissions to drop replicas',
+                                },
+                              }}
+                            >
+                              Drop replica
+                            </DropdownMenuItemTooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
