@@ -3,18 +3,16 @@ import { SurveyChart } from '../SurveyChart'
 function generateHeadquartersSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.funding_stage !== 'unset') {
-    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
-  if (activeFilters.startup_age !== 'unset') {
-    whereClauses.push(`startup_age = '${activeFilters.startup_age}'`)
+  if (activeFilters.team_count !== 'unset') {
+    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
-  if (activeFilters.previous_company !== 'unset') {
-    // Convert string to boolean for the SQL query
-    const previousCompanyBool = activeFilters.previous_company === 'true'
-    whereClauses.push(`previous_company = ${previousCompanyBool}`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -32,7 +30,7 @@ export function HeadquartersChart() {
     <SurveyChart
       title="Where is your startup headquartered?"
       targetColumn="headquarters"
-      filterColumns={['funding_stage', 'startup_age', 'previous_company']}
+      filterColumns={['person_age', 'team_count', 'money_raised']}
       generateSQLQuery={generateHeadquartersSQL}
     />
   )

@@ -10,12 +10,12 @@ function generateIndustrySQL(activeFilters: Record<string, string>) {
   if (activeFilters.person_age !== 'unset') {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
-  if (activeFilters.funding_stage !== 'unset') {
-    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
-  if (activeFilters.market_model !== 'unset') {
-    whereClauses.push(`'${activeFilters.market_model}' = ANY(market_model)`)
+  if (activeFilters.headquarters !== 'unset') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -45,7 +45,7 @@ export function IndustryChart() {
     <SurveyChart
       title="What is your startup's primary industry or target customer segment?"
       targetColumn="industry_normalized"
-      filterColumns={['person_age', 'funding_stage', 'market_model']}
+      filterColumns={['person_age', 'headquarters', 'money_raised']}
       generateSQLQuery={generateIndustrySQL}
     />
   )

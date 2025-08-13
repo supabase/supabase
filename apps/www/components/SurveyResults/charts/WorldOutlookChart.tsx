@@ -4,16 +4,16 @@ import { SurveyChart } from '../SurveyChart'
 function generateWorldOutlookSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.role !== 'unset') {
-    whereClauses.push(`role = '${activeFilters.role}'`)
-  }
-
-  if (activeFilters.funding_stage !== 'unset') {
-    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
   if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  }
+
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -32,7 +32,7 @@ export function WorldOutlookChart() {
     <SurveyChart
       title="Given the state of the world, are you…"
       targetColumn="world_outlook"
-      filterColumns={['role', 'funding_stage', 'headquarters']}
+      filterColumns={['person_age', 'headquarters', 'money_raised']}
       generateSQLQuery={generateWorldOutlookSQL}
     />
   )

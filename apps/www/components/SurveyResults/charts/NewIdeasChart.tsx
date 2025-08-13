@@ -11,12 +11,12 @@ function generateNewIdeasSQL(activeFilters: Record<string, string>) {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
-  if (activeFilters.role !== 'unset') {
-    whereClauses.push(`role = '${activeFilters.role}'`)
+  if (activeFilters.headquarters !== 'unset') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.industry_normalized !== 'unset') {
-    whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -37,7 +37,7 @@ export function NewIdeasChart() {
     <SurveyChart
       title="Where do you usually discover new dev tools or startup ideas?"
       targetColumn="new_ideas"
-      filterColumns={['person_age', 'role', 'industry_normalized']}
+      filterColumns={['person_age', 'headquarters', 'money_raised']}
       generateSQLQuery={generateNewIdeasSQL}
     />
   )

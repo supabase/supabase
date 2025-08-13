@@ -3,24 +3,23 @@ import { SurveyChart } from '../SurveyChart'
 function generateRegularSocialMediaUseSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.role !== 'unset') {
-    whereClauses.push(`role = '${activeFilters.role}'`)
-  }
-
-  if (activeFilters.industry_normalized !== 'unset') {
-    whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
-  }
-
   if (activeFilters.person_age !== 'unset') {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
+  }
+
+  if (activeFilters.headquarters !== 'unset') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  }
+
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
   return `WITH founders AS (
   SELECT id, regular_social_media_use
-  FROM responses_2025
-  WHERE role = 'Founder / Co-founder'
+  FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 )
 SELECT
   platform AS label,
@@ -46,9 +45,8 @@ export function RegularSocialMediaUseChart() {
     <SurveyChart
       title="Which social media platforms do you use at least 3× per week?"
       targetColumn="regular_social_media_use"
-      filterColumns={['role', 'industry_normalized', 'person_age']}
+      filterColumns={['person_age', 'headquarters', 'money_raised']}
       generateSQLQuery={generateRegularSocialMediaUseSQL}
-      // isPercentageData={false}
     />
   )
 }
