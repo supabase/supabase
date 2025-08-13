@@ -31,25 +31,6 @@ export const LogPage: NextPageWithLayout = () => {
     }
   }, [router, hasLoaded, org, lastVisitedLogsPage, ref, isUnifiedLogsEnabled])
 
-  // Handle redirects when unified logs preview flag changes
-  useEffect(() => {
-    // Only handle redirects if we're currently on a logs page
-    if (!router.asPath.includes('/logs') || (IS_PLATFORM && !hasLoaded)) return
-
-    if (IS_PLATFORM && isUnifiedLogsEnabled) {
-      // If unified logs preview is enabled and we're not already on the main logs page
-      if (router.asPath !== `/project/${ref}/logs` && router.asPath.includes('/logs/')) {
-        router.push(`/project/${ref}/logs`)
-      }
-    } else {
-      // If unified logs preview is disabled and admin flag is also off
-      // and we're on the main logs page, redirect to explorer
-      if (router.asPath === `/project/${ref}/logs`) {
-        router.push(`/project/${ref}/logs/explorer`)
-      }
-    }
-  }, [isUnifiedLogsEnabled, router, ref, hasLoaded])
-
   if (isUnifiedLogsEnabled) {
     return (
       <DefaultLayout>
