@@ -440,22 +440,24 @@ const LogTable = ({
               document.body
             )}
         </ResizablePanel>
-        <ResizableHandle withHandle />
-
         {selectionOpen && (
-          <ResizablePanel minSize={40} defaultSize={50}>
-            <LogSelection
-              isLoading={isSelectedLogLoading || false}
-              projectRef={projectRef}
-              onClose={() => {
-                onSelectedLogChange?.(null)
-                setSelectionOpen(false)
-              }}
-              log={selectedLog}
-              error={selectedLogError}
-              queryType={queryType}
-            />
-          </ResizablePanel>
+          <>
+            <ResizableHandle withHandle />
+
+            <ResizablePanel minSize={40} defaultSize={50}>
+              <LogSelection
+                isLoading={isSelectedLogLoading || false}
+                projectRef={projectRef}
+                onClose={() => {
+                  onSelectedLogChange?.(null)
+                  setSelectionOpen(false)
+                }}
+                log={selectedLog}
+                error={selectedLogError}
+                queryType={queryType}
+              />
+            </ResizablePanel>
+          </>
         )}
       </ResizablePanelGroup>
     </section>
