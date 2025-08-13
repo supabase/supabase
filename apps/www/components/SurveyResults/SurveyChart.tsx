@@ -14,8 +14,8 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 // Separate Supabase client for external project
 const externalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY || ''
 )
 
 // Sentinel for “no filter”
@@ -335,7 +335,8 @@ export function SurveyChart({
             </div>
           ) : view === 'chart' ? (
             <div className="flex flex-col h-full w-full justify-between px-8 pt-4 pb-12 min-h-[300px]">
-              {chartData.length > 0 ? (
+              {displayData.length > 0 ? (
+                // Show chart content (either skeleton during loading or real data)
                 <div
                   className="flex flex-col gap-10"
                   style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
@@ -403,6 +404,7 @@ export function SurveyChart({
                   ))}
                 </div>
               ) : (
+                // Only show "no responses" when NOT loading and no data
                 <div className="flex-1 pt-8 flex flex-col items-center justify-center gap-4">
                   <p className="text-balance text-center">
                     No responses match those filters. Maybe next year?
