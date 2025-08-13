@@ -1,9 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { toast } from 'sonner'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -16,12 +18,14 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
+import { Button, Form_Shadcn_, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
-import type { Provider } from './AuthProvidersForm.types'
-import FormField from './FormField'
+import { FormField } from './FormField'
+import { Provider } from './AuthProvidersFormValidation'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -66,7 +70,6 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `${protocol}://${endpoint}`
-
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const INITIAL_VALUES = (() => {
@@ -93,7 +96,19 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     return initialValues
   })()
 
-  const onSubmit = (values: any, { resetForm }: any) => {
+  const schema =
+    typeof provider.validationSchema === `function`
+      ? provider.validationSchema(config.HOOK_SEND_SMS_ENABLED)
+      : provider.validationSchema
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: INITIAL_VALUES,
+  })
+
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
+    if (!projectRef) return console.error('Project ref is required')
+
     const payload = { ...values }
     Object.keys(values).map((x: string) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
@@ -106,10 +121,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     }
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      { projectRef, config: payload },
       {
         onSuccess: () => {
-          resetForm({ values: { ...values }, initialValues: { ...values } })
+          form.reset(values, { keepValues: true })
           setOpen(false)
           setUrlProvider(null)
           toast.success('Successfully updated settings')
@@ -131,6 +146,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     const isProviderInQuery = urlProvider.toLowerCase() === provider.title.toLowerCase()
     setOpen(isProviderInQuery)
   }, [urlProvider, provider.title])
+
+  const formId = `provider-${provider.title}-form`
 
   return (
     <>
@@ -173,106 +190,111 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             />
             <SheetTitle>{provider.title}</SheetTitle>
           </SheetHeader>
-          <Form
-            id={`provider-${provider.title}-form`}
-            name={`provider-${provider.title}-form`}
-            initialValues={INITIAL_VALUES}
-            validationSchema={provider.validationSchema}
-            onSubmit={onSubmit}
-            className="flex-1 overflow-hidden flex flex-col"
-          >
-            {({ handleReset, initialValues, values, setFieldValue }: any) => {
-              const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
-              return (
-                <>
-                  <div className="flex-1 overflow-y-auto group py-6 px-4 md:px-6 text-foreground">
-                    <div className="mx-auto max-w-lg space-y-6">
-                      <AuthAlert
-                        title={provider.title}
-                        isHookSendSMSEnabled={config.HOOK_SEND_SMS_ENABLED}
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              name={`provider-${provider.title}-form`}
+              className="flex-1 overflow-hidden flex flex-col"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <div className="flex-1 overflow-y-auto group py-6 px-4 md:px-6 text-foreground">
+                <div className="mx-auto max-w-lg space-y-6">
+                  <AuthAlert
+                    title={provider.title}
+                    isHookSendSMSEnabled={config.HOOK_SEND_SMS_ENABLED}
+                  />
+                  {Object.entries(provider.properties).map(([key, value]) => {
+                    if (value.show) {
+                      if (value.show.matches) {
+                        if (!value.show.matches.includes(form.getValues(value.show.key))) {
+                          return null
+                        }
+                      } else if (!form.getValues(value.show.key)) {
+                        return null
+                      }
+                    }
+                    return (
+                      <FormField
+                        key={key}
+                        name={key}
+                        control={form.control}
+                        properties={value}
+                        disabled={shouldDisableField(key) || !canUpdateConfig}
                       />
-                      {Object.keys(provider.properties).map((x: string) => (
-                        <FormField
-                          key={x}
-                          name={x}
-                          setFieldValue={setFieldValue}
-                          properties={provider.properties[x]}
-                          formValues={values}
-                          disabled={shouldDisableField(x) || !canUpdateConfig}
-                        />
-                      ))}
+                    )
+                  })}
 
-                      {provider?.misc?.alert && (
-                        <Admonition
-                          type="warning"
-                          title={provider.misc.alert.title}
-                          description={
-                            <>
-                              <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                            </>
-                          }
-                        />
-                      )}
+                  {provider?.misc?.alert && (
+                    <Admonition
+                      type="warning"
+                      title={provider.misc.alert.title}
+                      description={<Markdown content={provider.misc.alert.description} />}
+                    />
+                  )}
 
-                      {provider.misc.requiresRedirect && (
-                        <Input
-                          copy
-                          readOnly
-                          disabled
-                          label="Callback URL (for OAuth)"
-                          value={
-                            customDomainData?.customDomain?.status === 'active'
-                              ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                              : `${apiUrl}/auth/v1/callback`
-                          }
-                          descriptionText={
-                            <Markdown
-                              content={provider.misc.helper}
-                              className="text-foreground-lighter"
-                            />
-                          }
-                        />
-                      )}
-                    </div>
-                  </div>
-                  <SheetFooter className="shrink-0">
-                    <div className="flex items-center justify-between w-full">
-                      <DocsButton href={provider.link} />
-                      <div className="flex items-center gap-x-3">
-                        <Button
-                          type="default"
-                          htmlType="reset"
-                          onClick={() => {
-                            handleReset()
-                            setOpen(false)
-                            setUrlProvider(null)
-                          }}
-                          disabled={isUpdatingConfig}
-                        >
-                          Cancel
-                        </Button>
-                        <ButtonTooltip
-                          htmlType="submit"
-                          loading={isUpdatingConfig}
-                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !canUpdateConfig
-                                ? 'You need additional permissions to update provider settings'
-                                : undefined,
-                            },
-                          }}
-                        >
-                          Save
-                        </ButtonTooltip>
-                      </div>
-                    </div>
-                  </SheetFooter>
-                </>
-              )
-            }}
-          </Form>
+                  {provider.misc.requiresRedirect && (
+                    <FormLayout
+                      label="Callback URL (for OAuth)"
+                      description={
+                        provider.misc.helper ? (
+                          <Markdown
+                            content={provider.misc.helper}
+                            className="text-foreground-lighter"
+                          />
+                        ) : undefined
+                      }
+                    >
+                      <Input
+                        copy
+                        readOnly
+                        disabled
+                        value={
+                          customDomainData?.customDomain?.status === 'active'
+                            ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+                            : `${apiUrl}/auth/v1/callback`
+                        }
+                      />
+                    </FormLayout>
+                  )}
+                </div>
+              </div>
+            </form>
+          </Form_Shadcn_>
+          <SheetFooter className="shrink-0">
+            <div className="flex items-center justify-between w-full">
+              <DocsButton href={provider.link} />
+              <div className="flex items-center gap-x-3">
+                <Button
+                  type="default"
+                  htmlType="reset"
+                  onClick={() => {
+                    form.reset()
+                    setOpen(false)
+                    setUrlProvider(null)
+                  }}
+                  disabled={isUpdatingConfig}
+                >
+                  Cancel
+                </Button>
+                <ButtonTooltip
+                  form={formId}
+                  htmlType="submit"
+                  loading={isUpdatingConfig}
+                  disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateConfig
+                        ? 'You need additional permissions to update provider settings'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Save
+                </ButtonTooltip>
+              </div>
+            </div>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </>
