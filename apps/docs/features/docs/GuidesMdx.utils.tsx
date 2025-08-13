@@ -73,7 +73,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       editLink,
     }
   } catch (error: unknown) {
-    if (error instanceof FileNotFoundError) {
+    if (error instanceof Error && error.cause instanceof FileNotFoundError) {
       // Not using console.error because this includes pages that are genuine
       // 404s and clutters up the logs
       console.log('Could not read Markdown at path: %s', fullPath)
