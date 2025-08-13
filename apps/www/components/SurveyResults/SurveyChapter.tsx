@@ -51,7 +51,7 @@ export function SurveyChapter({
                 key={index}
                 className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand' : index === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
                 style={{
-                  maskImage: 'url("/survey/pattern-front.svg")',
+                  maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
                   maskSize: '14.5px 15px',
                   maskRepeat: 'repeat',
                   maskPosition: 'top left',
