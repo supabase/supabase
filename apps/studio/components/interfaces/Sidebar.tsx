@@ -41,7 +41,10 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useUnifiedLogsPreview,
+} from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -243,7 +246,12 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project)
+
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+
+  const otherRoutes = generateOtherRoutes(ref, project, {
+    unifiedLogs: isUnifiedLogsEnabled,
+  })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
