@@ -45,7 +45,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
         <div
           className="absolute inset-0 pointer-events-none bg-foreground-muted"
           style={{
-            maskImage: 'url("/survey/pattern-checker.svg")',
+            maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
             maskSize: '8px 8px',
             maskRepeat: 'repeat',
             maskPosition: 'center',
@@ -66,7 +66,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
           <div
             className={`absolute inset-0 pointer-events-none bg-brand`}
             style={{
-              maskImage: 'url("/survey/pattern-checker.svg")',
+              maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
               maskSize: '8px 8px',
               maskRepeat: 'repeat',
               maskPosition: 'center',

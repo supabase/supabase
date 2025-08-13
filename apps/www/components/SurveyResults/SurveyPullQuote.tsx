@@ -18,7 +18,7 @@ export function SurveyPullQuote({
         <div
           className="absolute inset-0 pointer-events-none bg-surface-400 dark:bg-surface-75"
           style={{
-            maskImage: 'url("/survey/pattern-back.svg")',
+            maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
             maskSize: '15px 15px',
             maskRepeat: 'repeat',
             maskPosition: 'top left',

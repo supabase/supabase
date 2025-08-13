@@ -1,17 +1,25 @@
 import { useEffect, useRef, useState } from 'react'
+
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
+
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button, cn } from 'ui'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import data from '~/data/surveys/state-of-startups-2025'
+
+import pageData from '~/data/surveys/state-of-startups-2025'
 
 function StateOfStartupsPage() {
-  const pageData = data()
+  const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
+  const meta_description =
+    pageData.metaDescription ||
+    'We surveyed over 1,800 startup founders and builders to uncover what’s powering modern startups: their stacks, their go-to-market motion, and their approach to AI.'
+
   const [showFloatingToc, setShowFloatingToc] = useState(false)
   const [isTocOpen, setIsTocOpen] = useState(false)
   const [activeChapter, setActiveChapter] = useState(1)
@@ -162,7 +170,21 @@ function StateOfStartupsPage() {
 
   return (
     <>
-      {/* <NextSeo {...pageData.seo} /> */}
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/state-of-startups`,
+          images: [
+            {
+              url: `https://supabase.com/images/state-of-startups/state-of-startups-og.png`,
+            },
+          ],
+        }}
+      />
+
       <DefaultLayout className="bg-alternative overflow-hidden">
         <FloatingTableOfContents />
         {/* Intro section */}
@@ -186,7 +208,7 @@ function StateOfStartupsPage() {
                       key={index}
                       className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand' : index === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
                       style={{
-                        maskImage: 'url("/survey/pattern-front.svg")',
+                        maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
                         maskSize: '14.5px 15px',
                         maskRepeat: 'repeat',
                         maskPosition: 'top left',
