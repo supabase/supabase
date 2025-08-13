@@ -24,7 +24,10 @@ import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
@@ -91,8 +94,27 @@ const DatabaseUsage = () => {
   })
   const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
-  const REPORT_ATTRIBUTES = getReportAttributes(org!, project!)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)
+  const { data: diskConfig } = useDiskAttributesQuery({ projectRef: project?.ref })
+  const { data: maxConnections } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
+
+  const REPORT_ATTRIBUTES = getReportAttributes(
+    org!,
+    project!,
+    diskConfig,
+    maxConnections,
+    poolerConfig
+  )
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(
+    org!,
+    project!,
+    diskConfig,
+    maxConnections,
+    poolerConfig
+  )
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return

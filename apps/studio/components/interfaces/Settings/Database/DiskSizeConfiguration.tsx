@@ -21,7 +21,6 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const currentDiskSize = project?.volumeSizeGb ?? 0
-
   const { data } = useDatabaseSizeQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
