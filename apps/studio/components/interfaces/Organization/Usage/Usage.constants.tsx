@@ -92,7 +92,8 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         subscription?.cached_egress_enabled === true
           ? 'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.'
           : 'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.',
-      chartDescription: 'The data refreshes every 24 hours.',
+      chartDescription:
+        'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every 24 hours.',
       links: [
         {
           name: 'Documentation',
