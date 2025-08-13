@@ -13,7 +13,6 @@ import { materializedViewKeys } from 'data/materialized-views/keys'
 // Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = [
   'table',
-  'function',
   'view',
   'materialized_view',
 ]
