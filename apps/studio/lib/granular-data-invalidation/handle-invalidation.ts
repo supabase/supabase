@@ -58,7 +58,7 @@ export async function invalidateTableQueries(
     )
   }
 
-  await Promise.all(promises)
+  await Promise.allSettled(promises)
 }
 
 export async function invalidateFunctionQueries(
@@ -106,7 +106,7 @@ export async function invalidatePolicyQueries(
     )
   }
 
-  await Promise.all(promises)
+  await Promise.allSettled(promises)
 }
 
 async function invalidateIndexQueries(
@@ -227,7 +227,12 @@ export async function handleInvalidation(
   queryClient: QueryClient,
   event: InvalidationEvent
 ): Promise<void> {
+  // Schedule invalidation to run asynchronously without blocking the main thread
   setTimeout(async () => {
-    await executeInvalidation(queryClient, event)
+    try {
+      await executeInvalidation(queryClient, event)
+    } catch (error) {
+      console.error(`handleInvalidation: Failed to invalidate ${event.entityType}`, error)
+    }
   }, 0)
 }

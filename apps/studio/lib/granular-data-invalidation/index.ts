@@ -102,7 +102,9 @@ export async function invalidateDataGranularly(
   try {
     const events = parseSqlStatements(sql, projectRef)
 
-    await Promise.allSettled(events.map((event) => handleInvalidation(queryClient, event)))
+    // Fire off all invalidations without blocking
+    // Each invalidation runs in its own setTimeout callback
+    events.forEach((event) => handleInvalidation(queryClient, event))
   } catch (error) {
     console.error('invalidateCacheGranularly: Error processing SQL', error)
   }
