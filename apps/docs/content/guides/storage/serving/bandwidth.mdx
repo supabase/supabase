@@ -24,10 +24,12 @@ from
   edge_logs
   cross join unnest(metadata) as metadata
   cross join unnest(metadata.request) as request
-  cross join unnest(metadata.response) response
+  cross join unnest(metadata.response) as response
   cross join unnest(response.headers) as responseHeaders
-where (path like '%storage/v1/object/%' or path like '%storage/v1/render/%') and request.method = 'GET'
-group by 1,2,3
+where
+  (path like '%storage/v1/object/%' or path like '%storage/v1/render/%')
+  and request.method = 'GET'
+group by 1, 2, 3
 order by num_requests desc
 limit 100;
 ```
