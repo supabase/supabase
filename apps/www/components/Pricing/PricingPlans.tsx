@@ -73,7 +73,11 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                     {plan.description}
                   </p>
                   {isUpgradablePlan && hasExistingOrganizations ? (
-                    <UpgradePlan organizations={organizations} onClick={sendPricingEvent} />
+                    <UpgradePlan
+                      planId={plan.planId}
+                      organizations={organizations}
+                      onClick={sendPricingEvent}
+                    />
                   ) : (
                     <Button
                       block
@@ -107,6 +111,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                               className={`mt-2 pb-1 font-mono ${
                                 plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                               }`}
+                              translate="no"
                             >
                               {plan.name !== 'Enterprise' ? '$' : ''}
                               {plan.priceMonthly}

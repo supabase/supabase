@@ -14,7 +14,14 @@ export type BucketUpdateVariables = {
   allowed_mime_types: string[] | null
 }
 
-type UpdateStorageBucketBody = components['schemas']['UpdateStorageBucketBody']
+// [Alaister]: API accept null values for allowed_mime_types and file_size_limit to reset
+type UpdateStorageBucketBody = Omit<
+  components['schemas']['UpdateStorageBucketBody'],
+  'allowed_mime_types' | 'file_size_limit'
+> & {
+  allowed_mime_types: string[] | null
+  file_size_limit: number | null
+}
 
 export async function updateBucket({
   projectRef,
@@ -27,12 +34,12 @@ export async function updateBucket({
   if (!id) throw new Error('Bucket name is requried')
 
   const payload: Partial<UpdateStorageBucketBody> = { public: isPublic }
-  if (file_size_limit) payload.file_size_limit = file_size_limit
-  if (allowed_mime_types) payload.allowed_mime_types = allowed_mime_types
+  if (file_size_limit !== undefined) payload.file_size_limit = file_size_limit
+  if (allowed_mime_types !== undefined) payload.allowed_mime_types = allowed_mime_types
 
   const { data, error } = await patch('/platform/storage/{ref}/buckets/{id}', {
     params: { path: { id, ref: projectRef } },
-    body: payload as UpdateStorageBucketBody,
+    body: payload as any,
   })
 
   if (error) handleError(error)

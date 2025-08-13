@@ -1,8 +1,12 @@
 import { format } from 'date-fns'
 import { Clock } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
 
 const TimeSplitInput = ({
   type,
@@ -154,6 +158,46 @@ const TimeSplitInput = ({
 
   useEffect(() => {
     handleOnBlur()
+  }, [startDate, endDate])
+
+  function handlePaste(event: ClipboardEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    navigator.clipboard.readText().then((text) => {
+      let date: null | Date = null
+      if (isUnixMicro(text)) {
+        date = new Date(unixMicroToIsoTimestamp(text))
+      } else {
+        date = new Date(Number(text))
+      }
+
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date or timestamp in clipboard')
+        return
+      }
+
+      if (date) {
+        // Offset the date by 1s to make sure it will find the logs in that second
+        if (type === 'start') {
+          date.setSeconds(date.getSeconds() - 1)
+        }
+        if (type === 'end') {
+          date.setSeconds(date.getSeconds() + 1)
+        }
+
+        setTime({
+          HH: date.getHours().toString().padStart(2, '0'),
+          mm: date.getMinutes().toString().padStart(2, '0'),
+          ss: date.getSeconds().toString().padStart(2, '0'),
+        })
+      }
+    })
+  }
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste)
+    return () => document.removeEventListener('paste', handlePaste)
   }, [startDate, endDate])
 
   return (

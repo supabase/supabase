@@ -1,9 +1,9 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
-import { handleError, patch } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { lintKeys } from 'data/lint/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import type { ResponseError } from 'types'
@@ -13,8 +13,9 @@ export type UpdateTableBody = components['schemas']['UpdateTableBody']
 
 export type TableUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
+  name: string
   schema: string
   payload: UpdateTableBody
 }
@@ -23,26 +24,20 @@ export async function updateTable({
   projectRef,
   connectionString,
   id,
+  name,
+  schema,
   payload,
 }: TableUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.tables.update({ id, name, schema }, payload)
 
-  const { data, error } = await patch('/platform/pg-meta/{ref}/tables', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const { result } = await executeSql<void>({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['table', 'update', id],
   })
 
-  if (error) handleError(error)
-
-  // [Alaister] we have to manually cast the data to PostgresTable
-  // because the API types are slightly wrong
-  return data as PostgresTable
+  return result
 }
 
 type TableUpdateData = Awaited<ReturnType<typeof updateTable>>

@@ -26,7 +26,6 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
 
   return (
     <Modal
-      closable
       hideFooter
       size="small"
       visible={visible}

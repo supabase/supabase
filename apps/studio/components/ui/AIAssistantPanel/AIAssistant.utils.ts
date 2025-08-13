@@ -1,101 +1,17 @@
+import { toast } from 'sonner'
+import { handleError } from 'data/fetchers'
+import { ResponseError } from 'types'
+
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
+import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
 import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
 import { tableKeys } from 'data/tables/keys'
-import { CommonDatabaseEntity } from 'state/app-state'
-import { SupportedAssistantEntities } from './AIAssistant.types'
+import { tryParseJson } from 'lib/helpers'
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
-
-const PLACEHOLDER_PREFIX = `-- Press tab to use this code
-\n&nbsp;\n`
-
-// [Joshen] Not used but keeping this for now in case we do an inline editor
-export const generatePlaceholder = (
-  editor?: SupportedAssistantEntities | null,
-  entity?: CommonDatabaseEntity,
-  existingDefinition?: string
-) => {
-  switch (editor) {
-    case 'functions':
-      if (entity === undefined) {
-        return `${PLACEHOLDER_PREFIX}
-CREATE FUNCTION *schema*.*function_name*(*param1 type*, *param2 type*)\n
-&nbsp;&nbsp;RETURNS *return_type*\n
-&nbsp;&nbsp;LANGUAGE *plpgsql*\n
-&nbsp;&nbsp;SECURITY DEFINER\n
-&nbsp;&nbsp;SET *search_path = ''*\n
-AS $$\n
-DECLARE\n
-&nbsp;&nbsp;*-- Variable declarations*\n
-BEGIN\n
-&nbsp;&nbsp;*-- Function logic*\n
-END;\n
-$$;
-`
-      } else {
-        return `${PLACEHOLDER_PREFIX}
--- To rename the function\n
-ALTER FUNCTION *${entity.name}* RENAME TO *new_name*;\n
-&nbsp;\n
--- To change the schema of the function\n
-ALTER FUNCTION *${entity.name}* SET SCHEMA *new_schema*;\n
-&nbsp;\n
--- To update the function body or the arguments, use\n
--- the create or replace statement instead\n
-${existingDefinition
-  ?.replaceAll(
-    '\n ',
-    `\n\
-  &nbsp;&nbsp;`
-  )
-  .replaceAll('\n', '\n\n')
-  .trim()}
-`
-      }
-    case 'rls-policies':
-      if (entity === undefined) {
-        return `${PLACEHOLDER_PREFIX}
-CREATE POLICY *name* ON *table_name*\n
-AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
-FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
-TO *role_name* -- Default: public\n
-USING ( *using_expression* )\n
-WITH CHECK ( *check_expression* );
-`
-      } else {
-        let expression = ''
-        if (entity.definition !== null && entity.definition !== undefined) {
-          expression += `USING ( *${entity.definition}* )${
-            entity.check === null || entity.check === undefined ? ';' : ''
-          }\n`
-        }
-        if (entity.check !== null && entity.check !== undefined) {
-          expression += `WITH CHECK ( *${entity.check}* );\n`
-        }
-        return `${PLACEHOLDER_PREFIX}
-BEGIN;\n
-&nbsp;\n
--- To update your policy definition\n
-ALTER POLICY "${entity.name}"\n
-ON "${entity.schema}"."${entity.table}"\n
-TO *${(entity.roles ?? []).join(', ')}*\n
-${expression}
-&nbsp;\n
--- To rename the policy\n
-ALTER POLICY "${entity.name}"\n
-ON "${entity.schema}"."${entity.table}"\n
-RENAME TO "*New Policy Name*";\n
-&nbsp;\n
-COMMIT;
-`
-      }
-    default:
-      return undefined
-  }
-}
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps
 export const identifyQueryType = (query: string) => {
@@ -111,6 +27,7 @@ export const identifyQueryType = (query: string) => {
 }
 
 // Check for function calls that aren't in the safe list
+/** @deprecated [Joshen] Ideally we move away from this as this isn't a scalable way to deduce */
 export const containsUnknownFunction = (query: string) => {
   const normalizedQuery = query.trim().toLowerCase()
   const functionCallRegex = /\w+\s*\(/g
@@ -122,6 +39,11 @@ export const containsUnknownFunction = (query: string) => {
   })
 }
 
+/** @deprecated
+ * [Joshen] This isn't really a scalable way to reduce this behaviour, we now have support
+ * for a readonly connection string which we can use this to run queries, and is a much
+ * clearer way to deduce if the query is read only or not
+ */
 export const isReadOnlySelect = (query: string): boolean => {
   const normalizedQuery = query.trim().toLowerCase()
 
@@ -177,8 +99,26 @@ export const getContextualInvalidationKeys = ({
         'database/triggers': [databaseTriggerKeys.list(ref)],
         'database/types': [enumeratedTypesKeys.list(ref)],
         'database/extensions': [databaseExtensionsKeys.list(ref)],
-        'database/indexes': [databaseKeys.indexes(ref, schema)],
+        'database/indexes': [databaseIndexesKeys.list(ref, schema)],
       } as const
     )[key] ?? []
   )
+}
+
+export const onErrorChat = (error: Error) => {
+  const parsedError = error ? tryParseJson(error.message) : undefined
+
+  try {
+    handleError(parsedError?.error || parsedError || error)
+  } catch (e: any) {
+    if (e instanceof ResponseError) {
+      toast.error(e.message)
+    } else if (e instanceof Error) {
+      toast.error(e.message)
+    } else if (typeof e === 'string') {
+      toast.error(e)
+    } else {
+      toast.error('An unknown error occurred')
+    }
+  }
 }

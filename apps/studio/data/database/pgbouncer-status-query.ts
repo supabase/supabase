@@ -4,12 +4,12 @@ import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
-export type ProjectPgbouncerStatusVariables = {
+export type PgbouncerStatusVariables = {
   projectRef?: string
 }
 
-export async function getProjectPgbouncerStatus(
-  { projectRef }: ProjectPgbouncerStatusVariables,
+export async function getPgbouncerStatus(
+  { projectRef }: PgbouncerStatusVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -22,19 +22,19 @@ export async function getProjectPgbouncerStatus(
   return data
 }
 
-export type ProjectPgbouncerStatusData = Awaited<ReturnType<typeof getProjectPgbouncerStatus>>
-export type ProjectPgbouncerStatusError = ResponseError
+export type PgbouncerStatusData = Awaited<ReturnType<typeof getPgbouncerStatus>>
+export type PgbouncerStatusError = ResponseError
 
-export const useProjectPgbouncerStatusQuery = <TData = ProjectPgbouncerStatusData>(
-  { projectRef }: ProjectPgbouncerStatusVariables,
+export const usePgbouncerStatusQuery = <TData = PgbouncerStatusData>(
+  { projectRef }: PgbouncerStatusVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectPgbouncerStatusData, ProjectPgbouncerStatusError, TData> = {}
+  }: UseQueryOptions<PgbouncerStatusData, PgbouncerStatusError, TData> = {}
 ) =>
-  useQuery<ProjectPgbouncerStatusData, ProjectPgbouncerStatusError, TData>(
+  useQuery<PgbouncerStatusData, PgbouncerStatusError, TData>(
     databaseKeys.pgbouncerStatus(projectRef),
-    ({ signal }) => getProjectPgbouncerStatus({ projectRef }, signal),
+    ({ signal }) => getPgbouncerStatus({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,

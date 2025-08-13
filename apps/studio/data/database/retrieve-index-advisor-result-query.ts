@@ -6,7 +6,7 @@ import { databaseKeys } from './keys'
 
 export type GetIndexAdvisorResultVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   query: string
 }
 

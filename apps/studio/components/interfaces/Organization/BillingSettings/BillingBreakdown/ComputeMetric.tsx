@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { ComputeUsageMetric, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { formatCurrency } from 'lib/helpers'
 import { useMemo } from 'react'
@@ -49,27 +49,45 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
           </Link>
           <span className="text-sm">{usageLabel}</span>&nbsp;
           {relativeToSubscription && usageMeta?.cost && usageMeta.cost > 0 ? (
-            <span className="text-sm">({formatCurrency(usageMeta?.cost)})</span>
+            <span className="text-sm" translate="no">
+              ({formatCurrency(usageMeta?.cost)})
+            </span>
           ) : null}
         </div>
       </HoverCardTrigger>
       <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
         <div className="text-sm text-foreground space-y-2">
-          <p className="font-medium">{usageMeta?.unit_price_desc}</p>
+          <p className="font-medium" translate="no">
+            {usageMeta?.unit_price_desc}
+          </p>
 
           <div className="my-2">
-            <p className="text-sm">
-              Every project is a dedicated server and database. For every hour your project is
-              active, it incurs compute costs based on the compute size of your project. Paused
-              projects do not incur compute costs.{' '}
-              <Link
-                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
-                target="_blank"
-                className="transition text-brand hover:text-brand-600 underline"
-              >
-                Read more
-              </Link>
-            </p>
+            {usageMeta?.metric === ComputeUsageMetric.COMPUTE_HOURS_BRANCH ? (
+              <p className="text-sm">
+                Each Preview branch is a separate environment with all Supabase services (Database,
+                Auth, Storage, etc.).{' '}
+                <Link
+                  href="https://supabase.com/docs/guides/platform/manage-your-usage/branching"
+                  target="_blank"
+                  className="transition text-brand hover:text-brand-600 underline"
+                >
+                  Read more
+                </Link>
+              </p>
+            ) : (
+              <p className="text-sm">
+                Every project is a dedicated server and database. For every hour your project is
+                active, it incurs compute costs based on the compute size of your project. Paused
+                projects do not incur compute costs.{' '}
+                <Link
+                  href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+                  target="_blank"
+                  className="transition text-brand hover:text-brand-600 underline"
+                >
+                  Read more
+                </Link>
+              </p>
+            )}
           </div>
 
           {usageMeta && sortedProjectAllocations.length > 0 && (

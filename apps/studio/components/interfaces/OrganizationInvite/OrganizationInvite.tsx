@@ -25,14 +25,15 @@ export const OrganizationInvite = () => {
   )
   const hasError =
     isError || (isSuccess && (data.token_does_not_exist || data.expired_token || !data.email_match))
+  const isNotSignedInError = error?.message.includes('No authorization token was found')
 
-  const organizationName = data?.organization_name ?? name ?? 'an organization'
+  const organizationName = isSuccess ? data?.organization_name : 'an organization'
   const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   const { mutate: joinOrganization, isLoading: isJoining } =
     useOrganizationAcceptInvitationMutation({
       onSuccess: () => {
-        router.push('/projects')
+        router.push('/organizations')
       },
       onError: (error) => {
         toast.error(`Failed to join organization: ${error.message}`)
@@ -50,27 +51,29 @@ export const OrganizationInvite = () => {
       <div className="flex flex-col gap-2 px-6 py-8">
         <p className="text-sm text-foreground">You have been invited to join </p>
         <p className="text-3xl text-foreground">{organizationName}</p>
-        {slug && <p className="text-xs text-foreground-lighter">{`organization slug: ${slug}`}</p>}
+        {isSuccess && slug && (
+          <p className="text-xs text-foreground-lighter">{`organization slug: ${slug}`}</p>
+        )}
       </div>
 
       <div className={cn('border-t border-muted', hasError ? 'bg-alternative' : 'bg-transparent')}>
-        <div className={cn('flex flex-col gap-4', !isLoading && !hasError && 'px-6 py-4')}>
-          {profile === undefined && (
-            <div className="flex flex-col gap-3">
-              <p className="text-xs text-foreground-lighter">
-                You will need to sign in to accept this invitation
-              </p>
-              <div className="flex justify-center gap-3">
-                <Button asChild type="default">
-                  <Link href={loginRedirectLink}>Sign in</Link>
-                </Button>
-                <Button asChild type="default">
-                  <Link href={loginRedirectLink}>Create an account</Link>
-                </Button>
-              </div>
+        {profile === undefined && (
+          <div className="flex flex-col gap-3 py-4">
+            <p className="text-xs text-foreground-lighter">
+              You will need to sign in to accept this invitation
+            </p>
+            <div className="flex justify-center gap-3">
+              <Button asChild type="default">
+                <Link href={loginRedirectLink}>Sign in</Link>
+              </Button>
+              <Button asChild type="default">
+                <Link href={loginRedirectLink}>Create an account</Link>
+              </Button>
             </div>
-          )}
-          {hasError && (
+          </div>
+        )}
+        <div className={cn('flex flex-col gap-4', !isLoading && !hasError && 'px-6 py-4')}>
+          {hasError && !isNotSignedInError && (
             <OrganizationInviteError
               data={data}
               error={error as unknown as ResponseError}

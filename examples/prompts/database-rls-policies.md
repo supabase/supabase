@@ -1,7 +1,7 @@
 ---
 # Specify the following for Cursor rules
 description: Guidelines for writing Postgres Row Level Security policies
-globs: "**/*.sql"
+alwaysApply: false
 ---
 
 # Database: Create RLS policies

@@ -20,7 +20,7 @@ We generally recommend using the new `@supabase/ssr` package instead of `auth-he
   size="medium"
   className="text-foreground-light border-b mt-8 pb-2"
   >
-  
+
   <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
@@ -320,7 +320,7 @@ const {
 
 The session contains a user property. This is the user metadata saved, unencoded, to the local storage medium. It's unverified and can be tampered by the user, so don't use it for authorization or sensitive purposes.
 
-<GetSessionWarning />
+<$Partial path="get_session_warning.mdx" />
 
 ```jsx
 const user = session?.user

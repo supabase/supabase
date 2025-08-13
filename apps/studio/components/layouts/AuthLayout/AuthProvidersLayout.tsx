@@ -1,15 +1,10 @@
-import { ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import AuthLayout from './AuthLayout'
 
-interface AuthProvidersLayoutProps {
-  children: ReactNode
-}
-
-export const AuthProvidersLayout = ({ children }: AuthProvidersLayoutProps) => {
+export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
 
   const navItems = [
@@ -24,16 +19,14 @@ export const AuthProvidersLayout = ({ children }: AuthProvidersLayoutProps) => {
   ]
 
   return (
-    <DefaultLayout>
-      <AuthLayout>
-        <PageLayout
-          title="Sign In / Up"
-          subtitle="Configure authentication providers and login methods for your users"
-          navigationItems={navItems}
-        >
-          {children}
-        </PageLayout>
-      </AuthLayout>
-    </DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="Sign In / Providers"
+        subtitle="Configure authentication providers and login methods for your users"
+        navigationItems={navItems}
+      >
+        {children}
+      </PageLayout>
+    </AuthLayout>
   )
 }

@@ -18,7 +18,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-     ```sql SQL_EDITOR
+     ```sql name=SQL_EDITOR
       select * from auth.users;
       ````
 
@@ -41,7 +41,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npx create-next-app -e with-supabase
       ```
 
@@ -52,13 +52,13 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.local.example` to `.env.local` and populate with [your project's URL and Anon Key](https://supabase.com/dashboard/project/_/settings/api).
+    Rename `.env.example` to `.env.local` and populate with [your project's URL and Anon Key](https://supabase.com/dashboard/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```text .env.local
+      ```text name=.env.local
         NEXT_PUBLIC_SUPABASE_URL=your-project-url
         NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
       ```
@@ -78,7 +78,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

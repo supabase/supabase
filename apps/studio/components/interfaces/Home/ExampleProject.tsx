@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 
 interface ExampleProjectProps {
@@ -17,7 +17,7 @@ interface ExampleProjectProps {
 const ExampleProject = ({ framework, title, description, url }: ExampleProjectProps) => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { mutate: sendEvent } = useSendEventMutation()
 

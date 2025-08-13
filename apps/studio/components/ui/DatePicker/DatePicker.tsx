@@ -1,8 +1,8 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
-import { ArrowRight, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { ArrowRight, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import DatePicker from 'react-datepicker'
+import ReactDatePicker from 'react-datepicker'
 
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
@@ -37,7 +37,7 @@ const END_DATE_DEFAULT = new Date()
 const START_TIME_DEFAULT = { HH: '00', mm: '00', ss: '00' }
 const END_TIME_DEFAULT = { HH: '23', mm: '59', ss: '59' }
 
-function _DatePicker({
+function DatePicker({
   to,
   from,
   onChange,
@@ -221,7 +221,7 @@ function _DatePicker({
             </>
           )}
           <div className="p-2">
-            <DatePicker
+            <ReactDatePicker
               inline
               selectsRange={selectsRange}
               selected={startDate}
@@ -292,4 +292,4 @@ function _DatePicker({
   )
 }
 
-export default _DatePicker
+export default DatePicker

@@ -9,7 +9,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
   status: QUEUE_MESSAGE_TYPE[]
 }

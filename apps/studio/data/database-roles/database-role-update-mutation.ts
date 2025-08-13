@@ -10,7 +10,7 @@ type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]
 
 export type DatabaseRoleUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   payload: UpdateRoleBody
 }

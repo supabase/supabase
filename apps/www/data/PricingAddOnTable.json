@@ -197,6 +197,30 @@
             "value": "12,000"
           }
         ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": ">16XL" },
+          {
+            "key": "pricing",
+            "title": "Price USD",
+            "value": "Contact Us",
+            "url": "/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes"
+          },
+          { "key": "cpu", "title": "CPU", "value": "Custom" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "Custom" },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "Custom"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "Custom"
+          }
+        ]
       }
     ]
   },

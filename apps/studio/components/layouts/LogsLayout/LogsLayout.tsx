@@ -2,11 +2,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
 
@@ -23,13 +23,15 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const router = useRouter()
   const [_, setLastLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
-    router.pathname.split('/logs/')[1]
+    router.pathname.split('/logs/')[1] || ''
   )
 
   useEffect(() => {
     if (router.pathname.includes('/logs/')) {
       const path = router.pathname.split('/logs/')[1]
-      setLastLogsPage(path)
+      if (path) {
+        setLastLogsPage(path)
+      }
     }
   }, [router, setLastLogsPage])
 

@@ -5,9 +5,11 @@ import '../styles/index.css'
 import {
   AuthProvider,
   FeatureFlagProvider,
+  IS_PLATFORM,
   PageTelemetry,
   ThemeProvider,
   useThemeSandbox,
+  TelemetryTagManager,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
@@ -15,7 +17,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsentToast } from 'ui-patterns/consent'
 
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
@@ -27,11 +29,11 @@ import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const { hasAcceptedConsent } = useConsent()
+  const { hasAcceptedConsent } = useConsentToast()
 
   useThemeSandbox()
 
-  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+  const site_title = `${APP_NAME} | The Postgres Development Platform.`
   const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
@@ -84,7 +86,7 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
             enableSystem
@@ -96,12 +98,17 @@ export default function App({ Component, pageProps }: AppProps) {
                 <SonnerToaster position="top-right" />
                 <Component {...pageProps} />
                 <WwwCommandMenu />
-                <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
+                <PageTelemetry
+                  API_URL={API_URL}
+                  hasAcceptedConsent={hasAcceptedConsent}
+                  enabled={IS_PLATFORM}
+                />
               </CommandProvider>
             </TooltipProvider>
           </ThemeProvider>
         </FeatureFlagProvider>
       </AuthProvider>
+      <TelemetryTagManager />
     </>
   )
 }

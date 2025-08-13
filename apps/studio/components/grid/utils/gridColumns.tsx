@@ -37,8 +37,7 @@ export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 export function getGridColumns(
   table: SupaTable,
   options?: {
-    projectRef?: string
-    tableId?: string
+    tableId?: number
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
@@ -87,7 +86,6 @@ export function getGridColumns(
           )
         : undefined,
       renderCell: getCellRenderer(x, columnType, {
-        projectRef: options?.projectRef,
         tableId: options?.tableId,
       }),
 
@@ -189,7 +187,7 @@ function getCellEditor(
 function getCellRenderer(
   columnDef: SupaColumn,
   columnType: ColumnType,
-  metadata: { projectRef?: string; tableId?: string }
+  metadata: { tableId?: number }
 ) {
   switch (columnType) {
     case 'boolean': {
@@ -200,9 +198,7 @@ function getCellRenderer(
         return DefaultFormatter
       } else {
         // eslint-disable-next-line react/display-name
-        return (p: any) => (
-          <ForeignKeyFormatter {...p} projectRef={metadata.projectRef} tableId={metadata.tableId} />
-        )
+        return (p: any) => <ForeignKeyFormatter {...p} tableId={metadata.tableId} />
       }
     }
     case 'binary': {

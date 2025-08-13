@@ -24,7 +24,7 @@ function Blog(props: any) {
   const isList = view === 'list'
   const router = useRouter()
 
-  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
+  const meta_title = 'Supabase Blog: the Postgres development platform'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
 
   return (

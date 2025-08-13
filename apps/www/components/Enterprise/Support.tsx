@@ -7,13 +7,13 @@ import type { LucideIcon } from 'lucide-react'
 
 interface Props {
   id: string
-  label: string | JSX.Element
+  label?: string | JSX.Element
   heading: string | JSX.Element
   features: Feature[]
 }
 
 type Feature = {
-  icon: LucideIcon
+  icon: LucideIcon | any
   heading: string
   subheading: string
 }

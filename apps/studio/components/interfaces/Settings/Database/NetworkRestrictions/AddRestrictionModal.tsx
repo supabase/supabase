@@ -30,7 +30,7 @@ const AddRestrictionModal = ({
   const formId = 'add-restriction-form'
   const { ref } = useParams()
 
-  const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const { data } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: type !== undefined })
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
   // @ts-ignore [Joshen] API typing issue
   const ipv6Restrictions = data?.config?.dbAllowedCidrsV6 ?? []
@@ -162,7 +162,7 @@ const AddRestrictionModal = ({
                   database.
                 </p>
                 <InformationBox
-                  title="Note: Restrictions only apply to direct connections to your database and Supavisor"
+                  title="Note: Restrictions only apply to direct connections to your database and connection pooler"
                   description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
                   urlLabel="Learn more"
                   url="https://supabase.com/docs/guides/platform/network-restrictions#limitations"

@@ -5,6 +5,8 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { TimestampInfo } from 'ui-patterns'
+import { TableCell, TableRow } from 'ui'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -18,18 +20,31 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
   const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
 
   return (
-    <Table.tr>
-      <Table.td>
+    <TableRow>
+      <TableCell>
         <p className="truncate py-2">{secret.name}</p>
-      </Table.td>
-      <Table.td>
-        <div className="flex items-center space-x-2">
-          <p className="font-mono text-sm truncate" title={secret.value}>
-            {secret.value}
-          </p>
-        </div>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
+        <p
+          className="font-mono text-sm max-w-96 truncate text-foreground-light"
+          title={secret.value}
+        >
+          {secret.value}
+        </p>
+      </TableCell>
+      <TableCell>
+        {!!secret.updated_at ? (
+          <TimestampInfo
+            displayAs="utc"
+            utcTimestamp={secret.updated_at}
+            labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+            className="!text-sm text-foreground-light"
+          />
+        ) : (
+          '-'
+        )}
+      </TableCell>
+      <TableCell>
         <div className="flex items-center justify-end">
           <ButtonTooltip
             type="text"
@@ -49,8 +64,8 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
             }}
           />
         </div>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }
 

@@ -410,7 +410,7 @@ You can generate types from your database either through the [Supabase CLI](http
 If you have a GraphQL background, you might be wondering if you can fetch your data in a single round-trip. The answer is yes! The syntax is very similar. This example shows how you might achieve the same thing with Apollo GraphQL and Supabase.
 
 Still want GraphQL?
-If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/settings/database).
+If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/database/settings).
 `,
     js: (apikey?: string, endpoint?: string) => `
 // With Apollo GraphQL
@@ -722,10 +722,31 @@ let { data: ${resourceId}, error } = await supabase
           key: 'with-filtering',
           title: 'With filtering',
           bash: `
-curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
+curl --get '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apikey}" \\
 -H "Authorization: Bearer ${apikey}" \\
--H "Range: 0-9"
+-H "Range: 0-9" \\
+-d "select=*" \\
+\\
+\`# Filters\` \\
+-d "column=eq.Equal+to" \\
+-d "column=gt.Greater+than" \\
+-d "column=lt.Less+than" \\
+-d "column=gte.Greater+than+or+equal+to" \\
+-d "column=lte.Less+than+or+equal+to" \\
+-d "column=like.*CaseSensitive*" \\
+-d "column=ilike.*CaseInsensitive*" \\
+-d "column=is.null" \\
+-d "column=in.(Array,Values)" \\
+-d "column=neq.Not+equal+to" \\
+\\
+\`# Arrays\` \\
+-d "array_column=cs.{array,contains}" \\
+-d "array_column=cd.{contained,by}" \\
+\\
+\`# Logical operators\` \\
+-d "column=not.like.Negate+filter" \\
+-d "or=(some_column.eq.Some+value,other_column.eq.Other+value)"
         `,
           js: `
 let { data: ${resourceId}, error } = await supabase
@@ -747,6 +768,10 @@ let { data: ${resourceId}, error } = await supabase
   // Arrays
   .contains('array_column', ['array', 'contains'])
   .containedBy('array_column', ['contained', 'by'])
+
+  // Logical operators
+  .not('column', 'like', 'Negate filter')
+  .or('some_column.eq.Some value, other_column.eq.Other value')
           `,
         },
       ]

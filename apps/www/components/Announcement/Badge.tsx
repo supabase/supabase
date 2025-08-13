@@ -10,6 +10,7 @@ interface Props {
   target?: '_self' | '_blank' | string
   className?: string
   hasArrow?: boolean
+  style?: React.CSSProperties
 }
 
 const AnnouncementBadge = ({
@@ -19,8 +20,9 @@ const AnnouncementBadge = ({
   target = '_self',
   className,
   hasArrow = true,
+  style,
 }: Props) => (
-  <div className={cn('relative w-fit max-w-xl flex justify-center', className)}>
+  <div className={cn('relative w-fit max-w-xl flex justify-center', className)} style={style}>
     <Link
       href={url}
       target={target}
@@ -59,7 +61,7 @@ const AnnouncementBadge = ({
         <ArrowNarrowRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
-        className="absolute inset-0 -z-10 bg-gradient-to-br
+        className="announcement-overlay absolute inset-0 -z-10 bg-gradient-to-br
             opacity-70
             group-hover/announcement:opacity-100
             transition-opacity

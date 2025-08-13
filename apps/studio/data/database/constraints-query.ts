@@ -51,7 +51,7 @@ inner join table_info ti
 
 export type TableConstraintsVariables = GetTableConstraintsVariables & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type TableConstraintsData = Constraint[]

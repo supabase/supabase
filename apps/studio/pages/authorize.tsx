@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -6,7 +5,8 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
+import { useParams } from 'common'
+import { AuthorizeRequesterDetails } from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -30,7 +30,7 @@ import {
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { auth_id } = useParams()
+  const { auth_id, organization_slug } = useParams()
   const [isApproving, setIsApproving] = useState(false)
   const [isDeclining, setIsDeclining] = useState(false)
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
@@ -52,13 +52,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
-      router.push('/projects')
+      router.push('/organizations')
     },
   })
 
   useEffect(() => {
     if (isSuccessOrganizations && organizations.length > 0) {
-      setSelectedOrgSlug(organizations[0].slug)
+      if (organization_slug) {
+        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
+      } else {
+        setSelectedOrgSlug(organizations[0].slug)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessOrganizations])
@@ -168,7 +172,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             <Button
               type="default"
               loading={isDeclining}
-              disabled={isApproving || isExpired}
+              disabled={
+                isApproving || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
+              }
               onClick={onDeclineRequest}
             >
               Decline
@@ -182,7 +188,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             ) : (
               <Button
                 loading={isApproving}
-                disabled={isDeclining || isExpired}
+                disabled={
+                  isDeclining || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
+                }
                 onClick={onApproveRequest}
               >
                 Authorize {requester?.name}
@@ -226,11 +234,27 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
               first.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
+        ) : organization_slug && !selectedOrgSlug ? (
+          <Alert_Shadcn_ variant="warning">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle_Shadcn_>
+              Organization is needed for installing an integration
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="">
+              Your account is not a member of the pre-selected organization. To use this
+              integration, it must be installed within an organization your account is associated
+              with.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         ) : (
           <Listbox
-            label="Select an organization to grant API access to"
+            label={
+              organization_slug
+                ? 'API access will be granted to pre-selected organization:'
+                : 'Select an organization to grant API access to:'
+            }
             value={selectedOrgSlug}
-            disabled={isExpired}
+            disabled={isExpired || Boolean(organization_slug)}
             onChange={setSelectedOrgSlug}
           >
             {(organizations ?? []).map((organization) => (

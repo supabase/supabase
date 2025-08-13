@@ -1,13 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
-import { useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge } from 'ui'
 
 interface PolicyTableRowHeaderProps {
@@ -34,15 +33,20 @@ const PolicyTableRowHeader = ({
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
-  const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canCreatePolicies } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'policies'
+  )
+  const { can: canToggleRLS } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
-  const [_, setEditView] = useQueryState('view', { defaultValue: '' })
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
@@ -115,7 +119,8 @@ const PolicyTableRowHeader = ({
               type="default"
               className="px-1"
               onClick={() => {
-                setAiAssistantPanel({
+                aiSnap.newChat({
+                  name: 'Create new policy',
                   open: true,
                   initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })

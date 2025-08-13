@@ -2,84 +2,92 @@
 id: 'function-regional-invocation'
 title: 'Regional Invocations'
 description: 'How to execute an Edge Functions in a particular region.'
-subtitle: 'How to execute an Edge Function in a particular region.'
+subtitle: 'Execute Edge Functions in specific regions for optimal performance.'
 ---
 
-Edge Functions are executed in the region closest to the user making the request. This helps to reduce network latency and provide faster responses to the user.
+Edge Functions automatically execute in the region closest to the user making the request. This reduces network latency and provides faster responses.
 
-However, if your Function performs lots of database or storage operations, invoking the Function in the same region as your database may provide better performance. Some situations where this might be helpful include:
+However, if your function performs intensive database or storage operations, executing in the same region as your database often provides better performance:
 
-- Bulk adding and editing records in your database
-- Uploading files
+- **Bulk database operations:** Adding or editing many records
+- **File uploads:** Processing large files or multiple uploads
+- **Complex queries:** Operations requiring multiple database round trips
 
-Supabase provides an option to specify the region when invoking the Function.
-
-## Using the `x-region` header
-
-Use the `x-region` HTTP header when calling an Edge Function to determine where the Function should be executed:
-
-<CH.Code>
-
-```bash cURL
-# https://supabase.com/docs/guides/functions/deploy#invoking-remote-functions
-curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
-  --header 'Authorization: Bearer ANON_KEY' \
-  --header 'Content-Type: application/json' \
-  --header 'x-region: eu-west-3' \
-  --data '{ "name":"Functions" }'
-```
-
-```js JavaScript
-// https://supabase.com/docs/reference/javascript/installing
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-
-// https://supabase.com/docs/reference/javascript/functions-invoke
-const { data, error } = await supabase.functions.invoke('hello-world', {
-  body: { name: 'Functions' },
-  headers: { 'x-region': 'eu-west-3' },
-})
-```
-
-</CH.Code>
-
-You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/logging).
+---
 
 ## Available regions
 
-These are the currently supported region values you can provide for `x-region` header.
+The following regions are supported:
 
-- `ap-northeast-1`
-- `ap-northeast-2`
-- `ap-south-1`
-- `ap-southeast-1`
-- `ap-southeast-2`
-- `ca-central-1`
-- `eu-central-1`
-- `eu-west-1`
-- `eu-west-2`
-- `eu-west-3`
-- `sa-east-1`
-- `us-east-1`
-- `us-west-1`
-- `us-west-2`
+**Asia Pacific:**
 
-## Using the client library
+- `ap-northeast-1` (Tokyo)
+- `ap-northeast-2` (Seoul)
+- `ap-south-1` (Mumbai)
+- `ap-southeast-1` (Singapore)
+- `ap-southeast-2` (Sydney)
 
-You can also specify the region when invoking a Function using the Supabase client library:
+**North America:**
 
-```js
-const { createClient, FunctionRegion } = require('@supabase/supabase-js')
-const { data: ret, error } = await supabase.functions.invoke('my-function-name', {
-  headers: { 'Content-Type': 'application/json' },
-  method: 'GET',
-  body: {},
-  region: FunctionRegion.UsEast1,
+- `ca-central-1` (Canada Central)
+- `us-east-1` (N. Virginia)
+- `us-west-1` (N. California)
+- `us-west-2` (Oregon)
+
+**Europe:**
+
+- `eu-central-1` (Frankfurt)
+- `eu-west-1` (Ireland)
+- `eu-west-2` (London)
+- `eu-west-3` (Paris)
+
+**South America:**
+
+- `sa-east-1` (São Paulo)
+
+---
+
+## Usage
+
+You can specify the region programmatically using the Supabase Client library, or using the `x-region` HTTP header.
+
+<$CodeTabs>
+
+```js name=JavaScript
+import { createClient, FunctionRegion } from '@supabase/supabase-js'
+
+const { data, error } = await supabase.functions.invoke('function-name', {
+  ...
+  region: FunctionRegion.UsEast1, // Execute in us-east-1 region
 })
 ```
 
-## Handling regional outages
+```bash name=cURL
+curl --request POST 'https://<project_ref>.supabase.co/functions/v1/function-name' \
+  --header 'x-region: us-east-1'  # Execute in us-east-1 region
+```
 
-If you explicitly specify the region via `x-region` header, requests **will NOT** be automatically re-routed to another region and you should consider temporarily changing regions during the outage.
+</$CodeTabs>
+
+In case you cannot add the `x-region` header to the request (e.g.: CORS requests, Webhooks), you can use `forceFunctionRegion` query parameter.
+
+<Admonition type="note">
+
+You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/logging).
+
+</Admonition>
+
+---
+
+## Region outages
+
+When you explicitly specify a region via the `x-region` header, requests will NOT be automatically
+re-routed to another region.
+
+During outages, consider temporarily changing to a different region.
+
+<Admonition type="caution">
+
+Test your function's performance with and without regional specification to determine if the benefits outweigh automatic region selection.
+
+</Admonition>

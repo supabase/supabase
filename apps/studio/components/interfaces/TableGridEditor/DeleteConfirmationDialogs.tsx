@@ -1,71 +1,50 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
-import { Entity } from 'data/table-editor/table-editor-types'
+import { TableLike } from 'data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
-import { TablesData, useGetTables } from 'data/tables/tables-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { noop } from 'lib/void'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
-  selectedTable?: Entity | PostgresTable
-  onAfterDeleteTable?: (tables: TablesData) => void
+  selectedTable?: TableLike
+  onTableDeleted?: () => void
 }
 
 const DeleteConfirmationDialogs = ({
   selectedTable,
-  onAfterDeleteTable = noop,
+  onTableDeleted,
 }: DeleteConfirmationDialogsProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
-  const { selectedSchema } = useQuerySchemaState()
+  const { filters, onApplyFilters } = useTableFilter()
 
-  const [{ filter }, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
-  const filters = formatFilterURLParams(filter as string[])
-
-  const getTables = useGetTables({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
-    setParams((prevParams) => {
-      const existingFilters = (prevParams?.filter ?? []) as string[]
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-
-      return {
-        ...prevParams,
-        filter: existingFilters.filter((filter: string) => {
-          const [column] = filter.split(':')
-          if (column !== columnName) return filter
-        }),
-        sort: existingSorts.filter((sort: string) => {
-          const [column] = sort.split(':')
-          if (column !== columnName) return sort
-        }),
-      }
-    })
+  const removeDeletedColumnFromFiltersAndSorts = ({
+    columnName,
+  }: {
+    ref?: string
+    tableName?: string
+    schema?: string
+    columnName: string
+  }) => {
+    onApplyFilters(filters.filter((filter) => filter.column !== columnName))
   }
 
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
     onSuccess: () => {
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
-      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
+      removeDeletedColumnFromFiltersAndSorts({ columnName: selectedColumnToDelete.name })
       toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
     },
     onError: (error) => {
@@ -79,9 +58,8 @@ const DeleteConfirmationDialogs = ({
   })
   const { mutate: deleteTable } = useTableDeleteMutation({
     onSuccess: async () => {
-      const tables = await getTables(selectedSchema)
-      onAfterDeleteTable(tables)
       toast.success(`Successfully deleted table "${selectedTable?.name}"`)
+      onTableDeleted?.()
     },
     onError: (error) => {
       toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
@@ -91,7 +69,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteRows } = useTableRowDeleteMutation({
+  const { mutate: deleteRows, isLoading: isDeletingRows } = useTableRowDeleteMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -103,7 +81,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteAllRows } = useTableRowDeleteAllMutation({
+  const { mutate: deleteAllRows, isLoading: isDeletingAllRows } = useTableRowDeleteAllMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -118,7 +96,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: truncateRows } = useTableRowTruncateMutation({
+  const { mutate: truncateRows, isLoading: isTruncatingRows } = useTableRowTruncateMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -155,11 +133,10 @@ const DeleteConfirmationDialogs = ({
     if (selectedColumnToDelete === undefined) return
 
     deleteColumn({
-      id: selectedColumnToDelete.id,
+      column: selectedColumnToDelete,
       cascade: isDeleteWithCascade,
       projectRef: project.ref,
       connectionString: project?.connectionString,
-      table: selectedTable,
     })
   }
 
@@ -172,13 +149,14 @@ const DeleteConfirmationDialogs = ({
     deleteTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      schema: selectedTableToDelete.schema,
       id: selectedTableToDelete.id,
+      name: selectedTableToDelete.name,
+      schema: selectedTableToDelete.schema,
       cascade: isDeleteWithCascade,
     })
   }
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const onConfirmDeleteRow = async () => {
     if (!project) return console.error('Project ref is required')
@@ -188,7 +166,7 @@ const DeleteConfirmationDialogs = ({
 
     if (snap.confirmationDialog.allRowsSelected) {
       if (filters.length === 0) {
-        if (getImpersonatedRole() !== undefined) {
+        if (getImpersonatedRoleState().role !== undefined) {
           snap.closeConfirmationDialog()
           return toast.error('Table truncation is not supported when impersonating a role')
         }
@@ -196,24 +174,24 @@ const DeleteConfirmationDialogs = ({
         truncateRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
         })
       } else {
         deleteAllRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
           filters,
-          impersonatedRole: getImpersonatedRole(),
+          roleImpersonationState: getImpersonatedRoleState(),
         })
       }
     } else {
       deleteRows({
         projectRef: project.ref,
         connectionString: project.connectionString,
-        table: selectedTable as any,
+        table: selectedTable,
         rows: selectedRowsToDelete as SupaRow[],
-        impersonatedRole: getImpersonatedRole(),
+        roleImpersonationState: getImpersonatedRoleState(),
       })
     }
   }
@@ -332,6 +310,7 @@ const DeleteConfirmationDialogs = ({
         confirmLabelLoading="Deleting"
         onCancel={() => snap.closeConfirmationDialog()}
         onConfirm={() => onConfirmDeleteRow()}
+        loading={isTruncatingRows || isDeletingRows || isDeletingAllRows}
       >
         <div className="space-y-4">
           <p className="text-sm text-foreground-light">

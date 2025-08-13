@@ -17,11 +17,11 @@ Launching a Read Replica creates an additional database with its own dedicated d
 
 ## How charges are calculated
 
-Disk throughput is charged by Mbps-Hrs (Mbps stands for megabits per second). 1 Mbps-Hr represents disk throughput of 1 Mbps being provisioned for 1 hour. For example, having 10 Mbps provisioned for 5 hours results in 50 Mbps-Hrs (10 Mbps × 5 hours).
+Disk throughput is charged by MB/s-Hrs (MB/s stands for megabytes per second). 1 MB/s-Hr represents disk throughput of 1 MB/s being provisioned for 1 hour. For example, having 10 MB/s provisioned for 5 hours results in 50 MB/s-Hrs (10 MB/s × 5 hours).
 
 ### Usage on your invoice
 
-Usage is shown as "Disk Throughput Mbps-Hrs" on your invoice.
+Usage is shown as "Disk Throughput MB/s-Hrs" on your invoice.
 
 ## Pricing
 
@@ -29,13 +29,15 @@ Pricing depends on the [disk type](/docs/guides/platform/compute-and-disk#disk-t
 
 ### General purpose disks (gp3)
 
-$0.00013 per Mbps-Hr ($0.095 per Mbps per month). gp3 disks come with a baseline throughput of 125 Mbps. You are only charged for provisioned throughput exceeding these 125 Mbps.
+<Price price="0.00013" /> per MB/s-Hr (<Price price="0.095" /> per MB/s per month). gp3 disks come
+with a baseline throughput of 125 MB/s. You are only charged for provisioned throughput exceeding
+these 125 MB/s.
 
-| Plan       | Included Disk Throughput | Over-Usage per Mbps per month | Over-Usage per Mbps-Hrs |
-| ---------- | ------------------------ | ----------------------------- | ----------------------- |
-| Pro        | 125 Mbps                 | $0.095                        | $0.00013                |
-| Team       | 125 Mbps                 | $0.095                        | $0.00013                |
-| Enterprise | Custom                   | Custom                        | Custom                  |
+| Plan       | Included Disk Throughput | Over-Usage per MB/s per month | Over-Usage per MB/s-Hr    |
+| ---------- | ------------------------ | ----------------------------- | ------------------------- |
+| Pro        | 125 MB/s                 | <Price price="0.095" />       | <Price price="0.00013" /> |
+| Team       | 125 MB/s                 | <Price price="0.095" />       | <Price price="0.00013" /> |
+| Enterprise | Custom                   | Custom                        | Custom                    |
 
 ### High performance disks (io2)
 
@@ -45,42 +47,42 @@ There are no charges. Throughput scales with IOPS at no additional cost.
 
 ### No additional throughput configured
 
-| Line Item                     | Units     | Costs   |
-| ----------------------------- | --------- | ------- |
-| Pro Plan                      | 1         | $25     |
-|                               |           |         |
-| Compute Hours Micro Project 1 | 744 hours | $10     |
-| Disk Throughput Project 1     | 125 Mbps  | $0      |
-|                               |           |         |
-| **Subtotal**                  |           | **$35** |
-| Compute Credits               |           | -$10    |
-| **Total**                     |           | **$25** |
+| Line Item                     | Units     | Costs                    |
+| ----------------------------- | --------- | ------------------------ |
+| Pro Plan                      | 1         | <Price price="25" />     |
+|                               |           |                          |
+| Compute Hours Micro Project 1 | 744 hours | <Price price="10" />     |
+| Disk Throughput Project 1     | 125 MB/s  | <Price price="0" />      |
+|                               |           |                          |
+| **Subtotal**                  |           | **<Price price="35" />** |
+| Compute Credits               |           | -<Price price="10" />    |
+| **Total**                     |           | **<Price price="25" />** |
 
 ### Additional throughput configured
 
-| Line Item                     | Units     | Costs       |
-| ----------------------------- | --------- | ----------- |
-| Pro Plan                      | 1         | $25         |
-|                               |           |             |
-| Compute Hours Large Project 1 | 744 hours | $110        |
-| Disk Throughput Project 1     | 200 Mbps  | $7.13       |
-|                               |           |             |
-| **Subtotal**                  |           | **$142.13** |
-| Compute Credits               |           | -$10        |
-| **Total**                     |           | **$132.13** |
+| Line Item                     | Units     | Costs                        |
+| ----------------------------- | --------- | ---------------------------- |
+| Pro Plan                      | 1         | <Price price="25" />         |
+|                               |           |                              |
+| Compute Hours Large Project 1 | 744 hours | <Price price="110" />        |
+| Disk Throughput Project 1     | 200 MB/s  | <Price price="7.13" />       |
+|                               |           |                              |
+| **Subtotal**                  |           | **<Price price="142.13" />** |
+| Compute Credits               |           | -<Price price="10" />        |
+| **Total**                     |           | **<Price price="132.13" />** |
 
 ### Additional throughput configured with Read Replica
 
-| Line Item                     | Units     | Costs       |
-| ----------------------------- | --------- | ----------- |
-| Pro Plan                      | 1         | $25         |
-|                               |           |             |
-| Compute Hours Large Project 1 | 744 hours | $110        |
-| Disk Throughput Project 1     | 200 Mbps  | $7.13       |
-|                               |           |             |
-| Compute Hours Large Replica   | 744 hours | $110        |
-| Disk Throughput Replica       | 200 Mbps  | $7.13       |
-|                               |           |             |
-| **Subtotal**                  |           | **$259.26** |
-| Compute Credits               |           | -$10        |
-| **Total**                     |           | **$249.26** |
+| Line Item                     | Units     | Costs                        |
+| ----------------------------- | --------- | ---------------------------- |
+| Pro Plan                      | 1         | <Price price="25" />         |
+|                               |           |                              |
+| Compute Hours Large Project 1 | 744 hours | <Price price="110" />        |
+| Disk Throughput Project 1     | 200 MB/s  | <Price price="7.13" />       |
+|                               |           |                              |
+| Compute Hours Large Replica   | 744 hours | <Price price="110" />        |
+| Disk Throughput Replica       | 200 MB/s  | <Price price="7.13" />       |
+|                               |           |                              |
+| **Subtotal**                  |           | **<Price price="259.26" />** |
+| Compute Credits               |           | -<Price price="10" />        |
+| **Total**                     |           | **<Price price="249.26" />** |

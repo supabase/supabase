@@ -7,7 +7,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
@@ -17,9 +16,10 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
+import Link from 'next/link'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
-import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Button,
   DropdownMenu,
@@ -29,7 +29,6 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
-import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
@@ -39,7 +38,7 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useShowNewReplicaPanel } from './use-show-new-replica'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
@@ -47,12 +46,11 @@ const InstanceConfigurationUI = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
-  const { project, isLoading: isLoadingProject } = useProjectContext()
-  const { setPanel } = useAddonsPagePanel()
+  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
-  const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
+  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
   const [refetchInterval, setRefetchInterval] = useState<number | boolean>(10000)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
@@ -253,8 +251,10 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem onClick={() => setPanel('computeInstance')}>
-                        <div>Resize databases</div>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                          Resize databases
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
@@ -346,8 +346,6 @@ const InstanceConfigurationUI = () => {
         onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setSelectedReplicaToRestart(undefined)}
       />
-
-      <ComputeInstanceSidePanel />
     </div>
   )
 }

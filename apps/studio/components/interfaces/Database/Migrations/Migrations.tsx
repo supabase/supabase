@@ -2,21 +2,21 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { Button, Input, SidePanel } from 'ui'
-import MigrationsEmptyState from './MigrationsEmptyState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Search } from 'lucide-react'
+import { Button, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
+import MigrationsEmptyState from './MigrationsEmptyState'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data, isLoading, isSuccess, isError, error } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -46,8 +46,8 @@ const Migrations = () => {
             description={
               <>
                 <p className="mb-1">
-                  Try refreshing your browser, but if the issue persists, please reach out to us via
-                  support.
+                  Try refreshing your browser, but if the issue persists for more than a few
+                  minutes, please reach out to us via support.
                 </p>
                 <p className="mb-4">Error: {(error as any)?.message ?? 'Unknown'}</p>
               </>
@@ -55,7 +55,7 @@ const Migrations = () => {
           >
             <Button key="contact-support" asChild type="default">
               <Link
-                href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+                href={`/support/new?projectRef=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
               >
                 Contact support
               </Link>

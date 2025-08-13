@@ -21,7 +21,7 @@ export const getMigrationsSql = () => {
 
 export type MigrationsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getMigrations(

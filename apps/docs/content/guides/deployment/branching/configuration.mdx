@@ -1,0 +1,207 @@
+---
+title: 'Configuration'
+subtitle: 'Configure your Supabase branches using configuration as code'
+---
+
+This guide covers how to configure your Supabase branches, using the `config.toml` file. In one single file, you can configure all your branches, including branch settings and secrets.
+
+## Branch configuration with remotes
+
+When Branching is enabled, your `config.toml` settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
+
+### Basic configuration
+
+To update configuration for a Supabase branch, modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
+
+### Remote-specific configuration
+
+For persistent branches that need specific settings, you can use the `[remotes]` block in your `config.toml`. Each remote configuration must reference an existing project ID.
+
+Here's an example of configuring a separate seed script for a staging environment:
+
+```toml
+[remotes.staging]
+project_id = "your-project-ref"
+
+[remotes.staging.db.seed]
+sql_paths = ["./seeds/staging.sql"]
+```
+
+Since the `project_id` field must reference an existing branch, you need to create the persistent branch before adding its configuration. Use the CLI to create a persistent branch first:
+
+```bash
+supabase --experimental branches create --persistent
+# Do you want to create a branch named develop? [Y/n]
+```
+
+### Configuration merging
+
+When merging a PR into a persistent branch, the Supabase integration:
+
+1. Checks for configuration changes
+2. Logs the changes
+3. Applies them to the target remote
+
+If no remote is declared or the project ID is incorrect, the configuration step is skipped.
+
+### Available configuration options
+
+All standard configuration options are available in the `[remotes]` block. This includes:
+
+- Database settings
+- API configurations
+- Authentication settings
+- Edge Functions configuration
+- And more
+
+You can use this to maintain different configurations for different environments while keeping them all in version control.
+
+## Managing secrets for branches
+
+For sensitive configuration like SMTP credentials or API keys, you can use the Supabase CLI to manage secrets for your branches. This is especially useful for custom SMTP setup or other services that require secure credentials.
+
+To set secrets for a persistent branch:
+
+```bash
+# Set secrets from a .env file
+supabase secrets set --env-file ./supabase/.env
+
+# Or set individual secrets
+supabase secrets set SMTP_HOST=smtp.example.com
+supabase secrets set SMTP_USER=your-username
+supabase secrets set SMTP_PASSWORD=your-password
+```
+
+These secrets will be available to your branch's services and can be used in your configuration. For example, in your `config.toml`:
+
+```toml
+[auth.smtp]
+host = "env(SMTP_HOST)"
+user = "env(SMTP_USER)"
+password = "env(SMTP_PASSWORD)"
+```
+
+<Admonition type="note" label="Secrets are branch-specific">
+
+Secrets set for one branch are not automatically available in other branches. You'll need to set them separately for each branch that needs them.
+
+</Admonition>
+
+### Using dotenvx for git-based workflow
+
+For managing environment variables across different branches, you can use [dotenvx](https://dotenvx.com/) to securely manage your configurations. This approach is particularly useful for teams working with Git branches and preview deployments.
+
+#### Environment file structure
+
+Following the conventions used in the [example repository](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone-dotenvx/README.md), environments are configured using dotenv files in the `supabase` directory:
+
+| File            | Environment | `.gitignore` it? | Encrypted |
+| --------------- | ----------- | ---------------- | --------- |
+| .env.keys       | All         | Yes              | No        |
+| .env.local      | Local       | Yes              | No        |
+| .env.production | Production  | No               | Yes       |
+| .env.preview    | Branches    | No               | Yes       |
+| .env            | Any         | Maybe            | Yes       |
+
+#### Setting up encrypted secrets
+
+1. Generate key pair and encrypt your secrets:
+
+```bash
+npx @dotenvx/dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.preview
+```
+
+This creates a new encryption key in `supabase/.env.preview` and a new decryption key in `supabase/.env.keys`.
+
+2. Update project secrets:
+
+```bash
+npx supabase secrets set --env-file supabase/.env.keys
+```
+
+3. Choose your configuration approach in `config.toml`:
+
+Option A: Use encrypted values directly:
+
+```toml
+[auth.external.github]
+enabled = true
+secret = "encrypted:<encrypted-value>"
+```
+
+Option B: Use environment variables:
+
+```toml
+[auth.external.github]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
+```
+
+<Admonition type="note" label="Secret fields">
+
+The `encrypted:` syntax only works for designated "secret" fields in the configuration (like `secret` in auth providers). Using encrypted values in other fields will not be automatically decrypted and may cause issues. For non-secret fields, use environment variables with the `env()` syntax instead.
+
+</Admonition>
+
+#### Using with preview branches
+
+When you commit your `.env.preview` file with encrypted values, the branching executor will automatically retrieve and use these values when deploying your branch. This allows you to maintain different configurations for different branches while keeping sensitive information secure.
+
+## Configuration examples
+
+### Multi-environment setup
+
+Here's an example of a complete multi-environment configuration:
+
+```toml
+# Default configuration for all branches
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+pool_size = 10
+
+# Staging-specific configuration
+[remotes.staging]
+project_id = "staging-project-ref"
+
+[remotes.staging.api]
+max_rows = 1000
+
+[remotes.staging.db.seed]
+sql_paths = ["./seeds/staging.sql"]
+
+# Production-specific configuration
+[remotes.production]
+project_id = "prod-project-ref"
+
+[remotes.production.api]
+max_rows = 500
+
+[remotes.production.db]
+pool_size = 25
+```
+
+### Feature branch configuration
+
+For feature branches that need specific settings:
+
+```toml
+[remotes.feature-oauth]
+project_id = "feature-branch-ref"
+
+[remotes.feature-oauth.auth.external.google]
+enabled = true
+client_id = "env(GOOGLE_CLIENT_ID)"
+secret = "env(GOOGLE_CLIENT_SECRET)"
+```
+
+## Next steps
+
+- Explore [branching integrations](/docs/guides/deployment/branching/integrations)
+- Learn about [troubleshooting branches](/docs/guides/deployment/branching/troubleshooting)
+- Review [branching pricing](/docs/guides/deployment/branching/pricing)

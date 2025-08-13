@@ -15,7 +15,7 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
@@ -25,7 +25,7 @@ import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserHeader } from './UserHeader'
-import { PANEL_PADDING } from './UserPanel'
+import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
@@ -45,24 +45,38 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
 
-  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider: string) => {
-    return {
-      name: provider.startsWith('sso') ? 'SAML' : provider,
-      icon:
-        provider === 'email'
-          ? `${BASE_PATH}/img/icons/email-icon2.svg`
-          : providerIconMap[provider]
-            ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
-            : undefined,
+  const providers = ((user.raw_app_meta_data?.providers as string[]) ?? []).map(
+    (provider: string) => {
+      return {
+        name: provider.startsWith('sso') ? 'SAML' : provider,
+        icon:
+          provider === 'email'
+            ? `${BASE_PATH}/img/icons/email-icon2.svg`
+            : providerIconMap[provider]
+              ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
+              : undefined,
+      }
     }
-  })
+  )
 
-  const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
-  const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
-  const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
-  const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
-  const canRemoveMFAFactors = useCheckPermissions(
+  const { can: canUpdateUser } = useAsyncCheckProjectPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canSendMagicLink } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_magic_link'
+  )
+  const { can: canSendRecovery } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_recovery'
+  )
+  const { can: canSendOtp } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_otp'
+  )
+  const { can: canRemoveUser } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_DELETE,
+    'auth.users'
+  )
+  const { can: canRemoveMFAFactors } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.mfa_factors'
   )
@@ -197,18 +211,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) =>
-                x.title.toLowerCase() ===
-                (provider.name === 'linkedin' ? 'linkedin (oidc)' : provider.name)
+                ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
               provider.name === 'email'
-                ? 'email'
-                : provider.name === 'linkedin'
-                  ? 'LinkedIn'
-                  : providerMeta?.title ?? provider.name
+                ? provider.name.toLowerCase()
+                : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -338,7 +349,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
-            description="This will log the user out of all active sessions"
+            description="Removes all MFA factors associated with the user"
             button={{
               icon: <ShieldOff />,
               text: 'Remove MFA factors',
@@ -407,12 +418,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         onConfirm={() => handleDeleteFactors()}
         alert={{
           base: { variant: 'warning' },
-          title: 'Removing MFA factors is irreversible',
-          description: 'This will log the user out of all active sessions.',
+          title:
+            "Removing MFA factors will drop the user's authentication assurance level (AAL) to AAL1",
+          description: 'Note that this does not sign the user out',
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          Are you sure you want to remove the MFA factors for the user{' '}
           <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>

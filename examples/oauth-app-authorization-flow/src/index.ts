@@ -9,8 +9,8 @@ declare module 'bun' {
   }
 }
 
-const AUTHORIZATION_URL = 'https://api.supabase.com/v1/oauth/authorize'
-const TOKEN_URL = 'https://api.supabase.com/v1/oauth/token'
+const AUTHORIZATION_URL = 'http://localhost:8080/v1/oauth/authorize'
+const TOKEN_URL = 'http://localhost:8080/v1/oauth/token'
 
 const app = new Hono()
 

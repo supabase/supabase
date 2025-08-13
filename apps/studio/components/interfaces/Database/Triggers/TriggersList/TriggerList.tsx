@@ -2,12 +2,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
 import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Badge,
   Button,
@@ -36,8 +36,8 @@ const TriggerList = ({
   editTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
-  const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -51,7 +51,10 @@ const TriggerList = ({
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
   )
-  const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const { can: canUpdateTriggers } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   if (_triggers.length === 0 && filterString.length === 0) {
     return (
@@ -85,7 +88,10 @@ const TriggerList = ({
         <Table.tr key={x.id}>
           <Table.td className="space-x-2">
             <Tooltip>
-              <TooltipTrigger className="cursor-default truncate max-w-48 inline-block">
+              <TooltipTrigger
+                onClick={() => editTrigger(x)}
+                className="cursor-pointer text-foreground truncate max-w-48 inline-block"
+              >
                 {x.name}
               </TooltipTrigger>
               <TooltipContent side="bottom" align="center">
@@ -136,7 +142,12 @@ const TriggerList = ({
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1" icon={<MoreVertical />} />
+                      <Button
+                        aria-label="More options"
+                        type="default"
+                        className="px-1"
+                        icon={<MoreVertical />}
+                      />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem
@@ -153,16 +164,27 @@ const TriggerList = ({
                         className="space-x-2"
                         onClick={() => {
                           const sql = generateTriggerCreateSQL(x)
-                          setAiAssistantPanel({
+                          aiSnap.newChat({
+                            name: `Update trigger ${X.name}`,
                             open: true,
                             initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
                             suggestions: {
                               title:
                                 'I can help you make a change to this trigger, here are a few example prompts to get you started:',
                               prompts: [
-                                'Rename this trigger to ...',
-                                'Change the events this trigger responds to ...',
-                                'Modify this trigger to run after instead of before ...',
+                                {
+                                  label: 'Rename Trigger',
+                                  description: 'Rename this trigger to ...',
+                                },
+                                {
+                                  label: 'Change Events',
+                                  description: 'Change the events this trigger responds to ...',
+                                },
+                                {
+                                  label: 'Modify Timing',
+                                  description:
+                                    'Modify this trigger to run after instead of before ...',
+                                },
                               ],
                             },
                             sqlSnippets: [sql],

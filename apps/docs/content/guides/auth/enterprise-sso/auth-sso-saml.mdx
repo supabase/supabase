@@ -68,7 +68,7 @@ Below is information about your project's SAML 2.0 configuration which you can s
 | SLO URL                     | `https://<project>.supabase.co/auth/v1/sso/slo`                         |
 | `NameID`                    | Required `emailAddress` or `persistent`                                 |
 
-Note that SLO (Single Logout) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available.
+Note that SLO (Single Logout) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available. SLO is a best-effort service, so we recommend considering [Session Timebox or Session Inactivity Timeout](/docs/guides/auth/sessions#limiting-session-lifetime-and-number-of-allowed-sessions-per-user) instead to force your end-users to authenticate regularly.
 
 Append `?download=true` to the Metadata URL to download the Metadata XML file. This is useful in cases where the identity provider requires a file.
 
@@ -194,6 +194,10 @@ To initiate a sign-in request from your application's user interface (i.e. the S
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<your-anon-key>')
+
+// ---cut---
 supabase.auth.signInWithSSO({
   domain: 'company.com',
 })
@@ -382,7 +386,7 @@ You can use the `-o json` flag to output the information as JSON, should you nee
 
 ## Pricing
 
-<PricingMauSso />
+<$Partial path="billing/pricing/pricing_mau_sso.mdx" />
 
 For a detailed breakdown of how charges are calculated, refer to [Manage Monthly Active SSO Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-sso).
 
@@ -431,12 +435,16 @@ This setup allows you to implement multi-tenant SSO for multiple clients or orga
 Yes, also referred to as [cross-origin authentication within the same site](https://web.dev/articles/same-site-same-origin). To redirect to a URL other than the [Site URL](https://supabase.com/docs/guides/auth/redirect-urls), following the SAML response from the IdP, the `redirectTo` option can be added to [`signInWithSSO`](https://supabase.com/docs/reference/javascript/auth-signinwithsso).
 
 ```ts
-  const { data, error } = await supabase.auth.signInWithSSO({
-    domain: 'company.com'
-      options: {
-        redirectTo: `https://app.company.com/callback`,
-      },
-  })
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
+const { data, error } = await supabase.auth.signInWithSSO({
+  domain: 'company.com',
+  options: {
+    redirectTo: `https://app.company.com/callback`,
+  },
+})
 ```
 
 When redirecting to a URL other than the Site URL, a `/callback` endpoint is necessary to process the auth code from the IdP and exchange it for a session. This assumes the [Supabase SSR client](https://supabase.com/docs/guides/auth/server-side/creating-a-client) has already been configured.

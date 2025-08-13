@@ -1,81 +1,42 @@
 import { Filter, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
-import { IS_PLATFORM } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useParams } from 'common'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PROJECT_STATUS } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
   Checkbox_Shadcn_,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
   Input,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { useFlag } from 'hooks/ui/useFlag'
 
 interface HomePageActionsProps {
-  organizations: { name: string; slug: string }[]
   search: string
   filterStatus: string[]
+  hideNewProject?: boolean
   setSearch: (value: string) => void
   setFilterStatus: (value: string[]) => void
 }
 
 const HomePageActions = ({
-  organizations = EMPTY_ARR,
   search,
   filterStatus,
+  hideNewProject = false,
   setSearch,
   setFilterStatus,
 }: HomePageActionsProps) => {
-  const router = useRouter()
-
-  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
-  const { isSuccess: orgsLoaded } = useOrganizationsQuery()
-
-  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
-  const newProjectPath = projectCreationExperimentGroup === 'group-b' ? '/new/v2' : '/new'
+  const { slug } = useParams()
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button type="primary">
-            <span>New project</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="center">
-          <>
-            <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
-            {organizations
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((x) => (
-                <DropdownMenuItem
-                  key={x.slug}
-                  onClick={() => router.push(`${newProjectPath}/${x.slug}`)}
-                >
-                  {x.name}
-                </DropdownMenuItem>
-              ))}
-          </>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && (
-        <Button type="default" asChild>
-          <Link href="/new" className="flex items-center gap-2">
-            New organization
-          </Link>
+      {projectCreationEnabled && !hideNewProject && (
+        <Button asChild type="primary">
+          <Link href={`/new/${slug}`}>New project</Link>
         </Button>
       )}
 

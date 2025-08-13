@@ -9,7 +9,7 @@ export type ProjectPostgrestConfigVariables = {
   projectRef?: string
 }
 
-type PostgrestConfigResponse = components['schemas']['PostgrestConfigResponse'] & {
+type PostgrestConfigResponse = components['schemas']['GetPostgrestConfigResponse'] & {
   db_pool: number | null
 }
 

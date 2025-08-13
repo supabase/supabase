@@ -80,6 +80,7 @@ export default function TreeViewDemo() {
   return (
     <TreeView
       data={flattenTree(data)}
+      className="w-[420px] border bg py-2"
       aria-label="directory tree"
       nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => {
         return (

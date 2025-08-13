@@ -1,10 +1,17 @@
-import React, { Fragment, MouseEvent, ReactNode, useRef, useState } from 'react'
+import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Fragment, MouseEvent, ReactNode, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
-import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
-import { cn, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import {
+  cn,
+  copyToClipboard,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -62,7 +69,7 @@ const RightClickBrandLogo = () => {
    * Copy to clipboard logo SVG
    */
   const handleCopyToClipboard = (menuItem: MenuItemProps) => {
-    navigator.clipboard.writeText(menuItem.clipboard ?? '').then(() => {
+    copyToClipboard(menuItem.clipboard ?? '', () => {
       setCopied(true)
       setTimeout(() => {
         setCopied(false)

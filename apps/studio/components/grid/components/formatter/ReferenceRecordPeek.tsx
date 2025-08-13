@@ -11,7 +11,7 @@ import {
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
@@ -23,7 +23,7 @@ interface ReferenceRecordPeekProps {
 
 export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data, error, isSuccess, isError, isLoading } = useTableRowsQuery(
     {

@@ -1,15 +1,50 @@
-import { PropsWithChildren, createContext, useCallback, useContext, useEffect } from 'react'
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
+import { executeSql } from 'data/sql/execute-sql-query'
 import useLatest from 'hooks/misc/useLatest'
-import { ImpersonationRole } from 'lib/role-impersonation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'
+import { CustomAccessTokenHookDetails } from '../hooks/misc/useCustomAccessTokenHookDetails'
 
-export function createRoleImpersonationState() {
+export function createRoleImpersonationState(
+  projectRef: string,
+  customizeAccessTokenRef: {
+    current: (args: {
+      schema: string
+      functionName: string
+      claims: ReturnType<typeof getPostgrestClaims>
+    }) => Promise<any>
+  }
+) {
   const roleImpersonationState = proxy({
+    projectRef,
     role: undefined as ImpersonationRole | undefined,
-    setRole: (role: ImpersonationRole | undefined) => {
+    claims: undefined as ReturnType<typeof getPostgrestClaims> | undefined,
+
+    setRole: async (
+      role: ImpersonationRole | undefined,
+      customAccessTokenHookDetails?: CustomAccessTokenHookDetails
+    ) => {
+      let claims = role?.type === 'postgrest' ? getPostgrestClaims(projectRef, role) : undefined
+
+      if (customAccessTokenHookDetails?.type === 'postgres' && claims !== undefined) {
+        const { schema, functionName } = customAccessTokenHookDetails
+        const updatedClaims = await customizeAccessTokenRef.current({
+          schema,
+          functionName,
+          claims,
+        })
+        if (updatedClaims) {
+          claims = updatedClaims
+        }
+      }
+
       roleImpersonationState.role = role
+      if (claims) {
+        roleImpersonationState.claims = claims
+      }
     },
   })
 
@@ -19,11 +54,37 @@ export function createRoleImpersonationState() {
 export type RoleImpersonationState = ReturnType<typeof createRoleImpersonationState>
 
 export const RoleImpersonationStateContext = createContext<RoleImpersonationState>(
-  createRoleImpersonationState()
+  createRoleImpersonationState('', { current: async () => {} })
 )
 
 export const RoleImpersonationStateContextProvider = ({ children }: PropsWithChildren) => {
-  const state = useConstant(createRoleImpersonationState)
+  const { data: project } = useSelectedProjectQuery()
+  async function customizeAccessToken({
+    schema,
+    functionName,
+    claims,
+  }: {
+    schema: string
+    functionName: string
+    claims: ReturnType<typeof getPostgrestClaims>
+  }) {
+    const event = { user_id: claims.sub, claims, authentication_method: 'password' }
+
+    const result = await executeSql({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      sql: `select ${schema}.${functionName}('${JSON.stringify(event)}'::jsonb) as event;`,
+      queryKey: ['customize-access-token', project?.ref],
+    })
+
+    return result?.result?.[0]?.event?.claims
+  }
+
+  const customizeAccessTokenRef = useLatest(customizeAccessToken)
+
+  const state = useConstant(() =>
+    createRoleImpersonationState(project?.ref ?? '', customizeAccessTokenRef)
+  )
 
   return (
     <RoleImpersonationStateContext.Provider value={state}>
@@ -38,10 +99,14 @@ export function useRoleImpersonationStateSnapshot(options?: Parameters<typeof us
   return useSnapshot(roleImpersonationState, options)
 }
 
-export function useGetImpersonatedRole() {
+export function useGetImpersonatedRoleState() {
   const roleImpersonationState = useContext(RoleImpersonationStateContext)
 
-  return useCallback(() => snapshot(roleImpersonationState).role, [roleImpersonationState])
+  return useCallback(
+    // [Alaister]: typeof roleImpersonationState is needed to avoid readonly type errors everywhere
+    () => snapshot(roleImpersonationState) as typeof roleImpersonationState,
+    [roleImpersonationState]
+  )
 }
 
 export function useSubscribeToImpersonatedRole(
@@ -59,8 +124,4 @@ export function useSubscribeToImpersonatedRole(
 
 export function isRoleImpersonationEnabled(impersonationRole?: ImpersonationRole) {
   return impersonationRole?.type === 'postgrest'
-}
-
-export function useIsRoleImpersonationEnabled() {
-  return isRoleImpersonationEnabled(useRoleImpersonationStateSnapshot().role)
 }

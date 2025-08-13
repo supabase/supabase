@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "current-user-avatar",
+  "type": "registry:component",
+  "title": "Current User Avatar",
+  "description": "Component which renders the current user's avatar.",
+  "registryDependencies": ["avatar"],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+      "type": "registry:hook"
+    }
+  ]
+}

@@ -1,27 +1,27 @@
-import { partition, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
+import { AlertCircle, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
+import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
+import { DatabaseIndex, useIndexesQuery } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { AlertCircle, Search, Trash } from 'lucide-react'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
 const Indexes = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { schema: urlSchema, table } = useParams()
 
   const [search, setSearch] = useState('')
@@ -32,7 +32,6 @@ const Indexes = () => {
 
   const {
     data: allIndexes,
-    refetch: refetchIndexes,
     error: indexesError,
     isLoading: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
@@ -52,22 +51,14 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: deleteIndex, isLoading: isExecuting } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      await refetchIndexes()
       setSelectedIndexToDelete(undefined)
       toast.success('Successfully deleted index')
     },
-    onError: (error) => {
-      toast.error(`Failed to delete index: ${error.message}`)
-    },
   })
 
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes =
@@ -77,10 +68,12 @@ const Indexes = () => {
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
-    execute({
+
+    deleteIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      sql: `drop index if exists "${index.name}"`,
+      name: index.name,
+      schema: selectedSchema,
     })
   }
 
@@ -125,7 +118,7 @@ const Indexes = () => {
               icon={<Search size={14} />}
             />
 
-            {!isLocked && (
+            {!isSchemaLocked && (
               <Button
                 className="ml-auto flex-grow lg:flex-grow-0"
                 type="primary"
@@ -137,7 +130,7 @@ const Indexes = () => {
             )}
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="indexes" />}
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="indexes" />}
 
           {isLoadingIndexes && <GenericSkeletonLoader />}
 
@@ -193,8 +186,9 @@ const Indexes = () => {
                               <Button type="default" onClick={() => setSelectedIndex(index)}>
                                 View definition
                               </Button>
-                              {!isLocked && (
+                              {!isSchemaLocked && (
                                 <Button
+                                  aria-label="Delete index"
                                   type="text"
                                   className="px-1"
                                   icon={<Trash />}

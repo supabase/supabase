@@ -8,7 +8,7 @@ import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeCreateVariables = {
   projectRef: string
-  connectionString: string
+  connectionString: string | null
   schema: string
   name: string
   description?: string

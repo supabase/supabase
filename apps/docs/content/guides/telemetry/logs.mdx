@@ -201,6 +201,18 @@ If any permission errors are encountered when executing `alter role postgres ...
 
 </Admonition>
 
+### `RAISE`d log messages in Postgres
+
+Messages that are manually logged via `RAISE INFO`, `RAISE NOTICE`, `RAISE WARNING`, and `RAISE LOG` are shown in Postgres Logs. Note that only messages at or above your logging level are shown. Syncing of messages to Postgres Logs may take a few minutes.
+
+If your logs aren't showing, check your logging level by running:
+
+```sql
+show log_min_messages;
+```
+
+Note that `LOG` is a higher level than `WARNING` and `ERROR`, so if your level is set to `LOG`, you will not see `WARNING` and `ERROR` messages.
+
 ## Logging realtime connections
 
 Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the Supabase client.

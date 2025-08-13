@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { getContentById } from 'data/content/content-id-query'
 import {
   UpsertContentPayload,
@@ -11,8 +12,9 @@ import {
 import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 
@@ -30,14 +32,19 @@ const RenameQueryModal = ({
   onComplete,
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const tabsSnap = useTabsStateSnapshot()
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: organization?.slug },
+    { enabled: visible }
+  )
   const isSQLSnippet = snippet.type === 'sql'
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
 
   // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { id, name, description } = snippet
 
@@ -61,9 +68,7 @@ const RenameQueryModal = ({
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        if ('sql' in content) {
-          titleSql({ sql: content.sql })
-        }
+        if ('sql' in content) titleSql({ sql: content.sql })
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }
@@ -89,7 +94,6 @@ const RenameQueryModal = ({
       // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
       if (!('content' in localSnippet)) {
         localSnippet = await getContentById({ projectRef: ref, id })
-
         snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
       }
 
@@ -103,6 +107,9 @@ const RenameQueryModal = ({
       })
 
       snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+
+      const tabId = createTabId('sql', { id })
+      tabsSnap.updateTab(tabId, { label: nameInput })
 
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()

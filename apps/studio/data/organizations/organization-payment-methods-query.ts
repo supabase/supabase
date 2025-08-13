@@ -8,7 +8,7 @@ import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethod = components['schemas']['Payment']
+export type OrganizationPaymentMethod = components['schemas']['PaymentsResponse']['data'][0]
 
 export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,

@@ -736,6 +736,72 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.rate_limit.email_sent'
+    title: 'auth.rate_limit.email_sent'
+    tags: ['auth']
+    required: false
+    default: '2'
+    description: |
+      Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.sms_sent'
+    title: 'auth.rate_limit.sms_sent'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.anonymous_users'
+    title: 'auth.rate_limit.anonymous_users'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.token_refresh'
+    title: 'auth.rate_limit.token_refresh'
+    tags: ['auth']
+    required: false
+    default: '150'
+    description: |
+      Number of sessions that can be refreshed in a 5 minute interval per IP address.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.sign_in_sign_ups'
+    title: 'auth.rate_limit.sign_in_sign_ups'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.token_verifications'
+    title: 'auth.rate_limit.token_verifications'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of OTP / Magic link verifications that can be made in a 5 minute interval per IP address.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.enable_signup'
     title: 'auth.enable_signup'
     tags: ['auth']
@@ -829,14 +895,14 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'auth.email.otp_exp'
-    title: 'auth.email.otp_exp'
+  - id: 'auth.email.otp_expiry'
+    title: 'auth.email.otp_expiry'
     tags: ['auth']
     required: false
-    default: '300'
+    default: '3600'
     description: |
       The expiry time for an OTP code in seconds.
-      Default is 300 seconds (5 minutes).
+      Default is 3600 seconds (1 hour).
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'

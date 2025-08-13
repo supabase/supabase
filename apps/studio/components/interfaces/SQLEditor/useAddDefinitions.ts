@@ -1,5 +1,8 @@
 import { Monaco } from '@monaco-editor/react'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { IDisposable } from 'monaco-editor'
+import { useEffect, useRef } from 'react'
+
+import { LOCAL_STORAGE_KEYS } from 'common'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
@@ -7,14 +10,12 @@ import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
-import { IDisposable } from 'monaco-editor'
-import { useEffect, useRef } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(

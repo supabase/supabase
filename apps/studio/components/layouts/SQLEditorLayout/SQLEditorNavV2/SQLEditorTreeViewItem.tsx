@@ -1,8 +1,3 @@
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ComponentProps, useEffect } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
@@ -11,6 +6,21 @@ import { Snippet } from 'data/content/sql-folders-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useProfile } from 'lib/profile'
+import {
+  Copy,
+  Download,
+  Edit,
+  ExternalLink,
+  Heart,
+  Lock,
+  Move,
+  Plus,
+  Share,
+  Trash,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ComponentProps, useEffect } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -20,6 +30,7 @@ import {
   ContextMenuTrigger_Shadcn_,
   ContextMenu_Shadcn_,
   TreeViewItem,
+  cn,
 } from 'ui'
 
 interface SQLEditorTreeViewItemProps
@@ -76,6 +87,7 @@ export const SQLEditorTreeViewItem = ({
   sort,
   name,
   onFolderContentsChange,
+  ...props
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
@@ -85,6 +97,7 @@ export const SQLEditorTreeViewItem = ({
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
+  const isFavorite = element.metadata.favorite
 
   const isEditing = status === 'editing'
   const isSaving = status === 'saving'
@@ -154,6 +167,14 @@ export const SQLEditorTreeViewItem = ({
     }
   }
 
+  const onToggleFavorite = () => {
+    const snippetId = element.metadata.id
+    if (snippetId) {
+      if (isFavorite) snapV2.removeFavorite(snippetId)
+      else snapV2.addFavorite(snippetId)
+    }
+  }
+
   return (
     <>
       <ContextMenu_Shadcn_ modal={false}>
@@ -164,6 +185,7 @@ export const SQLEditorTreeViewItem = ({
             isExpanded={isExpanded}
             isBranch={isBranch}
             isSelected={isSelected}
+            isPreview={props.isPreview}
             isEditing={isEditing}
             isLoading={(isEnabled && isLoading) || isSaving}
             onEditSubmit={(value) => {
@@ -184,11 +206,11 @@ export const SQLEditorTreeViewItem = ({
                 if (isEditing) {
                   return
                 }
-
                 // When the item is a folder, we want to expand/close it
                 onClick(e)
               }
             }}
+            {...props}
             name={element.name}
             xPadding={16}
           />
@@ -259,13 +281,12 @@ export const SQLEditorTreeViewItem = ({
               <ContextMenuItem_Shadcn_
                 asChild
                 className="gap-x-2"
-                onSelect={() => {}}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
                 <Link
-                  href={`/project/${projectRef}/sql/${element.id}`}
-                  target="_blank"
+                  target="_self"
                   rel="noreferrer"
+                  href={`/project/${projectRef}/sql/${element.id}`}
                 >
                   <ExternalLink size={14} />
                   Open in new tab
@@ -322,6 +343,19 @@ export const SQLEditorTreeViewItem = ({
                   Duplicate query
                 </ContextMenuItem_Shadcn_>
               )}
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onSelect={() => onToggleFavorite()}
+                onFocusCapture={(e) => e.stopPropagation()}
+              >
+                <Heart
+                  size={14}
+                  className={cn(
+                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                  )}
+                />
+                {isFavorite ? 'Remove from' : 'Add to'} favorites
+              </ContextMenuItem_Shadcn_>
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"

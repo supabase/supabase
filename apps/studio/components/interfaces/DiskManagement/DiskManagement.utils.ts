@@ -104,8 +104,8 @@ export const calculateIOPSPrice = ({
       0,
       newProvisionedIOPS - DISK_LIMITS[DiskType.GP3].includedIops
     )
-    const oldPrice = oldChargeableIOPS * DISK_PRICING[oldStorageType]?.iops ?? 0
-    const newPrice = newChargeableIOPS * DISK_PRICING[newStorageType]?.iops ?? 0
+    const oldPrice = oldChargeableIOPS * (DISK_PRICING[oldStorageType]?.iops ?? 0)
+    const newPrice = newChargeableIOPS * (DISK_PRICING[newStorageType]?.iops ?? 0)
 
     return {
       oldPrice: (oldPrice * (1 + numReplicas)).toFixed(2),
@@ -116,8 +116,8 @@ export const calculateIOPSPrice = ({
       oldStorageType === 'gp3'
         ? (oldProvisionedIOPS - DISK_LIMITS[oldStorageType].includedIops) *
           DISK_PRICING[oldStorageType].iops
-        : oldProvisionedIOPS * DISK_PRICING[oldStorageType]?.iops ?? 0
-    const newPrice = newProvisionedIOPS * DISK_PRICING[newStorageType]?.iops ?? 0
+        : oldProvisionedIOPS * (DISK_PRICING[oldStorageType]?.iops ?? 0)
+    const newPrice = newProvisionedIOPS * (DISK_PRICING[newStorageType]?.iops ?? 0)
     return {
       oldPrice: (oldPrice * (1 + numReplicas)).toFixed(2),
       newPrice: (newPrice * (1 + numReplicas)).toFixed(2),
@@ -295,6 +295,7 @@ export const mapComputeSizeNameToAddonVariantId = (
   computeSize: ProjectDetail['infra_compute_size']
 ): ComputeInstanceAddonVariantId => {
   return {
+    pico: 'ci_pico',
     nano: 'ci_nano',
     micro: 'ci_micro',
     small: 'ci_small',
@@ -306,6 +307,14 @@ export const mapComputeSizeNameToAddonVariantId = (
     '8xlarge': 'ci_8xlarge',
     '12xlarge': 'ci_12xlarge',
     '16xlarge': 'ci_16xlarge',
+    '24xlarge': 'ci_24xlarge',
+    '24xlarge_optimized_memory': 'ci_24xlarge_optimized_memory',
+    '24xlarge_optimized_cpu': 'ci_24xlarge_optimized_cpu',
+    '24xlarge_high_memory': 'ci_24xlarge_high_memory',
+    '48xlarge': 'ci_48xlarge',
+    '48xlarge_optimized_memory': 'ci_48xlarge_optimized_memory',
+    '48xlarge_optimized_cpu': 'ci_48xlarge_optimized_cpu',
+    '48xlarge_high_memory': 'ci_48xlarge_high_memory',
   }[computeSize ?? 'nano'] as ComputeInstanceAddonVariantId
 }
 
@@ -324,6 +333,14 @@ export const mapAddOnVariantIdToComputeSize = (
     ci_8xlarge: '8XL',
     ci_12xlarge: '12XL',
     ci_16xlarge: '16XL',
+    ci_24xlarge: '24XL',
+    ci_24xlarge_optimized_memory: '24XL - Optimized Memory',
+    ci_24xlarge_optimized_cpu: '24XL - Optimized CPU',
+    ci_24xlarge_high_memory: '24XL - High Memory',
+    ci_48xlarge: '48XL',
+    ci_48xlarge_optimized_memory: '48XL - Optimized Memory',
+    ci_48xlarge_optimized_cpu: '48XL - Optimized CPU',
+    ci_48xlarge_high_memory: '48XL - High Memory',
   }[addonVariantId] as ComputeInstanceSize
 }
 

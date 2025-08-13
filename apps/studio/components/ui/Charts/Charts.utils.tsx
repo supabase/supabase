@@ -36,6 +36,9 @@ export const isFloat = (num: number) => String(num).includes('.')
  * precisionFormatter(123.123, 2)   // "123.12"
  */
 export const precisionFormatter = (num: number, precision: number): string => {
+  if (precision === 0) {
+    return String(Math.round(num))
+  }
   if (isFloat(num)) {
     const [head, tail] = String(num).split('.')
     return Number(head).toLocaleString() + '.' + tail.slice(0, precision)
@@ -83,10 +86,15 @@ export const useChartSize = (
   }
 ) => {
   const minHeight = sizeMap[size]
-  const Container: FC<PropsWithChildren> = useMemo(
+  const Container: FC<PropsWithChildren & { className?: string }> = useMemo(
     () =>
-      ({ children }) => (
-        <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
+      ({ className, children }) => (
+        <ResponsiveContainer
+          className={className}
+          height={minHeight}
+          minHeight={minHeight}
+          width="100%"
+        >
           {children as JSX.Element}
         </ResponsiveContainer>
       ),

@@ -1,11 +1,10 @@
 import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { noop } from 'lodash'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -14,12 +13,13 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
-import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
 interface FunctionsListProps {
@@ -35,8 +35,8 @@ const FunctionsList = ({
 }: FunctionsListProps) => {
   const router = useRouter()
   const { search } = useParams()
-  const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
+  const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -51,20 +51,18 @@ const FunctionsList = ({
     router.push(url)
   }
 
-  const canCreateFunctions = useCheckPermissions(
+  const { can: canCreateFunctions } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
-  const { data: schemas } = useSchemasQuery({
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  // [Joshen] This is to preload the data for the Schema Selector
+  useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const foundSchema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === foundSchema?.id)
 
   const {
     data: functions,
@@ -126,7 +124,7 @@ const FunctionsList = ({
             </div>
 
             <div className="flex items-center gap-x-2">
-              {!isLocked && (
+              {!isSchemaLocked && (
                 <>
                   <ButtonTooltip
                     disabled={!canCreateFunctions}
@@ -149,7 +147,8 @@ const FunctionsList = ({
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}
                     onClick={() =>
-                      setAiAssistantPanel({
+                      aiSnap.newChat({
+                        name: 'Create new function',
                         open: true,
                         initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                       })
@@ -168,7 +167,7 @@ const FunctionsList = ({
             </div>
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
 
           <Table
             className="table-fixed overflow-x-auto"
@@ -191,7 +190,7 @@ const FunctionsList = ({
               <FunctionList
                 schema={selectedSchema}
                 filterString={filterString}
-                isLocked={isLocked}
+                isLocked={isSchemaLocked}
                 editFunction={editFunction}
                 deleteFunction={deleteFunction}
               />

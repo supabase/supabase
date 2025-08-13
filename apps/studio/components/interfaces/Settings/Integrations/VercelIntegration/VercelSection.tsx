@@ -26,20 +26,18 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { Button, cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import PartnerIcon from 'components/ui/PartnerIcon'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
   const isBranch = project?.parent_project_ref !== undefined
@@ -216,7 +214,6 @@ You can change the scope of the access for Supabase by configuring
                     />
                   )}
                   <EmptyIntegrationConnection
-                    orgSlug={org?.slug}
                     disabled={isBranch || !canCreateVercelConnection}
                     onClick={() => onAddVercelConnection(vercelIntegration.id)}
                   >

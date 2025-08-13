@@ -1,0 +1,35 @@
+---
+title: 'Settings'
+description: 'Realtime Settings that allow you to configure your Realtime usage.'
+subtitle: 'Realtime Settings that allow you to configure your Realtime usage.'
+---
+
+## Settings
+
+<Admonition type="note">
+
+Realtime settings are currently under Feature Preview section in the dashboard.
+
+</Admonition>
+
+<Admonition type="caution">
+
+All changes made in this screen will disconnect all your connected clients to ensure Realtime starts with the appropriate settings and all changes are stored in Supabase middleware.
+
+</Admonition>
+
+<Image
+  alt="Usage page navigation bar"
+  src={{
+    light: '/docs/img/guides/platform/realtime/realtime-settings--light.png',
+    dark: '/docs/img/guides/platform/realtime/realtime-settings--dark.png',
+  }}
+  zoomable
+/>
+
+You can set the following settings using the Realtime Settings screen in your Dashboard:
+
+- Channel Restrictions: You can toggle this settings to set Realtime to allow public channels or set it to use only private channels with [Realtime Authorization](/docs/content/guides/realtime/authorization).
+- Database connection pool size: Determines the number of connections used for Realtime Authorization RLS checking
+  {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+- Max concurrent clients: Determines the maximum number of clients that can be connected

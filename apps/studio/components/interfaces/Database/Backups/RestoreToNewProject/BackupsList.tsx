@@ -1,11 +1,10 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-import BackupsEmpty from '../BackupsEmpty'
+import { BackupsEmpty } from '../BackupsEmpty'
 
 interface BackupsListProps {
   onSelectRestore: (id: number) => void
@@ -13,11 +12,10 @@ interface BackupsListProps {
 }
 
 export const BackupsList = ({ onSelectRestore, disabled }: BackupsListProps) => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
 
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },

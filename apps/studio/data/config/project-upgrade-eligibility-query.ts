@@ -1,14 +1,14 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { IS_PLATFORM } from 'common'
 import { get, handleError } from 'data/fetchers'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useProjectByRefQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { components } from 'api-types'
 
-export type ProjectUpgradeTargetVersion = components['schemas']['ProjectVersion']
+export type ProjectUpgradeTargetVersion = { postgres_version: string; release_channel: string }
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse =
   components['schemas']['ProjectUpgradeEligibilityResponse']
@@ -38,7 +38,7 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
     ...options
   }: UseQueryOptions<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData> = {}
 ) => {
-  const project = useProjectByRef(projectRef)
+  const { data: project } = useProjectByRefQuery(projectRef)
   return useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>(
     configKeys.upgradeEligibility(projectRef),
     ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),

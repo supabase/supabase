@@ -45,7 +45,7 @@ export const TextSearchPopover = ({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+      <PopoverContent_Shadcn_ portal className="p-0" side="bottom" align="start">
         <div className="space-y-4 p-3 min-w-[170px]">
           <TextArea_Shadcn_
             value={search}

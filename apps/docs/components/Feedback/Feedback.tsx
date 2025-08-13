@@ -18,7 +18,7 @@ import { Button, cn } from 'ui'
 import { IS_PLATFORM } from '~/lib/constants'
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { getNotionTeam, getSanitizedTabParams } from './Feedback.utils'
+import { getLinearTeam, getSanitizedTabParams } from './Feedback.utils'
 import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 
 const FeedbackButton = forwardRef<
@@ -96,6 +96,8 @@ function Feedback({ className }: { className?: string }) {
   const showNo = unanswered || isNo
 
   async function sendFeedbackVote(response: Response) {
+    if (!supabase) return
+
     const { error } = await supabase.from('feedback').insert({
       vote: response,
       page: pathname,
@@ -134,7 +136,7 @@ function Feedback({ className }: { className?: string }) {
       title,
       // @ts-expect-error -- can't click this button without having a state.response
       isHelpful: state.response === 'yes',
-      team: getNotionTeam(pathname),
+      team: getLinearTeam(pathname),
     })
     setModalOpen(false)
     refocusButton()

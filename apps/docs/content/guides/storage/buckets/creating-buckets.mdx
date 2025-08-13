@@ -18,6 +18,10 @@ Here we create a bucket called "avatars":
 <TabPanel id="javascript" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 // Use the JS library to create a bucket.
 
 const { data, error } = await supabase.storage.createBucket('avatars', {
@@ -97,6 +101,10 @@ For example, imagine you want to allow your users to upload only images to the `
 You can achieve the following by providing: `allowedMimeTypes` and `maxFileSize`
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 // Use the JS library to create a bucket.
 
 const { data, error } = await supabase.storage.createBucket('avatars', {

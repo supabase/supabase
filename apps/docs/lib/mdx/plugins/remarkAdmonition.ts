@@ -25,7 +25,9 @@ const remarkMkDocsAdmonition = function () {
 
         // Extract the admonition type, title, and remaining text
         const [, , typeTitle, value] = match
-        const [, type, title] = typeTitle.match(/^(.+?) ?(?:"(.*)")?$/)
+        const typeTitleMatch = typeTitle.match(/^(.+?) ?(?:"(.*)")?$/)
+        if (!typeTitleMatch) return
+        const [, type, title] = typeTitleMatch
 
         // Rewrite the node's value to remove the admonition syntax
         firstChild.value = value
@@ -76,7 +78,7 @@ const remarkMkDocsAdmonition = function () {
  * Splices the discovered siblings out of the original parent and returns them.
  */
 function extractLinkedSiblings(parent: Root, node: Node, index: number, indentAmount = 4) {
-  const { column } = node.position.start
+  const { column } = node.position?.start || { column: 0 }
 
   let nextSibling: Content
   let i = index

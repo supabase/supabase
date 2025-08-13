@@ -24,8 +24,9 @@ export async function getOpenAPISpec({ projectRef }: OpenAPISpecVariables, signa
 
   if (error) handleError(error)
 
-  const tables = data.definitions
-    ? Object.entries(data.definitions).map(([key, table]: any) => ({
+  const definitions = (data as any).definitions
+  const tables = definitions
+    ? Object.entries(definitions).map(([key, table]: any) => ({
         ...table,
         name: key,
         fields: Object.entries(table.properties || {}).map(([key, field]: any) => ({
@@ -35,8 +36,9 @@ export async function getOpenAPISpec({ projectRef }: OpenAPISpecVariables, signa
       }))
     : []
 
-  const functions = data.paths
-    ? Object.entries(data.paths)
+  const paths = (data as any).paths
+  const functions = paths
+    ? Object.entries(paths)
         .map(([path, value]: any) => ({
           ...value,
           path,

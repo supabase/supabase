@@ -29,7 +29,7 @@ export const SearchList = ({ search }: SearchListProps) => {
       { keepPreviousData: true }
     )
 
-  const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
+  const { data: count } = useContentCountQuery(
     {
       projectRef,
       cumulative: true,

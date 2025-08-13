@@ -1,0 +1,74 @@
+---
+title: 'Building on open table formats'
+description: Open table formats like Apache Iceberg, Delta Lake, and Apache Hudi are transforming how developers manage large-scale data on object storage systems.
+author: prashant
+image: 2025-05-29-building-on-open-table-formats/building-on-open-table-formats.png
+thumb: 2025-05-29-building-on-open-table-formats/building-on-open-table-formats.png
+toc_depth: 3
+categories:
+  - product
+  - company
+tags:
+  - postgres
+  - iceberg
+  - otel
+date: '2025-05-29'
+---
+
+Open table formats are specifications that define how to store and manage large datasets in a structured manner on distributed storage systems. They provide a layer of abstraction over raw data files, enabling features such as ACID transactions, schema evolution, and time travel. This abstraction allows multiple processing engines to interact with the data consistently and reliably.
+
+The primary open table formats in use today are Apache Iceberg, Delta Lake, and Apache Hudi. Each offers unique capabilities tailored to specific use cases:
+
+- [Apache Iceberg](https://iceberg.apache.org) was initiated at Netflix and open sourced. It is designed for high-performance analytics and provides full support for schema and partition evolution, hidden partitioning, and time travel.
+- [Delta Lake](https://delta.io) is developed by Databricks and emphasizes ACID transactions. It’s tightly integrated with the Spark ecosystem.
+- [Apache Hudi](https://hudi.apache.org) is developed by Uber and is optimized for streaming data and real-time ingestion. It supports incremental data processing and efficient upsets.
+
+These three open table formats emerged to solve distinct challenges. Iceberg shines in analytics scenarios where you need consistency, flexibility, and compatibility with many data engines. Delta Lake is best when you are in a Spark environment (e.g., Databricks.) And Hudi is good for streaming-centric environments and database change data capture (CDC).
+
+## The rise of Apache Iceberg
+
+Iceberg was designed to solve the challenges of managing large, analytical databases stored in object storage systems like [Supabase Storage](/storage), Amazon S3, Google Cloud Storage, and Azure Blob Storage. Iceberg brings database-like capabilities to distributed file systems, enabling reliable, consistent access to data that would otherwise be locked in raw files.
+
+Open table formats define how data and metadata are organized. They sit on top of [Parquet](https://parquet.apache.org) files (or other files with data) and they make large datasets queryable across multiple engines without sacrificing consistency or performance. Iceberg’s design allows multiple systems to write to and query the same dataset safely. This makes it an essential component for modern data platforms that need to scale.
+
+Iceberg offers several key features:
+
+- **ACID transactions**. Multiple users or processes can read and write data concurrently without risking corruption or inconsistencies. This is critical when datasets are shared across teams and tools.
+- **Schema evolution**. In real-world systems, schemas change over time. Iceberg allows developers to add or remove columns, rename fields, and evolve the schema without rewriting existing data. Iceberg’s metadata layer tracks these changes, so queries remain consistent and backward-compatible.
+- **Time travel**. Iceberg tracks snapshot of the table at different points in time. This enables developers to query the dataset as it existed at a specific version, enabling auditing, debugging, and reproducibility of data scenarios.
+- **Interoperability.** Multiple compute engines can read and write data to the same Iceberg table. What used to be a data warehouse world of incompatible silos has quickly become an interoperable world where companies need to compete on features and dependability instead of data lock-in.
+
+## Object storage is the key
+
+Iceberg addresses several trends prevalent in our industry today, turning raw object storage into a usable, consistent, and vendor-neutral data layer:
+
+- **Businesses now routinely store petabytes of data, driven by logs, events, IoT sensors, user interactions, and AI-generated outputs**. The retention of this data, for years or decades, is now standard practice for compliance, analytics, or AI model training. Traditional data lake architectures cannot scale on either operations or price under this load. Iceberg comes at exactly the right time, enabling companies to offload their data to much lower cost object storage systems, while still being able to query and use the data as if it were in a more traditional data environment.
+- **Development stacks now routinely separate storage and compute**. Object storage has become the default data substrate because of its low cost, durability, and scalability. At the same time, development teams want to mix and match compute engines based on the task, whether it’s Spark for batch, Flink for streaming, DuckDB for analytics, and so on. Iceberg’s support for object storage and its support for concurrent access and schema evolution makes it ideal for this type of architecture.
+- **Telemetry data (logs, metrics, traces, and events) has exploded in volume**, driven by modern distributed systems, microservices, and AI workloads. OpenTelemetry has emerged as the de facto standard for collecting and transmitting this data, but raw telemetry on its own is not enough. Once generated, it needs a scalable, queryable, and consistent backend for analysis and long-term retention. Iceberg provides that backend for telemetry, turning ephemeral streams into durable, structured datasets that can be queried alongside other analytical data. This bridges the gap between observability pipelines and data lakes.
+- **AI has changed how data is used**. Models are no longer trained once and deployed indefinitely. They are retrained frequently, sometimes daily, using new data. This requires a reproducible, versioned data pipeline. Teams need to know exactly what data was used to train a model and be able to recreate that state months later. Iceberg’s time travel and snapshot isolation features make this possible.
+
+Moreover, teams do not want to be locked in to proprietary systems. Data is meant to be free, not stored in formats that provide artificial advantages and perverse incentives to companies. The idea of the lakehouse (combining the scalability and cost efficiency of data lakes with the transactional guarantees of data warehouses) remains popular, while Iceberg makes it feasible for data to be free as companies compete on compute engines.
+
+## Amazon S3 and Iceberg
+
+It takes two to tango. The combination of Iceberg and Amazon S3 is a potent alternative to traditional proprietary data lakes and data warehouses. It’s thanks to the significant evolution of Amazon S3 that much of Iceberg’s promise has come to fruition:
+
+- [**S3 Express**](https://aws.amazon.com/s3/storage-classes/express-one-zone/) is a new storage class designed for high-performance workloads. S3 Express delivers up to 10x lower latency and 10x higher throughput than standard S3, while reducing costs by up to 85 percent. This makes it viable for interactive, near-real-time applications.
+- [**Conditional writes**](https://aws.amazon.com/about-aws/whats-new/2024/08/amazon-s3-conditional-writes/) offer native support for conditional operations in S3, allowing developers to build data pipelines that safely update data only when it has not been modified by another process. This eliminates the need for complex external systems to manage transactions.
+- [**S3 Tables**](https://aws.amazon.com/blogs/aws/new-amazon-s3-tables-storage-optimized-for-analytics-workloads/) offers native support for Apache Iceberg within S3. S3 Tables are optimized for analytics workloads, offering up to 3X faster query performance and up to 10X higher transactions per second compared to self-managed tables.
+
+## S3 + Iceberg = ETL
+
+The ETL industry was built around a fundamental problem: moving data from one system to another, transforming it along the way to make it usable for different purposes. For decades, this meant extracting data from operational databases, cleaning and reshaping it through a series of batch processes, and loading it into a data warehouse for analysis. This pipeline was slow, fragile, and expensive. However, it was necessary, because storage and compute were tightly coupled, and operational systems could not support large-scale analytics directly.
+
+What’s happening now with S3 + Iceberg is a paradigm shift. Open table formats like Iceberg turn object storage into a queryable, versioned, and structured data layer. At the same time, innovations like S3 Express, Conditional Writes, and S3 Tables make it possible to write directly into object storage at scale with transactional guarantees and low latency.
+
+This means the traditional ETL model—extract, transform, and load—starts to break down. Instead of lifting data out of one system, transforming it, and depositing it into another, teams can write once into Iceberg tables on S3 and access the same dataset across multiple engines. Transformation can happen in place, not as a separate pipeline. The data is already where it needs to be.
+
+## Supabase and the data cloud
+
+Supabase has always been more than just a Postgres host. We are the platform for building modern applications. Supabase starts with [a Postgres database](/database) and includes products for [Authentication](/auth), [Storage](/storage), [Edge Functions](/edge-functions), [Realtime](/realtime), [Vectors](/modules/vector), and more. As the industry moves toward open table formats like Iceberg and S3 as the default storage layer, Supabase’s role evolves with it to be less about a database, and more about data.
+
+Postgres remains the core of the Supabase platform: the system of record for operational data. [As we’ve written](/blog/open-data-standards-postgres-otel-iceberg), we are also building first-class support for OpenTelemetry across our services, enabling developers to collect observability data (logs, metrics, and traces) without managing additional infrastructure. And with [Supabase ETL](https://github.com/supabase/etl), we will provide a lightweight, Postgres-native way to move data into S3 and more, where it can be queried at scale using Iceberg and your choice of analytics engines.
+
+Our goal is to make Supabase the developer’s data cloud: Postgres for transactions, OpenTelemetry for observability, and Iceberg for analytics, all connected by simple, open tools. To do so, we remain focused on what developers need: a backend that starts simple, grows with your product, and keeps your data open and portable at every stage.

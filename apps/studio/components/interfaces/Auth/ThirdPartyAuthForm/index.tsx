@@ -17,7 +17,7 @@ import {
   ThirdPartyAuthIntegration,
   useThirdPartyAuthIntegrationsQuery,
 } from 'data/third-party-auth/integrations-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
@@ -25,6 +25,7 @@ import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
 import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
+import { CreateWorkOSIntegrationDialog } from './CreateWorkOSDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
   getIntegrationType,
@@ -48,7 +49,10 @@ export const ThirdPartyAuthForm = () => {
     useState<ThirdPartyAuthIntegration>()
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   if (isError) {
     return (
@@ -102,6 +106,7 @@ export const ThirdPartyAuthForm = () => {
           >
             <p className="text-sm text-foreground-light">No providers configured yet</p>
             <AddIntegrationDropdown
+              align="center"
               buttonText="Add a new integration"
               onSelectIntegrationType={setSelectedIntegration}
             />
@@ -148,10 +153,17 @@ export const ThirdPartyAuthForm = () => {
         onClose={() => setSelectedIntegration(undefined)}
       />
 
+      <CreateWorkOSIntegrationDialog
+        visible={selectedIntegration === 'workos'}
+        onDelete={() => {}}
+        onClose={() => setSelectedIntegration(undefined)}
+      />
+
       <ConfirmationModal
+        size="medium"
         visible={!!selectedIntegrationForDeletion}
         variant="destructive"
-        title="Confirm to delete"
+        title="Confirm to delete integration"
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
         onCancel={() => setSelectedIntegrationForDeletion(undefined)}
@@ -174,8 +186,9 @@ export const ThirdPartyAuthForm = () => {
           }
         }}
       >
-        <p className="py-4 text-sm text-foreground-light">
-          {`Are you sure you want to delete the ${getIntegrationTypeLabel(getIntegrationType(selectedIntegrationForDeletion))} integration?`}
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to delete the{' '}
+          {getIntegrationTypeLabel(getIntegrationType(selectedIntegrationForDeletion))} integration?
         </p>
       </ConfirmationModal>
     </ScaffoldSection>

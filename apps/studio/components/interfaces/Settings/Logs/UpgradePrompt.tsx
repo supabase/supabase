@@ -1,32 +1,44 @@
 import Link from 'next/link'
 
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Modal } from 'ui'
 import { TIER_QUERY_LIMITS } from './Logs.constants'
 
 interface Props {
   show: boolean
   setShowUpgradePrompt: (value: boolean) => void
+  title?: string
+  description?: string
+  source?: string
 }
-
-const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
-  const organization = useSelectedOrganization()
+/**
+ * @param show - whether to show the modal
+ * @param setShowUpgradePrompt - function to set the show state
+ * @param title - title of the modal
+ * @param description - description of the modal
+ * @param source - source of the upgrade prompt used to track the source of the upgrade prompt in the billing page
+ * @returns
+ */
+const UpgradePrompt: React.FC<Props> = ({
+  show,
+  setShowUpgradePrompt,
+  title = 'Log retention',
+  description = 'Logs can be retained up to a duration of 3 months depending on the plan that your project is on.',
+  source = 'logsRetentionUpgradePrompt',
+}) => {
+  const { data: organization } = useSelectedOrganizationQuery()
 
   return (
     <Modal
       hideFooter
       visible={show}
-      closable
       size="medium"
-      header="Log retention"
+      header={title}
       onCancel={() => setShowUpgradePrompt(false)}
     >
       <Modal.Content>
         <div className="space-y-4">
-          <p className="text-sm">
-            Logs can be retained up to a duration of 3 months depending on the plan that your
-            project is on.
-          </p>
+          <p className="text-sm">{description}</p>
           <div className="border-control bg-surface-300 rounded border">
             <div className="flex items-center px-4 pt-2 pb-1">
               <p className="text-foreground-light w-[40%] text-sm">Plan</p>
@@ -59,9 +71,7 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
           Close
         </Button>
         <Button asChild size="tiny">
-          <Link
-            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=logsRetentionUpgradePrompt`}
-          >
+          <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=${source}`}>
             Upgrade
           </Link>
         </Button>

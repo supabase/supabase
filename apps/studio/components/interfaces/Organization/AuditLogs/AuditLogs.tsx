@@ -32,6 +32,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { formatSelectedDateRange } from './AuditLogs.utils'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -79,23 +80,6 @@ const AuditLogs = () => {
       }
     )
 
-  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
-  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
-  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
-  // higher tiers (7 days of logs).The user will see a loading shimmer.
-  useEffect(() => {
-    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
-    const interval = setInterval(() => {
-      const currentTime = dayjs().utc().set('millisecond', 0)
-      setDateRange({
-        from: currentTime.add(duration).toISOString(),
-        to: currentTime.toISOString(),
-      })
-    }, 5 * 60000)
-
-    return () => clearInterval(interval)
-  }, [dateRange.from, dateRange.to])
-
   const activeMembers = (members ?? []).filter((x) => !x.invited_at)
   const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
 
@@ -123,6 +107,25 @@ const AuditLogs = () => {
     })
 
   const currentOrganization = organizations?.find((o) => o.slug === slug)
+  const minDate = dayjs().subtract(retentionPeriod, 'days')
+  const maxDate = dayjs()
+
+  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
+  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
+  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  useEffect(() => {
+    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
+    const interval = setInterval(() => {
+      const currentTime = dayjs().utc().set('millisecond', 0)
+      setDateRange({
+        from: currentTime.add(duration).toISOString(),
+        to: currentTime.toISOString(),
+      })
+    }, 5 * 60000)
+
+    return () => clearInterval(interval)
+  }, [dateRange.from, dateRange.to])
 
   if (!canReadAuditLogs) {
     return (
@@ -208,23 +211,11 @@ const AuditLogs = () => {
                     triggerButtonTitle=""
                     from={dateRange.from}
                     to={dateRange.to}
-                    minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
-                    maxDate={dayjs().toDate()}
+                    minDate={minDate.toDate()}
+                    maxDate={maxDate.toDate()}
                     onChange={(value) => {
                       if (value.from !== null && value.to !== null) {
-                        const current = dayjs().utc()
-                        const from = dayjs(value.from)
-                          .utc()
-                          .hour(current.hour())
-                          .minute(current.minute())
-                          .second(current.second())
-                          .toISOString()
-                        const to = dayjs(value.to)
-                          .utc()
-                          .hour(current.hour())
-                          .minute(current.minute())
-                          .second(current.second())
-                          .toISOString()
+                        const { from, to } = formatSelectedDateRange(value)
                         setDateRange({ from, to })
                       }
                     }}

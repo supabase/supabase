@@ -46,7 +46,7 @@ sudo apt-get update
 sudo apt-get install postgresql-client
 ```
 
-Once installed, you can find your PSQL string from the [Database Settings](https://supabase.com/dashboard/project/_/settings/database), which can be executed in the terminal to create a psql session.
+Once installed, you can find your PSQL string on the dashboard by clicking [connect](https://supabase.com/dashboard/project/_?showConnect=true). Make sure if you are using the pooler connection that it is the Session pooler (port 5432).
 
 If your network can use IPv6, consider using the direct connection string instead of Supavisor. It's not mandatory, but for tasks that run a long time, it's best to reduce network complexity. To check if your network is compatible, use this cURL command to request your IPv6 address:
 
@@ -54,7 +54,7 @@ If your network can use IPv6, consider using the direct connection string instea
 curl -6 https://ifconfig.co/ip
 ```
 
-If an address is returned, you should be able to use your direct connection string found in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database):
+If an address is returned, you should use your direct connection string found on the dashboard by clicking [connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 **3. Increase memory for index creation (optional)**
 
@@ -104,7 +104,8 @@ If your task is particularly long, you can speed it up by boosting your computin
 
 **7. Consider increasing disk size (optional)**
 
-HSNW indexes can produce temporary files during their construction that may consume a few GBs worth of disk. Consider increasing the disk size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) to accommodate for short-term disk stress.
+HSNW indexes can produce temporary files during their construction that may consume a few GBs worth of disk.
+Consider increasing the disk size in the [Compute and Disk settings](https://supabase.com/dashboard/project/_/settings/compute-and-disk) to accommodate for short-term disk stress.
 
 <img
   width="947"

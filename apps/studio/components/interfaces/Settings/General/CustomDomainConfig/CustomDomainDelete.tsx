@@ -18,7 +18,9 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
   const { mutate: deleteCustomDomain } = useCustomDomainDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted custom domain`)
+      toast.success(
+        `Successfully deleted custom domain. It may take a few seconds before your custom domain is fully removed, hence you may need to refresh your browser.`
+      )
       setIsDeleteConfirmModalVisible(false)
     },
   })

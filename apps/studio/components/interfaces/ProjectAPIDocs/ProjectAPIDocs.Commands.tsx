@@ -25,7 +25,7 @@ export function useApiDocsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-api-user-management',
         name: 'User Management Docs',
-        route: `/project/${ref}/api?page=users`,
+        route: `/project/${ref}/api?page=users-management`,
         defaultHidden: true,
       },
       {

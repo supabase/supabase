@@ -79,6 +79,10 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 1.  Use Supabase Auth's [admin create user](/docs/reference/javascript/auth-admin-createuser) method to recreate the user in Supabase Auth. If the user has a confirmed email address or phone number, set `email_confirm` or `phone_confirm` to `true`.
 
     ```ts
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const { data, error } = await supabase.auth.admin.createUser({
       email: 'valid.email@supabase.io',
       password_hash: '$2y$10$a9pghn27d7m0ltXvlX8LiOowy7XfFw0hW0G80OjKYQ1jaoejaA7NC',
@@ -95,6 +99,10 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
     If you have a plaintext password instead of a hash, you can provide that instead. Supabase Auth will handle hashing the password for you. (Passwords are **always** stored hashed.)
 
     ```ts
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const { data, error } = await supabase.auth.admin.createUser({
       email: 'valid.email@supabase.io',
       password: 'supersecurepassword123!',
@@ -114,6 +122,10 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 For passwordless signin via email or phone, check for users with verified email addresses or phone numbers. Create these users in Supabase Auth with `email_confirm` or `phone_confirm` set to `true`:
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const { data, error } = await supabase.auth.admin.createUser({
   email: 'valid.email@supabase.io',
   email_confirm: true,
@@ -150,6 +162,10 @@ Supabase Auth provides 2 fields which you can use to map user-specific metadata 
 Both columns are accessible from the admin user methods. To create a user with custom metadata, you can use the following method:
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const { data, error } = await supabase.auth.admin.createUser({
   email: 'valid.email@supabase.io',
   user_metadata: {

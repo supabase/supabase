@@ -1,14 +1,12 @@
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useEffect, useState } from 'react'
-import { useSelectedOrganization } from './useSelectedOrganization'
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 
 export const useUpgradePrompt = (from: string) => {
-  const organization = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: organization } = useSelectedOrganizationQuery()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
-  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
+  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
 
   useEffect(() => {
     if (shouldShowUpgradePrompt) {

@@ -14,6 +14,8 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { Alert, Button } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
+import { formatSelectedDateRange } from '../Organization/AuditLogs/AuditLogs.utils'
 
 const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -36,6 +38,25 @@ const AuditLogs = () => {
       iso_timestamp_end: dateRange.to,
     })
 
+  const retentionPeriod = data?.retention_period ?? 0
+  const logs = data?.result ?? []
+  const sortedLogs = logs
+    ?.sort((a, b) =>
+      dateSortDesc
+        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
+        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
+    )
+    ?.filter((log) => {
+      if (filters.projects.length > 0) {
+        return filters.projects.includes(log.target.metadata.project_ref || '')
+      } else {
+        return log
+      }
+    })
+
+  const minDate = dayjs().subtract(retentionPeriod, 'days')
+  const maxDate = dayjs()
+
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
@@ -53,25 +74,9 @@ const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
-  const retentionPeriod = data?.retention_period ?? 0
-  const logs = data?.result ?? []
-  const sortedLogs = logs
-    ?.sort((a, b) =>
-      dateSortDesc
-        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
-        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
-    )
-    ?.filter((log) => {
-      if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
-      } else {
-        return log
-      }
-    })
-
   return (
     <>
-      <div className="space-y-4 flex flex-col">
+      <div className="space-y-4 flex flex-col pb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div className="flex items-center space-x-2">
             <p className="text-xs prose">Filter by</p>
@@ -90,23 +95,11 @@ const AuditLogs = () => {
               triggerButtonTitle=""
               from={dateRange.from}
               to={dateRange.to}
-              minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
-              maxDate={dayjs().toDate()}
+              minDate={minDate.toDate()}
+              maxDate={maxDate.toDate()}
               onChange={(value) => {
                 if (value.from !== null && value.to !== null) {
-                  const current = dayjs().utc()
-                  const from = dayjs(value.from)
-                    .utc()
-                    .hour(current.hour())
-                    .minute(current.minute())
-                    .second(current.second())
-                    .toISOString()
-                  const to = dayjs(value.to)
-                    .utc()
-                    .hour(current.hour())
-                    .minute(current.minute())
-                    .second(current.second())
-                    .toISOString()
+                  const { from, to } = formatSelectedDateRange(value)
                   setDateRange({ from, to })
                 }
               }}
@@ -253,7 +246,7 @@ const AuditLogs = () => {
                             </p>
                           </Table.td>
                           <Table.td>
-                            {dayjs(log.occurred_at).format('DD MMM YYYY, HH:mm:ss')}
+                            <TimestampInfo className="text-sm" utcTimestamp={log.occurred_at} />
                           </Table.td>
                           <Table.td align="right">
                             <Button type="default">View details</Button>

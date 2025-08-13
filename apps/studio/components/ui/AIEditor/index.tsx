@@ -1,5 +1,4 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
-import { useCompletion } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'
@@ -18,14 +17,16 @@ interface AIEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
-    includeSchemaMetadata?: boolean
+    connectionString?: string | null
+    orgSlug?: string
   }
   initialPrompt?: string
   readOnly?: boolean
+  autoFocus?: boolean
   className?: string
   options?: monacoEditor.IStandaloneEditorConstructionOptions
   onChange?: (value: string) => void
+  onClose?: () => void
   executeQuery?: () => void
 }
 
@@ -41,9 +42,11 @@ const AIEditor = ({
   aiMetadata,
   initialPrompt,
   readOnly = false,
+  autoFocus = false,
   className = '',
   options = {},
   onChange,
+  onClose,
   executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
@@ -67,29 +70,64 @@ const AIEditor = ({
   })
   const [promptInput, setPromptInput] = useState(initialPrompt || '')
 
-  const {
-    complete,
-    completion,
-    isLoading: isCompletionLoading,
-    setCompletion,
-  } = useCompletion({
-    api: aiEndpoint || '',
-    body: aiMetadata,
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
+  const [isCompletionLoading, setIsCompletionLoading] = useState(false)
+
+  const complete = useCallback(
+    async (
+      prompt: string,
+      options?: {
+        headers?: Record<string, string>
+        body?: { completionMetadata?: any }
+      }
+    ) => {
+      try {
+        if (!aiEndpoint) throw new Error('AI endpoint is not configured')
+        setIsCompletionLoading(true)
+
+        const response = await fetch(aiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(options?.headers ?? {}),
+          },
+          body: JSON.stringify({
+            ...(aiMetadata ?? {}),
+            ...(options?.body ?? {}),
+          }),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Failed to generate completion')
+        }
+
+        const text: string = await response.json()
+
+        const meta = options?.body?.completionMetadata ?? {}
+        const beforeSelection: string = meta.textBeforeCursor ?? ''
+        const afterSelection: string = meta.textAfterCursor ?? ''
+        const selection: string = meta.selection ?? ''
+
+        const original = beforeSelection + selection + afterSelection
+        const modified = beforeSelection + text + afterSelection
+
+        setDiffValue({ original, modified })
+        setIsDiffMode(true)
+      } catch (error: any) {
+        toast.error(`Failed to generate: ${error?.message ?? 'Unknown error'}`)
+      } finally {
+        setIsCompletionLoading(false)
+      }
     },
-    onError: (error) => {
-      toast.error(`Failed to generate: ${error.message}`)
-    },
-  })
+    [aiEndpoint, aiMetadata]
+  )
 
   const handleReset = useCallback(() => {
-    setCompletion('')
     setIsDiffMode(false)
     setPromptState((prev) => ({ ...prev, isOpen: false }))
     setPromptInput('')
     editorRef.current?.focus()
-  }, [setCompletion])
+  }, [])
 
   const handleAcceptDiff = useCallback(() => {
     if (diffValue.modified) {
@@ -125,6 +163,19 @@ const AIEditor = ({
       }
     }
 
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
+    // Add edge runtime types to the TS language service
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/edge-runtime.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
     if (!!executeQueryRef.current) {
       editor.addAction({
         id: 'run-query',
@@ -133,6 +184,17 @@ const AIEditor = ({
         contextMenuGroupId: 'operation',
         contextMenuOrder: 0,
         run: () => executeQueryRef.current?.(),
+      })
+    }
+
+    if (!!onClose) {
+      editor.addAction({
+        id: 'close-editor',
+        label: 'Close editor',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
+        contextMenuGroupId: 'operation',
+        contextMenuOrder: 0,
+        run: () => onClose(),
       })
     }
 
@@ -163,6 +225,11 @@ const AIEditor = ({
         })
       },
     })
+
+    if (autoFocus) {
+      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
+      editor.focus()
+    }
   }
 
   const handlePrompt = async (
@@ -182,8 +249,10 @@ const AIEditor = ({
       }))
 
       const headerData = await constructHeaders()
+      const authorizationHeader = headerData.get('Authorization')
+
       await complete(prompt, {
-        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           ...aiMetadata,
           completionMetadata: {
@@ -238,20 +307,6 @@ const AIEditor = ({
   }, [isDiffMode])
 
   useEffect(() => {
-    if (!completion) {
-      setIsDiffMode(false)
-      return
-    }
-
-    const original =
-      promptState.beforeSelection + promptState.selection + promptState.afterSelection
-    const modified = promptState.beforeSelection + completion + promptState.afterSelection
-
-    setDiffValue({ original, modified })
-    setIsDiffMode(true)
-  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
-
-  useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         handleReset()
@@ -274,7 +329,7 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}
@@ -312,8 +367,9 @@ const AIEditor = ({
         </div>
       ) : (
         <div className="w-full h-full relative">
+          {/* [Joshen] Refactor: Use CodeEditor.tsx instead, reduce duplicate declaration of Editor */}
           <Editor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             value={currentValue}
             options={defaultOptions}

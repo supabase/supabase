@@ -6,7 +6,7 @@ import {
   ConnectTabTriggers,
   ConnectTabContent,
 } from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -19,10 +19,14 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
 
       <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
-VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
-        `}
+          {[
+            '',
+            `VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+            projectKeys?.publishableKey
+              ? `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+              : `VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+            '',
+          ].join('\n')}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
@@ -32,7 +36,8 @@ VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.${projectKeys.publishableKey ? 'VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'VITE_SUPABASE_ANON_KEY'};
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default supabase

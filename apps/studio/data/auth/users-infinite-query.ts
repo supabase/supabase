@@ -2,7 +2,7 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 
 import type { components } from 'data/api'
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { authKeys } from './keys'
 
@@ -10,7 +10,7 @@ export type Filter = 'verified' | 'unverified' | 'anonymous'
 
 export type UsersVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   page?: number
   keywords?: string
   filter?: Filter
@@ -51,7 +51,7 @@ export const getUsersSQL = ({
     // [Joshen] Escape single quotes properly
     const formattedKeywords = keywords.replaceAll("'", "''")
     conditions.push(
-      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%'`
+      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%' or raw_user_meta_data->>'full_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'first_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'last_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'display_name' ilike '%${formattedKeywords}%'`
     )
   }
 
@@ -91,7 +91,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
   { projectRef, connectionString, keywords, filter, providers, sort, order }: UsersVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useInfiniteQuery<UsersData, UsersError, TData>(

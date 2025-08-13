@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
@@ -15,22 +14,22 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
+import EditSecretModal from './EditSecretModal'
 
 interface SecretRowProps {
   secret: VaultSecret
-  onSelectEdit: (secret: VaultSecret) => void
   onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
+const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
-
+  const { data: project } = useSelectedProjectQuery()
+  const [modal, setModal] = useState<string | null>(null)
   const [revealSecret, setRevealSecret] = useState(false)
   const name = secret?.name ?? 'No name provided'
 
@@ -47,6 +46,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
     }
   )
 
+  const onCloseModal = () => setModal(null)
+
   return (
     <div className="px-6 py-4 flex items-center space-x-4">
       <div className="space-y-1 min-w-[35%] max-w-[35%]">
@@ -61,18 +62,10 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           )}
         </div>
         <div className="flex items-center space-x-2 group">
-          <Key
-            size={14}
-            strokeWidth={2}
-            className="text-foreground-light transition group-hover:text-brand"
-          />
-          <Link
-            href={`/project/${ref}/integrations/vault/keys?search=${secret.key_id}`}
-            className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
-            title={secret.key_id}
-          >
-            {secret.key_id}
-          </Link>
+          <Key size={14} strokeWidth={2} className="text-foreground-light transition" />
+          <p className="text-foreground-light font-mono text-xs transition" title={secret.id}>
+            {secret.id}
+          </p>
         </div>
       </div>
       <div className="flex items-center space-x-2 w-[40%]">
@@ -103,17 +96,18 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" className="px-1" icon={<MoreVertical />} />
+            <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-32">
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
-                  onClick={() => onSelectEdit(secret)}
+                  onClick={() => setModal(`edit`)}
                 >
                   <Edit3 size="14" />
                   <p>Edit</p>
@@ -127,7 +121,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             </Tooltip>
 
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -145,6 +139,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <EditSecretModal visible={modal === `edit`} secret={secret} onClose={onCloseModal} />
       </div>
     </div>
   )

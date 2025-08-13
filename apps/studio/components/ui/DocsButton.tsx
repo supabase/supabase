@@ -9,7 +9,13 @@ interface DocsButtonProps {
 
 export const DocsButton = ({ href, abbrev = true, className }: DocsButtonProps) => {
   return (
-    <Button asChild type="default" className={className} icon={<BookOpen />}>
+    <Button
+      asChild
+      type="default"
+      className={className}
+      icon={<BookOpen />}
+      onClick={(e) => e.stopPropagation()}
+    >
       <a target="_blank" rel="noopener noreferrer" href={href}>
         {abbrev ? 'Docs' : 'Documentation'}
       </a>

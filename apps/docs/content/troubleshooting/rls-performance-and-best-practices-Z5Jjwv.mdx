@@ -9,8 +9,7 @@ database_id = "bb06ff88-e0a9-41bc-b00b-9afde10468a5"
 
 ## RLS performance and best practices
 
-Although most of the time spent on thinking about RLS is to get it to handle security needs, the impact of it on performance
-of your queries can be massive.
+Although most of the time spent on thinking about RLS is to get it to handle security needs, the impact of it on performance of your queries can be massive.
 This is especially true on queries that look at every row in a table like for many select operations and updates.
 Note that queries that use limit and offset will usually have to query all rows to determine order, not just the limit amount so they are impacted too.
 

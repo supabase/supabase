@@ -181,7 +181,7 @@ function useBreadcrumbs() {
   return findMenuItemByUrl(menu, pathname, [])
 }
 
-function findMenuItemByUrl(menu, targetUrl, parents = []) {
+function findMenuItemByUrl(menu: any, targetUrl: string, parents: any[] = []) {
   // If the menu has items, recursively search through them
   if (menu.items) {
     for (let item of menu.items) {
