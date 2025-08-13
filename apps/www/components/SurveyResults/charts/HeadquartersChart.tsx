@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateHeadquartersSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -29,7 +29,7 @@ ORDER BY total DESC;`
 
 export function HeadquartersChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="Where is your startup headquartered?"
       targetColumn="headquarters"
       filterColumns={['funding_stage', 'startup_age', 'previous_company']}

@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateAcceleratorParticipationSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -31,7 +31,7 @@ ORDER BY total DESC;`
 
 export function AcceleratorParticipationChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="If your startup has participated in an accelerator, which one?"
       targetColumn="accelerator_participation_normalized"
       filterColumns={['previous_company', 'headquarters', 'funding_stage']}

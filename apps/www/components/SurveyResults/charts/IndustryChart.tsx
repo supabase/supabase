@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 // Generate SQL query for team count chart
 function generateIndustrySQL(activeFilters: Record<string, string>) {
@@ -42,7 +42,7 @@ ORDER BY total DESC;`
 
 export function IndustryChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="What is your startup's primary industry or target customer segment?"
       targetColumn="industry_normalized"
       filterColumns={['person_age', 'funding_stage', 'market_model']}

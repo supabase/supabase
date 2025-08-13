@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateFrontendStackSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -28,7 +28,7 @@ ORDER BY total DESC;
 
 export function FrontendStackChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="What frontend technologies are your startup using?"
       targetColumn="frontend_stack"
       filterColumns={['headquarters', 'industry_normalized', 'person_age']}
