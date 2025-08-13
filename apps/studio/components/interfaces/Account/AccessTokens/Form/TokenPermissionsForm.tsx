@@ -65,7 +65,7 @@ export const TokenPermissionsForm = ({
                         value="add-all-permissions"
                         onSelect={() => {
                           const allPermissions = ALL_RESOURCES.map((resource) => ({
-                            resource: resource.resource,
+                            resource: resource.value,
                             action: resource.actions.includes('read-write')
                               ? 'read-write'
                               : resource.actions[0],
@@ -88,7 +88,7 @@ export const TokenPermissionsForm = ({
                           const projectPermissions = ALL_RESOURCES.filter(
                             (resource) => resource.group === 'Project permissions'
                           ).map((resource) => ({
-                            resource: resource.resource,
+                            resource: resource.value,
                             action: resource.actions.includes('read-write')
                               ? 'read-write'
                               : resource.actions[0],
@@ -113,7 +113,7 @@ export const TokenPermissionsForm = ({
                           const orgPermissions = ALL_RESOURCES.filter(
                             (resource) => resource.group === 'Organization permissions'
                           ).map((resource) => ({
-                            resource: resource.resource,
+                            resource: resource.value,
                             action: resource.actions.includes('read-write')
                               ? 'read-write'
                               : resource.actions[0],
@@ -216,7 +216,7 @@ export const TokenPermissionsForm = ({
                           value="add-all-permissions"
                           onSelect={() => {
                             const allPermissions = ALL_RESOURCES.map((resource) => ({
-                              resource: resource.resource,
+                              resource: resource.value,
                               action: resource.actions.includes('read-write')
                                 ? 'read-write'
                                 : resource.actions[0],
@@ -266,7 +266,7 @@ export const TokenPermissionsForm = ({
                             const orgPermissions = ALL_RESOURCES.filter(
                               (resource) => resource.group === 'Organization permissions'
                             ).map((resource) => ({
-                              resource: resource.resource,
+                              resource: resource.value,
                               action: resource.actions.includes('read-write')
                                 ? 'read-write'
                                 : resource.actions[0],

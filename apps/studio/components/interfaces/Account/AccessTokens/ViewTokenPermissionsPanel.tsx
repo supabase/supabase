@@ -20,6 +20,8 @@ import { ACCESS_TOKEN_PERMISSIONS } from './AccessToken.constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useState } from 'react'
 import { Info } from 'lucide-react'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 interface ViewTokenPermissionsPanelProps {
   visible: boolean
@@ -35,6 +37,8 @@ export function ViewTokenPermissionsPanel({
   onDeleteToken,
 }: ViewTokenPermissionsPanelProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const { data: organizations = [] } = useOrganizationsQuery()
+  const { data: projects = [] } = useProjectsQuery()
 
   // Dummy access settings for demonstration
   const getDummyAccess = (resource: string) => {
@@ -116,6 +120,39 @@ export function ViewTokenPermissionsPanel({
     setIsDeleteModalOpen(false)
   }
 
+  // Get resource access information from token data
+  const getResourceAccessInfo = () => {
+    const resources: Array<{ name: string; type: string; identifier: string }> = []
+
+    // Add organizations if token has organization_slugs
+    const organizationSlugs = (token as any)?.organization_slugs
+    if (organizationSlugs && organizationSlugs.length > 0) {
+      organizationSlugs.forEach((orgSlug: string) => {
+        const org = organizations.find((o) => o.slug === orgSlug)
+        resources.push({
+          name: org?.name || orgSlug,
+          type: 'Organization',
+          identifier: orgSlug,
+        })
+      })
+    }
+
+    // Add projects if token has project_refs
+    const projectRefs = (token as any)?.project_refs
+    if (projectRefs && projectRefs.length > 0) {
+      projectRefs.forEach((projectRef: string) => {
+        const project = projects.find((p) => p.ref === projectRef)
+        resources.push({
+          name: project?.name || projectRef,
+          type: 'Project',
+          identifier: projectRef,
+        })
+      })
+    }
+
+    return resources
+  }
+
   return (
     <>
       <Sheet open={visible} onOpenChange={() => onClose()}>
@@ -169,22 +206,26 @@ export function ViewTokenPermissionsPanel({
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        <TableRow>
-                          <TableCell>
-                            <p className="truncate text-foreground">Acme Corp</p>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-foreground-light">Organization</span>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <p className="truncate text-foreground">api-gateway</p>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-foreground-light">Project</span>
-                          </TableCell>
-                        </TableRow>
+                        {getResourceAccessInfo().length > 0 ? (
+                          getResourceAccessInfo().map((resource, index) => (
+                            <TableRow key={`${resource.type}-${resource.identifier}-${index}`}>
+                              <TableCell>
+                                <p className="truncate text-foreground">{resource.name}</p>
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-foreground-light">{resource.type}</span>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={2}>
+                              <p className="text-foreground-light text-center py-4">
+                                This token has access to all resources.
+                              </p>
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </CardContent>

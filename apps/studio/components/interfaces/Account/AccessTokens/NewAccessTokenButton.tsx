@@ -27,6 +27,7 @@ import { Admonition } from 'ui-patterns'
 import { TokenBasicInfoForm } from './Form/TokenBasicInfoForm'
 import { TokenResourceAccessForm } from './Form/TokenResourceAccessForm'
 import { TokenPermissionsForm } from './Form/TokenPermissionsForm'
+import { ACCESS_TOKEN_PERMISSIONS } from './AccessToken.constants'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
@@ -72,6 +73,8 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const resourceAccess = form.watch('resourceAccess')
   const expirationDate = form.watch('expirationDate')
   const permissionRows = form.watch('permissionRows') || []
+
+
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
     // Validate that at least one permission is configured

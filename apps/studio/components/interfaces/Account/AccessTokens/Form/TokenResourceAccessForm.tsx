@@ -24,8 +24,7 @@ export const TokenResourceAccessForm = ({
   const { data: organizations = [], isLoading: isLoadingOrgs } = useOrganizationsQuery()
   const { data: projects = [], isLoading: isLoadingProjects } = useProjectsQuery()
 
-  console.log('Projects', projects)
-  console.log('Organizations', organizations)
+
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
@@ -211,7 +210,7 @@ export const TokenResourceAccessForm = ({
                         </div>
                       ) : (
                         organizations.map((org) => (
-                          <MultiSelectorItem key={org.slug} value={org.name}>
+                          <MultiSelectorItem key={org.slug} value={org.slug}>
                             {org.name}
                           </MultiSelectorItem>
                         ))
@@ -253,7 +252,7 @@ export const TokenResourceAccessForm = ({
                         </div>
                       ) : (
                         projects.map((project) => (
-                          <MultiSelectorItem key={project.ref} value={project.name}>
+                          <MultiSelectorItem key={project.ref} value={project.ref}>
                             {project.name}
                           </MultiSelectorItem>
                         ))

@@ -9,6 +9,9 @@ export const ACCESS_TOKEN_EXPIRY = [
   'Custom',
 ]
 
+
+
+// Legacy permissions structure (keeping for backward compatibility)
 export const ACCESS_TOKEN_PERMISSIONS = [
   {
     name: 'Organization permissions',

@@ -37,16 +37,26 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
   const { data: tokens, isLoading } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
+      console.log('✅ Token deleted successfully')
       toast.success('Successfully deleted access token')
       setIsOpen(false)
     },
+    onError: (error) => {
+      console.error('❌ Failed to delete token:', error)
+      toast.error(`Failed to delete access token: ${error.message}`)
+    },
   })
+
+  console.log('Tokens', tokens)
 
   const [isOpen, setIsOpen] = useState(false)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
-  const onDeleteToken = async (tokenId: string) => deleteToken({ id: tokenId })
+  const onDeleteToken = async (tokenId: string) => {
+    console.log('🗑️ Attempting to delete token with ID:', tokenId)
+    deleteToken({ id: tokenId })
+  }
 
   const filteredTokens = useMemo(() => {
     return !searchString
@@ -181,6 +191,10 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
                         <DropdownMenuItem
                           className="gap-x-2"
                           onClick={() => {
+                            console.log('🔍 Selected token for deletion:', x)
+                            console.log('🔍 Token object keys:', Object.keys(x))
+                            console.log('🔍 Token ID field:', x.id)
+                            console.log('🔍 Token token_alias:', x.token_alias)
                             setToken(x)
                             setIsOpen(true)
                           }}
