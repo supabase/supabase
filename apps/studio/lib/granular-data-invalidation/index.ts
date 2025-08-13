@@ -61,6 +61,31 @@ export function parseSqlStatement(sql: string, projectRef: string): Invalidation
 }
 
 /**
+ * Parse multiple SQL statements and return all invalidation events
+ */
+export function parseSqlStatements(sql: string, projectRef: string): InvalidationEvent[] {
+  if (!sql || !projectRef) return []
+
+  // Split by semicolon but keep semicolons for proper parsing
+  const statements = sql
+    .split(';')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .map((s) => s + ';')
+
+  const events: InvalidationEvent[] = []
+
+  for (const statement of statements) {
+    const event = parseSqlStatement(statement, projectRef)
+    if (event) {
+      events.push(event)
+    }
+  }
+
+  return events
+}
+
+/**
  * Process SQL and handle invalidation automatically
  * This is the main entry point for processing SQL statements
  */
@@ -75,10 +100,9 @@ export async function invalidateDataGranularly(
   }
 
   try {
-    const event = parseSqlStatement(sql, projectRef)
-    if (event) {
-      await handleInvalidation(queryClient, event)
-    }
+    const events = parseSqlStatements(sql, projectRef)
+
+    await Promise.allSettled(events.map((event) => handleInvalidation(queryClient, event)))
   } catch (error) {
     console.error('invalidateCacheGranularly: Error processing SQL', error)
   }
