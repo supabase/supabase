@@ -131,6 +131,7 @@ export const SignInForm = () => {
                   autoComplete="email"
                   {...field}
                   placeholder="you@example.com"
+                  disabled={isSubmitting}
                 />
               </FormControl_Shadcn_>
             </FormItemLayout>
