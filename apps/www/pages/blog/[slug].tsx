@@ -232,7 +232,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
         isDraftMode: draftMode,
       },
       // Don't use revalidate in draft mode
-      ...(draftMode ? {} : { revalidate: 60 * 10 }),
+      // ...(draftMode ? {} : { revalidate: 60 * 10 }),
     }
   } catch (error) {
     console.log('[getStaticProps] Static post not found, trying CMS post...')
@@ -276,7 +276,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
           isDraftMode: draftMode,
         },
         // Don't use revalidate in draft mode
-        ...(draftMode ? {} : { revalidate: 60 * 10 }),
+        // ...(draftMode ? {} : { revalidate: 60 * 10 }),
       }
     }
     console.log('[getStaticProps] Not in draft mode and no CMS post found, returning 404')
@@ -305,7 +305,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
       isDraftMode: draftMode,
     },
     // Don't use revalidate in draft mode
-    ...(draftMode ? {} : { revalidate: 60 * 10 }),
+    // ...(draftMode ? {} : { revalidate: 60 * 10 }),
   }
 }
 
