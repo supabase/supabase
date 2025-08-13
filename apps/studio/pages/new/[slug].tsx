@@ -23,6 +23,7 @@ import {
   PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { smartRegionToExactRegion } from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
@@ -37,6 +38,7 @@ import { useAvailableOrioleImageVersion } from 'data/config/project-creation-pos
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
@@ -88,7 +90,6 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -311,11 +312,12 @@ const Wizard: NextPageWithLayout = () => {
   })
 
   const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion,
+      dbRegion: dbRegionExact,
       organizationSlug: organization,
     },
     { enabled: currentOrg != null && !isManagedByVercel }

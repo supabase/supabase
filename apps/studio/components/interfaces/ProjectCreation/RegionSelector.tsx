@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { PROVIDERS } from 'lib/constants'
+import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -15,7 +15,6 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 
 interface RegionSelectorProps {
   cloudProvider: CloudProvider
@@ -39,7 +38,7 @@ export const RegionSelector = ({
 
   const { data: availableRegionsData, isLoading } = useOrganizationAvailableRegionsQuery({
     slug: organizationSlug,
-    cloudProvider: cloudProvider as CloudProvider,
+    cloudProvider,
   })
 
   const smartRegions = availableRegionsData?.all.smartGroup ?? []
