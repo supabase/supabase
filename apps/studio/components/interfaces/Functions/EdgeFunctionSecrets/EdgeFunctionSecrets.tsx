@@ -9,18 +9,8 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Badge,
-  Separator,
-  Table,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableCell,
-  TableBody,
-  Card,
-} from 'ui'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretForm from './AddNewSecretForm'
@@ -31,8 +21,14 @@ const EdgeFunctionSecrets = () => {
   const [searchString, setSearchString] = useState('')
   const [selectedSecret, setSelectedSecret] = useState<ProjectSecret>()
 
-  const canReadSecrets = useCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const canUpdateSecrets = useCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
+  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
+  const { can: canUpdateSecrets } = useAsyncCheckProjectPermissions(
+    PermissionAction.SECRETS_WRITE,
+    '*'
+  )
 
   const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
     projectRef: projectRef,
@@ -65,7 +61,7 @@ const EdgeFunctionSecrets = () => {
 
   return (
     <>
-      {isLoading && <GenericSkeletonLoader />}
+      {(isLoading || isLoadingPermissions) && <GenericSkeletonLoader />}
       {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
       {isSuccess && (
         <>

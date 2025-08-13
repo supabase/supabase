@@ -13,7 +13,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -42,11 +42,15 @@ const SSLConfiguration = () => {
     }
   )
 
-  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
   const initialIsEnforced = isSuccess
     ? sslEnforcementConfiguration.appliedSuccessfully &&
       sslEnforcementConfiguration.currentConfig.database
@@ -143,7 +147,7 @@ const SSLConfiguration = () => {
                         ? 'You need additional permissions to update SSL enforcement for your project'
                         : !hasAccessToSSLEnforcement
                           ? 'Your project does not have access to SSL enforcement'
-                          : ''}
+                          : undefined}
                     </TooltipContent>
                   )}
                 </Tooltip>

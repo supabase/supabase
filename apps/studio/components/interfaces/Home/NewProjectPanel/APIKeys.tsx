@@ -9,7 +9,7 @@ import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { Input, SimpleCodeBlock } from 'ui'
 
 const generateInitSnippet = (endpoint: string) => ({
@@ -65,7 +65,10 @@ const APIKeys = () => {
 
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
+  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated

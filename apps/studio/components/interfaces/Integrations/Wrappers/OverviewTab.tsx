@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
@@ -27,7 +27,11 @@ export const WrapperOverviewTab = () => {
   const { data: project } = useSelectedProjectQuery()
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
-  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+
+  const { can: canCreateWrapper } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'wrappers'
+  )
 
   const { data } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
