@@ -5811,6 +5811,7 @@ export interface components {
       /** @enum {string} */
       billing_partner?: 'fly' | 'aws' | 'vercel_marketplace'
       billing_via_partner: boolean
+      cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
       customer_balance: number
@@ -6089,6 +6090,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID: string
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
+      EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean
       EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
       EXTERNAL_WORKOS_ENABLED: boolean
@@ -6720,6 +6722,7 @@ export interface components {
         /** @enum {string} */
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -8287,6 +8290,7 @@ export interface components {
         /** @enum {string} */
         usage_metric?:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -8550,6 +8554,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID?: string | null
       EXTERNAL_TWITTER_ENABLED?: boolean | null
       EXTERNAL_TWITTER_SECRET?: string | null
+      EXTERNAL_WEB3_ETHEREUM_ENABLED?: boolean | null
       EXTERNAL_WEB3_SOLANA_ENABLED?: boolean | null
       EXTERNAL_WORKOS_CLIENT_ID?: string | null
       EXTERNAL_WORKOS_ENABLED?: boolean | null
@@ -11893,6 +11898,7 @@ export interface operations {
         interval?: string
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -17744,6 +17750,7 @@ export interface operations {
           | 'total_realtime_egress'
           | 'total_ingress'
           | 'total_egress'
+          | 'total_cached_egress'
           | 'total_requests'
           | 'total_get_requests'
           | 'total_patch_requests'
