@@ -4,13 +4,13 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-import { Button } from 'ui'
 
 import { tryParseJson } from 'lib/helpers'
+import { Button } from 'ui'
 import {
+  MAX_TABLE_EDITOR_IMPORT_CSV_SIZE,
   UPLOAD_FILE_EXTENSIONS,
   UPLOAD_FILE_TYPES,
-  MAX_TABLE_EDITOR_IMPORT_CSV_SIZE,
 } from './SpreadsheetImport.constants'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
@@ -196,31 +196,4 @@ export function flagInvalidFileImport(file: File): boolean {
   }
 
   return false
-}
-
-// Custom event type for file drop processing
-const PROCESS_DROPPED_FILE_EVENT = 'supa::tableEditor::processDroppedFile' as const
-export interface ProcessDroppedFileEventDetail {
-  file: File
-}
-
-export interface ProcessDroppedFileEvent extends CustomEvent<ProcessDroppedFileEventDetail> {
-  type: typeof PROCESS_DROPPED_FILE_EVENT
-}
-
-// Helper function to dispatch the custom event
-export function dispatchProcessDroppedFileEvent(file: File): void {
-  const event = new CustomEvent(PROCESS_DROPPED_FILE_EVENT, {
-    detail: { file },
-  }) as ProcessDroppedFileEvent
-  window.dispatchEvent(event)
-}
-
-// Helper function to listen for the custom event
-export function addProcessDroppedFileListener(
-  handler: (event: ProcessDroppedFileEvent) => void
-): () => void {
-  const listener = handler as EventListener
-  window.addEventListener(PROCESS_DROPPED_FILE_EVENT, listener)
-  return () => window.removeEventListener(PROCESS_DROPPED_FILE_EVENT, listener)
 }

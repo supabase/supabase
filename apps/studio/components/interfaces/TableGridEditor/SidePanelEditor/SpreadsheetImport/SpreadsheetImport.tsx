@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
@@ -15,11 +16,9 @@ import SpreadSheetTextInput from './SpreadSheetTextInput'
 import { EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import {
-  addProcessDroppedFileListener,
   flagInvalidFileImport,
   parseSpreadsheet,
   parseSpreadsheetText,
-  type ProcessDroppedFileEvent,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
 
@@ -46,6 +45,10 @@ const SpreadsheetImport = ({
 }: SpreadsheetImportProps) => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+
+  const fileFromState =
+    tableEditorSnap.sidePanel?.type === 'csv-import' ? tableEditorSnap.sidePanel.file : undefined
 
   const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
   const [input, setInput] = useState<string>('')
@@ -111,17 +114,6 @@ const SpreadsheetImport = ({
     [processFile]
   )
 
-  // Handle dropped file from custom event
-  useEffect(() => {
-    const handleDroppedFile = (event: ProcessDroppedFileEvent) => {
-      if (visible) {
-        processFile(event.detail.file)
-      }
-    }
-
-    return addProcessDroppedFileListener(handleDroppedFile)
-  }, [visible, processFile])
-
   const resetSpreadsheetImport = () => {
     setInput('')
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
@@ -146,6 +138,7 @@ const SpreadsheetImport = ({
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handler = useCallback(debounce(readSpreadsheetText, debounceDuration), [])
   const onInputChange = (event: any) => {
     setInput(event.target.value)
@@ -181,8 +174,12 @@ const SpreadsheetImport = ({
   }
 
   useEffect(() => {
-    if (visible && headers.length === 0) resetSpreadsheetImport()
-  }, [visible])
+    if (visible) {
+      if (fileFromState) processFile(fileFromState)
+      else if (headers.length === 0) resetSpreadsheetImport()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, fileFromState, processFile])
 
   return (
     <SidePanel
