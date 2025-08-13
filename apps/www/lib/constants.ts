@@ -38,7 +38,7 @@ export const CMS_SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
     ? 'https://supabase.com'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('//zone-www-dot-com-', '//cms-')}`
       : 'http://localhost:3030'
 
 export const LW_URL = `${SITE_ORIGIN}/launch-week/13`

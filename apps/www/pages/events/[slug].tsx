@@ -35,7 +35,6 @@ import { getAllCMSEvents, getAllCMSEventSlugs, getCMSEventBySlug } from 'lib/get
 
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import type Author from '~/types/author'
-import { BASE_PATH, CMS_SITE_ORIGIN } from '../../lib/constants'
 import { useRouter } from 'next/router'
 
 dayjs.extend(utc)
@@ -487,8 +486,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                       dark: event.isCMS ? event.thumb : `/images/events/` + event.thumb,
                       light: event.isCMS
                         ? event.thumb
-                        : `/images/events/` +
-                          (!!event.thumb_light ? event.thumb_light! : event.thumb),
+                        : `/images/events/` + (event.thumb_light ? event.thumb_light : event.thumb),
                     }}
                     fill
                     sizes="100%"

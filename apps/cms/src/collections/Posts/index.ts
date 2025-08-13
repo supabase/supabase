@@ -28,6 +28,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '../../fields/slug/index.ts'
+import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
 
 const launchweekOptions = [
   { label: '6', value: '6' },
@@ -48,7 +49,7 @@ export const Posts: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data }) => {
-        const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+        const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
         // Always use the preview route for live preview to ensure draft mode is enabled
         return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
       },
@@ -74,7 +75,7 @@ export const Posts: CollectionConfig = {
       ],
     },
     preview: (data) => {
-      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+      const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
       // Always use the preview route to ensure draft mode is enabled
       return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
     },

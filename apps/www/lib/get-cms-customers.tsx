@@ -1,9 +1,9 @@
-import { BASE_PATH } from './constants'
+import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
 const toc = require('markdown-toc')
 
 // Payload API configuration
-const PAYLOAD_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
+const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSCustomer = {
@@ -161,8 +161,7 @@ export async function getAllCMSCustomerSlugs() {
  * Fetch a single customer from the CMS by slug
  */
 export async function getCMSCustomerBySlug(slug: string, preview = false) {
-  const PAYLOAD_URL =
-    process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
+  const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
   console.log(
     `[getCMSCustomerBySlug] Fetching customer '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
   )

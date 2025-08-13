@@ -9,7 +9,6 @@
     "cms#build": {
       "dependsOn": ["^build"],
       "env": [
-        "BLOG_APP_URL",
         "CRON_SECRET",
         "DATABASE_URI",
         "NEXT_PUBLIC_SERVER_URL",

@@ -30,6 +30,7 @@ import BlogLinks from 'components/LaunchWeek/7/BlogLinks'
 import LWXSummary from 'components/LaunchWeek/X/LWXSummary'
 import DefaultLayout from 'components/Layouts/Default'
 import DraftModeBanner from 'components/Blog/DraftModeBanner'
+import { CMS_SITE_ORIGIN } from '../../lib/constants'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -321,7 +322,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const { data: livePreviewData, isLoading: isLivePreviewLoading } = useLivePreview({
     initialData: props.blog,
-    serverURL: process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030',
+    serverURL: CMS_SITE_ORIGIN || 'http://localhost:3030',
     depth: 2,
   })
 
@@ -333,7 +334,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   console.log('[BlogPostPage] Initial data:', props.blog)
   console.log(
     '[BlogPostPage] Server URL for live preview:',
-    process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
+    CMS_SITE_ORIGIN || 'http://localhost:3030'
   )
 
   // For LivePreview, we'll use the raw content directly with ReactMarkdown

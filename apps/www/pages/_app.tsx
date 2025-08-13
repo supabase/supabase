@@ -24,7 +24,7 @@ import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
 import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import { API_URL, APP_NAME, CMS_SITE_ORIGIN, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 import { RefreshRouteOnSave as PayloadLivePreview } from '@payloadcms/live-preview-react'
 
@@ -106,7 +106,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 />
                 <PayloadLivePreview
                   refresh={() => router.replace(router.asPath)}
-                  serverURL={process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'}
+                  serverURL={CMS_SITE_ORIGIN || 'http://localhost:3030'}
                 />
               </CommandProvider>
             </TooltipProvider>
