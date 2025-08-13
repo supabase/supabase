@@ -134,6 +134,13 @@ export async function getAllCMSEventSlugs() {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.toLowerCase().includes('application/json')) {
+      const body = await response.text()
+      throw new Error(
+        `Expected JSON from ${PAYLOAD_URL}/api/events but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      )
+    }
     const data = await response.json()
     return data.docs.map((event: CMSEvent) => ({
       params: {
@@ -174,6 +181,13 @@ export async function getCMSEventBySlug(slug: string, preview = false) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.toLowerCase().includes('application/json')) {
+      const body = await response.text()
+      throw new Error(
+        `Expected JSON from ${url} but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      )
+    }
     const data = await response.json()
     console.log(
       `[getCMSEventBySlug] API responded with ${data.docs?.length || 0} events, draft mode: ${preview}`
@@ -207,6 +221,16 @@ export async function getCMSEventBySlug(slug: string, preview = false) {
         throw new Error(`HTTP error! status: ${publishedResponse.status}`)
       }
 
+      const publishedContentType = publishedResponse.headers.get('content-type') || ''
+      if (!publishedContentType.toLowerCase().includes('application/json')) {
+        const body = await publishedResponse.text()
+        throw new Error(
+          `Expected JSON from ${publishedUrl} but received '${publishedContentType}'. Body (truncated): ${body.slice(
+            0,
+            200
+          )}`
+        )
+      }
       const publishedData = await publishedResponse.json()
       console.log(
         `[getCMSEventBySlug] Published API responded with ${publishedData.docs?.length || 0} events`
@@ -320,6 +344,13 @@ export async function getAllCMSEvents({
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.toLowerCase().includes('application/json')) {
+      const body = await response.text()
+      throw new Error(
+        `Expected JSON from ${PAYLOAD_URL}/api/events but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      )
+    }
     const data = await response.json()
 
     let events = data.docs

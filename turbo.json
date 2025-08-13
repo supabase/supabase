@@ -11,7 +11,6 @@
       "env": [
         "CRON_SECRET",
         "DATABASE_URI",
-        "NEXT_PUBLIC_SERVER_URL",
         "PAYLOAD_SECRET",
         "PREVIEW_SECRET",
         "S3_BUCKET",

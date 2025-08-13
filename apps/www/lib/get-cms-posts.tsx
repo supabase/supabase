@@ -152,6 +152,13 @@ export async function getAllCMSPostSlugs() {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.toLowerCase().includes('application/json')) {
+      const body = await response.text()
+      throw new Error(
+        `Expected JSON from ${PAYLOAD_URL}/api/posts but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      )
+    }
     const data = await response.json()
     console.log(
       '[getAllCMSPostSlugs] Found posts:',
@@ -209,6 +216,13 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.toLowerCase().includes('application/json')) {
+      const body = await response.text()
+      throw new Error(
+        `Expected JSON from ${url} but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      )
+    }
     const data = await response.json()
     console.log(
       `[getCMSPostBySlug] API responded with ${data.docs?.length || 0} posts, draft mode: ${preview}`
@@ -243,6 +257,16 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
         throw new Error(`HTTP error! status: ${publishedResponse.status}`)
       }
 
+      const publishedContentType = publishedResponse.headers.get('content-type') || ''
+      if (!publishedContentType.toLowerCase().includes('application/json')) {
+        const body = await publishedResponse.text()
+        throw new Error(
+          `Expected JSON from ${publishedUrl} but received '${publishedContentType}'. Body (truncated): ${body.slice(
+            0,
+            200
+          )}`
+        )
+      }
       const publishedData = await publishedResponse.json()
       console.log(
         `[getCMSPostBySlug] Published API responded with ${publishedData.docs?.length || 0} posts`
@@ -390,6 +414,13 @@ export async function getAllCMSPosts({
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.toLowerCase().includes('application/json')) {
+      const body = await response.text()
+      throw new Error(
+        `Expected JSON from ${PAYLOAD_URL}/api/posts but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      )
+    }
     const data = await response.json()
 
     let posts = data.docs
