@@ -17,7 +17,7 @@ import { isNotNullOrUndefined } from 'lib/helpers'
 import mdxComponents from 'lib/mdx/mdxComponents'
 import { mdxSerialize } from 'lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
-import { getAllCMSPostSlugs, getCMSPostBySlug, getAllCMSPosts } from 'lib/get-cms-posts'
+import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 
 import ShareArticleActions from 'components/Blog/ShareArticleActions'
 import CTABanner from 'components/CTABanner'
@@ -200,8 +200,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 
     // Get all posts for navigation and related posts
     const allStaticPosts = getSortedPosts({ directory: '_blog' })
-    const allCmsPosts = await getAllCMSPosts()
-    const allPosts = [...allStaticPosts, ...allCmsPosts].sort(
+    const allPosts = [...allStaticPosts].sort(
       (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
     )
     const currentIndex = allPosts.findIndex((post) => post.slug === slug)
@@ -316,6 +315,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   // console.log('isDraftMode', isDraftMode)
   const [previewData, setPreviewData] = useState<ProcessedBlogData>(props.blog)
+  const [cmsPosts, setCmsPosts] = useState<any[]>([])
 
   // Only use live preview hook for CMS posts in draft mode
   const shouldUseLivePreview = isDraftMode && props.blog.isCMS
@@ -399,6 +399,22 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     // Fallback to props.blog
     return props.blog
   }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, props.blog])
+
+  // Fetch CMS posts client-side to enrich prev/next suggestions
+  useEffect(() => {
+    const loadCmsPosts = async () => {
+      try {
+        const res = await fetch('/api-v2/cms-posts')
+        const data = await res.json()
+        if (data.success && Array.isArray(data.posts)) {
+          setCmsPosts(data.posts)
+        }
+      } catch (e) {
+        console.error('Failed to load CMS posts', e)
+      }
+    }
+    loadCmsPosts()
+  }, [])
 
   // const handlePreviewUpdate = (data: any) => {
   //   // console.log('[BlogPostPage] Received preview update:', data)

@@ -1,10 +1,10 @@
 import fs from 'fs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
-import { getAllCMSPosts } from '~/lib/get-cms-posts'
+// CMS posts are fetched client-side from /api-v2/cms-posts to keep server bundle small
 
 import type PostTypes from '~/types/post'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -20,6 +20,7 @@ export type BlogView = 'list' | 'grid'
 function Blog(props: any) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
+  const [cmsPosts, setCmsPosts] = useState<any[]>([])
   const [blogs, setBlogs] = useState(props.blogs)
   const [view, setView] = useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
@@ -27,6 +28,34 @@ function Blog(props: any) {
 
   const meta_title = 'Supabase Blog: the Postgres development platform'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
+  // Merge CMS posts with static ones when CMS posts arrive
+  const allPosts = [...props.blogs, ...cmsPosts].sort(
+    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
+  // Keep list in sync once after CMS posts load, but don't override user filters later
+  useEffect(() => {
+    setBlogs((prev: any[]) => (prev.length === props.blogs.length ? allPosts : prev))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cmsPosts])
+
+  // Fetch CMS posts
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const fetchCmsPosts = async () => {
+      try {
+        const res = await fetch('/api-v2/cms-posts')
+        const data = await res.json()
+        if (data.success && Array.isArray(data.posts)) {
+          setCmsPosts(data.posts)
+        }
+      } catch (e) {
+        console.error('Failed to load CMS posts', e)
+      }
+    }
+    fetchCmsPosts()
+  }, [])
 
   return (
     <>
@@ -54,7 +83,7 @@ function Blog(props: any) {
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
         <div className="md:container mx-auto py-4 lg:py-10 px-4 sm:px-12 xl:px-16">
-          {props.blogs.slice(0, 1).map((blog: any) => (
+          {allPosts.slice(0, 1).map((blog: any) => (
             <FeaturedThumb key={blog.slug} {...blog} />
           ))}
         </div>
@@ -62,7 +91,7 @@ function Blog(props: any) {
         <div className="border-default border-t">
           <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
             <BlogFilters
-              allPosts={props.blogs}
+              allPosts={allPosts}
               setPosts={setBlogs}
               view={view as BlogView}
               setView={setView}
@@ -107,11 +136,8 @@ export async function getStaticProps() {
   // Get static blog posts
   const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
 
-  // Get CMS blog posts
-  const cmsPostsData = await getAllCMSPosts()
-
-  // Combine both data sources
-  const allPostsData = [...staticPostsData, ...cmsPostsData].sort((a: any, b: any) => {
+  // Only static data at build time; CMS posts are fetched client-side
+  const allPostsData = [...staticPostsData].sort((a: any, b: any) => {
     const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
     const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
     return dateB - dateA
