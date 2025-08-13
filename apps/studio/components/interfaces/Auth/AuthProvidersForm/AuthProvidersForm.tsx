@@ -17,7 +17,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from './AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import { ProviderForm } from './ProviderForm'
 
