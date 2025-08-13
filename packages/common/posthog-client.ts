@@ -3,7 +3,7 @@ import { PostHogConfig } from 'posthog-js'
 
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
-const MAX_PENDING_EVENTS = 200
+const MAX_PENDING_EVENTS = 20
 
 interface PostHogClientConfig {
   apiKey?: string
@@ -40,6 +40,10 @@ class PostHogClient {
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
       loaded: (posthog) => {
+        // Apply pending properties that were set before PostHog
+        // initialized due to poor connection or user not accepting
+        // consent right away
+
         // Apply any pending groups
         Object.entries(this.pendingGroups).forEach(([type, id]) => {
           posthog.group(type, id)
@@ -62,7 +66,7 @@ class PostHogClient {
         // Flush any pending events
         this.pendingEvents.forEach(({ event, properties }) => {
           try {
-            posthog.capture(event, properties)
+            posthog.capture(event, properties, { transport: 'sendBeacon' })
           } catch (error) {
             console.error('PostHog capture failed:', error)
           }
@@ -80,6 +84,7 @@ class PostHogClient {
 
     if (!this.initialized) {
       // Queue the event for when PostHog initializes (up to cap)
+      // (e.g. poor connection or user not accepting consent right away)
       if (this.pendingEvents.length >= this.maxPendingEvents) {
         this.pendingEvents.shift() // Remove oldest event
       }
@@ -106,6 +111,7 @@ class PostHogClient {
 
     if (!this.initialized) {
       // Queue the event for when PostHog initializes (up to cap)
+      // (e.g. poor connection or user not accepting consent right away)
       if (this.pendingEvents.length >= this.maxPendingEvents) {
         this.pendingEvents.shift() // Remove oldest event
       }
