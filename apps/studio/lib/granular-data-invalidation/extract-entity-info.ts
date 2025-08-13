@@ -8,7 +8,7 @@ const SQL_PATTERNS = {
   trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+"?(?:(\w+)\.)?"?(\w+)"?)?/i,
   policy: /policy\s+(?:"([^"]+)"|(\w+))\s+on\s+(?:"?(\w+)"?\.)??"?(\w+)"?/i,
   index:
-    /(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+(?:not\s+)?exists\s+)?"?(\w+)"?\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?/i,
+    /(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)??"?(\w+)"?(?:\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?)?/i,
   cron: /(?:select\s+)?cron\.(?:schedule|unschedule)\s*\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))/i,
   view: /view\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
   schema: /schema\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"([^"]+)"|(\w+))/i,
@@ -74,11 +74,23 @@ function extractIndexInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | 
   const match = sql.match(SQL_PATTERNS.index)
   if (!match) return null
 
-  return {
-    entityType: 'index',
-    schema: match[2] || DEFAULT_SCHEMA,
-    table: match[3],
-    entityName: match[1],
+  // For DROP INDEX: match[1] is schema (optional), match[2] is index name
+  // For CREATE INDEX: match[2] is index name, match[3] is schema (optional), match[4] is table
+  const isDropIndex = !match[3] && !match[4]
+  
+  if (isDropIndex) {
+    return {
+      entityType: 'index',
+      schema: match[1] || DEFAULT_SCHEMA,
+      entityName: match[2],
+    }
+  } else {
+    return {
+      entityType: 'index',
+      schema: match[3] || DEFAULT_SCHEMA,
+      table: match[4],
+      entityName: match[2],
+    }
   }
 }
 
