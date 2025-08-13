@@ -148,7 +148,7 @@ export function SurveyWordCloud({
                 <div
                   className="absolute inset-0 pointer-events-none bg-foreground-muted"
                   style={{
-                    maskImage: 'url("/survey/pattern-back.svg")',
+                    maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
                     maskSize: '15px 15px',
                     maskRepeat: 'repeat',
                     maskPosition: 'center',
@@ -169,7 +169,7 @@ export function SurveyWordCloud({
                   <div
                     className={`absolute inset-0 pointer-events-none bg-brand`}
                     style={{
-                      maskImage: 'url("/survey/pattern-front.svg")',
+                      maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
                       maskSize: '14.5px 15px',
                       maskRepeat: 'repeat',
                       maskPosition: 'top left',

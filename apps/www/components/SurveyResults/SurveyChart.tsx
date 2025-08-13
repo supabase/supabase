@@ -387,7 +387,7 @@ export function SurveyChart({
                       <div
                         className="absolute inset-0 pointer-events-none bg-foreground-muted/50"
                         style={{
-                          maskImage: 'url("/survey/pattern-back.svg")',
+                          maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
                           maskSize: '15px 15px',
                           maskRepeat: 'repeat',
                           maskPosition: 'center',
@@ -408,7 +408,7 @@ export function SurveyChart({
                         <div
                           className={`absolute inset-0 pointer-events-none ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-light'}`}
                           style={{
-                            maskImage: 'url("/survey/pattern-front.svg")',
+                            maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
                             maskSize: '14.5px 15px',
                             maskRepeat: 'repeat',
                             maskPosition: 'top left',
