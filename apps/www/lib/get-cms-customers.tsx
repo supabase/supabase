@@ -4,7 +4,7 @@ const toc = require('markdown-toc')
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
-const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
+const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
 type CMSCustomer = {
   id: string
@@ -148,9 +148,13 @@ export async function getAllCMSCustomerSlugs() {
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.toLowerCase().includes('application/json')) {
       const body = await response.text()
-      throw new Error(
-        `Expected JSON from ${PAYLOAD_URL}/api/customers but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      console.warn(
+        `[getAllCMSCustomerSlugs] Non-JSON response from ${PAYLOAD_URL}/api/customers (content-type: '${contentType}'). Returning empty slugs. Body (truncated): ${body.slice(
+          0,
+          200
+        )}`
       )
+      return []
     }
     const data = await response.json()
     return data.docs.map((customer: CMSCustomer) => ({
@@ -195,9 +199,13 @@ export async function getCMSCustomerBySlug(slug: string, preview = false) {
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.toLowerCase().includes('application/json')) {
       const body = await response.text()
-      throw new Error(
-        `Expected JSON from ${url} but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      console.warn(
+        `[getCMSCustomerBySlug] Non-JSON response from ${url} (content-type: '${contentType}'). Returning null. Body (truncated): ${body.slice(
+          0,
+          200
+        )}`
       )
+      return null
     }
     const data = await response.json()
     console.log(
@@ -235,12 +243,13 @@ export async function getCMSCustomerBySlug(slug: string, preview = false) {
       const publishedContentType = publishedResponse.headers.get('content-type') || ''
       if (!publishedContentType.toLowerCase().includes('application/json')) {
         const body = await publishedResponse.text()
-        throw new Error(
-          `Expected JSON from ${publishedUrl} but received '${publishedContentType}'. Body (truncated): ${body.slice(
+        console.warn(
+          `[getCMSCustomerBySlug] Non-JSON response from ${publishedUrl} (content-type: '${publishedContentType}'). Returning null. Body (truncated): ${body.slice(
             0,
             200
           )}`
         )
+        return null
       }
       const publishedData = await publishedResponse.json()
       console.log(
@@ -356,9 +365,13 @@ export async function getAllCMSCustomers({
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.toLowerCase().includes('application/json')) {
       const body = await response.text()
-      throw new Error(
-        `Expected JSON from ${PAYLOAD_URL}/api/customers but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      console.warn(
+        `[getAllCMSCustomers] Non-JSON response from ${PAYLOAD_URL}/api/customers (content-type: '${contentType}'). Returning empty customers. Body (truncated): ${body.slice(
+          0,
+          200
+        )}`
       )
+      return []
     }
     const data = await response.json()
 

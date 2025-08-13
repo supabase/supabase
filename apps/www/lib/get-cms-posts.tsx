@@ -4,7 +4,7 @@ const toc = require('markdown-toc')
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
-const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
+const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
 // Debug logging for environment variables
 console.log('[cms-posts] PAYLOAD_URL:', PAYLOAD_URL)
@@ -155,9 +155,13 @@ export async function getAllCMSPostSlugs() {
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.toLowerCase().includes('application/json')) {
       const body = await response.text()
-      throw new Error(
-        `Expected JSON from ${PAYLOAD_URL}/api/posts but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      console.warn(
+        `[getAllCMSPostSlugs] Non-JSON response from ${PAYLOAD_URL}/api/posts (content-type: '${contentType}'). Returning empty slugs. Body (truncated): ${body.slice(
+          0,
+          200
+        )}`
       )
+      return []
     }
     const data = await response.json()
     console.log(
@@ -219,9 +223,13 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.toLowerCase().includes('application/json')) {
       const body = await response.text()
-      throw new Error(
-        `Expected JSON from ${url} but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      console.warn(
+        `[getCMSPostBySlug] Non-JSON response from ${url} (content-type: '${contentType}'). Returning null. Body (truncated): ${body.slice(
+          0,
+          200
+        )}`
       )
+      return null
     }
     const data = await response.json()
     console.log(
@@ -260,12 +268,13 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       const publishedContentType = publishedResponse.headers.get('content-type') || ''
       if (!publishedContentType.toLowerCase().includes('application/json')) {
         const body = await publishedResponse.text()
-        throw new Error(
-          `Expected JSON from ${publishedUrl} but received '${publishedContentType}'. Body (truncated): ${body.slice(
+        console.warn(
+          `[getCMSPostBySlug] Non-JSON response from ${publishedUrl} (content-type: '${publishedContentType}'). Returning null. Body (truncated): ${body.slice(
             0,
             200
           )}`
         )
+        return null
       }
       const publishedData = await publishedResponse.json()
       console.log(
@@ -417,9 +426,13 @@ export async function getAllCMSPosts({
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.toLowerCase().includes('application/json')) {
       const body = await response.text()
-      throw new Error(
-        `Expected JSON from ${PAYLOAD_URL}/api/posts but received '${contentType}'. Body (truncated): ${body.slice(0, 200)}`
+      console.warn(
+        `[getAllCMSPosts] Non-JSON response from ${PAYLOAD_URL}/api/posts (content-type: '${contentType}'). Returning empty posts. Body (truncated): ${body.slice(
+          0,
+          200
+        )}`
       )
+      return []
     }
     const data = await response.json()
 
