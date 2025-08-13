@@ -82,10 +82,9 @@ export const Grid = memo(
       const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
         enabled: isTableEmpty && !isForeignTable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
-        onTelemetryEvent: (eventName, properties) => {
+        onTelemetryEvent: (eventName) => {
           sendEvent({
             action: eventName,
-            properties,
             groups: {
               project: project?.ref ?? 'Unknown',
               organization: org?.slug ?? 'Unknown',
@@ -136,7 +135,7 @@ export const Grid = memo(
       return (
         <div
           className={cn(
-            `flex flex-col relative`,
+            'flex flex-col relative transition-colors',
             containerClass,
             isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand-600'
           )}
@@ -169,7 +168,7 @@ export const Grid = memo(
               {isSuccess && (
                 <>
                   {(filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-full h-full transition-colors">
+                    <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light">
                         {isDraggedOver ? 'Drop your CSV file here' : 'This table is empty'}
                       </p>

@@ -914,15 +914,7 @@ export interface ImportDataButtonClickedEvent {
  * @page /dashboard/project/{ref}/editor
  */
 export interface ImportDataFileDroppedEvent {
-  action: 'import_data_file_dropped'
-  properties: {
-    /**
-     * The type of table the data is imported to.
-     * New Table means added when creating new table by clicking from New table sidebar,
-     * Existing Table means added to an existing table by going to the table and clicking from the green Insert button..
-     */
-    tableType: 'New Table' | 'Existing Table'
-  }
+  action: 'import_data_dropzone_file_added'
   groups: TelemetryGroups
 }
 

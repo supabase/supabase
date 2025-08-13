@@ -21,6 +21,7 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
+import { useChanged } from 'hooks/misc/useChanged'
 
 interface SpreadsheetImportProps {
   debounceDuration?: number
@@ -50,6 +51,7 @@ const SpreadsheetImport = ({
   const fileFromState =
     tableEditorSnap.sidePanel?.type === 'csv-import' ? tableEditorSnap.sidePanel.file : undefined
 
+  const visiblityChanged = useChanged(visible)
   const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
   const [input, setInput] = useState<string>('')
   const [uploadedFile, setUploadedFile] = useState<File>()
@@ -114,13 +116,13 @@ const SpreadsheetImport = ({
     [processFile]
   )
 
-  const resetSpreadsheetImport = () => {
+  const resetSpreadsheetImport = useCallback(() => {
     setInput('')
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(undefined)
     setErrors([])
     updateEditorDirty(false)
-  }
+  }, [updateEditorDirty])
 
   const readSpreadsheetText = async (text: string) => {
     if (text.length > 0) {
@@ -174,12 +176,18 @@ const SpreadsheetImport = ({
   }
 
   useEffect(() => {
-    if (visible) {
+    if (visiblityChanged && visible) {
       if (fileFromState) processFile(fileFromState)
       else if (headers.length === 0) resetSpreadsheetImport()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, fileFromState, processFile])
+  }, [
+    visiblityChanged,
+    visible,
+    fileFromState,
+    processFile,
+    headers.length,
+    resetSpreadsheetImport,
+  ])
 
   return (
     <SidePanel
