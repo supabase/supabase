@@ -40,7 +40,7 @@ import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 export const TableEditorMenu = () => {
-  const { id: _id } = useParams()
+  const { slug, id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -252,6 +252,7 @@ export const TableEditorMenu = () => {
                     // @ts-expect-error
                     ItemComponent={EntityListItem}
                     itemProps={{
+                      slug: slug,
                       projectRef: project?.ref!,
                       id: Number(id),
                       isSchemaLocked,

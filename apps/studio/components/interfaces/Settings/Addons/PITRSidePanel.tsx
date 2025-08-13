@@ -54,7 +54,7 @@ const PITR_CATEGORY_OPTIONS: {
 ]
 
 const PITRSidePanel = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
@@ -290,7 +290,7 @@ const PITRSidePanel = () => {
                   title="Your project is required to minimally be on a Small compute size to enable PITR"
                   actions={[
                     <Button asChild key="change-compute" type="default">
-                      <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                      <Link href={`/org/${slug}/project/${projectRef}/settings/compute-and-disk`}>
                         Change compute size
                       </Link>
                     </Button>,

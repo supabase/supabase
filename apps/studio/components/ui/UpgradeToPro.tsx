@@ -83,7 +83,7 @@ const UpgradeToPro = ({
                     ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
                     : addon == null
                       ? `/org/${organization?.slug ?? '_'}/billing?panel=costControl&source=${source}`
-                      : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+                      : `/org/${organization?.slug}/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
                 }
               >
                 {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}

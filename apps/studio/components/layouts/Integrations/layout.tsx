@@ -16,6 +16,7 @@ import { Menu, Separator } from 'ui'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import AlertError from 'components/ui/AlertError'
+import { useParams } from 'next/navigation'
 
 /**
  * Layout component for the Integrations section
@@ -35,6 +36,7 @@ const IntegrationsLayout = ({ ...props }: PropsWithChildren) => {
 const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
   const project = useSelectedProject()
   const router = useRouter()
+  const { slug } = useParams() as { slug: string }
   // Refs for the main scrollable area and header
   const mainElementRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
@@ -93,7 +95,7 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
     name: integration.name,
     label: integration.status,
     key: `integrations/${integration.id}`,
-    url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
+    url: `/org/${slug}/project/${project?.ref}/integrations/${integration.id}/overview`,
     icon: (
       <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
         {integration.icon({ className: 'p-1' })}
@@ -110,7 +112,7 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
       isBlocking={false}
       productMenu={
         <>
-          <ProductMenu page={page} menu={generateIntegrationsMenu({ projectRef: project?.ref })} />
+          <ProductMenu page={page} menu={generateIntegrationsMenu({ slug, projectRef: project?.ref })} />
           <Separator />
           <div className="px-4 py-6 md:px-6">
             <Menu.Group
@@ -155,8 +157,9 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
 
 const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const page = router.pathname.split('/')[6]
   const project = useSelectedProject()
+  const { slug } = useParams() as { slug: string }
 
   const {
     installedIntegrations: integrations,
@@ -169,7 +172,7 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
     name: integration.name,
     label: integration.status,
     key: `integrations/${integration.id}`,
-    url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
+    url: `/org/${slug}/project/${project?.ref}/integrations/${integration.id}/overview`,
     icon: (
       <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
         {integration.icon({ className: 'p-1' })}
@@ -184,7 +187,7 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
       product="Integrations"
       productMenu={
         <>
-          <ProductMenu page={page} menu={generateIntegrationsMenu({ projectRef: project?.ref })} />
+          <ProductMenu page={page} menu={generateIntegrationsMenu({ slug, projectRef: project?.ref })} />
           <Separator />
           <div className="p-6">
             <Menu.Group
@@ -228,7 +231,7 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
 // Wrap component with authentication HOC before exporting
 export default withAuth(IntegrationsLayout)
 
-const generateIntegrationsMenu = ({ projectRef }: { projectRef?: string }): ProductMenuGroup[] => {
+const generateIntegrationsMenu = ({ slug, projectRef }: { slug: string, projectRef?: string }): ProductMenuGroup[] => {
   return [
     {
       title: 'All Integrations',
@@ -236,7 +239,7 @@ const generateIntegrationsMenu = ({ projectRef }: { projectRef?: string }): Prod
         {
           name: 'All Integrations',
           key: 'integrations',
-          url: `/project/${projectRef}/integrations`,
+          url: `/org/${slug}/project/${projectRef}/integrations`,
           items: [],
         },
       ],

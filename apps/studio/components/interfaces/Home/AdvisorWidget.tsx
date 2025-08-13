@@ -36,7 +36,7 @@ interface SlowQuery {
 }
 
 export const AdvisorWidget = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams() as { slug: string; ref?: string }
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
   const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
@@ -102,6 +102,7 @@ export const AdvisorWidget = () => {
   }
 
   const renderLintTabContent = (
+    slug: string,
     title: string,
     lints: Lint[],
     errorCount: number,
@@ -132,7 +133,7 @@ export const AdvisorWidget = () => {
                 >
                   <div className="flex items-center justify-between w-full group">
                     <Link
-                      href={`/project/${projectRef}/advisors/${title.toLowerCase()}?id=${lint.cache_key}&preset=${lint.level}`}
+                      href={`/org/${slug}/project/${projectRef}/advisors/${title.toLowerCase()}?id=${lint.cache_key}&preset=${lint.level}`}
                       className="flex items-center gap-2 transition truncate flex-1 min-w-0 py-3"
                     >
                       <EntityTypeIcon type={lint.metadata?.type} />
@@ -228,12 +229,13 @@ export const AdvisorWidget = () => {
                   },
                 }}
               >
-                <Link href={`/project/${projectRef}/advisors/${selectedTab}`} />
+                <Link href={`/org/${slug}/project/${projectRef}/advisors/${selectedTab}`} />
               </ButtonTooltip>
             </CardHeader>
             <CardContent className="!p-0 mt-0 flex-1 overflow-y-auto">
               <TabsContent value="security" className="p-0 mt-0 h-full">
                 {renderLintTabContent(
+                  slug,
                   'Security',
                   securityLints,
                   securityErrorCount,
@@ -243,6 +245,7 @@ export const AdvisorWidget = () => {
               </TabsContent>
               <TabsContent value="performance" className="p-0 mt-0 h-full">
                 {renderLintTabContent(
+                  slug,
                   'Performance',
                   performanceLints,
                   performanceErrorCount,
@@ -269,7 +272,7 @@ export const AdvisorWidget = () => {
                 },
               }}
             >
-              <Link href={`/project/${projectRef}/advisors/query-performance`} />
+              <Link href={`/org/${slug}/project/${projectRef}/advisors/query-performance`} />
             </ButtonTooltip>
           </CardHeader>
           <CardContent className="!p-0 flex-1 overflow-y-auto">

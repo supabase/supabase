@@ -4,6 +4,7 @@ import { partition } from 'lodash'
 import { NextRouter } from 'next/router'
 import { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
+import { useOrganizationSlug } from '../data/organizations/organization-path-slug'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
@@ -109,7 +110,7 @@ function getSavedTabs(ref: string) {
   }
 }
 
-function createTabsState(projectRef: string) {
+function createTabsState(slug: string, projectRef: string) {
   const recentItems = getSavedRecentItems(projectRef)
   const { openTabs, activeTab, tabsMap, previewTabId } = getSavedTabs(projectRef)
 
@@ -278,7 +279,7 @@ function createTabsState(projectRef: string) {
       switch (tab.type) {
         case 'sql':
           const schema = (router.query.schema as string) || 'public'
-          router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
+          router.push(`/org/${slug}/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
           break
         case 'r':
         case 'v':
@@ -286,7 +287,7 @@ function createTabsState(projectRef: string) {
         case 'f':
         case 'p':
           router.push(
-            `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
+            `/org/${slug}/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
           )
           break
       }
@@ -337,17 +338,17 @@ function createTabsState(projectRef: string) {
           // If no tabs of same type, go to the home of the current section
           switch (tabBeingClosed?.type) {
             case 'sql':
-              router.push(`/project/${router.query.ref}/sql`)
+              router.push(`/org/${slug}/project/${router.query.ref}/sql`)
               break
             case 'r':
             case 'v':
             case 'm':
             case 'f':
             case 'p':
-              router.push(`/project/${router.query.ref}/editor`)
+              router.push(`/org/${slug}/project/${router.query.ref}/editor`)
               break
             default:
-              router.push(`/project/${router.query.ref}/${editor}`)
+              router.push(`/org/${slug}/project/${router.query.ref}/${editor}`)
           }
         }
       }
@@ -369,7 +370,7 @@ function createTabsState(projectRef: string) {
           : store.openTabs.filter((x) => x.startsWith('sql'))
       store.removeTabs(tabsToClose)
       onClearDashboardHistory()
-      router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+      router.push(`/org/${slug}/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
     },
     handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: any) => {
       // Make permanent if needed
@@ -396,17 +397,18 @@ function createTabsState(projectRef: string) {
 
 export type TabsState = ReturnType<typeof createTabsState>
 
-export const TabsStateContext = createContext<TabsState>(createTabsState(''))
+export const TabsStateContext = createContext<TabsState>(createTabsState('', ''))
 
 export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
-  const [state, setState] = useState(createTabsState(project?.ref ?? ''))
+  const slug = useOrganizationSlug()
+  const [state, setState] = useState(createTabsState(slug || '', project?.ref ?? ''))
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !!project?.ref) {
-      setState(createTabsState(project?.ref ?? ''))
+      setState(createTabsState(slug || '', project?.ref ?? ''))
     }
-  }, [project?.ref])
+  }, [project?.ref, slug])
 
   useEffect(() => {
     if (typeof window !== 'undefined' && project?.ref) {

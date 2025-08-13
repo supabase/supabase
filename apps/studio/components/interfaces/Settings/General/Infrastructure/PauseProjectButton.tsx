@@ -17,9 +17,11 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useParams } from 'next/navigation'
 
 const PauseProjectButton = () => {
   const router = useRouter()
+  const { slug } = useParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
@@ -41,7 +43,7 @@ const PauseProjectButton = () => {
     onSuccess: (_, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.PAUSING)
       toast.success('Pausing project...')
-      router.push(`/project/${projectRef}`)
+      router.push(`/org/${slug}/project/${projectRef}`)
     },
   })
 

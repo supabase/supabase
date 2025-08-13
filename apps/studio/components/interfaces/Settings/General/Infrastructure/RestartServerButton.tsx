@@ -25,9 +25,11 @@ import {
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { useParams } from 'next/navigation'
 
 const RestartServerButton = () => {
   const router = useRouter()
+  const { slug } = useParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const isProjectActive = useIsProjectActive()
@@ -82,7 +84,7 @@ const RestartServerButton = () => {
   const onRestartSuccess = () => {
     setProjectStatus(queryClient, projectRef, 'RESTARTING')
     toast.success('Restarting server...')
-    router.push(`/project/${projectRef}`)
+    router.push(`/org/${slug}/project/${projectRef}`)
     setServiceToRestart(undefined)
   }
 

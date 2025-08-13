@@ -28,7 +28,7 @@ export interface DefaultLayoutProps {
 const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
   const { ref } = useParams()
   const router = useRouter()
-  const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
+  const showProductMenu = !!ref && router.pathname !== '/org/[slug]/project/[ref]'
 
   useCheckLatestDeploy()
 

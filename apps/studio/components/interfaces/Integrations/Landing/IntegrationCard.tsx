@@ -5,6 +5,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { Badge, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
+import { useParams } from 'next/navigation'
 
 type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
@@ -40,9 +41,10 @@ export const IntegrationCard = ({
   isInstalled,
 }: IntegrationCardProps) => {
   const { project } = useProjectContext()
+  const { slug } = useParams()
 
   return (
-    <Link href={`/project/${project?.ref}/integrations/${id}/overview`}>
+    <Link href={`/org/${slug}/project/${project?.ref}/integrations/${id}/overview`}>
       <div className={INTEGRATION_CARD_STYLE}>
         <div className="w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
           {icon()}

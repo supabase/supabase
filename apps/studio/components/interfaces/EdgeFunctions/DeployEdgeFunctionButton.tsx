@@ -22,7 +22,7 @@ import {
 
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const org = useSelectedOrganization()
   const snap = useAiAssistantStateSnapshot()
 
@@ -38,7 +38,7 @@ export const DeployEdgeFunctionButton = () => {
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuItem
           onSelect={() => {
-            router.push(`/project/${ref}/functions/new`)
+            router.push(`/org/${slug}/project/${ref}/functions/new`)
             sendEvent({
               action: 'edge_function_via_editor_button_clicked',
               properties: { origin: 'secondary_action' },

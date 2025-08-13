@@ -5,7 +5,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const PublicSchemaNotEnabledAlert = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   return (
     <Admonition type="default">
@@ -16,7 +16,7 @@ const PublicSchemaNotEnabledAlert = () => {
       </p>
       <Button asChild type="default" className="mt-1">
         <Link
-          href={`/project/${projectRef}/settings/api#postgrest-config`}
+          href={`/org/${slug}/project/${projectRef}/settings/api#postgrest-config`}
           className="!no-underline"
         >
           View API settings

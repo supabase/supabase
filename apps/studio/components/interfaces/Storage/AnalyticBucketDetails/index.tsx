@@ -48,9 +48,11 @@ import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceRow } from './NamespaceRow'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
+import { useParams } from 'next/navigation'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   const { project } = useProjectContext()
+  const { slug } = useParams() as { slug: string }
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -157,6 +159,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           <ExtensionNotInstalled
             bucketName={bucket.name}
             projectRef={project?.ref!}
+            slug={slug}
             wrapperMeta={wrapperMeta}
             wrappersExtension={wrappersExtension!}
           />
@@ -165,6 +168,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           <ExtensionNeedsUpgrade
             bucketName={bucket.name}
             projectRef={project?.ref!}
+            slug={slug}
             wrapperMeta={wrapperMeta}
             wrappersExtension={wrappersExtension!}
           />
@@ -268,11 +272,13 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
 const ExtensionNotInstalled = ({
   bucketName,
   projectRef,
+  slug,
   wrapperMeta,
   wrappersExtension,
 }: {
   bucketName: string
   projectRef: string
+  slug: string
   wrapperMeta: WrapperMeta
   wrappersExtension: DatabaseExtension
 }) => {
@@ -302,8 +308,8 @@ const ExtensionNotInstalled = ({
             <Link
               href={
                 databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
+                  ? `/org/${slug}/project/${projectRef}/settings/infrastructure`
+                  : `/org/${slug}/project/${projectRef}/database/extensions?filter=wrappers`
               }
             >
               {databaseNeedsUpgrading ? 'Upgrade database' : 'Install wrappers extension'}
@@ -319,11 +325,13 @@ const ExtensionNotInstalled = ({
 const ExtensionNeedsUpgrade = ({
   bucketName,
   projectRef,
+  slug,
   wrapperMeta,
   wrappersExtension,
 }: {
   bucketName: string
   projectRef: string
+  slug: string
   wrapperMeta: WrapperMeta
   wrappersExtension: DatabaseExtension
 }) => {
@@ -358,8 +366,8 @@ const ExtensionNeedsUpgrade = ({
             <Link
               href={
                 databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
+                  ? `/org/${slug}/project/${projectRef}/settings/infrastructure`
+                  : `/org/${slug}/project/${projectRef}/database/extensions?filter=wrappers`
               }
             >
               {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}

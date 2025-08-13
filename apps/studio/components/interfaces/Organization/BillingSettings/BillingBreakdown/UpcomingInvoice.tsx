@@ -233,7 +233,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                     >
                                       <Link
                                         className="underline"
-                                        href={`/project/${breakdown.project_ref}`}
+                                        href={`/org/${slug}/project/${breakdown.project_ref}`}
                                         target="_blank"
                                       >
                                         {breakdown.project_name}

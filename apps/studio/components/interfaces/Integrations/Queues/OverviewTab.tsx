@@ -7,7 +7,7 @@ import { Admonition } from 'ui-patterns'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 
 export const QueuesOverviewTab = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const project = useSelectedProject()
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
@@ -28,7 +28,7 @@ export const QueuesOverviewTab = () => {
               settings
             </p>
             <Button asChild type="default">
-              <Link href={`/project/${ref}/integrations/queues/settings`}>
+              <Link href={`/org/${slug}/project/${ref}/integrations/queues/settings`}>
                 Manage queues settings
               </Link>
             </Button>

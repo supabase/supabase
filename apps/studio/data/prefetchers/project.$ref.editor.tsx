@@ -8,11 +8,13 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchEntityTypes } from 'data/entity-types/entity-types-infinite-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
+import { useParams } from 'next/navigation'
 
 export function usePrefetchEditorIndexPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
+  const { slug } = useParams()
 
   const [entityTypesSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -23,7 +25,7 @@ export function usePrefetchEditorIndexPage() {
     if (!project) return
 
     // Prefetch code
-    router.prefetch(`/project/${project.ref}/editor`)
+    router.prefetch(`/org/${slug}/project/${project.ref}/editor`)
 
     // Prefetch data
     prefetchSchemas(queryClient, {
@@ -45,12 +47,14 @@ export function usePrefetchEditorIndexPage() {
 
 interface EditorIndexPageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 'prefetcher'> {
   projectRef?: string
+  slug: string
   href?: PrefetchableLinkProps['href']
 }
 
 export function EditorIndexPageLink({
   href,
   projectRef,
+  slug,
   children,
   ...props
 }: PropsWithChildren<EditorIndexPageLinkProps>) {
@@ -58,7 +62,7 @@ export function EditorIndexPageLink({
 
   return (
     <PrefetchableLink
-      href={href || `/project/${projectRef}/editor`}
+      href={href || `/org/${slug}/project/${projectRef}/editor`}
       prefetcher={prefetch}
       {...props}
     >

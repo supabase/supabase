@@ -27,7 +27,7 @@ import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
   const router = useRouter()
-  const { ref, bucketId } = useParams()
+  const { slug, ref, bucketId } = useParams() as { slug: string; ref: string; bucketId: string }
   const projectDetails = useSelectedProject()
   const isBranch = projectDetails?.parent_project_ref !== undefined
 
@@ -43,7 +43,7 @@ const StorageMenu = () => {
     'created-at'
   )
 
-  const page = router.pathname.split('/')[4] as
+  const page = router.pathname.split('/')[6] as
     | undefined
     | 'policies'
     | 'settings'
@@ -172,6 +172,7 @@ const StorageMenu = () => {
                     <BucketRow
                       key={`${idx}_${bucket.id}`}
                       bucket={bucket}
+                      slug={slug}
                       projectRef={ref}
                       isSelected={isSelected}
                       onSelectEmptyBucket={() => setSelectedBucketToEmpty(bucket)}
@@ -188,12 +189,12 @@ const StorageMenu = () => {
 
           <div className="mx-3">
             <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
-            <Link href={`/project/${ref}/storage/policies`}>
+            <Link href={`/org/${slug}/project/${ref}/storage/policies`}>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
               </Menu.Item>
             </Link>
-            <Link href={`/project/${ref}/settings/storage`}>
+            <Link href={`/org/${slug}/project/${ref}/settings/storage`}>
               <Menu.Item rounded>
                 <div className="flex items-center justify-between">
                   <p className="truncate">Settings</p>

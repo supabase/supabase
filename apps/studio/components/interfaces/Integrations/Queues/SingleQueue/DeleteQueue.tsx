@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseQueueDeleteMutation } from 'data/database-queues/database-queues-delete-mutation'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { useParams } from 'next/navigation'
 
 interface DeleteQueueProps {
   queueName: string
@@ -13,12 +14,13 @@ interface DeleteQueueProps {
 
 const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) => {
   const { project } = useProjectContext()
+  const { slug } = useParams()
   const router = useRouter()
 
   const { mutate: deleteDatabaseQueue, isLoading } = useDatabaseQueueDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully removed queue ${queueName}`)
-      router.push(`/project/${project?.ref}/integrations/queues/queues`)
+      router.push(`/org/${slug}/project/${project?.ref}/integrations/queues/queues`)
       onClose()
     },
   })

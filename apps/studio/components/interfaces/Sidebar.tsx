@@ -217,13 +217,13 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
 
 const ProjectLinks = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref?: string }
   const { project } = useProjectContext()
   const snap = useAppStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
 
-  const activeRoute = router.pathname.split('/')[3]
+  const activeRoute = router.pathname.split('/')[5]
 
   const {
     projectAuthAll: authEnabled,
@@ -237,15 +237,15 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
-  const toolRoutes = generateToolRoutes(ref, project)
-  const productRoutes = generateProductRoutes(ref, project, {
+  const toolRoutes = generateToolRoutes(slug, ref, project)
+  const productRoutes = generateProductRoutes(slug, ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project)
-  const settingsRoutes = generateSettingsRoutes(ref, project)
+  const otherRoutes = generateOtherRoutes(slug, ref, project)
+  const settingsRoutes = generateSettingsRoutes(slug, ref, project)
 
   return (
     <SidebarMenu>
@@ -257,8 +257,8 @@ const ProjectLinks = () => {
             key: 'HOME',
             label: 'Project overview',
             icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: `/project/${ref}`,
-            linkElement: <ProjectIndexPageLink projectRef={ref} />,
+            link: `/org/${slug}/project/${ref}`,
+            linkElement: <ProjectIndexPageLink slug={slug} projectRef={ref} />,
           }}
         />
         {toolRoutes.map((route, i) => (
@@ -348,7 +348,7 @@ const OrganizationLinks = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  const activeRoute = router.pathname.split('/')[3]
+  const activeRoute = router.pathname.split('/')[5]
 
   const navMenuItems = [
     {

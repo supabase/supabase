@@ -4,7 +4,7 @@ import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 export function useStorageGotoCommands(options?: CommandOptions) {
-  let { ref } = useParams()
+  let { slug, ref } = useParams()
   ref ||= '_'
 
   useRegisterCommands(
@@ -13,10 +13,10 @@ export function useStorageGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-storage',
         name: 'Storage',
-        route: `/project/${ref}/storage`,
+        route: `/org/${slug}/project/${ref}/storage`,
         defaultHidden: true,
       },
     ],
-    { ...options, deps: [ref] }
+    { ...options, deps: [ref, slug] }
   )
 }

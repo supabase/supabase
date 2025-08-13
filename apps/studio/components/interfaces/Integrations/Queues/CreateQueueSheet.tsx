@@ -30,6 +30,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
 import { useRouter } from 'next/router'
+import { useParams } from 'next/navigation'
 
 export interface CreateQueueSheetProps {
   isClosing: boolean
@@ -79,6 +80,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
   //   'extensions'
   // )
   const router = useRouter()
+  const { slug } = useParams()
   const { project } = useProjectContext()
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
@@ -129,7 +131,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
       {
         onSuccess: () => {
           toast.success(`Successfully created queue ${name}`)
-          router.push(`/project/${project?.ref}/integrations/queues/queues/${name}`)
+          router.push(`/org/${slug}/project/${project?.ref}/integrations/queues/queues/${name}`)
           onClose()
         },
       }

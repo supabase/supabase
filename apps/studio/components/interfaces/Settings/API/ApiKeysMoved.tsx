@@ -7,7 +7,7 @@ import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.typ
 import { Sidebar } from 'components/interfaces/Sidebar'
 
 export const ApiKeysMoved = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   // Create menu structure matching the ProductMenu expected format
   const mockMenu: ProductMenuGroup[] = [
@@ -44,10 +44,10 @@ export const ApiKeysMoved = () => {
           They can now be found in their own respective pages.
         </p>
         <div className="flex flex-row gap-4">
-          <Link href={`/project/${projectRef}/settings/api-keys`}>
+          <Link href={`/org/${slug}/project/${projectRef}/settings/api-keys`}>
             <Button type="default">Go to API Keys</Button>
           </Link>
-          <Link href={`/project/${projectRef}/settings/api-keys`}>
+          <Link href={`/org/${slug}/project/${projectRef}/settings/api-keys`}>
             <Button type="default">Go to JWT Keys</Button>
           </Link>
         </div>

@@ -7,7 +7,7 @@ import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
 export const CLSPreview = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
 
   return (
     <div className="flex flex-col gap-2">
@@ -45,7 +45,7 @@ export const CLSPreview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
             Grant access to a new UI for granting and/or revoking column-level privileges{' '}
-            <InlineLink href={`/project/${ref}/database/column-privileges`}>here</InlineLink>.
+            <InlineLink href={`/org/${slug}/project/${ref}/database/column-privileges`}>here</InlineLink>.
           </li>
         </ul>
       </div>

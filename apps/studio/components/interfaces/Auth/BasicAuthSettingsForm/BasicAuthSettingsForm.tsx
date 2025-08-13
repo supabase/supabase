@@ -40,7 +40,7 @@ const schema = object({
 })
 
 const BasicAuthSettingsForm = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
@@ -222,7 +222,7 @@ const BasicAuthSettingsForm = () => {
                         the <code className="text-xs">public</code> and{' '}
                         <code className="text-xs">authenticated</code> roles. We strongly advise{' '}
                         <Link
-                          href={`/project/${projectRef}/auth/policies`}
+                          href={`/org/${slug}/project/${projectRef}/auth/policies`}
                           className="text-foreground underline"
                         >
                           reviewing your RLS policies
@@ -245,7 +245,7 @@ const BasicAuthSettingsForm = () => {
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
                       We highly recommend{' '}
-                      <InlineLink href={`/project/${projectRef}/auth/protection`}>
+                      <InlineLink href={`/org/${slug}/project/${projectRef}/auth/protection`}>
                         enabling captcha
                       </InlineLink>{' '}
                       for anonymous sign-ins

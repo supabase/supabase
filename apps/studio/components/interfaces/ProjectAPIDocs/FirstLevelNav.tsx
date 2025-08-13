@@ -17,7 +17,7 @@ import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
 const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
 
 const FirstLevelNav = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const snap = useAppStateSnapshot()
 
   const {
@@ -165,7 +165,7 @@ const FirstLevelNav = () => {
           }
           onClick={() => snap.setShowProjectApiDocs(false)}
         >
-          <Link className="!justify-start" href={`/project/${ref}/api/graphiql`}>
+          <Link className="!justify-start" href={`/org/${slug}/project/${ref}/api/graphiql`}>
             GraphiQL
           </Link>
         </Button>

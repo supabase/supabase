@@ -24,7 +24,7 @@ export interface DiskSizeConfigurationProps {
 }
 
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { project } = useProjectContext()
 
   const organization = useSelectedOrganization()
@@ -111,7 +111,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       <div className="col-span-2 mt-4">
                         <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
                           <Link
-                            href={`/project/${projectRef}/reports/database#database-size-report`}
+                            href={`/org/${slug}/project/${projectRef}/reports/database#database-size-report`}
                           >
                             View detailed summary
                           </Link>

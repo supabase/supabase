@@ -8,6 +8,7 @@ import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
+  const { slug } = useParams()
   let project = useSelectedProject()
   const ref = project?.ref || '_'
 
@@ -17,7 +18,7 @@ export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
       {
         id: 'create-table',
         name: 'Create new table',
-        route: `/project/${ref}/editor?create=table`,
+        route: `/org/${slug}/project/${ref}/editor?create=table`,
         icon: () => <Table2 />,
       },
     ],
@@ -32,7 +33,7 @@ export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
 }
 
 export function useTableEditorGotoCommands(options?: CommandOptions) {
-  let { ref } = useParams()
+  let { slug, ref } = useParams()
   ref ||= '_'
 
   useRegisterCommands(
@@ -41,7 +42,7 @@ export function useTableEditorGotoCommands(options?: CommandOptions) {
       {
         id: 'view-tables',
         name: 'View your tables',
-        route: `/project/${ref}/editor`,
+        route: `/org/${slug}/project/${ref}/editor`,
         icon: () => <Table2 />,
       },
     ],
@@ -59,7 +60,7 @@ export function useTableEditorGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-table-editor',
         name: 'Table Editor',
-        route: `/project/${ref}/editor`,
+        route: `/org/${slug}/project/${ref}/editor`,
         defaultHidden: true,
       },
     ],

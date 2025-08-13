@@ -17,7 +17,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const ComplianceConfig = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
   const [isSensitive, setIsSensitive] = useState(false)
 
@@ -73,7 +73,7 @@ const ComplianceConfig = () => {
               description={
                 <p className="text-sm text-foreground-light">
                   Enable security warnings in the{' '}
-                  <InlineLink href={`/project/${ref}/advisors/security`}>
+                  <InlineLink href={`/org/${slug}/project/${ref}/advisors/security`}>
                     Security Advisor
                   </InlineLink>{' '}
                   to enforce requirements for managing sensitive data

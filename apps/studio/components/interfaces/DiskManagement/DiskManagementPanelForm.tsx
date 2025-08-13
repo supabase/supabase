@@ -7,7 +7,7 @@ import { NoticeBar } from './ui/NoticeBar'
 
 // [Joshen] Only used for non AWS projects
 export function DiskManagementPanelForm() {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   return (
     <div id="disk-management">
@@ -23,7 +23,7 @@ export function DiskManagementPanelForm() {
         actions={
           <Button type="default" asChild>
             <Link
-              href={`/project/${projectRef}/settings/compute-and-disk`}
+              href={`/org/${slug}/project/${projectRef}/settings/compute-and-disk`}
               className="!no-underline"
             >
               Go to Compute and Disk

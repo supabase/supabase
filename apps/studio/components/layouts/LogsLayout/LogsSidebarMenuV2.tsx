@@ -77,7 +77,7 @@ export function SidebarCollapsible({
 
 export function LogsSidebarMenuV2() {
   const router = useRouter()
-  const { ref } = useParams() as { ref: string }
+  const { ref, slug } = useParams() as { ref: string, slug: string }
 
   const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
@@ -116,26 +116,26 @@ export function LogsSidebarMenuV2() {
     {
       name: 'API Gateway',
       key: 'edge-logs',
-      url: `/project/${ref}/logs/edge-logs`,
+      url: `/org/${slug}/project/${ref}/logs/edge-logs`,
       items: [],
     },
     {
       name: 'Postgres',
       key: 'postgres-logs',
-      url: `/project/${ref}/logs/postgres-logs`,
+      url: `/org/${slug}/project/${ref}/logs/postgres-logs`,
       items: [],
     },
     {
       name: 'PostgREST',
       key: 'postgrest-logs',
-      url: `/project/${ref}/logs/postgrest-logs`,
+      url: `/org/${slug}/project/${ref}/logs/postgrest-logs`,
       items: [],
     },
     IS_PLATFORM
       ? {
           name: isFreePlan ? 'Pooler' : 'Shared Pooler',
           key: 'pooler-logs',
-          url: `/project/${ref}/logs/pooler-logs`,
+          url: `/org/${slug}/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
@@ -143,7 +143,7 @@ export function LogsSidebarMenuV2() {
       ? {
           name: 'Dedicated Pooler',
           key: 'dedicated-pooler-logs',
-          url: `/project/${ref}/logs/dedicated-pooler-logs`,
+          url: `/org/${slug}/project/${ref}/logs/dedicated-pooler-logs`,
           items: [],
         }
       : null,
@@ -151,7 +151,7 @@ export function LogsSidebarMenuV2() {
       ? {
           name: 'Auth',
           key: 'auth-logs',
-          url: `/project/${ref}/logs/auth-logs`,
+          url: `/org/${slug}/project/${ref}/logs/auth-logs`,
           items: [],
         }
       : null,
@@ -159,7 +159,7 @@ export function LogsSidebarMenuV2() {
       ? {
           name: 'Storage',
           key: 'storage-logs',
-          url: `/project/${ref}/logs/storage-logs`,
+          url: `/org/${slug}/project/${ref}/logs/storage-logs`,
           items: [],
         }
       : null,
@@ -167,20 +167,20 @@ export function LogsSidebarMenuV2() {
       ? {
           name: 'Realtime',
           key: 'realtime-logs',
-          url: `/project/${ref}/logs/realtime-logs`,
+          url: `/org/${slug}/project/${ref}/logs/realtime-logs`,
           items: [],
         }
       : null,
     {
       name: 'Edge Functions',
       key: 'edge-functions-logs',
-      url: `/project/${ref}/logs/edge-functions-logs`,
+      url: `/org/${slug}/project/${ref}/logs/edge-functions-logs`,
       items: [],
     },
     {
       name: 'Cron',
       key: 'pg_cron',
-      url: `/project/${ref}/logs/pgcron-logs`,
+      url: `/org/${slug}/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
   ].filter((x) => x !== null)
@@ -190,7 +190,7 @@ export function LogsSidebarMenuV2() {
         {
           name: 'Postgres Version Upgrade',
           key: 'pg-upgrade-logs',
-          url: `/project/${ref}/logs/pg-upgrade-logs`,
+          url: `/org/${slug}/project/${ref}/logs/pg-upgrade-logs`,
           items: [],
         },
       ]
@@ -233,7 +233,7 @@ export function LogsSidebarMenuV2() {
                 type="default"
                 onClick={() => {
                   enableUnifiedLogs()
-                  router.push(`/project/${ref}/logs`)
+                  router.push(`/org/${slug}/project/${ref}/logs`)
                 }}
               >
                 Enable preview
@@ -265,14 +265,14 @@ export function LogsSidebarMenuV2() {
           type="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
-          onClick={() => router.push(`/project/${ref}/logs/explorer`)}
+          onClick={() => router.push(`/org/${slug}/project/${ref}/logs/explorer`)}
         />
       </div>
       <div className="px-2">
         <InnerSideMenuItem
           title="Templates"
-          isActive={isActive(`/project/${ref}/logs/explorer/templates`)}
-          href={`/project/${ref}/logs/explorer/templates`}
+          isActive={isActive(`/org/${slug}/project/${ref}/logs/explorer/templates`)}
+          href={`/org/${slug}/project/${ref}/logs/explorer/templates`}
         >
           Templates
         </InnerSideMenuItem>
@@ -323,7 +323,7 @@ export function LogsSidebarMenuV2() {
             description="Create and save your queries to use them in the explorer"
             actions={
               <Button asChild type="default">
-                <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
+                <Link href={`/org/${slug}/project/${ref}/logs/explorer`}>Create query</Link>
               </Button>
             }
           />

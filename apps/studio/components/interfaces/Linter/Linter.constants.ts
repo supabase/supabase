@@ -9,7 +9,7 @@ export type LintInfo = {
   name: string
   title: string
   icon: JSX.Element
-  link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
+  link: (args: { slug: string, projectRef: string; metadata: Lint['metadata'] }) => string
   linkText: string
   docsLink: string
   category: 'security' | 'performance'

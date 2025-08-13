@@ -52,7 +52,7 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 }
 
 export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const selectedOrganization = useSelectedOrganization()
@@ -61,7 +61,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
 
-  const orgSlug = selectedOrganization?.slug
   const {
     data: pauseStatus,
     error: pauseStatusError,
@@ -79,7 +78,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const isRestoreDisabled = isSuccess && !pauseStatus.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
-    { slug: orgSlug },
+    { slug: slug },
     { enabled: isFreePlan }
   )
 
@@ -243,14 +242,14 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   {isFreePlan ? (
                     <Button asChild type="primary">
                       <Link
-                        href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
+                        href={`/org/${slug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
                       >
                         Upgrade to Pro
                       </Link>
                     </Button>
                   ) : (
                     <Button asChild type="default">
-                      <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
+                      <Link href={`/org/${slug}/project/${ref}/settings/general`}>View project settings</Link>
                     </Button>
                   )}
                 </div>

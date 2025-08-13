@@ -10,7 +10,7 @@ import { NextPageWithLayout } from 'types'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref, id, pageId, childId } = useParams()
+  const { ref, id, pageId, childId, slug } = useParams()
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
@@ -38,7 +38,7 @@ const IntegrationPage: NextPageWithLayout = () => {
       !installation &&
       pageId !== 'overview'
     ) {
-      router.replace(`/project/${ref}/integrations/${id}/overview`)
+      router.replace(`/org/${slug}/project/${ref}/integrations/${id}/overview`)
     }
   }, [installation, isIntegrationsLoading, pageId, router])
 

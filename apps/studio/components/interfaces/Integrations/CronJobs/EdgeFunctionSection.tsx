@@ -35,7 +35,7 @@ const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) =>
 
 export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
   const { project: selectedProject } = useProjectContext()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { data: functions, isSuccess, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = useMemo(() => functions ?? [], [functions])
@@ -82,7 +82,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
           <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
             <p className="text-sm">No edge functions created yet</p>
             <Button asChild>
-              <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
+              <Link href={`/org/${slug}/project/${ref}/functions`}>Create an edge function</Link>
             </Button>
           </div>
         </div>

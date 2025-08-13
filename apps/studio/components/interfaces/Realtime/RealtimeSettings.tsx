@@ -39,7 +39,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 const formId = 'realtime-configuration-form'
 
 export const RealtimeSettings = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const canUpdateConfig = useCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
@@ -166,7 +166,7 @@ export const RealtimeSettings = () => {
                                 </p>
 
                                 <Button asChild type="default" className="mt-2">
-                                  <Link href={`/project/${projectRef}/realtime/policies`}>
+                                  <Link href={`/org/${slug}/project/${projectRef}/realtime/policies`}>
                                     Create policy
                                   </Link>
                                 </Button>

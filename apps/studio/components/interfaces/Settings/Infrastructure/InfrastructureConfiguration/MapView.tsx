@@ -51,7 +51,7 @@ const MapView = ({
   onSelectRestartReplica,
   onSelectDropReplica,
 }: MapViewProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const dbSelectorState = useDatabaseSelectorStateSnapshot()
 
   const [mount, setMount] = useState(false)
@@ -310,7 +310,7 @@ const MapView = ({
                               disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                             >
                               <Link
-                                href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
+                                href={`/org/${slug}/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
                               >
                                 View replication lag
                               </Link>

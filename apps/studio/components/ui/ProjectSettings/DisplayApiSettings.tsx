@@ -24,7 +24,7 @@ export const DisplayApiSettings = ({
   showNotice?: boolean
   showLegacyText?: boolean
 }) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   const newApiKeysInRollOut = useFlag('basicApiKeys')
 
@@ -175,7 +175,7 @@ export const DisplayApiSettings = ({
                         <span>
                           Prefer using{' '}
                           <Link
-                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            href={`/org/${slug}/project/${projectRef}/settings/api-keys/new`}
                             className="text-link underline"
                           >
                             Secret API keys
@@ -192,7 +192,7 @@ export const DisplayApiSettings = ({
                         <span>
                           Prefer using{' '}
                           <Link
-                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            href={`/org/${slug}/project/${projectRef}/settings/api-keys/new`}
                             className="text-link underline"
                           >
                             Publishable API keys

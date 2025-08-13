@@ -39,7 +39,7 @@ const ColumnList = ({
   onEditColumn = noop,
   onDeleteColumn = noop,
 }: ColumnListProps) => {
-  const { id: _id, ref } = useParams()
+  const { slug, id: _id, ref } = useParams()
   const id = _id ? Number(_id) : undefined
 
   const { project } = useProjectContext()
@@ -71,7 +71,7 @@ const ColumnList = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
-            <Link href={`/project/${ref}/database/tables`} />
+            <Link href={`/org/${slug}/project/${ref}/database/tables`} />
           </Button>
           <Input
             size="small"

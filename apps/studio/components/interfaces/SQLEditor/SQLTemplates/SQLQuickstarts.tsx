@@ -18,7 +18,7 @@ import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 
 const SQLQuickstarts = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const org = useSelectedOrganization()
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -53,7 +53,7 @@ const SQLQuickstarts = () => {
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
 
-      router.push(`/project/${ref}/sql/${snippet.id}`)
+      router.push(`/org/${slug}/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
     }

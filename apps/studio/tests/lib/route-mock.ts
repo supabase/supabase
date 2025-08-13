@@ -6,6 +6,6 @@ export const routerMock = _routerMock
 routerMock.useParser(
   createDynamicRouteParser([
     // These paths should match those found in the `/pages` folder:
-    '/projects/[ref]',
+    '/org/[slug]/projects/[ref]',
   ])
 )

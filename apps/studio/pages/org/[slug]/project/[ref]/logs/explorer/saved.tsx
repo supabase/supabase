@@ -13,7 +13,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 
 // [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
 export const LogsSavedPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { data, isLoading } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
@@ -55,7 +55,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
           <p className="text-sm text-foreground-lighter">
             Saved queries will appear here. Queries can be saved from the{' '}
-            <Link href={`/project/${ref}/logs/explorer`}>
+            <Link href={`/org/${slug}/project/${ref}/logs/explorer`}>
               <span className="cursor-pointer font-bold underline">Query</span>
             </Link>{' '}
             tab.

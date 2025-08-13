@@ -10,16 +10,18 @@ import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useOrganizationSlug } from '../../../data/organizations/organization-path-slug'
 
 export interface DatabaseLayoutProps {
   title?: string
 }
 
 const DatabaseProductMenu = () => {
-  const project = useSelectedProject()
-
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const project = useSelectedProject()
+  const slug = useOrganizationSlug() || 'unknown'
+
+  const page = router.pathname.split('/')[6]
 
   const { data } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -36,7 +38,7 @@ const DatabaseProductMenu = () => {
     <>
       <ProductMenu
         page={page}
-        menu={generateDatabaseMenu(project, {
+        menu={generateDatabaseMenu(slug, project, {
           pgNetExtensionExists,
           pitrEnabled,
           columnLevelPrivileges,

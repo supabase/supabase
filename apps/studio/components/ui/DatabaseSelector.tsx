@@ -49,7 +49,7 @@ const DatabaseSelector = ({
   portal = true,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -209,12 +209,12 @@ const DatabaseSelector = ({
                   className="cursor-pointer w-full"
                   onSelect={() => {
                     setOpen(false)
-                    router.push(`/project/${projectRef}/settings/infrastructure`)
+                    router.push(`/org/${slug}/project/${projectRef}/settings/infrastructure`)
                   }}
                   onClick={() => setOpen(false)}
                 >
                   <Link
-                    href={`/project/${projectRef}/settings/infrastructure`}
+                    href={`/org/${slug}/project/${projectRef}/settings/infrastructure`}
                     onClick={() => {
                       setOpen(false)
                       // [Joshen] This is used in the Connect UI which is available across all pages

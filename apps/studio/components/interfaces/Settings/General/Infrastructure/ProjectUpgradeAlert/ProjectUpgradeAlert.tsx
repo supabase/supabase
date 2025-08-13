@@ -65,7 +65,7 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 
 const ProjectUpgradeAlert = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const queryClient = useQueryClient()
   const org = useSelectedOrganization()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
@@ -90,7 +90,7 @@ const ProjectUpgradeAlert = () => {
     onSuccess: (res, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.UPGRADING)
       toast.success('Upgrading project')
-      router.push(`/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`)
+      router.push(`/org/${slug}/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`)
     },
   })
 

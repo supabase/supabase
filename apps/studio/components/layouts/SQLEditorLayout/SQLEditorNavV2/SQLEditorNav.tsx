@@ -51,7 +51,7 @@ interface SQLEditorNavProps {
 
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
-  const { ref: projectRef, id } = useParams()
+  const { slug, ref: projectRef, id } = useParams()
 
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -325,9 +325,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     const existingSnippetIds = Object.keys(snapV2.snippets).filter((x) => !ids.includes(x))
 
     if (existingSnippetIds.length === 0) {
-      router.push(`/project/${projectRef}/sql/new`)
+      router.push(`/org/${slug}/project/${projectRef}/sql/new`)
     } else if (ids.includes(id as string)) {
-      router.push(`/project/${projectRef}/sql/${existingSnippetIds[0]}`)
+      router.push(`/org/${slug}/project/${projectRef}/sql/${existingSnippetIds[0]}`)
     }
 
     if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
@@ -425,7 +425,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
     snapV2.addSnippet({ projectRef, snippet: snippetCopy })
     snapV2.addNeedsSaving(snippetCopy.id!)
-    router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
+    router.push(`/org/${slug}/project/${projectRef}/sql/${snippetCopy.id}`)
   }
 
   const onConfirmDeleteFolder = async () => {
@@ -771,7 +771,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                           sql: '',
                         })
                         snapV2.addSnippet({ projectRef: project.ref, snippet })
-                        router.push(`/project/${projectRef}/sql/${snippet.id}`)
+                        router.push(`/org/${slug}/project/${projectRef}/sql/${snippet.id}`)
                       }
                     }}
                     onSelectDelete={() => {

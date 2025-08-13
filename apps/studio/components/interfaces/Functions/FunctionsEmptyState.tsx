@@ -32,7 +32,7 @@ import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
 import { TerminalInstructions } from './TerminalInstructions'
 
 export const FunctionsEmptyState = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
 
@@ -58,7 +58,7 @@ export const FunctionsEmptyState = () => {
             <Button
               type="default"
               onClick={() => {
-                router.push(`/project/${ref}/functions/new`)
+                router.push(`/org/${slug}/project/${ref}/functions/new`)
                 sendEvent({
                   action: 'edge_function_via_editor_button_clicked',
                   properties: { origin: 'no_functions_block' },
@@ -169,7 +169,7 @@ export const FunctionsEmptyState = () => {
               })
             }}
           >
-            <Link href={`/project/${ref}/functions/new?template=${template.value}`}>
+            <Link href={`/org/${slug}/project/${ref}/functions/new?template=${template.value}`}>
               <p>{template.name}</p>
               <p className="text-sm text-foreground-lighter">{template.description}</p>
             </Link>

@@ -154,7 +154,7 @@ export const TopApiRoutesRenderer = (
     avg?: number
   }>
 ) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const [showMore, setShowMore] = useState(false)
 
   const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
@@ -225,7 +225,7 @@ export const TopApiRoutesRenderer = (
             className="text-foreground-lighter"
             onClick={() => {
               props.router.push({
-                pathname: `/project/${projectRef}/logs/explorer`,
+                pathname: `/org/${slug}/project/${projectRef}/logs/explorer`,
                 query: {
                   q: props.params?.sql,
                   its: props.params!.iso_timestamp_start,

@@ -11,14 +11,14 @@ import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   useEffect(() => {
     // Redirect to pooler logs if user is on free plan
     if (!isOrgPlanLoading && isFreePlan) {
-      router.push(`/project/${ref}/logs/pooler-logs`)
+      router.push(`/org/${slug}/project/${ref}/logs/pooler-logs`)
     }
   }, [isFreePlan, isOrgPlanLoading, ref, router])
 

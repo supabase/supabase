@@ -83,7 +83,7 @@ export const OrganizationInvite = () => {
           {isSuccess && !hasError && (
             <div className="flex flex-row items-center justify-center gap-3">
               <Button type="default" disabled={isJoining} asChild>
-                <Link href="/projects">Decline</Link>
+                <Link href={`/org/${slug}/projects`}>Decline</Link>
               </Button>
               <Button
                 type="primary"

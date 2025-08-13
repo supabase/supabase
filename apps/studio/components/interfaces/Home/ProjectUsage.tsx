@@ -65,7 +65,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
 
 const ProjectUsage = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
@@ -113,13 +113,13 @@ const ProjectUsage = () => {
 
     if (_type === 'rest') {
       router.push(
-        `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}`
+        `/org/${slug}/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}`
       )
       return
     }
 
     router.push(
-      `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}&f=${JSON.stringify(
+      `/org/${slug}/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}&f=${JSON.stringify(
         {
           product: {
             [_type]: true,
@@ -205,7 +205,7 @@ const ProjectUsage = () => {
                 </div>
               }
               title="Database"
-              href={`/project/${projectRef}/editor`}
+              href={`/org/${slug}/project/${projectRef}/editor`}
             />
 
             <Loading active={isLoading}>
@@ -231,7 +231,7 @@ const ProjectUsage = () => {
                   </div>
                 }
                 title="Auth"
-                href={`/project/${projectRef}/auth/users`}
+                href={`/org/${slug}/project/${projectRef}/auth/users`}
               />
               <Loading active={isLoading}>
                 <BarChart
@@ -257,7 +257,7 @@ const ProjectUsage = () => {
                   </div>
                 }
                 title="Storage"
-                href={`/project/${projectRef}/storage/buckets`}
+                href={`/org/${slug}/project/${projectRef}/storage/buckets`}
               />
 
               <Loading active={isLoading}>

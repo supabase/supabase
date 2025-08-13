@@ -14,7 +14,7 @@ import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
 
   const org = useSelectedOrganization()
@@ -27,7 +27,7 @@ export const LogPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (hasLoaded && !!org && !isUnifiedLogsEnabled) {
-      router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
+      router.replace(`/org/${slug}/project/${ref}/logs/${lastVisitedLogsPage}`)
     }
   }, [router, hasLoaded, org, lastVisitedLogsPage, ref, isUnifiedLogsEnabled])
 
@@ -38,14 +38,14 @@ export const LogPage: NextPageWithLayout = () => {
 
     if (IS_PLATFORM && isUnifiedLogsEnabled) {
       // If unified logs preview is enabled and we're not already on the main logs page
-      if (router.asPath !== `/project/${ref}/logs` && router.asPath.includes('/logs/')) {
-        router.push(`/project/${ref}/logs`)
+      if (router.asPath !== `/org/${slug}/project/${ref}/logs` && router.asPath.includes('/logs/')) {
+        router.push(`/org/${slug}/project/${ref}/logs`)
       }
     } else {
       // If unified logs preview is disabled and admin flag is also off
       // and we're on the main logs page, redirect to explorer
-      if (router.asPath === `/project/${ref}/logs`) {
-        router.push(`/project/${ref}/logs/explorer`)
+      if (router.asPath === `/org/${slug}/project/${ref}/logs`) {
+        router.push(`/org/${slug}/project/${ref}/logs/explorer`)
       }
     }
   }, [isUnifiedLogsEnabled, router, ref, hasLoaded])

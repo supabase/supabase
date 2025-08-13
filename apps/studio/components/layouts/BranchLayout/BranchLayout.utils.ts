@@ -1,6 +1,6 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
-export const generateBranchMenu = (ref: string): ProductMenuGroup[] => {
+export const generateBranchMenu = (slug: string, ref: string): ProductMenuGroup[] => {
   return [
     {
       title: 'Manage',
@@ -8,13 +8,13 @@ export const generateBranchMenu = (ref: string): ProductMenuGroup[] => {
         {
           name: 'Branches',
           key: 'branches',
-          url: `/project/${ref}/branches`,
+          url: `/org/${slug}/project/${ref}/branches`,
           items: [],
         },
         {
           name: 'Merge requests',
           key: 'merge-requests',
-          url: `/project/${ref}/branches/merge-requests`,
+          url: `/org/${slug}/project/${ref}/branches/merge-requests`,
           items: [],
         },
       ],

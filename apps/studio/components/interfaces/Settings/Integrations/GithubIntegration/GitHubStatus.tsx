@@ -11,7 +11,7 @@ import { BASE_PATH } from 'lib/constants'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 export const GitHubStatus = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const parentProjectRef = selectedProject?.parent_project_ref || projectRef
@@ -40,7 +40,7 @@ export const GitHubStatus = () => {
     <HoverCard openDelay={300} closeDelay={100}>
       <HoverCardTrigger asChild>
         <Link
-          href={`/project/${parentProjectRef}/settings/integrations`}
+          href={`/org/${slug}/project/${parentProjectRef}/settings/integrations`}
           className="block w-full transition truncate text-sm text-foreground-light hover:text-foreground"
         >
           <div className="w-full flex items-center justify-between">

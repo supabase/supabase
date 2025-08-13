@@ -55,7 +55,7 @@ const FunctionSelector = ({
   noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
   const [open, setOpen] = useState(false)
 
@@ -161,12 +161,12 @@ const FunctionSelector = ({
                     className="cursor-pointer w-full"
                     onSelect={() => {
                       setOpen(false)
-                      router.push(`/project/${ref}/database/functions`)
+                      router.push(`/org/${slug}/project/${ref}/database/functions`)
                     }}
                     onClick={() => setOpen(false)}
                   >
                     <Link
-                      href={`/project/${ref}/database/functions`}
+                      href={`/org/${slug}/project/${ref}/database/functions`}
                       onClick={() => {
                         setOpen(false)
                       }}

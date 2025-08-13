@@ -46,6 +46,7 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { useOrganizationSlug } from '../data/organizations/organization-path-slug'
 
 type UploadProgress = {
   percentage: number
@@ -73,11 +74,13 @@ if (typeof window !== 'undefined') {
 
 function createStorageExplorerState({
   projectRef,
+  slug,
   resumableUploadUrl,
   serviceKey,
   supabaseClient,
 }: {
   projectRef: string
+  slug: string
   resumableUploadUrl: string
   serviceKey: string
   supabaseClient?: SupabaseClient<any, 'public', any>
@@ -89,6 +92,7 @@ function createStorageExplorerState({
 
   const state = proxy({
     projectRef,
+    slug,
     supabaseClient,
     resumableUploadUrl,
     serviceKey,
@@ -923,7 +927,7 @@ function createStorageExplorerState({
           <p>
             Uploading files to Storage through the dashboard is currently unavailable with the new
             API keys. Please re-enable{' '}
-            <InlineLink href={`/project/${state.projectRef}/settings/api-keys`}>
+            <InlineLink href={`/org/${slug}/project/${state.projectRef}/settings/api-keys`}>
               legacy JWT keys
             </InlineLink>{' '}
             if you'd like to upload files to Storage through the dashboard.
@@ -971,7 +975,7 @@ function createStorageExplorerState({
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
-              <InlineLink href={`/project/${state.projectRef}/settings/storage`}>
+              <InlineLink href={`/org/${slug}/project/${state.projectRef}/settings/storage`}>
                 Storage settings
               </InlineLink>
               .
@@ -1723,6 +1727,7 @@ type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 const DEFAULT_STATE_CONFIG = {
   projectRef: '',
   resumableUploadUrl: '',
+  slug: '',
   serviceKey: '',
   supabaseClient: undefined,
 }
@@ -1737,6 +1742,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
+  const slug = useOrganizationSlug()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
@@ -1775,6 +1781,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
+          slug: slug ?? '',
           supabaseClient,
           resumableUploadUrl,
           serviceKey: serviceApiKey,
@@ -1789,6 +1796,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     resumableUploadUrl,
     protocol,
     endpoint,
+    slug,
   ])
 
   return (

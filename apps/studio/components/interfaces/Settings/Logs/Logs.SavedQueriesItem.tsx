@@ -26,7 +26,7 @@ interface SavedQueriesItemProps {
 
 const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
 
@@ -75,7 +75,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
       <LogsSidebarItem
         label={item.name}
         icon={<SqlEditor size="15" />}
-        href={`/project/${ref}/logs/explorer?queryId=${encodeURIComponent(item.id)}&q=${encodeURIComponent(item.content.sql)}`}
+        href={`/org/${slug}/project/${ref}/logs/explorer?queryId=${encodeURIComponent(item.id)}&q=${encodeURIComponent(item.content.sql)}`}
         isActive={isActive}
         dropdownItems={
           <>

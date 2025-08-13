@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function Introduction({ selectedLang }: Props) {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
@@ -34,7 +34,7 @@ export default function Introduction({ selectedLang }: Props) {
           <p>
             All projects have a RESTful endpoint that you can use with your project's API key to
             query and manage your database. These can be obtained from the{' '}
-            <InlineLink href={`/project/${projectRef}/settings/api`}>API settings</InlineLink>.
+            <InlineLink href={`/org/${slug}/project/${projectRef}/settings/api`}>API settings</InlineLink>.
           </p>
           <p>
             You can initialize a new Supabase client using the <code>createClient()</code> method.

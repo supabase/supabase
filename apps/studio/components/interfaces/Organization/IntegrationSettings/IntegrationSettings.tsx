@@ -30,6 +30,7 @@ import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 import { useRouter } from 'next/router'
+import { useParams } from 'next/navigation'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -43,6 +44,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 
 const IntegrationSettings = () => {
   const org = useSelectedOrganization()
+  const { slug } = useParams()
   const router = useRouter()
 
   const canReadGithubConnection = useCheckPermissions(
@@ -70,7 +72,7 @@ const IntegrationSettings = () => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const onAddGitHubConnection = useCallback(() => {
-    router.push('/project/_/settings/integrations')
+    router.push(`/org/${slug}/project/_/settings/integrations`)
   }, [sidePanelsStateSnapshot])
 
   const onDeleteGitHubConnection = useCallback(

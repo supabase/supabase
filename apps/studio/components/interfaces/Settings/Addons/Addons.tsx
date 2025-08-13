@@ -46,7 +46,7 @@ import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
   const selectedOrg = useSelectedOrganization()
   const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
@@ -121,7 +121,7 @@ const Addons = () => {
             <AlertDescription_Shadcn_>
               Updating addons here will only apply to this preview branch. To manage your addons,
               for your main branch, please visit the{' '}
-              <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
+              <Link href={`/org/${slug}/project/${parentProject.ref}/settings/general`} className="text-brand">
                 main branch
               </Link>
               .
@@ -238,7 +238,7 @@ const Addons = () => {
                       description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
                       actions={
                         <Button type="default" asChild>
-                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                          <Link href={`/org/${slug}/project/${projectRef}/settings/compute-and-disk`}>
                             Go to Compute and Disk
                           </Link>
                         </Button>
@@ -282,7 +282,7 @@ const Addons = () => {
                       </Alert>
                     ) : null}
                     <div className="mt-2 w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
+                      <Link href={`/org/${slug}/project/${projectRef}/settings/infrastructure#ram`}>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Memory
@@ -297,7 +297,7 @@ const Addons = () => {
                       <p className="text-sm">{meta?.memory_gb ?? '-'} GB</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
+                      <Link href={`/org/${slug}/project/${projectRef}/settings/infrastructure#cpu`}>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             CPU

@@ -8,6 +8,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { WorkflowLogs } from './WorkflowLogs'
+import { useParams } from 'next/navigation'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode
@@ -77,13 +78,14 @@ export const BranchRow = ({
   rowActions,
 }: BranchRowProps) => {
   const router = useRouter()
+  const { slug } = useParams()
   const page = router.pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
-  const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
+  const navigateUrl = rowLink ?? `/org/${slug}/project/${branch.project_ref}`
 
   const handleRowClick = () => {
     if (external) {

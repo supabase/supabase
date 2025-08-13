@@ -79,7 +79,7 @@ const DiffEditor = dynamic(
 export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
-  const { ref, id: urlId } = useParams()
+  const { slug, ref, id: urlId } = useParams()
 
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -356,7 +356,7 @@ export const SQLEditor = () => {
         })
         snapV2.addSnippet({ projectRef: ref, snippet })
         snapV2.addNeedsSaving(snippet.id!)
-        router.push(`/project/${ref}/sql/${snippet.id}`)
+        router.push(`/org/${slug}/project/${ref}/sql/${snippet.id}`)
       } catch (error: any) {
         toast.error(`Failed to create new query: ${error.message}`)
       }

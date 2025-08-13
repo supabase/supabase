@@ -17,7 +17,7 @@ export const DecryptedReadOnlyInput = ({
   descriptionText: string
   label: string
 }) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
   const [showHidden, setShowHidden] = useState(false)
 
@@ -53,7 +53,7 @@ export const DecryptedReadOnlyInput = ({
               <a
                 target="_blank"
                 rel="noreferrer noopener"
-                href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
+                href={`/org/${slug}/project/${ref}/integrations/vault/secrets?search=${value}`}
               >
                 <ExternalLink
                   size={14}

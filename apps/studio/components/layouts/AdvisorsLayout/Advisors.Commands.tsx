@@ -4,7 +4,7 @@ import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 export function useAdvisorsGoToCommands(options?: CommandOptions) {
-  let { ref } = useParams()
+  let { ref, slug } = useParams()
   ref ||= '_'
 
   useRegisterCommands(
@@ -13,16 +13,16 @@ export function useAdvisorsGoToCommands(options?: CommandOptions) {
       {
         id: 'nav-advisors-security',
         name: 'Security Advisor',
-        route: `/project/${ref}/advisors/security`,
+        route: `/org/${slug}/project/${ref}/advisors/security`,
         defaultHidden: true,
       },
       {
         id: 'nav-advisors-performance',
         name: 'Performance Advisor',
-        route: `/project/${ref}/advisors/performance`,
+        route: `/org/${slug}/project/${ref}/advisors/performance`,
         defaultHidden: true,
       },
     ],
-    { ...options, deps: [ref] }
+    { ...options, deps: [ref, slug] }
   )
 }

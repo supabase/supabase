@@ -15,7 +15,7 @@ import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref?: string}
   const selectedProject = useSelectedProject()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
@@ -58,7 +58,7 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
         !hideMenu && (
           <ProductMenu
             page={getPage()}
-            menu={generateDocsMenu(projectRef, tableNames, functionNames, { authEnabled })}
+            menu={generateDocsMenu(slug, projectRef, tableNames, functionNames, { authEnabled })}
           />
         )
       }

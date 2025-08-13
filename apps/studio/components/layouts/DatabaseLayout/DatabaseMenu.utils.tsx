@@ -3,6 +3,7 @@ import type { Project } from 'data/projects/project-detail-query'
 import { ArrowUpRight } from 'lucide-react'
 
 export const generateDatabaseMenu = (
+  slug: string,
   project?: Project,
   flags?: {
     pgNetExtensionExists: boolean
@@ -22,45 +23,45 @@ export const generateDatabaseMenu = (
         {
           name: 'Schema Visualizer',
           key: 'schemas',
-          url: `/project/${ref}/database/schemas`,
+          url: `/org/${slug}/project/${ref}/database/schemas`,
           items: [],
         },
-        { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
+        { name: 'Tables', key: 'tables', url: `/org/${slug}/project/${ref}/database/tables`, items: [] },
         {
           name: 'Functions',
           key: 'functions',
-          url: `/project/${ref}/database/functions`,
+          url: `/org/${slug}/project/${ref}/database/functions`,
           items: [],
         },
         {
           name: 'Triggers',
           key: 'triggers',
-          url: `/project/${ref}/database/triggers`,
+          url: `/org/${slug}/project/${ref}/database/triggers`,
           items: [],
         },
         {
           name: 'Enumerated Types',
           key: 'types',
-          url: `/project/${ref}/database/types`,
+          url: `/org/${slug}/project/${ref}/database/types`,
 
           items: [],
         },
         {
           name: 'Extensions',
           key: 'extensions',
-          url: `/project/${ref}/database/extensions`,
+          url: `/org/${slug}/project/${ref}/database/extensions`,
           items: [],
         },
         {
           name: 'Indexes',
           key: 'indexes',
-          url: `/project/${ref}/database/indexes`,
+          url: `/org/${slug}/project/${ref}/database/indexes`,
           items: [],
         },
         {
           name: 'Publications',
           key: 'publications',
-          url: `/project/${ref}/database/publications`,
+          url: `/org/${slug}/project/${ref}/database/publications`,
           items: [],
         },
         ...(enablePgReplicate
@@ -68,7 +69,7 @@ export const generateDatabaseMenu = (
               {
                 name: 'Replication',
                 key: 'replication',
-                url: `/project/${ref}/database/replication`,
+                url: `/org/${slug}/project/${ref}/database/replication`,
                 items: [],
               },
             ]
@@ -76,7 +77,7 @@ export const generateDatabaseMenu = (
               {
                 name: 'Replication',
                 key: 'replication',
-                url: `/project/${ref}/database/replication`,
+                url: `/org/${slug}/project/${ref}/database/replication`,
                 label: 'Coming Soon',
                 items: [],
               },
@@ -86,13 +87,13 @@ export const generateDatabaseMenu = (
     {
       title: 'Access Control',
       items: [
-        { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
+        { name: 'Roles', key: 'roles', url: `/org/${slug}/project/${ref}/database/roles`, items: [] },
         ...(columnLevelPrivileges
           ? [
               {
                 name: 'Column Privileges',
                 key: 'column-privileges',
-                url: `/project/${ref}/database/column-privileges`,
+                url: `/org/${slug}/project/${ref}/database/column-privileges`,
                 items: [],
                 label: 'ALPHA',
               },
@@ -101,7 +102,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Policies',
           key: 'policies',
-          url: `/project/${ref}/auth/policies`,
+          url: `/org/${slug}/project/${ref}/auth/policies`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
@@ -114,20 +115,20 @@ export const generateDatabaseMenu = (
           name: 'Backups',
           key: 'backups',
           url: pitrEnabled
-            ? `/project/${ref}/database/backups/pitr`
-            : `/project/${ref}/database/backups/scheduled`,
+            ? `/org/${slug}/project/${ref}/database/backups/pitr`
+            : `/org/${slug}/project/${ref}/database/backups/scheduled`,
           items: [],
         },
         {
           name: 'Migrations',
           key: 'migrations',
-          url: `/project/${ref}/database/migrations`,
+          url: `/org/${slug}/project/${ref}/database/migrations`,
           items: [],
         },
         {
           name: 'Wrappers',
           key: 'wrappers',
-          url: `/project/${ref}/integrations?category=wrapper`,
+          url: `/org/${slug}/project/${ref}/integrations?category=wrapper`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
@@ -136,7 +137,7 @@ export const generateDatabaseMenu = (
               {
                 name: 'Webhooks',
                 key: 'hooks',
-                url: `/project/${ref}/integrations/webhooks/overview`,
+                url: `/org/${slug}/project/${ref}/integrations/webhooks/overview`,
                 rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
                 items: [],
               },
@@ -150,21 +151,21 @@ export const generateDatabaseMenu = (
         {
           name: 'Security Advisor',
           key: 'security-advisor',
-          url: `/project/${ref}/advisors/security`,
+          url: `/org/${slug}/project/${ref}/advisors/security`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
         {
           name: 'Performance Advisor',
           key: 'performance-advisor',
-          url: `/project/${ref}/advisors/performance`,
+          url: `/org/${slug}/project/${ref}/advisors/performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance`,
+          url: `/org/${slug}/project/${ref}/advisors/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },

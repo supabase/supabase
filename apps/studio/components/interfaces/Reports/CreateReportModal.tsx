@@ -7,6 +7,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Button, Form, Input, Modal } from 'ui'
+import { useParams } from 'next/navigation'
 
 type CustomReport = { name: string; description?: string }
 export interface CreateReportModal {
@@ -20,6 +21,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
   const { profile } = useProfile()
   const project = useSelectedProject()
   const ref = project?.ref ?? 'default'
+  const { slug } = useParams()
 
   // Preserve date range query parameters when navigating to new report
   const preservedQueryParams = useMemo(() => {
@@ -39,7 +41,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
     onSuccess: (_, vars) => {
       toast.success('Successfully created new report')
       const newReportId = vars.payload.id
-      router.push(`/project/${ref}/reports/${newReportId}${preservedQueryParams}`)
+      router.push(`/org/${slug}/project/${ref}/reports/${newReportId}${preservedQueryParams}`)
       afterSubmit()
     },
     onError: (error) => {

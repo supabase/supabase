@@ -22,7 +22,7 @@ interface ReferenceRecordPeekProps {
 }
 
 export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref: string }
   const project = useSelectedProject()
 
   const { data, error, isSuccess, isError, isLoading } = useTableRowsQuery(
@@ -128,7 +128,8 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       />
       <div className="flex items-center justify-end px-2 py-1">
         <EditorTablePageLink
-          href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
+          href={`/org/${slug}/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
+          slug={slug}
           projectRef={ref}
           id={String(table.id)}
           filters={[{ column, operator: '=', value: String(value) }]}

@@ -67,7 +67,7 @@ export const ChartConfig = ({
   config,
   onConfigChange,
 }: ChartConfigProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
 
   const [acknowledged, setAcknowledged] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED(ref as string),
@@ -222,7 +222,7 @@ export const ChartConfig = ({
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
             <Button asChild size="tiny" type="default" className="mt-2">
-              <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
+              <Link href={`/org/${slug}/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>
         )}

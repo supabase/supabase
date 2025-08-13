@@ -32,7 +32,7 @@ import { RecentItems } from './RecentItems'
 
 export function NewTab() {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const editor = useEditorType()
   const { profile } = useProfile()
   const org = useSelectedOrganization()
@@ -69,7 +69,7 @@ export function NewTab() {
       description: 'Execute SQL queries',
       bgColor: 'bg-green-500',
       isBeta: false,
-      onClick: () => router.push(`/project/${ref}/sql/new`),
+      onClick: () => router.push(`/org/${slug}/project/${ref}/sql/new`),
     },
   ]
 
@@ -104,7 +104,7 @@ export function NewTab() {
         metadata: { sqlId: snippet.id },
       })
 
-      router.push(`/project/${ref}/sql/${snippet.id}`)
+      router.push(`/org/${slug}/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
     }
@@ -150,7 +150,7 @@ export function NewTab() {
               </div>
               <div className="flex justify-center mt-5">
                 <Button asChild type="default">
-                  <Link href={`/project/${ref}/sql/templates`}>View more templates</Link>
+                  <Link href={`/org/${slug}/project/${ref}/sql/templates`}>View more templates</Link>
                 </Button>
               </div>
             </TabsContent_Shadcn_>
@@ -177,7 +177,7 @@ export function NewTab() {
               </div>
               <div className="flex justify-center mt-5">
                 <Button asChild type="default">
-                  <Link href={`/project/${ref}/sql/quickstarts`}>View more templates</Link>
+                  <Link href={`/org/${slug}/project/${ref}/sql/quickstarts`}>View more templates</Link>
                 </Button>
               </div>
             </TabsContent_Shadcn_>

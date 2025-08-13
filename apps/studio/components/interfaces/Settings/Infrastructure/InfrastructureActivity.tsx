@@ -48,7 +48,7 @@ const NON_DEDICATED_IO_RESOURCES = [
 ]
 
 const InfrastructureActivity = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
@@ -101,7 +101,7 @@ const InfrastructureActivity = () => {
       ? `/`
       : organization.plan.id === 'free'
         ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
-        : `/project/${projectRef}/settings/addons`
+        : `/org/${slug}/project/${projectRef}/settings/addons`
 
   const categoryMeta = INFRA_ACTIVITY_METRICS.find((category) => category.key === 'infra')
 

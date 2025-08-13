@@ -16,7 +16,7 @@ interface FilterSideBarProps {
 
 export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { table } = useDataTable()
 
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
@@ -24,7 +24,7 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
 
   const handleGoBackToOldLogs = () => {
     disableUnifiedLogs()
-    router.push(`/project/${ref}/logs/explorer`)
+    router.push(`/org/${slug}/project/${ref}/logs/explorer`)
   }
 
   return (

@@ -27,7 +27,7 @@ import { PITRForm } from './pitr-form'
 
 const PITRSelection = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const queryClient = useQueryClient()
 
   const { data: backups } = useBackupsQuery({ projectRef: ref })
@@ -52,7 +52,7 @@ const PITRSelection = () => {
       setTimeout(() => {
         setShowConfirmation(false)
         setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
-        router.push(`/project/${variables.ref}`)
+        router.push(`/org/${slug}/project/${variables.ref}`)
       }, 3000)
     },
   })
@@ -96,7 +96,7 @@ const PITRSelection = () => {
               <div className="flex items-center gap-x-2 mt-2">
                 {/* [Joshen] Ideally we have some links to a docs to explain why so */}
                 <Button type="default">
-                  <Link href={`/project/${ref}/settings/infrastructure`}>
+                  <Link href={`/org/${slug}/project/${ref}/settings/infrastructure`}>
                     Infrastructure settings
                   </Link>
                 </Button>

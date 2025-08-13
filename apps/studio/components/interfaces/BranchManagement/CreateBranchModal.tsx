@@ -52,7 +52,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 
 export const CreateBranchModal = () => {
   const allowDataBranching = useFlag('allowDataBranching')
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const router = useRouter()
   const queryClient = useQueryClient()
   const projectDetails = useSelectedProject()
@@ -108,7 +108,7 @@ export const CreateBranchModal = () => {
       })
 
       setShowCreateBranchModal(false)
-      router.push(`/project/${data.project_ref}`)
+      router.push(`/org/${slug}/project/${data.project_ref}`)
     },
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)
@@ -194,7 +194,7 @@ export const CreateBranchModal = () => {
 
   const handleGitHubClick = () => {
     setShowCreateBranchModal(false)
-    router.push(`/project/${projectRef}/settings/integrations`)
+    router.push(`/org/${slug}/project/${projectRef}/settings/integrations`)
   }
 
   useEffect(() => {

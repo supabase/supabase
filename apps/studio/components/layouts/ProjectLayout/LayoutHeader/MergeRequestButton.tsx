@@ -10,7 +10,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { toast } from 'sonner'
 
 export const MergeRequestButton = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const router = useRouter()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -37,7 +37,7 @@ export const MergeRequestButton = () => {
 
   const handleClick = () => {
     if (hasReviewRequested) {
-      router.push(`/project/${selectedBranch.project_ref}/merge`)
+      router.push(`/org/${slug}/project/${selectedBranch.project_ref}/merge`)
     } else {
       updateBranch(
         {
@@ -48,7 +48,7 @@ export const MergeRequestButton = () => {
         {
           onSuccess: () => {
             toast.success('Merge request created')
-            router.push(`/project/${selectedBranch.project_ref}/merge`)
+            router.push(`/org/${slug}/project/${selectedBranch.project_ref}/merge`)
             sendEvent({
               action: 'branch_create_merge_request_button_clicked',
               properties: {

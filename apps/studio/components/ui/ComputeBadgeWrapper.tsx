@@ -12,6 +12,7 @@ import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
 import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
+import { useParams } from 'next/navigation'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -35,6 +36,8 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
+
+  const { slug } = useParams() as { slug: string }
 
   // returns hardcoded values for infra
   const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
@@ -81,7 +84,7 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <Link href={`/project/${project?.ref}/settings/compute-and-disk`}>
+        <Link href={`/org/${slug}/project/${project?.ref}/settings/compute-and-disk`}>
           <ComputeBadge infraComputeSize={project.infra_compute_size} />
         </Link>
       </HoverCardTrigger>
@@ -146,7 +149,7 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
               </div>
               <div>
                 <Button asChild type="default" htmlType="button" role="button">
-                  <Link href={`/project/${project?.ref}/settings/compute-and-disk`}>
+                  <Link href={`/org/${slug}/project/${project?.ref}/settings/compute-and-disk`}>
                     Upgrade compute
                   </Link>
                 </Button>

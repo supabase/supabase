@@ -48,7 +48,7 @@ const PoolingConfigurationFormSchema = z.object({
  * [Joshen] PgBouncer configuration will be the main endpoint for GET and PATCH of pooling config
  */
 export const ConnectionPooling = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const snap = useDatabaseSettingsStateSnapshot()
@@ -174,7 +174,7 @@ export const ConnectionPooling = () => {
           >
             <p className="!m-0">
               If your network only supports IPv4, consider purchasing the{' '}
-              <InlineLink href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
+              <InlineLink href={`/org/${slug}/project/${projectRef}/settings/addons?panel=ipv4`}>
                 IPv4 add-on
               </InlineLink>
             </p>

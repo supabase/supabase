@@ -8,6 +8,7 @@ import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSetti
 import { DESCRIPTIONS } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
+import { useParams } from 'next/navigation'
 
 const wrapperMeta = {
   options: [
@@ -20,6 +21,7 @@ const wrapperMeta = {
 
 export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string }) => {
   const { project } = useProjectContext()
+  const { slug } = useParams() as { slug: string }
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
@@ -50,7 +52,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
       <Card className="flex flex-col gap-6 p-6 pb-0">
         <p className="text-sm text-foreground-light mb-4">
           To get AWS credentials, you can create them using the{' '}
-          <Link href={`/project/${project?.ref}/settings/storage`}>
+          <Link href={`/org/${slug}/project/${project?.ref}/settings/storage`}>
             <a className="underline ">S3 Access Keys</a>
           </Link>{' '}
           feature.

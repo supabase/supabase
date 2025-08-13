@@ -9,7 +9,7 @@ import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 export function useIntegrationsGotoCommands(options?: CommandOptions) {
-  let { ref } = useParams()
+  let { slug, ref } = useParams()
   ref ||= '_'
 
   const getName = (integration: IntegrationDefinition) => {
@@ -32,7 +32,7 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
         id: `nav-integrations-${x.id}`,
         name: x.name,
         value: `Integrations: ${x.name}`,
-        route: `/project/${ref}/integrations/${x.id}/overview`,
+        route: `/org/${slug}/project/${ref}/integrations/${x.id}/overview`,
         defaultHidden: true,
       }
     }),
@@ -45,7 +45,7 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
       return {
         id: `manage-${x.id}`,
         name: getName(x),
-        route: `/project/${ref}/integrations/${x.id}/overview`,
+        route: `/org/${slug}/project/${ref}/integrations/${x.id}/overview`,
         icon: () => (
           <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
             {x.icon()}

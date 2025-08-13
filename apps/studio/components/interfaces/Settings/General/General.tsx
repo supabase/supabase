@@ -24,9 +24,11 @@ import {
 } from 'ui'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
+import { useParams } from 'next/navigation'
 
 const General = () => {
   const { project } = useProjectContext()
+  const { slug } = useParams()
   const organization = useSelectedOrganization()
 
   const parentProject = useProjectByRef(project?.parent_project_ref)
@@ -67,7 +69,7 @@ const General = () => {
           <AlertDescription_Shadcn_>
             Certain settings are not available while you're on a preview branch. To adjust your
             project settings, you may return to your{' '}
-            <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
+            <Link href={`/org/${slug}/project/${parentProject.ref}/settings/general`} className="text-brand">
               main branch
             </Link>
             .

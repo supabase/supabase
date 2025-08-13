@@ -40,7 +40,7 @@ export const EdgeFunctionBlock = ({
   showCode: _showCode = false,
   tooltip,
 }: EdgeFunctionBlockProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const [isDeployed, setIsDeployed] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
@@ -190,7 +190,7 @@ export const EdgeFunctionBlock = ({
                 The{' '}
                 <Link
                   className="text-foreground"
-                  href={`/project/${ref}/functions/${functionName}/details`}
+                  href={`/org/${slug}/project/${ref}/functions/${functionName}/details`}
                 >
                   new function
                 </Link>{' '}

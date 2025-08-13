@@ -14,12 +14,15 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { useParams } from 'next/navigation'
 
 const Header = () => {
+  const { slug } = useParams()
+
   return (
     <div className="border-default border-b p-3">
       <div className="flex items-center space-x-2">
-        <Link href="/projects">
+        <Link href={`/org/${slug}/projects`}>
           <img
             src={`${BASE_PATH}/img/supabase-logo.svg`}
             alt="Supabase"
@@ -68,11 +71,11 @@ const GenericProjectPage: NextPage = () => {
       const hash = location.hash
 
       if (!Array.isArray(slug)) {
-        return [`/project/${projectRef}`, query, hash].filter(Boolean).join('')
+        return [`/org/${slug}/project/${projectRef}`, query, hash].filter(Boolean).join('')
       }
 
       const slugPath = slug.join('/')
-      return [`/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
+      return [`/org/${slug}/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
     }
   }
 

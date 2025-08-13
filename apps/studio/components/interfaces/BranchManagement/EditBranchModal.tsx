@@ -46,7 +46,7 @@ interface EditBranchModalProps {
 }
 
 export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const router = useRouter()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -202,7 +202,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const openLinkerPanel = () => {
     onClose()
-    router.push(`/project/${projectRef}/settings/integrations`)
+    router.push(`/org/${slug}/project/${projectRef}/settings/integrations`)
   }
 
   return (

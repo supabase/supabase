@@ -12,7 +12,7 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 dayjs.extend(relativeTime)
 
 export function RecentItems() {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const editor = useEditorType()
 
@@ -55,7 +55,7 @@ export function RecentItems() {
                   transition={{ delay: index * 0.012, duration: 0.15 }}
                 >
                   <Link
-                    href={`/project/${ref}/${
+                    href={`/org/${slug}/project/${ref}/${
                       item.type === 'sql'
                         ? `sql/${item.metadata?.sqlId}`
                         : item.type === 'r' ||

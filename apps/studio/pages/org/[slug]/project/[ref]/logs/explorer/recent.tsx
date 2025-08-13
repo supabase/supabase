@@ -12,7 +12,7 @@ import { Clock } from 'lucide-react'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
 
   const [recentLogSnippets, setRecentLogSnippets] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${ref}-recent-log-sql`,
@@ -47,7 +47,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
             <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
             <p className="text-sm text-foreground-lighter">
               Your recent queries run from the{' '}
-              <Link href={`/project/${ref}/logs/explorer`}>
+              <Link href={`/org/${slug}/project/${ref}/logs/explorer`}>
                 <span className="cursor-pointer font-bold underline">Query</span>
               </Link>{' '}
               tab will show here.

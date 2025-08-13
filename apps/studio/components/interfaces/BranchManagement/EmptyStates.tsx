@@ -10,6 +10,7 @@ const EMPTY_STATE_CONTAINER = 'flex items-center flex-col justify-center w-full 
 
 export const PullRequestsEmptyState = ({
   url,
+  slug,
   projectRef,
   branches,
   onBranchSelected,
@@ -18,6 +19,7 @@ export const PullRequestsEmptyState = ({
   gitlessBranching = false,
 }: {
   url: string
+  slug: string
   projectRef: string
   branches: Branch[]
   onBranchSelected: (branch: Branch) => void
@@ -40,7 +42,7 @@ export const PullRequestsEmptyState = ({
           </Button>
         ) : (
           <Button asChild type="outline">
-            <Link href={`/project/${projectRef}/settings/integrations`}>Connect to GitHub</Link>
+            <Link href={`/org/${slug}/project/${projectRef}/settings/integrations`}>Connect to GitHub</Link>
           </Button>
         )}
         {gitlessBranching && (

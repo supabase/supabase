@@ -10,6 +10,7 @@ import { BASE_PATH } from 'lib/constants'
 import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import { useParams } from 'next/navigation'
 
 export interface ProjectCardProps {
   project: ProjectInfo
@@ -26,6 +27,7 @@ const ProjectCard = ({
   vercelIntegration,
   resourceWarnings,
 }: ProjectCardProps) => {
+  const { slug } = useParams() as { slug: string }
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
@@ -38,7 +40,7 @@ const ProjectCard = ({
   return (
     <li className="list-none">
       <CardButton
-        linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
+        linkHref={rewriteHref ? rewriteHref : `/org/${slug}/project/${projectRef}`}
         className="h-44 !px-0 group pt-5 pb-0"
         title={
           <div className="w-full justify-between space-y-1.5 px-5">
@@ -74,7 +76,7 @@ const ProjectCard = ({
         footer={
           <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
         }
-        containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
+        containerElement={<ProjectIndexPageLink slug={slug} projectRef={projectRef} />}
       />
     </li>
   )

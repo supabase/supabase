@@ -37,6 +37,7 @@ LogsTemplatesPage.getLayout = (page) => (
 export default LogsTemplatesPage
 
 const Template = ({ projectRef, template }: { projectRef?: string; template: LogTemplate }) => {
+  const { slug } = useParams()
   const [showPreview, setShowPreview] = useState(false)
 
   return (
@@ -58,7 +59,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
         </div>
       }
       className="h-44"
-      linkHref={`/project/${projectRef}/logs/explorer?q=${encodeURI(template.searchString)}`}
+      linkHref={`/org/${slug}/project/${projectRef}/logs/explorer?q=${encodeURI(template.searchString)}`}
       description={template.description}
       footer={
         <div className="flex flex-row justify-end">

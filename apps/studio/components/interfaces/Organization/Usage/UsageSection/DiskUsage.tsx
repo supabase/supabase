@@ -19,6 +19,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import Panel from 'components/ui/Panel'
+import { useParams } from 'next/navigation'
 
 export interface DiskUsageProps {
   slug: string
@@ -185,7 +186,7 @@ const DiskUsage = ({
                           {project.name}
                         </span>
                         <Button asChild type="default" size={'tiny'}>
-                          <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
+                          <Link href={`/org/${slug}/project/${project.ref}/settings/compute-and-disk`}>
                             Manage Disk
                           </Link>
                         </Button>

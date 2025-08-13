@@ -32,6 +32,7 @@ export interface DatabaseSizeUsageProps {
 }
 
 const DatabaseSizeUsage = ({
+  slug,
   attribute,
   subscription,
   usage,
@@ -118,7 +119,7 @@ const DatabaseSizeUsage = ({
                       </span>
                       <Button asChild type="default" size={'tiny'}>
                         <Link
-                          href={`/project/${project.ref}/reports/database#database-size-report`}
+                          href={`/org/${slug}/project/${project.ref}/reports/database#database-size-report`}
                         >
                           Manage Database Size
                         </Link>

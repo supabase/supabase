@@ -78,7 +78,7 @@ const formSchema = z
   )
 
 export const PostgrestConfig = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { project } = useProjectContext()
 
   const [showModal, setShowModal] = useState(false)
@@ -317,7 +317,7 @@ export const PostgrestConfig = () => {
                                           </p>
                                           <Button asChild type="default">
                                             <Link
-                                              href={`/project/${projectRef}/database/extensions`}
+                                              href={`/org/${slug}/project/${projectRef}/database/extensions`}
                                             >
                                               Disable the pg_graphql extension
                                             </Link>

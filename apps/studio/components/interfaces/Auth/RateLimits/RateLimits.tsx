@@ -31,7 +31,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
 const RateLimits = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
@@ -186,7 +186,7 @@ const RateLimits = () => {
                               </p>
                               <div className="mt-3">
                                 <Button asChild type="default" size="tiny">
-                                  <Link href={`/project/${projectRef}/auth/providers`}>
+                                  <Link href={`/org/${slug}/project/${projectRef}/auth/providers`}>
                                     View auth providers
                                   </Link>
                                 </Button>
@@ -203,7 +203,7 @@ const RateLimits = () => {
                               </p>
                               <div className="mt-3">
                                 <Button asChild type="default" size="tiny">
-                                  <Link href={`/project/${projectRef}/auth/smtp`}>
+                                  <Link href={`/org/${slug}/project/${projectRef}/auth/smtp`}>
                                     View SMTP settings
                                   </Link>
                                 </Button>
@@ -250,7 +250,7 @@ const RateLimits = () => {
                           </p>
                           <div className="mt-3">
                             <Button asChild type="default" size="tiny">
-                              <Link href={`/project/${projectRef}/auth/providers`}>
+                              <Link href={`/org/${slug}/project/${projectRef}/auth/providers`}>
                                 View auth providers
                               </Link>
                             </Button>
@@ -379,7 +379,7 @@ const RateLimits = () => {
                           </p>
                           <div className="mt-3">
                             <Button asChild type="default" size="tiny">
-                              <Link href={`/project/${projectRef}/auth/providers`}>
+                              <Link href={`/org/${slug}/project/${projectRef}/auth/providers`}>
                                 View auth settings
                               </Link>
                             </Button>
@@ -465,7 +465,7 @@ const RateLimits = () => {
                           </p>
                           <div className="mt-3">
                             <Button asChild type="default" size="tiny">
-                              <Link href={`/project/${projectRef}/auth/providers`}>
+                              <Link href={`/org/${slug}/project/${projectRef}/auth/providers`}>
                                 View Auth provider settings
                               </Link>
                             </Button>

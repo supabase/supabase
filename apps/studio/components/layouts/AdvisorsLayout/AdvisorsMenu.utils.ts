@@ -3,6 +3,7 @@ import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const generateAdvisorsMenu = (
+  slug: string,
   project?: Project,
   features?: { advisorRules: boolean }
 ): ProductMenuGroup[] => {
@@ -15,19 +16,19 @@ export const generateAdvisorsMenu = (
         {
           name: 'Security Advisor',
           key: 'security',
-          url: `/project/${ref}/advisors/security`,
+          url: `/org/${slug}/project/${ref}/advisors/security`,
           items: [],
         },
         {
           name: 'Performance Advisor',
           key: 'performance',
-          url: `/project/${ref}/advisors/performance`,
+          url: `/org/${slug}/project/${ref}/advisors/performance`,
           items: [],
         },
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance`,
+          url: `/org/${slug}/project/${ref}/advisors/query-performance`,
           items: [],
         },
       ],
@@ -40,7 +41,7 @@ export const generateAdvisorsMenu = (
               {
                 name: 'Settings',
                 key: 'rules',
-                url: `/project/${ref}/advisors/rules/security`,
+                url: `/org/${slug}/project/${ref}/advisors/rules/security`,
                 items: [],
               },
             ],

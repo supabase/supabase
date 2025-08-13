@@ -32,6 +32,7 @@ import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
+import { useParams } from 'next/navigation'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -58,6 +59,7 @@ RestoreToNewProjectPage.getLayout = (page) => (
 )
 
 const RestoreToNewProject = () => {
+  const { slug } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const isFreePlan = organization?.plan?.id === 'free'
@@ -167,7 +169,7 @@ const RestoreToNewProject = () => {
     } else {
       return (
         <Link
-          href={`/project/${clone.target_project.ref}`}
+          href={`/org/${slug}/project/${clone.target_project.ref}`}
           className="grid grid-cols-4 gap-2 text-sm p-4 group"
         >
           <div className="min-w-24 truncate">{(clone.target_project as any).name}</div>
@@ -245,7 +247,7 @@ const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full"
           content={`Restore to new project is only available for Postgres 15 and above.  
-            Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
+            Go to [infrastructure settings](/org/${slug}/project/${project?.ref}/settings/infrastructure)
             to upgrade your database version.
           `}
         />
@@ -289,7 +291,7 @@ const RestoreToNewProject = () => {
           If you need to restore from a restored project, please reach out via [support](/support/new?projectRef=${project?.ref}).`}
         />
         <Button asChild type="default">
-          <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
+          <Link href={`/org/${slug}/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
             Go to original project
           </Link>
         </Button>
@@ -377,7 +379,7 @@ const RestoreToNewProject = () => {
               being created. You'll be able to restore again once the project is ready.
             </p>
             <Button asChild type="default" className="mt-2">
-              <Link href={`/project/${restoringClone?.target_project.ref}`}>Go to new project</Link>
+              <Link href={`/org/${slug}/project/${restoringClone?.target_project.ref}`}>Go to new project</Link>
             </Button>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>

@@ -17,7 +17,7 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 }
 
 export const EditorBaseLayout = ({ children, title, product, ...props }: ExplorerLayoutProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const pathname = usePathname()
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -25,7 +25,7 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   const hasNoOpenTabs =
     editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
   const hideTabs =
-    pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
+    pathname === `/org/${slug}/project/${ref}/editor` || pathname === `/org/${slug}/project/${ref}/sql` || hasNoOpenTabs
 
   return (
     <ProjectLayoutWithAuth resizableSidebar title={title} product={product} {...props}>

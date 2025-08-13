@@ -71,7 +71,7 @@ const TableList = ({
   onDeleteTable = noop,
 }: TableListProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
 
   const prefetchEditorTablePage = usePrefetchEditorTablePage()
@@ -457,7 +457,7 @@ const TableList = ({
                             className="whitespace-nowrap hover:border-muted"
                             style={{ paddingTop: 3, paddingBottom: 3 }}
                           >
-                            <Link href={`/project/${ref}/database/tables/${x.id}`}>
+                            <Link href={`/org/${slug}/project/${ref}/database/tables/${x.id}`}>
                               {x.columns.length} columns
                             </Link>
                           </Button>
@@ -471,7 +471,7 @@ const TableList = ({
                                 <DropdownMenuItem
                                   className="flex items-center space-x-2"
                                   onClick={() =>
-                                    router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                    router.push(`/org/${slug}/project/${project?.ref}/editor/${x.id}`)
                                   }
                                   onMouseEnter={() =>
                                     prefetchEditorTablePage({ id: x.id ? String(x.id) : undefined })

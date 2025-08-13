@@ -3,12 +3,14 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Badge, NavMenu, NavMenuItem } from 'ui'
+import { useParams } from 'next/navigation'
 
 type Props = {
   active: 'pitr' | 'scheduled' | 'rtnp'
 }
 
 function DatabaseBackupsNav({ active }: Props) {
+  const { slug } = useParams()
   const { ref, cloud_provider } = useProjectContext()?.project || {}
 
   const navMenuItems = [
@@ -16,13 +18,13 @@ function DatabaseBackupsNav({ active }: Props) {
       enabled: true,
       id: 'scheduled',
       label: 'Scheduled backups',
-      href: `/project/${ref}/database/backups/scheduled`,
+      href: `/org/${slug}/project/${ref}/database/backups/scheduled`,
     },
     {
       enabled: true,
       id: 'pitr',
       label: 'Point in time',
-      href: `/project/${ref}/database/backups/pitr`,
+      href: `/org/${slug}/project/${ref}/database/backups/pitr`,
     },
     {
       enabled: cloud_provider !== 'FLY',
@@ -35,7 +37,7 @@ function DatabaseBackupsNav({ active }: Props) {
           </Badge>
         </div>
       ),
-      href: `/project/${ref}/database/backups/restore-to-new-project`,
+      href: `/org/${slug}/project/${ref}/database/backups/restore-to-new-project`,
     },
   ] as const
 

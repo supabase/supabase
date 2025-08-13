@@ -7,6 +7,7 @@ import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 import GitHubSection from './GithubIntegration/GithubSection'
 import VercelSection from './VercelIntegration/VercelSection'
+import { useParams } from 'next/navigation'
 
 export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -21,6 +22,7 @@ export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' 
 const IntegrationSettings = () => {
   const project = useSelectedProject()
   const parentProject = useProjectByRef(project?.parent_project_ref)
+  const { slug } = useParams()
   const isBranch = project?.parent_project_ref !== undefined
 
   return (
@@ -34,7 +36,7 @@ const IntegrationSettings = () => {
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               To adjust your project's integration settings, you may return to your{' '}
-              <Link href={`/project/${parentProject?.ref}/settings/general`} className="text-brand">
+              <Link href={`/org/${slug}/project/${parentProject?.ref}/settings/general`} className="text-brand">
                 main branch
               </Link>
               .

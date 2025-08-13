@@ -37,7 +37,7 @@ const Policies = ({
   onSelectEditPolicy: onSelectEditPolicyAI,
 }: PoliciesProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
@@ -124,7 +124,7 @@ const Policies = ({
           ctaButtonLabel="Create a table"
           infoButtonLabel="What is RLS?"
           infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
-          onClickCta={() => router.push(`/project/${ref}/editor`)}
+          onClickCta={() => router.push(`/org/${slug}/project/${ref}/editor`)}
         >
           <div className="space-y-4">
             <InformationBox

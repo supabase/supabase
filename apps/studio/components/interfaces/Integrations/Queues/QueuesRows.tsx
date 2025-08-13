@@ -9,6 +9,7 @@ import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metr
 import { PostgresQueue } from 'data/database-queues/database-queues-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { DATETIME_FORMAT } from 'lib/constants'
+import { useParams } from 'next/navigation'
 
 interface QueuesRowsProps {
   queues: PostgresQueue[]
@@ -17,6 +18,7 @@ interface QueuesRowsProps {
 
 const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
   const router = useRouter()
+  const { slug } = useParams()
   const { project: selectedProject } = useProjectContext()
 
   const { data: queueTables } = useTablesQuery({
@@ -45,7 +47,7 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
       key={queue.queue_name}
       onClick={() => {
         router.push(
-          `/project/${selectedProject?.ref}/integrations/queues/queues/${queue.queue_name}`
+          `/org/${slug}/project/${selectedProject?.ref}/integrations/queues/queues/${queue.queue_name}`
         )
       }}
     >

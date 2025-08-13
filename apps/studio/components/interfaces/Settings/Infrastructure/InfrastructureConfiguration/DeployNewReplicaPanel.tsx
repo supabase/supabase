@@ -66,7 +66,7 @@ const DeployNewReplicaPanel = ({
   onSuccess,
   onClose,
 }: DeployNewReplicaPanelProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
 
@@ -314,7 +314,7 @@ const DeployNewReplicaPanel = ({
                     href={
                       isFreePlan
                         ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
-                        : `/project/${projectRef}/settings/compute-and-disk`
+                        : `/org/${slug}/project/${projectRef}/settings/compute-and-disk`
                     }
                   >
                     {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
@@ -411,7 +411,7 @@ const DeployNewReplicaPanel = ({
                         href={
                           isFreePlan
                             ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
-                            : `/project/${projectRef}/settings/compute-and-disk`
+                            : `/org/${slug}/project/${projectRef}/settings/compute-and-disk`
                         }
                       >
                         Upgrade compute size

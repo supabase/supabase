@@ -10,12 +10,12 @@ import { generateBranchMenu } from './BranchLayout.utils'
 
 const BranchProductMenu = () => {
   const router = useRouter()
-  const { ref: projectRef = 'default' } = useParams()
-  const page = router.pathname.split('/')[4] ?? 'branches'
+  const { slug, ref: projectRef = 'default' } = useParams() as { slug: string; ref?: string}
+  const page = router.pathname.split('/')[6] ?? 'branches'
 
   return (
     <>
-      <ProductMenu page={page} menu={generateBranchMenu(projectRef)} />
+      <ProductMenu page={page} menu={generateBranchMenu(slug, projectRef)} />
       <div className="px-6">
         <h3 className="text-sm font-mono text-foreground-lighter uppercase mb-3">Configure</h3>
         <GitHubStatus />

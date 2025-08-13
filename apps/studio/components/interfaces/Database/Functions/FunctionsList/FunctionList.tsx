@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { useParams } from 'next/navigation'
 
 interface FunctionListProps {
   schema: string
@@ -34,6 +35,7 @@ const FunctionList = ({
   deleteFunction = noop,
 }: FunctionListProps) => {
   const router = useRouter()
+  const { slug } = useParams()
   const { project: selectedProject } = useProjectContext()
   const aiSnap = useAiAssistantStateSnapshot()
 
@@ -118,7 +120,7 @@ const FunctionList = ({
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
                             className="space-x-2"
-                            onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
+                            onClick={() => router.push(`/org/${slug}/project/${projectRef}/api?rpc=${x.name}`)}
                           >
                             <FileText size={14} />
                             <p>Client API docs</p>

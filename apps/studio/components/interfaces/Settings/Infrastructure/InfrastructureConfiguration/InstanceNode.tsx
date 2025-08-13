@@ -65,7 +65,7 @@ interface ReplicaNodeData extends NodeData {
 }
 
 export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { numDatabases } = data
 
   return (
@@ -93,7 +93,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
-                <Link href={`/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
+                <Link href={`/org/${slug}/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -179,7 +179,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     onSelectResizeReplica,
     onSelectDropReplica,
   } = data
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const dbSelectorState = useDatabaseSelectorStateSnapshot()
   const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
@@ -355,7 +355,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               className="gap-x-2"
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
             >
-              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
+              <Link href={`/org/${slug}/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
                 View replication lag
               </Link>
             </DropdownMenuItem>

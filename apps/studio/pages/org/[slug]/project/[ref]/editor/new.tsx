@@ -11,10 +11,10 @@ import type { NextPageWithLayout } from 'types'
 
 const EditorNewPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   const onTableCreated = (table: { id: number }) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
+    router.push(`/org/${slug}/project/${projectRef}/editor/${table.id}`)
   }
 
   return (

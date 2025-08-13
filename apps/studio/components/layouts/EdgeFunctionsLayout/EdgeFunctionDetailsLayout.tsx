@@ -39,7 +39,7 @@ const EdgeFunctionDetailsLayout = ({
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
   const org = useSelectedOrganization()
-  const { functionSlug, ref } = useParams()
+  const { slug, functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
@@ -78,7 +78,7 @@ const EdgeFunctionDetailsLayout = ({
   const breadcrumbItems = [
     {
       label: 'Edge Functions',
-      href: `/project/${ref}/functions`,
+      href: `/org/${slug}/project/${ref}/functions`,
     },
   ]
 
@@ -86,23 +86,23 @@ const EdgeFunctionDetailsLayout = ({
     ? [
         {
           label: 'Overview',
-          href: `/project/${ref}/functions/${functionSlug}`,
+          href: `/org/${slug}/project/${ref}/functions/${functionSlug}`,
         },
         {
           label: 'Invocations',
-          href: `/project/${ref}/functions/${functionSlug}/invocations`,
+          href: `/org/${slug}/project/${ref}/functions/${functionSlug}/invocations`,
         },
         {
           label: 'Logs',
-          href: `/project/${ref}/functions/${functionSlug}/logs`,
+          href: `/org/${slug}/project/${ref}/functions/${functionSlug}/logs`,
         },
         {
           label: 'Code',
-          href: `/project/${ref}/functions/${functionSlug}/code`,
+          href: `/org/${slug}/project/${ref}/functions/${functionSlug}/code`,
         },
         {
           label: 'Details',
-          href: `/project/${ref}/functions/${functionSlug}/details`,
+          href: `/org/${slug}/project/${ref}/functions/${functionSlug}/details`,
         },
       ]
     : []
@@ -135,7 +135,7 @@ const EdgeFunctionDetailsLayout = ({
 
     if (!!functionSlug && isError && error.code === 404 && !cancel) {
       toast('Edge function cannot be found in your project')
-      router.push(`/project/${ref}/functions`)
+      router.push(`/org/${slug}/project/${ref}/functions`)
     }
 
     return () => {

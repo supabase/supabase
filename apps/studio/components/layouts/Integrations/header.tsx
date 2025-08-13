@@ -15,7 +15,7 @@ interface HeaderProps {
 
 export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) => {
   const router = useRouter()
-  const { id } = useParams()
+  const { id, slug } = useParams()
   // Get project context
   const { project } = useProjectContext()
   // Find the integration details based on ID
@@ -78,7 +78,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       transition={{ duration: 0.15 }}
                     >
                       <Link
-                        href={`/project/${project?.ref}/integrations`}
+                        href={`/org/${slug}/project/${project?.ref}/integrations`}
                         className="text-foreground-light hover:text-foreground transition flex items-center"
                       >
                         <ChevronLeft size={14} />
@@ -106,7 +106,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       transition={layoutTransition}
                       className="text-xs text-foreground-light hover:text-foreground !p-0"
                     >
-                      <Link href={`/project/${project?.ref}/integrations`}>Integrations</Link>
+                      <Link href={`/org/${slug}/project/${project?.ref}/integrations`}>Integrations</Link>
                     </motion.span>
                   )}
                 </div>

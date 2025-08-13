@@ -18,7 +18,7 @@ export default function EmptyPageState({ error }: any) {
       </div>
       <div className="flex items-center space-x-4">
         <Button asChild>
-          <Link href="/projects">Head back</Link>
+          <Link href="/org">Head back</Link>
         </Button>
         <Button asChild type="secondary">
           <Link href="/support/new">Submit a support request</Link>

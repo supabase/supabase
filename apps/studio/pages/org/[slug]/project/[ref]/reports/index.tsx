@@ -15,7 +15,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
 
   const { profile } = useProfile()
   const [showCreateReportModal, setShowCreateReportModal] = useState(false)
@@ -30,8 +30,8 @@ export const UserReportPage: NextPageWithLayout = () => {
         const reports = data.content
           .filter((x) => x.type === 'report')
           .sort((a, b) => a.name.localeCompare(b.name))
-        if (reports.length >= 1) router.push(`/project/${ref}/reports/${reports[0].id}`)
-        if (reports.length === 0) router.push(`/project/${ref}/reports/api-overview`)
+        if (reports.length >= 1) router.push(`/org/${slug}/project/${ref}/reports/${reports[0].id}`)
+        if (reports.length === 0) router.push(`/org/${slug}/project/${ref}/reports/api-overview`)
       },
     }
   )

@@ -9,11 +9,13 @@ import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organizati
 import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
 import { API_URL } from 'lib/constants'
 import { Button } from 'ui'
+import { useParams } from 'next/navigation'
 
 const SignInFlyTos = () => {
   const [loading, setLoading] = useState(true)
   const isLoggedIn = useIsLoggedIn()
   const router = useRouter()
+  const { slug } = useParams()
   const {
     isReady,
     query: { fly_extension_id, fly_organization_id },
@@ -21,7 +23,7 @@ const SignInFlyTos = () => {
   const { resolvedTheme } = useTheme()
   const { mutateAsync: getProjectByFlyExtensionId } = useProjectByFlyExtensionIdMutation({
     onSuccess: (res) => {
-      router.replace(`/project/${res.ref}`)
+      router.replace(`/org/${slug}/project/${res.ref}`)
     },
     onError: () => {
       setLoading(false)
@@ -73,7 +75,7 @@ const SignInFlyTos = () => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href="/projects">
+              <Link href="/org/${slug}/projects">
                 <div>
                   <Image
                     src={

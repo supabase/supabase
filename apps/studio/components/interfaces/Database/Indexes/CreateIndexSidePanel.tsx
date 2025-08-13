@@ -38,6 +38,7 @@ import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
+import { useParams } from 'next/navigation'
 
 interface CreateIndexSidePanelProps {
   visible: boolean
@@ -45,6 +46,7 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
+  const { slug } = useParams()
   const { project } = useProjectContext()
   const isOrioleDb = useIsOrioleDb()
 
@@ -392,7 +394,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   <Link
                     href={
                       project !== undefined
-                        ? `/project/${project.ref}/sql/new?content=${generatedSQL}`
+                        ? `/org/${slug}/project/${project.ref}/sql/new?content=${generatedSQL}`
                         : '/'
                     }
                   >

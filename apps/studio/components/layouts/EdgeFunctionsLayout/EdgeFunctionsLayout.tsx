@@ -7,9 +7,9 @@ import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 
 const EdgeFunctionsProductMenu = () => {
-  const { ref: projectRef = 'default' } = useParams()
+  const { slug, ref: projectRef = 'default' } = useParams()
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const page = router.pathname.split('/')[6]
 
   const menuItems = [
     {
@@ -19,13 +19,13 @@ const EdgeFunctionsProductMenu = () => {
           name: 'Functions',
           key: 'main',
           pages: ['', '[functionSlug]', 'new'],
-          url: `/project/${projectRef}/functions`,
+          url: `/org/${slug}/project/${projectRef}/functions`,
           items: [],
         },
         {
           name: 'Secrets',
           key: 'secrets',
-          url: `/project/${projectRef}/functions/secrets`,
+          url: `/org/${slug}/project/${projectRef}/functions/secrets`,
           items: [],
         },
       ],

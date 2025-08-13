@@ -23,7 +23,7 @@ interface DisableRuleModalProps {
 }
 
 export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const router = useRouter()
   const routeCategory = router.pathname.split('/').pop()
 
@@ -38,7 +38,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
       if (ruleLintMeta) {
         if (!!routeCategory && routeCategory !== ruleLintMeta.category) {
           router.push(
-            `/project/${ref}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
+            `/org/${slug}/project/${ref}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
           )
         }
       }

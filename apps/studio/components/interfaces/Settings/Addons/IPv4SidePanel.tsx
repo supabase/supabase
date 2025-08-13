@@ -20,7 +20,7 @@ import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
@@ -136,7 +136,7 @@ const IPv4SidePanel = () => {
             <p className="text-sm">
               If you are connecting via the Shared connection pooler, you do not need this add-on as
               our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-              <InlineLink href={`/project/${projectRef}/settings/database#connection-pooler`}>
+              <InlineLink href={`/org/${slug}/project/${projectRef}/settings/database#connection-pooler`}>
                 project database settings
               </InlineLink>
               .

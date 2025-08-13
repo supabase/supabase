@@ -30,7 +30,7 @@ Future<void> main() async {
 })
 
 const APIKeys = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   const availableLanguages = [
     { name: 'Javascript', key: 'js' },
@@ -164,7 +164,7 @@ const APIKeys = () => {
                   for your tables and configured policies. You may also use the service key which
                   can be found{' '}
                   <Link
-                    href={`/project/${projectRef}/settings/api`}
+                    href={`/org/${slug}/project/${projectRef}/settings/api`}
                     className="transition text-brand hover:text-brand-600"
                   >
                     here

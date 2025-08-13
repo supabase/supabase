@@ -11,7 +11,7 @@ import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
 const NewProjectPanel = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref: string }
 
   const {
     projectAuthAll: authEnabled,
@@ -47,10 +47,10 @@ const NewProjectPanel = () => {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
-                  <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
+                  <EditorIndexPageLink slug={slug} projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
                 <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
-                  <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
+                  <Link href={`/org/${slug}/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink />}>
                   <Link
@@ -93,7 +93,7 @@ const NewProjectPanel = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button type="default" asChild>
-                        <Link href={`/project/${ref}/auth/users`}>Explore Auth</Link>
+                        <Link href={`/org/${slug}/project/${ref}/auth/users`}>Explore Auth</Link>
                       </Button>
 
                       <Button
@@ -129,7 +129,7 @@ const NewProjectPanel = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button type="default" asChild>
-                        <Link href={`/project/${ref}/storage/buckets`}>Explore Storage</Link>
+                        <Link href={`/org/${slug}/project/${ref}/storage/buckets`}>Explore Storage</Link>
                       </Button>
 
                       <Button
@@ -166,7 +166,7 @@ const NewProjectPanel = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button type="default" asChild>
-                        <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
+                        <Link href={`/org/${slug}/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
                         className="translate-y-[1px]"
@@ -200,7 +200,7 @@ const NewProjectPanel = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button type="default" asChild>
-                        <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
+                        <Link href={`/org/${slug}/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
                         className="translate-y-[1px]"
@@ -243,7 +243,7 @@ const NewProjectPanel = () => {
           </div>
           <div className="flex items-center space-x-2">
             <Button asChild type="default">
-              <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
+              <Link href={`/org/${slug}/project/${ref}/settings/api`}>View API settings</Link>
             </Button>
             <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
               <Link

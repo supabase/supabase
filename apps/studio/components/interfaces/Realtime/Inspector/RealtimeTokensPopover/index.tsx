@@ -19,7 +19,7 @@ interface RealtimeTokensPopoverProps {
 }
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const org = useSelectedOrganization()
   const snap = useRoleImpersonationStateSnapshot()
 
@@ -87,7 +87,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
           <>
             Role impersonation for the Realtime Inspector is currently unavailable temporarily due
             to the new API keys. Please re-enable{' '}
-            <InlineLink href={`/project/${ref}/settings/api-keys`}>legacy JWT keys</InlineLink> if
+            <InlineLink href={`/org/${slug}/project/${ref}/settings/api-keys`}>legacy JWT keys</InlineLink> if
             you'd like to use role impersonation with the Realtime Inspector.
           </>
         ) : undefined

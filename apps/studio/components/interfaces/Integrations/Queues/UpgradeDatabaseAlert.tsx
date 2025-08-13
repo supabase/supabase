@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { useParams } from 'next/navigation'
 
 interface UpgradeDatabaseAlertProps {
   minimumVersion?: string
@@ -10,6 +11,7 @@ interface UpgradeDatabaseAlertProps {
 
 export const UpgradeDatabaseAlert = ({ minimumVersion = '15.6' }: UpgradeDatabaseAlertProps) => {
   const project = useSelectedProject()
+  const { slug } = useParams()
 
   return (
     <Admonition
@@ -25,7 +27,7 @@ export const UpgradeDatabaseAlert = ({ minimumVersion = '15.6' }: UpgradeDatabas
         </p>
       </div>
       <Button color="primary" className="w-fit">
-        <Link href={`/project/${project?.ref}/settings/infrastructure`}>Upgrade database</Link>
+        <Link href={`/org/${slug}/project/${project?.ref}/settings/infrastructure`}>Upgrade database</Link>
       </Button>
     </Admonition>
   )

@@ -7,6 +7,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAdvisorsMenu } from './AdvisorsMenu.utils'
+import { useParams } from 'next/navigation'
 
 export interface AdvisorsLayoutProps {
   title?: string
@@ -17,14 +18,15 @@ const AdvisorsLayout = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) =>
   const advisorRules = useIsAdvisorRulesEnabled()
 
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const { slug } = useParams() as { slug: string }
+  const page = router.pathname.split('/')[6]
 
   return (
     <ProjectLayout
       isLoading={false}
       product="Advisors"
       productMenu={
-        <ProductMenu page={page} menu={generateAdvisorsMenu(project, { advisorRules })} />
+        <ProductMenu page={page} menu={generateAdvisorsMenu(slug, project, { advisorRules })} />
       }
     >
       {children}

@@ -15,7 +15,7 @@ export interface ConnectingStateProps {
 }
 
 const ConnectingState = ({ project }: ConnectingStateProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const queryClient = useQueryClient()
   const checkProjectConnectionIntervalRef = useRef<number>()
 
@@ -80,7 +80,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
 
               <div className="flex items-center justify-center space-x-2">
                 <Button asChild type="default">
-                  <Link href={`/project/${ref}/settings/infrastructure`}>
+                  <Link href={`/org/${slug}/project/${ref}/settings/infrastructure`}>
                     Check database health
                   </Link>
                 </Button>

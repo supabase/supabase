@@ -73,7 +73,7 @@ const StatusIcon = ({
 }
 
 export const ServiceStatus = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
 
@@ -301,7 +301,7 @@ export const ServiceStatus = () => {
       <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
-            href={`/project/${ref}${service.logsUrl}`}
+            href={`/org/${slug}/project/${ref}${service.logsUrl}`}
             key={service.name}
             className="transition px-3 py-2 text-xs flex items-center justify-between border-b last:border-none group relative hover:bg-surface-300"
           >

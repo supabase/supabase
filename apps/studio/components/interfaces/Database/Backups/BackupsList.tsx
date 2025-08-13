@@ -21,7 +21,7 @@ import BackupsStorageAlert from './BackupsStorageAlert'
 const BackupsList = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   const { project: selectedProject } = useProjectContext()
   const isHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -43,7 +43,7 @@ const BackupsList = () => {
               'DD MMM YYYY HH:mm:ss'
             )}`
           )
-          router.push(`/project/${projectRef}`)
+          router.push(`/org/${slug}/project/${projectRef}`)
         }, 3000)
       }
     },

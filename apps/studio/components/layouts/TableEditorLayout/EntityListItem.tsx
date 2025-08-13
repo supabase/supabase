@@ -48,6 +48,7 @@ import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 export interface EntityListItemProps {
   id: number | string
+  slug: string
   projectRef: string
   isLocked: boolean
   isActive?: boolean
@@ -61,6 +62,7 @@ function isTableLikeEntityListItem(entity: { type?: string }) {
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   id,
+  slug,
   projectRef,
   item: entity,
   isLocked,
@@ -224,7 +226,8 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     <EditorTablePageLink
       title={entity.name}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}`}
+      slug={slug}
+      href={`/org/${slug}/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(
@@ -355,7 +358,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
-                      href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
+                      href={`/org/${slug}/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
                     >
                       <Lock size={12} />
                       <span>View policies</span>

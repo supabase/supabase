@@ -19,7 +19,7 @@ import {
 
 export const useNewQuery = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -50,7 +50,7 @@ export const useNewQuery = () => {
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
       if (shouldRedirect) {
-        router.push(`/project/${ref}/sql/${snippet.id}`)
+        router.push(`/org/${slug}/project/${ref}/sql/${snippet.id}`)
         return undefined
       } else {
         return snippet.id

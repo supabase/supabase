@@ -57,7 +57,7 @@ const FormSchema = z.object({
 
 export const EdgeFunctionDetails = () => {
   const router = useRouter()
-  const { ref: projectRef, functionSlug } = useParams()
+  const { slug, ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
@@ -79,7 +79,7 @@ export const EdgeFunctionDetails = () => {
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
-      router.push(`/project/${projectRef}/functions`)
+      router.push(`/org/${slug}/project/${projectRef}/functions`)
     },
   })
 

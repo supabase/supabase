@@ -24,7 +24,7 @@ export interface EditBucketModalProps {
 }
 
 const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
 
   const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation({
     onSuccess: () => {
@@ -228,7 +228,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                               <p className="text-foreground-light text-sm">
                                 Note: Individual bucket upload will still be capped at the{' '}
                                 <Link
-                                  href={`/project/${ref}/settings/storage`}
+                                  href={`/org/${slug}/project/${ref}/settings/storage`}
                                   className="font-bold underline"
                                 >
                                   global upload limit

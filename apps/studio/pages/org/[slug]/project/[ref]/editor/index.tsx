@@ -14,12 +14,12 @@ import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const tabStore = useTabsStateSnapshot()
   const appSnap = useAppStateSnapshot()
 
   const onTableCreated = (table: { id: number }) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
+    router.push(`/org/${slug}/project/${projectRef}/editor/${table.id}`)
   }
 
   useEffect(() => {
@@ -29,11 +29,11 @@ const TableEditorPage: NextPageWithLayout = () => {
       editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
     )
     if (lastOpenedTab !== undefined) {
-      router.push(`/project/${projectRef}/editor/${appSnap.dashboardHistory.editor}`)
+      router.push(`/org/${slug}/project/${projectRef}/editor/${appSnap.dashboardHistory.editor}`)
     } else if (lastTabId) {
       // Handle redirect to last opened table tab, or last table tab
       const lastTab = tabStore.tabsMap[lastTabId]
-      if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
+      if (lastTab) router.push(`/org/${slug}/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
     }
   }, [])
 

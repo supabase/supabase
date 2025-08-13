@@ -211,7 +211,7 @@ const Wizard: NextPageWithLayout = () => {
           organization: res.organization_slug,
         },
       })
-      router.push(`/project/${res.ref}/building`)
+      router.push(`/org/${res.organization_slug}/project/${res.ref}/building`)
     },
   })
 

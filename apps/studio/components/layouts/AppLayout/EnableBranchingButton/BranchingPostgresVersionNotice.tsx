@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
 
 export const BranchingPostgresVersionNotice = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const snap = useAppStateSnapshot()
 
   return (
@@ -22,7 +22,7 @@ export const BranchingPostgresVersionNotice = () => {
       <AlertDescription_Shadcn_>
         <Button size="tiny" type="default" className="mt-4">
           <Link
-            href={`/project/${ref}/settings/infrastructure`}
+            href={`/org/${slug}/project/${ref}/settings/infrastructure`}
             onClick={() => snap.setShowCreateBranchModal(false)}
           >
             Head to project settings

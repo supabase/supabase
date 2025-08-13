@@ -30,7 +30,7 @@ import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 
 export const EditorTabs = () => {
-  const { ref, id } = useParams()
+  const { slug, ref, id } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
 
@@ -86,7 +86,7 @@ export const EditorTabs = () => {
 
       tabs.removeTabs(tabsToClose)
       onClearDashboardHistory()
-      router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+      router.push(`/org/${slug}/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
     }
   }
 
@@ -102,7 +102,7 @@ export const EditorTabs = () => {
 
       const entityId = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
       if (id !== entityId) {
-        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
+        router.push(`/org/${slug}/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
       }
     }
   }
@@ -215,7 +215,7 @@ export const EditorTabs = () => {
                 className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
                 onClick={() =>
                   router.push(
-                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
+                    `/org/${slug}/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
                   )
                 }
                 initial={{ opacity: 0, scale: 0.8, x: -10 }}

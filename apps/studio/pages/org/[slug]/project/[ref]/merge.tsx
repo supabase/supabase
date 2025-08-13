@@ -43,7 +43,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
 
@@ -250,7 +250,7 @@ const MergePage: NextPageWithLayout = () => {
         },
         groups: {
           project: parentProjectRef ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
+          organization: slug ?? 'Unknown',
         },
       })
     },
@@ -259,7 +259,7 @@ const MergePage: NextPageWithLayout = () => {
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Branch closed successfully')
-      router.push(`/project/${parentProjectRef}/branches`)
+      router.push(`/org/${slug}/project/${parentProjectRef}/branches`)
       // Track delete button click
       sendEvent({
         action: 'branch_delete_button_clicked',
@@ -268,7 +268,7 @@ const MergePage: NextPageWithLayout = () => {
         },
         groups: {
           project: parentProjectRef ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
+          organization: slug ?? 'Unknown',
         },
       })
     },
@@ -332,7 +332,7 @@ const MergePage: NextPageWithLayout = () => {
     () => [
       {
         label: 'Merge requests',
-        href: `/project/${project?.ref}/branches/merge-requests`,
+        href: `/org/${slug}/project/${project?.ref}/branches/merge-requests`,
       },
     ],
     [parentProjectRef]
@@ -345,7 +345,7 @@ const MergePage: NextPageWithLayout = () => {
       const query: Record<string, string> = { tab }
       if (currentWorkflowRunId) query.workflow_run_id = currentWorkflowRunId
       const qs = new URLSearchParams(query).toString()
-      return `/project/[ref]/merge?${qs}`
+      return `/org/${slug}/project/[ref]/merge?${qs}`
     }
 
     return [
@@ -443,12 +443,12 @@ const MergePage: NextPageWithLayout = () => {
                 {
                   onSuccess: () => {
                     toast.success('Successfully closed merge request')
-                    router.push(`/project/${project?.ref}/branches?tab=prs`)
+                    router.push(`/org/${slug}/project/${project?.ref}/branches?tab=prs`)
                     sendEvent({
                       action: 'branch_close_merge_request_button_clicked',
                       groups: {
                         project: parentProjectRef ?? 'Unknown',
-                        organization: selectedOrg?.slug ?? 'Unknown',
+                        organization: slug ?? 'Unknown',
                       },
                     })
                   },
@@ -466,7 +466,7 @@ const MergePage: NextPageWithLayout = () => {
   const pageTitle = () => (
     <span>
       Merge{' '}
-      <Link href={`/project/${ref}/editor`}>
+      <Link href={`/org/${slug}/project/${ref}/editor`}>
         <Badge className="font-mono text-lg gap-1">
           <GitBranchIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
           {currentBranch.name}
@@ -474,7 +474,7 @@ const MergePage: NextPageWithLayout = () => {
       </Link>{' '}
       into{' '}
       <Link
-        href={`/project/${mainBranch?.project_ref}/editor`}
+        href={`/org/${slug}/project/${mainBranch?.project_ref}/editor`}
         className="font-mono inline-flex gap-4"
       >
         <Badge className="font-mono text-lg gap-1">
@@ -550,7 +550,7 @@ const MergePage: NextPageWithLayout = () => {
                       icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"
                     >
-                      <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
+                      <Link href={`/org/${slug}/project/${parentProjectRef}/branches`}>Create new branch</Link>
                     </Button>
                   ) : hasCurrentWorkflowCompleted &&
                     currentWorkflowRun?.id === parentBranchWorkflow?.id ? (

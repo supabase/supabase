@@ -40,7 +40,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const MergeRequestsPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams() as { slug: string, ref: string }
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useIsBranching2Enabled()
@@ -113,11 +113,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
               },
               groups: {
                 project: projectRef ?? 'Unknown',
-                organization: selectedOrg?.slug ?? 'Unknown',
+                organization: slug ?? 'Unknown',
               },
             })
 
-            router.push(`/project/${branch.project_ref}/merge`)
+            router.push(`/org/${slug}/project/${branch.project_ref}/merge`)
           },
         }
       )
@@ -218,7 +218,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                           const isPR = branch.pr_number !== undefined
                           const rowLink = isPR
                             ? `https://github.com/${repo}/pull/${branch.pr_number}`
-                            : `/project/${branch.project_ref}/merge`
+                            : `/org/${slug}/project/${branch.project_ref}/merge`
                           return (
                             <BranchRow
                               key={branch.id}
@@ -285,6 +285,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                         <PullRequestsEmptyState
                           url={generateCreatePullRequestURL()}
                           gitlessBranching={gitlessBranching}
+                          slug={slug}
                           projectRef={projectRef ?? '_'}
                           branches={previewBranches}
                           onBranchSelected={handleMarkBranchForReview}
@@ -306,7 +307,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
 const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useIsBranching2Enabled()
@@ -351,7 +352,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
               },
             })
 
-            router.push(`/project/${branch.project_ref}/merge`)
+            router.push(`/org/${slug}/project/${branch.project_ref}/merge`)
           },
         }
       )

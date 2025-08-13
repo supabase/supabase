@@ -71,7 +71,7 @@ const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFor
 export default ChooseFunctionForm
 
 const NoticeBox = () => {
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
 
   return (
     <div className="px-6">
@@ -81,7 +81,7 @@ const NoticeBox = () => {
         description={`You can make functions by using the Database Functions`}
         button={
           <Button asChild type="default">
-            <Link href={`/project/${ref}/database/functions`}>Go to Functions</Link>
+            <Link href={`/org/${slug}/project/${ref}/database/functions`}>Go to Functions</Link>
           </Button>
         }
       />
@@ -92,14 +92,14 @@ const NoticeBox = () => {
 const NoFunctionsState = () => {
   // for the empty 'no tables' state link
   const router = useRouter()
-  const { ref } = router.query
+  const { ref, slug } = router.query
 
   return (
     <ProductEmptyState
       title="No Trigger Functions found in database"
       ctaButtonLabel="Create a trigger function"
       onClickCta={() => {
-        router.push(`/project/${ref}/database/functions`)
+        router.push(`/org/${slug}/project/${ref}/database/functions`)
       }}
     >
       <p className="text-sm text-foreground-light">

@@ -16,7 +16,7 @@ interface EdgeFunctionsListItemProps {
 
 export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
   const [isCopied, setIsCopied] = useState(false)
 
@@ -36,7 +36,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
     <Table.tr
       key={item.id}
       onClick={() => {
-        router.push(`/project/${ref}/functions/${item.slug}`)
+        router.push(`/org/${slug}/project/${ref}/functions/${item.slug}`)
       }}
     >
       <Table.td>

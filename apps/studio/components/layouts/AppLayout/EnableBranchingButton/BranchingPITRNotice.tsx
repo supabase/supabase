@@ -9,7 +9,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
 
 export const BranchingPITRNotice = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const snap = useAppStateSnapshot()
 
   const canUpdateSubscription = useCheckPermissions(
@@ -49,7 +49,7 @@ export const BranchingPITRNotice = () => {
         ) : (
           <Button size="tiny" type="default" asChild>
             <Link
-              href={`/project/${ref}/settings/addons?panel=pitr`}
+              href={`/org/${slug}/project/${ref}/settings/addons?panel=pitr`}
               onClick={() => snap.setShowCreateBranchModal(false)}
             >
               Enable PITR

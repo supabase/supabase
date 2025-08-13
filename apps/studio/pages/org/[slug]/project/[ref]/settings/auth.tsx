@@ -7,7 +7,7 @@ import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const { ref } = useParams() as { ref: string }
+  const { ref, slug } = useParams() as { ref: string, slug: string }
 
   return (
     <ProductEmptyState title="Authentication settings have moved">
@@ -17,77 +17,77 @@ const ProjectSettings: NextPageWithLayout = () => {
           settings will follow in the coming weeks.
         </p>
         <Link
-          href={`/project/${ref}/auth/providers`}
+          href={`/org/${slug}/project/${ref}/auth/providers`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           General user signup
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/providers`}
+          href={`/org/${slug}/project/${ref}/auth/providers`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Password settings in email provider
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/sessions`}
+          href={`/org/${slug}/project/${ref}/auth/sessions`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           User sessions
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/sessions`}
+          href={`/org/${slug}/project/${ref}/auth/sessions`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Refresh tokens
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/protection`}
+          href={`/org/${slug}/project/${ref}/auth/protection`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Bot and abuse protection
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/smtp`}
+          href={`/org/${slug}/project/${ref}/auth/smtp`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           SMTP settings
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/settings/api#jwt-settings`}
+          href={`/org/${slug}/project/${ref}/settings/api#jwt-settings`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Access token expiry
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/mfa`}
+          href={`/org/${slug}/project/${ref}/auth/mfa`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Multifactor authentication
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/third-party`}
+          href={`/org/${slug}/project/${ref}/auth/third-party`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Third party authentication
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/advanced`}
+          href={`/org/${slug}/project/${ref}/auth/advanced`}
           className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Max request duration
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/auth/advanced`}
+          href={`/org/${slug}/project/${ref}/auth/advanced`}
           className="block py-2 hover:text-foreground flex items-center justify-between"
         >
           Max direct database connections

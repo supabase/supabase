@@ -10,6 +10,7 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { DEFAULT_HOME } from '../../../pages/api/constants'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -31,8 +32,6 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
-
-  const DEFAULT_HOME = '/organizations'
 
   /**
    * Array of urls/routes that should be ignored

@@ -42,7 +42,7 @@ import { StorageCredItem } from './StorageCredItem'
 import { getConnectionURL } from './StorageSettings.utils'
 
 export const S3Connection = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const isProjectActive = useIsProjectActive()
   const { project, isLoading: projectIsLoading } = useProjectContext()
 
@@ -208,7 +208,7 @@ export const S3Connection = () => {
               </AlertDescription_Shadcn_>
               <div className="mt-3 flex items-center space-x-2">
                 <Button asChild type="default">
-                  <Link href={`/project/${projectRef}`}>Restore project</Link>
+                  <Link href={`/org/${slug}/project/${projectRef}`}>Restore project</Link>
                 </Button>
               </div>
             </Alert_Shadcn_>
@@ -238,7 +238,7 @@ export const S3Connection = () => {
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_>
               <Button asChild type="default" className="mt-3">
-                <Link href={`/project/${projectRef}`}>Restore project</Link>
+                <Link href={`/org/${slug}/project/${projectRef}`}>Restore project</Link>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>

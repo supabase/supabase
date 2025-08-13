@@ -11,7 +11,7 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } f
 import { Markdown } from '../Markdown'
 
 export const IndexAdvisorDisabledState = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -76,7 +76,7 @@ export const IndexAdvisorDisabledState = () => {
         <div className="flex items-center gap-x-2">
           {indexAdvisor === undefined ? (
             <Button asChild type="default">
-              <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
+              <Link href={`/org/${slug}/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
             </Button>
           ) : (
             <Button

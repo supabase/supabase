@@ -37,10 +37,11 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } f
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
 const PrivilegesPage: NextPageWithLayout = () => {
-  const { ref, table: paramTable } = useParams()
+  const { slug, ref, table: paramTable } = useParams()
   const { project } = useProjectContext()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const isEnabled = useIsColumnLevelPrivilegesEnabled()
+
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)
@@ -328,7 +329,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   </p>
                   {selectedSchema === 'public' && (
                     <Button asChild className="mt-4">
-                      <Link href={`/project/${ref}/editor`}>Create a new table</Link>
+                      <Link href={`/org/${slug}/project/${ref}/editor`}>Create a new table</Link>
                     </Button>
                   )}
                 </div>

@@ -40,7 +40,7 @@ interface UserOverviewProps {
 }
 
 export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
@@ -228,7 +228,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   </p>
                   <Button asChild type="default" className="mt-2">
                     <Link
-                      href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
+                      href={`/org/${slug}/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
                     >
                       Configure {providerName} provider
                     </Link>

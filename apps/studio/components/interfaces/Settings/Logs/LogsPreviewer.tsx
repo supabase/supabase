@@ -63,7 +63,7 @@ export const LogsPreviewer = ({
   const useUniversalFilterBar = useFlag('universalFilterBar')
 
   const router = useRouter()
-  const { db } = useParams()
+  const { slug, db } = useParams()
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -213,7 +213,7 @@ export const LogsPreviewer = ({
     defaultSearchValue: search,
     defaultToValue: timestampEnd,
     defaultFromValue: timestampStart,
-    queryUrl: `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+    queryUrl: `/org/${slug}/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
       params.sql || ''
     )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`,
     onSelectTemplate,

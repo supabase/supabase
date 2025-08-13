@@ -5,6 +5,7 @@ import { MessageSquare, X } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from 'ui'
+import { useParams } from 'next/navigation'
 
 interface AIAssistantOptionProps {
   projectRef: string
@@ -17,6 +18,7 @@ export const AIAssistantOption = ({
   organizationSlug,
   isCondensed = false,
 }: AIAssistantOptionProps) => {
+  const { slug } = useParams()
   const [isVisible, setIsVisible] = useState(isCondensed ? true : false)
   const { data: projects } = useProjectsQuery()
   const { mutate: sendEvent } = useSendEventMutation()
@@ -49,7 +51,7 @@ export const AIAssistantOption = ({
     return orgProjects?.[0]?.ref || '_'
   }
 
-  const aiLink = `/project/${getProjectRef()}?aiAssistantPanelOpen=true`
+  const aiLink = `/org/${slug}/project/${getProjectRef()}?aiAssistantPanelOpen=true`
 
   return (
     <AnimatePresence initial={false}>

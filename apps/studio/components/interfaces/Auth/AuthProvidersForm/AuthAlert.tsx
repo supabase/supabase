@@ -17,7 +17,7 @@ export const AuthAlert = ({
   title: string
   isHookSendSMSEnabled: boolean
 }) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
 
   switch (title) {
     // TODO (KM): Remove after 10th October 2024 when we disable the provider
@@ -52,7 +52,7 @@ export const AuthAlert = ({
             <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
               <p>The SMS hook will be used in place of the SMS provider configured</p>
               <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                <Link href={`/project/${ref}/auth/hooks`}>View auth hooks</Link>
+                <Link href={`/org/${slug}/project/${ref}/auth/hooks`}>View auth hooks</Link>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>

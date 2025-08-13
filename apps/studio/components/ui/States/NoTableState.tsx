@@ -7,14 +7,14 @@ interface Props {
 
 const NoTableState: React.FC<Props> = ({ message }) => {
   const router = useRouter()
-  const { ref } = router.query
+  const { slug, ref } = router.query
 
   return (
     <ProductEmptyState
       title="No public tables found"
       ctaButtonLabel="Create a new table"
       onClickCta={() => {
-        router.push(`/project/${ref}/editor`)
+        router.push(`/org/${slug}/project/${ref}/editor`)
       }}
     >
       <p className="text-sm text-foreground-light">{message}</p>

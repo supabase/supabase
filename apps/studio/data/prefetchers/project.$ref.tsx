@@ -4,15 +4,17 @@ import { PropsWithChildren, useCallback } from 'react'
 
 import { prefetchProjectDetail } from 'data/projects/project-detail-query'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
+import { useParams } from 'next/navigation'
 
 export function usePrefetchProjectIndexPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { slug } = useParams()
 
   return useCallback(
     ({ projectRef }: { projectRef?: string }) => {
       // Prefetch code
-      router.prefetch(`/project/${projectRef}`)
+      router.prefetch(`/org/${slug}/project/${projectRef}`)
 
       // Prefetch data
       prefetchProjectDetail(queryClient, {
@@ -27,12 +29,14 @@ export function usePrefetchProjectIndexPage() {
 
 interface ProjectIndexPageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 'prefetcher'> {
   projectRef?: string
+  slug: string
   href?: PrefetchableLinkProps['href']
 }
 
 export function ProjectIndexPageLink({
   href,
   projectRef,
+  slug,
   children,
   ...props
 }: PropsWithChildren<ProjectIndexPageLinkProps>) {
@@ -40,7 +44,7 @@ export function ProjectIndexPageLink({
 
   return (
     <PrefetchableLink
-      href={href || `/project/${projectRef}`}
+      href={href || `/org/${slug}/project/${projectRef}`}
       prefetcher={() => prefetch({ projectRef })}
       {...props}
     >

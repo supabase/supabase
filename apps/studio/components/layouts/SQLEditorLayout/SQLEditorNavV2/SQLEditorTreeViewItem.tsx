@@ -78,7 +78,7 @@ export const SQLEditorTreeViewItem = ({
   ...props
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
-  const { id, ref: projectRef } = useParams()
+  const { slug, id, ref: projectRef } = useParams()
   const { profile } = useProfile()
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -173,11 +173,11 @@ export const SQLEditorTreeViewItem = ({
             onClick={(e) => {
               if (!isBranch) {
                 if (!e.shiftKey) {
-                  router.push(`/project/${projectRef}/sql/${element.id}`)
+                  router.push(`/org/${slug}/project/${projectRef}/sql/${element.id}`)
                 } else if (id !== 'new') {
                   onMultiSelect?.(element.id)
                 } else {
-                  router.push(`/project/${projectRef}/sql/${element.id}`)
+                  router.push(`/org/${slug}/project/${projectRef}/sql/${element.id}`)
                 }
               } else {
                 // Prevent expanding folder while editing text
@@ -265,7 +265,7 @@ export const SQLEditorTreeViewItem = ({
                 <Link
                   target="_self"
                   rel="noreferrer"
-                  href={`/project/${projectRef}/sql/${element.id}`}
+                  href={`/org/${slug}/project/${projectRef}/sql/${element.id}`}
                 >
                   <ExternalLink size={14} />
                   Open in new tab

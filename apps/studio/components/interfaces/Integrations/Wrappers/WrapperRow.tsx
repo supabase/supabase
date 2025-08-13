@@ -19,7 +19,7 @@ interface WrapperRowProps {
 }
 
 const WrapperRow = ({ wrapper }: WrapperRowProps) => {
-  const { ref, id } = useParams()
+  const { slug, ref, id } = useParams()
   const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const [editWrapperShown, setEditWrapperShown] = useState(false)
@@ -79,7 +79,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                   />
                 </Badge>
 
-                <Link href={`/project/${ref}/editor/${table.id}`}>
+                <Link href={`/org/${slug}/project/${ref}/editor/${table.id}`}>
                   <Badge className="transition hover:bg-surface-300 pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem] border-l-0">
                     <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                     {table.schema}.{table.table_name}
@@ -94,7 +94,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
             <div key={metadata.name} className="flex items-center space-x-2 text-sm">
               {/* <p className="text-foreground-light">{metadata.label}:</p> */}
               <Link
-                href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
+                href={`/org/${slug}/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                 className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
               >
                 <span className="truncate" title={metadata.label}>

@@ -12,6 +12,7 @@ import type {
 import { EMPTY_ARR } from 'lib/void'
 import { basename } from 'path'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
+import { useParams } from 'next/navigation'
 
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult
@@ -69,6 +70,8 @@ const FunctionDiff = ({
   currentBranchRef,
   fileInfos,
 }: FunctionDiffProps) => {
+  const { slug } = useParams()
+
   // Get all file keys from fileInfos
   const allFileKeys = useMemo(() => fileInfos.map((info) => info.key), [fileInfos])
 
@@ -104,7 +107,7 @@ const FunctionDiff = ({
       <CardHeader>
         <CardTitle>
           <Link
-            href={`/project/${currentBranchRef}/functions/${functionSlug}`}
+            href={`/org/${slug}/project/${currentBranchRef}/functions/${functionSlug}`}
             className="flex items-center gap-2"
           >
             <Code strokeWidth={1.5} size={16} className="text-foreground-muted" />

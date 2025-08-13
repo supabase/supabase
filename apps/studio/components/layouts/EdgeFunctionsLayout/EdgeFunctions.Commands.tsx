@@ -4,7 +4,7 @@ import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 export function useFunctionsGotoCommands(options?: CommandOptions) {
-  let { ref } = useParams()
+  let { slug, ref } = useParams()
   ref ||= '_'
 
   useRegisterCommands(
@@ -13,10 +13,10 @@ export function useFunctionsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-functions',
         name: 'Edge Functions',
-        route: `/project/${ref}/functions`,
+        route: `/org/${slug}/project/${ref}/functions`,
         defaultHidden: true,
       },
     ],
-    { ...options, deps: [ref] }
+    { ...options, deps: [ref, slug] }
   )
 }

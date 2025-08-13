@@ -47,7 +47,7 @@ const HTTPRequestFields = ({
   onUpdateParameter,
   onRemoveParameter,
 }: HTTPRequestFieldsProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project: selectedProject } = useProjectContext()
 
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
@@ -93,7 +93,7 @@ const HTTPRequestFields = ({
               <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
                 <p className="text-sm">No edge functions created yet</p>
                 <Button asChild>
-                  <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
+                  <Link href={`/org/${slug}/project/${ref}/functions`}>Create an edge function</Link>
                 </Button>
               </div>
               {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}

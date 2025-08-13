@@ -41,7 +41,7 @@ const LinterDataGrid = ({
   currentTab,
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref: string }
   const router = useRouter()
   const snap = useAiAssistantStateSnapshot()
 
@@ -258,6 +258,7 @@ const LinterDataGrid = ({
                           </Button>
                           <LintCTA
                             title={selectedLint.name}
+                            slug={slug}
                             projectRef={ref!}
                             metadata={selectedLint.metadata}
                           />

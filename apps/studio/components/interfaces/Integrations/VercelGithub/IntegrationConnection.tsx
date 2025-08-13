@@ -22,6 +22,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useParams } from 'next/navigation'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -31,6 +32,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const router = useRouter()
+    const { slug } = useParams()
     const org = useSelectedOrganization()
 
     const { type, connection } = props
@@ -70,7 +72,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
       syncEnvs({ connectionId: connection.id })
     }, [connection, syncEnvs])
 
-    const projectIntegrationUrl = `/project/[ref]/settings/integrations`
+    const projectIntegrationUrl = `/org/${slug}/project/[ref]/settings/integrations`
 
     return (
       <>

@@ -9,12 +9,14 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { Button, cn } from 'ui'
+import { useParams } from 'next/navigation'
 
 const Header = () => {
+  const { slug } = useParams()
   return (
     <div className="border-default border-b p-3">
       <div className="flex items-center space-x-2">
-        <Link href="/projects">
+        <Link href={`/org/${slug}/projects`}>
           <img
             src={`${BASE_PATH}/img/supabase-logo.svg`}
             alt="Supabase"

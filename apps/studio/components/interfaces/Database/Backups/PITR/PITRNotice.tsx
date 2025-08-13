@@ -10,7 +10,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { getPITRRetentionDuration } from './PITR.utils'
 
 const PITRNotice = ({}) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { data: addonsResponse } = useProjectAddonsQuery({ projectRef })
   const retentionPeriod = getPITRRetentionDuration(addonsResponse?.selected_addons ?? [])
 
@@ -40,7 +40,7 @@ const PITRNotice = ({}) => {
               },
             }}
           >
-            <Link href={`/project/${projectRef}/settings/addons?panel=pitr`}>
+            <Link href={`/org/${slug}/project/${projectRef}/settings/addons?panel=pitr`}>
               Increase retention period
             </Link>
           </ButtonTooltip>

@@ -19,7 +19,7 @@ export interface DeleteBucketModalProps {
 
 const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketModalProps) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { project } = useProjectContext()
 
   const { data } = useBucketsQuery({ projectRef })
@@ -58,7 +58,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
         )
 
         toast.success(`Successfully deleted bucket ${bucket?.name}`)
-        router.push(`/project/${projectRef}/storage/buckets`)
+        router.push(`/org/${slug}/project/${projectRef}/storage/buckets`)
         onClose()
       } catch (error) {
         toast.success(

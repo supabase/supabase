@@ -8,6 +8,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
+import { useParams } from 'next/navigation'
 
 export interface RealtimeLayoutProps {
   title: string
@@ -17,11 +18,12 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
   const project = useSelectedProject()
   const enableRealtimeSettingsFF = useIsRealtimeSettingsFFEnabled()
   const enableRealtimeSettingsFP = useIsRealtimeSettingsEnabled()
+  const { slug } = useParams() as { slug: string }
 
   const enableRealtimeSettings = enableRealtimeSettingsFF && enableRealtimeSettingsFP
 
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const page = router.pathname.split('/')[6]
 
   return (
     <ProjectLayout
@@ -30,7 +32,7 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateRealtimeMenu(project!, { enableRealtimeSettings })}
+          menu={generateRealtimeMenu(slug, project!, { enableRealtimeSettings })}
         />
       }
     >

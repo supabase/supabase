@@ -17,7 +17,7 @@ import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBa
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganization, useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -42,7 +42,7 @@ const Home: NextPageWithLayout = () => {
   const parentProject = useProjectByRef(project?.parent_project_ref)
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
-  const { ref, enableBranching } = useParams()
+  const { ref, enableBranching, slug } = useParams()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -97,7 +97,7 @@ const Home: NextPageWithLayout = () => {
               <div>
                 {!isMainBranch && (
                   <Link
-                    href={`/project/${parentProject?.ref}`}
+                    href={`/org/${slug}/project/${parentProject?.ref}`}
                     className="text-sm text-foreground-light"
                   >
                     {parentProject?.name}
@@ -136,7 +136,7 @@ const Home: NextPageWithLayout = () => {
                 <div className="flex items-center gap-x-6">
                   <div className="flex flex-col gap-y-1">
                     <Link
-                      href={`/project/${ref}/editor`}
+                      href={`/org/${slug}/project/${ref}/editor`}
                       className="transition text-foreground-light hover:text-foreground text-sm"
                     >
                       Tables
@@ -153,7 +153,7 @@ const Home: NextPageWithLayout = () => {
                   {IS_PLATFORM && (
                     <div className="flex flex-col gap-y-1">
                       <Link
-                        href={`/project/${ref}/functions`}
+                        href={`/org/${slug}/project/${ref}/functions`}
                         className="transition text-foreground-light hover:text-foreground text-sm"
                       >
                         Functions
@@ -171,7 +171,7 @@ const Home: NextPageWithLayout = () => {
                   {IS_PLATFORM && (
                     <div className="flex flex-col gap-y-1">
                       <Link
-                        href={`/project/${ref}/settings/infrastructure`}
+                        href={`/org/${slug}/project/${ref}/settings/infrastructure`}
                         className="transition text-foreground-light hover:text-foreground text-sm"
                       >
                         Replicas

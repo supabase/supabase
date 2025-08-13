@@ -67,7 +67,7 @@ const defaultValues = {
  */
 export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetProps) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   // const [_, setExpandedLint] = useQueryState('lint')
 
   const routeCategory = router.pathname.split('/').pop()
@@ -83,7 +83,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
       if (ruleLintMeta) {
         if (!!routeCategory && routeCategory !== ruleLintMeta.category) {
           router.push(
-            `/project/${projectRef}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
+            `/org/${slug}/project/${projectRef}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
           )
         } else {
           // setExpandedLint(ruleLintMeta?.name)

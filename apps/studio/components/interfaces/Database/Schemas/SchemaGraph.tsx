@@ -26,7 +26,7 @@ import { tablesToSQL } from 'lib/helpers'
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -279,7 +279,7 @@ export const SchemaGraph = () => {
               <ProductEmptyState
                 title="No tables created yet"
                 ctaButtonLabel="Create a new table"
-                ctaUrl={`/project/${ref}/editor?create=table`}
+                ctaUrl={`/org/${slug}/project/${ref}/editor?create=table`}
               >
                 <p className="text-sm text-foreground-light">
                   There are no tables found in the schema "{selectedSchema}"

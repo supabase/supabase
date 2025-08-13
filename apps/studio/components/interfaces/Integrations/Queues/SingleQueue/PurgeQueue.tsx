@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseQueuePurgeMutation } from 'data/database-queues/database-queues-purge-mutation'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { useParams } from 'next/navigation'
 
 interface PurgeQueueProps {
   queueName: string
@@ -13,12 +14,13 @@ interface PurgeQueueProps {
 
 const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
   const { project } = useProjectContext()
+  const { slug } = useParams()
   const router = useRouter()
 
   const { mutate: purgeDatabaseQueue, isLoading } = useDatabaseQueuePurgeMutation({
     onSuccess: () => {
       toast.success(`Successfully purged queue ${queueName}`)
-      router.push(`/project/${project?.ref}/integrations/queues`)
+      router.push(`/org/${slug}/project/${project?.ref}/integrations/queues`)
       onClose()
     },
   })

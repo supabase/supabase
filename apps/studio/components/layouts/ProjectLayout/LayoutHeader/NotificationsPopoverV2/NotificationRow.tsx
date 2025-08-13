@@ -12,6 +12,7 @@ import { Notification, NotificationData } from 'data/notifications/notifications
 import { ProjectInfo } from 'data/projects/projects-query'
 import type { Organization } from 'types'
 import { CriticalIcon, WarningIcon } from 'ui'
+import { useParams } from 'next/navigation'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
@@ -33,6 +34,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   onUpdateNotificationStatus,
   queueMarkRead,
 }) => {
+  const { slug } = useParams() as { slug: string }
   const ref = useRef<HTMLDivElement>(null)
   const { ref: viewRef, inView } = useInView()
   const { status, priority } = notification
@@ -109,7 +111,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
             {project !== undefined && (
               <Link
                 title={project.name}
-                href={`/project/${project.ref}`}
+                href={`/org/${slug}/project/${project.ref}`}
                 className="text-xs transition text-foreground-light hover:text-foreground underline truncate"
               >
                 {project.name}

@@ -28,7 +28,7 @@ const NoResultAlert = ({
   hasChannelSet: boolean
   showSendMessage: () => void
 }) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
 
   return (
     <div className="w-full max-w-md flex items-center flex-col">
@@ -58,7 +58,7 @@ const NoResultAlert = ({
                   Send messages between multiple clients
                 </p>
               </div>
-              <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
+              <Link href={`/org/${slug}/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<ExternalLink />}>
                   Open inspector
                 </Button>
@@ -74,7 +74,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Listen to a table for changes</p>
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
-              <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
+              <Link href={`/org/${slug}/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<ExternalLink />}>
                   Publications settings
                 </Button>

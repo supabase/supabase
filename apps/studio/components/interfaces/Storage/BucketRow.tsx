@@ -21,6 +21,7 @@ import {
 
 export interface BucketRowProps {
   bucket: Bucket
+  slug: string
   projectRef?: string
   isSelected: boolean
   onSelectEmptyBucket: () => void
@@ -30,6 +31,7 @@ export interface BucketRowProps {
 
 const BucketRow = ({
   bucket,
+  slug,
   projectRef = '',
   isSelected = false,
   onSelectEmptyBucket = noop,
@@ -48,7 +50,7 @@ const BucketRow = ({
     >
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
-        href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
+        href={`/org/${slug}/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
         className={'py-1 px-3 grow'}
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">

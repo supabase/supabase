@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
 
 import { Button, cn } from 'ui'
+import { useParams } from 'next/navigation'
 
 // ReactFlow is scaling everything by the factor of 2
 const TABLE_NODE_WIDTH = 320
@@ -30,6 +31,8 @@ const TableNode = ({
   sourcePosition,
   placeholder,
 }: NodeProps<TableNodeData> & { placeholder?: boolean }) => {
+  const { slug } = useParams()
+
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
@@ -67,7 +70,7 @@ const TableNode = ({
             </div>
             {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}`}>
+                <Link href={`/org/${slug}/project/${data.ref}/editor/${data.id}`}>
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>

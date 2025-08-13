@@ -14,6 +14,7 @@ import {
 } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useParams } from 'next/navigation'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
@@ -21,6 +22,7 @@ export function useApiKeysCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 
+  const { slug } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
@@ -100,7 +102,7 @@ export function useApiKeysCommands() {
         !(anonKey || serviceKey) && {
           id: 'api-keys-project-settings',
           name: 'See API keys in Project Settings',
-          route: `/project/${ref}/settings/api`,
+          route: `/org/${slug}/project/${ref}/settings/api`,
           icon: () => <Key />,
         },
       ].filter(Boolean) as ICommand[],

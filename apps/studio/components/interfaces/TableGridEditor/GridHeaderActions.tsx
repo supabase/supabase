@@ -47,7 +47,7 @@ export interface GridHeaderActionsProps {
 }
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
 
@@ -219,7 +219,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   >
                     <Link
                       passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                      href={`/org/${slug}/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
                     >
                       Add RLS policy
                     </Link>
@@ -249,7 +249,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   >
                     <Link
                       passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                      href={`/org/${slug}/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
                     >
                       Auth {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
@@ -336,7 +336,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingViewLint?.level}&id=${matchingViewLint?.cache_key}`}
+                        href={`/org/${slug}/project/${ref}/advisors/security?preset=${matchingViewLint?.level}&id=${matchingViewLint?.cache_key}`}
                       >
                         Learn more
                       </Link>
@@ -378,7 +378,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
+                        href={`/org/${slug}/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
                       >
                         Learn more
                       </Link>
@@ -460,7 +460,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           {!isRealtimeEnabled && (
             <p className="text-sm">
               You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/publications`} className="text-brand">
+              <Link href={`/org/${slug}/project/${ref}/database/publications`} className="text-brand">
                 database publications
               </Link>{' '}
               settings.

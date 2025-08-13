@@ -65,7 +65,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref, q, queryId, source: routerSource } = useParams()
+  const { slug, ref, q, queryId, source: routerSource } = useParams()
   const projectRef = ref as string
   const organization = useSelectedOrganization()
 
@@ -218,7 +218,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     upsertContent(
       { projectRef, payload },
       {
-        onSuccess: () => router.push(`/project/${projectRef}/logs/explorer?queryId=${id}`),
+        onSuccess: () => router.push(`/org/${slug}/project/${projectRef}/logs/explorer?queryId=${id}`),
       }
     )
   }

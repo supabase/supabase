@@ -49,7 +49,7 @@ const MonacoEditor = ({
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref, content } = useParams()
+  const { slug, ref, content } = useParams()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
@@ -173,7 +173,7 @@ const MonacoEditor = ({
           })
           snapV2.addSnippet({ projectRef: ref, snippet })
           snapV2.addNeedsSaving(snippet.id)
-          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+          router.push(`/org/${slug}/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
         }
       }
     }

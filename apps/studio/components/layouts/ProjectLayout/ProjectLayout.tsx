@@ -36,26 +36,26 @@ import { UpgradingState } from './UpgradingState'
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
 const routesToIgnoreProjectDetailsRequest = [
-  '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
-  '/project/[ref]/settings/storage',
-  '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/addons',
+  '/org/[slug]/project/[ref]/settings/general',
+  '/org/[slug]/project/[ref]/settings/database',
+  '/org/[slug]/project/[ref]/settings/storage',
+  '/org/[slug]/project/[ref]/settings/infrastructure',
+  '/org/[slug]/project/[ref]/settings/addons',
 ]
 
 const routesToIgnoreDBConnection = [
-  '/project/[ref]/branches',
-  '/project/[ref]/database/backups/scheduled',
-  '/project/[ref]/database/backups/pitr',
-  '/project/[ref]/settings/addons',
+  '/org/[slug]/project/[ref]/branches',
+  '/org/[slug]/project/[ref]/database/backups/scheduled',
+  '/org/[slug]/project/[ref]/database/backups/pitr',
+  '/org/[slug]/project/[ref]/settings/addons',
 ]
 
 const routesToIgnorePostgrestConnection = [
-  '/project/[ref]/reports',
-  '/project/[ref]/settings/general',
-  '/project/[ref]/settings/database',
-  '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/addons',
+  '/org/[slug]/project/[ref]/reports',
+  '/org/[slug]/project/[ref]/settings/general',
+  '/org/[slug]/project/[ref]/settings/database',
+  '/org/[slug]/project/[ref]/settings/infrastructure',
+  '/org/[slug]/project/[ref]/settings/addons',
 ]
 
 export interface ProjectLayoutProps {
@@ -108,12 +108,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const showProductMenu = selectedProject
       ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
         (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings')) ||
-        router.pathname.includes('/project/[ref]/branches')
+          router.pathname.includes('/org/[slug]/project/[ref]/settings')) ||
+        router.pathname.includes('/org/[slug]/project/[ref]/branches')
       : true
 
     const ignorePausedState =
-      router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+      router.pathname === '/org/[slug]/project/[ref]' || router.pathname.includes('/org/[slug]/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
     useEffect(() => {
@@ -325,10 +325,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
-  const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
-  const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
-  const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
-  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
+  const isBranchesPage = router.pathname.includes('/org/[slug]/project/[ref]/branches')
+  const isSettingsPages = router.pathname.includes('/org/[slug]/project/[ref]/settings')
+  const isVaultPage = router.pathname === '/org/[slug]/project/[ref]/settings/vault'
+  const isBackupsPage = router.pathname.includes('/org/[slug]/project/[ref]/database/backups')
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage

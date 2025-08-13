@@ -3,6 +3,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { useParams } from 'next/navigation'
 
 const ProjectBuildingPage: NextPageWithLayout = () => {
   return <RedirectToDashboard />
@@ -18,7 +19,7 @@ export default ProjectBuildingPage
 
 const RedirectToDashboard = () => {
   const router = useRouter()
-  const { ref } = router.query
+  const { slug, ref } = useParams()
 
   useEffect(() => {
     // Use redirect to reload store data properly after project has been
@@ -29,7 +30,7 @@ const RedirectToDashboard = () => {
     // TODO: for experiment only
     // Cos we already pulling new connectionString after project building/restoring
     // just use normal router.push is enough
-    router.push(`/project/${ref}`)
+    router.push(`/org/${slug}/project/${ref}`)
   }, [])
 
   return null

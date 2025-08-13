@@ -21,6 +21,7 @@ import {
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import { useParams } from 'next/navigation'
 
 interface MemberRowProps {
   member: OrganizationMember
@@ -32,6 +33,7 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
+  const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
 
   const { data: projects } = useProjectsQuery()
@@ -179,7 +181,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                                 return (
                                   <Link
                                     key={name}
-                                    href={`/project/${ref}`}
+                                    href={`/org/${slug}/project/${ref}`}
                                     className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
                                   >
                                     <span className="text-xs truncate max-w-[60%]">{name}</span>

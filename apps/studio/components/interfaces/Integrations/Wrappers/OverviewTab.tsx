@@ -23,7 +23,7 @@ import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
 
 export const WrapperOverviewTab = () => {
-  const { id } = useParams()
+  const { id, slug } = useParams()
   const { project } = useProjectContext()
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
@@ -80,8 +80,8 @@ export const WrapperOverviewTab = () => {
                   <Link
                     href={
                       databaseNeedsUpgrading
-                        ? `/project/${project?.ref}/settings/infrastructure`
-                        : `/project/${project?.ref}/database/extensions?filter=wrappers`
+                        ? `/org/${slug}/project/${project?.ref}/settings/infrastructure`
+                        : `/org/${slug}/project/${project?.ref}/database/extensions?filter=wrappers`
                     }
                   >
                     {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}

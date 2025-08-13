@@ -29,7 +29,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 const BranchesPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const snap = useAppStateSnapshot()
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -96,7 +96,7 @@ const BranchesPage: NextPageWithLayout = () => {
       {
         onSuccess: () => {
           if (selectedBranchToDelete.project_ref === ref) {
-            router.push(`/project/${selectedBranchToDelete.parent_project_ref}/branches`)
+            router.push(`/org/${slug}/project/${selectedBranchToDelete.parent_project_ref}/branches`)
           }
           // Track delete button click
           sendEvent({
@@ -107,7 +107,7 @@ const BranchesPage: NextPageWithLayout = () => {
             },
             groups: {
               project: projectRef ?? 'Unknown',
-              organization: selectedOrg?.slug ?? 'Unknown',
+              organization: slug ?? 'Unknown',
             },
           })
         },

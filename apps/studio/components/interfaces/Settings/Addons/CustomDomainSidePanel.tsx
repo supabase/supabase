@@ -26,7 +26,7 @@ import {
 import { ExternalLink, AlertCircle } from 'lucide-react'
 
 const CustomDomainSidePanel = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
@@ -149,7 +149,7 @@ const CustomDomainSidePanel = () => {
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
-            <Link href={`/project/${projectRef}/settings/general`} className="text-brand">
+            <Link href={`/org/${slug}/project/${projectRef}/settings/general`} className="text-brand">
               General Settings
             </Link>{' '}
             page after enabling the add-on.

@@ -12,7 +12,7 @@ interface AuthenticationProps {
 }
 
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { data: apiKeys } = useAPIKeysQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
@@ -63,7 +63,7 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
           <p>
             We have provided you a Client Key to get started. You will soon be able to add as many
             keys as you like. You can find the <code>anon</code> key in the{' '}
-            <Link href={`/project/${projectRef}/settings/api`}>API Settings</Link> page.
+            <Link href={`/org/${slug}/project/${projectRef}/settings/api`}>API Settings</Link> page.
           </p>
         </article>
         <article className="code">
@@ -94,7 +94,7 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
           <p>
             We have provided you with a Service Key to get started. Soon you will be able to add as
             many keys as you like. You can find the <code>service_role</code> in the{' '}
-            <Link href={`/project/${projectRef}/settings/api`}>API Settings</Link> page.
+            <Link href={`/org/${slug}/project/${projectRef}/settings/api`}>API Settings</Link> page.
           </p>
         </article>
         <article className="code">

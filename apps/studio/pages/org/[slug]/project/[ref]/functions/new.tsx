@@ -98,7 +98,7 @@ type FormValues = z.infer<typeof FormSchema>
 
 const NewFunctionPage = () => {
   const router = useRouter()
-  const { ref, template } = useParams()
+  const { slug, ref, template } = useParams()
   const project = useSelectedProject()
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const snap = useAiAssistantStateSnapshot()
@@ -132,7 +132,7 @@ const NewFunctionPage = () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
       if (ref && functionName) {
-        router.push(`/project/${ref}/functions/${functionName}/details`)
+        router.push(`/org/${slug}/project/${ref}/functions/${functionName}/details`)
       }
     },
   })
@@ -266,7 +266,7 @@ const NewFunctionPage = () => {
       breadcrumbs={[
         {
           label: 'Edge Functions',
-          href: `/project/${ref}/functions`,
+          href: `/org/${slug}/project/${ref}/functions`,
         },
       ]}
       primaryActions={

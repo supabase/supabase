@@ -13,15 +13,15 @@ import { generateAuthMenu } from './AuthLayout.utils'
 
 const AuthProductMenu = () => {
   const router = useRouter()
-  const { ref: projectRef = 'default' } = useParams()
+  const { slug, ref: projectRef = 'default' } = useParams()
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
-  const page = router.pathname.split('/')[4]
+  const page = router.pathname.split('/')[6]
 
   return (
     <>
-      <ProductMenu page={page} menu={generateAuthMenu(projectRef)} />
+      <ProductMenu page={page} menu={generateAuthMenu(slug!, projectRef)} />
       {columnLevelPrivileges && (
         <div className="px-3">
           <Alert_Shadcn_>
@@ -31,7 +31,7 @@ const AuthProductMenu = () => {
             <AlertDescription_Shadcn_ className="text-xs">
               <p className="mb-2">It can now be found in the menu under the database section.</p>
               <Button asChild type="default" size="tiny">
-                <Link href={`/project/${projectRef}/database/column-privileges`}>
+                <Link href={`/org/${slug}/project/${projectRef}/database/column-privileges`}>
                   Head over to Database
                 </Link>
               </Button>

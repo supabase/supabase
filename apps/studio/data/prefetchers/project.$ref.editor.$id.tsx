@@ -16,6 +16,7 @@ import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
+import { useParams } from 'next/navigation'
 
 interface PrefetchEditorTablePageArgs {
   queryClient: QueryClient
@@ -63,6 +64,7 @@ export function prefetchEditorTablePage({
 
 export function usePrefetchEditorTablePage() {
   const router = useRouter()
+  const { slug } = useParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -73,7 +75,7 @@ export function usePrefetchEditorTablePage() {
       if (!project || !id || isNaN(id)) return
 
       // Prefetch the code
-      router.prefetch(`/project/${project.ref}/editor/${id}`)
+      router.prefetch(`/org/${slug}/project/${project.ref}/editor/${id}`)
 
       // Prefetch the data
       prefetchEditorTablePage({
@@ -94,6 +96,7 @@ export function usePrefetchEditorTablePage() {
 
 interface EditorTablePageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 'prefetcher'> {
   projectRef?: string
+  slug: string
   id?: string
   sorts?: Sort[]
   filters?: Filter[]
@@ -102,6 +105,7 @@ interface EditorTablePageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 
 
 export function EditorTablePageLink({
   projectRef,
+  slug,
   id,
   sorts,
   filters,
@@ -113,7 +117,7 @@ export function EditorTablePageLink({
 
   return (
     <PrefetchableLink
-      href={href || `/project/${projectRef}/editor/${id}`}
+      href={href || `/org/${slug}/project/${projectRef}/editor/${id}`}
       prefetcher={() => prefetch({ id, sorts, filters })}
       {...props}
     >

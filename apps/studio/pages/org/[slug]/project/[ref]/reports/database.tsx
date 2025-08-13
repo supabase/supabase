@@ -60,7 +60,7 @@ export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
 
 const DatabaseUsage = () => {
-  const { db, chart, ref } = useParams()
+  const { db, chart, ref, slug } = useParams()
   const { project } = useProjectContext()
   const isReportsV2 = useFlag('reportsDatabaseV2')
   const org = useSelectedOrganization()
@@ -332,7 +332,7 @@ const DatabaseUsage = () => {
                   <div className="col-span-full lg:col-span-4 xl:col-span-7 lg:text-right">
                     {project?.cloud_provider === 'AWS' ? (
                       <Button asChild type="default">
-                        <Link href={`/project/${ref}/settings/compute-and-disk`}>
+                        <Link href={`/org/${slug}/project/${ref}/settings/compute-and-disk`}>
                           Increase disk size
                         </Link>
                       </Button>

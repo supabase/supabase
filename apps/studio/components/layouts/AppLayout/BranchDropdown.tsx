@@ -44,9 +44,10 @@ const BranchLink = ({
   setOpen: (value: boolean) => void
 }) => {
   const router = useRouter()
+  const { slug } = useParams()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
   const href =
-    sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
+    sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/org/${slug}/project/${branch.project_ref}`
 
   return (
     <Link passHref href={href}>
@@ -73,7 +74,7 @@ const BranchLink = ({
 
 export const BranchDropdown = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const snap = useAppStateSnapshot()
   const projectDetails = useSelectedProject()
 
@@ -126,7 +127,7 @@ export const BranchDropdown = () => {
 
       {isSuccess && (
         <>
-          <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+          <Link href={`/org/${slug}/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
             <span className="text-foreground max-w-32 lg:max-w-none truncate">
               {isBranchingEnabled ? selectedBranch?.name : 'main'}
             </span>
@@ -195,12 +196,12 @@ export const BranchDropdown = () => {
                       className="cursor-pointer w-full"
                       onSelect={() => {
                         setOpen(false)
-                        router.push(`/project/${ref}/branches`)
+                        router.push(`/org/${slug}/project/${ref}/branches`)
                       }}
                       onClick={() => setOpen(false)}
                     >
                       <Link
-                        href={`/project/${ref}/branches`}
+                        href={`/org/${slug}/project/${ref}/branches`}
                         className="w-full flex items-center gap-2"
                       >
                         <ListTree size={14} strokeWidth={1.5} />

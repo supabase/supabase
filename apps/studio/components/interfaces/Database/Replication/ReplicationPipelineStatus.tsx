@@ -25,7 +25,7 @@ import { TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 
 export const ReplicationPipelineStatus = () => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
+  const { slug, ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [filterString, setFilterString] = useState<string>('')
 
   const pipelineId = Number(_pipelineId)
@@ -136,7 +136,7 @@ export const ReplicationPipelineStatus = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-3">
           <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
-            <Link href={`/project/${projectRef}/database/replication`} />
+            <Link href={`/org/${slug}/project/${projectRef}/database/replication`} />
           </Button>
           <div>
             <div className="flex items-center gap-x-3">
@@ -212,7 +212,7 @@ export const ReplicationPipelineStatus = () => {
                 <Link
                   target="_blank"
                   rel="noreferrer noopener"
-                  href={`/project/${projectRef}/logs/postgres-logs`}
+                  href={`/org/${slug}/project/${projectRef}/logs/postgres-logs`}
                 >
                   View Logs
                 </Link>
@@ -276,7 +276,7 @@ export const ReplicationPipelineStatus = () => {
                           <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            href={`/project/${projectRef}/editor/${table.table_id}`}
+                            href={`/org/${slug}/project/${projectRef}/editor/${table.table_id}`}
                           />
                         </ButtonTooltip>
                       </div>

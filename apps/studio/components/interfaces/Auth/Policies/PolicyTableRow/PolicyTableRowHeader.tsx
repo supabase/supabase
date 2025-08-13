@@ -32,7 +32,7 @@ const PolicyTableRowHeader = ({
   onSelectToggleRLS = noop,
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref: string }
   const aiSnap = useAiAssistantStateSnapshot()
 
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
@@ -46,6 +46,7 @@ const PolicyTableRowHeader = ({
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex gap-x-4 text-left">
         <EditorTablePageLink
+          slug={slug}
           projectRef={ref}
           id={String(table.id)}
           className="flex items-center gap-x-2"

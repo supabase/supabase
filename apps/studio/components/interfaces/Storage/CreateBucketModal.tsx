@@ -73,7 +73,7 @@ const FormSchema = z.object({
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
 const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
   const router = useRouter()
@@ -149,7 +149,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         await createIcebergWrapper({ bucketName: values.name })
       }
       toast.success(`Successfully created bucket ${values.name}`)
-      router.push(`/project/${ref}/storage/buckets/${values.name}`)
+      router.push(`/org/${slug}/project/${ref}/storage/buckets/${values.name}`)
       onClose()
     } catch (error: any) {
       toast.error(`Failed to create bucket: ${error.message}`)
@@ -383,7 +383,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                               <p className="text-foreground-light text-sm">
                                 Note: Individual bucket uploads will still be capped at the{' '}
                                 <Link
-                                  href={`/project/${ref}/settings/storage`}
+                                  href={`/org/${slug}/project/${ref}/settings/storage`}
                                   className="font-bold underline"
                                 >
                                   global upload limit

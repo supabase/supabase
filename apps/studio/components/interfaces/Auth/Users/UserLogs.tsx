@@ -19,7 +19,7 @@ interface UserLogsProps {
 }
 
 export const UserLogs = ({ user }: UserLogsProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { filters, setFilters } = useLogsUrlState()
 
   const {
@@ -144,7 +144,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                         tooltip={{ content: { text: 'Open in logs' } }}
                         className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
                       >
-                        <Link href={`/project/${ref}/logs/auth-logs?log=${log.id}`}>
+                        <Link href={`/org/${slug}/project/${ref}/logs/auth-logs?log=${log.id}`}>
                           <ExternalLink size="12" className="text-foreground-light" />
                         </Link>
                       </ButtonTooltip>
@@ -159,7 +159,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
               type="outline"
               className="transition rounded-t-none text-foreground-light hover:text-foreground"
             >
-              <Link href={`/project/${ref}/logs/auth-logs?s=${user.id}`}>See more logs</Link>
+              <Link href={`/org/${slug}/project/${ref}/logs/auth-logs?s=${user.id}`}>See more logs</Link>
             </Button>
           </div>
         )}

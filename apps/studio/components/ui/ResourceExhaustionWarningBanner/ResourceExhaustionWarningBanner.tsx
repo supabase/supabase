@@ -9,7 +9,7 @@ import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.con
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 
 export const ResourceExhaustionWarningBanner = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref?: string }
   const router = useRouter()
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -70,12 +70,12 @@ export const ResourceExhaustionWarningBanner = () => {
 
   const correctionUrlVariants = {
     undefined: undefined,
-    null: '/project/[ref]/settings/[infra-path]',
-    disk_space: '/project/[ref]/settings/compute-and-disk',
-    read_only: '/project/[ref]/settings/compute-and-disk',
-    auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
-    auth_restricted_email_sending: '/project/[ref]/auth/smtp',
-    default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
+    null: '/org/[slug]/project/[ref]/settings/[infra-path]',
+    disk_space: '/org/[slug]/project/[ref]/settings/compute-and-disk',
+    read_only: '/org/[slug]/project/[ref]/settings/compute-and-disk',
+    auth_email_rate_limit: '/org/[slug]/project/[ref]/auth/rate-limits',
+    auth_restricted_email_sending: '/org/[slug]/project/[ref]/auth/smtp',
+    default: (metric: string) => `/org/[slug]/project/[ref]/settings/[infra-path]#${metric}`,
   }
 
   const getCorrectionUrl = (metric: string | undefined | null) => {
@@ -88,6 +88,7 @@ export const ResourceExhaustionWarningBanner = () => {
 
   const correctionUrl = getCorrectionUrl(metric)
     ?.replace('[ref]', ref ?? 'default')
+    ?.replace('[slug]', slug)
     ?.replace('[infra-path]', 'infrastructure')
 
   const buttonText =
@@ -116,8 +117,8 @@ export const ResourceExhaustionWarningBanner = () => {
     restrictToRoutes.some((route: string) => {
       // check for exact match with /project/[ref] (project home) first
       // doing this let's us avoid checking with regex, keeping it simple
-      if (route === '/project/[ref]') {
-        const isExactMatch = router.pathname === '/project/[ref]'
+      if (route === '/org/[slug]/project/[ref]') {
+        const isExactMatch = router.pathname === '/org/[slug]/project/[ref]'
         return isExactMatch
       }
 

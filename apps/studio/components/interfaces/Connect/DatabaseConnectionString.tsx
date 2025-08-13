@@ -62,7 +62,7 @@ const StepLabel = ({
  * So session mode connection details are always using the shared pooler (Supavisor)
  */
 export const DatabaseConnectionString = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -194,15 +194,15 @@ export const DatabaseConnectionString = () => {
 
   const ipv4AddOnUrl = {
     text: 'IPv4 add-on',
-    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+    url: `/org/${slug}/project/${projectRef}/settings/addons?panel=ipv4`,
   }
   const ipv4SettingsUrl = {
     text: 'IPv4 settings',
-    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+    url: `/org/${slug}/project/${projectRef}/settings/addons?panel=ipv4`,
   }
   const poolerSettingsUrl = {
     text: 'Pooler settings',
-    url: `/project/${projectRef}/settings/database#connection-pooling`,
+    url: `/org/${slug}/project/${projectRef}/settings/database#connection-pooling`,
   }
   const buttonLinks = !ipv4Addon
     ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
@@ -526,7 +526,7 @@ export const DatabaseConnectionString = () => {
         <p className="text-sm text-foreground-lighter">
           You may reset your database password in your project's{' '}
           <InlineLink
-            href={`/project/${projectRef}/settings/database`}
+            href={`/org/${slug}/project/${projectRef}/settings/database`}
             className="text-foreground-lighter hover:text-foreground"
           >
             Database Settings

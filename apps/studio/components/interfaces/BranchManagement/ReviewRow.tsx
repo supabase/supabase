@@ -24,7 +24,7 @@ interface ReviewRowProps {
 export const ReviewRow = ({ branch }: ReviewRowProps) => {
   const router = useRouter()
   const project = useSelectedProject()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const queryClient = useQueryClient()
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
@@ -40,7 +40,7 @@ export const ReviewRow = ({ branch }: ReviewRowProps) => {
   })
 
   const handleRowClick = () => {
-    router.push(`/project/${branch.project_ref}/merge`)
+    router.push(`/org/${slug}/project/${branch.project_ref}/merge`)
   }
 
   const handleNotReadyForReview = (e?: Event) => {

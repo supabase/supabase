@@ -75,7 +75,7 @@ export const SearchList = ({ search }: SearchListProps) => {
 }
 
 const SearchListItem = ({ snippet }: { snippet: Content }) => {
-  const { ref, id } = useParams()
+  const { slug, ref, id } = useParams()
   const isSelected = snippet.id === id
   return (
     <Link
@@ -83,7 +83,7 @@ const SearchListItem = ({ snippet }: { snippet: Content }) => {
         'h-full flex items-center gap-x-3 pl-4 hover:bg-control transition',
         isSelected && '!bg-selection [&>svg]:fill-foreground [&>p]:text-foreground'
       )}
-      href={`/project/${ref}/sql/${snippet.id}`}
+      href={`/org/${slug}/project/${ref}/sql/${snippet.id}`}
     >
       <SQL_ICON
         size={16}

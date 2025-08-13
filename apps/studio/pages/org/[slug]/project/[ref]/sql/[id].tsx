@@ -19,7 +19,7 @@ import { Admonition } from 'ui-patterns'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
-  const { id, ref, content, skip } = useParams()
+  const { id, ref, content, skip, slug } = useParams()
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -63,7 +63,7 @@ const SqlEditor: NextPageWithLayout = () => {
       content === undefined
     ) {
       const snippet = allSnippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
-      if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
+      if (snippet !== undefined) router.push(`/org/${slug}/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, allSnippets, content])
@@ -114,7 +114,7 @@ const SqlEditor: NextPageWithLayout = () => {
               </Button>
             ) : (
               <Button asChild type="default" className="mt-2">
-                <Link href={`/project/${ref}/sql`}>Head back</Link>
+                <Link href={`/org/${slug}/project/${ref}/sql`}>Head back</Link>
               </Button>
             )}
           </Admonition>

@@ -62,7 +62,7 @@ export const Overview = ({
     previewBranches,
     (branch) => branch.persistent
   )
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   return (
     <>
@@ -83,7 +83,7 @@ export const Overview = ({
         )}
         {isSuccess && mainBranch === undefined && (
           <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
-            <Link href={`/project/${projectRef}`} className="text-foreground block w-full">
+            <Link href={`/org/${slug}/project/${projectRef}`} className="text-foreground block w-full">
               <div className="flex items-center gap-x-3">
                 <Shield size={14} strokeWidth={1.5} className="text-warning" />
                 main
@@ -380,7 +380,7 @@ const PreviewBranchActions = ({
 
 // Actions for main (production) branch
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
@@ -392,7 +392,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
           {repo ? (
-            <Link passHref href={`/project/${projectRef}/settings/integrations`}>
+            <Link passHref href={`/org/${slug}/project/${projectRef}/settings/integrations`}>
               <DropdownMenuItem asChild className="gap-x-2">
                 <a>Change production branch</a>
               </DropdownMenuItem>

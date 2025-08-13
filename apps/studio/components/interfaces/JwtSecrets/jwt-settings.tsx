@@ -64,7 +64,7 @@ const schema = object({
 })
 
 const JWTSettings = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
 
   const newJwtSecrets = useFlag('newJwtSecrets')
 
@@ -212,7 +212,7 @@ const JWTSettings = () => {
                         )}
 
                         <Button type="default" asChild icon={<ExternalLink className="size-4" />}>
-                          <Link href={`/project/${projectRef}/settings/api-keys`}>
+                          <Link href={`/org/${slug}/project/${projectRef}/settings/api-keys`}>
                             Go to API keys
                           </Link>
                         </Button>
@@ -323,7 +323,7 @@ const JWTSettings = () => {
                               icon={<ExternalLink className="size-4" />}
                               asChild
                             >
-                              <Link href={`/project/${projectRef}/settings/api-keys/new`}>
+                              <Link href={`/org/${slug}/project/${projectRef}/settings/api-keys/new`}>
                                 Go to API Keys
                               </Link>
                             </Button>
@@ -332,7 +332,7 @@ const JWTSettings = () => {
                               icon={<ExternalLink className="size-4" />}
                               asChild
                             >
-                              <Link href={`/project/${projectRef}/settings/jwt/signing-keys`}>
+                              <Link href={`/org/${slug}/project/${projectRef}/settings/jwt/signing-keys`}>
                                 Go to JWT Signing Keys
                               </Link>
                             </Button>

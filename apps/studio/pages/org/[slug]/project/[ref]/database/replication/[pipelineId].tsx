@@ -13,13 +13,13 @@ import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
   const enablePgReplicate = useFlag('enablePgReplicate')
 
   useEffect(() => {
     if (hasLoaded && !enablePgReplicate) {
-      router.replace(`/project/${ref}/database/replication}`)
+      router.replace(`/org/${slug}/project/${ref}/database/replication}`)
     }
   }, [router, hasLoaded, ref, enablePgReplicate])
 

@@ -45,7 +45,7 @@ const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
 
@@ -253,7 +253,7 @@ const InstanceConfigurationUI = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
                       <DropdownMenuItem asChild>
-                        <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                        <Link href={`/org/${slug}/project/${projectRef}/settings/compute-and-disk`}>
                           Resize databases
                         </Link>
                       </DropdownMenuItem>

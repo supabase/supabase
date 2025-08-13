@@ -17,21 +17,15 @@ interface SettingsLayoutProps {
 
 const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams() as { slug: string; ref?: string }
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
-
-  useEffect(() => {
-    if (!IS_PLATFORM) {
-      router.push('/organizations')
-    }
-  }, [router])
 
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
   const page = router.pathname.includes('billing')
-    ? router.pathname.split('/')[5]
-    : router.pathname.split('/')[4]
+    ? router.pathname.split('/')[7]
+    : router.pathname.split('/')[6]
 
   const {
     projectAuthAll: authEnabled,
@@ -45,7 +39,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     'billing:invoices',
   ])
 
-  const menuRoutes = generateSettingsMenu(ref, project, organization, {
+  const menuRoutes = generateSettingsMenu(slug, ref, project, organization, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,

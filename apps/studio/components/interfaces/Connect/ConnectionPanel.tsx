@@ -115,7 +115,7 @@ export const ConnectionPanel = ({
   children,
   onCopyCallback,
 }: PropsWithChildren<ConnectionPanelProps>) => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data: poolingInfo } = useSupavisorConfigurationQuery({ projectRef })
@@ -144,7 +144,7 @@ export const ConnectionPanel = ({
             >
               <Button asChild type="default" className="mt-2">
                 <Link
-                  href={`/project/${projectRef}/settings/database#connection-pooler`}
+                  href={`/org/${slug}/project/${projectRef}/settings/database#connection-pooler`}
                   className="text-xs text-light hover:text-foreground"
                 >
                   Database Settings
@@ -286,7 +286,7 @@ export const ConnectionPanel = ({
                   <p className="text-xs text-foreground-lighter max-w-xs">
                     If you wish to use a Direct Connection with these, please purchase{' '}
                     <Link
-                      href={`/project/${projectRef}/settings/addons?panel=ipv4`}
+                      href={`/org/${slug}/project/${projectRef}/settings/addons?panel=ipv4`}
                       className="text-xs text-light hover:text-foreground"
                     >
                       IPv4 support

@@ -22,7 +22,7 @@ const ChartHighlightActions = ({
   updateDateRange: UpdateDateRange
 }) => {
   const router = useRouter()
-  const { ref } = router.query
+  const { slug, ref } = router.query
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
 
@@ -39,7 +39,7 @@ const ChartHighlightActions = ({
 
   const handleOpenLogsExplorer = () => {
     const rangeQueryParams = `?its=${selectedRangeStart}&ite=${selectedRangeEnd}`
-    router.push(`/project/${ref}/logs/postgres-logs${rangeQueryParams}`)
+    router.push(`/org/${slug}/project/${ref}/logs/postgres-logs${rangeQueryParams}`)
     clearHighlight && clearHighlight()
   }
 

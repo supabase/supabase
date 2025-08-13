@@ -32,7 +32,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const QueueTab = () => {
-  const { childId: queueName, ref } = useParams()
+  const { slug, childId: queueName, ref } = useParams()
   const { project } = useProjectContext()
 
   const [openRlsPopover, setOpenRlsPopover] = useState(false)
@@ -144,7 +144,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/org/${slug}/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Add RLS policy
                   </Link>
@@ -169,7 +169,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/org/${slug}/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
                   </Link>

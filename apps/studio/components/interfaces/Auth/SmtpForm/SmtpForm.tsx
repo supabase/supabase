@@ -46,7 +46,7 @@ interface SmtpFormValues {
 }
 
 const SmtpForm = () => {
-  const { ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
@@ -205,7 +205,7 @@ const SmtpForm = () => {
                           be adjusted{' '}
                           <Link
                             className="underline"
-                            href={`/project/${projectRef}/auth/rate-limits`}
+                            href={`/org/${slug}/project/${projectRef}/auth/rate-limits`}
                           >
                             here
                           </Link>

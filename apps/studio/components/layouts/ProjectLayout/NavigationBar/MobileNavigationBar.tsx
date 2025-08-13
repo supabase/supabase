@@ -29,7 +29,7 @@ const MobileNavigationBar = () => {
         )}
       >
         <Link
-          href={IS_PLATFORM ? '/organizations' : `/project/${projectRef}`}
+          href={'/organizations'}
           className="flex items-center h-[26px] w-[26px] min-w-[26px]"
         >
           <img

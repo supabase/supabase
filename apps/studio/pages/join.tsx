@@ -16,7 +16,7 @@ const JoinOrganizationPage: NextPageWithLayout = () => {
         'items-center justify-center gap-8 px-5'
       )}
     >
-      <Link href="/projects" className="flex items-center justify-center gap-4">
+      <Link href="/org" className="flex items-center justify-center gap-4">
         <img
           src={`${router.basePath}/img/supabase-logo.svg`}
           alt="Supabase"

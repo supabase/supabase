@@ -6,7 +6,7 @@ import { PageLayout } from '../PageLayout/PageLayout'
 import AdvisorsLayout from './AdvisorsLayout'
 
 export const AdvisorRulesLayout = ({ children }: PropsWithChildren<{}>) => {
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   return (
     <DefaultLayout>
       <AdvisorsLayout>
@@ -16,11 +16,11 @@ export const AdvisorRulesLayout = ({ children }: PropsWithChildren<{}>) => {
           navigationItems={[
             {
               label: 'Security',
-              href: `/project/${ref}/advisors/rules/security`,
+              href: `/org/${slug}/project/${ref}/advisors/rules/security`,
             },
             {
               label: 'Performance',
-              href: `/project/${ref}/advisors/rules/performance`,
+              href: `/org/${slug}/project/${ref}/advisors/rules/performance`,
             },
           ]}
         >

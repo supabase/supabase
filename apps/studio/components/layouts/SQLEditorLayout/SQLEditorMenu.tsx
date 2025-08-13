@@ -33,7 +33,7 @@ import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -68,7 +68,7 @@ export const SQLEditorMenu = () => {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
     try {
-      router.push(`/project/${ref}/sql/new?skip=true`)
+      router.push(`/org/${slug}/project/${ref}/sql/new?skip=true`)
       setSearch('')
       setShowSearch(false)
     } catch (error: any) {

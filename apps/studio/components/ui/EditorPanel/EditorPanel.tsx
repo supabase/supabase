@@ -49,7 +49,7 @@ interface EditorPanelProps {
 }
 
 export const EditorPanel = ({ onChange }: EditorPanelProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const project = useSelectedProject()
   const { editorPanel, setEditorPanel } = useAppStateSnapshot()
   const { profile } = useProfile()
@@ -250,7 +250,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
                 toast.success(
                   <div>
                     Saved snippet! View it{' '}
-                    <InlineLink href={`/project/${ref}/sql/${snippet.id}`}>here</InlineLink>
+                    <InlineLink href={`/org/${slug}/project/${ref}/sql/${snippet.id}`}>here</InlineLink>
                   </div>
                 )
               } catch (error: any) {

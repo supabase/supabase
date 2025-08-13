@@ -133,7 +133,7 @@ function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
 }
 
 export const PreviousRunsTab = () => {
-  const { childId } = useParams()
+  const { slug, childId } = useParams()
   const { project } = useProjectContext()
 
   const jobId = Number(childId)
@@ -267,7 +267,7 @@ export const PreviousRunsTab = () => {
               <h3 className="text-sm">Explore</h3>
               <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
                 {/* [Terry] need to link to the exact jobid, but not currently supported */}
-                <Link target="_blank" href={`/project/${project?.ref}/logs/pgcron-logs/`}>
+                <Link target="_blank" href={`/org/${slug}/project/${project?.ref}/logs/pgcron-logs/`}>
                   View logs
                 </Link>
               </Button>

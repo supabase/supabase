@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, Skeleton, Button } from 'ui'
 import { toast } from 'sonner'
 
 import DiffViewer from 'components/ui/DiffViewer'
+import { useParams } from 'next/navigation'
 
 interface DatabaseDiffPanelProps {
   diffContent?: string
@@ -19,6 +20,8 @@ const DatabaseDiffPanel = ({
   error,
   currentBranchRef,
 }: DatabaseDiffPanelProps) => {
+  const { slug } = useParams()
+
   if (isLoading) return <Skeleton className="h-64" />
 
   if (error)
@@ -49,7 +52,7 @@ const DatabaseDiffPanel = ({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
         <CardTitle>
           <Link
-            href={`/project/${currentBranchRef}/database/schema`}
+            href={`/org/${slug}/project/${currentBranchRef}/database/schema`}
             className="flex items-center gap-2"
           >
             <Database strokeWidth={1.5} size={16} className="text-foreground-muted" />
