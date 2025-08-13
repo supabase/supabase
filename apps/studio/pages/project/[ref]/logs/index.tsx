@@ -20,17 +20,6 @@ export const LogPage: NextPageWithLayout = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
-  const [lastVisitedLogsPage] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
-    'explorer'
-  )
-
-  useEffect(() => {
-    if (hasLoaded && !!org && !isUnifiedLogsEnabled) {
-      router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
-    }
-  }, [router, hasLoaded, org, lastVisitedLogsPage, ref, isUnifiedLogsEnabled])
-
   // Handle redirects when unified logs preview flag changes
   useEffect(() => {
     // Only handle redirects if we're currently on a logs page
