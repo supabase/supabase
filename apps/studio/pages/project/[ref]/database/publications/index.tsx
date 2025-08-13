@@ -3,8 +3,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PublicationsList } from 'components/interfaces/Database/Publications/PublicationsList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
@@ -19,11 +19,8 @@ const DatabasePublications: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <FormHeader title="Database Publications" />
-          <PublicationsList />
-        </div>
+      <ScaffoldSection isFullWidth>
+        <PublicationsList />
       </ScaffoldSection>
     </ScaffoldContainer>
   )
@@ -31,7 +28,9 @@ const DatabasePublications: NextPageWithLayout = () => {
 
 DatabasePublications.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Database">
+      <PageLayout title="Database Publications">{page}</PageLayout>
+    </DatabaseLayout>
   </DefaultLayout>
 )
 
