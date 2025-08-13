@@ -1,0 +1,16 @@
+---
+description: Docs components and linting
+alwaysApply: false
+globs: apps/docs/content/**/*.mdx
+---
+
+# Docs components
+
+Supabase docs are written in MDX. The available custom components are
+documented in @apps/docs/app/contributing/content.mdx.
+
+# Linting
+
+A prose linter is used to enforce the docs style and check for spelling.
+Run the linter with `pnpm -F docs run lint:mdx -- --output rdf` to check for
+lint issues and get suggested fixes.
