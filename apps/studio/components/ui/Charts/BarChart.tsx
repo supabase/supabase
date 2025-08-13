@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { ComponentProps, useState, useMemo } from 'react'
-import { useChartSync } from './useChartSync'
+import { useChartHoverState } from './useChartHoverState'
 import {
   Bar,
   CartesianGrid,
@@ -58,11 +58,9 @@ const BarChart = ({
   syncId,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
-  const {
-    state: syncState,
-    updateState: updateSyncState,
-    clearState: clearSyncState,
-  } = useChartSync(syncId)
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // Transform data to ensure yAxisKey values are numbers
@@ -151,21 +149,12 @@ const BarChart = ({
               setFocusDataIndex(e.activeTooltipIndex)
             }
 
-            if (syncId) {
-              updateSyncState({
-                activeIndex: e.activeTooltipIndex,
-                activePayload: e.activePayload,
-                activeLabel: e.activeLabel,
-                isHovering: true,
-              })
-            }
+            setHover(e.activeTooltipIndex)
           }}
           onMouseLeave={() => {
             setFocusDataIndex(null)
 
-            if (syncId) {
-              clearSyncState()
-            }
+            clearHover()
           }}
           onClick={(tooltipData) => {
             const datum = tooltipData?.activePayload?.[0]?.payload
@@ -188,16 +177,13 @@ const BarChart = ({
           />
           <Tooltip
             content={(props) =>
-              syncId && syncState.isHovering && syncState.activeIndex !== null ? (
+              syncId && syncTooltip && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">
-                    {dayjs(data[syncState.activeIndex]?.[xAxisKey]).format(customDateFormat)}
+                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
                   </div>
                   <div>
-                    {numberFormatter(
-                      Number(data[syncState.activeIndex]?.[yAxisKey]) || 0,
-                      valuePrecision
-                    )}
+                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
                     {typeof format === 'string' ? format : ''}
                   </div>
                 </div>
