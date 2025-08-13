@@ -1,13 +1,13 @@
+import dayjs from 'dayjs'
 import matter from 'gray-matter'
-import { useState, useMemo, useEffect } from 'react'
-import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
+import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import dayjs from 'dayjs'
+import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import { useLivePreview } from '@payloadcms/live-preview-react'
 import { Badge } from 'ui'
@@ -18,19 +18,21 @@ import mdxComponents from 'lib/mdx/mdxComponents'
 import { mdxSerialize } from 'lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
+import { CMS_SITE_ORIGIN } from 'lib/constants'
 
-import ShareArticleActions from 'components/Blog/ShareArticleActions'
-import CTABanner from 'components/CTABanner'
-import LW11Summary from 'components/LaunchWeek/11/LW11Summary'
-import LW12Summary from 'components/LaunchWeek/12/LWSummary'
-import LW13Summary from 'components/LaunchWeek/13/Releases/LWSummary'
-import LW14Summary from 'components/LaunchWeek/14/Releases/LWSummary'
-import LW15Summary from 'components/LaunchWeek/15/LWSummary'
-import BlogLinks from 'components/LaunchWeek/7/BlogLinks'
-import LWXSummary from 'components/LaunchWeek/X/LWXSummary'
-import DefaultLayout from 'components/Layouts/Default'
-import DraftModeBanner from 'components/Blog/DraftModeBanner'
-import { CMS_SITE_ORIGIN } from '../../lib/constants'
+import type { GetStaticProps, InferGetStaticPropsType } from 'next'
+
+const ShareArticleActions = dynamic(() => import(  'components/Blog/ShareArticleActions'))
+const CTABanner = dynamic(() => import( 'components/CTABanner'))
+const LW11Summary = dynamic(() => import( 'components/LaunchWeek/11/LW11Summary'))
+const LW12Summary = dynamic(() => import( 'components/LaunchWeek/12/LWSummary'))
+const LW13Summary = dynamic(() => import( 'components/LaunchWeek/13/Releases/LWSummary'))
+const LW14Summary = dynamic(() => import( 'components/LaunchWeek/14/Releases/LWSummary'))
+const LW15Summary = dynamic(() => import( 'components/LaunchWeek/15/LWSummary'))
+const BlogLinks = dynamic(() => import( 'components/LaunchWeek/7/BlogLinks'))
+const LWXSummary = dynamic(() => import( 'components/LaunchWeek/X/LWXSummary'))
+const DefaultLayout = dynamic(() => import( 'components/Layouts/Default'))
+const DraftModeBanner = dynamic(() => import( 'components/Blog/DraftModeBanner'))
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
