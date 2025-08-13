@@ -4,7 +4,7 @@ import { NextSeo } from 'next-seo'
 
 import { getSortedPosts } from 'lib/posts'
 import supabase from 'lib/supabase'
-import { getAllCMSEvents } from 'lib/get-cms-events'
+// CMS events are fetched client-side via /api-v2/cms-events to keep server bundle small
 
 import { cn } from 'ui'
 import DefaultLayout from 'components/Layouts/Default'
@@ -23,12 +23,11 @@ interface Props {
 
 function Events({ events: staticEvents, onDemandEvents, categories: staticCategories }: Props) {
   const [lumaEvents, setLumaEvents] = useState<BlogPost[]>([])
-  const [isLoadingLuma, setIsLoadingLuma] = useState(true)
-  const [filteredEvents, setFilteredEvents] = useState<BlogPost[]>([])
+  const [cmsEvents, setCmsEvents] = useState<BlogPost[]>([])
   const [events, setEvents] = useState(staticEvents)
   const router = useRouter()
 
-  // Fetch Luma events on client-side to avoid serverless maximum size limit error: https://vercel.com/guides/troubleshooting-function-250mb-limit
+  // Fetch Luma events on client-side
   useEffect(() => {
     const fetchLumaEvents = async () => {
       try {
@@ -67,25 +66,40 @@ function Events({ events: staticEvents, onDemandEvents, categories: staticCatego
         }
       } catch (error) {
         console.error('Error fetching Luma events:', error)
-      } finally {
-        setIsLoadingLuma(false)
       }
     }
 
     fetchLumaEvents()
   }, [])
 
+  // Fetch CMS events on client-side
+  useEffect(() => {
+    const fetchCmsEvents = async () => {
+      try {
+        const url = new URL('/api-v2/cms-events', window.location.origin)
+        const res = await fetch(url.toString())
+        const data = await res.json()
+        if (data.success && Array.isArray(data.events)) {
+          setCmsEvents(data.events)
+        }
+      } catch (error) {
+        console.error('Error fetching CMS events:', error)
+      }
+    }
+    fetchCmsEvents()
+  }, [])
+
   // Combine static and Luma events
   const allEvents = useMemo(() => {
-    const combined = [...staticEvents, ...lumaEvents]
+    const combined = [...staticEvents, ...cmsEvents, ...lumaEvents]
     return combined.filter((event: BlogPost) =>
       event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
     )
-  }, [staticEvents, lumaEvents])
+  }, [staticEvents, cmsEvents, lumaEvents])
 
-  // Initialize filtered events when allEvents changes
+  // Keep displayed events in sync with combined list
   useEffect(() => {
-    setFilteredEvents(allEvents)
+    setEvents(allEvents)
   }, [allEvents])
 
   // Recalculate categories with Luma events included
@@ -100,8 +114,16 @@ function Events({ events: staticEvents, onDemandEvents, categories: staticCatego
       })
     })
 
+    cmsEvents.forEach((event) => {
+      updatedCategories.all = (updatedCategories.all || 0) + 1
+
+      event.categories?.forEach((category) => {
+        updatedCategories[category] = (updatedCategories[category] || 0) + 1
+      })
+    })
+
     return updatedCategories
-  }, [staticCategories, lumaEvents])
+  }, [staticCategories, lumaEvents, cmsEvents])
 
   const meta_title = 'Supabase Events: webinars, talks, hackathons, and meetups'
   const meta_description = 'Join Supabase and the open-source community at the upcoming events.'
@@ -235,9 +257,7 @@ export async function getStaticProps() {
   }) as BlogPost[]
 
   // Get CMS blog posts
-  const cmsEventsData = await getAllCMSEvents()
-
-  const allEvents = [...staticEvents, ...meetupEvents, ...cmsEventsData].sort((a: any, b: any) => {
+  const allEvents = [...staticEvents, ...meetupEvents].sort((a: any, b: any) => {
     const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
     const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
     return dateB - dateA
