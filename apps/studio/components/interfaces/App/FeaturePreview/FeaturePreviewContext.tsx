@@ -83,7 +83,7 @@ export const useIsAPIDocsSidePanelEnabled = () => {
 
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS] || true
 }
 
 export const useIsInlineEditorEnabled = () => {

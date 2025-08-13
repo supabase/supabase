@@ -1,8 +1,10 @@
 import { useIsLoggedIn, useParams } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { OrganizationsError, useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo } from 'react'
 
-import { useProjectByRef, useProjectByRefQuery } from './useSelectedProject'
+import { useProjectByRef } from './useSelectedProject'
+import { Organization } from '../../types/index.js'
+import { UseQueryResult } from '@tanstack/react-query'
 
 /**
  * @deprecated Use useSelectedOrganizationQuery instead for access to loading states etc
@@ -19,32 +21,28 @@ import { useProjectByRef, useProjectByRefQuery } from './useSelectedProject'
 export function useSelectedOrganization({ enabled = true } = {}) {
   const isLoggedIn = useIsLoggedIn()
 
-  const { ref, slug } = useParams()
+  const { slug } = useParams()
   const { data = [] } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
-
-  const selectedProject = useProjectByRef(ref,!slug) || { organization_id: undefined }
 
   return useMemo(() => {
     return data?.find((org) => {
       if (slug !== undefined) return org.slug === slug
-      if (selectedProject !== undefined) return org.id === selectedProject.organization_id
       return undefined
     })
-  }, [data, selectedProject, slug])
+  }, [data, slug])
 }
 
-export function useSelectedOrganizationQuery({ enabled = true } = {}) {
+export function useSelectedOrganizationQuery({
+  enabled = true
+} = {}): UseQueryResult<Organization | undefined, OrganizationsError> {
   const isLoggedIn = useIsLoggedIn()
 
-  const { ref, slug } = useParams()
-  const { data: selectedProject } = useProjectByRefQuery(ref)
-
+  const { slug } = useParams()
   return useOrganizationsQuery({
     enabled: isLoggedIn && enabled,
     select: (data) => {
       return data.find((org) => {
         if (slug !== undefined) return org.slug === slug
-        if (selectedProject !== undefined) return org.id === selectedProject.organization_id
         return undefined
       })
     },

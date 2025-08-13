@@ -12,7 +12,7 @@ export function castOrganizationResponseToOrganization(org: OrganizationBase): O
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: org.slug.startsWith('vercel_icfg_') ? 'vercel-marketplace' : 'supabase',
+    managed_by: 'managed_by' in org && org.managed_by === 'vela' ? org.managed_by : org.slug.startsWith('vercel_icfg_') ? 'vercel-marketplace' : 'supabase',
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }

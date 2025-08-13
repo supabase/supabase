@@ -29,6 +29,8 @@ services:
       - /var/lib/postgresql/data
       # Seed data should be inserted last (alphabetical order)
       - ./dev/data.sql:/docker-entrypoint-initdb.d/seed.sql
+    ports:
+      - 5433:5432
   storage:
     volumes:
       - /var/lib/storage

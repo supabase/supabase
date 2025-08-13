@@ -4,7 +4,7 @@ import { PlanId } from 'data/subscriptions/types'
 import jsonLogic from 'json-logic-js'
 
 export interface Organization extends OrganizationBase {
-  managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
+  managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace' | 'vela'
   partner_id?: string
   plan: { id: PlanId; name: string }
 }

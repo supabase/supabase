@@ -7,7 +7,7 @@ import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 import type { Project } from './project-detail-query'
-import { DEFAULT_PROJECT, DEFAULT_PROJECT_2 } from '../../pages/api/constants'
+import { useSelectedOrganizationQuery } from '../../hooks/misc/useSelectedOrganization'
 
 export type ProjectsVariables = {
   ref?: string
@@ -18,14 +18,23 @@ export type ProjectInfo = components['schemas']['ProjectInfo']
 export async function getProjects({
   signal,
   headers,
+  organizationId,
 }: {
   signal?: AbortSignal
   headers?: Record<string, string>
+  organizationId: number | undefined
 }) {
-  //FIXME const { data, error } = await get('/platform/projects', { signal, headers })
-
-  //if (error) handleError(error)
-  return [DEFAULT_PROJECT, DEFAULT_PROJECT_2] as ProjectInfo[]
+  const { data, error } = await get('/platform/projects', {
+    signal,
+    headers,
+    params: {
+      query: {
+        organizationId: organizationId,
+      },
+    },
+  })
+  if (error) handleError(error)
+  return data as ProjectInfo[]
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
@@ -36,9 +45,10 @@ export const useProjectsQuery = <TData = ProjectsData>({
   ...options
 }: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
   const { profile } = useProfile()
+  const { data: organization } = useSelectedOrganizationQuery()
   return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
-    ({ signal }) => getProjects({ signal }),
+    ({ signal }) => getProjects({ signal, organizationId: organization?.id }),
     {
       enabled: enabled && profile !== undefined,
       staleTime: 30 * 60 * 1000, // 30 minutes
@@ -47,20 +57,21 @@ export const useProjectsQuery = <TData = ProjectsData>({
   )
 }
 
-export function prefetchProjects(client: QueryClient) {
-  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal }))
+export function prefetchProjects(client: QueryClient, organizationId?: number | undefined) {
+  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal, organizationId }))
 }
 
-export function useProjectsPrefetch() {
+export function useProjectsPrefetch(organizationId?: number | undefined) {
   const client = useQueryClient()
 
   return useCallback(() => {
-    prefetchProjects(client)
+    prefetchProjects(client, organizationId)
   }, [client])
 }
 
 export function useAutoProjectsPrefetch() {
-  const prefetch = useProjectsPrefetch()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const prefetch = useProjectsPrefetch(organization?.id)
 
   const called = useRef<boolean>(false)
   if (called.current === false) {

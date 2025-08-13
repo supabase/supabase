@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
 import { IS_VELA_PLATFORM } from '../../constants'
 import { getVelaClient } from '../../../../data/vela/vela'
-import { Organization } from '../../../../types/index.js'
+import { mapOrganization } from '../../../../data/vela/api-mappers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -61,17 +61,7 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(orgResponse.response.status).send(orgResponse.error)
   }
 
-  const org = orgResponse.data
-  return res.status(303).json({
-    id: org.id!,
-    name: org.name!,
-    slug: org.name!,
-    billing_email: "",
-    plan: {
-      id: "enterprise",
-      name: "Enterprise",
-    },
-  } as Organization)
+  return res.status(303).json(mapOrganization(orgResponse.data))
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -103,16 +93,5 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(response.response.status).send(response.error)
   }
 
-  return res.status(200).json(response.data.map(org => {
-    return {
-      id: org.id!,
-      name: org.name!,
-      slug: org.name!,
-      billing_email: "",
-      plan: {
-        id: "enterprise",
-        name: "Enterprise",
-      },
-    } as Organization // Type marker for Organizations
-  }));
+  return res.status(200).json(response.data.map(mapOrganization));
 }
