@@ -489,8 +489,8 @@ export default function ComposedChart({
               x1={chartHighlight?.coordinates.left}
               x2={chartHighlight?.coordinates.right}
               strokeOpacity={0.5}
-              stroke="#3ECF8E"
-              fill="#3ECF8E"
+              stroke="#FFFFFF"
+              fill="#FFFFFF"
               fillOpacity={0.3}
             />
           )}
