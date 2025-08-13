@@ -141,7 +141,7 @@ export async function getStaticProps() {
     props: {
       blogs: allPostsData,
     },
-    revalidate: 60 * 10, // Revalidate every 10 minutes
+    // revalidate: 60 * 10, // Revalidate every 10 minutes
   }
 }
 
