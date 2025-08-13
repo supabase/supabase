@@ -300,7 +300,7 @@ export function SurveyChart({
         <h3 className="text-foreground text-xl">{title}</h3>
       </header>
 
-      <div className={``}>
+      <div>
         {/* Filters and toggle */}
         <div className="flex flex-row flex-wrap gap-4 px-8 pb-4 justify-between">
           {filters && activeFilters && setFilterValue && (
@@ -334,74 +334,98 @@ export function SurveyChart({
               <p className="text-danger">Error: {error}</p>
             </div>
           ) : view === 'chart' ? (
-            <div className="flex flex-col h-full w-full justify-between px-8 pt-4 pb-12">
-              {/* Each bar as a vertical stack: label above, bar below */}
-              <div
-                className="flex flex-col gap-10"
-                style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
-              >
-                {displayData.map((item, index) => (
-                  <div key={index} className="flex flex-col">
-                    {/*  Text above the bar */}
-                    <div
-                      className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums transition-colors duration-300 ${
-                        shouldAnimateBars
-                          ? item.value === maxValue
-                            ? 'text-brand-link dark:text-brand'
-                            : 'text-foreground'
-                          : 'text-foreground-muted'
-                      }`}
-                    >
-                      <span>{item.label}</span>
-                      <span>{item.value < 1 ? '<1%' : `${item.value}%`}</span>
-                    </div>
-
-                    {/* Entire bar (including background) */}
-                    <div
-                      className="h-4 relative overflow-hidden"
-                      style={
-                        {
-                          '--bar-value': item.value,
-                          '--reference': maxValue,
-                        } as React.CSSProperties
-                      }
-                    >
-                      {/* Background pattern for the entire bar */}
+            <div className="flex flex-col h-full w-full justify-between px-8 pt-4 pb-12 min-h-[300px]">
+              {chartData.length > 0 ? (
+                <div
+                  className="flex flex-col gap-10"
+                  style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
+                >
+                  {displayData.map((item, index) => (
+                    <div key={index} className="flex flex-col">
+                      {/*  Text above the bar */}
                       <div
-                        className="absolute inset-0 pointer-events-none bg-foreground-muted/50"
-                        style={{
-                          maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
-                          maskSize: '15px 15px',
-                          maskRepeat: 'repeat',
-                          maskPosition: 'center',
-                        }}
-                      />
-
-                      {/* Filled portion of the bar */}
-                      <div
-                        className={`h-full relative bg-surface-100`}
-                        style={{
-                          width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
-                          transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
-                          transformOrigin: 'left',
-                          transition: `transform 0.5s steps(${Math.max(2, Math.floor((item.value / 100) * 12))}, end) ${index * 0.05}s`,
-                        }}
+                        className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums transition-colors duration-300 ${
+                          shouldAnimateBars
+                            ? item.value === maxValue
+                              ? 'text-brand-link dark:text-brand'
+                              : 'text-foreground'
+                            : 'text-foreground-muted'
+                        }`}
                       >
-                        {/* Foreground pattern for the filled portion */}
+                        <span>{item.label}</span>
+                        <span>{item.value < 1 ? '<1%' : `${item.value}%`}</span>
+                      </div>
+
+                      {/* Entire bar (including background) */}
+                      <div
+                        className="h-4 relative overflow-hidden"
+                        style={
+                          {
+                            '--bar-value': item.value,
+                            '--reference': maxValue,
+                          } as React.CSSProperties
+                        }
+                      >
+                        {/* Background pattern for the entire bar */}
                         <div
-                          className={`absolute inset-0 pointer-events-none ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-light'}`}
+                          className="absolute inset-0 pointer-events-none bg-foreground-muted/50"
                           style={{
-                            maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
-                            maskSize: '14.5px 15px',
+                            maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
+                            maskSize: '15px 15px',
                             maskRepeat: 'repeat',
-                            maskPosition: 'top left',
+                            maskPosition: 'center',
                           }}
                         />
+
+                        {/* Filled portion of the bar */}
+                        <div
+                          className={`h-full relative bg-surface-100`}
+                          style={{
+                            width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
+                            transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
+                            transformOrigin: 'left',
+                            transition: `transform 0.5s steps(${Math.max(2, Math.floor((item.value / 100) * 12))}, end) ${index * 0.05}s`,
+                          }}
+                        >
+                          {/* Foreground pattern for the filled portion */}
+                          <div
+                            className={`absolute inset-0 pointer-events-none ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-light'}`}
+                            style={{
+                              maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
+                              maskSize: '14.5px 15px',
+                              maskRepeat: 'repeat',
+                              maskPosition: 'top left',
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex-1 pt-8 flex flex-col items-center justify-center gap-4">
+                  <p className="text-balance text-center">
+                    No responses match those filters. Maybe next year?
+                  </p>
+                  <Button
+                    type="primary"
+                    size="tiny"
+                    onClick={() =>
+                      setActiveFilters(
+                        filterColumns.reduce(
+                          (acc: Record<string, string>, col: string) => ({
+                            ...acc,
+                            [col]: NO_FILTER,
+                          }),
+                          {}
+                        )
+                      )
+                    }
+                  >
+                    Clear filters
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="px-8 pt-4 pb-8">
@@ -470,16 +494,10 @@ function SurveyFilter({
           size="tiny"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
-          {selectedValue === NO_FILTER ? (
-            <div className="w-full flex gap-1">
-              <p className="text-foreground-lighter">{filterConfig.label}</p>
-            </div>
-          ) : (
-            <div className="w-full flex gap-1">
-              <p className="text-foreground-lighter">{filterConfig.label}</p>
-              <p className="text-foreground">{selectedValue}</p>
-            </div>
-          )}
+          <div className="w-full flex gap-1">
+            <p className="text-foreground-lighter">{filterConfig.label}</p>
+            {selectedValue !== NO_FILTER && <p className="text-foreground">{selectedValue}</p>}
+          </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
