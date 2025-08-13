@@ -16,7 +16,7 @@ import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/databa
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -220,7 +220,7 @@ export const CreateCronJobSheet = ({
   const { mutate: upsertCronJob, isLoading: isUpserting } = useDatabaseCronJobCreateMutation()
   const isLoading = isLoadingGetCronJob || isUpserting
 
-  const canToggleExtensions = useCheckPermissions(
+  const { can: canToggleExtensions } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )

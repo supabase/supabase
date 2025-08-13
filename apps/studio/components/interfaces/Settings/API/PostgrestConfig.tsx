@@ -21,7 +21,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
@@ -101,7 +101,7 @@ export const PostgrestConfig = () => {
 
   const formId = 'project-postgres-config'
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
-  const canUpdatePostgrestConfig = useCheckPermissions(
+  const { can: canUpdatePostgrestConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
