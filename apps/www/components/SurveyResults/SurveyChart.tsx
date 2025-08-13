@@ -35,9 +35,7 @@ interface ChartDataItem {
 // Add this interface and configuration mapping
 interface FilterColumnConfig {
   label: string
-  sortFunction?: (a: any, b: any) => number
-  valueTransform?: (value: any) => string
-  options?: { value: string; label: string }[]
+  options: { value: string; label: string }[]
 }
 
 const FILTER_COLUMN_CONFIGS: Record<string, FilterColumnConfig> = {
@@ -76,7 +74,6 @@ const FILTER_COLUMN_CONFIGS: Record<string, FilterColumnConfig> = {
     options: [
       { value: 'Africa', label: 'Africa' },
       { value: 'Asia', label: 'Asia' },
-      { value: 'Asiana', label: 'Asiana' },
       { value: 'Europe', label: 'Europe' },
       { value: 'Middle East', label: 'Middle East' },
       { value: 'North America', label: 'North America' },
@@ -86,126 +83,32 @@ const FILTER_COLUMN_CONFIGS: Record<string, FilterColumnConfig> = {
   },
 }
 
-// Custom hook to fetch filter options from Supabase
-function useFilterOptions(filterColumns: string[], shouldFetch: boolean) {
-  const [filters, setFilters] = useState<Filters>({})
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+// Simplified hook - no more async, no more loading states
+function useFilterOptions(filterColumns: string[]) {
+  // Build filters synchronously since everything is predefined
+  const filters: Filters = {}
 
-  useEffect(() => {
-    if (!shouldFetch) return
+  for (const column of filterColumns) {
+    const config = FILTER_COLUMN_CONFIGS[column]
 
-    async function fetchFilterOptions() {
-      try {
-        setIsLoading(true)
-        setError(null)
-
-        console.log('Fetching filter options from Supabase for columns:', filterColumns)
-
-        const filterOptions: Filters = {}
-
-        for (const column of filterColumns) {
-          const config = FILTER_COLUMN_CONFIGS[column] || {
-            // label: column.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-            label: column,
-          }
-
-          // If we have predefined options, use them (much faster!)
-          if (config.options) {
-            filterOptions[column] = {
-              label: config.label,
-              options: [
-                {
-                  value: 'unset',
-                  label: `All ${config.label}s`,
-                },
-                ...config.options,
-              ],
-            }
-            continue
-          }
-
-          // Otherwise, fetch from database (slower but dynamic)
-          const { data, error: fetchError } = await externalSupabase
-            .from('responses_2025')
-            .select(column)
-            .not(column, 'is', null)
-
-          if (fetchError) {
-            console.error(`Error fetching ${column} options:`, fetchError)
-            continue
-          }
-
-          console.log(`Raw data for ${column}:`, data)
-
-          // Extract all individual values from PostgreSQL arrays
-          const allValues = data.flatMap((row: any) => {
-            const value = row[column]
-            console.log(
-              `Processing value for ${column}:`,
-              value,
-              typeof value,
-              Array.isArray(value)
-            )
-
-            if (Array.isArray(value)) {
-              // Handle PostgreSQL arrays
-              return value.filter((item: any) => item && item.length > 0)
-            } else if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
-              // Handle PostgreSQL array format like {Firebase,MongoDB,MySQL}
-              const innerContent = value.slice(1, -1) // Remove { and }
-              if (innerContent.trim() === '') {
-                return []
-              }
-              return innerContent
-                .split(',')
-                .map((item: string) => item.trim())
-                .filter((item: string) => item.length > 0)
-            }
-            return [value]
-          })
-
-          console.log(`All values for ${column}:`, allValues)
-
-          // Get unique values and apply custom sorting if available
-          let uniqueValues = [...new Set(allValues)]
-          if (config.sortFunction) {
-            uniqueValues.sort(config.sortFunction)
-          } else {
-            uniqueValues.sort()
-          }
-
-          console.log(`Unique values for ${column}:`, uniqueValues)
-
-          filterOptions[column] = {
-            label: config.label,
-            options: [
-              {
-                value: 'unset',
-                label: `All ${config.label}s`,
-              },
-              ...uniqueValues.map((value) => ({
-                value: String(value),
-                label: config.valueTransform ? config.valueTransform(value) : String(value),
-              })),
-            ],
-          }
-        }
-
-        console.log('Final filter options:', filterOptions)
-        setFilters(filterOptions)
-      } catch (err: any) {
-        console.error('Error fetching filter options:', err)
-        setError(err.message)
-      } finally {
-        setIsLoading(false)
-      }
+    if (!config) {
+      console.warn(`No configuration found for filter column: ${column}`)
+      continue
     }
 
-    fetchFilterOptions()
-  }, [filterColumns, shouldFetch])
+    filters[column] = {
+      label: config.label,
+      options: [
+        {
+          value: 'unset',
+          label: `All ${config.label}s`,
+        },
+        ...config.options,
+      ],
+    }
+  }
 
-  return { filters, isLoading, error }
+  return { filters }
 }
 
 // Custom hook to fetch survey data using SQL query via RPC
@@ -315,12 +218,8 @@ export function SurveyChart({
     }
   }, [hasLoadedOnce])
 
-  // Get dynamic filter options
-  const {
-    filters,
-    isLoading: filtersLoading,
-    error: filtersError,
-  } = useFilterOptions(filterColumns, isInView)
+  // Get filter options - no more loading states needed
+  const { filters } = useFilterOptions(filterColumns)
 
   // Start with all filters unset (showing "all")
   const [activeFilters, setActiveFilters] = useState(
@@ -343,7 +242,7 @@ export function SurveyChart({
 
   // Trigger bar animation when data loads
   useEffect(() => {
-    if (!dataLoading && !filtersLoading && chartData.length > 0 && !shouldAnimateBars) {
+    if (!dataLoading && chartData.length > 0 && !shouldAnimateBars) {
       // Small delay to ensure DOM is ready
       const timer = setTimeout(() => {
         setShouldAnimateBars(true)
@@ -351,7 +250,7 @@ export function SurveyChart({
 
       return () => clearTimeout(timer)
     }
-  }, [dataLoading, filtersLoading, chartData.length, shouldAnimateBars])
+  }, [dataLoading, chartData.length, shouldAnimateBars])
 
   const [view, setView] = useState<'chart' | 'sql'>('chart')
 
@@ -362,8 +261,9 @@ export function SurveyChart({
     }))
   }
 
-  const isLoading = filtersLoading || dataLoading
-  const error = filtersError || dataError
+  // Simplified loading logic - only data loading matters now
+  const isLoading = dataLoading
+  const error = dataError
 
   // Find the maximum value for scaling
   const maxValue = chartData.length > 0 ? Math.max(...chartData.map((item) => item.value)) : 0
