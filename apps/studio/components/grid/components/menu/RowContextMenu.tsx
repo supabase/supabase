@@ -12,46 +12,51 @@ import { formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {
   rows: SupaRow[]
+  isReferenceView?: boolean
 }
 
-const RowContextMenu = ({ rows }: RowContextMenuProps) => {
+const RowContextMenu = ({ rows, isReferenceView = false }: RowContextMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
-  function onDeleteRow(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
-    const row = rows[rowIdx]
-    if (row) tableEditorSnap.onDeleteRows([row])
-  }
+  const onDeleteRow = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
+      const { rowIdx } = props
+      const row = rows[rowIdx]
+      if (row) tableEditorSnap.onDeleteRows([row])
+    },
+    [rows, tableEditorSnap]
+  )
 
-  function onEditRowClick(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
-    const row = rows[rowIdx]
-    tableEditorSnap.onEditRow(row)
-  }
+  const onEditRowClick = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
+      const { rowIdx } = props
+      const row = rows[rowIdx]
+      tableEditorSnap.onEditRow(row)
+    },
+    [rows, tableEditorSnap]
+  )
 
   const onCopyCellContent = useCallback(
     (p: ItemParams) => {
       const { props } = p
-
-      if (!snap.selectedCellPosition || !props) {
-        return
-      }
+      if (!snap.selectedCellPosition || !props) return
 
       const { rowIdx } = props
       const row = rows[rowIdx]
-
       const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
-
       const value = row[columnKey]
-      const text = formatClipboardValue(value)
+
+      const text = isReferenceView 
+        ? String(value)
+        : formatClipboardValue(value)
 
       copyToClipboard(text)
       toast.success('Copied cell value to clipboard')
     },
-    [rows, snap.gridColumns, snap.selectedCellPosition]
+    [rows, snap.gridColumns, snap.selectedCellPosition, isReferenceView, tableEditorSnap]
   )
 
   const onCopyRowContent = useCallback(
@@ -95,4 +100,5 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     </Menu>
   )
 }
+
 export default RowContextMenu
