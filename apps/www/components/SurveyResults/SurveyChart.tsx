@@ -1,8 +1,14 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { Button } from 'ui'
-import { SurveyFilter } from './SurveyFilter'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
+import { ChevronsUpDown } from 'lucide-react'
 import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
@@ -11,6 +17,9 @@ const externalSupabase = createClient(
   process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY!
 )
+
+// Sentinel for “no filter”
+const NO_FILTER = 'unset'
 
 interface FilterOption {
   value: string
@@ -98,13 +107,7 @@ function useFilterOptions(filterColumns: string[]) {
 
     filters[column] = {
       label: config.label,
-      options: [
-        {
-          value: 'unset',
-          label: `All ${config.label}s`,
-        },
-        ...config.options,
-      ],
+      options: [...config.options],
     }
   }
 
@@ -125,7 +128,7 @@ function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
         setIsLoading(true)
         setError(null)
 
-        console.log('Executing SQL query:', sqlQuery)
+        // console.log('Executing SQL query:', sqlQuery)
 
         // Execute the SQL query using Supabase RPC
         const { data, error: fetchError } = await externalSupabase.rpc('execute_sql', {
@@ -224,7 +227,7 @@ export function SurveyChart({
   // Start with all filters unset (showing "all")
   const [activeFilters, setActiveFilters] = useState(
     filterColumns.reduce(
-      (acc: Record<string, string>, col: string) => ({ ...acc, [col]: 'unset' }),
+      (acc: Record<string, string>, col: string) => ({ ...acc, [col]: NO_FILTER }),
       {}
     )
   )
@@ -424,5 +427,85 @@ export function SurveyChart({
         </div>
       </div>
     </div>
+  )
+}
+
+// Helper to build SQL WHERE clauses from active filters
+// Accepts optional initialClauses for charts that need extra constraints
+// (e.g., "column IS NOT NULL")
+export function buildWhereClause(
+  activeFilters: Record<string, string>,
+  initialClauses: string[] = []
+) {
+  const whereClauses: string[] = [...initialClauses]
+
+  for (const [column, value] of Object.entries(activeFilters)) {
+    if (value && value !== NO_FILTER) {
+      whereClauses.push(`${column} = '${value}'`)
+    }
+  }
+
+  return whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
+}
+
+function SurveyFilter({
+  filterKey,
+  filterConfig,
+  selectedValue,
+  setFilterValue,
+}: {
+  filterKey: string
+  filterConfig: {
+    label: string
+    options: { value: string; label: string }[]
+  }
+  selectedValue: string
+  setFilterValue: (filterKey: string, value: string) => void
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="default"
+          size="tiny"
+          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
+        >
+          {selectedValue === NO_FILTER ? (
+            <div className="w-full flex gap-1">
+              <p className="text-foreground-lighter">{filterConfig.label}</p>
+            </div>
+          ) : (
+            <div className="w-full flex gap-1">
+              <p className="text-foreground-lighter">{filterConfig.label}</p>
+              <p className="text-foreground">{selectedValue}</p>
+            </div>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {filterConfig.options
+          .filter((opt) => opt.value !== NO_FILTER)
+          .map((option) => (
+            <DropdownMenuItem
+              key={option.value}
+              onClick={() => setFilterValue(filterKey, option.value)}
+              className={selectedValue === option.value ? 'text-brand-600' : ''}
+            >
+              {option.label}
+            </DropdownMenuItem>
+          ))}
+
+        {selectedValue !== NO_FILTER && (
+          <div className="border-t border-border mt-1 pt-1">
+            <DropdownMenuItem
+              onClick={() => setFilterValue(filterKey, NO_FILTER)}
+              className="text-foreground-lighter"
+            >
+              Clear
+            </DropdownMenuItem>
+          </div>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

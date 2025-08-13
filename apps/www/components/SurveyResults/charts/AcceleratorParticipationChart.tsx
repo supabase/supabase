@@ -1,24 +1,9 @@
-import { SurveyChart } from '../SurveyChart'
+import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
 function generateAcceleratorParticipationSQL(activeFilters: Record<string, string>) {
-  const whereClauses = []
-
-  // Always filter out NULL values
-  whereClauses.push(`accelerator_participation_normalized IS NOT NULL`)
-
-  if (activeFilters.person_age !== 'unset') {
-    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
-  }
-
-  if (activeFilters.headquarters !== 'unset') {
-    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
-  }
-
-  if (activeFilters.money_raised !== 'unset') {
-    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
-  }
-
-  const whereClause = `WHERE ${whereClauses.join('\n  AND ')}`
+  const whereClause = buildWhereClause(activeFilters, [
+    'accelerator_participation_normalized IS NOT NULL',
+  ])
 
   return `SELECT
   accelerator_participation_normalized,
