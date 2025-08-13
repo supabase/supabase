@@ -3,16 +3,16 @@ import { SurveyChart } from '../SurveyChart'
 function generateDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
+  }
+
   if (activeFilters.team_count !== 'unset') {
     whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
-  if (activeFilters.ai_models_used !== 'unset') {
-    whereClauses.push(`'${activeFilters.ai_models_used}' = ANY(ai_models_used)`)
-  }
-
-  if (activeFilters.backend_stack !== 'unset') {
-    whereClauses.push(`'${activeFilters.backend_stack}' = ANY(backend_stack)`)
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -30,7 +30,7 @@ export function DatabasesChart() {
     <SurveyChart
       title="Which database(s) is your startup using?"
       targetColumn="databases"
-      filterColumns={['team_count', 'ai_models_used', 'backend_stack']}
+      filterColumns={['person_age', 'team_count', 'money_raised']}
       generateSQLQuery={generateDatabasesSQL}
     />
   )

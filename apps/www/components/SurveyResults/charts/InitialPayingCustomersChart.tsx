@@ -7,16 +7,16 @@ function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>
   // whereClauses.push(`initial_paying_customers IS NOT NULL`)
   // whereClauses.push(`initial_paying_customers != ''`)
 
-  if (activeFilters.industry_normalized !== 'unset') {
-    whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
-  if (activeFilters.market_model !== 'unset') {
-    whereClauses.push(`'${activeFilters.market_model}' = ANY(market_model)`)
+  if (activeFilters.headquarters !== 'unset') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'unset') {
-    whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
+  if (activeFilters.team_count !== 'unset') {
+    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -37,7 +37,7 @@ export function InitialPayingCustomersChart() {
     <SurveyChart
       title="Where did your startup’s initial paying customers come from?"
       targetColumn="initial_paying_customers"
-      filterColumns={['industry_normalized', 'market_model', 'currently_monetizing']}
+      filterColumns={['person_age', 'headquarters', 'team_count']}
       generateSQLQuery={generateInitialPayingCustomersSQL}
     />
   )

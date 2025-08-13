@@ -3,16 +3,16 @@ import { SurveyChart } from '../SurveyChart'
 function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
+  }
+
+  if (activeFilters.headquarters !== 'unset') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  }
+
   if (activeFilters.team_count !== 'unset') {
     whereClauses.push(`team_count = '${activeFilters.team_count}'`)
-  }
-
-  if (activeFilters.funding_stage !== 'unset') {
-    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
-  }
-
-  if (activeFilters.first_sales_hire_stage !== 'unset') {
-    whereClauses.push(`first_sales_hire_stage = '${activeFilters.first_sales_hire_stage}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -32,7 +32,7 @@ export function SalesToolsChart() {
     <SurveyChart
       title="What tools are you using to manage your sales process?"
       targetColumn="sales_tools"
-      filterColumns={['team_count', 'funding_stage', 'first_sales_hire_stage']}
+      filterColumns={['person_age', 'headquarters', 'team_count']}
       generateSQLQuery={generateSalesToolsSQL}
     />
   )
