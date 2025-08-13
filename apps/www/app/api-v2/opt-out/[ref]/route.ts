@@ -80,7 +80,6 @@ export async function POST(req: NextRequest, props: { params: Promise<{ ref: str
       .insert([{ project_ref: ref, reason, email }])
 
     if (supabaseError) {
-      Sentry.captureException(supabaseError)
       throw new Error(`Supabase error: ${supabaseError.message}`)
     }
 

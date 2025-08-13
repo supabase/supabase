@@ -502,6 +502,8 @@ export async function GET(req: Request, res: Response) {
     return await fetch(`${STORAGE_URL}/og/${ticketType}/${username}.png?t=${NEW_TIMESTAMP}`)
   } catch (error: any) {
     Sentry.captureException(error)
+    await Sentry.flush(2000)
+
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
