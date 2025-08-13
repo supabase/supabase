@@ -7,8 +7,8 @@ function generateRoleSQL(activeFilters: Record<string, string>) {
   if (activeFilters.person_age !== 'unset') {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
-  if (activeFilters.funding_stage !== 'unset') {
-    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
   if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
@@ -45,7 +45,7 @@ export function RoleChart() {
     <SurveyChart
       title="What is your functional role at your startup?"
       targetColumn="person_role_normalized"
-      filterColumns={['person_age', 'funding_stage', 'headquarters']}
+      filterColumns={['person_age', 'money_raised', 'headquarters']}
       generateSQLQuery={generateRoleSQL}
     />
   )

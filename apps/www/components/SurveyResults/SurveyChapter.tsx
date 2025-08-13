@@ -60,8 +60,8 @@ export function SurveyChapter({
             ))}
           </div>
           {/* Text content */}
-          <div className="max-w-[60rem] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-balance pb-12 px-8">
-            <div className="md:col-span-2 flex flex-col gap-4">
+          <div className="max-w-[60rem] mx-auto grid gap-y-8 grid-cols-1 md:grid-cols-3 text-balance pb-12">
+            <div className="md:col-span-2 flex flex-col gap-4 px-8">
               <p className="text-sm text-brand-link uppercase font-mono text-balance tracking-wide">
                 {shortTitle}
               </p>
@@ -69,7 +69,7 @@ export function SurveyChapter({
                 {title}
               </h2>
             </div>
-            <p className="md:col-span-2 md:col-start-2 text-lg xl:text-xl text-foreground text-balance md:px-4">
+            <p className="md:col-span-2 md:col-start-2 text-lg xl:text-xl text-foreground text-balance px-8">
               {description}
             </p>
           </div>

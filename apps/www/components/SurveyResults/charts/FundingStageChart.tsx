@@ -11,10 +11,8 @@ function generateFundingStageSQL(activeFilters: Record<string, string>) {
     whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
-  if (activeFilters.previous_company !== 'unset') {
-    // Convert string to boolean for the SQL query
-    const previousCompanyBool = activeFilters.previous_company === 'true'
-    whereClauses.push(`previous_company = ${previousCompanyBool}`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -46,7 +44,7 @@ export function FundingStageChart() {
     <SurveyChart
       title="What stage of funding is your startup in?"
       targetColumn="funding_stage"
-      filterColumns={['headquarters', 'team_count', 'previous_company']}
+      filterColumns={['person_age', 'headquarters', 'team_count']}
       generateSQLQuery={generateFundingStageSQL}
     />
   )

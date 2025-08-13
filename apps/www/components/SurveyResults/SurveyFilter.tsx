@@ -32,11 +32,11 @@ export function SurveyFilter({
         >
           {selectedValue === 'unset' ? (
             <div className="w-full flex gap-1">
-              <p className="text-foreground-lighter">{filterConfig.label.toLowerCase()}</p>
+              <p className="text-foreground-lighter">{filterConfig.label}</p>
             </div>
           ) : (
             <div className="w-full flex gap-1">
-              <p className="text-foreground-lighter">{filterConfig.label.toLowerCase()}</p>
+              <p className="text-foreground-lighter">{filterConfig.label}</p>
               <p className="text-foreground">{selectedValue}</p>
             </div>
           )}

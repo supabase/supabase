@@ -14,7 +14,7 @@ const stateOfStartupsData = {
       title: 'Who’s Building Startups',
       shortTitle: 'Founder and Company',
       description:
-        "Today's startup ecosystem is dominated by young, technical builders shipping fast with lean teams. They've done this before.",
+        "Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams. They've done this before.",
       pullQuote: {
         quote:
           "We’re a two-person team, both technical. It's not our first rodeo, and that experience helped us move way faster this time.",

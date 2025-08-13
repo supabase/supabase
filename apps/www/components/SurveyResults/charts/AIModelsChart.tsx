@@ -1,18 +1,18 @@
 import { SurveyChart } from '../SurveyChart'
 
-function generateDatabasesSQL(activeFilters: Record<string, string>) {
+function generateAIModelsSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.funding_stage !== 'unset') {
-    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
-  if (activeFilters.startup_age !== 'unset') {
-    whereClauses.push(`startup_age = '${activeFilters.startup_age}'`)
+  if (activeFilters.team_count !== 'unset') {
+    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'unset') {
-    whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -30,8 +30,8 @@ export function AIModelsChart() {
     <SurveyChart
       title="Which AI models are you using or planning to use?"
       targetColumn="ai_models_used"
-      filterColumns={['funding_stage', 'startup_age', 'currently_monetizing']}
-      generateSQLQuery={generateDatabasesSQL}
+      filterColumns={['person_age', 'team_count', 'money_raised']}
+      generateSQLQuery={generateAIModelsSQL}
     />
   )
 }

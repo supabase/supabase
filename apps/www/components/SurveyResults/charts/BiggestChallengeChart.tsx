@@ -7,16 +7,16 @@ function generateBiggestChallengeSQL(activeFilters: Record<string, string>) {
   // Always filter out NULL values
   whereClauses.push(`biggest_challenge IS NOT NULL`)
 
-  if (activeFilters.team_count !== 'unset') {
-    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
-  if (activeFilters.ai_models_used !== 'unset') {
-    whereClauses.push(`'${activeFilters.ai_models_used}' = ANY(ai_models_used)`)
+  if (activeFilters.headquarters !== 'unset') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'unset') {
-    whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -46,7 +46,7 @@ export function BiggestChallengeChart() {
     <SurveyChart
       title="What’s the biggest business challenge your startup is facing today?"
       targetColumn="biggest_challenge"
-      filterColumns={['team_count', 'ai_models_used', 'currently_monetizing']}
+      filterColumns={['person_age', 'headquarters', 'money_raised']}
       generateSQLQuery={generateBiggestChallengeSQL}
     />
   )
