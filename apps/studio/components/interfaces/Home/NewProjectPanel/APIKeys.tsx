@@ -12,7 +12,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { Input, SimpleCodeBlock } from 'ui'
 
-const generateInitSnippet = (endpoint: string) => ({
+const generateInitSnippet = (endpoint: string, anonKey?: string) => ({
   js: `
 import { createClient } from '@supabase/supabase-js'
 
@@ -27,6 +27,22 @@ Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
   runApp(MyApp());
 }`,
+  swift: `
+  import Supabase
+
+  let supabase = SupabaseClient(
+    supabaseURL: URL(string: "${endpoint}")!,
+    supabaseKey: "${anonKey ? anonKey : 'SUPABASE_ANON_KEY'}"
+  )
+  `,
+  py: `
+  import os
+  from supabase import create_client
+
+  url = '${endpoint}'
+  key = os.environ.get('SUPABASE_KEY')
+  supabase = create_client(url, key)
+  `,
 })
 
 const APIKeys = () => {
@@ -35,6 +51,8 @@ const APIKeys = () => {
   const availableLanguages = [
     { name: 'Javascript', key: 'js' },
     { name: 'Dart', key: 'dart' },
+    { name: 'Swift', key: 'swift' },
+    { name: 'Python', key: 'py' },
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
 
@@ -77,7 +95,7 @@ const APIKeys = () => {
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
-  const clientInitSnippet: any = generateInitSnippet(apiUrl)
+  const clientInitSnippet: any = generateInitSnippet(apiUrl, anonKey?.api_key_encrypted)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
 
   return (
