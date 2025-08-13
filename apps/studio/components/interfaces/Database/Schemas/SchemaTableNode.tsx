@@ -11,6 +11,7 @@ const TABLE_NODE_ROW_HEIGHT = 40
 export type TableNodeData = {
   id?: number
   name: string
+  schema: string
   ref: string
   isForeign: boolean
   columns: {
@@ -67,7 +68,7 @@ const TableNode = ({
             </div>
             {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}`}>
+                <Link href={`/project/${data.ref}/editor/${data.id}?schema=${data.schema}`}>
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>

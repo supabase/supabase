@@ -23,6 +23,7 @@ import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
+import { table } from 'console'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -57,8 +58,8 @@ export const TableGridEditor = ({
   }, [appSnap, projectRef])
 
   const onTableCreated = useCallback(
-    (table: { id: number }) => {
-      router.push(`/project/${projectRef}/editor/${table.id}`)
+    (table: { id: number; schema: string }) => {
+      router.push(`/project/${projectRef}/editor/${table.id}?schema=${table.schema}`)
     },
     [projectRef, router]
   )

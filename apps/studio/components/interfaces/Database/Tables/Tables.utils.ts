@@ -21,6 +21,7 @@ export const formatAllEntities = ({
       type: ENTITY_TYPE.TABLE as const,
       rows: x.live_rows_estimate,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 
@@ -33,6 +34,7 @@ export const formatAllEntities = ({
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 
@@ -45,6 +47,7 @@ export const formatAllEntities = ({
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 
@@ -57,6 +60,7 @@ export const formatAllEntities = ({
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 

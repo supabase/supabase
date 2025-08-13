@@ -68,12 +68,22 @@ export function usePrefetchEditorTablePage() {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   return useCallback(
-    ({ id: _id, filters, sorts }: { id?: string; filters?: Filter[]; sorts?: Sort[] }) => {
+    ({
+      id: _id,
+      schema,
+      filters,
+      sorts,
+    }: {
+      id?: string
+      schema?: string
+      filters?: Filter[]
+      sorts?: Sort[]
+    }) => {
       const id = _id ? Number(_id) : undefined
       if (!project || !id || isNaN(id)) return
 
       // Prefetch the code
-      router.prefetch(`/project/${project.ref}/editor/${id}`)
+      router.prefetch(`/project/${project.ref}/editor/${id}?schema=${schema}`)
 
       // Prefetch the data
       prefetchEditorTablePage({
@@ -95,6 +105,7 @@ export function usePrefetchEditorTablePage() {
 interface EditorTablePageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 'prefetcher'> {
   projectRef?: string
   id?: string
+  schema: string
   sorts?: Sort[]
   filters?: Filter[]
   href?: PrefetchableLinkProps['href']
@@ -103,6 +114,7 @@ interface EditorTablePageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 
 export function EditorTablePageLink({
   projectRef,
   id,
+  schema,
   sorts,
   filters,
   href,
@@ -113,8 +125,8 @@ export function EditorTablePageLink({
 
   return (
     <PrefetchableLink
-      href={href || `/project/${projectRef}/editor/${id}`}
-      prefetcher={() => prefetch({ id, sorts, filters })}
+      href={href || `/project/${projectRef}/editor/${id}?schema=${schema}`}
+      prefetcher={() => prefetch({ id, schema, sorts, filters })}
       {...props}
     >
       {children}
