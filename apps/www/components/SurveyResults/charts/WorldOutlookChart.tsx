@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 // Generate SQL query for team count chart
 function generateWorldOutlookSQL(activeFilters: Record<string, string>) {
@@ -29,7 +29,7 @@ ORDER BY total DESC;`
 
 export function WorldOutlookChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="Given the state of the world, are you…"
       targetColumn="world_outlook"
       filterColumns={['role', 'funding_stage', 'headquarters']}

@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateNewIdeasSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -34,7 +34,7 @@ ORDER BY respondents DESC;`
 
 export function NewIdeasChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="Where do you usually discover new dev tools or startup ideas?"
       targetColumn="new_ideas"
       filterColumns={['person_age', 'role', 'industry_normalized']}

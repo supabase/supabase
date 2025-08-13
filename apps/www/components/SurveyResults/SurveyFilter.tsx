@@ -8,7 +8,7 @@ import {
 import { ChevronsUpDown } from 'lucide-react'
 
 // Dropdown component for SQL
-export function FilterDropdown({
+export function SurveyFilter({
   filterKey,
   filterConfig,
   selectedValue,

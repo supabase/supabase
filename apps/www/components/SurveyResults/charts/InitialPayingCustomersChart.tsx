@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -34,7 +34,7 @@ ORDER BY respondents DESC;`
 
 export function InitialPayingCustomersChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="Where did your startup’s initial paying customers come from?"
       targetColumn="initial_paying_customers"
       filterColumns={['industry_normalized', 'market_model', 'currently_monetizing']}

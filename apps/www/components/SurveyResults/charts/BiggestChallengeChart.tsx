@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 // Generate SQL query for team count chart
 function generateBiggestChallengeSQL(activeFilters: Record<string, string>) {
@@ -43,7 +43,7 @@ ORDER BY total DESC;`
 
 export function BiggestChallengeChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="What’s the biggest business challenge your startup is facing today?"
       targetColumn="biggest_challenge"
       filterColumns={['team_count', 'ai_models_used', 'currently_monetizing']}

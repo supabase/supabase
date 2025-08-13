@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -27,7 +27,7 @@ ORDER BY total DESC;`
 
 export function AIModelsChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="Which AI models are you using or planning to use?"
       targetColumn="ai_models_used"
       filterColumns={['funding_stage', 'startup_age', 'currently_monetizing']}

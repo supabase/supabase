@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -29,7 +29,7 @@ ORDER BY total DESC;
 
 export function SalesToolsChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="What tools are you using to manage your sales process?"
       targetColumn="sales_tools"
       filterColumns={['team_count', 'funding_stage', 'first_sales_hire_stage']}

@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateFundingStageSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -43,7 +43,7 @@ function generateFundingStageSQL(activeFilters: Record<string, string>) {
 
 export function FundingStageChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="What stage of funding is your startup in?"
       targetColumn="funding_stage"
       filterColumns={['headquarters', 'team_count', 'previous_company']}

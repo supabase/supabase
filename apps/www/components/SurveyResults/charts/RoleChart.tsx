@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 // Generate SQL query for team count chart
 function generateRoleSQL(activeFilters: Record<string, string>) {
@@ -42,7 +42,7 @@ ORDER BY total DESC;
 
 export function RoleChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="What is your functional role at your startup?"
       targetColumn="person_role_normalized"
       filterColumns={['person_age', 'funding_stage', 'headquarters']}

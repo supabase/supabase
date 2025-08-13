@@ -1,14 +1,12 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
-import { FilterDropdown } from './FilterDropdown'
-import { ChevronDown, UnfoldVertical } from 'lucide-react'
+import { Button } from 'ui'
+import { SurveyFilter } from './SurveyFilter'
 import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
-import { SurveyCodeWindow } from './SurveyCodeWindow'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
-// Create a separate Supabase client for your external project
+// Separate Supabase client for external project
 const externalSupabase = createClient(
   process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY!
@@ -190,19 +188,19 @@ function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
   return { chartData, isLoading, error }
 }
 
-interface GenericChartWithQueryProps {
+interface SurveyChartProps {
   title: string
   targetColumn: string
   filterColumns: string[]
   generateSQLQuery: (activeFilters: Record<string, string>) => string
 }
 
-export function GenericChartWithQuery({
+export function SurveyChart({
   title,
   targetColumn,
   filterColumns,
   generateSQLQuery,
-}: GenericChartWithQueryProps) {
+}: SurveyChartProps) {
   const [isInView, setIsInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
   const [shouldAnimateBars, setShouldAnimateBars] = useState(false)
@@ -325,7 +323,7 @@ export function GenericChartWithQuery({
           {filters && activeFilters && setFilterValue && (
             <div className="flex flex-wrap gap-4">
               {Object.entries(filters).map(([filterKey, filterConfig]) => (
-                <FilterDropdown
+                <SurveyFilter
                   key={filterKey}
                   filterKey={filterKey}
                   filterConfig={filterConfig}
@@ -387,7 +385,7 @@ export function GenericChartWithQuery({
                     >
                       {/* Background pattern for the entire bar */}
                       <div
-                        className="absolute inset-0 pointer-events-none bg-foreground-muted"
+                        className="absolute inset-0 pointer-events-none bg-foreground-muted/50"
                         style={{
                           maskImage: 'url("/survey/pattern-back.svg")',
                           maskSize: '15px 15px',

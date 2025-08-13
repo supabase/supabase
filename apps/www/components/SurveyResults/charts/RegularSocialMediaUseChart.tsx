@@ -1,4 +1,4 @@
-import { GenericChartWithQuery } from './GenericChartWithQuery'
+import { SurveyChart } from '../SurveyChart'
 
 function generateRegularSocialMediaUseSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
@@ -43,7 +43,7 @@ ORDER BY total DESC;
 
 export function RegularSocialMediaUseChart() {
   return (
-    <GenericChartWithQuery
+    <SurveyChart
       title="Which social media platforms do you use at least 3× per week?"
       targetColumn="regular_social_media_use"
       filterColumns={['role', 'industry_normalized', 'person_age']}
