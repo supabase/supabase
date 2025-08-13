@@ -1,39 +1,36 @@
-import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronLeft, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { Loading } from 'components/ui/Loading'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { Button, Input } from 'ui'
+import Link from 'next/link'
+import { Button, Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import PublicationsTableItem from './PublicationsTableItem'
 
-interface PublicationsTablesProps {
-  selectedPublication: PostgresPublication
-  onSelectBack: () => void
-}
-
-export const PublicationsTables = ({
-  selectedPublication,
-  onSelectBack,
-}: PublicationsTablesProps) => {
+export const PublicationsTables = () => {
+  const { ref, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
   const { can: canUpdatePublications, isLoading: isLoadingPermissions } =
     useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'publications')
 
-  const { data: protectedSchemas } = useProtectedSchemas()
+  const { data: publications = [] } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const selectedPublication = publications.find((pub) => pub.id === Number(id))
 
   const {
-    data: tablesData,
+    data: tablesData = [],
     isLoading,
     isSuccess,
     isError,
@@ -42,26 +39,21 @@ export const PublicationsTables = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
   const tables = useMemo(() => {
-    return (tablesData || []).filter((table) =>
-      filterString.length === 0
-        ? !protectedSchemas.find((s) => s.name === table.schema)
-        : !protectedSchemas.find((s) => s.name === table.schema) &&
-          table.name.includes(filterString)
+    return tablesData.filter((table) =>
+      filterString.length === 0 ? table : table.name.includes(filterString)
     )
-  }, [tablesData, protectedSchemas, filterString])
+  }, [tablesData, filterString])
 
   return (
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Button
-              type="outline"
-              onClick={() => onSelectBack()}
-              icon={<ChevronLeft />}
-              style={{ padding: '5px' }}
-            />
+            <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
+              <Link href={`/project/${ref}/database/publications`} />
+            </Button>
             <div>
               <Input
                 size="small"
@@ -95,38 +87,32 @@ export const PublicationsTables = ({
           <NoSearchResults />
         ) : (
           <div>
-            <Table
-              head={[
-                <Table.th key="header-name">Name</Table.th>,
-                <Table.th key="header-schema">Schema</Table.th>,
-                <Table.th key="header-desc" className="hidden text-left lg:table-cell">
-                  Description
-                </Table.th>,
-                <Table.th key="header-all">
-                  {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
-              <div className="flex flex-row space-x-3 items-center justify-end">
-                <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
-                  All Tables
-                </div>
-                <Toggle
-                  size="tiny"
-                  align="right"
-                  error=""
-                  className="m-0 p-0 ml-2 mt-1 -mb-1"
-                  checked={enabledForAllTables}
-                  onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
-                />
-              </div> */}
-                </Table.th>,
-              ]}
-              body={tables.map((table) => (
-                <PublicationsTableItem
-                  key={table.id}
-                  table={table}
-                  selectedPublication={selectedPublication}
-                />
-              ))}
-            />
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Schema</TableHead>
+                    <TableHead>Description</TableHead>
+                    {/* 
+                      We've disabled All tables toggle for publications. 
+                      See https://github.com/supabase/supabase/pull/7233. 
+                    */}
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {!!selectedPublication &&
+                    tables.map((table) => (
+                      <PublicationsTableItem
+                        key={table.id}
+                        table={table}
+                        selectedPublication={selectedPublication}
+                      />
+                    ))}
+                </TableBody>
+              </Table>
+            </Card>
           </div>
         ))}
     </>
