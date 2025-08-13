@@ -45,7 +45,7 @@ export function RoleChart() {
     <SurveyChart
       title="What is your functional role at your startup?"
       targetColumn="person_role_normalized"
-      filterColumns={['person_age', 'money_raised', 'headquarters']}
+      filterColumns={['person_age', 'headquarters', 'money_raised']}
       generateSQLQuery={generateRoleSQL}
     />
   )
