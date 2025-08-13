@@ -7,8 +7,8 @@ const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
 // Debug logging for environment variables
-console.log('[cms-posts] PAYLOAD_URL:', PAYLOAD_URL)
-console.log('[cms-posts] PAYLOAD_API_KEY exists:', !!PAYLOAD_API_KEY)
+// console.log('[cms-posts] PAYLOAD_URL:', PAYLOAD_URL)
+// console.log('[cms-posts] PAYLOAD_API_KEY exists:', !!PAYLOAD_API_KEY)
 console.log('[cms-posts] Environment:', {
   NODE_ENV: process.env.NODE_ENV,
   CMS_SITE_ORIGIN,
@@ -164,15 +164,15 @@ export async function getAllCMSPostSlugs() {
       return []
     }
     const data = await response.json()
-    console.log(
-      '[getAllCMSPostSlugs] Found posts:',
-      data.docs.map((post: any) => ({
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        status: post._status,
-      }))
-    )
+    // console.log(
+    //   '[getAllCMSPostSlugs] Found posts:',
+    //   data.docs.map((post: any) => ({
+    //     id: post.id,
+    //     title: post.title,
+    //     slug: post.slug,
+    //     status: post._status,
+    //   }))
+    // )
 
     return data.docs
       .filter((post: CMSBlogPost) => post.slug) // Filter out posts with null/undefined slugs

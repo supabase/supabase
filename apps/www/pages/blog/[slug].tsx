@@ -178,7 +178,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
   params,
   draftMode = false,
 }) => {
-  console.log('[getStaticProps] Called with params:', params, 'draftMode:', draftMode)
+  // console.log('[getStaticProps] Called with params:', params, 'draftMode:', draftMode)
 
   if (!params?.slug) {
     console.error('[getStaticProps] Missing slug parameter:', params)
@@ -186,9 +186,9 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
   }
 
   const slug = `${params.slug}`
-  console.log(
-    `[getStaticProps] generating for slug: '${slug}', draft mode: ${draftMode ? 'true' : 'false'}`
-  )
+  // console.log(
+  //   `[getStaticProps] generating for slug: '${slug}', draft mode: ${draftMode ? 'true' : 'false'}`
+  // )
 
   // Try static post first
   try {
@@ -248,16 +248,16 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
     )
     // Try to fetch published version if draft mode failed
     if (draftMode) {
-      console.log('[getStaticProps] In draft mode but no draft found, trying published version...')
+      // console.log('[getStaticProps] In draft mode but no draft found, trying published version...')
       const publishedPost = await getCMSPostBySlug(slug, false)
-      console.log('[getStaticProps] Published post:', publishedPost)
+      // console.log('[getStaticProps] Published post:', publishedPost)
       if (!publishedPost) {
         console.log('[getStaticProps] No published version found either, returning 404')
         return { notFound: true }
       }
-      console.log('[getStaticProps] Found published version, using that for draft mode')
+      // console.log('[getStaticProps] Found published version, using that for draft mode')
       const mdxSource = await mdxSerialize(publishedPost.content || '')
-      console.log('[getStaticProps] MDX source:', mdxSource)
+      // console.log('[getStaticProps] MDX source:', mdxSource)
       return {
         props: {
           prevPost: null,
@@ -284,7 +284,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
   }
 
   // For CMS posts, process content
-  console.log('[getStaticProps] Processing CMS post data for render')
+  // console.log('[getStaticProps] Processing CMS post data for render')
   const mdxSource = await mdxSerialize(cmsPost.content || '')
 
   return {
@@ -314,7 +314,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   // Use the draft mode state passed from getStaticProps
   const isDraftMode = props.isDraftMode
 
-  console.log('isDraftMode', isDraftMode)
+  // console.log('isDraftMode', isDraftMode)
   const [previewData, setPreviewData] = useState<ProcessedBlogData>(props.blog)
 
   // Only use live preview hook for CMS posts in draft mode
@@ -326,16 +326,16 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     depth: 2,
   })
 
-  useEffect(() => {
-    console.log('livePreviewData', livePreviewData)
-  }, [livePreviewData])
+  // useEffect(() => {
+  //   console.log('livePreviewData', livePreviewData)
+  // }, [livePreviewData])
 
-  console.log('[BlogPostPage] LivePreview data from hook:', livePreviewData)
-  console.log('[BlogPostPage] Initial data:', props.blog)
-  console.log(
-    '[BlogPostPage] Server URL for live preview:',
-    CMS_SITE_ORIGIN || 'http://localhost:3030'
-  )
+  // console.log('[BlogPostPage] LivePreview data from hook:', livePreviewData)
+  // console.log('[BlogPostPage] Initial data:', props.blog)
+  // console.log(
+  //   '[BlogPostPage] Server URL for live preview:',
+  //   CMS_SITE_ORIGIN || 'http://localhost:3030'
+  // )
 
   // For LivePreview, we'll use the raw content directly with ReactMarkdown
   // instead of trying to use MDXRemote which requires specific serialization
@@ -350,7 +350,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       livePreviewData &&
       typeof livePreviewData === 'object'
     ) {
-      console.log('[BlogPostPage] Using livePreviewData for content')
+      // console.log('[BlogPostPage] Using livePreviewData for content')
 
       // If content is a string, use it directly
       if (typeof (livePreviewData as any).content === 'string') {
@@ -365,7 +365,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
     // Priority 2: Use data from postMessage updates
     if (isDraftMode && previewData !== props.blog) {
-      console.log('[BlogPostPage] Using previewData from postMessage for content')
+      // console.log('[BlogPostPage] Using previewData from postMessage for content')
 
       // If content is a string, use it directly
       if (typeof previewData.content === 'string') {
@@ -400,28 +400,28 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     return props.blog
   }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, props.blog])
 
-  const handlePreviewUpdate = (data: any) => {
-    console.log('[BlogPostPage] Received preview update:', data)
-    setPreviewData((prev) => {
-      const updatedData = {
-        ...prev,
-        ...data,
-      }
-      console.log('[BlogPostPage] Updated previewData:', updatedData)
-      return updatedData
-    })
+  // const handlePreviewUpdate = (data: any) => {
+  //   // console.log('[BlogPostPage] Received preview update:', data)
+  //   setPreviewData((prev) => {
+  //     const updatedData = {
+  //       ...prev,
+  //       ...data,
+  //     }
+  //     console.log('[BlogPostPage] Updated previewData:', updatedData)
+  //     return updatedData
+  //   })
 
-    // Force a router refresh to get the latest data
-    if (isDraftMode) {
-      console.log('[BlogPostPage] Refreshing router to get latest draft data')
-      router.replace(router.asPath, undefined, {
-        shallow: false,
-        scroll: false,
-      })
-    }
-  }
+  //   // Force a router refresh to get the latest data
+  //   if (isDraftMode) {
+  //     console.log('[BlogPostPage] Refreshing router to get latest draft data')
+  //     router.replace(router.asPath, undefined, {
+  //       shallow: false,
+  //       scroll: false,
+  //     })
+  //   }
+  // }
 
-  console.log('blogMetaData', blogMetaData)
+  // console.log('blogMetaData', blogMetaData)
   const content = blogMetaData.content
   const isCMS = blogMetaData.isCMS
   const isLaunchWeek7 = blogMetaData.launchweek === '7'
@@ -432,7 +432,6 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const isLaunchWeek14 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '14'
   const isLaunchWeek15 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '15'
 
-  console.log('livePreviewData', livePreviewData)
   // For CMS posts, the author info is already included
   // For static posts, we need to look up the author in authors.json
   const author = isCMS
