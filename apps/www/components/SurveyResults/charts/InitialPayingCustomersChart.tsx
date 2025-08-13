@@ -1,25 +1,7 @@
-import { SurveyChart } from '../SurveyChart'
+import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
 function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>) {
-  const whereClauses = []
-
-  // Always filter out NULL values
-  // whereClauses.push(`initial_paying_customers IS NOT NULL`)
-  // whereClauses.push(`initial_paying_customers != ''`)
-
-  if (activeFilters.person_age !== 'unset') {
-    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
-  }
-
-  if (activeFilters.headquarters !== 'unset') {
-    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
-  }
-
-  if (activeFilters.team_count !== 'unset') {
-    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
-  }
-
-  const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
+  const whereClause = buildWhereClause(activeFilters)
 
   return `SELECT 
   source,

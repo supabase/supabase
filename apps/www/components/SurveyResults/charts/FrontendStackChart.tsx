@@ -1,21 +1,7 @@
-import { SurveyChart } from '../SurveyChart'
+import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
 function generateFrontendStackSQL(activeFilters: Record<string, string>) {
-  const whereClauses = []
-
-  if (activeFilters.headquarters !== 'unset') {
-    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
-  }
-
-  if (activeFilters.industry_normalized !== 'unset') {
-    whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
-  }
-
-  if (activeFilters.person_age !== 'unset') {
-    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
-  }
-
-  const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
+  const whereClause = buildWhereClause(activeFilters)
 
   return `SELECT 
   unnest(frontend_stack) AS technology,
