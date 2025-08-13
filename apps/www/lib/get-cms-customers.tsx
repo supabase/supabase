@@ -173,14 +173,14 @@ export async function getAllCMSCustomerSlugs() {
  */
 export async function getCMSCustomerBySlug(slug: string, preview = false) {
   const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
-  console.log(
-    `[getCMSCustomerBySlug] Fetching customer '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
-  )
+  // console.log(
+  //   `[getCMSCustomerBySlug] Fetching customer '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
+  // )
 
   try {
     // When in preview mode, specify draft=true to get the latest draft content
     const url = `${PAYLOAD_URL}/api/customers?where[slug][equals]=${slug}&depth=2${preview ? '&draft=true' : ''}`
-    console.log(`[getCMSCustomerBySlug] API URL: ${url}`)
+    // console.log(`[getCMSCustomerBySlug] API URL: ${url}`)
 
     const response = await fetch(url, {
       headers: {
@@ -208,9 +208,9 @@ export async function getCMSCustomerBySlug(slug: string, preview = false) {
       return null
     }
     const data = await response.json()
-    console.log(
-      `[getCMSCustomerBySlug] API responded with ${data.docs?.length || 0} customers, draft mode: ${preview}`
-    )
+    // console.log(
+    //   `[getCMSCustomerBySlug] API responded with ${data.docs?.length || 0} customers, draft mode: ${preview}`
+    // )
 
     // In preview mode, we want to return the draft even if it's not published
     if (!data.docs.length && !preview) {
@@ -224,7 +224,7 @@ export async function getCMSCustomerBySlug(slug: string, preview = false) {
         `[getCMSCustomerBySlug] No draft found but in preview mode, trying published version`
       )
       const publishedUrl = `${PAYLOAD_URL}/api/customers?where[slug][equals]=${slug}&depth=2`
-      console.log(`[getCMSCustomerBySlug] Published API URL: ${publishedUrl}`)
+      // console.log(`[getCMSCustomerBySlug] Published API URL: ${publishedUrl}`)
 
       const publishedResponse = await fetch(publishedUrl, {
         headers: {
@@ -252,22 +252,22 @@ export async function getCMSCustomerBySlug(slug: string, preview = false) {
         return null
       }
       const publishedData = await publishedResponse.json()
-      console.log(
-        `[getCMSCustomerBySlug] Published API responded with ${publishedData.docs?.length || 0} customers`
-      )
+      // console.log(
+      //   `[getCMSCustomerBySlug] Published API responded with ${publishedData.docs?.length || 0} customers`
+      // )
 
       if (!publishedData.docs.length) {
         console.log(`[getCMSCustomerBySlug] No published version found either, returning null`)
         return null
       }
 
-      console.log(`[getCMSCustomerBySlug] Found published version, returning that instead of draft`)
+      // console.log(`[getCMSCustomerBySlug] Found published version, returning that instead of draft`)
       return processCustomerData(publishedData.docs[0])
     }
 
-    console.log(
-      `[getCMSCustomerBySlug] Found ${preview ? 'draft' : 'published'} customer, processing data`
-    )
+    // console.log(
+    //   `[getCMSCustomerBySlug] Found ${preview ? 'draft' : 'published'} customer, processing data`
+    // )
 
     // If we have a customer (either draft or published), process it
     const customer = data.docs[0]

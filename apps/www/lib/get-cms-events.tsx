@@ -162,14 +162,14 @@ export async function getAllCMSEventSlugs() {
  */
 export async function getCMSEventBySlug(slug: string, preview = false) {
   const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
-  console.log(
-    `[getCMSEventBySlug] Fetching event '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
-  )
+  // console.log(
+  //   `[getCMSEventBySlug] Fetching event '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
+  // )
 
   try {
     // When in preview mode, specify draft=true to get the latest draft content
     const url = `${PAYLOAD_URL}/api/events?where[slug][equals]=${slug}&depth=2${preview ? '&draft=true' : ''}`
-    console.log(`[getCMSEventBySlug] API URL: ${url}`)
+    // console.log(`[getCMSEventBySlug] API URL: ${url}`)
 
     const response = await fetch(url, {
       headers: {
@@ -197,9 +197,9 @@ export async function getCMSEventBySlug(slug: string, preview = false) {
       return null
     }
     const data = await response.json()
-    console.log(
-      `[getCMSEventBySlug] API responded with ${data.docs?.length || 0} events, draft mode: ${preview}`
-    )
+    // console.log(
+    //   `[getCMSEventBySlug] API responded with ${data.docs?.length || 0} events, draft mode: ${preview}`
+    // )
 
     // In preview mode, we want to return the draft even if it's not published
     if (!data.docs.length && !preview) {
@@ -209,11 +209,11 @@ export async function getCMSEventBySlug(slug: string, preview = false) {
 
     // If we're in preview mode and there's no draft, try to get the published version
     if (!data.docs.length && preview) {
-      console.log(
-        `[getCMSEventBySlug] No draft found but in preview mode, trying published version`
-      )
+      // console.log(
+      //   `[getCMSEventBySlug] No draft found but in preview mode, trying published version`
+      // )
       const publishedUrl = `${PAYLOAD_URL}/api/events?where[slug][equals]=${slug}&depth=2`
-      console.log(`[getCMSEventBySlug] Published API URL: ${publishedUrl}`)
+      // console.log(`[getCMSEventBySlug] Published API URL: ${publishedUrl}`)
 
       const publishedResponse = await fetch(publishedUrl, {
         headers: {
@@ -241,30 +241,30 @@ export async function getCMSEventBySlug(slug: string, preview = false) {
         return null
       }
       const publishedData = await publishedResponse.json()
-      console.log(
-        `[getCMSEventBySlug] Published API responded with ${publishedData.docs?.length || 0} events`
-      )
+      // console.log(
+      //   `[getCMSEventBySlug] Published API responded with ${publishedData.docs?.length || 0} events`
+      // )
 
       if (!publishedData.docs.length) {
         console.log(`[getCMSEventBySlug] No published version found either, returning null`)
         return null
       }
 
-      console.log(`[getCMSEventBySlug] Found published version, returning that instead of draft`)
+      // console.log(`[getCMSEventBySlug] Found published version, returning that instead of draft`)
       return processEventData(publishedData.docs[0])
     }
 
-    console.log(
-      `[getCMSEventBySlug] Found ${preview ? 'draft' : 'published'} event, processing data`
-    )
+    // console.log(
+    //   `[getCMSEventBySlug] Found ${preview ? 'draft' : 'published'} event, processing data`
+    // )
 
     // If we have a event (either draft or published), process it
     const event = data.docs[0]
 
     // Let's log some key data to ensure it's what we expect
-    console.log(`[getCMSEventBySlug] event title: ${event.title}`)
-    console.log(`[getCMSEventBySlug] event status: ${event._status || 'published'}`)
-    console.log(`[getCMSEventBySlug] event content type:`, typeof event.content)
+    // console.log(`[getCMSEventBySlug] event title: ${event.title}`)
+    // console.log(`[getCMSEventBySlug] event status: ${event._status || 'published'}`)
+    // console.log(`[getCMSEventBySlug] event content type:`, typeof event.content)
 
     return processEventData(event)
   } catch (error) {
