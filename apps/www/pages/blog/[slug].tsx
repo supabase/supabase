@@ -1,13 +1,11 @@
 import dayjs from 'dayjs'
-import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import { useLivePreview } from '@payloadcms/live-preview-react'
 import { Badge } from 'ui'
@@ -15,24 +13,32 @@ import { Badge } from 'ui'
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from 'lib/helpers'
 import mdxComponents from 'lib/mdx/mdxComponents'
-import { mdxSerialize } from 'lib/mdx/mdxSerialize'
+// mdxSerialize is imported lazily in getStaticProps to avoid client bundle impact
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { CMS_SITE_ORIGIN } from 'lib/constants'
 
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
+import type { ComponentType } from 'react'
 
-const ShareArticleActions = dynamic(() => import(  'components/Blog/ShareArticleActions'))
-const CTABanner = dynamic(() => import( 'components/CTABanner'))
-const LW11Summary = dynamic(() => import( 'components/LaunchWeek/11/LW11Summary'))
-const LW12Summary = dynamic(() => import( 'components/LaunchWeek/12/LWSummary'))
-const LW13Summary = dynamic(() => import( 'components/LaunchWeek/13/Releases/LWSummary'))
-const LW14Summary = dynamic(() => import( 'components/LaunchWeek/14/Releases/LWSummary'))
-const LW15Summary = dynamic(() => import( 'components/LaunchWeek/15/LWSummary'))
-const BlogLinks = dynamic(() => import( 'components/LaunchWeek/7/BlogLinks'))
-const LWXSummary = dynamic(() => import( 'components/LaunchWeek/X/LWXSummary'))
-const DefaultLayout = dynamic(() => import( 'components/Layouts/Default'))
-const DraftModeBanner = dynamic(() => import( 'components/Blog/DraftModeBanner'))
+const ShareArticleActions = dynamic(() => import('components/Blog/ShareArticleActions'))
+const CTABanner = dynamic(() => import('components/CTABanner'))
+const LW11Summary = dynamic(() => import('components/LaunchWeek/11/LW11Summary'))
+const LW12Summary = dynamic(() => import('components/LaunchWeek/12/LWSummary'))
+const LW13Summary = dynamic(() => import('components/LaunchWeek/13/Releases/LWSummary'))
+const LW14Summary = dynamic(() => import('components/LaunchWeek/14/Releases/LWSummary'))
+const LW15Summary = dynamic(() => import('components/LaunchWeek/15/LWSummary'))
+const BlogLinks = dynamic(() => import('components/LaunchWeek/7/BlogLinks'))
+const LWXSummary = dynamic(() => import('components/LaunchWeek/X/LWXSummary'))
+const DefaultLayout = dynamic(() => import('components/Layouts/Default'))
+const DraftModeBanner = dynamic(() => import('components/Blog/DraftModeBanner'))
+const ReactMarkdown = dynamic<{ children: string }>(
+  () =>
+    import('react-markdown').then(
+      (m) => m.default as unknown as ComponentType<{ children: string }>
+    ),
+  { ssr: false }
+)
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -56,8 +62,8 @@ type BlogData = {
   slug: string
   title: string
   description?: string
-  content: any
-  toc: any
+  content: MDXRemoteSerializeResult
+  toc: string | { content: string }
   author?: string
   authors?: (CMSAuthor | StaticAuthor)[]
   date: string
@@ -96,8 +102,8 @@ type Blog = {
   slug: string
   title: string
   description?: string
-  content: any
-  toc: any
+  content: MDXRemoteSerializeResult
+  toc: string | { content: string }
   author?: string
   authors?: (CMSAuthor | StaticAuthor)[]
   date: string
@@ -139,9 +145,6 @@ type Params = {
   slug: string
 }
 
-// table of contents extractor
-const toc = require('markdown-toc')
-
 type Tag =
   | string
   | {
@@ -152,9 +155,7 @@ type Tag =
       updatedAt: string
       publishedAt: string
     }
-type Category = string | { name: string }
 
-// Add a new type for processed blog data
 type ProcessedBlogData = BlogData &
   Blog & {
     needsSerialization?: boolean
@@ -192,6 +193,11 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
   //   `[getStaticProps] generating for slug: '${slug}', draft mode: ${draftMode ? 'true' : 'false'}`
   // )
 
+  // Server-only imports to keep client bundle lean
+  const matter = (await import('gray-matter')).default
+  const { mdxSerialize } = await import('lib/mdx/mdxSerialize')
+  const markdownToc = require('markdown-toc')
+
   // Try static post first
   try {
     const postContent = await getPostdata(slug, '_blog')
@@ -202,18 +208,22 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 
     // Get all posts for navigation and related posts
     const allStaticPosts = getSortedPosts({ directory: '_blog' })
-    const allPosts = [...allStaticPosts].sort(
-      (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    )
+    const allPosts = [...allStaticPosts].sort((a, b) => {
+      const aDate = new Date((a as unknown as { date: string }).date).getTime()
+      const bDate = new Date((b as unknown as { date: string }).date).getTime()
+      return bDate - aDate
+    })
     const currentIndex = allPosts.findIndex((post) => post.slug === slug)
     const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
     const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
-    const tocResult = toc(content, { maxdepth: blogPost.toc_depth ? blogPost.toc_depth : 2 })
+    const tocResult = markdownToc(content, {
+      maxdepth: blogPost.toc_depth ? blogPost.toc_depth : 2,
+    })
     const processedContent = tocResult.content.replace(/%23/g, '')
     const relatedPosts = getSortedPosts({
       directory: '_blog',
       limit: 3,
-      tags: mdxSource.scope.tags,
+      tags: (mdxSource as { scope: { tags?: string[] } }).scope.tags,
       currentPostSlug: slug,
     }) as unknown as (BlogData & Post)[]
 
@@ -235,7 +245,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
       // Don't use revalidate in draft mode
       // ...(draftMode ? {} : { revalidate: 60 * 10 }),
     }
-  } catch (error) {
+  } catch {
     console.log('[getStaticProps] Static post not found, trying CMS post...')
     // Not a static post, try CMS
   }
@@ -311,13 +321,11 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 }
 
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
-  const router = useRouter()
   // Use the draft mode state passed from getStaticProps
   const isDraftMode = props.isDraftMode
 
   // console.log('isDraftMode', isDraftMode)
-  const [previewData, setPreviewData] = useState<ProcessedBlogData>(props.blog)
-  const [cmsPosts, setCmsPosts] = useState<any[]>([])
+  const [previewData] = useState<ProcessedBlogData>(props.blog)
 
   // Only use live preview hook for CMS posts in draft mode
   const shouldUseLivePreview = isDraftMode && props.blog.isCMS
@@ -355,13 +363,16 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       // console.log('[BlogPostPage] Using livePreviewData for content')
 
       // If content is a string, use it directly
-      if (typeof (livePreviewData as any).content === 'string') {
-        return (livePreviewData as any).content
+      if (typeof (livePreviewData as unknown as { content?: unknown }).content === 'string') {
+        return (livePreviewData as unknown as { content?: string }).content as string
       }
 
       // If content is from source property
-      if ((livePreviewData as any).source && typeof (livePreviewData as any).source === 'string') {
-        return (livePreviewData as any).source
+      if (
+        (livePreviewData as unknown as { source?: unknown }).source &&
+        typeof (livePreviewData as unknown as { source?: unknown }).source === 'string'
+      ) {
+        return (livePreviewData as unknown as { source?: string }).source as string
       }
     }
 
@@ -370,13 +381,16 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       // console.log('[BlogPostPage] Using previewData from postMessage for content')
 
       // If content is a string, use it directly
-      if (typeof previewData.content === 'string') {
-        return previewData.content
+      if (typeof (previewData as unknown as { content?: unknown }).content === 'string') {
+        return (previewData as unknown as { content?: string }).content as string
       }
 
       // If content is from source property
-      if (previewData.source && typeof previewData.source === 'string') {
-        return previewData.source
+      if (
+        (previewData as unknown as { source?: unknown }).source &&
+        typeof (previewData as unknown as { source?: unknown }).source === 'string'
+      ) {
+        return (previewData as unknown as { source?: string }).source as string
       }
     }
 
@@ -402,21 +416,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     return props.blog
   }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, props.blog])
 
-  // Fetch CMS posts client-side to enrich prev/next suggestions
-  useEffect(() => {
-    const loadCmsPosts = async () => {
-      try {
-        const res = await fetch('/api-v2/cms-posts')
-        const data = await res.json()
-        if (data.success && Array.isArray(data.posts)) {
-          setCmsPosts(data.posts)
-        }
-      } catch (e) {
-        console.error('Failed to load CMS posts', e)
-      }
-    }
-    loadCmsPosts()
-  }, [])
+  // Removed unused client-side CMS posts fetch to reduce bundle size
 
   // const handlePreviewUpdate = (data: any) => {
   //   // console.log('[BlogPostPage] Received preview update:', data)
@@ -440,7 +440,6 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   // }
 
   // console.log('blogMetaData', blogMetaData)
-  const content = blogMetaData.content
   const isCMS = blogMetaData.isCMS
   const isLaunchWeek7 = blogMetaData.launchweek === '7'
   const isLaunchWeekX = blogMetaData.launchweek?.toString().toLocaleLowerCase() === 'x'
@@ -471,20 +470,29 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const authorUrls = author.map((author) => author?.author_url).filter(isNotNullOrUndefined)
 
-  const NextCard = (props: any) => {
+  type NextCardProps = {
+    post: { path: string; title: string; formattedDate: string }
+    label: string
+    className?: string
+  }
+  const NextCard = (props: NextCardProps) => {
     const { post, label, className } = props
 
     return (
       <Link href={`${post.path}`} as={`${post.path}`}>
-        <div className={className}>
+        <div className={className ?? ''}>
           <div className="hover:bg-control cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
                 <p className="text-foreground-lighter text-sm">{label}</p>
               </div>
               <div>
-                <h4 className="text-foreground text-lg">{post.title}</h4>
-                <p className="small">{post.formattedDate}</p>
+                {'title' in post && (
+                  <h4 className="text-foreground text-lg">{(post as { title?: string }).title}</h4>
+                )}
+                {'formattedDate' in post && (
+                  <p className="small">{(post as { formattedDate?: string }).formattedDate}</p>
+                )}
               </div>
             </div>
           </div>
@@ -514,7 +522,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           <div className="prose-toc">
             {blogMetaData.toc && (
               <ReactMarkdown>
-                {typeof blogMetaData.toc === 'string' ? blogMetaData.toc : blogMetaData.toc.content}
+                {typeof blogMetaData.toc === 'string'
+                  ? (blogMetaData.toc as string)
+                  : (blogMetaData.toc as { content: string }).content}
               </ReactMarkdown>
             )}
           </div>
@@ -523,7 +533,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     </div>
   )
 
-  const imageUrl = isCMS ? blogMetaData.thumb! : `/images/blog/${blogMetaData.thumb}`
+  const imageUrl = isCMS
+    ? blogMetaData.thumb ?? ''
+    : blogMetaData.thumb
+      ? `/images/blog/${blogMetaData.thumb}`
+      : ''
 
   const meta = {
     title: blogMetaData.meta_title ?? blogMetaData.title,
@@ -535,9 +549,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     return typeof tag === 'string' ? tag : tag.name
   }
 
-  const processCategory = (category: Category): string => {
-    return typeof category === 'string' ? category : category.name
-  }
+  // const processCategory = (category: Category): string => {
+  //   return typeof category === 'string' ? category : category.name
+  // }
 
   const tags = blogMetaData.tags
     ? Array.isArray(blogMetaData.tags)
@@ -545,11 +559,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       : []
     : []
 
-  const categories = blogMetaData.categories
-    ? Array.isArray(blogMetaData.categories)
-      ? (blogMetaData.categories as Category[]).map(processCategory)
-      : []
-    : []
+  // categories not used on this page; removed to keep bundle lean
 
   const generateReadingTime = (text: string | undefined): string => {
     if (!text) return '0 min read'
@@ -717,7 +727,10 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                       {isLivePreview ? (
                         <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
                       ) : (
-                        <MDXRemote {...props.blog.content} components={mdxComponents('blog')} />
+                        <MDXRemote
+                          {...(props.blog.content as MDXRemoteSerializeResult)}
+                          components={mdxComponents('blog')}
+                        />
                       )}
                     </div>
                   </article>
@@ -734,11 +747,32 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </div>
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
                     <div>
-                      {props.prevPost && <NextCard post={props.prevPost} label="Last post" />}
+                      {props.prevPost && (
+                        <NextCard
+                          post={
+                            props.prevPost as unknown as {
+                              path: string
+                              title: string
+                              formattedDate: string
+                            }
+                          }
+                          label="Last post"
+                        />
+                      )}
                     </div>
                     <div>
                       {props.nextPost && (
-                        <NextCard post={props.nextPost} label="Next post" className="text-right" />
+                        <NextCard
+                          post={
+                            props.nextPost as unknown as {
+                              path: string
+                              title: string
+                              formattedDate: string
+                            }
+                          }
+                          label="Next post"
+                          className="text-right"
+                        />
                       )}
                     </div>
                   </div>
