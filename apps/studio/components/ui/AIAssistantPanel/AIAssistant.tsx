@@ -727,7 +727,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
               )}
               loading={isChatLoading}
-              disabled={!isApiKeySet || disablePrompts || isChatLoading}
+              disabled={!isApiKeySet || disablePrompts || (isChatLoading && !editingMessageId)}
               placeholder={
                 hasMessages
                   ? 'Ask a follow up question...'
