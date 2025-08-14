@@ -6,16 +6,14 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
@@ -33,7 +31,10 @@ const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
   const [revealSecret, setRevealSecret] = useState(false)
   const name = secret?.name ?? 'No name provided'
 
-  const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const { data: revealedValue, isFetching } = useVaultSecretDecryptedValueQuery(
     {
@@ -102,41 +103,34 @@ const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
             <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-32">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem
-                  className="space-x-2"
-                  disabled={!canManageSecrets}
-                  onClick={() => setModal(`edit`)}
-                >
-                  <Edit3 size="14" />
-                  <p>Edit</p>
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canManageSecrets && (
-                <TooltipContent side="bottom">
-                  You need additional permissions to edit secrets
-                </TooltipContent>
-              )}
-            </Tooltip>
+            <DropdownMenuItemTooltip
+              className="gap-x-2"
+              disabled={!canManageSecrets}
+              onClick={() => setModal(`edit`)}
+              tooltip={{
+                content: { side: 'left', text: 'You need additional permissions to edit secrets' },
+              }}
+            >
+              <Edit3 size={12} />
+              <p>Edit</p>
+            </DropdownMenuItemTooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem
-                  className="space-x-2"
-                  disabled={!canManageSecrets}
-                  onClick={() => onSelectRemove(secret)}
-                >
-                  <Trash stroke="red" size="14" />
-                  <p className="text-foreground-light">Delete</p>
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canManageSecrets && (
-                <TooltipContent side="bottom">
-                  You need additional permissions to delete secrets
-                </TooltipContent>
-              )}
-            </Tooltip>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItemTooltip
+              className="gap-x-2"
+              disabled={!canManageSecrets}
+              onClick={() => onSelectRemove(secret)}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: 'You need additional permissions to delete secrets',
+                },
+              }}
+            >
+              <Trash size={12} />
+              <p className="text-foreground-light">Delete</p>
+            </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
 

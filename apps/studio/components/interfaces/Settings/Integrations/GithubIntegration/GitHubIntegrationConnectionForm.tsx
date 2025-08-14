@@ -16,7 +16,7 @@ import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-conn
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { GitHubConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
@@ -72,17 +72,16 @@ const GitHubIntegrationConnectionForm = ({
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
   const isParentProject = !Boolean(selectedProject?.parent_project_ref)
 
-  const canUpdateGitHubConnection = useCheckPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
-  const canCreateGitHubConnection = useCheckPermissions(
+  const { can: canCreateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
     any[]

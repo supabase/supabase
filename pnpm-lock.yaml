@@ -624,6 +624,9 @@ importers:
       '@types/unist':
         specifier: ^2.0.6
         version: 2.0.8
+      '@types/uuid':
+        specifier: ^10.0.0
+        version: 10.0.0
       api-types:
         specifier: workspace:*
         version: link:../../packages/api-types
@@ -10921,7 +10924,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.31.0:
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}
