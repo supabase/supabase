@@ -1,4 +1,6 @@
 import type { getSortedPosts } from 'lib/posts'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+
 export default interface PostTypes {
   type: 'casestudy' | 'blog' | 'event'
   slug?: string
@@ -72,11 +74,84 @@ export type StaticAuthor = {
 
 export type CMSAuthor = {
   author: string
-  author_image_url: {
-    url: string
-  }
+  author_image_url:
+    | {
+        url: string
+      }
+    | string
+    | null
   author_url: string
   position: string
+}
+
+export type Blog = {
+  slug: string
+  title: string
+  description?: string
+  content: MDXRemoteSerializeResult
+  toc: string | { content: string }
+  author?: string
+  authors?: (CMSAuthor | StaticAuthor)[]
+  date: string
+  categories?: string[]
+  tags?:
+    | string[]
+    | Array<{
+        id: number
+        documentId: string
+        name: string
+        createdAt: string
+        updatedAt: string
+        publishedAt: string
+      }>
+  toc_depth?: number
+  video?: string
+  docs_url?: string
+  blog_url?: string
+  url?: string
+  source: string
+  image?: string
+  thumb?: string
+  youtubeHero?: string
+  launchweek?: number | string
+  meta_title?: string
+  meta_description?: string
+  isCMS?: boolean
+}
+
+export type BlogData = {
+  slug: string
+  title: string
+  description?: string
+  content: MDXRemoteSerializeResult
+  toc: string | { content: string }
+  author?: string
+  authors?: (CMSAuthor | StaticAuthor)[]
+  date: string
+  categories?: string[]
+  tags?:
+    | string[]
+    | Array<{
+        id: number
+        documentId: string
+        name: string
+        createdAt: string
+        updatedAt: string
+        publishedAt: string
+      }>
+  toc_depth?: number
+  docs_url?: string
+  blog_url?: string
+  url?: string
+  source: string
+  image?: string
+  thumb?: string
+  youtubeHero?: string
+  launchweek?: number | string
+  meta_title?: string
+  meta_description?: string
+  video?: string
+  isCMS?: boolean
 }
 
 export type Tag =
@@ -93,7 +168,12 @@ export type Tag =
 export type Category = string | { name: string }
 
 // Add a new type for processed blog data
-export type ProcessedBlogData = EventData & {
+export type ProcessedBlogData = Blog &
+  BlogData & {
+    needsSerialization?: boolean
+  }
+
+export type ProcessedEventData = EventData & {
   needsSerialization?: boolean
 }
 
