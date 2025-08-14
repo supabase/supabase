@@ -88,10 +88,6 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     return typeof tag === 'string' ? tag : tag.name
   }
 
-  // const processCategory = (category: Category): string => {
-  //   return typeof category === 'string' ? category : category.name
-  // }
-
   const tags = blogMetaData.tags
     ? Array.isArray(blogMetaData.tags)
       ? (blogMetaData.tags as Tag[]).map(processTag)

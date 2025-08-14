@@ -1,26 +1,17 @@
 import dayjs from 'dayjs'
 import { MDXRemote } from 'next-mdx-remote'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
 import { ChevronLeft } from 'lucide-react'
-import { useLivePreview } from '@payloadcms/live-preview-react'
 import { Badge } from 'ui'
 
-import { isNotNullOrUndefined } from 'lib/helpers'
 import mdxComponents from 'lib/mdx/mdxComponents'
-// mdxSerialize is imported lazily in getStaticProps to avoid client bundle impact
-import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
-import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
-import { CMS_SITE_ORIGIN } from 'lib/constants'
 
-import type { GetStaticProps, InferGetStaticPropsType } from 'next'
+import type { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import type { ComponentType } from 'react'
-import { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from '../../types/post'
-import Author from '../../types/author'
 
 const ShareArticleActions = dynamic(() => import('components/Blog/ShareArticleActions'))
 const CTABanner = dynamic(() => import('components/CTABanner'))
@@ -189,22 +180,6 @@ const BlogPostRenderer = ({
     : blogMetaData.thumb
       ? `/images/blog/${blogMetaData.thumb}`
       : ''
-
-  const processTag = (tag: Tag): string => {
-    return typeof tag === 'string' ? tag : tag.name
-  }
-
-  // const processCategory = (category: Category): string => {
-  //   return typeof category === 'string' ? category : category.name
-  // }
-
-  const tags = blogMetaData.tags
-    ? Array.isArray(blogMetaData.tags)
-      ? (blogMetaData.tags as Tag[]).map(processTag)
-      : []
-    : []
-
-  // categories not used on this page; removed to keep bundle lean
 
   const generateReadingTime = (text: string | undefined): string => {
     if (!text) return '0 min read'
