@@ -1664,7 +1664,7 @@ functions:
       - name: phone
         isOptional: true
         type: String
-        description: Phone number to enroll for Phone factor type.
+        description: Phone number to enroll for phone factor type.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
