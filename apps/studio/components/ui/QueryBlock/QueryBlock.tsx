@@ -71,6 +71,10 @@ interface QueryBlockProps {
   onRunQuery?: (queryType: 'select' | 'mutation') => void
   /** Optional callback on drag start */
   onDragStart?: (e: DragEvent<Element>) => void
+  /** dnd-kit sortable attributes to attach to the header drag handle */
+  dragAttributes?: Record<string, any>
+  /** dnd-kit sortable listeners to attach to the header drag handle */
+  dragListeners?: Record<string, any>
   /** Optional: callback when the results are returned from running the SQL query*/
   onResults?: (results: any[]) => void
 
@@ -120,6 +124,8 @@ export const QueryBlock = ({
   onSetParameter,
   onUpdateChartConfig,
   onDragStart,
+  dragAttributes,
+  dragListeners,
   onResults,
 }: QueryBlockProps) => {
   const { ref } = useParams()
@@ -241,6 +247,8 @@ export const QueryBlock = ({
       tooltip={tooltip}
       loading={isExecuting}
       onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
+      dragAttributes={dragAttributes}
+      dragListeners={dragListeners}
       icon={
         <SQL_ICON
           size={18}
