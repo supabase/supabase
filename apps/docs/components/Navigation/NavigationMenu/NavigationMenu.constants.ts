@@ -291,6 +291,7 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/redwoodjs',
         },
         { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
+        { name: 'Angular', url: '/guides/getting-started/quickstarts/angular' },
       ],
     },
     {
