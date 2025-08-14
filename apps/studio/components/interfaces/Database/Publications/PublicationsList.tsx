@@ -166,7 +166,7 @@ export const PublicationsList = () => {
                             {x.tables === null
                               ? 'All tables'
                               : `${x.tables.length} ${
-                                  x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
+                                  x.tables.length === 1 ? 'table' : 'tables'
                                 }`}
                           </Link>
                         </Button>
