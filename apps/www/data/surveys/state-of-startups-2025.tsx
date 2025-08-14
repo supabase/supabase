@@ -6,7 +6,7 @@ const stateOfStartupsData = {
   heroSection: {
     title: 'State of Startups 2025',
     subheader:
-      'We surveyed over 1,800 startup founders and builders to uncover what’s powering modern startups: their stacks, their go-to-market motion, and their approach to AI.',
+      'We surveyed over 2,000 startup founders and builders to uncover what’s powering modern startups: their stacks, their go-to-market motion, and their approach to AI.',
     cta: 'This report is built for builders.',
   },
   pageChapters: [
@@ -254,13 +254,11 @@ const stateOfStartupsData = {
           stats: [
             {
               percent: 74,
-
               label: 'Startups using AI in their product',
             },
             { percent: 50, label: 'Startups building agents within their product' },
             {
               percent: 34,
-
               label: 'Startups adding natural language interfaces to their product',
             },
           ],
@@ -315,7 +313,6 @@ const stateOfStartupsData = {
             { percent: 36, label: 'Respondents that have built a developer community' },
             {
               percent: 20,
-
               label: 'Respondents that pay for at least one industry newsletter',
             },
           ],
@@ -355,7 +352,6 @@ const stateOfStartupsData = {
           stats: [
             {
               percent: 57,
-
               label: 'Startups that find their initial customers through word of mouth',
             },
             { percent: 47, label: 'Startups that engage users through social media' },
@@ -373,12 +369,10 @@ const stateOfStartupsData = {
           stats: [
             {
               percent: 75,
-
               label: 'Startups with their founders still directly responsible for sales',
             },
             {
               percent: 18,
-
               label: 'Startups that got their initial customers from personal networks',
             },
             { percent: 13, label: 'Startups that have a dedicated sales team' },
@@ -403,17 +397,14 @@ const stateOfStartupsData = {
           stats: [
             {
               percent: 81,
-
               label: 'Respondents that evaluate potential tools via hands-on experience',
             },
             {
               percent: 29,
-
               label: 'Respondents that saved the most time via AI coding assistance',
             },
             {
               percent: 14,
-
               label: 'Respondents that saved the most time via BaaS platforms like Supabase',
             },
           ],

@@ -18,7 +18,7 @@ function StateOfStartupsPage() {
   const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
   const meta_description =
     pageData.metaDescription ||
-    'We surveyed over 1,800 startup founders and builders to uncover what’s powering modern startups: their stacks, their go-to-market motion, and their approach to AI.'
+    'We surveyed over 2,000 startup founders and builders to uncover what’s powering modern startups: their stacks, their go-to-market motion, and their approach to AI.'
 
   const [showFloatingToc, setShowFloatingToc] = useState(false)
   const [isTocOpen, setIsTocOpen] = useState(false)

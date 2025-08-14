@@ -404,7 +404,7 @@ export function SurveyChart({
                 </div>
               ) : (
                 <div className="flex-1 pt-8 flex flex-col items-center justify-center gap-4">
-                  <p className="text-balance text-center">
+                  <p className="text-foreground-lighter text-balance text-center">
                     No responses match those filters. Maybe next year?
                   </p>
                   <Button
