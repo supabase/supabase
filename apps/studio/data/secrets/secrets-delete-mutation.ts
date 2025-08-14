@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { secretsKeys } from './keys'
+import { edgeFunctionsKeys } from '../edge-functions/keys'
 
 export type SecretsDeleteVariables = {
   projectRef?: string
@@ -38,7 +39,14 @@ export const useSecretsDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
+        
+        // Invalidate secrets cache
         await queryClient.invalidateQueries(secretsKeys.list(projectRef))
+        
+        // Trigger Edge Functions redeployment to pick up updated environment variables
+        // This ensures Edge Functions get the updated secrets (removed secrets)
+        await queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef))
+        
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
