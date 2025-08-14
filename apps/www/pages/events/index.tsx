@@ -4,7 +4,6 @@ import { NextSeo } from 'next-seo'
 
 import { getSortedPosts } from 'lib/posts'
 import supabase from 'lib/supabase'
-// CMS events are fetched client-side via /api-v2/cms-events to keep server bundle small
 
 import { cn } from 'ui'
 import DefaultLayout from 'components/Layouts/Default'
