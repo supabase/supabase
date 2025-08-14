@@ -10,7 +10,6 @@ import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { viewKeys } from 'data/views/keys'
 import { materializedViewKeys } from 'data/materialized-views/keys'
 
-// Entity types that require entity list invalidation
 const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = [
   'table',
   'view',
@@ -211,7 +210,6 @@ async function executeInvalidation(
   queryClient: QueryClient,
   event: InvalidationEvent
 ): Promise<void> {
-  // Execute invalidation strategy
   await executeInvalidationStrategy(queryClient, event)
 
   // Invalidate entity types list for certain entity types
@@ -219,9 +217,6 @@ async function executeInvalidation(
   await invalidateEntityTypesList(queryClient, projectRef, entityType)
 }
 
-/**
- * Handle invalidation event and update appropriate caches
- */
 export function handleInvalidation(queryClient: QueryClient, event: InvalidationEvent) {
   // Execute invalidation asynchronously without blocking the caller
   executeInvalidation(queryClient, event).catch((error) => {

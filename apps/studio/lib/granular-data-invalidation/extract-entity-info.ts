@@ -77,7 +77,7 @@ function extractIndexInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | 
   // For DROP INDEX: match[1] is schema (optional), match[2] is index name
   // For CREATE INDEX: match[2] is index name, match[3] is schema (optional), match[4] is table
   const isDropIndex = !match[3] && !match[4]
-  
+
   if (isDropIndex) {
     return {
       entityType: 'index',
