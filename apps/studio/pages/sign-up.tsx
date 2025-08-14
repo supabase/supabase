@@ -1,4 +1,5 @@
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
+import SignInWithGoogle from 'components/interfaces/SignIn/SignInWithGoogle'
 import SignUpForm from 'components/interfaces/SignIn/SignUpForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import Link from 'next/link'
@@ -9,7 +10,7 @@ const SignUpPage: NextPageWithLayout = () => {
     <>
       <div className="flex flex-col gap-5">
         <SignInWithGitHub />
-
+        <SignInWithGoogle />
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-strong" />
