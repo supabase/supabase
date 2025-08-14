@@ -238,17 +238,30 @@ const ProjectUsage = () => {
     (storageEnabled ? storageErr || 0 : 0)
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
 
+  // Mock comparison vs previous period (seeded for determinism)
+  const trDeltaSeed = seededRatio(`tr-${projectRef}-${interval}`)
+  const erDeltaSeed = seededRatio(`er-${projectRef}-${interval}`)
+  // Relative deltas: total requests -50%..+50%, error rate -30%..+30%
+  const totalRequestsChangePct = (trDeltaSeed - 0.5) * 100
+  const errorRateChangePct = (erDeltaSeed - 0.5) * 60
+  const formatDelta = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`
+  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand' : 'text-destructive'
+  const errorDeltaClass = errorRateChangePct <= 0 ? 'text-brand' : 'text-destructive'
+
   return (
     <div className="space-y-6">
       <div className="flex flex-row justify-between items-center gap-x-2">
         <div className="flex items-center gap-6">
-          <div className="flex items-baseline gap-2">
-            <span className="text-foreground text-xl">{totalRequests.toLocaleString()}</span>
-            <h3 className="heading-section">Total Requests</h3>
+          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+            <span className="text-foreground">{totalRequests.toLocaleString()}</span>
+            <span>Total Requests</span>
+            <span className={`${totalDeltaClass}`}>{formatDelta(totalRequestsChangePct)}</span>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-foreground text-xl">{errorRate.toFixed(1)}%</span>
-            <h3 className="heading-section">Error Rate</h3>
+          <span className="text-foreground-muted">/</span>
+          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+            <span className="text-foreground">{errorRate.toFixed(1)}%</span>
+            <span>Error Rate</span>
+            <span className={`${errorDeltaClass}`}>{formatDelta(errorRateChangePct)}</span>
           </div>
         </div>
         <DropdownMenu>
