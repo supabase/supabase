@@ -1,3 +1,6 @@
+import * as Sentry from '@sentry/nextjs'
+import { useEffect } from 'react'
+
 import { InlineLink } from 'components/ui/InlineLink'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -12,6 +15,12 @@ export const SessionTimeoutModal = ({
   onClose,
   redirectToSignIn,
 }: SessionTimeoutModalProps) => {
+  useEffect(() => {
+    if (visible) {
+      Sentry.captureException(new Error('Session error detected'))
+    }
+  }, [visible])
+
   return (
     <ConfirmationModal
       visible={visible}
