@@ -1,18 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronLeft, Search } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Loading } from 'components/ui/Loading'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import Link from 'next/link'
-import { Button, Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import PublicationsTableItem from './PublicationsTableItem'
 
 export const PublicationsTables = () => {
@@ -51,16 +53,23 @@ export const PublicationsTables = () => {
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
+            <ButtonTooltip
+              asChild
+              type="outline"
+              icon={<ChevronLeft />}
+              style={{ padding: '5px' }}
+              tooltip={{ content: { side: 'bottom', text: 'Go back to publications list' } }}
+            >
               <Link href={`/project/${ref}/database/publications`} />
-            </Button>
+            </ButtonTooltip>
             <div>
               <Input
-                size="small"
-                placeholder={'Filter'}
+                size="tiny"
+                placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size="14" />}
+                icon={<Search size={12} />}
+                className="w-48 pl-8"
               />
             </div>
           </div>
@@ -102,14 +111,24 @@ export const PublicationsTables = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {!!selectedPublication &&
+                  {!!selectedPublication ? (
                     tables.map((table) => (
                       <PublicationsTableItem
                         key={table.id}
                         table={table}
                         selectedPublication={selectedPublication}
                       />
-                    ))}
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4}>
+                        <p>The selected publication with ID {id} cannot be found</p>
+                        <p className="text-foreground-light">
+                          Head back to the list of publications to select one from there
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </Card>
