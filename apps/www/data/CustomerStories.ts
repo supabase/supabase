@@ -17,7 +17,7 @@ export type CustomerStoryType = {
   }
 }
 
-export const data: CustomerStoryType[] = [
+const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
     title: 'Kayhan Space saw 8x improvement in developer speed when moving to Supabase',

@@ -21,7 +21,7 @@ interface Props {
   products: { [key: string]: number }
 }
 
-export const useFilters = (initialIndustry: string, initialProduct: string) => {
+const useFilters = (initialIndustry: string, initialProduct: string) => {
   const router = useRouter()
   const [industry, setIndustry] = useState<string>(initialIndustry)
   const [product, setProduct] = useState<string>(initialProduct)

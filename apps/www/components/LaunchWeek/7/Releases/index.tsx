@@ -18,11 +18,11 @@ import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { motion } from 'framer-motion'
 import Day5 from './Day5'
 
-export const defaultEase = [0.25, 0.25, 0, 1]
-export const defaultDuratonIn = 0.25
-export const defaultDuratonOut = 0.1
+const defaultEase = [0.25, 0.25, 0, 1]
+const defaultDuratonIn = 0.25
+const defaultDuratonOut = 0.1
 
-export const opacityVariant = {
+const opacityVariant = {
   default: { opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
@@ -32,7 +32,7 @@ export const opacityVariant = {
     },
   },
 }
-export const opacityVariant2 = {
+const opacityVariant2 = {
   default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 0.2,
@@ -42,7 +42,7 @@ export const opacityVariant2 = {
     },
   },
 }
-export const opacityVariant3 = {
+const opacityVariant3 = {
   default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
@@ -84,13 +84,13 @@ export const scaleOpacityVariant2 = {
     },
   },
 }
-export const aiImageMobileVariant = {
+const aiImageMobileVariant = {
   default: { scale: 0.9 },
   hover: {
     scale: 0.9,
   },
 }
-export const moveX10 = {
+const moveX10 = {
   default: { x: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     x: 10,

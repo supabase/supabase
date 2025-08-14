@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
-export const PencilSvg = () => (
+const PencilSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M3.21792 11.2469L11.8015 2.66333L14.0953 4.95709L5.51167 13.5407M3.21792 11.2469L2.34219 14.4164L5.51167 13.5407M3.21792 11.2469L5.51167 13.5407"

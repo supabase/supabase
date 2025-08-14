@@ -54,8 +54,6 @@ export interface WeekDayProps {
   steps: StepProps[] | []
 }
 
-export const endOfLWXHackathon = '2024-04-17T23:59:59.999-08:00'
-
 const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
   {
     id: 'day-1',
