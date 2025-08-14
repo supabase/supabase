@@ -4,7 +4,7 @@ import { FILENAME_SUBSTRING } from './lib/posts'
 export const BlogPost = defineDocumentType(() => ({
   name: 'BlogPost',
   filePathPattern: `**/*.mdx`,
-  contentType: 'mdx',
+  // contentType: 'mdx',
   fields: {
     author: { type: 'string', required: true },
     author_url: { type: 'string', required: false },

@@ -6,14 +6,6 @@ const toc = require('markdown-toc')
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
-// Debug logging for environment variables
-// console.log('[cms-posts] PAYLOAD_URL:', PAYLOAD_URL)
-// console.log('[cms-posts] PAYLOAD_API_KEY exists:', !!PAYLOAD_API_KEY)
-console.log('[cms-posts] Environment:', {
-  NODE_ENV: process.env.NODE_ENV,
-  CMS_SITE_ORIGIN,
-})
-
 type CMSBlogPost = {
   id: string
   title: string
