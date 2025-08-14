@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle, Search } from 'lucide-react'
+import { AlertCircle, Info, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -22,6 +22,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -63,10 +66,11 @@ export const PublicationsList = () => {
     { event: 'Delete', key: 'publish_delete' },
     { event: 'Truncate', key: 'publish_truncate' },
   ]
-  const publications =
+  const publications = (
     filterString.length === 0
       ? data
       : data.filter((publication) => publication.name.includes(filterString))
+  ).sort((a, b) => a.id - b.id)
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
     publication: any
@@ -141,7 +145,26 @@ export const PublicationsList = () => {
               {isSuccess &&
                 publications.map((x) => (
                   <TableRow key={x.name}>
-                    <TableCell>{x.name}</TableCell>
+                    <TableCell className="flex items-center gap-x-2 items-center">
+                      {x.name}
+                      {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                      {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                        x.name
+                      ) && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info size={14} className="text-foreground-light" />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            {x.name === 'supabase_realtime'
+                              ? 'This publication is managed by Supabase and handles Postgres changes'
+                              : x.name === 'supabase_realtime_messages_publication'
+                                ? 'This publication is managed by Supabase and handles broadcasts from the database'
+                                : undefined}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </TableCell>
                     <TableCell>{x.id}</TableCell>
                     {publicationEvents.map((event) => (
                       <TableCell key={event.key}>
@@ -165,9 +188,7 @@ export const PublicationsList = () => {
                           <Link href={`/project/${ref}/database/publications/${x.id}`}>
                             {x.tables === null
                               ? 'All tables'
-                              : `${x.tables.length} ${
-                                  x.tables.length === 1 ? 'table' : 'tables'
-                                }`}
+                              : `${x.tables.length} ${x.tables.length === 1 ? 'table' : 'tables'}`}
                           </Link>
                         </Button>
                       </div>
