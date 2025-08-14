@@ -33,6 +33,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -90,6 +91,18 @@ export function LogsSidebarMenuV2() {
     projectStorageAll: storageEnabled,
     realtimeAll: realtimeEnabled,
   } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
+
+  const enablePgReplicate = useFlag('enablePgReplicate')
+  const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
+    {
+      projectRef: ref,
+    },
+    {
+      enabled: enablePgReplicate,
+    }
+  )
+
+  const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
@@ -183,6 +196,14 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
+    showETLLogs
+      ? {
+          name: 'ETL',
+          key: 'etl_replication_logs',
+          url: `/project/${ref}/logs/etl-logs`,
+          items: [],
+        }
+      : null,
   ].filter((x) => x !== null)
 
   const OPERATIONAL_COLLECTIONS = IS_PLATFORM

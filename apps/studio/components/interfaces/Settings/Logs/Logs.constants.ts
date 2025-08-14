@@ -372,6 +372,7 @@ export enum LogsTableName {
   PGBOUNCER = 'pgbouncer_logs',
   PG_UPGRADE = 'pg_upgrade_logs',
   PG_CRON = 'pg_cron_logs',
+  ETL = 'etl_replication_logs',
 }
 
 export const LOGS_TABLES = {
@@ -387,6 +388,7 @@ export const LOGS_TABLES = {
   pg_upgrade: LogsTableName.PG_UPGRADE,
   pg_cron: LogsTableName.POSTGRES,
   pgbouncer: LogsTableName.PGBOUNCER,
+  etl: LogsTableName.ETL,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
