@@ -1,48 +1,38 @@
-import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronLeft, Search } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Loading } from 'components/ui/Loading'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import {
-  Button,
-  Input,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Card,
-} from 'ui'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
-import PublicationsTableItem from './PublicationsTableItem'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { PublicationsTableItem } from './PublicationsTableItem'
 
-interface PublicationsTablesProps {
-  selectedPublication: PostgresPublication
-  onSelectBack: () => void
-}
-
-export const PublicationsTables = ({
-  selectedPublication,
-  onSelectBack,
-}: PublicationsTablesProps) => {
+export const PublicationsTables = () => {
+  const { ref, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
   const { can: canUpdatePublications, isLoading: isLoadingPermissions } =
     useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'publications')
 
-  const { data: protectedSchemas } = useProtectedSchemas()
+  const { data: publications = [] } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const selectedPublication = publications.find((pub) => pub.id === Number(id))
 
   const {
-    data: tablesData,
+    data: tablesData = [],
     isLoading,
     isSuccess,
     isError,
@@ -51,33 +41,35 @@ export const PublicationsTables = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
   const tables = useMemo(() => {
-    return (tablesData || []).filter((table) =>
-      filterString.length === 0
-        ? !protectedSchemas.find((s) => s.name === table.schema)
-        : !protectedSchemas.find((s) => s.name === table.schema) &&
-          table.name.includes(filterString)
+    return tablesData.filter((table) =>
+      filterString.length === 0 ? table : table.name.includes(filterString)
     )
-  }, [tablesData, protectedSchemas, filterString])
+  }, [tablesData, filterString])
 
   return (
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Button
+            <ButtonTooltip
+              asChild
               type="outline"
-              onClick={() => onSelectBack()}
               icon={<ChevronLeft />}
               style={{ padding: '5px' }}
-            />
+              tooltip={{ content: { side: 'bottom', text: 'Go back to publications list' } }}
+            >
+              <Link href={`/project/${ref}/database/publications`} />
+            </ButtonTooltip>
             <div>
               <Input
-                size="small"
-                placeholder={'Filter'}
+                size="tiny"
+                placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size="14" />}
+                icon={<Search size={12} />}
+                className="w-48 pl-8"
               />
             </div>
           </div>
@@ -107,37 +99,35 @@ export const PublicationsTables = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="header-name">Name</TableHead>
-                  <TableHead key="header-schema">Schema</TableHead>
-                  <TableHead key="header-desc" className="hidden text-left lg:table-cell">
-                    Description
-                  </TableHead>
-                  <TableHead key="header-all">
-                    {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
-              <div className="flex flex-row space-x-3 items-center justify-end">
-                <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
-                  All Tables
-                </div>
-                <Toggle
-                  size="tiny"
-                  align="right"
-                  error=""
-                  className="m-0 p-0 ml-2 mt-1 -mb-1"
-                  checked={enabledForAllTables}
-                  onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
-                />
-              </div> */}
-                  </TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Schema</TableHead>
+                  <TableHead>Description</TableHead>
+                  {/* 
+                      We've disabled All tables toggle for publications. 
+                      See https://github.com/supabase/supabase/pull/7233. 
+                    */}
+                  <TableHead />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tables.map((table) => (
-                  <PublicationsTableItem
-                    key={table.id}
-                    table={table}
-                    selectedPublication={selectedPublication}
-                  />
-                ))}
+                {!!selectedPublication ? (
+                  tables.map((table) => (
+                    <PublicationsTableItem
+                      key={table.id}
+                      table={table}
+                      selectedPublication={selectedPublication}
+                    />
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p>The selected publication with ID {id} cannot be found</p>
+                      <p className="text-foreground-light">
+                        Head back to the list of publications to select one from there
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </Card>
