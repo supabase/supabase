@@ -222,16 +222,9 @@ async function executeInvalidation(
 /**
  * Handle invalidation event and update appropriate caches
  */
-export async function handleInvalidation(
-  queryClient: QueryClient,
-  event: InvalidationEvent
-): Promise<void> {
-  // Schedule invalidation to run asynchronously without blocking the main thread
-  setTimeout(async () => {
-    try {
-      await executeInvalidation(queryClient, event)
-    } catch (error) {
-      console.error(`handleInvalidation: Failed to invalidate ${event.entityType}`, error)
-    }
-  }, 0)
+export function handleInvalidation(queryClient: QueryClient, event: InvalidationEvent) {
+  // Execute invalidation asynchronously without blocking the caller
+  executeInvalidation(queryClient, event).catch((error) => {
+    console.error(`handleInvalidation: Failed to invalidate ${event.entityType}`, error)
+  })
 }
