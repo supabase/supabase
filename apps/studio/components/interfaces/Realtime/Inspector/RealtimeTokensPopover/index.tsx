@@ -69,7 +69,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
           .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
       } else {
         try {
-          const data = await getTemporaryAPIKey({ projectRef: config.projectRef })
+          const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
           token = data.api_key
         } catch (error) {
           token = publishableKey?.api_key
