@@ -7,8 +7,9 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { VaultSecret } from 'types'
 import {
   Button,
   Input,
@@ -22,7 +23,6 @@ import {
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import SecretRow from './SecretRow'
-import type { VaultSecret } from 'types'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
@@ -33,11 +33,10 @@ export const SecretsManagement = () => {
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
   const [selectedSort, setSelectedSort] = useState('updated_at')
 
-  const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
-  useEffect(() => {
-    if (search !== undefined) setSearchValue(search)
-  }, [search])
+  const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const { data, isLoading } = useVaultSecretsQuery({
     projectRef: project?.ref!,
@@ -60,6 +59,10 @@ export const SecretsManagement = () => {
       }
     }
   )
+
+  useEffect(() => {
+    if (search !== undefined) setSearchValue(search)
+  }, [search])
 
   return (
     <>

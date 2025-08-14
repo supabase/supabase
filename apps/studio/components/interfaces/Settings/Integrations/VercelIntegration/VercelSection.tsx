@@ -25,13 +25,14 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Button, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 
@@ -42,15 +43,13 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
   const isBranch = project?.parent_project_ref !== undefined
 
-  const canReadVercelConnection = useCheckPermissions(
-    PermissionAction.READ,
-    'integrations.vercel_connections'
-  )
-  const canCreateVercelConnection = useCheckPermissions(
+  const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckProjectPermissions(PermissionAction.READ, 'integrations.vercel_connections')
+  const { can: canCreateVercelConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
     'integrations.vercel_connections'
   )
-  const canUpdateVercelConnection = useCheckPermissions(
+  const { can: canUpdateVercelConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
@@ -162,7 +161,9 @@ You can change the scope of the access for Supabase by configuring
           <IntegrationImageHandler title="vercel" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadVercelConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadVercelConnection ? (
             <NoPermission resourceText="view this organization's Vercel connections" />
           ) : (
             <>
