@@ -1068,7 +1068,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.auth.startAutoRefresh()
+          supabase.auth.startAutoRefresh()
           ```
 
   - id: stop-auto-refresh
@@ -1277,7 +1277,7 @@ functions:
         code: |
           ```swift
           let user = try await supabase.auth.admin.getUserById(
-            uid: "715ed5db-f090-4b8c-a067-640ecee36aa0"
+            "715ed5db-f090-4b8c-a067-640ecee36aa0"
           )
           ```
 
@@ -1298,7 +1298,7 @@ functions:
         code: |
           ```swift
           let users = try await supabase.auth.admin.listUsers(
-            params: AdminUserListRequest(
+            params: PageParams(
               page: 2,
               perPage: 10
             )
@@ -1335,7 +1335,7 @@ functions:
         code: |
           ```swift
           let user = try await supabase.auth.admin.updateUserById(
-            uid: "715ed5db-f090-4b8c-a067-640ecee36aa0",
+            "715ed5db-f090-4b8c-a067-640ecee36aa0",
             attributes: AdminUserAttributes(
               email: "newemail@email.com"
             )
@@ -1353,7 +1353,7 @@ functions:
         code: |
           ```swift
           let user = try await supabase.auth.admin.inviteUserByEmail(
-            email: "user@email.com",
+            "user@email.com",
             data: ["role": "admin"],
             redirectTo: URL(string: "https://example.com/welcome")
           )
@@ -4811,7 +4811,7 @@ functions:
           ```
 
   - id: from-create-signed-upload-url
-    title: from.createSignedUploadUrl()
+    title: from.createSignedUploadURL()
     description: |
       Create a signed upload URL that can be used to upload files to a bucket.
     notes: |
@@ -4827,7 +4827,7 @@ functions:
           ```swift
           let signedUploadUrl = try await supabase.storage
             .from("avatars")
-            .createSignedUploadUrl(path: "folder/avatar1.png")
+            .createSignedUploadURL(path: "folder/avatar1.png")
           ```
       - id: create-signed-upload-url-with-options
         name: Create signed upload URL with options
@@ -4835,9 +4835,9 @@ functions:
           ```swift
           let signedUploadUrl = try await supabase.storage
             .from("avatars")
-            .createSignedUploadUrl(
+            .createSignedUploadURL(
               path: "folder/avatar1.png",
-              options: CreateSignedUploadUrlOptions(
+              options: CreateSignedUploadURLOptions(
                 upsert: true
               )
             )
@@ -4848,7 +4848,7 @@ functions:
     description: |
       Upload a file to a bucket using a signed URL.
     notes: |
-      - Use this method to upload files using a signed upload URL created with `createSignedUploadUrl()`.
+      - Use this method to upload files using a signed upload URL created with `createSignedUploadURL()`.
     examples:
       - id: upload-to-signed-url
         name: Upload to signed URL
@@ -4860,7 +4860,7 @@ functions:
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(
-              path: "folder/avatar1.png",
+              "folder/avatar1.png",
               token: "your-signed-token",
               data: fileData,
               options: FileOptions(
@@ -4877,7 +4877,7 @@ functions:
           try await supabase.storage
             .from("avatars")
             .uploadToSignedURL(
-              path: "folder/avatar1.png",
+              "folder/avatar1.png",
               token: "your-signed-token",
               fileURL: fileURL,
               options: FileOptions(
