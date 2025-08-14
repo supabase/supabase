@@ -8,8 +8,8 @@ const disabledFeaturesStaticArray = Object.entries(enabledFeaturesStaticObj)
   .filter(([_, value]) => !value)
   .map(([key]) => key as Feature)
 
-function checkFeature(feature: Feature, features: Feature[]) {
-  return !features.includes(feature)
+function checkFeature(feature: Feature, features: Set<Feature>) {
+  return !features.has(feature)
 }
 
 type SnakeToCamelCase<S extends string> = S extends `${infer First}_${infer Rest}`
@@ -34,9 +34,10 @@ function useIsFeatureEnabled<T extends Feature[]>(
 function useIsFeatureEnabled(features: Feature): boolean
 function useIsFeatureEnabled<T extends Feature | Feature[]>(features: T) {
   const { profile } = useProfile()
-  const disabledFeatures = [
-    ...new Set([...(profile?.disabled_features ?? []), ...disabledFeaturesStaticArray]),
-  ]
+  const disabledFeatures = new Set([
+    ...(profile?.disabled_features ?? []),
+    ...disabledFeaturesStaticArray,
+  ])
 
   if (Array.isArray(features)) {
     return Object.fromEntries(
