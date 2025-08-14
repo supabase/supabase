@@ -46,7 +46,6 @@ const SignInPage: NextPageWithLayout = () => {
             <span className="px-2 text-sm bg-studio text-foreground">or</span>
           </div>
         </div>
-
         <SignInForm />
       </div>
 

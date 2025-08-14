@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { ModelMessage, stepCountIs, streamText } from 'ai'
+import { ModelMessage, stepCountIs, generateText, Output } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -18,6 +18,7 @@ import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod/v4'
 
 export const maxDuration = 60
 
@@ -148,14 +149,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
+    const { experimental_output } = await generateText({
       model,
       stopWhen: stepCountIs(5),
+      experimental_output: Output.object({
+        schema: z.object({
+          code: z.string().describe('The modified code'),
+        }),
+      }),
       messages: coreMessages,
       tools,
     })
 
-    return result.pipeUIMessageStreamToResponse(res)
+    return res.status(200).json(experimental_output?.code)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({

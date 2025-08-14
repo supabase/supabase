@@ -38,6 +38,7 @@ Deepthi Sigireddi
 Deji I
 Div Arora
 Divit D
+Douglas Hunley
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
@@ -85,6 +86,7 @@ Luca Forstner
 Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
+Matt Rossman
 Monica Khoury
 Mykhailo Mischa Lieibenson
 Nyannyacha

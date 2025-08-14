@@ -8,6 +8,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { VaultSecret } from 'types'
 import {
   Button,
   Input,
@@ -21,7 +22,6 @@ import {
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import SecretRow from './SecretRow'
-import type { VaultSecret } from 'types'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
@@ -35,10 +35,6 @@ export const SecretsManagement = () => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
-
-  useEffect(() => {
-    if (search !== undefined) setSearchValue(search)
-  }, [search])
 
   const { data, isLoading } = useVaultSecretsQuery({
     projectRef: project?.ref!,
@@ -61,6 +57,10 @@ export const SecretsManagement = () => {
       }
     }
   )
+
+  useEffect(() => {
+    if (search !== undefined) setSearchValue(search)
+  }, [search])
 
   return (
     <>

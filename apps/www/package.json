@@ -30,6 +30,7 @@
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@octokit/rest": "^21.0.0",
     "@radix-ui/react-dialog": "^1.0.5",
+    "@sentry/nextjs": "^10",
     "@supabase/supabase-js": "catalog:",
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",

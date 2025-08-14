@@ -83,7 +83,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
     // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
     // this happens when a user stops the assistant response while the tool is being called
-    if (msg && msg.role === 'assistant') {
+    if (msg && msg.role === 'assistant' && msg.parts) {
       const cleanedParts = msg.parts.filter((part: any) => {
         return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
       })

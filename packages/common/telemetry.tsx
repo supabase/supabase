@@ -54,6 +54,12 @@ export function handlePageTelemetry(
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const pageData = getSharedTelemetryData(pathname)
+
+    // Align frontend and backend session IDs for correlation
+    if (pageData.session_id) {
+      document.cookie = `session_id=${pageData.session_id}; path=/; SameSite=Lax`
+    }
+
     posthogClient.capturePageView({
       $current_url: pageData.page_url,
       $pathname: pageData.pathname,
@@ -63,6 +69,7 @@ export function handlePageTelemetry(
         ...(ref ? { project: ref } : {}),
       },
       page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
       ...pageData.ph,
       ...Object.fromEntries(
         Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
@@ -72,12 +79,14 @@ export function handlePageTelemetry(
 
   // Send to backend
   // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(
-    `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
+  const sharedData = getSharedTelemetryData(pathname)
+  const { session_id, ...backendData } = sharedData // Remove session_id from backend payload (it's already in the cookie)
+
+  const payload =
     telemetryDataOverride !== undefined
       ? { feature_flags: featureFlags, ...telemetryDataOverride }
       : {
-          ...getSharedTelemetryData(pathname),
+          ...backendData,
           ...(slug || ref
             ? {
                 groups: {
@@ -87,9 +96,10 @@ export function handlePageTelemetry(
               }
             : {}),
           feature_flags: featureFlags,
-        },
-    { headers: { Version: '2' } }
-  )
+        }
+  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page`, payload, {
+    headers: { Version: '2' },
+  })
 }
 
 export function handlePageLeaveTelemetry(
@@ -108,6 +118,7 @@ export function handlePageLeaveTelemetry(
       $current_url: pageData.page_url,
       $pathname: pageData.pathname,
       page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
     })
   }
 

@@ -21,7 +21,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
-import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Button, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
@@ -164,18 +164,11 @@ const PlanUpdateSidePanel = () => {
               const isDowngradeOption =
                 getPlanChangeType(subscription?.plan.id, plan?.planId) === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
-              const features = pickFeatures(plan, billingPartner)
-              const footer = pickFooter(plan, billingPartner)
+              const features = plan.features
+              const footer = plan.footer
 
               if (plan.id === 'tier_enterprise') {
-                return (
-                  <EnterpriseCard
-                    key={plan.id}
-                    plan={plan}
-                    isCurrentPlan={isCurrentPlan}
-                    billingPartner={billingPartner}
-                  />
-                )
+                return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
               }
 
               return (
