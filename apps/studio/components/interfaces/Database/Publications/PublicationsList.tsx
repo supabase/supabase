@@ -3,9 +3,19 @@ import { noop } from 'lodash'
 import { AlertCircle, Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Input, Toggle } from 'ui'
+import {
+  Button,
+  Input,
+  Toggle,
+  Table,
+  TableHeader,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Card,
+} from 'ui'
 
-import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -96,61 +106,65 @@ export const PublicationsList = ({ onSelectPublication = noop }: PublicationsLis
         </div>
       </div>
 
-      <div className="w-full overflow-hidden overflow-x-auto">
-        <Table
-          head={[
-            <Table.th key="header.name">Name</Table.th>,
-            <Table.th key="header.id">System ID</Table.th>,
-            <Table.th key="header.insert">Insert</Table.th>,
-            <Table.th key="header.update">Update</Table.th>,
-            <Table.th key="header.delete">Delete</Table.th>,
-            <Table.th key="header.truncate">Truncate</Table.th>,
-            <Table.th key="header.source" className="text-right">
-              Source
-            </Table.th>,
-          ]}
-          body={
-            isLoading
-              ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
-              : publications.map((x) => (
-                  <Table.tr className="border-t" key={x.name}>
-                    <Table.td className="px-4 py-3">{x.name}</Table.td>
-                    <Table.td>{x.id}</Table.td>
-                    {publicationEvents.map((event) => (
-                      <Table.td key={event.key}>
-                        <Toggle
-                          size="tiny"
-                          checked={(x as any)[event.key]}
-                          disabled={!canUpdatePublications}
-                          onChange={() => {
-                            setToggleListenEventValue({
-                              publication: x,
-                              event,
-                              currentStatus: (x as any)[event.key],
-                            })
-                          }}
-                        />
-                      </Table.td>
-                    ))}
-                    <Table.td className="px-4 py-3 pr-2">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          type="default"
-                          style={{ paddingTop: 3, paddingBottom: 3 }}
-                          onClick={() => onSelectPublication(x.id)}
-                        >
-                          {x.tables == null
-                            ? 'All tables'
-                            : `${x.tables.length} ${
-                                x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                              }`}
-                        </Button>
-                      </div>
-                    </Table.td>
-                  </Table.tr>
-                ))
-          }
-        />
+      <div className="w-full overflow-hidden">
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead key="header.name">Name</TableHead>
+                <TableHead key="header.id">System ID</TableHead>
+                <TableHead key="header.insert">Insert</TableHead>
+                <TableHead key="header.update">Update</TableHead>
+                <TableHead key="header.delete">Delete</TableHead>
+                <TableHead key="header.truncate">Truncate</TableHead>
+                <TableHead key="header.source" className="text-right">
+                  Source
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading
+                ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
+                : publications.map((x) => (
+                    <TableRow className="border-t" key={x.name}>
+                      <TableCell className="px-4 py-3">{x.name}</TableCell>
+                      <TableCell>{x.id}</TableCell>
+                      {publicationEvents.map((event) => (
+                        <TableCell key={event.key}>
+                          <Toggle
+                            size="tiny"
+                            checked={(x as any)[event.key]}
+                            disabled={!canUpdatePublications}
+                            onChange={() => {
+                              setToggleListenEventValue({
+                                publication: x,
+                                event,
+                                currentStatus: (x as any)[event.key],
+                              })
+                            }}
+                          />
+                        </TableCell>
+                      ))}
+                      <TableCell className="px-4 py-3 pr-2">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            type="default"
+                            style={{ paddingTop: 3, paddingBottom: 3 }}
+                            onClick={() => onSelectPublication(x.id)}
+                          >
+                            {x.tables == null
+                              ? 'All tables'
+                              : `${x.tables.length} ${
+                                  x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
+                                }`}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+            </TableBody>
+          </Table>
+        </Card>
       </div>
 
       {!isLoading && publications.length === 0 && (

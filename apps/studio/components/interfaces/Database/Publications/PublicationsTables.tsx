@@ -4,14 +4,23 @@ import { ChevronLeft, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { Loading } from 'components/ui/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { Button, Input } from 'ui'
+import {
+  Button,
+  Input,
+  Table,
+  TableHeader,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Card,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 import PublicationsTableItem from './PublicationsTableItem'
 
@@ -94,16 +103,17 @@ export const PublicationsTables = ({
         (tables.length === 0 ? (
           <NoSearchResults />
         ) : (
-          <div>
-            <Table
-              head={[
-                <Table.th key="header-name">Name</Table.th>,
-                <Table.th key="header-schema">Schema</Table.th>,
-                <Table.th key="header-desc" className="hidden text-left lg:table-cell">
-                  Description
-                </Table.th>,
-                <Table.th key="header-all">
-                  {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="header-name">Name</TableHead>
+                  <TableHead key="header-schema">Schema</TableHead>
+                  <TableHead key="header-desc" className="hidden text-left lg:table-cell">
+                    Description
+                  </TableHead>
+                  <TableHead key="header-all">
+                    {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
               <div className="flex flex-row space-x-3 items-center justify-end">
                 <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
                   All Tables
@@ -117,17 +127,20 @@ export const PublicationsTables = ({
                   onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
                 />
               </div> */}
-                </Table.th>,
-              ]}
-              body={tables.map((table) => (
-                <PublicationsTableItem
-                  key={table.id}
-                  table={table}
-                  selectedPublication={selectedPublication}
-                />
-              ))}
-            />
-          </div>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tables.map((table) => (
+                  <PublicationsTableItem
+                    key={table.id}
+                    table={table}
+                    selectedPublication={selectedPublication}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         ))}
     </>
   )

@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
+import ExtensionRow from 'components/interfaces/Database/Extensions/ExtensionRow'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { Loading } from 'components/ui/Loading'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -16,6 +16,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
@@ -80,7 +81,7 @@ export const GraphiQLTab = () => {
     }
 
     return customFetcher
-  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken, serviceKey])
+  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken, serviceKey, secretKey?.api_key])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Loading />
@@ -98,7 +99,26 @@ export const GraphiQLTab = () => {
             </p>
           </div>
 
-          <ExtensionCard extension={pgGraphqlExtension} />
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="version">Version</TableHead>
+                  <TableHead key="schema">Schema</TableHead>
+                  <TableHead key="description">Description</TableHead>
+                  <TableHead key="used-by">Used by</TableHead>
+                  <TableHead key="links">Links</TableHead>
+                  <TableHead key="enabled" className="w-20">
+                    Enabled
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <ExtensionRow extension={pgGraphqlExtension} />
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       </div>
     )

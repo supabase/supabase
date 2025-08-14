@@ -3,11 +3,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import Table from 'components/to-be-cleaned/Table'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Badge, Toggle } from 'ui'
+import { Badge, Toggle, TableRow, TableCell } from 'ui'
 
 interface PublicationsTableItemProps {
   table: PostgresTable
@@ -70,13 +69,13 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
   }
 
   return (
-    <Table.tr key={table.id}>
-      <Table.td className="whitespace-nowrap">{table.name}</Table.td>
-      <Table.td className="whitespace-nowrap">{table.schema}</Table.td>
-      <Table.td className="hidden max-w-sm truncate whitespace-nowrap lg:table-cell">
+    <TableRow key={table.id}>
+      <TableCell className="whitespace-nowrap">{table.name}</TableCell>
+      <TableCell className="whitespace-nowrap">{table.schema}</TableCell>
+      <TableCell className="hidden max-w-sm truncate whitespace-nowrap lg:table-cell">
         {table.comment}
-      </Table.td>
-      <Table.td className="px-4 py-3 pr-2">
+      </TableCell>
+      <TableCell className="px-4 py-3 pr-2">
         <div className="flex justify-end gap-2">
           {enabledForAllTables ? (
             <Badge>
@@ -94,8 +93,8 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
             />
           )}
         </div>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }
 
