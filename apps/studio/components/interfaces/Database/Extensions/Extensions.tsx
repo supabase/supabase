@@ -11,7 +11,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Input, Card, Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from 'ui'
+import { Card, Input, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import ExtensionRow from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 
@@ -74,42 +74,44 @@ const Extensions = () => {
       {isLoading ? (
         <GenericSkeletonLoader />
       ) : (
-        <>
-          {extensions.length === 0 ? (
-            <NoSearchResults
-              searchString={filterString}
-              onResetFilter={() => setFilterString('')}
-            />
-          ) : (
-            <div className="w-full overflow-hidden overflow-x-auto">
-              <Card>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead key="name">Name</TableHead>
-                      <TableHead key="version">Version</TableHead>
-                      <TableHead key="schema">Schema</TableHead>
-                      <TableHead key="description">Description</TableHead>
-                      <TableHead key="used-by">Used by</TableHead>
-                      <TableHead key="links">Links</TableHead>
-                      <TableHead
-                        key="enabled"
-                        className="w-20 bg-background-200 border-l sticky right-0"
-                      >
-                        Enabled
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[...enabledExtensions, ...disabledExtensions].map((extension) => (
-                      <ExtensionRow key={extension.name} extension={extension} />
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
-            </div>
-          )}
-        </>
+        <div className="w-full overflow-hidden overflow-x-auto">
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="version">Version</TableHead>
+                  <TableHead key="schema">Schema</TableHead>
+                  <TableHead key="description">Description</TableHead>
+                  <TableHead key="used-by">Used by</TableHead>
+                  <TableHead key="links">Links</TableHead>
+                  <TableHead
+                    key="enabled"
+                    className="w-20 bg-background-200 border-l sticky right-0"
+                  >
+                    Enabled
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...enabledExtensions, ...disabledExtensions].map((extension) => (
+                  <ExtensionRow key={extension.name} extension={extension} />
+                ))}
+                {extensions.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <NoSearchResults
+                        className="border-none !p-0 bg-transparent"
+                        searchString={filterString}
+                        onResetFilter={() => setFilterString('')}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </div>
       )}
     </>
   )

@@ -8,8 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
-  cn,
 } from 'ui'
 
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
@@ -18,8 +16,9 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
-import type { SecretTableColumn } from './Secrets.utils'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import EditSecretModal from './EditSecretModal'
+import type { SecretTableColumn } from './Secrets.utils'
 
 interface SecretRowProps {
   row: VaultSecret
@@ -114,8 +113,8 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
           onClick={() => setRevealSecret(!revealSecret)}
         />
         <div className="flex-grow min-w-0">
-          {revealSecret && revealedValue ? (
-            <Input copy size="small" className="font-mono" value={revealedValue} readOnly />
+          {revealSecret && revealedValue !== undefined ? (
+            <Input copy readOnly size="tiny" className="font-mono" value={revealedValue} />
           ) : (
             <p className="text-sm font-mono text-foreground">••••••••••••••••••</p>
           )}
@@ -147,13 +146,13 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
   }
 
   return (
-    <div className="w-full flex flex-col gap-1 justify-center">
+    <div className="w-full flex flex-col justify-center">
       <p className="text-xs text-foreground truncate" title={name}>
         {name}
       </p>
       {row.description !== undefined && row.description !== '' && (
         <div>
-          <p className="text-xs text-foreground-light w-full truncate">{row.description}</p>
+          <p className="text-xs text-foreground-lighter w-full truncate">{row.description}</p>
         </div>
       )}
     </div>
