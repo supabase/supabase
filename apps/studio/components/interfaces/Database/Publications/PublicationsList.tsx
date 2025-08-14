@@ -1,44 +1,52 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import { AlertCircle, Search } from 'lucide-react'
+import { AlertCircle, Info, Search } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  Input,
-  Toggle,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Card,
-} from 'ui'
 
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import {
+  Button,
+  Card,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import PublicationSkeleton from './PublicationSkeleton'
+import { PublicationSkeleton } from './PublicationSkeleton'
 
 interface PublicationEvent {
   event: string
   key: string
 }
 
-interface PublicationsListProps {
-  onSelectPublication: (id: number) => void
-}
-
-export const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
+export const PublicationsList = () => {
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data, isLoading } = useDatabasePublicationsQuery({
+  const {
+    data = [],
+    error,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -58,10 +66,11 @@ export const PublicationsList = ({ onSelectPublication = noop }: PublicationsLis
     { event: 'Delete', key: 'publish_delete' },
     { event: 'Truncate', key: 'publish_truncate' },
   ]
-  const publications =
+  const publications = (
     filterString.length === 0
-      ? data ?? []
-      : (data ?? []).filter((publication) => publication.name.includes(filterString))
+      ? data
+      : data.filter((publication) => publication.name.includes(filterString))
+  ).sort((a, b) => a.id - b.id)
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
     publication: any
@@ -89,8 +98,9 @@ export const PublicationsList = ({ onSelectPublication = noop }: PublicationsLis
           <div className="flex items-center">
             <Input
               size="tiny"
-              icon={<Search size="14" />}
-              placeholder={'Filter'}
+              icon={<Search size={12} />}
+              className="w-48 pl-8"
+              placeholder="Search for a publication"
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
             />
@@ -106,62 +116,85 @@ export const PublicationsList = ({ onSelectPublication = noop }: PublicationsLis
         </div>
       </div>
 
-      <div className="w-full overflow-hidden">
+      <div className="w-full overflow-hidden overflow-x-auto">
         <Card>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead key="header.name">Name</TableHead>
-                <TableHead key="header.id">System ID</TableHead>
-                <TableHead key="header.insert">Insert</TableHead>
-                <TableHead key="header.update">Update</TableHead>
-                <TableHead key="header.delete">Delete</TableHead>
-                <TableHead key="header.truncate">Truncate</TableHead>
-                <TableHead key="header.source" className="text-right">
-                  Source
-                </TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>System ID</TableHead>
+                <TableHead>Insert</TableHead>
+                <TableHead>Update</TableHead>
+                <TableHead>Delete</TableHead>
+                <TableHead>Truncate</TableHead>
+                <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading
-                ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
-                : publications.map((x) => (
-                    <TableRow className="border-t" key={x.name}>
-                      <TableCell className="px-4 py-3">{x.name}</TableCell>
-                      <TableCell>{x.id}</TableCell>
-                      {publicationEvents.map((event) => (
-                        <TableCell key={event.key}>
-                          <Toggle
-                            size="tiny"
-                            checked={(x as any)[event.key]}
-                            disabled={!canUpdatePublications}
-                            onChange={() => {
-                              setToggleListenEventValue({
-                                publication: x,
-                                event,
-                                currentStatus: (x as any)[event.key],
-                              })
-                            }}
-                          />
-                        </TableCell>
-                      ))}
-                      <TableCell className="px-4 py-3 pr-2">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            type="default"
-                            style={{ paddingTop: 3, paddingBottom: 3 }}
-                            onClick={() => onSelectPublication(x.id)}
-                          >
-                            {x.tables == null
-                              ? 'All tables'
-                              : `${x.tables.length} ${
-                                  x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                                }`}
-                          </Button>
-                        </div>
+              {isLoading &&
+                Array.from({ length: 2 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)}
+
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <AlertError error={error} subject="Failed to retrieve publications" />
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {isSuccess &&
+                publications.map((x) => (
+                  <TableRow key={x.name}>
+                    <TableCell className="flex items-center gap-x-2 items-center">
+                      {x.name}
+                      {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                      {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                        x.name
+                      ) && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info size={14} className="text-foreground-light" />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            {x.name === 'supabase_realtime'
+                              ? 'This publication is managed by Supabase and handles Postgres changes'
+                              : x.name === 'supabase_realtime_messages_publication'
+                                ? 'This publication is managed by Supabase and handles broadcasts from the database'
+                                : undefined}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </TableCell>
+                    <TableCell>{x.id}</TableCell>
+                    {publicationEvents.map((event) => (
+                      <TableCell key={event.key}>
+                        <Switch
+                          size="small"
+                          checked={(x as any)[event.key]}
+                          disabled={!canUpdatePublications}
+                          onClick={() => {
+                            setToggleListenEventValue({
+                              publication: x,
+                              event,
+                              currentStatus: (x as any)[event.key],
+                            })
+                          }}
+                        />
                       </TableCell>
-                    </TableRow>
-                  ))}
+                    ))}
+                    <TableCell>
+                      <div className="flex justify-end">
+                        <Button asChild type="default" style={{ paddingTop: 3, paddingBottom: 3 }}>
+                          <Link href={`/project/${ref}/database/publications/${x.id}`}>
+                            {x.tables === null
+                              ? 'All tables'
+                              : `${x.tables.length} ${x.tables.length === 1 ? 'table' : 'tables'}`}
+                          </Link>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </Card>
