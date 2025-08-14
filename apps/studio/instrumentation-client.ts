@@ -63,8 +63,12 @@ Sentry.init({
     const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
       `Failed to construct 'URL': Invalid URL`
     )
+    // [Joshen] Similar behaviour for this error from SessionTimeoutModal to control the quota usage
+    const isSessionTimeoutEvent = (hint.originalException as any)?.message.includes(
+      'Session error detected'
+    )
 
-    if (isInvalidUrlEvent && Math.random() > 0.01) {
+    if ((isInvalidUrlEvent || isSessionTimeoutEvent) && Math.random() > 0.01) {
       return null
     }
 

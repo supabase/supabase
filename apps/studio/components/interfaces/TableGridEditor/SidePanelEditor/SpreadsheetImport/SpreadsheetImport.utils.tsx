@@ -1,8 +1,17 @@
 import dayjs from 'dayjs'
-import Papa from 'papaparse'
 import { has, includes } from 'lodash'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import Papa from 'papaparse'
+import { toast } from 'sonner'
+
 import { tryParseJson } from 'lib/helpers'
-import { UPLOAD_FILE_EXTENSIONS } from './SpreadsheetImport.constants'
+import { Button } from 'ui'
+import {
+  MAX_TABLE_EDITOR_IMPORT_CSV_SIZE,
+  UPLOAD_FILE_EXTENSIONS,
+  UPLOAD_FILE_TYPES,
+} from './SpreadsheetImport.constants'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
@@ -160,4 +169,31 @@ export const inferColumnType = (column: string, rows: object[]) => {
 export const acceptedFileExtension = (file: any) => {
   const ext = file?.name.split('.').pop().toLowerCase()
   return UPLOAD_FILE_EXTENSIONS.includes(ext)
+}
+
+export function flagInvalidFileImport(file: File): boolean {
+  if (!file || !UPLOAD_FILE_TYPES.includes(file.type) || !acceptedFileExtension(file)) {
+    toast.error("Couldn't import file: only CSV files are accepted")
+    return true
+  } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
+    toast.error(
+      <div className="space-y-1">
+        <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
+        <p>For bulk data loading, we recommend doing so directly through the database.</p>
+        <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
+          <Link
+            href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Learn more
+          </Link>
+        </Button>
+      </div>,
+      { duration: Infinity }
+    )
+    return true
+  }
+
+  return false
 }
