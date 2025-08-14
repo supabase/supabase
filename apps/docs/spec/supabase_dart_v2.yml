@@ -1644,7 +1644,7 @@ functions:
       Starts the enrollment process for a new Multi-Factor Authentication (MFA) factor. This method creates a new `unverified` factor.
       To verify a factor, present the QR code or secret to the user and ask them to add it to their authenticator app.
       The user has to enter the code from their authenticator app to verify it.
-      - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
+      - Use `totp` or `phone` as the `factorType` and the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
