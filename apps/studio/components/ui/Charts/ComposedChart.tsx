@@ -489,9 +489,9 @@ export default function ComposedChart({
               x1={chartHighlight?.coordinates.left}
               x2={chartHighlight?.coordinates.right}
               strokeOpacity={0.5}
-              stroke="#FFFFFF"
-              fill="#FFFFFF"
-              fillOpacity={0.3}
+              stroke={isDarkMode ? '#FFFFFF' : '#3ECF8E'}
+              fill={isDarkMode ? '#FFFFFF' : '#3ECF8E'}
+              fillOpacity={isDarkMode ? 0.2 : 0.3}
             />
           )}
         </RechartComposedChart>
