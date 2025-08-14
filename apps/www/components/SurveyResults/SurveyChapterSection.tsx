@@ -22,7 +22,7 @@ interface SurveyChapterSectionProps {
   number: string
   title: string
   description: string
-  stats?: Array<{ number: number; unit: string; label: string }>
+  stats?: Array<{ percent: number; label: string }>
   charts?: string[]
   pullQuote?: {
     quote: string
@@ -86,12 +86,7 @@ export function SurveyChapterSection({
         {stats && (
           <aside className="border-t border-muted flex flex-row flex-wrap divide-x divide-muted">
             {stats.map((stat, index) => (
-              <SurveyStatCard
-                key={index}
-                progressValue={stat.number}
-                unit={stat.unit}
-                label={stat.label}
-              />
+              <SurveyStatCard key={index} percent={stat.percent} label={stat.label} />
             ))}
           </aside>
         )}
