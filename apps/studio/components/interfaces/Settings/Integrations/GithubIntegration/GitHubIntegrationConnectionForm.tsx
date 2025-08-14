@@ -345,13 +345,13 @@ const GitHubIntegrationConnectionForm = ({
   }
 
   useEffect(() => {
-    if (selectedRepository) {
+    if (!connection && selectedRepository) {
       githubSettingsForm.setValue(
         'branchName',
         githubRepos.find((repo) => repo.id === selectedRepository.id)?.default_branch || 'main'
       )
     }
-  }, [selectedRepository])
+  }, [selectedRepository, connection, githubRepos, githubSettingsForm])
 
   useEffect(() => {
     if (connection) {
