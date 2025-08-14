@@ -20,7 +20,7 @@ export const LogPage: NextPageWithLayout = () => {
 
 LogPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout title="ETL Logs">{page}</LogsLayout>
+    <LogsLayout title="ETL Replication Logs">{page}</LogsLayout>
   </DefaultLayout>
 )
 

@@ -201,7 +201,7 @@ export function LogsSidebarMenuV2() {
       ? {
           name: 'ETL',
           key: 'etl_replication_logs',
-          url: `/project/${ref}/logs/etl-logs`,
+          url: `/project/${ref}/logs/etl-replication-logs`,
           items: [],
         }
       : null,
