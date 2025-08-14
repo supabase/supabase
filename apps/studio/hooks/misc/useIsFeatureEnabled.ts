@@ -5,7 +5,7 @@ function useIsFeatureEnabled<T extends Feature[]>(
   features: T
 ): ReturnType<typeof isFeatureEnabled<T>>
 function useIsFeatureEnabled(features: Feature): ReturnType<typeof isFeatureEnabled>
-function useIsFeatureEnabled<T extends Feature | Feature[]>(features: T): any {
+function useIsFeatureEnabled<T extends Feature | Feature[]>(features: T) {
   const { profile } = useProfile()
   const disabledFeatures = profile?.disabled_features
 
