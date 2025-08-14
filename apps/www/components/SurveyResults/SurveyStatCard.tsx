@@ -1,23 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 
-export function SurveyStatCard({
-  unit = '%',
-  label,
-  progressValue,
-  maxValue = 100,
-}: {
-  unit?: string
-  label: string
-  progressValue: number
-  maxValue?: number
-}) {
+export function SurveyStatCard({ label, percent }: { label: string; percent: number }) {
   const [displayValue, setDisplayValue] = useState(0)
   const [hasAnimated, setHasAnimated] = useState(false)
   const [shouldAnimateBar, setShouldAnimateBar] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!progressValue || hasAnimated) return
+    if (!percent || hasAnimated) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -30,7 +20,7 @@ export function SurveyStatCard({
             const startTime = Date.now()
             const duration = 600
             const startValue = 0
-            const endValue = progressValue
+            const endValue = percent
 
             const animate = () => {
               const elapsed = Date.now() - startTime
@@ -64,7 +54,7 @@ export function SurveyStatCard({
         observer.unobserve(currentCardRef)
       }
     }
-  }, [progressValue, hasAnimated])
+  }, [percent, hasAnimated])
 
   return (
     <div ref={cardRef} className="flex-1 px-8 py-8 flex flex-col gap-4">
@@ -74,8 +64,7 @@ export function SurveyStatCard({
         className="h-2 relative overflow-hidden"
         style={
           {
-            '--bar-value': progressValue,
-            '--reference': maxValue,
+            '--bar-value': percent,
           } as React.CSSProperties
         }
       >
@@ -94,10 +83,10 @@ export function SurveyStatCard({
         <div
           className={`h-full relative bg-surface-100`}
           style={{
-            width: `calc(max(0.5%, (var(--bar-value) / var(--reference)) * 100%))`,
+            width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
             transform: shouldAnimateBar ? 'scaleX(1)' : 'scaleX(0)',
             transformOrigin: 'left',
-            transition: `transform 0.5s steps(${Math.max(2, Math.floor((progressValue / maxValue) * 12))}, end)`,
+            transition: `transform 0.5s steps(${Math.max(2, Math.floor((percent / 100) * 12))}, end)`,
           }}
         >
           {/* Foreground pattern for the filled portion */}
@@ -118,7 +107,7 @@ export function SurveyStatCard({
           className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-brand' : 'text-foreground-muted'} transition-colors duration-1000`}
         >
           {displayValue}
-          <span className="md:text-4xl">{unit}</span>
+          <span className="md:text-4xl">%</span>
         </p>
         <p className="text-foreground-light text-sm text-balance md:mr-6">{label}</p>
       </div>
