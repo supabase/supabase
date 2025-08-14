@@ -157,8 +157,7 @@
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
-        "LUMA_API_KEY",
-        "SENTRY_AUTH_TOKEN"
+        "LUMA_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
