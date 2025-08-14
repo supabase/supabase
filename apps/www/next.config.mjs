@@ -126,7 +126,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   outputFileTracingExcludes: {
-    '/.contentlayer': ['./generated/BlogPost/*'],
+    '*': ['.contentlayer/generated/BlogPost/**/*'],
   },
 }
 
