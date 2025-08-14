@@ -4,7 +4,7 @@ import { Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const AccessTokenList = () => {
@@ -23,7 +23,7 @@ const AccessTokenList = () => {
 
   return (
     <>
-      <div className="overflow-hidden overflow-x-scroll">
+      <Card>
         <Table>
           <TableHeader>
             <TableRow>
@@ -37,7 +37,7 @@ const AccessTokenList = () => {
           <TableBody>
             {tokens && tokens.length == 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="p-3 py-12 text-center">
+                <TableCell colSpan={6} className="text-center">
                   <p className="text-foreground-light">
                     {isLoading ? 'Checking for tokens' : 'You do not have any tokens created yet'}
                   </p>
@@ -77,7 +77,7 @@ const AccessTokenList = () => {
             )}
           </TableBody>
         </Table>
-      </div>
+      </Card>
       <ConfirmationModal
         visible={isOpen}
         variant={'destructive'}
@@ -89,8 +89,8 @@ const AccessTokenList = () => {
           if (token) onDeleteToken(token.id)
         }}
       >
-        <p className="py-4 text-sm text-foreground-light">
-          {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
+        <p className="text-sm text-foreground-light">
+          This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
         </p>
       </ConfirmationModal>
     </>

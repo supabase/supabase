@@ -196,7 +196,7 @@ const SchemaSelector = ({
                         }}
                       >
                         <Plus size={12} />
-                        Create a new schemaxxx
+                        Create a new schema
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>
                   </>
