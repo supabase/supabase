@@ -1,8 +1,15 @@
-import type { Feature } from 'data/profile/types'
+import type { Profile } from 'data/profile/types'
 import { useProfile } from 'lib/profile'
+import enabledFeaturesStaticObj from '../../enabled-features.json'
 
-function checkFeature(feature: Feature, features?: Feature[]) {
-  return !features?.includes(feature) ?? true
+export type Feature = Profile['disabled_features'][number] | keyof typeof enabledFeaturesStaticObj
+
+const disabledFeaturesStaticArray = Object.entries(enabledFeaturesStaticObj)
+  .filter(([_, value]) => !value)
+  .map(([key]) => key as Feature)
+
+function checkFeature(feature: Feature, features: Feature[]) {
+  return !features.includes(feature)
 }
 
 type SnakeToCamelCase<S extends string> = S extends `${infer First}_${infer Rest}`
@@ -27,17 +34,20 @@ function useIsFeatureEnabled<T extends Feature[]>(
 function useIsFeatureEnabled(features: Feature): boolean
 function useIsFeatureEnabled<T extends Feature | Feature[]>(features: T) {
   const { profile } = useProfile()
+  const disabledFeatures = [
+    ...new Set([...(profile?.disabled_features ?? []), ...disabledFeaturesStaticArray]),
+  ]
 
   if (Array.isArray(features)) {
     return Object.fromEntries(
       features.map((feature) => [
         featureToCamelCase(feature),
-        checkFeature(feature, profile?.disabled_features),
+        checkFeature(feature, disabledFeatures),
       ])
     )
   }
 
-  return checkFeature(features, profile?.disabled_features)
+  return checkFeature(features, disabledFeatures)
 }
 
 export { useIsFeatureEnabled }
