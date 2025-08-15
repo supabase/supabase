@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Button,
   DropdownMenu,
@@ -292,7 +293,7 @@ export function SurveyChart({
       ref={chartRef}
       className="w-full bg-200 border-t border-muted"
       style={{
-        background: `radial-gradient(circle at center -100%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+        background: `radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
       }}
     >
       <header className="px-8 py-8">
@@ -323,10 +324,15 @@ export function SurveyChart({
             borderOverride="border-overlay"
           />
         </div>
-        <div
+        <motion.div
           className="overflow-hidden relative"
-          style={{
+          initial={false}
+          animate={{
             height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
+          }}
+          transition={{
+            duration: 0.3,
+            ease: 'easeInOut',
           }}
         >
           {error ? (
@@ -448,7 +454,7 @@ export function SurveyChart({
               </Button>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   )
