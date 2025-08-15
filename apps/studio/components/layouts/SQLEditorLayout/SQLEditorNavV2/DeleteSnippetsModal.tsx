@@ -23,12 +23,15 @@ export const DeleteSnippetsModal = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const postDeleteCleanup = (ids: string[]) => {
-    const existingSnippetIds = Object.keys(snapV2.snippets).filter((x) => !ids.includes(x))
-
-    if (existingSnippetIds.length === 0) {
-      router.push(`/project/${projectRef}/sql/new`)
-    } else if (ids.includes(id as string)) {
-      router.push(`/project/${projectRef}/sql/${existingSnippetIds[0]}`)
+    if (!!id && ids.includes(id)) {
+      const openedSQLTabs = tabs.openTabs.filter((x) => x.startsWith('sql-') && !x.includes(id))
+      if (openedSQLTabs.length > 0) {
+        // [Joshen] For simplicity, just opening the first tab for now
+        const firstTabId = openedSQLTabs[0].split('sql-')[1]
+        router.push(`/project/${projectRef}/sql/${firstTabId}`)
+      } else {
+        router.push(`/project/${projectRef}/sql/new`)
+      }
     }
 
     if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
@@ -36,10 +39,17 @@ export const DeleteSnippetsModal = ({
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => {
+      toast.success(
+        `Successfully deleted ${snippets.length.toLocaleString()} quer${snippets.length > 1 ? 'ies' : 'y'}`
+      )
+
       // Update Tabs state - currently unknown how to differentiate between sql and non-sql content
       // so we're just deleting all tabs for with matching IDs
       const tabIds = data.map((id) => createTabId('sql', { id }))
       tabs.removeTabs(tabIds)
+
+      postDeleteCleanup(data)
+      onClose()
     },
     onError: (error, data) => {
       if (error.message.includes('Contents not found')) {
@@ -53,18 +63,7 @@ export const DeleteSnippetsModal = ({
 
   const onConfirmDelete = () => {
     if (!projectRef) return console.error('Project ref is required')
-    deleteContent(
-      { projectRef, ids: snippets.map((x) => x.id) },
-      {
-        onSuccess: (data) => {
-          toast.success(
-            `Successfully deleted ${snippets.length.toLocaleString()} quer${snippets.length > 1 ? 'ies' : 'y'}`
-          )
-          postDeleteCleanup(data)
-          onClose()
-        },
-      }
-    )
+    deleteContent({ projectRef, ids: snippets.map((x) => x.id) })
   }
 
   return (

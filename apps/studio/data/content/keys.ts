@@ -35,7 +35,7 @@ export const contentKeys = {
     options?: { sort?: 'inserted_at' | 'name'; name?: string }
   ) => ['projects', projectRef, 'content', 'folders', id, options].filter(Boolean),
   resource: (projectRef: string | undefined, id?: string) =>
-    ['projects', projectRef, 'content', id] as const,
+    ['projects', projectRef, 'content-id', id] as const,
   count: (
     projectRef: string | undefined,
     type?: string,

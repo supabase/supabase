@@ -42,7 +42,7 @@ export const SearchList = ({ search }: SearchListProps) => {
       { keepPreviousData: true }
     )
 
-  const { data: count } = useContentCountQuery(
+  const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
     {
       projectRef,
       cumulative: true,
@@ -61,7 +61,7 @@ export const SearchList = ({ search }: SearchListProps) => {
   return (
     <>
       <div className="flex flex-col flex-grow">
-        {isLoading ? (
+        {isLoadingCount ? (
           <div className="px-4 py-1 pb-2.5">
             <Loader2 className="animate-spin" size={14} />
           </div>
