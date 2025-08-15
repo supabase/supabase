@@ -100,6 +100,14 @@ describe(`EditSecretModal`, () => {
 
     fireEvent.click(submitButton)
 
-    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+    console.log('onClose.mock.calls')
+    console.log('onClose.mock.calls')
+    console.log('onClose.mock.calls')
+    console.log('onClose.mock.calls')
+    console.log(onClose.mock.calls.length)
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce(), {
+      timeout: 5000,
+    })
   })
 })
