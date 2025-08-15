@@ -207,7 +207,7 @@ export const getPhoneProviderValidationSchema = (smsEnabled: boolean) => {
 
   const otpSchema = z.discriminatedUnion(`SMS_TEST_OTP`, [
     z.object({
-      SMS_TEST_OTP: z.undefined(),
+      SMS_TEST_OTP: z.literal(``),
     }),
     z.object({
       SMS_TEST_OTP: z
