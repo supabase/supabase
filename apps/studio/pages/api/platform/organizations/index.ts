@@ -46,7 +46,7 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const orgId = location.split('/').pop()
-  const orgResponse = await client.GET('/organizations/{organization_id}/', {
+  const readResponse = await client.GET('/organizations/{organization_id}/', {
     params: {
       path: {
         organization_id: parseInt(orgId!),
@@ -57,11 +57,11 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
     },
   })
 
-  if (orgResponse.response.status !== 200 || !orgResponse.data) {
-    return res.status(orgResponse.response.status).send(orgResponse.error)
+  if (readResponse.response.status !== 200 || !readResponse.data) {
+    return res.status(readResponse.response.status).send(readResponse.error)
   }
 
-  return res.status(303).json(mapOrganization(orgResponse.data))
+  return res.status(200).json(mapOrganization(readResponse.data))
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
