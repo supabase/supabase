@@ -146,6 +146,7 @@ export const PipelineStatus = ({
             {statusConfig.tooltip}
             {['unknown', 'failed'].includes(pipelineStatus?.name ?? '') && (
               <>
+                {' '}
                 Check the{' '}
                 <InlineLink href={`/project/${ref}/logs/etl-replication-logs`}>logs</InlineLink> for
                 more information.
