@@ -94,7 +94,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
           />
         </div>
       </div>
-      <p className="w-full text-foreground-lighter text-sm font-mono uppercase tracking-widest">
+      <p className="w-full text-foreground-lighter text-sm font-mono uppercase tracking-wider">
         {label}
       </p>
     </div>
