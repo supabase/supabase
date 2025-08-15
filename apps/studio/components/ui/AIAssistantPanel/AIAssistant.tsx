@@ -121,7 +121,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+  const isApiKeySet = !!check?.hasKey
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']

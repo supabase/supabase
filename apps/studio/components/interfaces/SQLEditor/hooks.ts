@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { ContentDiff, DiffType } from './SQLEditor.types'
@@ -45,7 +44,6 @@ export const useNewQuery = () => {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,
