@@ -49,7 +49,6 @@ const formId = 'sign-up-form'
 export const SignUpForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -64,14 +63,12 @@ export const SignUpForm = () => {
     token: parseAsString.withDefault(''),
   })
 
-  const { mutate: signup } = useSignUpMutation({
+  const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
-      setIsSubmitting(false)
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
     },
     onError: (error) => {
-      setIsSubmitting(false)
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign up: ${error.message}`)
@@ -80,7 +77,6 @@ export const SignUpForm = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email, password }) => {
     // [Joshen] Separate submitting state as there's 2 async processes here
-    setIsSubmitting(true)
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
@@ -116,6 +112,7 @@ export const SignUpForm = () => {
   }
 
   const password = form.watch('password')
+  const isSubmitting = form.formState.isSubmitting || isSigningUp
 
   return (
     <div className="relative">
