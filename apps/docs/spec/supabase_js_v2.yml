@@ -2128,6 +2128,8 @@ functions:
       Currently, there is support for time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10.
 
       Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
+
+      Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
     title: 'mfa.enroll()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'

@@ -1633,9 +1633,9 @@ functions:
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+      Currently, Supabase supports time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10..
 
-      Having a 2nd TOTP factor for recovery means the user doesn't have to store their recovery codes. It also reduces the attack surface since the recovery factor is usually time-limited and not a single static code.
+      Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
 
       Learn more about implementing MFA on your application on our guide [here](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
@@ -1644,7 +1644,7 @@ functions:
       Starts the enrollment process for a new Multi-Factor Authentication (MFA) factor. This method creates a new `unverified` factor.
       To verify a factor, present the QR code or secret to the user and ask them to add it to their authenticator app.
       The user has to enter the code from their authenticator app to verify it.
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Use `totp` or `phone` as the `factorType` and the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
@@ -1661,6 +1661,10 @@ functions:
         isOptional: true
         type: String
         description: Human readable name assigned to the factor.
+      - name: phone
+        isOptional: true
+        type: String
+        description: Phone number to enroll for phone factor type.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -1680,6 +1684,27 @@ functions:
               qrCode: '<QR_CODE_AS_SVG_DATA>',
               secret: '<SECRET>',
               uri: '<URI>',
+            ),
+            phone: null,
+          );
+          ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.enroll(factorType: FactorType.phone, phone: '+1234567890');
+
+          final phone = res.phone;
+          ```
+        response: |
+          ```json
+          AuthMFAEnrollResponse(
+            id: '<ID>',
+            type: FactorType.phone,
+            totp: null,
+            phone: PhoneEnrollment(
+              phone: '+1234567890',
             ),
           );
           ```
