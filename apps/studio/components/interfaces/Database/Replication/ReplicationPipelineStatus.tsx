@@ -175,7 +175,7 @@ export const ReplicationPipelineStatus = () => {
             />
           </div>
           <Button asChild type="default">
-            <Link href={`/project/${ref}/logs/etl-replication-logs`}>View logs</Link>
+            <Link href={`/project/${projectRef}/logs/etl-replication-logs`}>View logs</Link>
           </Button>
           <Button
             type={statusName === 'stopped' ? 'primary' : 'default'}
