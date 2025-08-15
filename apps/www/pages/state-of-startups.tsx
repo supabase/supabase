@@ -10,6 +10,8 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
 import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
+import { DecorativeProgressBar } from '~/components/SurveyResults/DecorativeProgressBar'
+
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import pageData from '~/data/surveys/state-of-startups-2025'
@@ -205,21 +207,8 @@ function StateOfStartupsPage() {
                 }
                 className="border-b md:border-b-0 md:border-r border-muted border-opacity-50 md:text-right flex-1 md:max-w-[var(--left-width)]"
               >
-                {/* Decorative progress bar */}
-                <div aria-hidden="true" className="flex flex-col">
-                  {[0, 1, 2, 3].map((item, index) => (
-                    <div
-                      key={index}
-                      className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand' : index === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
-                      style={{
-                        maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
-                        maskSize: '14.5px 15px',
-                        maskRepeat: 'repeat',
-                        maskPosition: 'top left',
-                      }}
-                    />
-                  ))}
-                </div>
+                <DecorativeProgressBar />
+
                 <p className="text-brand-link text-sm font-mono uppercase py-4 px-8">
                   Supabase presents the 2025
                 </p>
