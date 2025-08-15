@@ -20,14 +20,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!IS_VELA_PLATFORM) {
-    if (req.query.ref === '1') {
+    if (req.query.ref === 'default') {
       // Platform specific endpoint
       return res.status(200).json({
         ...DEFAULT_PROJECT,
         connectionString: '',
         restUrl: PROJECT_REST_URL,
       })
-    } else if (req.query.ref === '2') {
+    } else if (req.query.ref === 'default2') {
       return res.status(200).json({
         ...DEFAULT_PROJECT_2,
         connectionString: '',

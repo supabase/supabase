@@ -3,15 +3,11 @@ import { DEFAULT_ORGANIZATION, IS_VELA_PLATFORM } from '../../../constants'
 import { getVelaClient } from '../../../../../data/vela/vela'
 import { apiBuilder } from '../../../../../lib/api/apiBuilder'
 
-const apiHandler = apiBuilder((builder) => builder.useAuth().get(handleGet))
-
-export default apiHandler
-
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const slug = req.query.slug as string
   if (!IS_VELA_PLATFORM) {
     switch (slug) {
-      case 'default':
+      case 'default-org-slug':
         return res.status(200).json(DEFAULT_ORGANIZATION)
       default:
         return res
@@ -71,3 +67,7 @@ const handleUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(createResponse.response.status).send(createResponse.error)
   }
 }
+
+const apiHandler = apiBuilder((builder) => builder.useAuth().get(handleGet))
+
+export default apiHandler

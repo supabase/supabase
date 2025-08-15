@@ -1,5 +1,6 @@
 import apiWrapper from './apiWrapper'
 import { NextApiHandler } from 'next/dist/shared/lib/utils'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export type ApiHandler = NextApiHandler
 
@@ -15,11 +16,11 @@ export interface ApiBuilder {
 export function apiBuilder(builder: (builder: ApiBuilder) => void): ApiHandler {
   let useAuth = false
   const handlers: {
-    GET: ApiHandler | undefined
-    POST: ApiHandler | undefined
-    PUT: ApiHandler | undefined
-    DELETE: ApiHandler | undefined
-    PATCH: ApiHandler | undefined
+    GET?: ApiHandler
+    POST?: ApiHandler
+    PUT?: ApiHandler
+    DELETE?: ApiHandler
+    PATCH?: ApiHandler
   } = {}
 
   const apiBuilder: ApiBuilder = {
@@ -28,46 +29,52 @@ export function apiBuilder(builder: (builder: ApiBuilder) => void): ApiHandler {
       return this
     },
     get(handler: ApiHandler): ApiBuilder {
-      if (handlers.get) {
+      if (handlers.GET) {
         throw new Error('Only one GET handler can be defined')
       }
-      handlers.get = handler
+      handlers.GET = handler
+      return this
     },
     post(handler: ApiHandler): ApiBuilder {
-      if (handlers.post) {
+      if (handlers.POST) {
         throw new Error('Only one POST handler can be defined')
       }
-      handlers.post = handler
+      handlers.POST = handler
+      return this
     },
     put(handler: ApiHandler): ApiBuilder {
-      if (handlers.put) {
+      if (handlers.PUT) {
         throw new Error('Only one PUT handler can be defined')
       }
-      handlers.put = handler
+      handlers.PUT = handler
+      return this
     },
     delete(handler: ApiHandler): ApiBuilder {
-      if (handlers.delete) {
+      if (handlers.DELETE) {
         throw new Error('Only one DELETE handler can be defined')
       }
-      handlers.delete = handler
+      handlers.DELETE = handler
+      return this
     },
     patch(handler: ApiHandler): ApiBuilder {
-      if (handlers.patch) {
+      if (handlers.PATCH) {
         throw new Error('Only one PATCH handler can be defined')
       }
-      handlers.patch = handler
+      handlers.PATCH = handler
+      return this
     },
   }
 
   builder(apiBuilder)
 
+  const keys = Object.keys(handlers) as (keyof typeof handlers)[];
   const methods = [
-    ...(Objects.keys(handlers).filter(
-      (key) => handlers[key as keyof typeof handlers] !== undefined
-    ) as keyof typeof handlers),
+    ...(keys.filter(
+      (key) => handlers[key] !== undefined
+    )),
   ]
 
-  const handlerFunction = async (req, res) => {
+  const handlerFunction = async (req: NextApiRequest, res: NextApiResponse) => {
     const method = req.method?.toUpperCase()
     if (!methods.includes(method as keyof typeof handlers)) {
       return res
