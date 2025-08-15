@@ -7,12 +7,33 @@ import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 
 const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data, isSuccess } = useVercelRedirectQuery({
-    installationId: selectedOrganization?.partner_id,
-  })
+
+  const vercelQuery = useVercelRedirectQuery(
+    {
+      installationId: selectedOrganization?.partner_id,
+    },
+    {
+      enabled: selectedOrganization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE,
+    }
+  )
+
+  const awsQuery = useAwsRedirectQuery(
+    {
+      organizationSlug: selectedOrganization?.slug,
+    },
+    {
+      enabled: selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE,
+    }
+  )
+
+  // Select the appropriate query based on partner
+  const { data, isSuccess } =
+    selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? awsQuery : vercelQuery
 
   return (
     <div className={cn('w-full flex flex-col overflow-hidden')}>

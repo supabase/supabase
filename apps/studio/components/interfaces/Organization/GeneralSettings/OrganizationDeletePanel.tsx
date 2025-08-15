@@ -3,6 +3,7 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Admonition } from 'ui-patterns'
 import { DeleteOrganizationButton } from './DeleteOrganizationButton'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 
 const OrganizationDeletePanel = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -20,7 +21,7 @@ const OrganizationDeletePanel = () => {
         </Admonition>
       ) : (
         <PartnerManagedResource
-          partner="vercel-marketplace"
+          managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
           resource="Organizations"
           cta={{
             installationId: selectedOrganization?.partner_id,

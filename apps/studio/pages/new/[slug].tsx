@@ -57,6 +57,7 @@ import {
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
   FLY_REGIONS_DEFAULT,
+  MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
@@ -925,7 +926,7 @@ const Wizard: NextPageWithLayout = () => {
                 ) : isManagedByVercel ? (
                   <Panel.Content>
                     <PartnerManagedResource
-                      partner="vercel-marketplace"
+                      managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
                       resource="Projects"
                       cta={{
                         installationId: currentOrg?.partner_id,
