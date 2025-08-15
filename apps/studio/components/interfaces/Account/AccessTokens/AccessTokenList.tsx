@@ -34,7 +34,7 @@ export interface AccessTokenListProps {
 }
 
 const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
-  const { data: tokens, isLoading } = useAccessTokensQuery()
+  const { data: tokens, isLoading, error } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
       console.log('✅ Token deleted successfully')
@@ -48,20 +48,21 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
   })
 
   console.log('Tokens', tokens)
+  console.log('Tokens error', error)
 
   const [isOpen, setIsOpen] = useState(false)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
-  const onDeleteToken = async (tokenId: string) => {
+  const onDeleteToken = async (tokenId: number) => {
     console.log('🗑️ Attempting to delete token with ID:', tokenId)
     deleteToken({ id: tokenId })
   }
 
   const filteredTokens = useMemo(() => {
     return !searchString
-      ? tokens?.tokens
-      : tokens?.tokens?.filter((token) => {
+      ? tokens
+      : tokens?.filter((token) => {
           return token.name.toLowerCase().includes(searchString.toLowerCase())
         })
   }, [tokens, searchString])
@@ -109,6 +110,17 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
     </Card>
   )
 
+  if (error) {
+    return (
+      <TableContainer>
+        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+          <p className="text-sm text-foreground">Failed to load access tokens</p>
+          <p className="text-sm text-foreground-light">Please try refreshing the page</p>
+        </div>
+      </TableContainer>
+    )
+  }
+
   if (isLoading) {
     return (
       <TableContainer>
@@ -135,7 +147,9 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
         <TableContainer>
           {filteredTokens?.map((x) => {
             const createdDate = new Date(x.created_at)
-            const expiryDate = new Date('2025-07-31T17:16:36')
+            // Access tokens don't expire by default, show "Never" or handle expiry if available
+            const hasExpiry = x.expires_at
+            const expiryDate = hasExpiry ? new Date(x.expires_at) : null
 
             return (
               <TableRow key={x.token_alias}>
@@ -146,23 +160,27 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
                   <span className="font-mono text-foreground-light">{x.token_alias}</span>
                 </TableCell>
                 <TableCell>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="text-foreground-light">
-                        {expiryDate.toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        Expires on {expiryDate.toLocaleDateString('en-GB')},{' '}
-                        {expiryDate.toLocaleTimeString('en-GB')}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
+                  {hasExpiry ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-foreground-light">
+                          {expiryDate!.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>
+                          Expires on {expiryDate!.toLocaleDateString('en-GB')},{' '}
+                          {expiryDate!.toLocaleTimeString('en-GB')}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <p className="text-foreground-light">Never</p>
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end gap-x-2">

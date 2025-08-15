@@ -93,9 +93,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
     createAccessToken(
       {
         name: values.tokenName,
-        permissions: [],
-        project_refs: values.selectedProjects,
-        organization_slugs: values.selectedOrganizations,
+        scope: tokenScope,
       },
       {
         onSuccess: (data) => {

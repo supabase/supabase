@@ -1557,7 +1557,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets all projects for the given organization */
+    /**
+     * Gets all projects for the given organization
+     * @description Returns a paginated list of projects for the specified organization.
+     *
+     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     */
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
     post?: never
@@ -2112,42 +2117,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/profile/scoped-access-tokens': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the user's scoped access tokens */
-    get: operations['ScopedAccessTokensController_getAccessTokens']
-    put?: never
-    /** Creates a new scoped access token */
-    post: operations['ScopedAccessTokensController_createAccessToken']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/profile/scoped-access-tokens/{id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the scoped access token with the given ID */
-    get: operations['ScopedAccessTokensController_getAccessToken']
-    put?: never
-    post?: never
-    /** Deletes the scoped access token with the given ID */
-    delete: operations['ScopedAccessTokensController_deleteAccessToken']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/profile/search': {
     parameters: {
       query?: never
@@ -2173,10 +2142,12 @@ export interface paths {
       cookie?: never
     }
     /**
-     * Gets all projects that belong to the authenticated user
-     * @description Only returns the minimal project info
+     * Gets all projects that belong to the authenticated user (paginated)
+     * @description Returns a paginated list of projects across all organizations the user has access to.
+     *
+     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
-    get: operations['ProjectsController_getProjects']
+    get: operations['ProjectsController_getProjectsPaginated']
     put?: never
     /** Creates a project */
     post: operations['ProjectsController_createProject']
@@ -4510,8 +4481,8 @@ export interface components {
       organization_linking_eligibility: {
         is_eligible: boolean
         reasons: (
-          | 'ALREADY_BILLED_BY_PARTNER'
-          | 'ALREADY_BILLED_BY_PARTNER_AWS'
+          | 'ALREADY_MANAGED_BY_PARTNER'
+          | 'ALREADY_MANAGED_BY_PARTNER_AWS'
           | 'OVERDUE_INVOICES'
         )[]
         slug: string
@@ -5097,20 +5068,6 @@ export interface components {
     CreateSchemaBody: {
       name: string
       owner: string
-    }
-    CreateScopedAccessTokenBody: {
-      name: string
-      organization_slugs?: string[]
-      permissions: string[]
-      project_refs?: string[]
-    }
-    CreateScopedAccessTokenResponse: {
-      created_at: string
-      id: string
-      last_used_at: string | null
-      name: string
-      token: string
-      token_alias: string
     }
     CreateSourceResponse: {
       /** @description Source id */
@@ -5791,22 +5748,6 @@ export interface components {
       }
       path: string
     }
-    GetScopedAccessTokenResponse: {
-      created_at: string
-      id: string
-      last_used_at: string | null
-      name: string
-      token_alias: string
-    }
-    GetScopedAccessTokensResponse: {
-      tokens: {
-        created_at: string
-        id: string
-        last_used_at: string | null
-        name: string
-        token_alias: string
-      }[]
-    }
     GetSignedUrlBody: {
       expiresIn: number
       options?: {
@@ -6479,6 +6420,54 @@ export interface components {
         oauth_app_id: string
       }[]
     }
+    ListProjectsPaginatedResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page (actual number may be less) */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
+      projects: {
+        cloud_provider: string
+        disk_volume_size_gb?: number
+        id: number
+        /** @enum {string} */
+        infra_compute_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        inserted_at: string | null
+        is_branch_enabled: boolean
+        is_physical_backups_enabled: boolean | null
+        name: string
+        organization_id: number
+        organization_slug: string
+        preview_branch_refs: string[]
+        ref: string
+        region: string
+        status: string
+        subscription_id: string | null
+      }[]
+    }
     ListRepositoryBranchesResponse: {
       branches: {
         name: string
@@ -6590,6 +6579,14 @@ export interface components {
       website: string
     }
     OrganizationProjectsResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
       projects: {
         databases: {
           cloud_provider: string
@@ -13076,7 +13073,16 @@ export interface operations {
   }
   OrganizationProjectsController_getOrganizationProjects: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Number of projects to return per page */
+        limit?: number
+        /** @description Number of projects to skip */
+        offset?: number
+        /** @description Search projects by name */
+        search?: string
+        /** @description Sort order for projects */
+        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+      }
       header?: never
       path: {
         /** @description Organization slug */
@@ -15552,116 +15558,6 @@ export interface operations {
       }
     }
   }
-  ScopedAccessTokensController_getAccessTokens: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetScopedAccessTokensResponse']
-        }
-      }
-      /** @description Failed to get user's scoped access tokens */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ScopedAccessTokensController_createAccessToken: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateScopedAccessTokenBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CreateScopedAccessTokenResponse']
-        }
-      }
-      /** @description Failed to create scoped access token */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ScopedAccessTokensController_getAccessToken: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetScopedAccessTokenResponse']
-        }
-      }
-      /** @description Failed to get scoped access token */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ScopedAccessTokensController_deleteAccessToken: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete scoped access token */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   SearchProfileController_searchProfile: {
     parameters: {
       query?: never
@@ -15692,9 +15588,18 @@ export interface operations {
       }
     }
   }
-  ProjectsController_getProjects: {
+  ProjectsController_getProjectsPaginated: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Number of projects to return per page */
+        limit?: number
+        /** @description Number of projects to skip */
+        offset?: number
+        /** @description Search projects by name */
+        search?: string
+        /** @description Sort order for projects */
+        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+      }
       header?: never
       path?: never
       cookie?: never
@@ -15706,7 +15611,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectInfo'][]
+          'application/json': components['schemas']['ListProjectsPaginatedResponse']
         }
       }
     }
