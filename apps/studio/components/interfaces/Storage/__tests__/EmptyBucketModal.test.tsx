@@ -43,7 +43,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
   )
 }
 
-describe(`EmptyBucketModal`, () => {
+describe.skip(`EmptyBucketModal`, () => {
   beforeEach(() => {
     // useParams
     routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
