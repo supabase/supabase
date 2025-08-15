@@ -1,5 +1,5 @@
 import { BASE_PATH } from 'lib/constants'
-import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersForm/AuthProvidersFormValidation'
 
 export const PANEL_PADDING = 'px-5 py-5'
 

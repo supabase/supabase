@@ -14,7 +14,7 @@ import {
   ContextMenuTrigger_Shadcn_,
   copyToClipboard,
 } from 'ui'
-import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { PROVIDERS_SCHEMAS } from '../AuthProvidersForm/AuthProvidersFormValidation'
 import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
 

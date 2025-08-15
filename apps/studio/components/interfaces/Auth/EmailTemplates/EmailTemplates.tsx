@@ -3,7 +3,7 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { Card, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
+import { TEMPLATES_SCHEMAS } from './EmailTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import TemplateEditor from './TemplateEditor'
 
@@ -41,7 +41,7 @@ const EmailTemplates = () => {
           ) : null}
           <Card>
             <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
-              <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
+              <TabsList_Shadcn_ className="pt-2 px-6 gap-5overflow-x-scroll no-scrollbar mb-4">
                 {TEMPLATES_SCHEMAS.map((template) => {
                   return (
                     <TabsTrigger_Shadcn_

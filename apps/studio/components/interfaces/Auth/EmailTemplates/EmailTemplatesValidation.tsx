@@ -1,9 +1,29 @@
-import type { FormSchema } from 'types'
-import { object, string } from 'yup'
+import z from 'zod'
 
-const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
+const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#' as const
 
-const CONFIRMATION: FormSchema = {
+export interface Template {
+  $schema: typeof JSON_SCHEMA_VERSION
+  type: 'object'
+  id: string
+  title: string
+  properties: Record<
+    string,
+    {
+      title: string
+      type: 'string' | 'code'
+      description?: string
+      descriptionOptional?: string
+    }
+  >
+  validationSchema: ((smsEnabled: boolean) => z.ZodSchema) | z.ZodSchema
+  misc: {
+    iconKey: string
+    helper?: string
+  }
+}
+
+const CONFIRMATION = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'CONFIRMATION',
   type: 'object',
@@ -28,17 +48,19 @@ const CONFIRMATION: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_CONFIRMATION: string().required('"Subject heading is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_CONFIRMATION: z.string({
+      required_error: '"Subject heading is required.',
+    }),
   }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
+} as const satisfies Template
 
-const INVITE: FormSchema = {
+const INVITE = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'INVITE',
   type: 'object',
@@ -63,17 +85,17 @@ const INVITE: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_INVITE: string().required('"Subject heading is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_INVITE: z.string({ required_error: '"Subject heading is required.' }),
   }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
+} as const satisfies Template
 
-const MAGIC_LINK: FormSchema = {
+const MAGIC_LINK = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MAGIC_LINK',
   type: 'object',
@@ -98,17 +120,17 @@ const MAGIC_LINK: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_MAGIC_LINK: string().required('"Subject heading is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_MAGIC_LINK: z.string({ required_error: '"Subject heading is required.' }),
   }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
+} as const satisfies Template
 
-const EMAIL_CHANGE: FormSchema = {
+const EMAIL_CHANGE = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'EMAIL_CHANGE',
   type: 'object',
@@ -134,17 +156,17 @@ const EMAIL_CHANGE: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_EMAIL_CHANGE: string().required('"Subject heading is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_EMAIL_CHANGE: z.string({ required_error: '"Subject heading is required.' }),
   }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
+} as const satisfies Template
 
-const RECOVERY: FormSchema = {
+const RECOVERY = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'RECOVERY',
   type: 'object',
@@ -169,16 +191,17 @@ const RECOVERY: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_RECOVERY: string().required('"Subject heading is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_RECOVERY: z.string({ required_error: '"Subject heading is required.' }),
   }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
-const REAUTHENTICATION: FormSchema = {
+} as const satisfies Template
+
+const REAUTHENTICATION = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'REAUTHENTICATION',
   type: 'object',
@@ -200,15 +223,15 @@ const REAUTHENTICATION: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_REAUTHENTICATION: string().required('"Subject heading is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_REAUTHENTICATION: z.string({ required_error: '"Subject heading is required.' }),
   }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
-}
+} as const satisfies Template
 
 export const TEMPLATES_SCHEMAS = [
   CONFIRMATION,
@@ -217,4 +240,4 @@ export const TEMPLATES_SCHEMAS = [
   EMAIL_CHANGE,
   RECOVERY,
   REAUTHENTICATION,
-]
+] as const

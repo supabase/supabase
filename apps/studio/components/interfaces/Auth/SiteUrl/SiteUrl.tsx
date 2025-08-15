@@ -1,10 +1,10 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { AlertCircle } from 'lucide-react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -26,8 +26,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const schema = object({
-  SITE_URL: string().required('Must have a Site URL'),
+const schema = z.object({
+  SITE_URL: z.string().url('Must have a Site URL'),
 })
 
 const SiteUrl = () => {
@@ -41,8 +41,8 @@ const SiteUrl = () => {
     'custom_config_gotrue'
   )
 
-  const siteUrlForm = useForm({
-    resolver: yupResolver(schema),
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       SITE_URL: '',
     },
@@ -50,17 +50,18 @@ const SiteUrl = () => {
 
   useEffect(() => {
     if (authConfig && !isUpdatingSiteUrl) {
-      siteUrlForm.reset({
+      form.reset({
         SITE_URL: authConfig.SITE_URL || '',
       })
     }
   }, [authConfig, isUpdatingSiteUrl])
 
-  const onSubmitSiteUrl = (values: any) => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
+    if (!projectRef) return console.error('Project ref is required')
     setIsUpdatingSiteUrl(true)
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: values },
+      { projectRef, config: values },
       {
         onError: (error) => {
           toast.error(`Failed to update site URL: ${error?.message}`)
@@ -88,12 +89,12 @@ const SiteUrl = () => {
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle className="mb-4">Site URL</ScaffoldSectionTitle>
 
-      <Form_Shadcn_ {...siteUrlForm}>
-        <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Card>
             <CardContent className="pt-6">
               <FormField_Shadcn_
-                control={siteUrlForm.control}
+                control={form.control}
                 name="SITE_URL"
                 render={({ field }) => (
                   <FormItemLayout
@@ -110,15 +111,15 @@ const SiteUrl = () => {
             </CardContent>
 
             <CardFooter className="justify-end space-x-2">
-              {siteUrlForm.formState.isDirty && (
-                <Button type="default" onClick={() => siteUrlForm.reset()}>
+              {form.formState.isDirty && (
+                <Button type="default" onClick={() => form.reset()}>
                   Cancel
                 </Button>
               )}
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={!canUpdateConfig || isUpdatingSiteUrl || !siteUrlForm.formState.isDirty}
+                disabled={!canUpdateConfig || isUpdatingSiteUrl || !form.formState.isDirty}
                 loading={isUpdatingSiteUrl}
               >
                 Save changes

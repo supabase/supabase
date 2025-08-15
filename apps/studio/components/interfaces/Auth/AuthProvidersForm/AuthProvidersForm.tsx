@@ -17,8 +17,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import type { Provider } from './AuthProvidersForm.types'
+import { PROVIDERS_SCHEMAS } from './AuthProvidersFormValidation'
 import { ProviderForm } from './ProviderForm'
 
 export const AuthProvidersForm = () => {
@@ -73,29 +72,25 @@ export const AuthProvidersForm = () => {
             ))}
           {isSuccess &&
             PROVIDERS_SCHEMAS.map((provider) => {
-              const providerSchema =
-                provider.title === 'Phone'
-                  ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
-                  : provider
               let isActive = false
-              if (providerSchema.title === 'SAML 2.0') {
+              if (provider.title === 'SAML 2.0') {
                 isActive = authConfig && (authConfig as any)['SAML_ENABLED']
-              } else if (providerSchema.title === 'LinkedIn (OIDC)') {
+              } else if (provider.title === 'LinkedIn (OIDC)') {
                 isActive = authConfig && (authConfig as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
-              } else if (providerSchema.title === 'Slack (OIDC)') {
+              } else if (provider.title === 'Slack (OIDC)') {
                 isActive = authConfig && (authConfig as any)['EXTERNAL_SLACK_OIDC_ENABLED']
-              } else if (providerSchema.title.includes('Web3')) {
+              } else if (provider.title.includes('Web3')) {
                 isActive = authConfig && (authConfig as any)['EXTERNAL_WEB3_SOLANA_ENABLED']
               } else {
                 isActive =
                   authConfig &&
-                  (authConfig as any)[`EXTERNAL_${providerSchema.title.toUpperCase()}_ENABLED`]
+                  (authConfig as any)[`EXTERNAL_${provider.title.toUpperCase()}_ENABLED`]
               }
               return (
                 <ProviderForm
-                  key={`provider_${providerSchema.title}`}
+                  key={`provider_${provider.title}`}
                   config={authConfig!}
-                  provider={providerSchema as unknown as Provider}
+                  provider={provider}
                   isActive={isActive}
                 />
               )
