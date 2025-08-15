@@ -97,7 +97,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
           ref={formRef}
           {...props}
           onSubmit={handleSubmit}
-          className={cn('relative overflow-hidden', className)}
+          className={cn('relative', className)}
         >
           {sqlSnippets && sqlSnippets.length > 0 && (
             <SnippetRow
