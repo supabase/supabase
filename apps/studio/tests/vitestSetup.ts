@@ -41,7 +41,7 @@ beforeAll(() => {
   vi.mock('common', async (importOriginal) => {
     const actual = await importOriginal()
     return {
-      ...actual,
+      ...(typeof actual === 'object' ? actual : {}),
       useParams: () => ({ ref: 'default' }),
     }
   })
