@@ -25,7 +25,9 @@ export function SurveyPullQuote({
           }}
         />
         <div className="relative max-w-[60rem] mx-auto md:border-x border-muted flex flex-col gap-4 text-center items-center px-6 py-24 bg-alternative">
-          <p className="text-foreground-lighter text-2xl text-balance max-w-prose">“{quote}”</p>
+          <p className="text-foreground-lighter text-2xl tracking-tight text-balance max-w-prose">
+            “{quote}”
+          </p>
           <Image
             src={authorAvatar || '/images/twitter-profiles/qhvO9V6x_400x400.jpg'}
             width={48}

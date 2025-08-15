@@ -198,27 +198,27 @@ function StateOfStartupsPage() {
           {/* Text contents */}
           <header className="w-full flex flex-col md:flex-col">
             <div className="flex flex-col md:flex-row">
-              {/* Left side - spans from left edge to end of second grid column */}
+              {/* Intro area */}
               <div
                 style={
                   {
                     '--left-width': 'calc((50% - 60rem / 2) + (60rem * 1/3))',
                   } as React.CSSProperties
                 }
-                className="border-b md:border-b-0 md:border-r border-muted border-opacity-50 md:text-right flex-1 md:max-w-[var(--left-width)]"
+                className="md:border-r border-muted border-opacity-50 md:text-right flex-1 md:max-w-[var(--left-width)]"
               >
                 <DecorativeProgressBar />
 
-                <p className="text-brand-link text-sm font-mono uppercase py-4 px-8">
+                <p className="text-brand-link text-sm font-mono uppercase px-8 pt-12 text-balance">
                   Supabase presents the 2025
                 </p>
               </div>
 
-              {/* Right side - takes up remaining space */}
+              {/* Headline area */}
               <div
-                className="px-8 py-12 md:pt-36 pb-28 flex-1"
+                className="px-8 pt-10 pb-16 md:pt-36 md:pb-28 flex-1"
                 style={{
-                  background: `radial-gradient(ellipse at 5% -40%, hsl(var(--brand-500)), transparent 65%), radial-gradient(ellipse at 85% 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+                  background: `radial-gradient(ellipse at 5% 200%, hsl(var(--brand-400)), transparent 70%)`,
                 }}
               >
                 <h1 className="text-7xl sm:text-8xl lg:text-9xl tracking-tight">
@@ -227,11 +227,12 @@ function StateOfStartupsPage() {
                 </h1>
               </div>
             </div>
-            <SurveySectionBreak />
+
+            <SurveySectionBreak className="hidden md:block" />
 
             <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto border-x border-muted">
               {/* Intro text */}
-              <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground md:text-2xl">
+              <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl">
                 <p>{pageData.heroSection.subheader}</p>
                 <p>{pageData.heroSection.cta}</p>
               </div>

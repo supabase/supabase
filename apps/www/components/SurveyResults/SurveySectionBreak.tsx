@@ -1,6 +1,8 @@
-export function SurveySectionBreak() {
+import { cn } from 'ui'
+
+export function SurveySectionBreak({ className }: { className?: string }) {
   return (
-    <div aria-hidden="true" className="border-y border-muted">
+    <div aria-hidden="true" className={cn('border-y border-muted', className)}>
       <div className="max-w-[60rem] mx-auto md:border-x border-muted">
         <div
           className="h-14 md:h-18 lg:h-20 xl:h-24 bg-surface-400 dark:bg-surface-75"
