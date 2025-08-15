@@ -1,11 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM } from 'common'
-import { useParams } from 'common/hooks/useParams'
-import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useLatest from 'hooks/misc/useLatest'
-import { useProfile } from 'lib/profile'
 import {
   Copy,
   Download,
@@ -21,6 +14,18 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
+
+import { IS_PLATFORM } from 'common'
+import { useParams } from 'common/hooks/useParams'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { getContentById } from 'data/content/content-id-query'
+import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
+import { Snippet } from 'data/content/sql-folders-query'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import useLatest from 'hooks/misc/useLatest'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProfile } from 'lib/profile'
+import uuidv4 from 'lib/uuid'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -46,7 +51,6 @@ interface SQLEditorTreeViewItemProps
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
-  onSelectDuplicate?: () => void
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
@@ -77,7 +81,6 @@ export const SQLEditorTreeViewItem = ({
   onSelectShare,
   onSelectUnshare,
   onSelectDownload,
-  onSelectDuplicate,
   onEditSave,
   onMultiSelect,
   isLastItem,
@@ -92,6 +95,7 @@ export const SQLEditorTreeViewItem = ({
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
@@ -102,10 +106,14 @@ export const SQLEditorTreeViewItem = ({
   const isEditing = status === 'editing'
   const isSaving = status === 'saving'
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const parentId = element.parent === 0 ? undefined : element.parent
 
@@ -173,6 +181,38 @@ export const SQLEditorTreeViewItem = ({
       if (isFavorite) snapV2.removeFavorite(snippetId)
       else snapV2.addFavorite(snippetId)
     }
+  }
+
+  const onSelectDuplicate = async () => {
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+    if (!projectRef) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+
+    const snippet = element.metadata
+    let sql: string = ''
+
+    if (snippet.content && snippet.content.sql) {
+      sql = snippet.content.sql
+    } else {
+      // Fetch the content first
+      const { content } = await getContentById({ projectRef, id: snippet.id })
+      if ('sql' in content) {
+        sql = content.sql
+      }
+    }
+
+    const snippetCopy = createSqlSnippetSkeletonV2({
+      id: uuidv4(),
+      name: `${snippet.name} (Duplicate)`,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    })
+
+    snapV2.addSnippet({ projectRef, snippet: snippetCopy })
+    snapV2.addNeedsSaving(snippetCopy.id!)
+    router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
   }
 
   return (
