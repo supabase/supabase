@@ -21,10 +21,13 @@ export async function getProjects({
   signal?: AbortSignal
   headers?: Record<string, string>
 }) {
-  const { data, error } = await get('/platform/projects', { signal, headers })
+  const { data, error } = await get('/platform/projects', {
+    signal,
+    headers: { ...headers, Version: '2' },
+  })
 
   if (error) handleError(error)
-  return data as ProjectInfo[]
+  return data.projects as ProjectInfo[]
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>

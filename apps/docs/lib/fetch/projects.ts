@@ -8,9 +8,14 @@ const projectKeys = {
 }
 
 export async function getProjects(signal?: AbortSignal) {
-  const { data, error } = await get('/platform/projects', { signal })
+  const { data, error } = await get('/platform/projects', {
+    signal,
+    headers: {
+      Version: '2',
+    },
+  })
   if (error) throw error
-  return data
+  return data.projects
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
