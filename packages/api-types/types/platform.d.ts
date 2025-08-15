@@ -227,6 +227,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/cloud-marketplace/buyers/{buyer_id}/onboarding-info': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get info needed for AWS Marketplace onboarding */
+    get: operations['ClazarController_getCloudMarketplaceOnboardingInfo']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/database/{ref}/backups': {
     parameters: {
       query?: never
@@ -1634,23 +1651,6 @@ export interface paths {
     put?: never
     /** Creates organization billed by AWS Marketplace */
     post: operations['OrganizationsController_createAwsBilledOrganization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/cloud-marketplace/check-eligibility': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Check whether given organizations are eligible for AWS billing */
-    get: operations['OrganizationsController_checkCloudMarketplaceEligibility']
-    put?: never
-    post?: never
     delete?: never
     options?: never
     head?: never
@@ -4438,11 +4438,6 @@ export interface components {
     ChangeMFAEnforcementStateRequest: {
       enforced: boolean
     }
-    CheckCloudMarketplaceEligibilityResponse: {
-      is_eligible: boolean
-      reasons: string[]
-      slug: string
-    }[]
     CloneBackupsResponse: {
       backups: {
         id: number
@@ -4470,6 +4465,22 @@ export interface components {
       newProjectName: string
       /** @default 0 */
       recoveryTimeTarget?: number
+    }
+    CloudMarketplaceOnboardingInfoResponse: {
+      aws_contract_auto_renewal: boolean
+      aws_contract_end_date: string
+      aws_contract_settings_url: string
+      aws_contract_start_date: string
+      organization_linking_eligibility: {
+        is_eligible: boolean
+        reasons: (
+          | 'ALREADY_BILLED_BY_PARTNER'
+          | 'ALREADY_BILLED_BY_PARTNER_AWS'
+          | 'OVERDUE_INVOICES'
+        )[]
+        slug: string
+      }[]
+      plan_name_selected_on_marketplace: string
     }
     ConfirmCreateSubscriptionChangeBody: {
       kind?: string
@@ -5800,6 +5811,7 @@ export interface components {
       /** @enum {string} */
       billing_partner?: 'fly' | 'aws' | 'vercel_marketplace'
       billing_via_partner: boolean
+      cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
       customer_balance: number
@@ -6078,6 +6090,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID: string
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
+      EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean
       EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
       EXTERNAL_WORKOS_ENABLED: boolean
@@ -6709,6 +6722,7 @@ export interface components {
         /** @enum {string} */
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -8276,6 +8290,7 @@ export interface components {
         /** @enum {string} */
         usage_metric?:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -8539,6 +8554,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID?: string | null
       EXTERNAL_TWITTER_ENABLED?: boolean | null
       EXTERNAL_TWITTER_SECRET?: string | null
+      EXTERNAL_WEB3_ETHEREUM_ENABLED?: boolean | null
       EXTERNAL_WEB3_SOLANA_ENABLED?: boolean | null
       EXTERNAL_WORKOS_CLIENT_ID?: string | null
       EXTERNAL_WORKOS_ENABLED?: boolean | null
@@ -9764,6 +9780,34 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve CLI login session */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ClazarController_getCloudMarketplaceOnboardingInfo: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        buyer_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CloudMarketplaceOnboardingInfoResponse']
+        }
+      }
+      /** @description Failed to get info for AWS Marketplace onboarding */
       500: {
         headers: {
           [name: string]: unknown
@@ -11854,6 +11898,7 @@ export interface operations {
         interval?: string
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -13256,36 +13301,10 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateOrganizationResponse']
+          'application/json': components['schemas']['OrganizationResponse']
         }
       }
       /** @description Failed to create organization billed by AWS Marketplace */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationsController_checkCloudMarketplaceEligibility: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CheckCloudMarketplaceEligibilityResponse']
-        }
-      }
-      /** @description Failed to check whether organizations are eligible for AWS billing */
       500: {
         headers: {
           [name: string]: unknown
@@ -17731,6 +17750,7 @@ export interface operations {
           | 'total_realtime_egress'
           | 'total_ingress'
           | 'total_egress'
+          | 'total_cached_egress'
           | 'total_requests'
           | 'total_get_requests'
           | 'total_patch_requests'

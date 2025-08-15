@@ -6,6 +6,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Handle, NodeProps, Position } from 'reactflow'
 
 import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import SparkBar from 'components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
@@ -13,7 +14,7 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -181,7 +182,10 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   } = data
   const { ref } = useParams()
   const dbSelectorState = useDatabaseSelectorStateSnapshot()
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'projects'
+  )
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
@@ -370,24 +374,18 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem
-                  className="gap-x-2 !pointer-events-auto"
-                  disabled={!canManageReplicas}
-                  onClick={() => {
-                    if (canManageReplicas) onSelectDropReplica()
-                  }}
-                >
-                  Drop replica
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canManageReplicas && (
-                <TooltipContent side="left">
-                  You need additional permissions to drop replicas
-                </TooltipContent>
-              )}
-            </Tooltip>
+            <DropdownMenuItemTooltip
+              className="gap-x-2 !pointer-events-auto"
+              disabled={!canManageReplicas}
+              onClick={() => {
+                if (canManageReplicas) onSelectDropReplica()
+              }}
+              tooltip={{
+                content: { side: 'left', text: 'You need additional permissions to drop replicas' },
+              }}
+            >
+              Drop replica
+            </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

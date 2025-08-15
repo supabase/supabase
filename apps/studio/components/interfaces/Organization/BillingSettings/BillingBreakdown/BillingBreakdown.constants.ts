@@ -35,6 +35,14 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     unitName: 'GB',
   },
   {
+    key: PricingMetric.CACHED_EGRESS,
+    name: 'Cached Egress',
+    units: 'bytes',
+    anchor: 'cachedEgress',
+    category: 'Database',
+    unitName: 'GB',
+  },
+  {
     key: PricingMetric.MONTHLY_ACTIVE_USERS,
     name: 'Monthly Active Users',
     units: 'absolute',

@@ -8,7 +8,7 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
@@ -32,7 +32,7 @@ const CustomDomainSidePanel = () => {
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const canUpdateCustomDomain = useCheckPermissions(
+  const { can: canUpdateCustomDomain } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

@@ -64,9 +64,11 @@ If you upgrade your project to a larger instance for 10 hours and then downgrade
 
 Read more about [Compute usage](/docs/guides/platform/manage-your-usage/compute).
 
-#### What is unified egress and how is it billed?
+#### What is egress and how is it billed?
 
-Unified egress refers to the total egress quota available to each organization. This quota can be utilized for various purposes such as Storage, Realtime, Auth, Functions, Supavisor, Log Drains and Database. Each plan includes a specific egress quota, and any additional usage beyond that quota is billed accordingly.
+Egress refers to the total bandwidth (network traffic) quota available to each organization. This quota can be utilized for various purposes such as Storage, Realtime, Auth, Functions, Supavisor, Log Drains and Database. Each plan includes a specific egress quota, and any additional usage beyond that quota is billed accordingly.
+
+We differentiate between cached (served via our CDN from cache hits) and uncached egress and give quotas for each type and have varying pricing (cached egress is cheaper).
 
 Read more about [Egress usage](/docs/guides/platform/manage-your-usage/egress).
 
@@ -128,7 +130,7 @@ The Fair Use Policy is generally applied to all projects of the restricted organ
 
 To remove restrictions, you will need to address the issue that caused the restriction. This could be reducing your usage, paying overdue invoices, updating your payment method, or any other issue that caused the restriction. Once the issue is resolved, the restriction will be lifted.
 
-Restrictions due to usage limits are lifted with the next billing cycle as your quota refills at the beginning of each cycle. You can see when your current billing cycle ends on the [billing page](https://supabase.com/dashboard/org/_/billing) under "Upcoming Invoice". If your organization is on the Free Plan, you can also lift restrictions immediately by [upgrading](https://supabase.com/dashboard/org/_/billing?panel=subscriptionPlan) to Pro.
+Restrictions due to usage limits are lifted with the next billing cycle as your quota refills at the beginning of each cycle. You can see when your current billing cycle ends on the [billing page](https://supabase.com/dashboard/org/_/billing) under "Upcoming Invoice". You can also lift restrictions immediately by [upgrading](https://supabase.com/dashboard/org/_/billing?panel=subscriptionPlan) to Pro (if on Free Plan) or by [disabling spend cap](https://supabase.com/dashboard/org/_/billing?panel=costControl) (if on Pro Plan with spend cap enabled).
 
 ## Reports and invoices
 

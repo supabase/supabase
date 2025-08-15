@@ -1,26 +1,57 @@
-import { useParams } from 'common'
 import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { formatPoliciesForStorage } from './Storage.utils'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Label_Shadcn_,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface DeleteBucketModalProps {
   visible: boolean
-  bucket?: Bucket
+  bucket: Bucket
   onClose: () => void
 }
 
-const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketModalProps) => {
+const formId = `delete-storage-bucket-form`
+
+export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModalProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
+  const schema = z.object({
+    confirm: z.literal(bucket.name, {
+      errorMap: () => ({ message: `Please enter "${bucket.name}" to confirm` }),
+    }),
+  })
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+  })
 
   const { data } = useBucketsQuery({ projectRef })
   const { data: policies } = useDatabasePoliciesQuery({
@@ -30,7 +61,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
   })
   const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()
 
-  const { mutate: deleteBucket, isLoading: isDeleting } = useBucketDeleteMutation({
+  const { mutate: deleteBucket, isLoading } = useBucketDeleteMutation({
     onSuccess: async () => {
       if (!project) return console.error('Project is required')
 
@@ -41,7 +72,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
         storageObjectsPolicies
       )
       const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket!.name }),
+        find(formattedStorageObjectPolicies, { name: bucket.name }),
         ['policies'],
         []
       )
@@ -57,12 +88,12 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
           )
         )
 
-        toast.success(`Successfully deleted bucket ${bucket?.name}`)
+        toast.success(`Successfully deleted bucket ${bucket.name}`)
         router.push(`/project/${projectRef}/storage/buckets`)
         onClose()
       } catch (error) {
         toast.success(
-          `Successfully deleted bucket ${bucket?.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
+          `Successfully deleted bucket ${bucket.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
         )
       }
     },
@@ -70,34 +101,83 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
 
   const buckets = data ?? []
 
-  const onDeleteBucket = async () => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
     deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
   }
 
   return (
-    <TextConfirmModal
-      variant={'destructive'}
-      visible={visible}
-      title={`Confirm deletion of ${bucket?.name}`}
-      confirmPlaceholder="Type in name of bucket"
-      onConfirm={onDeleteBucket}
-      onCancel={onClose}
-      confirmString={bucket?.name ?? ''}
-      loading={isDeleting}
-      text={
-        <>
-          Your bucket <span className="font-bold text-foreground">{bucket?.name}</span> and all its
-          contents will be permanently deleted.
-        </>
-      }
-      alert={{
-        title: 'You cannot recover this bucket once deleted.',
-        description: 'All bucket data will be lost.',
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose()
+        }
       }}
-      confirmLabel="Delete bucket"
-    />
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{`Confirm deletion of ${bucket.name}`}</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-4">
+          <Admonition
+            type="destructive"
+            title="You cannot recover this bucket once deleted."
+            description="All bucket data will be lost."
+          />
+          <p>
+            Your bucket <span className="font-bold text-foreground">{bucket.name}</span> and all its
+            contents will be permanently deleted.
+          </p>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField_Shadcn_
+                key="confirm"
+                name="confirm"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    name="confirm"
+                    label={
+                      <>
+                        Type <span className="font-bold text-foreground">{bucket.name}</span> to
+                        confirm.
+                      </>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        id="confirm"
+                        autoComplete="off"
+                        {...field}
+                        placeholder="Type in name of bucket"
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form_Shadcn_>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" disabled={isLoading} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button form={formId} htmlType="submit" type="danger" loading={isLoading}>
+            Delete Bucket
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
