@@ -21,3 +21,14 @@
     clip-path: inset(0 0 0 100%);
   }
 }
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}

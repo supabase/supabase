@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import './surveyResults.css'
 
 export function SurveySummarizedAnswer({ label, answers }: { label: string; answers: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isBlinking, setIsBlinking] = useState(false)
 
   useEffect(() => {
     if (answers.length <= 1) return
@@ -17,6 +19,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
   useEffect(() => {
     // First, reset the bar to 0%
     setIsAnimating(false)
+    setIsBlinking(false)
 
     // Then start the animation after a brief delay to ensure the reset is applied
     const startTimer = setTimeout(() => {
@@ -28,15 +31,32 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
       setIsAnimating(false)
     }, 4050)
 
+    // Start blinking shortly before text change
+    const blinkTimer = setTimeout(() => {
+      setIsBlinking(true)
+    }, 3700)
+
+    // Stop blinking when text changes
+    const stopBlinkTimer = setTimeout(() => {
+      setIsBlinking(false)
+    }, 4000)
+
     return () => {
       clearTimeout(startTimer)
       clearTimeout(stopTimer)
+      clearTimeout(blinkTimer)
+      clearTimeout(stopBlinkTimer)
     }
   }, [currentIndex])
 
   return (
     <div className="border-t border-muted flex flex-col gap-6 px-8 py-16 sm:items-center sm:text-center">
-      <p className="text-foreground text-xl tracking-tight transition-opacity duration-500">
+      <p
+        className="text-foreground text-xl tracking-tight transition-opacity duration-500"
+        style={{
+          animation: isBlinking ? 'blink 100ms infinite' : 'none',
+        }}
+      >
         {answers[currentIndex]}
       </p>
       {/* Decorative progress bar */}
