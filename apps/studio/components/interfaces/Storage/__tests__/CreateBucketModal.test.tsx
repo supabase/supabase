@@ -4,9 +4,10 @@ import userEvent from '@testing-library/user-event'
 
 import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { render } from 'tests/helpers'
+
 import { routerMock } from 'tests/lib/route-mock'
 import CreateBucketModal from '../CreateBucketModal'
+import { customRender } from 'tests/lib/custom-render'
 
 describe(`CreateBucketModal`, () => {
   beforeEach(() => {
@@ -40,7 +41,7 @@ describe(`CreateBucketModal`, () => {
   })
 
   it(`renders a dialog with a form`, async () => {
-    render(
+    customRender(
       <ProjectContextProvider projectRef="default">
         <CreateBucketModal />
       </ProjectContextProvider>

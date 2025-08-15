@@ -8,8 +8,8 @@ import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
 import EmptyBucketModal from '../EmptyBucketModal'
-import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
+import { customRender } from 'tests/lib/custom-render'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
@@ -81,7 +81,7 @@ describe(`EmptyBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)

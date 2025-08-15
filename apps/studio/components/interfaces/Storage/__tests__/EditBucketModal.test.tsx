@@ -7,9 +7,9 @@ import { faker } from '@faker-js/faker'
 import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
 import EditBucketModal from '../EditBucketModal'
+import { customRender } from 'tests/lib/custom-render'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
@@ -70,7 +70,7 @@ describe(`EditBucketModal`, () => {
 
   it(`renders a dialog with a form`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)

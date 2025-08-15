@@ -8,8 +8,8 @@ import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
 import DeleteBucketModal from '../DeleteBucketModal'
-import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
+import { customRender } from 'tests/lib/custom-render'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
@@ -104,7 +104,7 @@ describe(`DeleteBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
@@ -122,7 +122,7 @@ describe(`DeleteBucketModal`, () => {
 
   it(`prevents submission when the input doesn't match the bucket name`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
