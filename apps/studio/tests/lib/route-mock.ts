@@ -1,7 +1,7 @@
-import { glob } from 'fs/promises'
+import { glob } from 'node:fs/promises'
+import { normalize, posix, sep, join } from 'node:path'
 import _routerMock from 'next-router-mock'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
-import { normalize, posix, sep, join } from 'path'
 
 export const routerMock = _routerMock
 
@@ -22,5 +22,7 @@ const paths = [
   ...(await Array.fromAsync(glob(`${pagesRoot}/**/*\].tsx`))),
   ...(await Array.fromAsync(glob(`${pagesRoot}/**/**\]/**/index.tsx`))),
 ].map(pipe(normalize, toPosix, removePrefix, removeExt))
+
+console.log({ pagesRoot, paths })
 
 routerMock.useParser(createDynamicRouteParser(paths))
