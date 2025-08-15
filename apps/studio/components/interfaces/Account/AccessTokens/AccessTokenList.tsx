@@ -3,6 +3,8 @@ import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tok
 import { Trash, MoreVertical } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
+import dayjs from 'dayjs'
+import { DATETIME_FORMAT } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -37,25 +39,19 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
   const { data: tokens, isLoading, error } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
-      console.log('✅ Token deleted successfully')
       toast.success('Successfully deleted access token')
       setIsOpen(false)
     },
     onError: (error) => {
-      console.error('❌ Failed to delete token:', error)
       toast.error(`Failed to delete access token: ${error.message}`)
     },
   })
-
-  console.log('Tokens', tokens)
-  console.log('Tokens error', error)
 
   const [isOpen, setIsOpen] = useState(false)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
   const onDeleteToken = async (tokenId: number) => {
-    console.log('🗑️ Attempting to delete token with ID:', tokenId)
     deleteToken({ id: tokenId })
   }
 
@@ -99,7 +95,7 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
                 Token
               </TableHead>
               <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                Expiry
+                Created
               </TableHead>
               <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />
             </TableRow>
@@ -146,10 +142,6 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
       <TooltipProvider>
         <TableContainer>
           {filteredTokens?.map((x) => {
-            const createdDate = new Date(x.created_at)
-            // Access tokens don't expire by default, show "Never" or handle expiry if available
-            const hasExpiry = x.expires_at
-            const expiryDate = hasExpiry ? new Date(x.expires_at) : null
 
             return (
               <TableRow key={x.token_alias}>
@@ -160,31 +152,22 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
                   <span className="font-mono text-foreground-light">{x.token_alias}</span>
                 </TableCell>
                 <TableCell>
-                  {hasExpiry ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <p className="text-foreground-light">
-                          {expiryDate!.toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </p>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          Expires on {expiryDate!.toLocaleDateString('en-GB')},{' '}
-                          {expiryDate!.toLocaleTimeString('en-GB')}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <p className="text-foreground-light">Never</p>
-                  )}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <p className="text-foreground-light">
+                        {dayjs(x.created_at).format('D MMM YYYY')}
+                      </p>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        Created on {dayjs(x.created_at).format(DATETIME_FORMAT)}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end gap-x-2">
-                    <Button
+                    {/* <Button
                       type="default"
                       title="View access"
                       onClick={() => {
@@ -193,7 +176,7 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
                       }}
                     >
                       View access
-                    </Button>
+                    </Button> */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -209,10 +192,6 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
                         <DropdownMenuItem
                           className="gap-x-2"
                           onClick={() => {
-                            console.log('🔍 Selected token for deletion:', x)
-                            console.log('🔍 Token object keys:', Object.keys(x))
-                            console.log('🔍 Token ID field:', x.id)
-                            console.log('🔍 Token token_alias:', x.token_alias)
                             setToken(x)
                             setIsOpen(true)
                           }}
