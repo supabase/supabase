@@ -1,14 +1,14 @@
-import { useRef, useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
-import { useQueryClient } from '@tanstack/react-query'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import z from 'zod'
 import * as Sentry from '@sentry/nextjs'
 import type { AuthError } from '@supabase/supabase-js'
-import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { useQueryClient } from '@tanstack/react-query'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
 
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
@@ -16,12 +16,13 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LastSignInWrapper } from './LastSignInWrapper'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = z.object({
-  email: z.string({ required_error: 'Email is required' }).email('Must be a valid email'),
-  password: z.string({ required_error: 'Password is required' }),
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+  password: z.string().min(1, 'Password is required'),
 })
 
 const formId = 'sign-in-form'
@@ -131,6 +132,7 @@ export const SignInForm = () => {
                   autoComplete="email"
                   {...field}
                   placeholder="you@example.com"
+                  disabled={isSubmitting}
                 />
               </FormControl_Shadcn_>
             </FormItemLayout>
@@ -190,5 +192,3 @@ export const SignInForm = () => {
     </Form_Shadcn_>
   )
 }
-
-export default SignInForm

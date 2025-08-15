@@ -6,7 +6,15 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { motion } from 'framer-motion'
+import { CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
+import { useRef, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
@@ -20,31 +28,37 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  cn,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = z.object({
-  email: z.string({ required_error: 'Email is required' }).email('Must be a valid email'),
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
   password: z
     .string()
     .min(1, 'Password is required')
     .max(72, 'Password cannot exceed 72 characters')
-    .refine((password) => {
-      // Basic password validation - you can enhance this based on your requirements
-      const hasUppercase = /[A-Z]/.test(password)
-      const hasLowercase = /[a-z]/.test(password)
-      const hasNumber = /[0-9]/.test(password)
-      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password)
-      const isLongEnough = password.length >= 8
-
-      return hasUppercase && hasLowercase && hasNumber && hasSpecialChar && isLongEnough
-    }, 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character'),
+    .refine((password) => password.length >= 8, 'Password must be at least 8 characters')
+    .refine(
+      (password) => /[A-Z]/.test(password),
+      'Password must contain at least 1 uppercase character'
+    )
+    .refine(
+      (password) => /[a-z]/.test(password),
+      'Password must contain at least 1 lowercase character'
+    )
+    .refine((password) => /[0-9]/.test(password), 'Password must contain at least 1 number')
+    .refine(
+      (password) => /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password),
+      'Password must contain at least 1 symbol'
+    ),
 })
 
 const formId = 'sign-up-form'
 
-const SignUpForm = () => {
+export const SignUpForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -74,6 +88,7 @@ const SignUpForm = () => {
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email, password }) => {
+    // [Joshen] Separate submitting state as there's 2 async processes here
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
@@ -109,27 +124,32 @@ const SignUpForm = () => {
   }
 
   const password = form.watch('password')
+  const isSubmitting = form.formState.isSubmitting || isSigningUp
 
   return (
     <div className="relative">
+      {isSubmitted && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="absolute top-0 w-full"
+        >
+          <Alert_Shadcn_ variant="default">
+            <CheckCircle />
+            <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              You've successfully signed up. Please check your email to confirm your account before
+              signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </motion.div>
+      )}
       <div
-        className={`absolute top-0 duration-500 delay-300 w-full ${
-          isSubmitted ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <Alert_Shadcn_ variant="default">
-          <CheckCircle />
-          <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs">
-            You've successfully signed up. Please check your email to confirm your account before
-            signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </div>
-      <div
-        className={`w-full py-1 transition-all overflow-y-hidden duration-500 ${
+        className={cn(
+          'w-full py-1 transition-all duration-500',
           isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
-        }`}
+        )}
       >
         <Form_Shadcn_ {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -142,9 +162,8 @@ const SignUpForm = () => {
                   <FormControl_Shadcn_>
                     <Input_Shadcn_
                       id="email"
-                      type="email"
                       autoComplete="email"
-                      disabled={isSigningUp}
+                      disabled={isSubmitting}
                       {...field}
                       placeholder="you@example.com"
                     />
@@ -168,15 +187,15 @@ const SignUpForm = () => {
                         placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
                         {...field}
                         onFocus={() => setShowConditions(true)}
-                        disabled={isSigningUp}
+                        disabled={isSubmitting}
                       />
                       <Button
                         type="default"
                         title={passwordHidden ? `Hide password` : `Show password`}
                         aria-label={passwordHidden ? `Hide password` : `Show password`}
-                        className="absolute right-2 top-1 px-3 py-2"
+                        className="absolute right-1 top-1 px-1.5"
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
-                        disabled={isSigningUp}
+                        disabled={isSubmitting}
                         onClick={() => setPasswordHidden((prev) => !prev)}
                       />
                     </div>
@@ -198,12 +217,8 @@ const SignUpForm = () => {
                 ref={captchaRef}
                 sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
                 size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
               />
             </div>
 
@@ -212,8 +227,8 @@ const SignUpForm = () => {
               form={formId}
               htmlType="submit"
               size="large"
-              disabled={password.length === 0 || isSigningUp}
-              loading={isSigningUp}
+              disabled={password.length === 0 || isSubmitting}
+              loading={isSubmitting}
             >
               Sign Up
             </Button>
@@ -223,5 +238,3 @@ const SignUpForm = () => {
     </div>
   )
 }
-
-export default SignUpForm

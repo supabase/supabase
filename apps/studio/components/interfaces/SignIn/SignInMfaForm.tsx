@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Lock } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
-import type { Factor } from '@supabase/supabase-js'
 
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -18,7 +20,7 @@ import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Sha
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = z.object({
-  code: z.string({ required_error: 'MFA Code is required' }),
+  code: z.string().min(1, 'MFA Code is required'),
 })
 
 const formId = 'sign-in-mfa-form'
@@ -192,5 +194,3 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     </>
   )
 }
-
-export default SignInMfaForm

@@ -141,7 +141,7 @@
     "use-debounce": "^7.0.1",
     "uuid": "^9.0.1",
     "valtio": "catalog:",
-    "yup-password": "^0.3.0",
+    "yup": "^1.4.0",
     "zod": "^3.25.76",
     "zxcvbn": "^4.4.2"
   },
