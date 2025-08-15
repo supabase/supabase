@@ -1,9 +1,28 @@
-import { Plus } from 'lucide-react'
+import type { CSSProperties, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import { Plus } from 'lucide-react'
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+} from '@dnd-kit/core'
+import { SortableContext, rectSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import { useParams } from 'common'
+import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
-import { useContentQuery } from 'data/content/content-query'
+import { Content, useContentQuery, useContentQuery as useReportQuery } from 'data/content/content-query'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useProfile } from 'lib/profile'
+import type { Dashboards } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -17,29 +36,8 @@ import {
   CommandItem_Shadcn_,
 } from 'ui'
 import { Row } from 'ui-patterns'
-import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
-import dayjs from 'dayjs'
-import type { Dashboards } from 'types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Content, useContentQuery as useReportQuery } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import {
-  DndContext,
-  DragEndEvent,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  closestCenter,
-} from '@dnd-kit/core'
-import { SortableContext, rectSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable'
-import type { CSSProperties, ReactNode } from 'react'
 
-type CustomReportSectionProps = {}
-
-export default function CustomReportSection({}: CustomReportSectionProps) {
+export default function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
   const endDate = dayjs().toISOString()
   const [snippetSearch, setSnippetSearch] = useState('')
@@ -84,7 +82,7 @@ export default function CustomReportSection({}: CustomReportSectionProps) {
   // Drag and drop reordering for report blocks
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
-  const handleDragStart = (_event: DragStartEvent) => {}
+  const handleDragStart = () => {}
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -319,9 +317,7 @@ function SortableReportBlock({
     | ((args: { attributes: any; listeners: any; isDragging: boolean }) => ReactNode)
     | ReactNode
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-  })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
 
   const style: CSSProperties = {
     transform: transform

@@ -1,11 +1,12 @@
 import Link from 'next/link'
-import ActivityStats from 'components/interfaces/Home/ActivityStats'
+
+import ActivityStats from 'components/interfaces/HomeNew/ActivityStats'
+import InstanceConfiguration from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
-import InstanceConfiguration from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 
 interface TopSectionProps {
   projectName: string

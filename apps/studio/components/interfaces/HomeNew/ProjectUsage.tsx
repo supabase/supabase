@@ -7,7 +7,6 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import { InlineLink } from 'components/ui/InlineLink'
-// Replaced legacy Panel with Card primitives
 import {
   ProjectLogStatsVariables,
   useProjectLogStatsQuery,
@@ -71,22 +70,18 @@ type StatusTimeseriesDatum = {
   status: UsageStatus
 }
 
-// Deterministic pseudo-random generator based on a string seed
 const seededRatio = (seed: string) => {
   let hash = 0
   for (let i = 0; i < seed.length; i++) {
-    // simple string hash
     hash = (hash << 5) - hash + seed.charCodeAt(i)
     hash |= 0
   }
-  // Map to [0, 1)
   const n = Math.abs(hash % 1000)
   return n / 1000
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
-// Generate mock per-status timeseries from an aggregated base series
 const generateStatusTimeSeries = (
   base: any[] = [],
   totalKey: string,
@@ -97,31 +92,28 @@ const generateStatusTimeSeries = (
     const ts = String(point.timestamp)
     const total = Number(point?.[totalKey] || 0)
 
-    // Mock fallback: if total is zero, seed a small baseline so charts don't look empty
     const seededBaseline = Math.round(5 + seededRatio(`${serviceKey}-${ts}-base`) * 20)
-    // Add jitter/spikes to make values more varied even when totals exist
-    const jitter = 0.85 + seededRatio(`${serviceKey}-${ts}-jitter`) * 0.4 // 0.85 - 1.25
+    const jitter = 0.85 + seededRatio(`${serviceKey}-${ts}-jitter`) * 0.4
     let effectiveTotal = total > 0 ? Math.max(1, Math.round(total * jitter)) : seededBaseline
     const spikeChance = seededRatio(`${serviceKey}-${ts}-spike`)
+    
     if (spikeChance > 0.98) {
       effectiveTotal = Math.round(effectiveTotal * 2.5)
     } else if (spikeChance < 0.02) {
       effectiveTotal = Math.max(1, Math.round(effectiveTotal * 0.6))
     }
 
-    // Derive stable ratios per timestamp+service
     const r1 = seededRatio(`${serviceKey}-${ts}-a`)
     const r2 = seededRatio(`${serviceKey}-${ts}-b`)
-
-    // Warn in ~5%-20%, Err in ~1%-10%, with additional jitter for variability
-    const ratioJitter = 0.8 + seededRatio(`${serviceKey}-${ts}-rj`) * 0.4 // 0.8 - 1.2
+    const ratioJitter = 0.8 + seededRatio(`${serviceKey}-${ts}-rj`) * 0.4
     const warnRatio = clamp((0.05 + r1 * 0.15) * ratioJitter, 0, 0.9)
     const errRatio = clamp((0.01 + r2 * 0.09) * ratioJitter, 0, 0.5)
+    
     let warn = Math.round(effectiveTotal * warnRatio)
     let err = Math.round(effectiveTotal * errRatio)
     let ok = effectiveTotal - warn - err
+    
     if (ok < 0) {
-      // Adjust to ensure non-negative and sum equals total
       const deficit = -ok
       const takeFromWarn = Math.min(deficit, warn)
       warn -= takeFromWarn
@@ -131,9 +123,11 @@ const generateStatusTimeSeries = (
       ok = effectiveTotal - warn - err
     }
 
-    rows.push({ timestamp: ts, count: ok, status: 'Ok' })
-    rows.push({ timestamp: ts, count: warn, status: 'Warn' })
-    rows.push({ timestamp: ts, count: err, status: 'Err' })
+    rows.push(
+      { timestamp: ts, count: ok, status: 'Ok' },
+      { timestamp: ts, count: warn, status: 'Warn' },
+      { timestamp: ts, count: err, status: 'Err' }
+    )
   }
   return rows
 }
@@ -144,18 +138,14 @@ const sumStatus = (rows: StatusTimeseriesDatum[], status: UsageStatus) =>
 const ProjectUsage = () => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
   ])
-
   const { plan } = useCurrentOrgPlan()
 
   const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
-
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
-
   const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
@@ -164,23 +154,16 @@ const ProjectUsage = () => {
     selectedInterval.startUnit as dayjs.ManipulateType
   )
   const endDateLocal = dayjs()
-  // Choose finer fill intervals to make the charts denser per selected range
-  const fillInterval =
-    interval === '1hr' ? '5m' : interval === '1day' ? '30m' : interval === '7day' ? '2h' : '30m'
+  const fillInterval = interval === '1hr' ? '5m' : interval === '1day' ? '30m' : '2h'
 
   const { data: charts } = useFillTimeseriesSorted(
     data?.result || [],
     'timestamp',
-    [
-      'total_auth_requests',
-      'total_rest_requests',
-      'total_storage_requests',
-      'total_realtime_requests',
-    ],
+    ['total_auth_requests', 'total_rest_requests', 'total_storage_requests', 'total_realtime_requests'],
     10,
     startDateLocal.toISOString(),
     endDateLocal.toISOString(),
-    Number.MAX_SAFE_INTEGER, // always run filler to densify regardless of input length
+    Number.MAX_SAFE_INTEGER,
     fillInterval
   )
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
@@ -206,12 +189,10 @@ const ProjectUsage = () => {
   const realtimeWarn = sumStatus(realtimeSeries, 'Warn')
   const realtimeErr = sumStatus(realtimeSeries, 'Err')
 
-  // Edge functions (mock): derive a synthetic total from REST + Auth activity with jitter
   const edgeCharts = (charts || []).map((c) => {
-    const base =
-      Number(c.total_rest_requests || 0) * 0.12 + Number(c.total_auth_requests || 0) * 0.08 || 0
+    const base = Number(c.total_rest_requests || 0) * 0.12 + Number(c.total_auth_requests || 0) * 0.08 || 0
     const ts = String(c.timestamp)
-    const jitter = 0.8 + seededRatio(`edge-${ts}-j`) * 0.6 // 0.8 - 1.4
+    const jitter = 0.8 + seededRatio(`edge-${ts}-j`) * 0.6
     const spike = seededRatio(`edge-${ts}-s`)
     let total = Math.max(1, Math.round(base * jitter))
     if (spike > 0.985) total = Math.round(total * 2.2)
@@ -223,25 +204,14 @@ const ProjectUsage = () => {
   const edgeWarn = sumStatus(edgeSeries, 'Warn')
   const edgeErr = sumStatus(edgeSeries, 'Err')
 
-  // Aggregate totals for overall header
-  const totalRequests =
-    (restTotal || 0) +
-    (edgeTotal || 0) +
-    (realtimeTotal || 0) +
-    (authEnabled ? authTotal || 0 : 0) +
-    (storageEnabled ? storageTotal || 0 : 0)
-  const totalErrors =
-    (restErr || 0) +
-    (edgeErr || 0) +
-    (realtimeErr || 0) +
-    (authEnabled ? authErr || 0 : 0) +
-    (storageEnabled ? storageErr || 0 : 0)
+  const totalRequests = (restTotal || 0) + (edgeTotal || 0) + (realtimeTotal || 0) +
+    (authEnabled ? authTotal || 0 : 0) + (storageEnabled ? storageTotal || 0 : 0)
+  const totalErrors = (restErr || 0) + (edgeErr || 0) + (realtimeErr || 0) +
+    (authEnabled ? authErr || 0 : 0) + (storageEnabled ? storageErr || 0 : 0)
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
 
-  // Mock comparison vs previous period (seeded for determinism)
   const trDeltaSeed = seededRatio(`tr-${projectRef}-${interval}`)
   const erDeltaSeed = seededRatio(`er-${projectRef}-${interval}`)
-  // Relative deltas: total requests -50%..+50%, error rate -30%..+30%
   const totalRequestsChangePct = (trDeltaSeed - 0.5) * 100
   const errorRateChangePct = (erDeltaSeed - 0.5) * 60
   const formatDelta = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`
@@ -283,11 +253,10 @@ const ProjectUsage = () => {
                 if (disabled) {
                   const retentionDuration = LOG_RETENTION[plan?.id ?? 'free']
                   return (
-                    <Tooltip>
+                    <Tooltip key={i.key}>
                       <TooltipTrigger asChild>
                         <DropdownMenuRadioItem
                           disabled
-                          key={i.key}
                           value={i.key}
                           className="!pointer-events-auto"
                         >
@@ -477,35 +446,33 @@ const PanelHeader = ({
   total?: number
   warn?: number
   err?: number
-}) => {
-  return (
-    <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
-      <div className="flex items-center gap-2">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-foreground-light">
-              {href ? <Link href={href}>{title}</Link> : title}
-            </CardTitle>
-          </div>
-          <span className="text-foreground text-xl">{(total || 0).toLocaleString()}</span>
+}) => (
+  <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
+    <div className="flex items-center gap-2">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-foreground-light">
+            {href ? <Link href={href}>{title}</Link> : title}
+          </CardTitle>
         </div>
+        <span className="text-foreground text-xl">{(total || 0).toLocaleString()}</span>
       </div>
-      <div className="flex items-end gap-4 text-foreground-light">
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-warning rounded-full" />
-            <span className="heading-meta">Warn</span>
-          </div>
-          <span className="text-foreground text-xl">{(warn || 0).toLocaleString()}</span>
+    </div>
+    <div className="flex items-end gap-4 text-foreground-light">
+      <div className="flex flex-col items-end">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-warning rounded-full" />
+          <span className="heading-meta">Warn</span>
         </div>
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-            <span className="heading-meta">Err</span>
-          </div>
-          <span className="text-foreground text-xl">{(err || 0).toLocaleString()}</span>
-        </div>
+        <span className="text-foreground text-xl">{(warn || 0).toLocaleString()}</span>
       </div>
-    </CardHeader>
-  )
-}
+      <div className="flex flex-col items-end">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
+          <span className="heading-meta">Err</span>
+        </div>
+        <span className="text-foreground text-xl">{(err || 0).toLocaleString()}</span>
+      </div>
+    </div>
+  </CardHeader>
+)
