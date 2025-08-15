@@ -32,10 +32,15 @@ const AuditLogs = () => {
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useProfileAuditLogsQuery({
-      iso_timestamp_start: dateRange.from,
-      iso_timestamp_end: dateRange.to,
-    })
+    useProfileAuditLogsQuery(
+      {
+        iso_timestamp_start: dateRange.from,
+        iso_timestamp_end: dateRange.to,
+      },
+      {
+        retry: false,
+      }
+    )
 
   const logs = data?.result ?? []
   const sortedLogs = logs
@@ -84,6 +89,7 @@ const AuditLogs = () => {
               onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
             />
             <LogsDatePicker
+              hideWarnings
               value={dateRange}
               onSubmit={(value) => setDateRange(value)}
               helpers={[
