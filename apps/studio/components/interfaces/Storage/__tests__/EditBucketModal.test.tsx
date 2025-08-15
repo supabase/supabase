@@ -7,8 +7,8 @@ import { faker } from '@faker-js/faker'
 import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import EditBucketModal from '../EditBucketModal'
 import { render } from 'tests/helpers'
+import EditBucketModal from '../EditBucketModal'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),

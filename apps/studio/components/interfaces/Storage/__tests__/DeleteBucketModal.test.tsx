@@ -8,8 +8,8 @@ import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
 import DeleteBucketModal from '../DeleteBucketModal'
-import { routerMock } from 'tests/lib/route-mock'
 import { render } from 'tests/helpers'
+import { routerMock } from 'tests/lib/route-mock'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
