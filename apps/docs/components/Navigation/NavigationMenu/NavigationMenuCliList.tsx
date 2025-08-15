@@ -4,6 +4,7 @@ import { BASE_PATH } from '~/lib/constants'
 import clientLibsCommon from '~/spec/common-cli.yml' with { type: 'yml' }
 import * as NavItems from './NavigationMenu.constants'
 import { ChevronLeft } from 'lucide-react'
+import { Separator } from 'ui'
 
 const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   const menu = NavItems[id]
@@ -44,10 +45,6 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
         {title}
       </span>
     )
-  }
-
-  const Divider = () => {
-    return <div className="h-px w-full bg-border my-3"></div>
   }
 
   const MenuSections = [
@@ -123,7 +120,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           {MenuSections.map((section) => {
             return (
               <>
-                <Divider />
+                <Separator className="h-px w-full bg-border border-t my-3" />
                 <SideMenuTitle title={section.label} />
 
                 {clientLibsCommon.commands
@@ -134,8 +131,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
               </>
             )
           })}
-
-          <Divider />
+          <Separator className="h-px w-full bg-border border-t my-3" />
         </ul>
       </div>
     </div>
