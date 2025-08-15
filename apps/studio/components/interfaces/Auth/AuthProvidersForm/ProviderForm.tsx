@@ -62,6 +62,50 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     )
   }
 
+  const showAlert = (title: string) => {
+    switch (title) {
+      case 'Slack (Deprecated)':
+        return (
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC) provider
+              below. Developers using this provider should move over to the new provider. Please
+              refer to our{' '}
+              <a
+                href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
+                className="underline"
+                target="_blank"
+              >
+                documentation
+              </a>{' '}
+              for more details.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )
+      case 'Phone':
+        return (
+          config.HOOK_SEND_SMS_ENABLED && (
+            <Alert_Shadcn_>
+              <WarningIcon />
+              <AlertTitle_Shadcn_>
+                SMS provider settings are disabled while the SMS hook is enabled.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                <p>The SMS hook will be used in place of the SMS provider configured</p>
+                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                  <Link href={`/project/${projectRef}/auth/hooks`}>View auth hooks</Link>
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )
+        )
+      default:
+        return null
+    }
+  }
+
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
@@ -92,6 +136,28 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     })
     return initialValues
   })()
+
+  const isSAMLEnabled: boolean =
+    provider.title === 'SAML 2.0' && config && (config as any)['SAML_ENABLED']
+  // [Joel] Introduced as the new LinkedIn provider has a corresponding config var of LINKEDIN_OIDC
+  const isLinkedInOIDCEnabled: boolean =
+    provider.title === 'LinkedIn (OIDC)' &&
+    config &&
+    (config as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
+  const isSlackOIDCEnabled =
+    provider.title === 'Slack (OIDC)' && config['EXTERNAL_SLACK_OIDC_ENABLED']
+  const isSlackDeprecated = provider.title === 'Slack (Deprecated)'
+  const isSlackDeprecatedEnabled = isSlackDeprecated && config['EXTERNAL_SLACK_ENABLED']
+  const isExternalProviderAndEnabled: boolean =
+    config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+
+  // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
+  const isActive: boolean =
+    isSAMLEnabled ||
+    isExternalProviderAndEnabled ||
+    isLinkedInOIDCEnabled ||
+    isSlackOIDCEnabled ||
+    isSlackDeprecatedEnabled
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
@@ -131,6 +197,11 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     const isProviderInQuery = urlProvider.toLowerCase() === provider.title.toLowerCase()
     setOpen(isProviderInQuery)
   }, [urlProvider, provider.title])
+
+  if (isSlackDeprecated && !isSlackDeprecatedEnabled) {
+    // only show deprecated Slack provider for projects that already have it configured, everyone else must use the new OIDC provider
+    return null
+  }
 
   return (
     <>
