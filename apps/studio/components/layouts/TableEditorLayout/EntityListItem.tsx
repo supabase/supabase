@@ -216,8 +216,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         Object.keys(row).forEach((column) => {
           if (typeof row[column] === 'object' && row[column] !== null) {
             formattedRow[column] = JSON.stringify(row[column])
-          } else if (typeof row[column] === 'string') {
-            formattedRow[column] = row[column].replace(/'/g, "''")
           }
         })
         return formattedRow
