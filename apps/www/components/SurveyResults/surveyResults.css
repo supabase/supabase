@@ -8,8 +8,11 @@
   50% {
     clip-path: inset(0 40% 0 0);
   }
-  80% {
+  70% {
     clip-path: inset(0 20% 0 0);
+  }
+  80% {
+    clip-path: inset(0 0% 0 0);
   }
   90% {
     clip-path: inset(0 0 0 50%);
