@@ -7,9 +7,8 @@ import { faker } from '@faker-js/faker'
 import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import { render } from 'tests/helpers'
-import { routerMock } from 'tests/lib/route-mock'
 import EditBucketModal from '../EditBucketModal'
+import { render } from 'tests/helpers'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
@@ -43,8 +42,6 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 
 describe(`EditBucketModal`, () => {
   beforeEach(() => {
-    // useParams
-    routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
     // useSelectedProject -> Project
     addAPIMock({
       method: `get`,
