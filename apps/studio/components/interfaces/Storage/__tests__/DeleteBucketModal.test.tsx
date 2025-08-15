@@ -117,7 +117,7 @@ describe(`DeleteBucketModal`, () => {
     await userEvent.type(input, `test`)
 
     const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
-    fireEvent.click(confirmButton)
+    await userEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
 
@@ -141,7 +141,7 @@ describe(`DeleteBucketModal`, () => {
     await userEvent.type(input, `invalid`)
 
     const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
-    fireEvent.click(confirmButton)
+    await userEvent.click(confirmButton)
 
     await waitFor(() => {
       expect(screen.getByText(/Please enter/)).toBeInTheDocument()

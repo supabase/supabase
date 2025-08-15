@@ -92,7 +92,7 @@ describe(`EmptyBucketModal`, () => {
 
     const confirmButton = screen.getByRole(`button`, { name: `Empty Bucket` })
 
-    fireEvent.click(confirmButton)
+    await userEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
   })

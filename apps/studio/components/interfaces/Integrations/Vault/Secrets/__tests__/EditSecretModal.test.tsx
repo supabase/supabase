@@ -98,16 +98,8 @@ describe(`EditSecretModal`, () => {
     await userEvent.clear(descriptionInput)
     await userEvent.type(valueInput, `qux`)
 
-    fireEvent.click(submitButton)
+    await userEvent.click(submitButton)
 
-    console.log('onClose.mock.calls')
-    console.log('onClose.mock.calls')
-    console.log('onClose.mock.calls')
-    console.log('onClose.mock.calls')
-    console.log(onClose.mock.calls.length)
-
-    await waitFor(() => expect(onClose).toHaveBeenCalledOnce(), {
-      timeout: 5000,
-    })
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
   })
 })
