@@ -3,9 +3,10 @@ import { ExternalLink } from 'lucide-react'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import PartnerIcon from './PartnerIcon'
+import { MANAGED_BY, ManagedBy } from 'lib/constants/infrastructure'
 
 interface PartnerManagedResourceProps {
-  partner: 'vercel-marketplace' | 'aws-marketplace'
+  partner: ManagedBy
   resource: string
   cta?: {
     installationId?: string
@@ -15,11 +16,13 @@ interface PartnerManagedResourceProps {
 }
 
 export const PARTNER_TO_NAME = {
-  'vercel-marketplace': 'Vercel Marketplace',
-  'aws-marketplace': 'AWS Marketplace',
+  [MANAGED_BY.VERCEL_MARKETPLACE]: 'Vercel Marketplace',
+  [MANAGED_BY.AWS_MARKETPLACE]: 'AWS Marketplace',
+  [MANAGED_BY.SUPABASE]: 'Supabase',
 } as const
 
 function PartnerManagedResource({ partner, resource, cta }: PartnerManagedResourceProps) {
+  const isManagedBySupabase = partner === MANAGED_BY.SUPABASE
   const ctaEnabled = cta !== undefined
 
   const { data, isLoading, isError } = useVercelRedirectQuery(
@@ -27,9 +30,11 @@ function PartnerManagedResource({ partner, resource, cta }: PartnerManagedResour
       installationId: cta?.installationId,
     },
     {
-      enabled: ctaEnabled,
+      enabled: ctaEnabled && !isManagedBySupabase,
     }
   )
+
+  if (isManagedBySupabase) return null
 
   const ctaUrl = (data?.url ?? '') + (cta?.path ?? '')
 
