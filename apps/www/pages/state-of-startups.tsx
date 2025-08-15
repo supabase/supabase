@@ -218,7 +218,7 @@ function StateOfStartupsPage() {
               <div
                 className="px-8 pt-10 pb-16 md:pt-36 md:pb-28 flex-1"
                 style={{
-                  background: `radial-gradient(ellipse at 5% 200%, hsl(var(--brand-400)), transparent 70%)`,
+                  background: `radial-gradient(ellipse at -35% 215%, hsl(var(--brand-400)), transparent 70%)`,
                 }}
               >
                 <h1 className="text-7xl sm:text-8xl lg:text-9xl tracking-tight">
@@ -301,7 +301,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
       className="flex flex-col items-center gap-4 py-32 text-center border-b border-muted"
       style={{
         background:
-          'radial-gradient(circle at center 280%, hsl(var(--brand-500)), transparent 70%)',
+          'radial-gradient(circle at center 280%, hsl(var(--brand-400)), transparent 70%)',
       }}
       ref={ref}
     >

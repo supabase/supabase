@@ -308,9 +308,9 @@ export function SurveyChart({
 
       <div>
         {/* Filters and toggle */}
-        <div className="flex flex-row flex-wrap gap-4 px-8 pb-4 justify-between">
+        <div className="flex flex-row flex-wrap gap-6 px-8 pb-4 justify-between">
           {filters && activeFilters && setFilterValue && (
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3">
               {Object.entries(filters).map(([filterKey, filterConfig]) => (
                 <SurveyFilter
                   key={filterKey}
@@ -322,12 +322,14 @@ export function SurveyChart({
               ))}
             </div>
           )}
-          <TwoOptionToggle
-            options={['SQL', 'chart']}
-            activeOption={view}
-            onClickOption={handleViewChange}
-            borderOverride="border-overlay"
-          />
+          <div className="hidden xs:block">
+            <TwoOptionToggle
+              options={['SQL', 'chart']}
+              activeOption={view}
+              onClickOption={handleViewChange}
+              borderOverride="border-overlay"
+            />
+          </div>
         </div>
         <motion.div
           key={view} // Force a re-render when view changes
