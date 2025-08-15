@@ -1,4 +1,5 @@
 import { SurveyPullQuote } from './SurveyPullQuote'
+import './surveyChapter.css'
 
 interface SurveyChapterProps {
   number: number
@@ -47,16 +48,31 @@ export function SurveyChapter({
             }}
           >
             {[0, 1, 2, 3].map((item, index) => (
-              <div
-                key={index}
-                className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand' : index === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
-                style={{
-                  maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
-                  maskSize: '14.5px 15px',
-                  maskRepeat: 'repeat',
-                  maskPosition: 'top left',
-                }}
-              />
+              <div key={index} className="relative">
+                {/* Background bar (static) */}
+                <div
+                  className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-foreground-muted/80' : index === 1 ? 'bg-foreground-muted/50' : 'bg-foreground-muted/20'}`}
+                  // className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand/20' : index === 1 ? 'bg-brand-500/20' : 'bg-brand-300/20'}`}
+                  style={{
+                    maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
+                    maskSize: '15px 15px',
+                    maskRepeat: 'repeat',
+                    maskPosition: 'center',
+                  }}
+                />
+
+                {/* Animated foreground bar */}
+                <div
+                  className={`absolute inset-0 h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand' : index === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
+                  style={{
+                    maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
+                    maskSize: '14.5px 15px',
+                    maskRepeat: 'repeat',
+                    maskPosition: 'top left',
+                    animation: `terminalLine 10s steps(8, end) ${index * 0.3}s infinite ${number % 2 === 0 ? '' : 'reverse'}`,
+                  }}
+                />
+              </div>
             ))}
           </div>
           {/* Text content */}
