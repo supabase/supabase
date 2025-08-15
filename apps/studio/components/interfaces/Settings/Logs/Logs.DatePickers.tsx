@@ -12,6 +12,8 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import {
   Button,
   ButtonProps,
+  Input,
+  Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -236,6 +238,91 @@ export const LogsDatePicker = ({
     return true
   }
 
+  /**
+   * Custom Helper State
+   */
+  const [generatedCustomHelpers, setGeneratedCustomHelpers] = useState<DatetimeHelper[]>([])
+  const hasGeneratedCustomHelpers = generatedCustomHelpers.length > 0
+  const [customHelperValue, setCustomHelperValue] = useState('')
+
+  useEffect(() => {
+    // Reset the custom helper value on unmount
+    return () => {
+      setCustomHelperValue('')
+    }
+  }, [])
+
+  const handleCustomHelperChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    setCustomHelperValue(val)
+
+    if (val.length === 0) {
+      setGeneratedCustomHelpers([])
+      return
+    }
+
+    // find the number in the string
+    const number = val.match(/\d+/)?.[0]
+    if (!number) return
+
+    const generateHelper = ({
+      value,
+      unit,
+    }: {
+      value: number
+      unit: 'minute' | 'hour' | 'day'
+    }): DatetimeHelper => {
+      return {
+        text: `Last ${value} ${unit}s`,
+        calcTo: () => {
+          return dayjs().add(+value, unit).toISOString()
+        },
+        calcFrom: () => {
+          return dayjs().subtract(+value, unit).toISOString()
+        },
+        availableIn: ['free', 'team', 'enterprise'],
+      }
+    }
+
+    setGeneratedCustomHelpers([
+      generateHelper({ value: +number, unit: 'minute' }),
+      generateHelper({ value: +number, unit: 'hour' }),
+      generateHelper({ value: +number, unit: 'day' }),
+    ])
+  }
+
+  function HelperList({ helpers }: { helpers: DatetimeHelper[] }) {
+    return helpers.map((helper) => (
+      <Label
+        key={helper.text}
+        className={cn(
+          '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
+          {
+            'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
+          }
+        )}
+      >
+        <RadioGroupItem
+          hidden
+          key={helper.text}
+          value={helper.text}
+          disabled={helper.disabled}
+          aria-disabled={helper.disabled}
+        ></RadioGroupItem>
+        {helper.text}
+        {showHelperBadge(helper) ? (
+          <Badge
+            size="small"
+            variant="outline"
+            className="h-5 text-[10px] text-foreground-light capitalize"
+          >
+            {helper.availableIn?.[0] || ''}
+          </Badge>
+        ) : null}
+      </Label>
+    ))
+  }
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
@@ -252,41 +339,27 @@ export const LogsDatePicker = ({
         portal={true}
         {...popoverContentProps}
       >
-        <RadioGroup
-          onValueChange={handleHelperChange}
-          value={value.isHelper ? value.text : ''}
-          className="border-r p-2 flex flex-col gap-px"
-        >
-          {helpers.map((helper) => (
-            <Label
-              key={helper.text}
-              className={cn(
-                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
-                {
-                  'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
-                }
-              )}
-            >
-              <RadioGroupItem
-                hidden
-                key={helper.text}
-                value={helper.text}
-                disabled={helper.disabled}
-                aria-disabled={helper.disabled}
-              ></RadioGroupItem>
-              {helper.text}
-              {showHelperBadge(helper) ? (
-                <Badge
-                  size="small"
-                  variant="outline"
-                  className="h-5 text-[10px] text-foreground-light capitalize"
-                >
-                  {helper.availableIn?.[0] || ''}
-                </Badge>
-              ) : null}
-            </Label>
-          ))}
-        </RadioGroup>
+        <div className="flex flex-col border-r p-2 gap-px">
+          <Input_Shadcn_
+            size="tiny"
+            type="text"
+            placeholder="Custom: 5h, 8min..."
+            onChange={handleCustomHelperChange}
+            value={customHelperValue}
+            className="focus-visible:border-brand-600 transition-colors hover:border-foreground-lighter mb-2 rounded-sm"
+          />
+          <RadioGroup
+            onValueChange={handleHelperChange}
+            value={value.isHelper ? value.text : ''}
+            className="flex flex-col gap-px"
+          >
+            {hasGeneratedCustomHelpers ? (
+              <HelperList helpers={generatedCustomHelpers} />
+            ) : (
+              <HelperList helpers={helpers} />
+            )}
+          </RadioGroup>
+        </div>
 
         <div>
           <div className="flex p-2 gap-2 items-center">
