@@ -131,14 +131,6 @@ const AuditLogs = () => {
     <>
       <ScaffoldContainerLegacy>
         <div className="space-y-4 flex flex-col">
-          {isLoading && (
-            <div className="space-y-2">
-              <ShimmeringLoader />
-              <ShimmeringLoader className="w-3/4" />
-              <ShimmeringLoader className="w-1/2" />
-            </div>
-          )}
-
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-xs prose">Filter by</p>
@@ -209,6 +201,14 @@ const AuditLogs = () => {
               {isRefetching ? 'Refreshing' : 'Refresh'}
             </Button>
           </div>
+
+          {isLoading && (
+            <div className="space-y-2">
+              <ShimmeringLoader />
+              <ShimmeringLoader className="w-3/4" />
+              <ShimmeringLoader className="w-1/2" />
+            </div>
+          )}
 
           {isError ? (
             error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.') ? (
