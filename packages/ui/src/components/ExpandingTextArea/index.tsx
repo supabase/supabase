@@ -41,10 +41,7 @@ const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps
         }}
         rows={1}
         aria-expanded={false}
-        className={cn(
-          'h-auto resize-none box-border focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-foreground/30 dark:focus-visible:border-foreground/25 transition-[border-color] duration-200',
-          className
-        )}
+        className={cn('h-auto resize-none box-border', className)}
         value={value}
         {...props}
       />
