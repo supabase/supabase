@@ -8,12 +8,12 @@ export function SurveyRankedAnswersPair({
       {rankedAnswersPair.map((item, index) => (
         <div
           key={index}
-          className={`flex gap-8 md:gap-12 flex-1 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
+          className={`flex gap-6 md:gap-12 flex-1 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
         >
           {/* Decorative progress bar */}
           <div
             aria-hidden="true"
-            className={`flex flex-row ${index % 2 === 0 ? 'items-start' : 'sm:items-end'}`}
+            className={`flex ${index % 2 === 0 ? 'items-start' : 'flex-row-reverse sm:flex-row sm:items-end'}`}
           >
             {item.answers.map((answer, answerIndex) => (
               <div
@@ -31,7 +31,7 @@ export function SurveyRankedAnswersPair({
 
           {/* Text content */}
           <div
-            className={`px-6 py-8 flex  ${index % 2 === 0 ? 'flex-col' : 'flex-col-reverse'}  gap-12`}
+            className={`px-6 py-8 flex  ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}  gap-12`}
           >
             <ol className="flex flex-col gap-3">
               {item.answers.map((answer, answerIndex) => (
