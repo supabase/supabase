@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, forwardRef } from 'react'
 
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
@@ -25,17 +25,21 @@ function StateOfStartupsPage() {
   const [activeChapter, setActiveChapter] = useState(1)
   const tocRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
+  const ctaBannerRef = useRef<HTMLElement>(null)
 
   // Scroll detection to show floating ToC
   useEffect(() => {
     const handleScroll = () => {
       const heroElement = heroRef.current
+      const ctaBannerElement = ctaBannerRef.current
 
-      if (heroElement) {
+      if (heroElement && ctaBannerElement) {
         const heroRect = heroElement.getBoundingClientRect()
+        const ctaBannerRect = ctaBannerElement.getBoundingClientRect()
 
         // Show floating ToC when the hero section is completely out of view
-        if (heroRect.bottom < 0) {
+        // but hide it when the CTA banner comes into view
+        if (heroRect.bottom < 0 && ctaBannerRect.top > window.innerHeight) {
           setShowFloatingToc(true)
         } else {
           setShowFloatingToc(false)
@@ -292,7 +296,7 @@ function StateOfStartupsPage() {
             </SurveyChapter>
           </>
         ))}
-        <CTABanner />
+        <CTABanner ref={ctaBannerRef} />
       </DefaultLayout>
     </>
   )
@@ -300,7 +304,7 @@ function StateOfStartupsPage() {
 
 export default StateOfStartupsPage
 
-const CTABanner = () => {
+const CTABanner = forwardRef<HTMLElement>((props, ref) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
   return (
     <section
@@ -309,6 +313,7 @@ const CTABanner = () => {
         background:
           'radial-gradient(circle at center 280%, hsl(var(--brand-500)), transparent 70%)',
       }}
+      ref={ref}
     >
       <div className="flex flex-col items-center gap-4 max-w-prose">
         <h2 className="text-foreground-light text-5xl text-balance">
@@ -351,3 +356,6 @@ const CTABanner = () => {
     </section>
   )
 }
+})
+
+CTABanner.displayName = 'CTABanner'
