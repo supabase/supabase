@@ -84,7 +84,7 @@ export function SurveyChapterSection({
         </header>
 
         {stats && (
-          <aside className="border-t border-muted flex flex-row flex-wrap divide-x divide-muted">
+          <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
             {stats.map((stat, index) => (
               <SurveyStatCard key={index} percent={stat.percent} label={stat.label} />
             ))}
