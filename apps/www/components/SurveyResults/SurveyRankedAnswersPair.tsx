@@ -8,7 +8,7 @@ export function SurveyRankedAnswersPair({
       {rankedAnswersPair.map((item, index) => (
         <div
           key={index}
-          className={`flex gap-3 flex-1 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
+          className={`flex gap-8 md:gap-12 flex-1 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
         >
           {/* Decorative progress bar */}
           <div
@@ -18,7 +18,7 @@ export function SurveyRankedAnswersPair({
             {item.answers.map((answer, answerIndex) => (
               <div
                 key={answerIndex}
-                className={`h-${(answerIndex + 1) * 4} w-full pointer-events-none ${answerIndex === 0 ? 'bg-brand' : answerIndex === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
+                className={`${['h-32 md:h-64', 'h-20 md:h-32', 'h-8 md:h-12'][answerIndex] || 'hidden'} w-full pointer-events-none ${['bg-brand', 'bg-brand-500', 'bg-brand-300'][answerIndex] || 'bg-brand-300'}`}
                 style={{
                   maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
                   maskSize: '14.5px 15px',
