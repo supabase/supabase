@@ -1,15 +1,16 @@
-import { useState } from 'react'
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { screen, waitFor, fireEvent } from '@testing-library/dom'
+import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
+import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { mockAnimationsApi } from 'jsdom-testing-mocks'
+import { useState } from 'react'
 import { render } from 'tests/helpers'
 import { addAPIMock } from 'tests/lib/msw'
-import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import EditSecretModal from '../EditSecretModal'
 import { routerMock } from 'tests/lib/route-mock'
+import { VaultSecret } from 'types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import EditSecretModal from '../EditSecretModal'
 
-const secret = {
+const secret: VaultSecret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
   name: 'test',
   description: 'new text',
@@ -65,9 +66,9 @@ describe(`EditSecretModal`, () => {
     // both call the same endpoint but execute different SQL queries
     addAPIMock({
       method: `post`,
-      path: `/platform/pg-meta/:ref/query`,
+      path: `/platform/pg-meta/:ref/query?key=projects-default-secrets-${secret.id}`,
       // @ts-expect-error this path erroneously has a `never` return type when it should be `unknown` since it executes a SQL query
-      response: [{ decrypted_secret: 'bar', update_secret: '' }],
+      response: [{ decrypted_secret: 'bar' }],
     })
   })
 
