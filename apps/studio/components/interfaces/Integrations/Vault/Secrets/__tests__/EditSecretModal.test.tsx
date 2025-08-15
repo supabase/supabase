@@ -39,7 +39,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 
 mockAnimationsApi()
 
-describe.skip(`EditSecretModal`, () => {
+describe(`EditSecretModal`, () => {
   beforeEach(() => {
     // useSelectedProjectQuery -> useParams
     routerMock.setCurrentUrl(`/project/default/integrations/vault/secrets`)
