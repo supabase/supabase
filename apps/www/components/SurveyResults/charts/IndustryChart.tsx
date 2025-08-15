@@ -27,7 +27,7 @@ ORDER BY total DESC;`
 export function IndustryChart() {
   return (
     <SurveyChart
-      title="What is your startup's primary industry or target customer segment?"
+      title="What is your startup’s primary industry or target customer segment?"
       targetColumn="industry_normalized"
       filterColumns={['person_age', 'headquarters', 'money_raised']}
       generateSQLQuery={generateIndustrySQL}
