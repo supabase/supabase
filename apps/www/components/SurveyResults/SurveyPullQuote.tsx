@@ -14,7 +14,7 @@ export function SurveyPullQuote({
 }) {
   return (
     <>
-      <aside className="relative">
+      <aside className="relative border-b border-muted md:border-b-0">
         <div
           className="absolute inset-0 pointer-events-none bg-surface-400 dark:bg-surface-75"
           style={{
@@ -42,7 +42,7 @@ export function SurveyPullQuote({
           </p>
         </div>
       </aside>
-      <SurveySectionBreak />
+      <SurveySectionBreak className="hidden md:block" />
     </>
   )
 }

@@ -6,15 +6,9 @@ export function SurveyRankedAnswersPair({
   return (
     <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-y divide-muted divide-opacity-50">
       {rankedAnswersPair.map((item, index) => (
-        <div
-          key={index}
-          className={`flex gap-6 md:gap-12 flex-1 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
-        >
+        <div key={index} className="flex gap-6 md:gap-12 flex-1 flex-col">
           {/* Decorative progress bar */}
-          <div
-            aria-hidden="true"
-            className={`flex ${index % 2 === 0 ? 'items-start' : 'flex-row-reverse sm:flex-row sm:items-end'}`}
-          >
+          <div aria-hidden="true" className="flex items-start">
             {item.answers.map((answer, answerIndex) => (
               <div
                 key={answerIndex}
@@ -30,18 +24,20 @@ export function SurveyRankedAnswersPair({
           </div>
 
           {/* Text content */}
-          <div
-            className={`px-6 py-8 flex  ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}  gap-12`}
-          >
+          <div className="px-6 py-8 flex flex-col gap-12">
             <ol className="flex flex-col gap-3">
               {item.answers.map((answer, answerIndex) => (
                 <li key={answerIndex} className="flex flex-col gap-2">
                   <span className="text-sm font-mono text-brand">#{answerIndex + 1}</span>
-                  <span className="text-lg text-foreground">{answer}</span>
+                  <span
+                    className={`${['text-2xl', 'text-lg', 'text-sm'][answerIndex] || 'text-lg'} text-foreground`}
+                  >
+                    {answer}
+                  </span>
                 </li>
               ))}
             </ol>
-            <p className="text-foreground-lighter text-sm font-mono uppercase tracking-wide">
+            <p className="text-foreground-lighter text-sm font-mono uppercase tracking-wider">
               {item.label}
             </p>
           </div>
