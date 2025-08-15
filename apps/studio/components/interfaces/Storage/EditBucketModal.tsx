@@ -44,6 +44,7 @@ import { Admonition } from 'ui-patterns'
 import { Bucket } from 'data/storage/buckets-query'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { isNonNullable } from 'lib/isNonNullable'
+import { useRouter } from 'next/router'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -66,6 +67,8 @@ const formId = 'edit-storage-bucket-form'
 
 export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
   const { ref } = useParams()
+  const router = useRouter()
+  console.log({ external: ref, internal: router.query.ref })
 
   const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation()
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
