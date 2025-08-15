@@ -66,9 +66,9 @@ describe(`EditSecretModal`, () => {
     // both call the same endpoint but execute different SQL queries
     addAPIMock({
       method: `post`,
-      path: `/platform/pg-meta/:ref/query?key=projects-default-secrets-${secret.id}`,
+      path: `/platform/pg-meta/:ref/query`,
       // @ts-expect-error this path erroneously has a `never` return type when it should be `unknown` since it executes a SQL query
-      response: [{ decrypted_secret: 'bar' }],
+      response: [{ decrypted_secret: 'bar', update_secret: '' }],
     })
   })
 
