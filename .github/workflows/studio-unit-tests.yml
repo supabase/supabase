@@ -28,8 +28,6 @@ jobs:
     # Uses larger hosted runner as it significantly decreases build times
     runs-on:
       group: Default Larger Runners
-    env:
-      NEXT_PUBLIC_PROJECT_REF: projectref
     strategy:
       matrix:
         test_number: [1]

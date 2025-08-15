@@ -74,7 +74,10 @@ describe(`EditBucketModal`, () => {
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
+
+    await waitFor(() => {
+      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
+    })
 
     const nameInput = screen.getByLabelText(`Name of bucket`)
     expect(nameInput).toHaveValue(`test`)

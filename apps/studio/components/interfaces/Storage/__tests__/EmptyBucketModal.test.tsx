@@ -8,8 +8,8 @@ import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
 import EmptyBucketModal from '../EmptyBucketModal'
-import { routerMock } from 'tests/lib/route-mock'
 import { customRender } from 'tests/lib/custom-render'
+import { routerMock } from 'tests/lib/route-mock'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
@@ -85,7 +85,10 @@ describe(`EmptyBucketModal`, () => {
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
+
+    await waitFor(() => {
+      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
+    })
 
     const confirmButton = screen.getByRole(`button`, { name: `Empty Bucket` })
 

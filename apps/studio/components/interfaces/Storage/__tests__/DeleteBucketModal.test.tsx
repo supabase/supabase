@@ -108,7 +108,10 @@ describe(`DeleteBucketModal`, () => {
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
+
+    await waitFor(() => {
+      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
+    })
 
     const input = screen.getByLabelText(/Type/)
     await userEvent.type(input, `test`)
@@ -117,7 +120,10 @@ describe(`DeleteBucketModal`, () => {
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
-    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets`)
+
+    await waitFor(() => {
+      expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets`)
+    })
   })
 
   it(`prevents submission when the input doesn't match the bucket name`, async () => {
@@ -126,7 +132,10 @@ describe(`DeleteBucketModal`, () => {
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
+
+    await waitFor(() => {
+      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
+    })
 
     const input = screen.getByLabelText(/Type/)
     await userEvent.type(input, `invalid`)

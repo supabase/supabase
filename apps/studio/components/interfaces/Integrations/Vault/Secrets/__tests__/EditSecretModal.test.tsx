@@ -3,7 +3,7 @@ import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { screen, waitFor, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import { render } from 'tests/helpers'
+import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import EditSecretModal from '../EditSecretModal'
@@ -73,12 +73,14 @@ describe(`EditSecretModal`, () => {
 
   it(`renders a modal pre-filled with the secret's values`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
 
-    await screen.findByRole(`dialog`)
+    await waitFor(() => {
+      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
+    })
 
     const nameInput = screen.getByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
