@@ -355,7 +355,6 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
       </div>
     </section>
   )
-}
 })
 
 CTABanner.displayName = 'CTABanner'
