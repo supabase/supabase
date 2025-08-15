@@ -75,7 +75,7 @@ export function SurveyChapterSection({
     <div id={title.toLowerCase().replace(/\s+/g, '-')} className="">
       <div className="max-w-[60rem] mx-auto flex flex-col md:border-x border-muted">
         <header className="grid grid-cols-1 md:grid-cols-3 text-balance">
-          <h3 className="py-8 px-8 md:border-r border-muted text-brand-link dark:text-brand font-mono uppercase tracking-widest text-sm">
+          <h3 className="py-8 px-8 md:border-r border-muted text-brand-link dark:text-brand font-mono uppercase tracking-wider text-sm">
             {title}
           </h3>
           <p className="py-8 px-8 md:col-span-2 text-foreground-light text-xl leading-relaxed">
