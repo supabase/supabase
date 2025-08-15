@@ -6,15 +6,8 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
-import { CheckCircle, Eye, EyeOff } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryStates } from 'nuqs'
-import { useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
@@ -32,7 +25,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
