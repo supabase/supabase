@@ -1,0 +1,344 @@
+import { Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useParams } from 'common'
+import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from 'data/analytics/constants'
+import { useContentQuery } from 'data/content/content-query'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Command_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandList_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+} from 'ui'
+import { Row } from 'ui-patterns'
+import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
+import dayjs from 'dayjs'
+import type { Dashboards } from 'types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useProfile } from 'lib/profile'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Content, useContentQuery as useReportQuery } from 'data/content/content-query'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+} from '@dnd-kit/core'
+import { SortableContext, rectSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable'
+import type { CSSProperties, ReactNode } from 'react'
+
+type CustomReportSectionProps = {}
+
+export default function CustomReportSection({}: CustomReportSectionProps) {
+  const startDate = dayjs().subtract(7, 'day').toISOString()
+  const endDate = dayjs().toISOString()
+  const [snippetSearch, setSnippetSearch] = useState('')
+  const { ref } = useParams()
+  const { profile } = useProfile()
+
+  // Load first report
+  const { data: reportsData } = useReportQuery({ projectRef: ref, type: 'report', limit: 1 })
+  const firstReport = reportsData?.content?.[0] as Content | undefined
+  const reportContent = firstReport?.content as Dashboards.Content | undefined
+  const [editableReport, setEditableReport] = useState<Dashboards.Content | undefined>(
+    reportContent
+  )
+
+  useEffect(() => {
+    if (reportContent) setEditableReport(reportContent)
+  }, [reportContent])
+
+  const canUpdateReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
+    resource: {
+      type: 'report',
+      visibility: (firstReport as any)?.visibility,
+      owner_id: (firstReport as any)?.owner_id,
+    },
+    subject: { id: profile?.id },
+  })
+
+  const { mutate: upsertContent } = useContentUpsertMutation()
+
+  const persistReport = (updated: Dashboards.Content) => {
+    if (!ref || !firstReport) return
+    upsertContent({ projectRef: ref, payload: { ...firstReport, content: updated } })
+  }
+
+  const { data: snippetsData, isLoading: isLoadingSnippets } = useContentQuery({
+    projectRef: ref,
+    type: 'sql',
+    name: snippetSearch.length === 0 ? undefined : snippetSearch,
+  })
+  const snippets = (snippetsData?.content ?? []) as any[]
+
+  // Drag and drop reordering for report blocks
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+
+  const handleDragStart = (_event: DragStartEvent) => {}
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!editableReport || !active || !over || active.id === over.id) return
+    const items = editableReport.layout.map((x: any) => String(x.id))
+    const oldIndex = items.indexOf(String(active.id))
+    const newIndex = items.indexOf(String(over.id))
+    if (oldIndex === -1 || newIndex === -1) return
+
+    // Reorder and recompute a simple 2-column grid like GridResize does (x,y with w=1,h=1)
+    const moved = arrayMove(editableReport.layout, oldIndex, newIndex)
+    const recomputed = moved.map((block: any, idx: number) => ({
+      ...block,
+      x: idx % 2,
+      y: Math.floor(idx / 2),
+      w: 1,
+      h: 1,
+    }))
+    const updated = { ...editableReport, layout: recomputed }
+    setEditableReport(updated)
+    persistReport(updated)
+  }
+
+  const addSnippetToReport = (snippet: any) => {
+    if (!editableReport) return
+    const current = [...editableReport.layout]
+    let x = 0
+    let y: number | null = null
+    const chartsByY = current.reduce((acc: Record<string, any[]>, item: any) => {
+      const key = String(item.y)
+      acc[key] = acc[key] ? [...acc[key], item] : [item]
+      return acc
+    }, {})
+    const yValues = Object.keys(chartsByY)
+    if (yValues.length === 0) {
+      y = 0
+    } else {
+      for (const yValue of yValues) {
+        const totalWidthTaken = chartsByY[yValue].reduce((a, b) => a + b.w, 0)
+        if (2 - totalWidthTaken >= 1) {
+          y = Number(yValue)
+          x = totalWidthTaken
+          break
+        }
+      }
+      if (y === null) {
+        y = Number(yValues[yValues.length - 1]) + 1
+      }
+    }
+    current.push({
+      x,
+      y: y as number,
+      w: 1,
+      h: 1,
+      id: snippet.id,
+      label: snippet.name,
+      attribute: `snippet_${snippet.id}` as Dashboards.ChartType,
+      provider: undefined as any,
+      chart_type: 'bar',
+      chartConfig: DEFAULT_CHART_CONFIG,
+    })
+    const updated = { ...editableReport, layout: current }
+    setEditableReport(updated)
+    persistReport(updated)
+  }
+
+  const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {
+    if (!editableReport) return
+    const nextLayout = editableReport.layout.filter((x) => x.attribute !== (metric.key as any))
+    const updated = { ...editableReport, layout: nextLayout }
+    setEditableReport(updated)
+    persistReport(updated)
+  }
+
+  const handleUpdateChart = (
+    id: string,
+    { chart, chartConfig }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<any> }
+  ) => {
+    if (!editableReport) return
+    const currentChart = editableReport.layout.find((x) => x.id === id)
+    if (!currentChart) return
+    const updatedChart: Dashboards.Chart = { ...currentChart, ...(chart ?? {}) }
+    if (chartConfig) {
+      updatedChart.chartConfig = { ...(currentChart.chartConfig ?? {}), ...chartConfig }
+    }
+    const updatedLayouts = editableReport.layout.map((x) => (x.id === id ? updatedChart : x))
+    const updated = { ...editableReport, layout: updatedLayouts }
+    setEditableReport(updated)
+    persistReport(updated)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="heading-section">At a glance</h3>
+        {canUpdateReport ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" icon={<Plus />}>
+                Add block
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end" className="w-80 p-0">
+              <Command_Shadcn_ shouldFilter={false}>
+                <CommandInput_Shadcn_
+                  autoFocus
+                  placeholder="Search snippets..."
+                  value={snippetSearch}
+                  onValueChange={setSnippetSearch}
+                />
+                <CommandList_Shadcn_>
+                  {isLoadingSnippets ? (
+                    <CommandEmpty_Shadcn_>Loading…</CommandEmpty_Shadcn_>
+                  ) : snippets.length === 0 ? (
+                    <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
+                  ) : null}
+                  <CommandGroup_Shadcn_>
+                    {snippets.map((snippet: any) => (
+                      <CommandItem_Shadcn_
+                        key={snippet.id}
+                        onSelect={() => addSnippetToReport(snippet)}
+                      >
+                        {snippet.name}
+                      </CommandItem_Shadcn_>
+                    ))}
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+      </div>
+      <div className="relative">
+        {(() => {
+          const layout = editableReport?.layout ?? []
+          if (layout.length === 0) {
+            return (
+              <div className="flex min-h-[270px] items-center justify-center rounded border-2 border-dashed p-16 border-default">
+                {canUpdateReport ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" iconRight={<Plus size={14} />}>
+                        Add your first chart
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="center" className="w-80 p-0">
+                      <Command_Shadcn_ shouldFilter={false}>
+                        <CommandInput_Shadcn_
+                          autoFocus
+                          placeholder="Search snippets..."
+                          value={snippetSearch}
+                          onValueChange={setSnippetSearch}
+                        />
+                        <CommandList_Shadcn_>
+                          {isLoadingSnippets ? (
+                            <CommandEmpty_Shadcn_>Loading…</CommandEmpty_Shadcn_>
+                          ) : snippets.length === 0 ? (
+                            <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
+                          ) : null}
+                          <CommandGroup_Shadcn_>
+                            {snippets.map((snippet: any) => (
+                              <CommandItem_Shadcn_
+                                key={snippet.id}
+                                onSelect={() => addSnippetToReport(snippet)}
+                              >
+                                {snippet.name}
+                              </CommandItem_Shadcn_>
+                            ))}
+                          </CommandGroup_Shadcn_>
+                        </CommandList_Shadcn_>
+                      </Command_Shadcn_>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <p className="text-sm text-foreground-light">No charts set up yet in report</p>
+                )}
+              </div>
+            )
+          }
+          return (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={(editableReport?.layout ?? []).map((x: any) => String(x.id))}
+                strategy={rectSortingStrategy}
+              >
+                <Row columns={[3, 2, 1]}>
+                  {layout.map((item: any) => (
+                    <SortableReportBlock key={item.id} id={String(item.id)}>
+                      {({ attributes, listeners }: { attributes: any; listeners: any }) => (
+                        <div className="h-64">
+                          <ReportBlock
+                            key={item.id}
+                            item={item}
+                            startDate={startDate}
+                            endDate={endDate}
+                            interval={
+                              (editableReport?.interval as AnalyticsInterval) ??
+                              ('1d' as AnalyticsInterval)
+                            }
+                            disableUpdate={false}
+                            isRefreshing={false}
+                            onRemoveChart={handleRemoveChart}
+                            onUpdateChart={(config) => handleUpdateChart(item.id, config as any)}
+                            dragAttributes={attributes}
+                            dragListeners={listeners}
+                          />
+                        </div>
+                      )}
+                    </SortableReportBlock>
+                  ))}
+                </Row>
+              </SortableContext>
+            </DndContext>
+          )
+        })()}
+      </div>
+    </div>
+  )
+}
+
+function SortableReportBlock({
+  id,
+  children,
+}: {
+  id: string
+  children:
+    | ((args: { attributes: any; listeners: any; isDragging: boolean }) => ReactNode)
+    | ReactNode
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  })
+
+  const style: CSSProperties = {
+    transform: transform
+      ? `translate3d(${Math.round(transform.x)}px, ${Math.round(transform.y)}px, 0)`
+      : undefined,
+    transition,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={isDragging ? 'opacity-70 will-change-transform' : 'will-change-transform'}
+    >
+      {typeof children === 'function'
+        ? (children as any)({ attributes, listeners, isDragging })
+        : children}
+    </div>
+  )
+}

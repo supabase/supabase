@@ -278,11 +278,21 @@ export const ServiceStatus = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProjectNew])
 
+  const anyUnhealthy = services.some((service) => !service.isHealthy)
+  const anyComingUp = services.some((service) => service.status === 'COMING_UP')
+  const overallStatusLabel = isLoadingChecks
+    ? 'Checking status'
+    : anyUnhealthy
+      ? 'Unhealthy'
+      : anyComingUp || isProjectNew
+        ? 'Coming up...'
+        : 'Healthy'
+
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          type="default"
+          className="p-0 border-0 h-auto text-base"
           icon={
             isLoadingChecks || (!allServicesOperational && isProjectNew && isMigrationLoading) ? (
               <LoaderIcon />
@@ -295,10 +305,10 @@ export const ServiceStatus = () => {
             )
           }
         >
-          {isBranch ? 'Branch' : 'Project'} Status
+          {overallStatusLabel}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
+      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="start">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
