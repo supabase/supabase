@@ -5,13 +5,13 @@ export const contentKeys = {
   allContentLists: (projectRef: string | undefined) => ['projects', projectRef, 'content'] as const,
   infiniteList: (
     projectRef: string | undefined,
-    options: {
+    options?: {
       type: ContentType | undefined
       name: string | undefined
       limit?: number
       sort?: string
     }
-  ) => ['projects', projectRef, 'content-infinite', options] as const,
+  ) => ['projects', projectRef, 'content-infinite', options].filter(Boolean),
   list: (
     projectRef: string | undefined,
     options: { type?: ContentType; name?: string; limit?: number }
