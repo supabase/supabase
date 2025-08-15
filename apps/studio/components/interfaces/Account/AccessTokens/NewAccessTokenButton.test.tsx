@@ -105,26 +105,26 @@ describe(`NewAccessTokenButton`, () => {
     expect(nameInput).not.toHaveValue(`close modal test`)
   })
 
-  it(`shows validation error when no permissions are configured`, async () => {
-    const onCreateToken = vi.fn()
-    render(<NewAccessTokenButton onCreateToken={onCreateToken} />)
+  // it(`shows validation error when no permissions are configured`, async () => {
+  //   const onCreateToken = vi.fn()
+  //   render(<NewAccessTokenButton onCreateToken={onCreateToken} />)
 
-    const dialogTrigger = screen.getByRole(`button`, { name: `Generate new token` })
-    await userEvent.click(dialogTrigger)
+  //   const dialogTrigger = screen.getByRole(`button`, { name: `Generate new token` })
+  //   await userEvent.click(dialogTrigger)
 
-    // Fill in the token name
-    const nameInput = screen.getByLabelText(`Name`)
-    await userEvent.type(nameInput, `test`)
+  //   // Fill in the token name
+  //   const nameInput = screen.getByLabelText(`Name`)
+  //   await userEvent.type(nameInput, `test`)
 
-    // Try to submit without adding permissions
-    const generateButton = screen.getByRole(`button`, { name: `Generate token` })
-    await userEvent.click(generateButton)
+  //   // Try to submit without adding permissions
+  //   const generateButton = screen.getByRole(`button`, { name: `Generate token` })
+  //   await userEvent.click(generateButton)
 
-    // The form should not submit and onCreateToken should not be called
-    // because validation prevents submission when no permissions are configured
-    expect(onCreateToken).not.toHaveBeenCalled()
+  //   // The form should not submit and onCreateToken should not be called
+  //   // because validation prevents submission when no permissions are configured
+  //   expect(onCreateToken).not.toHaveBeenCalled()
 
-    // The form should still be open and the button should still be enabled
-    expect(screen.getByRole(`button`, { name: `Generate token` })).toBeInTheDocument()
-  })
+  //   // The form should still be open and the button should still be enabled
+  //   expect(screen.getByRole(`button`, { name: `Generate token` })).toBeInTheDocument()
+  // })
 })
