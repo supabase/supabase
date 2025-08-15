@@ -28,7 +28,6 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 
 export const SQLEditorMenu = () => {
@@ -152,7 +151,7 @@ export const SQLEditorMenu = () => {
           </DropdownMenu>
         </div>
 
-        {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
+        <SQLEditorNav sort={sort} search={showSearch ? debouncedSearch : undefined} />
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
