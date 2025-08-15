@@ -159,23 +159,20 @@ export const SQLEditorNav = ({ sort = 'inserted_at', search }: SQLEditorNavProps
   })
   const numPrivateSnippets = snippetCountData?.private ?? 0
 
-  const privateSnippetsTreeState = useMemo(
-    () => {
-      if (folders.length === 0 && privateSnippets.length === 0) {
-        return [ROOT_NODE]
-      }
-      
-      // When searching, only show folders that contain matching snippets
-      const filteredFolders = search 
-        ? folders.filter(folder => 
-            privateSnippets.some(snippet => snippet.folder_id === folder.id)
-          )
-        : folders
-      
-      return formatFolderResponseForTreeView({ folders: filteredFolders, contents: privateSnippets })
-    },
-    [folders, privateSnippets, search]
-  )
+  const privateSnippetsTreeState = useMemo(() => {
+    if (folders.length === 0 && privateSnippets.length === 0) {
+      return [ROOT_NODE]
+    }
+
+    // When searching, only show folders that contain matching snippets
+    const filteredFolders = search
+      ? folders.filter((folder) =>
+          privateSnippets.some((snippet) => snippet.folder_id === folder.id)
+        )
+      : folders
+
+    return formatFolderResponseForTreeView({ folders: filteredFolders, contents: privateSnippets })
+  }, [folders, privateSnippets, search])
 
   const privateSnippetsLastItemIds = useMemo(
     () => getLastItemIds(privateSnippetsTreeState),
