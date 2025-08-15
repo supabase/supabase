@@ -1,5 +1,5 @@
 import { SurveyPullQuote } from './SurveyPullQuote'
-import './surveyChapter.css'
+import './surveyResults.css'
 
 interface SurveyChapterProps {
   number: number
@@ -52,7 +52,6 @@ export function SurveyChapter({
                 {/* Background bar (static) */}
                 <div
                   className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-foreground-muted/80' : index === 1 ? 'bg-foreground-muted/50' : 'bg-foreground-muted/20'}`}
-                  // className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand/20' : index === 1 ? 'bg-brand-500/20' : 'bg-brand-300/20'}`}
                   style={{
                     maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
                     maskSize: '15px 15px',
