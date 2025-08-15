@@ -16,7 +16,7 @@ import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -238,13 +238,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     Signed in with a {providerName} account via{' '}
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
-                  <Button asChild type="default" className="mt-2">
-                    <Link
-                      href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
-                    >
-                      Configure {providerName} provider
-                    </Link>
-                  </Button>
+                  {IS_PLATFORM && (
+                    <Button asChild type="default" className="mt-2">
+                      <Link
+                        href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
+                      >
+                        Configure {providerName} provider
+                      </Link>
+                    </Button>
+                  )}
                 </div>
                 {isActive ? (
                   <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
