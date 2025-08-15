@@ -36,7 +36,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
 
   return (
     <div className="border-t border-muted flex flex-col gap-6 px-8 py-16 sm:items-center sm:text-center">
-      <p className="text-foreground text-xl transition-opacity duration-500">
+      <p className="text-foreground text-xl tracking-tight transition-opacity duration-500">
         {answers[currentIndex]}
       </p>
       {/* Decorative progress bar */}
@@ -74,7 +74,9 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
           />
         </div>
       </div>
-      <p className="w-full text-foreground-lighter text-sm font-mono uppercase">{label}</p>
+      <p className="w-full text-foreground-lighter text-sm font-mono uppercase tracking-widest">
+        {label}
+      </p>
     </div>
   )
 }

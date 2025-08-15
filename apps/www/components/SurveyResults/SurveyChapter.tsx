@@ -37,7 +37,7 @@ export function SurveyChapter({
         <header
           className={`flex flex-col gap-24 border-b border-muted`}
           style={{
-            background: `radial-gradient(circle at ${number % 2 === 0 ? '65%' : '35%'} 280%, hsl(var(--brand-500)), transparent 70%)`,
+            background: `radial-gradient(circle at ${number % 2 === 0 ? '65%' : '35%'} 280%, hsl(var(--brand-300)), transparent 70%)`,
           }}
         >
           {/* Decorative progress bar */}
@@ -51,7 +51,7 @@ export function SurveyChapter({
               <p className="text-sm text-brand-link uppercase font-mono text-balance tracking-wide">
                 {shortTitle}
               </p>
-              <h2 className="text-3xl md:text-4xl xl:text-6xl text-balance leading-tight">
+              <h2 className="text-3xl md:text-4xl xl:text-6xl text-balance leading-tight tracking-tight">
                 {title}
               </h2>
             </div>

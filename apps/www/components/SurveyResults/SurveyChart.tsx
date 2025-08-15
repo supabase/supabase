@@ -292,12 +292,12 @@ export function SurveyChart({
       ref={chartRef}
       className="w-full bg-200 border-t border-muted"
       style={{
-        background: `radial-gradient(circle at center -100%, hsl(var(--brand-500)), transparent 70%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+        background: `radial-gradient(circle at center -100%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
       }}
     >
       <header className="px-8 py-8">
         <p className="text-foreground/30 text-sm font-mono uppercase tracking-widest">Q&A</p>
-        <h3 className="text-foreground text-xl">{title}</h3>
+        <h3 className="text-foreground text-xl tracking-tight">{title}</h3>
       </header>
 
       <div>
