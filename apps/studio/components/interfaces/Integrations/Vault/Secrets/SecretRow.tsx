@@ -8,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
 } from 'ui'
 
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
@@ -17,19 +16,22 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import EditSecretModal from './EditSecretModal'
+import type { SecretTableColumn } from './Secrets.utils'
 
 interface SecretRowProps {
-  secret: VaultSecret
+  row: VaultSecret
+  col: SecretTableColumn
   onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
+const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [modal, setModal] = useState<string | null>(null)
   const [revealSecret, setRevealSecret] = useState(false)
-  const name = secret?.name ?? 'No name provided'
+  const name = row?.name ?? 'No name provided'
 
   const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -40,69 +42,23 @@ const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
     {
       projectRef: ref!,
       connectionString: project?.connectionString,
-      id: secret.id,
+      id: row.id,
     },
     {
-      enabled: !!(ref! && secret.id) && revealSecret,
+      enabled: !!(ref! && row.id) && revealSecret,
     }
   )
 
   const onCloseModal = () => setModal(null)
 
-  return (
-    <div className="px-6 py-4 flex items-center space-x-4">
-      <div className="space-y-1 min-w-[35%] max-w-[35%]">
-        <div>
-          <p className="text-sm text-foreground" title={name}>
-            {name}
-          </p>
-          {secret.description !== undefined && (
-            <p className="text-sm text-foreground-light" title={secret.description}>
-              {secret.description}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center space-x-2 group">
-          <Key size={14} strokeWidth={2} className="text-foreground-light transition" />
-          <p className="text-foreground-light font-mono text-xs transition" title={secret.id}>
-            {secret.id}
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center space-x-2 w-[40%]">
-        <Button
-          type="text"
-          className="px-1.5"
-          icon={
-            isFetching && revealedValue === undefined ? (
-              <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-            ) : !revealSecret ? (
-              <Eye size={16} strokeWidth={1.5} />
-            ) : (
-              <EyeOff size={16} strokeWidth={1.5} />
-            )
-          }
-          onClick={() => setRevealSecret(!revealSecret)}
-        />
-        <div className="flex-grow">
-          {revealSecret && revealedValue ? (
-            <Input copy size="small" className="font-mono" value={revealedValue} />
-          ) : (
-            <p className="text-sm font-mono">••••••••••••••••••</p>
-          )}
-        </div>
-      </div>
-      <div className="flex items-center justify-end w-[25%] space-x-4">
-        <p className="text-sm text-foreground-light">
-          {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
-          {dayjs(secret.updated_at).format('MMM D, YYYY')}
-        </p>
-
+  if (col.id === 'actions') {
+    return (
+      <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-32">
+          <DropdownMenuContent side="bottom" align="end" className="w-40">
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
@@ -120,7 +76,7 @@ const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => onSelectRemove(secret)}
+              onClick={() => onSelectRemove(row)}
               tooltip={{
                 content: {
                   side: 'left',
@@ -134,8 +90,71 @@ const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <EditSecretModal visible={modal === `edit`} secret={secret} onClose={onCloseModal} />
+        <EditSecretModal visible={modal === `edit`} secret={row} onClose={onCloseModal} />
       </div>
+    )
+  }
+
+  if (col.id === 'secret_value') {
+    return (
+      <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
+        <Button
+          type="text"
+          className="px-1.5"
+          icon={
+            isFetching && revealedValue === undefined ? (
+              <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+            ) : !revealSecret ? (
+              <Eye size={16} strokeWidth={1.5} />
+            ) : (
+              <EyeOff size={16} strokeWidth={1.5} />
+            )
+          }
+          onClick={() => setRevealSecret(!revealSecret)}
+        />
+        <div className="flex-grow min-w-0">
+          {revealSecret && revealedValue !== undefined ? (
+            <Input copy readOnly size="tiny" className="font-mono" value={revealedValue} />
+          ) : (
+            <p className="text-sm font-mono text-foreground">••••••••••••••••••</p>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  if (col.id === 'updated_at') {
+    return (
+      <div className="w-full flex items-center justify-start">
+        <p className="text-xs text-foreground-light">
+          {row.updated_at === row.created_at ? 'Added' : 'Updated'} on{' '}
+          {dayjs(row.updated_at).format('MMM D, YYYY')}
+        </p>
+      </div>
+    )
+  }
+
+  if (col.id === 'id') {
+    return (
+      <div className="w-full flex items-center">
+        <Key size={12} strokeWidth={2} className="text-foreground-light mr-2" />
+        <p className="text-foreground-light text-xs font-mono truncate" title={row.id}>
+          {row.id}
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full flex flex-col justify-center">
+      <p className="text-xs text-foreground truncate" title={name}>
+        {name}
+      </p>
+      {row.description !== undefined && row.description !== '' && (
+        <div>
+          <p className="text-xs text-foreground-lighter w-full truncate">{row.description}</p>
+        </div>
+      )}
     </div>
   )
 }
