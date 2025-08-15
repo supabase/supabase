@@ -92,16 +92,37 @@ export const SearchList = ({ search }: SearchListProps) => {
               })
               const isPreview = tabs.previewTabId === tabId
               const isActive = !isPreview && element.metadata?.id === id
+              const visibility =
+                element.metadata?.visibility === 'user'
+                  ? 'Private'
+                  : element.metadata?.visibility === 'project'
+                    ? 'Shared'
+                    : undefined
 
               return (
                 <SQLEditorTreeViewItem
                   {...props}
-                  element={element}
+                  element={{
+                    ...element,
+                    name: (
+                      <span className="flex flex-col py-0.5">
+                        <span title={element.name} className="truncate">
+                          {element.name}
+                        </span>
+                        {!!visibility && (
+                          <span title={visibility} className="text-foreground-lighter text-xs">
+                            {visibility}
+                          </span>
+                        )}
+                      </span>
+                    ),
+                  }}
                   isOpened={isOpened && !isPreview}
                   isSelected={isActive}
                   isPreview={isPreview}
                   isLastItem={snippetsLastItemIds.has(element.id as string)}
                   status="idle"
+                  className="items-start h-[40px] [&>svg]:translate-y-0.5"
                   onSelectDelete={() => setSelectedSnippetToDelete(element.metadata as Snippet)}
                   onSelectRename={() => setSelectedSnippetToRename(element.metadata as Snippet)}
                   onSelectDownload={() => setSelectedSnippetToDownload(element.metadata as Snippet)}
