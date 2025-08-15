@@ -42,7 +42,6 @@ interface ChartDataItem {
   rawValue: number
 }
 
-// Add this interface and configuration mapping
 interface FilterColumnConfig {
   label: string
   options: { value: string; label: string }[]
@@ -258,6 +257,12 @@ export function SurveyChart({
 
   const [view, setView] = useState<'chart' | 'sql'>('chart')
 
+  // Add a wrapper function to handle both view change and expansion
+  const handleViewChange = (newView: 'chart' | 'sql') => {
+    setView(newView)
+    setIsExpanded(true)
+  }
+
   const setFilterValue = (filterKey: string, value: string) => {
     setActiveFilters((prev: Record<string, string>) => ({
       ...prev,
@@ -320,18 +325,19 @@ export function SurveyChart({
           <TwoOptionToggle
             options={['SQL', 'chart']}
             activeOption={view}
-            onClickOption={setView}
+            onClickOption={handleViewChange}
             borderOverride="border-overlay"
           />
         </div>
         <motion.div
+          key={view} // Force a re-render when view changes
           className="overflow-hidden relative"
           initial={false}
           animate={{
             height: isExpanded ? 'auto' : `${FIXED_HEIGHT}px`,
           }}
           transition={{
-            duration: 0.3,
+            duration: 0.2,
             ease: 'easeInOut',
           }}
         >
@@ -439,17 +445,15 @@ export function SurveyChart({
             </div>
           )}
 
-          {/* Expand button overlay */}
-          {!isExpanded && !isLoading && !error && chartData.length > 3 && (
+          {/* Expand button overlay - only show for chart view */}
+          {view === 'chart' && !isExpanded && !isLoading && !error && chartData.length > 3 && (
             <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
               <Button
                 type="default"
                 size="tiny"
-                // iconRight={<UnfoldVertical />}
                 onClick={() => setIsExpanded(true)}
                 className="shadow-sm"
               >
-                {/* Show {chartData.length - 3} more */}
                 Show more
               </Button>
             </div>
