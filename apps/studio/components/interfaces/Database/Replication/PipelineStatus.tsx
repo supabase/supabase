@@ -1,3 +1,5 @@
+import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
@@ -31,6 +33,8 @@ export const PipelineStatus = ({
   isSuccess,
   requestStatus,
 }: PipelineStatusProps) => {
+  const { ref } = useParams()
+
   // Map backend statuses to UX-friendly display
   const getStatusConfig = () => {
     const statusName =
@@ -138,7 +142,17 @@ export const PipelineStatus = ({
               <span>{statusConfig.label}</span>
             </div>
           </TooltipTrigger>
-          <TooltipContent side="bottom">{statusConfig.tooltip}</TooltipContent>
+          <TooltipContent side="bottom">
+            {statusConfig.tooltip}
+            {['unknown', 'failed'].includes(pipelineStatus?.name ?? '') && (
+              <>
+                {' '}
+                Check the{' '}
+                <InlineLink href={`/project/${ref}/logs/etl-replication-logs`}>logs</InlineLink> for
+                more information.
+              </>
+            )}
+          </TooltipContent>
         </Tooltip>
       )}
     </>
