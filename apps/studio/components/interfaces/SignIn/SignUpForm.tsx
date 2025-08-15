@@ -1,5 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { motion } from 'framer-motion'
 import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
@@ -20,6 +21,7 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
@@ -47,6 +49,7 @@ const formId = 'sign-up-form'
 export const SignUpForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -61,12 +64,14 @@ export const SignUpForm = () => {
     token: parseAsString.withDefault(''),
   })
 
-  const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
+  const { mutate: signup } = useSignUpMutation({
     onSuccess: () => {
+      setIsSubmitting(false)
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
     },
     onError: (error) => {
+      setIsSubmitting(false)
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign up: ${error.message}`)
@@ -74,6 +79,8 @@ export const SignUpForm = () => {
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email, password }) => {
+    // [Joshen] Separate submitting state as there's 2 async processes here
+    setIsSubmitting(true)
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
@@ -112,24 +119,28 @@ export const SignUpForm = () => {
 
   return (
     <div className="relative">
+      {isSubmitted && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="absolute top-0 w-full"
+        >
+          <Alert_Shadcn_ variant="default">
+            <CheckCircle />
+            <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              You've successfully signed up. Please check your email to confirm your account before
+              signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </motion.div>
+      )}
       <div
-        className={`absolute top-0 duration-500 delay-300 w-full ${
-          isSubmitted ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <Alert_Shadcn_ variant="default">
-          <CheckCircle />
-          <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs">
-            You've successfully signed up. Please check your email to confirm your account before
-            signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </div>
-      <div
-        className={`w-full py-1 transition-all overflow-y-hidden duration-500 ${
+        className={cn(
+          'w-full py-1 transition-all duration-500',
           isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
-        }`}
+        )}
       >
         <Form_Shadcn_ {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -144,7 +155,7 @@ export const SignUpForm = () => {
                       id="email"
                       type="email"
                       autoComplete="email"
-                      disabled={isSigningUp}
+                      disabled={isSubmitting}
                       {...field}
                       placeholder="you@example.com"
                     />
@@ -168,15 +179,15 @@ export const SignUpForm = () => {
                         placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
                         {...field}
                         onFocus={() => setShowConditions(true)}
-                        disabled={isSigningUp}
+                        disabled={isSubmitting}
                       />
                       <Button
                         type="default"
                         title={passwordHidden ? `Hide password` : `Show password`}
                         aria-label={passwordHidden ? `Hide password` : `Show password`}
-                        className="absolute right-2 top-1 px-3 py-2"
+                        className="absolute right-1 top-1 px-1.5"
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
-                        disabled={isSigningUp}
+                        disabled={isSubmitting}
                         onClick={() => setPasswordHidden((prev) => !prev)}
                       />
                     </div>
@@ -198,12 +209,8 @@ export const SignUpForm = () => {
                 ref={captchaRef}
                 sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
                 size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
               />
             </div>
 
@@ -212,8 +219,8 @@ export const SignUpForm = () => {
               form={formId}
               htmlType="submit"
               size="large"
-              disabled={password.length === 0 || isSigningUp}
-              loading={isSigningUp}
+              disabled={password.length === 0 || isSubmitting}
+              loading={isSubmitting}
             >
               Sign Up
             </Button>
