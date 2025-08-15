@@ -9,7 +9,9 @@ import { accessTokenKeys } from './keys'
 export type AccessTokenCreateVariables = components['schemas']['CreateAccessTokenBody']
 
 export async function createAccessToken({ name, scope }: AccessTokenCreateVariables) {
-  const { data, error } = await post('/platform/profile/access-tokens', { body: { name, scope } })
+  const { data, error } = await post('/platform/profile/access-tokens', {
+    body: { name, scope },
+  })
 
   if (error) handleError(error)
 

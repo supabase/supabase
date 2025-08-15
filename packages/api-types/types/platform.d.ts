@@ -1557,7 +1557,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets all projects for the given organization */
+    /**
+     * Gets all projects for the given organization
+     * @description Returns a paginated list of projects for the specified organization.
+     *
+     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     */
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
     post?: never
@@ -2137,10 +2142,12 @@ export interface paths {
       cookie?: never
     }
     /**
-     * Gets all projects that belong to the authenticated user
-     * @description Only returns the minimal project info
+     * Gets all projects that belong to the authenticated user (paginated)
+     * @description Returns a paginated list of projects across all organizations the user has access to.
+     *
+     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
-    get: operations['ProjectsController_getProjects']
+    get: operations['ProjectsController_getProjectsPaginated']
     put?: never
     /** Creates a project */
     post: operations['ProjectsController_createProject']
@@ -4474,8 +4481,8 @@ export interface components {
       organization_linking_eligibility: {
         is_eligible: boolean
         reasons: (
-          | 'ALREADY_BILLED_BY_PARTNER'
-          | 'ALREADY_BILLED_BY_PARTNER_AWS'
+          | 'ALREADY_MANAGED_BY_PARTNER'
+          | 'ALREADY_MANAGED_BY_PARTNER_AWS'
           | 'OVERDUE_INVOICES'
         )[]
         slug: string
@@ -6413,6 +6420,54 @@ export interface components {
         oauth_app_id: string
       }[]
     }
+    ListProjectsPaginatedResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page (actual number may be less) */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
+      projects: {
+        cloud_provider: string
+        disk_volume_size_gb?: number
+        id: number
+        /** @enum {string} */
+        infra_compute_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        inserted_at: string | null
+        is_branch_enabled: boolean
+        is_physical_backups_enabled: boolean | null
+        name: string
+        organization_id: number
+        organization_slug: string
+        preview_branch_refs: string[]
+        ref: string
+        region: string
+        status: string
+        subscription_id: string | null
+      }[]
+    }
     ListRepositoryBranchesResponse: {
       branches: {
         name: string
@@ -6524,6 +6579,14 @@ export interface components {
       website: string
     }
     OrganizationProjectsResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
       projects: {
         databases: {
           cloud_provider: string
@@ -9284,6 +9347,12 @@ export interface operations {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve GoTrue config */
       500: {
         headers: {
@@ -9316,6 +9385,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update GoTrue config */
       500: {
@@ -9836,6 +9911,12 @@ export interface operations {
           'application/json': components['schemas']['BackupsResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project backups */
       500: {
         headers: {
@@ -9869,6 +9950,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadBackupResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to download project backup */
       500: {
         headers: {
@@ -9898,6 +9985,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadableBackupsResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project backups */
       500: {
         headers: {
@@ -9920,6 +10013,12 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -9956,6 +10055,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project to a previous point in time */
       500: {
         headers: {
@@ -9987,6 +10092,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project backup */
       500: {
         headers: {
@@ -10013,6 +10124,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12305,6 +12422,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create organization invitation */
       500: {
         headers: {
@@ -12950,7 +13073,16 @@ export interface operations {
   }
   OrganizationProjectsController_getOrganizationProjects: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Number of projects to return per page */
+        limit?: number
+        /** @description Number of projects to skip */
+        offset?: number
+        /** @description Search projects by name */
+        search?: string
+        /** @description Sort order for projects */
+        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+      }
       header?: never
       path: {
         /** @description Organization slug */
@@ -15456,9 +15588,18 @@ export interface operations {
       }
     }
   }
-  ProjectsController_getProjects: {
+  ProjectsController_getProjectsPaginated: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Number of projects to return per page */
+        limit?: number
+        /** @description Number of projects to skip */
+        offset?: number
+        /** @description Search projects by name */
+        search?: string
+        /** @description Sort order for projects */
+        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+      }
       header?: never
       path?: never
       cookie?: never
@@ -15470,7 +15611,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectInfo'][]
+          'application/json': components['schemas']['ListProjectsPaginatedResponse']
         }
       }
     }

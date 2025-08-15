@@ -14,6 +14,8 @@ export async function deleteAccessToken({ id }: AccessTokenDeleteVariables) {
     params: { path: { id } },
   })
 
+  console.log('🗑️ Deleting access token with ID:', id)
+
   if (error) handleError(error)
 
   return data
