@@ -1,12 +1,12 @@
-import { useRef, useState } from 'react'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
-import { CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import z from 'zod'
-import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { toast } from 'sonner'
+import z from 'zod'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
@@ -21,11 +21,11 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import PasswordConditionsHelper from './PasswordConditionsHelper'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const schema = z.object({
-  email: z.string({ required_error: 'Email is required' }).email('Must be a valid email'),
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
   password: z
     .string()
     .min(1, 'Password is required')
@@ -44,7 +44,7 @@ const schema = z.object({
 
 const formId = 'sign-up-form'
 
-const SignUpForm = () => {
+export const SignUpForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -223,5 +223,3 @@ const SignUpForm = () => {
     </div>
   )
 }
-
-export default SignUpForm
