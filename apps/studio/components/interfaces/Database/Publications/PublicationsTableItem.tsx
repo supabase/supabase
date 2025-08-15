@@ -14,7 +14,10 @@ interface PublicationsTableItemProps {
   selectedPublication: PostgresPublication
 }
 
-const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTableItemProps) => {
+export const PublicationsTableItem = ({
+  table,
+  selectedPublication,
+}: PublicationsTableItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: protectedSchemas } = useProtectedSchemas()
   const enabledForAllTables = selectedPublication.tables == null
@@ -108,5 +111,3 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
     </TableRow>
   )
 }
-
-export default PublicationsTableItem

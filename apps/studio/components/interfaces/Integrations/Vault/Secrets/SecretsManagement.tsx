@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import DataGrid, { Row } from 'react-data-grid'
 import { sortBy } from 'lodash'
-import { Loader, Search, X } from 'lucide-react'
-import { Fragment, useEffect, useState } from 'react'
+import { Loader, RefreshCw, Search, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -13,16 +14,17 @@ import type { VaultSecret } from 'types'
 import {
   Button,
   Input,
+  LoadingLine,
+  cn,
   Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Separator,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
 } from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
-import SecretRow from './SecretRow'
+import { formatSecretColumns } from './Secrets.utils'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
@@ -31,140 +33,162 @@ export const SecretsManagement = () => {
   const [searchValue, setSearchValue] = useState<string>('')
   const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
-  const [selectedSort, setSelectedSort] = useState('updated_at')
+  const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
   const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
 
-  const { data, isLoading } = useVaultSecretsQuery({
+  const { data, isLoading, isRefetching, refetch, error, isError } = useVaultSecretsQuery({
     projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })
-  const allSecrets = data || []
-  const secrets = sortBy(
-    searchValue.length > 0
-      ? allSecrets.filter(
-          (secret) =>
-            (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
-            (secret?.id ?? '').toLowerCase().includes(searchValue.toLowerCase())
-        )
-      : allSecrets,
-    (s) => {
-      if (selectedSort === 'updated_at') {
-        return Number(new Date(s.updated_at))
-      } else {
-        return s[selectedSort as keyof VaultSecret]
-      }
+  const allSecrets = useMemo(() => data || [], [data])
+  const secrets = useMemo(() => {
+    const filtered =
+      searchValue.length > 0
+        ? allSecrets.filter(
+            (secret) =>
+              (secret?.name ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
+              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
+          )
+        : allSecrets
+
+    if (selectedSort === 'updated_at') {
+      return sortBy(filtered, (s) => Number(new Date(s.updated_at))).reverse()
     }
-  )
+    return sortBy(filtered, (s) => (s.name || '').toLowerCase())
+  }, [allSecrets, searchValue, selectedSort])
 
   useEffect(() => {
     if (search !== undefined) setSearchValue(search)
   }, [search])
 
+  const columns = useMemo(
+    () =>
+      formatSecretColumns({
+        onSelectRemove: (secret) => setSelectedSecretToRemove(secret),
+      }),
+    []
+  )
+
   return (
     <>
-      <div className="space-y-4 p-4 md:p-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-          <div className="flex flex-col md:flex-row md:items-center gap-2">
-            <Input
-              className="md:w-52"
-              size="tiny"
-              placeholder="Search by name or key ID"
-              value={searchValue}
-              onChange={(event) => setSearchValue(event.target.value)}
-              icon={<Search strokeWidth={2} size={16} />}
-              actions={
-                searchValue.length > 0
-                  ? [
-                      <Button
-                        key="clear"
-                        size="tiny"
-                        type="text"
-                        icon={<X />}
-                        className="px-1"
-                        onClick={() => setSearchValue('')}
-                      />,
-                    ]
-                  : []
-              }
-            />
-            <Select_Shadcn_ value={selectedSort} onValueChange={setSelectedSort}>
-              <SelectTrigger_Shadcn_ size="tiny" className="md:w-44">
-                <SelectValue_Shadcn_ asChild>
-                  <>Sort by {selectedSort}</>
-                </SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectItem_Shadcn_ value="updated_at" className="text-xs">
-                  Updated at
-                </SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="name" className="text-xs">
-                  Name
-                </SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </div>
-          <div className="flex items-center gap-x-2">
-            <DocsButton href="https://supabase.com/docs/guides/database/vault" />
-            <ButtonTooltip
-              type="primary"
-              disabled={!canManageSecrets}
-              onClick={() => setShowAddSecretModal(true)}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canManageSecrets
-                    ? 'You need additional permissions to add secrets'
-                    : undefined,
-                },
-              }}
-            >
-              Add new secret
-            </ButtonTooltip>
-          </div>
-        </div>
+      <div className="h-full w-full space-y-4">
+        <div className="h-full w-full flex flex-col relative">
+          <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap">
+            <div className="flex items-center gap-2">
+              <Input
+                size="tiny"
+                className="w-52"
+                placeholder="Search by name or key ID"
+                icon={<Search size={14} />}
+                value={searchValue ?? ''}
+                onChange={(e) => setSearchValue(e.target.value)}
+                actions={[
+                  searchValue && (
+                    <Button
+                      size="tiny"
+                      type="text"
+                      icon={<X />}
+                      onClick={() => {
+                        setSearchValue('')
+                      }}
+                      className="p-0 h-5 w-5"
+                    />
+                  ),
+                ]}
+              />
 
-        {/* Table of secrets */}
-        <div className="border border-default rounded">
-          {isLoading ? (
+              <Select_Shadcn_ value={selectedSort} onValueChange={(v) => setSelectedSort(v as any)}>
+                <SelectTrigger_Shadcn_ size="tiny" className="w-44">
+                  <SelectValue_Shadcn_ asChild>
+                    <>Sort by {selectedSort}</>
+                  </SelectValue_Shadcn_>
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectItem_Shadcn_ value="updated_at" className="text-xs">
+                    Updated at
+                  </SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="name" className="text-xs">
+                    Name
+                  </SelectItem_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            </div>
+
+            <div className="flex items-center gap-x-2">
+              <Button
+                type="default"
+                icon={<RefreshCw />}
+                loading={isRefetching}
+                onClick={() => refetch()}
+              >
+                Refresh
+              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/database/vault" />
+              <ButtonTooltip
+                type="primary"
+                disabled={!canManageSecrets}
+                onClick={() => setShowAddSecretModal(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canManageSecrets
+                      ? 'You need additional permissions to add secrets'
+                      : undefined,
+                  },
+                }}
+              >
+                Add new secret
+              </ButtonTooltip>
+            </div>
+          </div>
+
+          <LoadingLine loading={isLoading || isRefetching} />
+
+          {isError ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <Loader className="animate-spin text-foreground-light" size={16} strokeWidth={1.5} />
-              <p className="text-sm text-foreground">Loading secrets from the Vault</p>
+              <p className="text-sm text-foreground">Failed to load secrets</p>
             </div>
           ) : (
-            <>
-              {secrets.map((secret, idx) => {
-                return (
-                  <Fragment key={`secret-${idx}`}>
-                    <SecretRow secret={secret} onSelectRemove={setSelectedSecretToRemove} />
-                    {idx !== secrets.length - 1 && <Separator />}
-                  </Fragment>
+            <DataGrid
+              className="flex-grow border-t-0"
+              rowHeight={52}
+              headerRowHeight={36}
+              columns={columns}
+              rows={secrets}
+              rowKeyGetter={(row: VaultSecret) => row.id}
+              rowClass={() => {
+                return cn(
+                  'cursor-pointer',
+                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                  '[&>.rdg-cell:first-child>div]:pl-8'
                 )
-              })}
-              {secrets.length === 0 && (
-                <>
-                  {searchValue.length === 0 ? (
-                    <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                      <p className="text-sm text-foreground">No secrets added yet</p>
-                      <p className="text-sm text-foreground-light">
-                        The Vault allows you to store sensitive information like API keys
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="px-6 py-4 space-y-1">
-                      <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-foreground-light">
-                        Your search for "{searchValue}" did not return any results
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </>
+              }}
+              renderers={{
+                renderRow(_, props) {
+                  return <Row key={(props.row as VaultSecret).id} {...props} />
+                },
+              }}
+            />
           )}
+
+          {secrets.length === 0 && !isLoading && !isError ? (
+            <div className="absolute top-32 px-6 w-full">
+              <div className="text-center text-sm flex flex-col gap-y-1">
+                <p className="text-foreground">
+                  {searchValue ? 'No secrets found' : 'No secrets added yet'}
+                </p>
+                <p className="text-foreground-light">
+                  {searchValue
+                    ? `There are currently no secrets based on the search "${searchValue}"`
+                    : 'The Vault allows you to store sensitive information like API keys'}
+                </p>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
 
