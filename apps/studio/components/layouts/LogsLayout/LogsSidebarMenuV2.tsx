@@ -205,7 +205,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
-      {IS_PLATFORM && (
+      {IS_PLATFORM && !isUnifiedLogsPreviewAvailable && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           illustration={<Badge variant="default">Coming soon</Badge>}
