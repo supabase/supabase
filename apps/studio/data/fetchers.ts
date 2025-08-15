@@ -49,6 +49,13 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   const requestId = uuidv4()
   const headers = new Headers(headersInit)
 
+  if (typeof window !== 'undefined') {
+    const pathSegments = window.location.pathname.substring(1).split('/')
+    if (pathSegments.length >= 2 && pathSegments[0] === 'org') {
+      headers.set('X-Vela-Organization-Id', pathSegments[1])
+    }
+  }
+
   headers.set('X-Request-Id', requestId)
 
   if (!headers.has('Authorization')) {

@@ -9,7 +9,7 @@ export function mapOrganization(organization: VelaOrganization): Organization {
   return {
     id: organization.id!,
     name: organization.name!,
-    slug: organization.name!,
+    slug: `${organization.id!.toString()}`,
     billing_email: '',
     plan: {
       id: 'enterprise',
@@ -31,7 +31,7 @@ export function mapProject(project: VelaProject): Project {
   return {
     id: project.id!,
     name: project.name!,
-    ref: project.name!,
+    ref: `${project.id!.toString()}`,
     organization_id: project.organization_id!,
     cloud_provider: 'vela',
     status: 'ACTIVE_HEALTHY',

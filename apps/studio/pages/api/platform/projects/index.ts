@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
 import { DEFAULT_PROJECT, DEFAULT_PROJECT_2, IS_VELA_PLATFORM } from '../../constants'
-import { getVelaClient } from '../../../../data/vela/vela'
+import { getVelaClient, mustOrganizationId } from '../../../../data/vela/vela'
 import { mapProject } from '../../../../data/vela/api-mappers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
@@ -30,13 +30,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json(response)
   }
 
-  const header = req.headers['x-vela-organization-id']
-  if (!header) {
-    return res.status(400).send('Missing organization id')
-  }
-  const organizationId = parseInt(Array.isArray(header) ? header[0] : header)
-
   const client = getVelaClient()
+  const organizationId = mustOrganizationId(req)
+
   const response = await client.GET('/organizations/{organization_id}/projects/', {
     params: {
       path: {

@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
-import { DEFAULT_PROJECT, DEFAULT_PROJECT_2, PROJECT_REST_URL } from 'pages/api/constants'
+import { DEFAULT_PROJECT, DEFAULT_PROJECT_2, IS_VELA_PLATFORM, PROJECT_REST_URL } from 'pages/api/constants'
+import { getVelaClient, mustOrganizationId } from '../../../../../data/vela/vela'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -18,23 +19,41 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.query.ref === 'default') {
-    // Platform specific endpoint
-    const response = {
-      ...DEFAULT_PROJECT,
-      connectionString: '',
-      restUrl: PROJECT_REST_URL,
+  if (!IS_VELA_PLATFORM) {
+    if (req.query.ref === '1') {
+      // Platform specific endpoint
+      return res.status(200).json({
+        ...DEFAULT_PROJECT,
+        connectionString: '',
+        restUrl: PROJECT_REST_URL,
+      })
+    } else if (req.query.ref === '2') {
+      return res.status(200).json({
+        ...DEFAULT_PROJECT_2,
+        connectionString: '',
+        restUrl: PROJECT_REST_URL,
+      })
     }
-
-    return res.status(200).json(response)
+    return res.status(404).json({
+      data: null,
+      error: {
+        message: 'Project not found',
+      },
+    })
   }
 
-  // Platform specific endpoint
-  const response = {
-    ...DEFAULT_PROJECT_2,
-    connectionString: '',
-    restUrl: PROJECT_REST_URL,
-  }
+  const client = getVelaClient()
+  const projectId = parseInt(req.query.ref as string)
+  const organizationId = mustOrganizationId(req)
+
+  const response = await client.GET("/organizations/{organization_id}/projects/{project_id}/", {
+    params: {
+      path: {
+        organization_id: organizationId,
+        project_id: projectId
+      }
+    }
+  })
 
   return res.status(200).json(response)
 }

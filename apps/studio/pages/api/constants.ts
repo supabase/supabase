@@ -14,7 +14,7 @@ export const DEFAULT_HOME = '/org'
 
 export const DEFAULT_PROJECT = {
   id: 1,
-  ref: 'default',
+  ref: '1',
   name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
   organization_id: 1,
   cloud_provider: 'localhost',
@@ -25,11 +25,22 @@ export const DEFAULT_PROJECT = {
 
 export const DEFAULT_PROJECT_2 = {
   id: 2,
-  ref: 'default2',
+  ref: '2',
   name: 'Second Project',
   organization_id: 1,
   cloud_provider: 'localhost',
   status: 'ACTIVE_HEALTHY',
   region: 'local',
   inserted_at: '2021-08-02T06:40:40.646Z',
+}
+
+export const DEFAULT_ORGANIZATION = {
+  id: 1,
+  name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
+  slug: '1',
+  billing_email: 'billing@supabase.co',
+  plan: {
+    id: 'enterprise',
+    name: 'Enterprise',
+  },
 }
