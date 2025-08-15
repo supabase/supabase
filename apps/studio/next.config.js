@@ -103,16 +103,7 @@ const nextConfig = {
               destination: '/organizations',
               permanent: false,
             },
-            {
-              source: '/signup',
-              destination: '/organizations',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/organizations',
-              permanent: false,
-            },
+
             {
               source: '/login',
               destination: '/organizations',

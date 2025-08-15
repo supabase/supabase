@@ -67,19 +67,6 @@ const SignInLayout = ({
       .catch(() => {}) // catch all errors thrown by auth methods
   }, [])
 
-  const [quote, setQuote] = useState<{
-    text: string
-    url: string
-    handle: string
-    img_url: string
-  } | null>(null)
-
-  useEffect(() => {
-    const randomQuote = tweets[Math.floor(Math.random() * tweets.length)]
-
-    setQuote(randomQuote)
-  }, [])
-
   return (
     <>
       <div className="relative flex flex-col bg-alternative min-h-screen">
@@ -112,8 +99,8 @@ const SignInLayout = ({
           </nav>
         </div>
 
-        <div className="flex flex-1 h-full">
-          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
+        <div className="flex flex-1 h-full justify-center">
+          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 max-w-md">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">
                 <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">{heading}</h1>
@@ -145,37 +132,6 @@ const SignInLayout = ({
               </div>
             )}
           </main>
-
-          <aside className="flex-col items-center justify-center flex-1 flex-shrink hidden basis-1/4 xl:flex">
-            {quote !== null && (
-              <div className="relative flex flex-col gap-6">
-                <div className="absolute select-none -top-12 -left-11">
-                  <span className="text-[160px] leading-none text-foreground-muted/30">{'“'}</span>
-                </div>
-
-                <blockquote className="z-10 max-w-lg text-3xl">{quote.text}</blockquote>
-
-                <a
-                  href={quote.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4"
-                >
-                  <img
-                    src={`https://supabase.com${quote.img_url}`}
-                    alt={quote.handle}
-                    className="w-12 h-12 rounded-full"
-                  />
-
-                  <div className="flex flex-col">
-                    <cite className="not-italic font-medium text-foreground-light whitespace-nowrap">
-                      @{quote.handle}
-                    </cite>
-                  </div>
-                </a>
-              </div>
-            )}
-          </aside>
         </div>
       </div>
     </>
