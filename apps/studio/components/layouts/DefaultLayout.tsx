@@ -10,6 +10,8 @@ import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { setOrganizationCookie } from '../../data/vela/vela'
+import { useOrganizationQuery } from '../../data/organizations/organization-query'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -26,9 +28,14 @@ export interface DefaultLayoutProps {
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
 const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const router = useRouter()
   const showProductMenu = !!ref && router.pathname !== '/org/[slug]/project/[ref]'
+
+  const { data: organization } = useOrganizationQuery({ slug })
+  if (organization) {
+    setOrganizationCookie(organization.id)
+  }
 
   useCheckLatestDeploy()
 
