@@ -32,16 +32,20 @@ const schema = z.object({
     .string()
     .min(1, 'Password is required')
     .max(72, 'Password cannot exceed 72 characters')
-    .refine((password) => {
-      // Basic password validation - you can enhance this based on your requirements
-      const hasUppercase = /[A-Z]/.test(password)
-      const hasLowercase = /[a-z]/.test(password)
-      const hasNumber = /[0-9]/.test(password)
-      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password)
-      const isLongEnough = password.length >= 8
-
-      return hasUppercase && hasLowercase && hasNumber && hasSpecialChar && isLongEnough
-    }, 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character'),
+    .refine((password) => password.length >= 8, 'Password must be at least 8 characters')
+    .refine(
+      (password) => /[A-Z]/.test(password),
+      'Password must contain at least 1 uppercase character'
+    )
+    .refine(
+      (password) => /[a-z]/.test(password),
+      'Password must contain at least 1 lowercase character'
+    )
+    .refine((password) => /[0-9]/.test(password), 'Password must contain at least 1 number')
+    .refine(
+      (password) => /[!@#$%^&*()_+\-=\[\]{};`':"\\|,.<>\/?]/.test(password),
+      'Password must contain at least 1 symbol'
+    ),
 })
 
 const formId = 'sign-up-form'
@@ -150,7 +154,6 @@ export const SignUpForm = () => {
                   <FormControl_Shadcn_>
                     <Input_Shadcn_
                       id="email"
-                      type="email"
                       autoComplete="email"
                       disabled={isSubmitting}
                       {...field}
