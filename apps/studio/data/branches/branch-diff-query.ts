@@ -41,7 +41,7 @@ export async function getBranchDiff({
 type BranchDiffData = Awaited<ReturnType<typeof getBranchDiff>>
 
 export const useBranchDiffQuery = (
-  { branchId, projectRef, includedSchemas = 'public' }: BranchDiffVariables,
+  { branchId, projectRef, includedSchemas }: BranchDiffVariables,
   {
     enabled = true,
     ...options
