@@ -19,6 +19,8 @@ describe(`NewAccessTokenButton`, () => {
         id: faker.number.int(),
         token_alias: faker.lorem.words(),
         token: faker.lorem.words(),
+        expires_at: faker.date.future().toISOString(),
+        last_used_at: faker.date.recent().toISOString(),
       },
     })
   })

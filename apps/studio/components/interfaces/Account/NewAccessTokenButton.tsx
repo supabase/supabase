@@ -24,16 +24,50 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import dayjs from 'dayjs'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
 }
 
+const NON_EXPIRING_TOKEN_VALUE = 'never'
+const ExpiresAtOptions: Record<string, { value: string; label: string }> = {
+  hour: {
+    value: dayjs().add(1, 'hour').toISOString(),
+    label: '1 hour',
+  },
+  day: {
+    value: dayjs().add(1, 'days').toISOString(),
+    label: '1 day',
+  },
+  week: {
+    value: dayjs().add(7, 'days').toISOString(),
+    label: '7 days',
+  },
+  month: {
+    value: dayjs().add(30, 'days').toISOString(),
+    label: '30 days',
+  },
+  never: {
+    value: NON_EXPIRING_TOKEN_VALUE,
+    label: 'Never',
+  },
+}
+
 const TokenSchema = z.object({
   tokenName: z.string().min(1, 'Please enter a name for the token'),
+  expiresAt: z.preprocess(
+    (val) => (val === NON_EXPIRING_TOKEN_VALUE ? undefined : val),
+    z.string().datetime().optional()
+  ),
 })
 
 const formId = 'new-access-token-form'
@@ -44,14 +78,14 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
 
   const form = useForm<z.infer<typeof TokenSchema>>({
     resolver: zodResolver(TokenSchema),
-    defaultValues: { tokenName: '' },
+    defaultValues: { tokenName: '', expiresAt: ExpiresAtOptions['month'].value },
     mode: 'onSubmit',
   })
   const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
     createAccessToken(
-      { name: values.tokenName, scope: tokenScope },
+      { name: values.tokenName, scope: tokenScope, expires_at: values.expiresAt },
       {
         onSuccess: (data) => {
           toast.success(`Your access token "${data.name}" is ready.`)
@@ -158,6 +192,29 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                           {...field}
                           placeholder="Provide a name for your token"
                         />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+                <FormField_Shadcn_
+                  key="expiresAt"
+                  name="expiresAt"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout name="expiresAt" label="Expires at">
+                      <FormControl_Shadcn_>
+                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger_Shadcn_>
+                            <SelectValue_Shadcn_ placeholder="Expires at" />
+                          </SelectTrigger_Shadcn_>
+                          <SelectContent_Shadcn_>
+                            {Object.values(ExpiresAtOptions).map((option) => (
+                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem_Shadcn_>
+                            ))}
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

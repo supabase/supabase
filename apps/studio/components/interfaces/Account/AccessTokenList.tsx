@@ -4,8 +4,7 @@ import { Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import Table from 'components/to-be-cleaned/Table'
-import { Button } from 'ui'
+import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const AccessTokenList = () => {
@@ -24,55 +23,61 @@ const AccessTokenList = () => {
 
   return (
     <>
-      <div className="overflow-hidden overflow-x-scroll">
-        <Table
-          head={[
-            <Table.th key="header-token">Token</Table.th>,
-            <Table.th key="header-name">Name</Table.th>,
-            <Table.th key="header-created">Created</Table.th>,
-            <Table.th key="header-action"></Table.th>,
-          ]}
-          body={
-            tokens && tokens.length == 0 ? (
-              <Table.tr>
-                <Table.td colSpan={5} className="p-3 py-12 text-center">
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Token</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Last Used</TableHead>
+              <TableHead>Expires</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tokens && tokens.length == 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
                   <p className="text-foreground-light">
                     {isLoading ? 'Checking for tokens' : 'You do not have any tokens created yet'}
                   </p>
-                </Table.td>
-              </Table.tr>
+                </TableCell>
+              </TableRow>
             ) : (
-              <>
-                {tokens?.map((x) => {
-                  return (
-                    <Table.tr key={x.token_alias}>
-                      <Table.td>
-                        <span className="font-mono">{x.token_alias}</span>
-                      </Table.td>
-                      <Table.td>{x.name}</Table.td>
-                      <Table.td>
-                        <p>{new Date(x.created_at).toLocaleString()}</p>
-                      </Table.td>
-                      <Table.td>
-                        <Button
-                          type="default"
-                          title="Delete token"
-                          className="px-1"
-                          onClick={() => {
-                            setToken(x)
-                            setIsOpen(true)
-                          }}
-                          icon={<Trash />}
-                        />
-                      </Table.td>
-                    </Table.tr>
-                  )
-                })}
-              </>
-            )
-          }
-        />
-      </div>
+              tokens?.map((x) => {
+                return (
+                  <TableRow key={x.token_alias}>
+                    <TableCell>
+                      <span className="font-mono">{x.token_alias}</span>
+                    </TableCell>
+                    <TableCell>{x.name}</TableCell>
+                    <TableCell>
+                      <p>
+                        {x.last_used_at ? new Date(x.last_used_at).toLocaleString() : 'Never used'}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <p>{x.expires_at ? new Date(x.expires_at).toLocaleString() : 'Never'}</p>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        type="default"
+                        title="Delete token"
+                        className="px-1"
+                        onClick={() => {
+                          setToken(x)
+                          setIsOpen(true)
+                        }}
+                        icon={<Trash />}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })
+            )}
+          </TableBody>
+        </Table>
+      </Card>
       <ConfirmationModal
         visible={isOpen}
         variant={'destructive'}
@@ -84,8 +89,8 @@ const AccessTokenList = () => {
           if (token) onDeleteToken(token.id)
         }}
       >
-        <p className="py-4 text-sm text-foreground-light">
-          {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
+        <p className="text-sm text-foreground-light">
+          This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
         </p>
       </ConfirmationModal>
     </>

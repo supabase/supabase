@@ -53,7 +53,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
         />
       </div>
       <div className="space-y-4">
-        {newToken && <NewTokenBanner token={newToken} />}
+        {newToken && <NewTokenBanner token={newToken} onClose={() => setNewToken(undefined)} />}
         <AccessTokenList />
       </div>
     </>
