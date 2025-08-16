@@ -42,6 +42,7 @@ const MemoizedMessage = memo(
     message,
     isLoading,
     onResults,
+    onDelete,
     onEdit,
     isAfterEditedMessage,
     isBeingEdited,
@@ -58,6 +59,7 @@ const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
+    onDelete: (id: string) => void
     onEdit: (id: string) => void
     isAfterEditedMessage: boolean
     isBeingEdited: boolean
@@ -70,6 +72,7 @@ const MemoizedMessage = memo(
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
+        onDelete={onDelete}
         onEdit={onEdit}
         isAfterEditedMessage={isAfterEditedMessage}
         isBeingEdited={isBeingEdited}
@@ -105,7 +108,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
+  const { ref: scrollContainerRef, isSticky, scrollToEnd, setIsSticky } = useAutoScroll()
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showMetadataWarning =
@@ -249,6 +252,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
+  const deleteMessageFromHere = useCallback(
+    (messageId: string) => {
+      // Find the message index in current chatMessages
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      if (isChatLoading) stop()
+
+      snap.deleteMessagesAfter(messageId, { includeSelf: true })
+
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+    },
+    [snap, setMessages, chatMessages, isChatLoading, stop]
+  )
+
   const editMessage = useCallback(
     (messageId: string) => {
       const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
@@ -292,6 +311,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
+            onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
             isBeingEdited={isBeingEdited}
@@ -299,7 +319,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           />
         )
       }),
-    [chatMessages, isChatLoading, updateMessage, editMessage, editingMessageId, cancelEdit]
+    [
+      chatMessages,
+      isChatLoading,
+      updateMessage,
+      deleteMessageFromHere,
+      editMessage,
+      cancelEdit,
+      editingMessageId,
+    ]
   )
 
   const hasMessages = chatMessages.length > 0
@@ -308,12 +336,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
       // Handling when the user is in edit mode
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
-      if (messageIndex === -1) return
-
-      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
-      const updatedMessages = chatMessages.slice(0, messageIndex)
-      setMessages(updatedMessages)
+      // delete the message(s) from the chat just like the delete button
+      deleteMessageFromHere(editingMessageId)
       setEditingMessageId(null)
     }
 
@@ -380,6 +404,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
+
+  useEffect(() => {
+    if (chatMessages.length === 0 && !isSticky) setIsSticky(true)
+  }, [chatMessages, isSticky, setIsSticky])
 
   return (
     <ErrorBoundary
@@ -699,7 +727,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
               )}
               loading={isChatLoading}
-              disabled={!isApiKeySet || disablePrompts || isChatLoading}
+              disabled={!isApiKeySet || disablePrompts || (isChatLoading && !editingMessageId)}
               placeholder={
                 hasMessages
                   ? 'Ask a follow up question...'
