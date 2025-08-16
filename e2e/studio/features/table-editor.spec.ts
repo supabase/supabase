@@ -416,6 +416,7 @@ test.describe('table editor', () => {
     await page.getByRole('button', { name: 'Apply sorting' }).click()
     await waitForGridDataToLoad(page, ref) // wait for sorted table data to load
     await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
+
     // verify sorted row content
     await page.waitForTimeout(500) // may take some time for sorting to complete
     expect(await page.getByRole('gridcell').nth(3).textContent()).toBe('123')
