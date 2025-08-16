@@ -34,3 +34,22 @@ export async function waitForApiResponse(
 type Options = {
   method?: HttpMethod
 }
+
+export async function waitForTableToLoad(page: Page, ref: string, schema?: string) {
+  const tableSchema = schema || 'public'
+  return await waitForApiResponse(page, 'pg-meta', ref, `query?key=entity-types-${tableSchema}-`)
+}
+
+export async function waitForGridDataToLoad(page: Page, ref: string) {
+  return await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-rows-')
+}
+
+export async function waitForDatabaseToLoad(page: Page, ref: string, schema?: string) {
+  const databaseSchema = schema || 'public'
+  return await waitForApiResponse(
+    page,
+    'pg-meta',
+    ref,
+    `tables?include_columns=true&included_schemas=${databaseSchema}`
+  )
+}
