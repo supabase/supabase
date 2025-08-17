@@ -1,6 +1,6 @@
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
 import DeleteProjectButton from './DeleteProjectButton'
 
@@ -20,17 +20,19 @@ export const DeleteProjectPanel = () => {
       : 'Make sure you have made a backup if you want to keep your data.'
 
   return (
-    <section id="delete-project">
-      <FormHeader title="Delete Project" description="" />
+    <ScaffoldSection id="delete-project" className="gap-6">
+      <ScaffoldSectionTitle>Delete Project</ScaffoldSectionTitle>
 
-      <Alert_Shadcn_ variant="destructive">
+      <Alert_Shadcn_ variant="destructive" className="py-4 px-6 [&>svg]:left-6">
         <CriticalIcon />
-        <AlertTitle_Shadcn_ className="mt-2">{title}</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
-        <div className="mt-2">
+        <div className="flex justify-between items-center">
+          <div className="xl:max-w-lg">
+            <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+          </div>
           <DeleteProjectButton />
         </div>
       </Alert_Shadcn_>
-    </section>
+    </ScaffoldSection>
   )
 }

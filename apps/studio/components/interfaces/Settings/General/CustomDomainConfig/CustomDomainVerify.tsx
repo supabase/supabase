@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
-import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
@@ -16,12 +15,15 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CardHeader,
+  CardContent,
+  CardFooter,
   WarningIcon,
 } from 'ui'
 import DNSRecord from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
 
-const CustomDomainVerify = () => {
+export const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
@@ -71,12 +73,12 @@ const CustomDomainVerify = () => {
 
   return (
     <>
-      <Panel.Content className="space-y-6">
+      <CardHeader>
+        Configure TXT verification for your custom domain{' '}
+        <code className="text-sm">{customDomain?.hostname}</code>
+      </CardHeader>
+      <CardContent className="space-y-6">
         <div>
-          <h4 className="text-foreground mb-2">
-            Configure TXT verification for your custom domain{' '}
-            <code className="text-sm">{customDomain?.hostname}</code>
-          </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
             control over the domain.
@@ -185,36 +187,23 @@ const CustomDomainVerify = () => {
             )}
           </div>
         )}
-      </Panel.Content>
-
-      <div className="border-t border-muted" />
-
-      <Panel.Content>
-        <div className="flex items-center justify-between">
-          <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
-          <div className="flex items-center space-x-2">
-            <Button
-              type="default"
-              onClick={onCancelCustomDomain}
-              loading={isDeleting}
-              className="self-end"
-            >
-              Cancel
-            </Button>
-            <Button
-              icon={<RefreshCw />}
-              onClick={onReverifyCustomDomain}
-              loading={!isValidating && isReverifyLoading}
-              disabled={isDeleting || isReverifyLoading || isValidating}
-              className="self-end"
-            >
-              Verify
-            </Button>
-          </div>
+      </CardContent>
+      <CardFooter className="justify-between">
+        <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+        <div className="flex justify-end items-center gap-2">
+          <Button type="default" onClick={onCancelCustomDomain} loading={isDeleting}>
+            Cancel
+          </Button>
+          <Button
+            icon={<RefreshCw />}
+            onClick={onReverifyCustomDomain}
+            loading={!isValidating && isReverifyLoading}
+            disabled={isDeleting || isReverifyLoading || isValidating}
+          >
+            Verify
+          </Button>
         </div>
-      </Panel.Content>
+      </CardFooter>
     </>
   )
 }
-
-export default CustomDomainVerify
