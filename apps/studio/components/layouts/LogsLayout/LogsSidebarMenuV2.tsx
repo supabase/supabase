@@ -90,7 +90,15 @@ export function LogsSidebarMenuV2() {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
     realtimeAll: realtimeEnabled,
-  } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
+    logsTemplates: templatesEnabled,
+    logsCollections: collectionsEnabled,
+  } = useIsFeatureEnabled([
+    'project_storage:all',
+    'project_auth:all',
+    'realtime:all',
+    'logs:templates',
+    'logs:collections',
+  ])
 
   const enablePgReplicate = useFlag('enablePgReplicate')
   const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
@@ -290,48 +298,54 @@ export function LogsSidebarMenuV2() {
           onClick={() => router.push(`/project/${ref}/logs/explorer`)}
         />
       </div>
-      <div className="px-2">
-        <InnerSideMenuItem
-          title="Templates"
-          isActive={isActive(`/project/${ref}/logs/explorer/templates`)}
-          href={`/project/${ref}/logs/explorer/templates`}
-        >
-          Templates
-        </InnerSideMenuItem>
-      </div>
-      <Separator className="my-4" />
-
-      <SidebarCollapsible title="Collections" defaultOpen={true}>
-        {filteredLogs.map((collection) => {
-          const isItemActive = isActive(collection.url)
-          return (
-            <LogsSidebarItem
-              key={collection.key}
-              isActive={isItemActive}
-              href={collection.url}
-              icon={<SupaIcon className="text-foreground-light" />}
-              label={collection.name}
-            />
-          )
-        })}
-      </SidebarCollapsible>
-      {OPERATIONAL_COLLECTIONS.length > 0 && (
-        <>
-          <Separator className="my-4" />
-          <SidebarCollapsible title="Database operations" defaultOpen={true}>
-            {filteredOperationalLogs.map((collection) => (
-              <LogsSidebarItem
-                key={collection.key}
-                isActive={isActive(collection.url)}
-                href={collection.url}
-                icon={<SupaIcon className="text-foreground-light" />}
-                label={collection.name}
-              />
-            ))}
-          </SidebarCollapsible>
-        </>
+      {templatesEnabled && (
+        <div className="px-2">
+          <InnerSideMenuItem
+            title="Templates"
+            isActive={isActive(`/project/${ref}/logs/explorer/templates`)}
+            href={`/project/${ref}/logs/explorer/templates`}
+          >
+            Templates
+          </InnerSideMenuItem>
+        </div>
       )}
       <Separator className="my-4" />
+
+      {collectionsEnabled && (
+        <>
+          <SidebarCollapsible title="Collections" defaultOpen={true}>
+            {filteredLogs.map((collection) => {
+              const isItemActive = isActive(collection.url)
+              return (
+                <LogsSidebarItem
+                  key={collection.key}
+                  isActive={isItemActive}
+                  href={collection.url}
+                  icon={<SupaIcon className="text-foreground-light" />}
+                  label={collection.name}
+                />
+              )
+            })}
+          </SidebarCollapsible>
+          {OPERATIONAL_COLLECTIONS.length > 0 && (
+            <>
+              <Separator className="my-4" />
+              <SidebarCollapsible title="Database operations" defaultOpen={true}>
+                {filteredOperationalLogs.map((collection) => (
+                  <LogsSidebarItem
+                    key={collection.key}
+                    isActive={isActive(collection.url)}
+                    href={collection.url}
+                    icon={<SupaIcon className="text-foreground-light" />}
+                    label={collection.name}
+                  />
+                ))}
+              </SidebarCollapsible>
+            </>
+          )}
+          <Separator className="my-4" />
+        </>
+      )}
       <SidebarCollapsible title="Queries" defaultOpen={true}>
         {savedQueriesLoading && (
           <div className="p-4">

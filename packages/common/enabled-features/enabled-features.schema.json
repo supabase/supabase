@@ -6,6 +6,15 @@
       "type": "string"
     },
 
+    "logs:templates": {
+      "type": "boolean",
+      "description": "Enable the logs templates page"
+    },
+    "logs:collections": {
+      "type": "boolean",
+      "description": "Enable the logs collections page"
+    },
+
     "profile:show_email": {
       "type": "boolean",
       "description": "Show the user's email address in the toolbar"
@@ -15,6 +24,6 @@
       "description": "Allow the user to change their profile information (first name, last name)"
     }
   },
-  "required": ["profile:show_email", "profile:update"],
+  "required": ["profile:show_email", "profile:update", "logs:templates", "logs:collections"],
   "additionalProperties": false
 }
