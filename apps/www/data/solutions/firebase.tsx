@@ -31,8 +31,7 @@ const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'
 const data = {
   metadata: {
     metaTitle: 'Switch from Firebase to Supabase',
-    metaDescription:
-      'The open-source Firebase alternative that scales with your business.',
+    metaDescription: 'The open-source Firebase alternative that scales with your business.',
   },
   heroSection: {
     id: 'hero',
