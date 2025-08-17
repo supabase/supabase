@@ -5,6 +5,8 @@ import { BillingSettings } from 'components/interfaces/Organization/BillingSetti
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import Error404 from 'pages/404'
 import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
@@ -15,6 +17,8 @@ const OrgBillingSettings: NextPageWithLayout = () => {
   const { panel } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
 
+  const showBilling = useIsFeatureEnabled('billing:all')
+
   useEffect(() => {
     const allowedValues = ['subscriptionPlan', 'costControl']
     if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
@@ -23,6 +27,10 @@ const OrgBillingSettings: NextPageWithLayout = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel])
+
+  if (!showBilling) {
+    return <Error404 />
+  }
 
   return <BillingSettings />
 }

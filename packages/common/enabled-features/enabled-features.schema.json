@@ -6,9 +6,36 @@
       "type": "string"
     },
 
+    "ai:opt_in_level_disabled": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'disabled'"
+    },
+    "ai:opt_in_level_schema": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema'"
+    },
+    "ai:opt_in_level_schema_and_log": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log'"
+    },
+    "ai:opt_in_level_schema_and_log_and_data": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log_and_data'"
+    },
+
+    "billing:all": {
+      "type": "boolean",
+      "description": "Enable billing"
+    },
+
     "client_libraries:show_all": {
       "type": "boolean",
       "description": "Show all client libraries. When false, the JavaScript client library will still be shown."
+    },
+
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
     },
 
     "logs:templates": {
@@ -53,11 +80,17 @@
     }
   },
   "required": [
+    "ai:opt_in_level_disabled",
+    "ai:opt_in_level_schema",
+    "ai:opt_in_level_schema_and_log",
+    "ai:opt_in_level_schema_and_log_and_data",
+    "billing:all",
     "client_libraries:show_all",
-    "profile:show_email",
-    "profile:update",
+    "integrations:vercel",
     "logs:templates",
     "logs:collections",
+    "profile:show_email",
+    "profile:update",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",

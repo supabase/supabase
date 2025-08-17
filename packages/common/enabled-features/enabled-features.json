@@ -1,7 +1,16 @@
 {
   "$schema": "./enabled-features.schema.json",
 
+  "ai:opt_in_level_disabled": true,
+  "ai:opt_in_level_schema": true,
+  "ai:opt_in_level_schema_and_log": true,
+  "ai:opt_in_level_schema_and_log_and_data": true,
+
+  "billing:all": true,
+
   "client_libraries:show_all": true,
+
+  "integrations:vercel": true,
 
   "logs:templates": true,
   "logs:collections": true,

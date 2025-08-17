@@ -355,6 +355,8 @@ const OrganizationLinks = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
+  const showBilling = useIsFeatureEnabled('billing:all')
+
   const activeRoute = router.pathname.split('/')[3]
 
   const navMenuItems = [
@@ -382,12 +384,16 @@ const OrganizationLinks = () => {
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-      key: 'billing',
-      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
+    ...(showBilling
+      ? [
+          {
+            label: 'Billing',
+            href: `/org/${slug}/billing`,
+            key: 'billing',
+            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          },
+        ]
+      : []),
     {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
