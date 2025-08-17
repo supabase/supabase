@@ -10,7 +10,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
-const TableEditorPage: NextPageWithLayout = () => {
+const SqlEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const store = useTabsStateSnapshot()
@@ -24,7 +24,9 @@ const TableEditorPage: NextPageWithLayout = () => {
       router.push(`/project/${projectRef}/sql/${appSnap.dashboardHistory.sql}`)
     } else if (lastTabId) {
       const lastTab = store.tabsMap[lastTabId]
-      if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+      if (lastTab) {
+        router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+      }
     } else {
       router.push(`/project/${projectRef}/sql/new`)
     }
@@ -34,7 +36,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   return null
 }
 
-TableEditorPage.getLayout = (page) => (
+SqlEditorPage.getLayout = (page) => (
   <DefaultLayout>
     <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
       <SQLEditorLayout>{page}</SQLEditorLayout>
@@ -42,4 +44,4 @@ TableEditorPage.getLayout = (page) => (
   </DefaultLayout>
 )
 
-export default TableEditorPage
+export default SqlEditorPage

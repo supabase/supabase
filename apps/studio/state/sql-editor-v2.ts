@@ -137,18 +137,19 @@ export const sqlEditorState = proxy({
       snippet.name = name
       snippet.description = description
 
-      sqlEditorState.needsSaving.set(id, true)
+      // The snippet is already saved in the database, so we don't need to set needsSaving
+      // sqlEditorState.needsSaving.set(id, true)
     }
   },
 
-  removeSnippet: (id: string) => {
+  removeSnippet: (id: string, skipSave: boolean = false) => {
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
 
     const { [id]: result, ...otherResults } = sqlEditorState.results
     sqlEditorState.results = otherResults
 
-    sqlEditorState.needsSaving.delete(id)
+    if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
 
   addFolder: ({ projectRef, folder }: { projectRef: string; folder: SnippetFolder }) => {

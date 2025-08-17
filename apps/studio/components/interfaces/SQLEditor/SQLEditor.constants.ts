@@ -22,6 +22,9 @@ export const sqlAiDisclaimerComment = `
 
 export const untitledSnippetTitle = 'Untitled query'
 
+export const generateSnippetTitle = () =>
+  `${untitledSnippetTitle} ${Math.floor(Math.random() * 900) + 100}`
+
 export const destructiveSqlRegex = [
   /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,
 ]

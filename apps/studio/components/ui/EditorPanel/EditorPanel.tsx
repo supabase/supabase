@@ -4,18 +4,19 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -93,6 +94,8 @@ export const EditorPanel = ({
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = !!check?.hasKey
   const { data: org } = useSelectedOrganizationQuery()
 
   const [isSaving, setIsSaving] = useState(false)
@@ -274,11 +277,14 @@ export const EditorPanel = ({
 
                 try {
                   setIsSaving(true)
-                  const { title: name } = await generateSqlTitle({
-                    sql: currentValue,
-                  })
+                  let name = generateSnippetTitle()
+                  if (isApiKeySet) {
+                    const { title } = await generateSqlTitle({
+                      sql: currentValue,
+                    })
+                    name = title
+                  }
                   const snippet = createSqlSnippetSkeletonV2({
-                    id: uuidv4(),
                     name,
                     sql: currentValue,
                     owner_id: profile.id,
