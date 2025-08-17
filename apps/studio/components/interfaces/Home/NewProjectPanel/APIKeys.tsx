@@ -10,6 +10,7 @@ import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Input, SimpleCodeBlock } from 'ui'
 
 const generateInitSnippet = (endpoint: string) => ({
@@ -32,9 +33,17 @@ Future<void> main() async {
 const APIKeys = () => {
   const { ref: projectRef } = useParams()
 
+  const {
+    projectConnectionJavascriptExample: javascriptExampleEnabled,
+    projectConnectionDartExample: dartExampleEnabled,
+  } = useIsFeatureEnabled([
+    'project_connection:javascript_example',
+    'project_connection:dart_example',
+  ])
+
   const availableLanguages = [
-    { name: 'Javascript', key: 'js' },
-    { name: 'Dart', key: 'dart' },
+    ...(javascriptExampleEnabled ? [{ name: 'Javascript', key: 'js' }] : []),
+    ...(dartExampleEnabled ? [{ name: 'Dart', key: 'dart' }] : []),
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
 

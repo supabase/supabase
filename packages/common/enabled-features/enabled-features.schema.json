@@ -6,6 +6,11 @@
       "type": "string"
     },
 
+    "client_libraries:show_all": {
+      "type": "boolean",
+      "description": "Show all client libraries. When false, the JavaScript client library will still be shown."
+    },
+
     "logs:templates": {
       "type": "boolean",
       "description": "Enable the logs templates page"
@@ -22,8 +27,42 @@
     "profile:update": {
       "type": "boolean",
       "description": "Allow the user to change their profile information (first name, last name)"
+    },
+
+    "project_connection:javascript_example": {
+      "type": "boolean",
+      "description": "Show the javascript example in the project connection settings"
+    },
+    "project_connection:dart_example": {
+      "type": "boolean",
+      "description": "Show the dart example in the project connection settings"
+    },
+
+    "project_creation:show_advanced_config": {
+      "type": "boolean",
+      "description": "Show the advanced config option in the project creation flow"
+    },
+
+    "project_homepage:show_instance_size": {
+      "type": "boolean",
+      "description": "Show the instance size badge in the project homepage"
+    },
+    "project_homepage:show_examples": {
+      "type": "boolean",
+      "description": "Show the examples in the project homepage"
     }
   },
-  "required": ["profile:show_email", "profile:update", "logs:templates", "logs:collections"],
+  "required": [
+    "client_libraries:show_all",
+    "profile:show_email",
+    "profile:update",
+    "logs:templates",
+    "logs:collections",
+    "project_creation:show_advanced_config",
+    "project_homepage:show_instance_size",
+    "project_homepage:show_examples",
+    "project_connection:javascript_example",
+    "project_connection:dart_example"
+  ],
   "additionalProperties": false
 }
