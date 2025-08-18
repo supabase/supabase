@@ -16,7 +16,7 @@ import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-conn
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { GitHubConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
@@ -72,17 +72,16 @@ const GitHubIntegrationConnectionForm = ({
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
   const isParentProject = !Boolean(selectedProject?.parent_project_ref)
 
-  const canUpdateGitHubConnection = useCheckPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
-  const canCreateGitHubConnection = useCheckPermissions(
+  const { can: canCreateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
     any[]
@@ -90,8 +89,15 @@ const GitHubIntegrationConnectionForm = ({
     enabled: Boolean(gitHubAuthorization),
   })
 
-  const { mutate: updateBranch } = useBranchUpdateMutation()
+  const { mutate: updateBranch } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Production branch settings successfully updated')
+    },
+  })
   const { mutate: createBranch } = useBranchCreateMutation({
+    onSuccess: () => {
+      toast.success('Production branch settings successfully updated')
+    },
     onError: (error) => {
       console.error('Failed to enable branching:', error)
     },
@@ -106,7 +112,11 @@ const GitHubIntegrationConnectionForm = ({
     useCheckGithubBranchValidity({ onError: () => {} })
 
   const { mutate: createConnection, isLoading: isCreatingConnection } =
-    useGitHubConnectionCreateMutation()
+    useGitHubConnectionCreateMutation({
+      onSuccess: () => {
+        toast.success('GitHub integration successfully updated')
+      },
+    })
 
   const { mutateAsync: deleteConnection, isLoading: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
@@ -246,7 +256,6 @@ const GitHubIntegrationConnectionForm = ({
         gitBranch: data.branchName,
       })
     }
-    toast.success('GitHub integration successfully updated')
   }
 
   const handleUpdateConnection = async (
@@ -290,7 +299,6 @@ const GitHubIntegrationConnectionForm = ({
       })
     }
 
-    toast.success('GitHub integration successfully updated')
     setIsConfirmingBranchChange(false)
   }
 
@@ -344,15 +352,6 @@ const GitHubIntegrationConnectionForm = ({
       toast.error('Failed to change repository')
     }
   }
-
-  useEffect(() => {
-    if (selectedRepository) {
-      githubSettingsForm.setValue(
-        'branchName',
-        githubRepos.find((repo) => repo.id === selectedRepository.id)?.default_branch || 'main'
-      )
-    }
-  }, [selectedRepository])
 
   useEffect(() => {
     if (connection) {
@@ -464,6 +463,10 @@ const GitHubIntegrationConnectionForm = ({
                                   onSelect={() => {
                                     field.onChange(repo.id)
                                     setRepoComboboxOpen(false)
+                                    githubSettingsForm.setValue(
+                                      'branchName',
+                                      repo.default_branch || 'main'
+                                    )
                                   }}
                                 >
                                   <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">

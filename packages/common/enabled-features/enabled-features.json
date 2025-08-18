@@ -1,0 +1,6 @@
+{
+  "$schema": "./enabled-features.schema.json",
+
+  "profile:show_email": true,
+  "profile:update": true
+}

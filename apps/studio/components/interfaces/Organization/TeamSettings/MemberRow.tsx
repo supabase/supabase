@@ -1,7 +1,6 @@
 import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
 import Link from 'next/link'
 
-import Table from 'components/to-be-cleaned/Table'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
@@ -17,6 +16,8 @@ import {
   HoverCard_Shadcn_,
   ScrollArea,
   cn,
+  TableRow,
+  TableCell,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { isInviteExpired } from '../Organization.utils'
@@ -68,8 +69,8 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     }).length > 0
 
   return (
-    <Table.tr>
-      <Table.td>
+    <TableRow>
+      <TableCell>
         <div className="flex items-center gap-x-4">
           <ProfileImage
             alt={member.primary_email ?? member.username ?? ''}
@@ -103,18 +104,18 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             />
           )}
         </div>
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         {isInvitedUser && member.invited_at && (
           <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
             {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
           </Badge>
         )}
         {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         <div className="flex items-center justify-center">
           {member.mfa_enabled ? (
             <Check className="text-brand" strokeWidth={2} size={20} />
@@ -122,9 +123,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             <X className="text-foreground-light" strokeWidth={1.5} size={20} />
           )}
         </div>
-      </Table.td>
+      </TableCell>
 
-      <Table.td className="max-w-64">
+      <TableCell className="max-w-64">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
         ) : isObfuscated ? (
@@ -201,11 +202,11 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             )
           })
         )}
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         <MemberActions member={member} />
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }

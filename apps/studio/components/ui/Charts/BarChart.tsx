@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { ComponentProps, useState, useMemo } from 'react'
+import { useChartSync } from './useChartSync'
 import {
   Bar,
   CartesianGrid,
@@ -30,6 +31,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
+  syncId?: string
 }
 
 const BarChart = ({
@@ -53,8 +55,14 @@ const BarChart = ({
   XAxisProps,
   YAxisProps,
   showGrid = false,
+  syncId,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
+  const {
+    state: syncState,
+    updateState: updateSyncState,
+    clearState: clearSyncState,
+  } = useChartSync(syncId)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // Transform data to ensure yAxisKey values are numbers
@@ -125,20 +133,41 @@ const BarChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
+        syncId={syncId}
+        data={data}
+        xAxisKey={xAxisKey}
+        yAxisKey={yAxisKey}
+        xAxisIsDate={xAxisIsDate}
+        displayDateInUtc={displayDateInUtc}
+        valuePrecision={valuePrecision}
+        attributes={[]}
       />
       <Container>
         <RechartBarChart
           data={transformedData}
           className="overflow-visible"
-          //   mouse hover focusing logic
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+
+            if (syncId) {
+              updateSyncState({
+                activeIndex: e.activeTooltipIndex,
+                activePayload: e.activePayload,
+                activeLabel: e.activeLabel,
+                isHovering: true,
+              })
+            }
           }}
-          onMouseLeave={() => setFocusDataIndex(null)}
+          onMouseLeave={() => {
+            setFocusDataIndex(null)
+
+            if (syncId) {
+              clearSyncState()
+            }
+          }}
           onClick={(tooltipData) => {
-            // receives tooltip data https://github.com/recharts/recharts/blob/2a3405ff64a0c050d2cf94c36f0beef738d9e9c2/src/chart/generateCategoricalChart.tsx
             const datum = tooltipData?.activePayload?.[0]?.payload
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
@@ -157,12 +186,28 @@ const BarChart = ({
             tickLine={{ stroke: CHART_COLORS.AXIS }}
             key={xAxisKey}
           />
-          <Tooltip content={() => null} />
+          <Tooltip
+            content={(props) =>
+              syncId && syncState.isHovering && syncState.activeIndex !== null ? (
+                <div className="bg-black/90 text-white p-2 rounded text-xs">
+                  <div className="font-medium">
+                    {dayjs(data[syncState.activeIndex]?.[xAxisKey]).format(customDateFormat)}
+                  </div>
+                  <div>
+                    {numberFormatter(
+                      Number(data[syncState.activeIndex]?.[yAxisKey]) || 0,
+                      valuePrecision
+                    )}
+                    {typeof format === 'string' ? format : ''}
+                  </div>
+                </div>
+              ) : null
+            }
+          />
           <Bar
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
             animationDuration={300}
-            // Max bar size required to prevent bars from expanding to max width.
             maxBarSize={48}
           >
             {data?.map((_entry: Datum, index: any) => (

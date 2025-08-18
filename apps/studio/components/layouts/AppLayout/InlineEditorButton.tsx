@@ -1,20 +1,15 @@
-import { SqlEditor } from 'icons'
-import { useAppStateSnapshot } from 'state/app-state'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { SqlEditor } from 'icons'
 import { KeyboardShortcut } from 'ui'
 
-export const InlineEditorButton = () => {
-  const { setShowEditorPanel, showEditorPanel } = useAppStateSnapshot()
-
+export const InlineEditorButton = ({ onClick }: { onClick: () => void }) => {
   return (
     <ButtonTooltip
       type="text"
       size="tiny"
       id="editor-trigger"
       className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
-      onClick={() => {
-        setShowEditorPanel(!showEditorPanel)
-      }}
+      onClick={onClick}
       tooltip={{
         content: {
           text: (

@@ -196,3 +196,23 @@ Common examples of check constraints that can result in such failures are:
 
 - validating against the current time, e.g. that the row being inserted references a future event
 - validating the contents of a row against the contents of another table
+
+#### Views that reference themselves
+
+Views that directly or indirectly reference themselves will cause logical restores to fail due to cyclic dependency errors. These views are also invalid and unusable in Postgres, and any query against them will result in a runtime error.
+
+**Example:**
+
+```
+-- Direct self-reference
+CREATE VIEW my_view AS
+  SELECT * FROM my_view;
+
+-- Indirect circular reference
+CREATE VIEW v1 AS SELECT * FROM v2;
+CREATE VIEW v2 AS SELECT * FROM v1;
+```
+
+-- Drop the offending view from your database, or delete them from the logical backup to make it restorable.
+
+Postgres documentation [views](https://www.postgresql.org/docs/current/sql-createview.html)

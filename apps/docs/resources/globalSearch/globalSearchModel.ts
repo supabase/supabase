@@ -22,7 +22,7 @@ export abstract class SearchResultModel {
     const includeFullContent = requestedFields.includes('content')
     const embeddingResult = await openAI().createContentEmbedding(query)
 
-    return embeddingResult.flatMapAsync(async (embedding) => {
+    return embeddingResult.flatMapAsync(async ({ embedding }) => {
       const matchResult = new Result(
         await supabase().rpc('search_content', {
           embedding,
@@ -49,7 +49,7 @@ export abstract class SearchResultModel {
     const includeFullContent = requestedFields.includes('content')
     const embeddingResult = await openAI().createContentEmbedding(query)
 
-    return embeddingResult.flatMapAsync(async (embedding) => {
+    return embeddingResult.flatMapAsync(async ({ embedding }) => {
       const matchResult = new Result(
         await supabase().rpc('search_content_hybrid', {
           query_text: query,

@@ -1,4 +1,4 @@
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { proxy, snapshot, useSnapshot } from 'valtio'
 
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
 type DashboardHistoryType = {
@@ -87,11 +87,6 @@ export const appState = proxy({
     appState.ongoingQueriesPanelOpen = value
   },
 
-  showEditorPanel: false,
-  setShowEditorPanel: (value: boolean) => {
-    appState.showEditorPanel = value
-  },
-
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
@@ -102,7 +97,6 @@ export const appState = proxy({
     appState.lastRouteBeforeVisitingAccountPage = value
   },
 })
-
 
 export const getAppStateSnapshot = () => snapshot(appState)
 
