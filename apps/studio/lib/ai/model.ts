@@ -25,6 +25,13 @@ export type ModelResponse = ModelSuccess | ModelError
 export const ModelErrorMessage =
   'No valid AI model available. Please set up a local AWS profile to use Bedrock, or pass an OPENAI_API_KEY to use OpenAI.'
 
+const openAIModel = wrapLanguageModel({
+  model: openai(OPENAI_MODEL),
+  // Wrap a model with Braintrust middleware
+  // @see https://www.braintrust.dev/docs/guides/integrations#vercel-ai-sdk-v5
+  middleware: BraintrustMiddleware({ debug: true }),
+})
+
 /**
  * Retrieves the appropriate AI model based on available credentials.
  *
