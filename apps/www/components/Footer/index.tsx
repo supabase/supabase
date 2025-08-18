@@ -1,3 +1,5 @@
+'use client'
+
 import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
 import Image from 'next/image'

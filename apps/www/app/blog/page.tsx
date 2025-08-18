@@ -1,7 +1,7 @@
 import fs from 'fs'
-import { generateRss } from '~/lib/rss'
-import { getSortedPosts } from '~/lib/posts'
-import BlogClient from '~/app/blog/BlogClient'
+import { generateRss } from 'lib/rss'
+import { getSortedPosts } from 'lib/posts'
+import BlogClient from 'app/blog/BlogClient'
 
 export const dynamic = 'force-static'
 

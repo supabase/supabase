@@ -30,11 +30,12 @@ export async function generateStaticParams() {
 }
 
 export default async function BlogPostPage({ params }: { params: Params }) {
-  if (!params?.slug) {
+  const { slug } = await params
+
+  if (!slug) {
     throw new Error('Missing slug for app/blog/[slug]/page.tsx')
   }
 
-  const slug = `${params.slug}`
   const { isEnabled: isDraft } = await draftMode()
 
   const matter = (await import('gray-matter')).default

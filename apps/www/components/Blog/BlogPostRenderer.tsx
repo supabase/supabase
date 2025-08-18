@@ -1,3 +1,5 @@
+'use client'
+
 import dayjs from 'dayjs'
 import { MDXRemote } from 'next-mdx-remote'
 import dynamic from 'next/dynamic'
