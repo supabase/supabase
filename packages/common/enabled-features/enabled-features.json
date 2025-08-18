@@ -1,6 +1,9 @@
 {
   "$schema": "./enabled-features.schema.json",
 
+  "logs:templates": true,
+  "logs:collections": true,
+
   "profile:show_email": true,
   "profile:update": true
 }
