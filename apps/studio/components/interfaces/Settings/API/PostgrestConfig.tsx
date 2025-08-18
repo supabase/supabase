@@ -37,7 +37,9 @@ import {
   Skeleton,
   Switch,
   WarningIcon,
+  cn,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -81,7 +83,7 @@ export const PostgrestConfig = () => {
 
   const [showModal, setShowModal] = useState(false)
 
-  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isError, isLoading } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -99,10 +101,8 @@ export const PostgrestConfig = () => {
 
   const formId = 'project-postgres-config'
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
-  const { can: canUpdatePostgrestConfig } = useAsyncCheckProjectPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_postgrest'
-  )
+  const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
@@ -176,10 +176,12 @@ export const PostgrestConfig = () => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className={cn(!isLoading ? 'p-0' : '')}>
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            {isError ? (
+            {isLoading ? (
+              <GenericSkeletonLoader />
+            ) : isError ? (
               <Admonition type="destructive" title="Failed to retrieve API settings" />
             ) : (
               <>
@@ -424,7 +426,7 @@ export const PostgrestConfig = () => {
           handleReset={resetForm}
           disabled={!canUpdatePostgrestConfig}
           helper={
-            !canUpdatePostgrestConfig
+            isPermissionsLoaded && !canUpdatePostgrestConfig
               ? "You need additional permissions to update your project's API settings"
               : undefined
           }
