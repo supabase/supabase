@@ -306,7 +306,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion,
       organizationSlug: organization,
     },
-    { enabled: currentOrg != null && !isManagedByVercel }
+    { enabled: currentOrg !== null && !isManagedByVercel }
   )
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
