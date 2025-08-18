@@ -97,9 +97,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
 export async function getStaticPaths() {
   const staticPaths = getAllPostSlugs('_events')
-  // const cmsPaths = await getAllCMSEventSlugs()
-  // const paths = [...staticPaths, ...cmsPaths]
-  const paths = [...staticPaths]
+  const cmsPaths = await getAllCMSEventSlugs()
+  const paths = [...staticPaths, ...cmsPaths]
 
   return {
     paths,
@@ -131,9 +130,8 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({
 
     // Get all posts for navigation and related posts
     const allStaticEvents = getSortedPosts({ directory: '_events' })
-    // const allCmsEvents = await getAllCMSEvents()
-    // const allPosts = [...allStaticEvents, ...allCmsEvents].sort(
-    const allPosts = [...allStaticEvents].sort(
+    const allCmsEvents = await getAllCMSEvents()
+    const allPosts = [...allStaticEvents, ...allCmsEvents].sort(
       (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
     )
     const currentIndex = allPosts.findIndex((post) => post.slug === slug)
@@ -168,61 +166,59 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({
     console.log('[getStaticProps] Static post not found, trying CMS post...')
   }
 
-  return { notFound: true }
-
   // Try CMS post (handle preview/draft logic)
-  // const cmsPost = await getCMSEventBySlug(slug, preview)
+  const cmsPost = await getCMSEventBySlug(slug, preview)
 
-  // if (!cmsPost) {
-  //   // Try to fetch published version if preview mode failed
-  //   if (preview) {
-  //     const publishedPost = await getCMSEventBySlug(slug, false)
-  //     if (!publishedPost) {
-  //       return { notFound: true }
-  //     }
-  //     const mdxSource = await mdxSerialize(publishedPost.content || '')
+  if (!cmsPost) {
+    // Try to fetch published version if preview mode failed
+    if (preview) {
+      const publishedPost = await getCMSEventBySlug(slug, false)
+      if (!publishedPost) {
+        return { notFound: true }
+      }
+      const mdxSource = await mdxSerialize(publishedPost.content || '')
 
-  //     const eventData: Event & EventData = {
-  //       ...(publishedPost as any),
-  //       tags: publishedPost.tags || [],
-  //       authors: publishedPost.authors || [],
-  //       isCMS: true,
-  //       content: mdxSource,
-  //       image: publishedPost.image ?? undefined,
-  //     }
+      const eventData: Event & EventData = {
+        ...(publishedPost as any),
+        tags: publishedPost.tags || [],
+        authors: publishedPost.authors || [],
+        isCMS: true,
+        content: mdxSource,
+        image: publishedPost.image ?? undefined,
+      }
 
-  //     return {
-  //       props: {
-  //         prevPost: null,
-  //         nextPost: null,
-  //         relatedPosts: [],
-  //         event: eventData,
-  //       },
-  //       revalidate: 60 * 10,
-  //     }
-  //   }
-  //   return { notFound: true }
-  // }
+      return {
+        props: {
+          prevPost: null,
+          nextPost: null,
+          relatedPosts: [],
+          event: eventData,
+        },
+        revalidate: 60 * 10,
+      }
+    }
+    return { notFound: true }
+  }
 
-  // const mdxSource = await mdxSerialize(cmsPost.content || '')
+  const mdxSource = await mdxSerialize(cmsPost.content || '')
 
-  // const eventData: Event & EventData = {
-  //   ...(cmsPost as any),
-  //   tags: cmsPost.tags || [],
-  //   authors: cmsPost.authors || [],
-  //   isCMS: true,
-  //   content: mdxSource,
-  // }
+  const eventData: Event & EventData = {
+    ...(cmsPost as any),
+    tags: cmsPost.tags || [],
+    authors: cmsPost.authors || [],
+    isCMS: true,
+    content: mdxSource,
+  }
 
-  // return {
-  //   props: {
-  //     prevPost: null,
-  //     nextPost: null,
-  //     relatedPosts: [],
-  //     event: eventData,
-  //   },
-  //   revalidate: 60 * 10,
-  // }
+  return {
+    props: {
+      prevPost: null,
+      nextPost: null,
+      relatedPosts: [],
+      event: eventData,
+    },
+    revalidate: 60 * 10,
+  }
 }
 
 export default EventPage
