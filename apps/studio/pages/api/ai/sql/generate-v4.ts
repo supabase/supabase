@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
+import { convertToModelMessages, ModelMessage, stepCountIs, streamText, wrapLanguageModel } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-import { initLogger, traced } from 'braintrust'
+import { initLogger, traced, BraintrustMiddleware, currentSpan } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -124,7 +124,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
+  const { model: rawModel, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
+
+  // Wrap AI SDK v5 model with Braintrust middleware for tracing
+  const model = wrapLanguageModel({
+    model: rawModel as any,
+    middleware: BraintrustMiddleware(),
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -202,13 +208,23 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     return traced(async (span) => {
       // log things scorers consume
-      // span.log({ input: coreMessages, metadata: { route: '/api/chat' } })
+      span.log({
+        input: coreMessages,
+        metadata: {
+          route: '/api/ai/sql/generate-v4',
+          task_type: 'text2sql',
+          projectRef,
+          orgSlug,
+          chatName,
+        },
+      })
 
       const result = streamText({
         model,
         stopWhen: stepCountIs(5),
         messages: coreMessages,
         tools,
+        onFinish: ({ text }) => currentSpan().log({ output: text }),
         abortSignal: abortController.signal,
       })
 

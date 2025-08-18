@@ -1,7 +1,6 @@
 import { openai } from '@ai-sdk/openai'
-import { LanguageModel, wrapLanguageModel } from 'ai'
+import { LanguageModel } from 'ai'
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
-import { BraintrustMiddleware } from 'braintrust'
 
 // Default behaviour here is to be throttled (e.g if this env var is not available, IS_THROTTLED should be true, unless specified 'false')
 const IS_THROTTLED = process.env.IS_THROTTLED !== 'false'
@@ -24,13 +23,6 @@ export type ModelResponse = ModelSuccess | ModelError
 
 export const ModelErrorMessage =
   'No valid AI model available. Please set up a local AWS profile to use Bedrock, or pass an OPENAI_API_KEY to use OpenAI.'
-
-const openAIModel = wrapLanguageModel({
-  model: openai(OPENAI_MODEL),
-  // Wrap a model with Braintrust middleware
-  // @see https://www.braintrust.dev/docs/guides/integrations#vercel-ai-sdk-v5
-  middleware: BraintrustMiddleware({ debug: true }),
-})
 
 /**
  * Retrieves the appropriate AI model based on available credentials.
@@ -56,7 +48,7 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
   // [Joshen] Only for local/self-hosted, hosted should always only use bedrock
   if (hasOpenAIKey) {
     return {
-      model: openAIModel,
+      model: openai(OPENAI_MODEL),
     }
   }
 

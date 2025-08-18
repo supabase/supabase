@@ -3,8 +3,6 @@ import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credentia
 import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
 import { selectWeightedKey } from './util'
-import { wrapLanguageModel } from 'ai'
-import { BraintrustMiddleware } from 'braintrust'
 
 const credentialProvider = createCredentialChain(
   // Vercel OIDC provider will be used for staging/production
@@ -113,11 +111,6 @@ export function createRoutedBedrock(routingKey?: string) {
     // Cross-region models require the region prefix
     const modelName = `${regionPrefixMap[bedrockRegion]}.${modelId}`
 
-    const bedrockModel = bedrock(modelName)
-
-    return wrapLanguageModel({
-      model: bedrockModel,
-      middleware: BraintrustMiddleware({ debug: true }),
-    })
+    return bedrock(modelName)
   }
 }
