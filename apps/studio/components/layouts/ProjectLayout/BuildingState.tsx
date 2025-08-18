@@ -13,9 +13,10 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 const BuildingState = () => {
-  const { ref } = useParams()
+  const { slug, ref } = getPathReferences()
   const project = useSelectedProject()
   const queryClient = useQueryClient()
 
@@ -28,7 +29,7 @@ const BuildingState = () => {
       },
       onSuccess: async (res) => {
         if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+          if (ref) invalidateProjectDetailsQuery(queryClient, slug as string, ref)
           invalidateProjectsQuery(queryClient)
         }
       },

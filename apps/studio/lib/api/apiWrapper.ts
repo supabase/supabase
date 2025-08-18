@@ -47,7 +47,14 @@ export default async function apiWrapper(
     }
 
     return handler(req, res)
-  } catch (error) {
+  } catch (error: any) {
+    if (error instanceof ResponseError) {
+      return res.status(error.code || 500).json({ error: error.message })
+    }
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message })
+    }
+    console.log(error)
     return res.status(500).json({ error })
   }
 }

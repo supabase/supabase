@@ -15,8 +15,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
       ].filter((v) => v)
       if (missingEnvVars.length == 0) {
-        const result = await proxyRequest(req)
-        return res.status(200).json(result)
+        try {
+          const result = await proxyRequest(req)
+          return res.status(200).json(result)
+        } catch (error: any) {
+          return res.status(500).json({ error: { message: error.message } })
+        }
       } else {
         return res
           .status(500)

@@ -12,9 +12,10 @@ import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
 import { useProjectContext } from './ProjectContext'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 const RestoringState = () => {
-  const { ref } = useParams()
+  const { slug, ref } = getPathReferences()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
 
@@ -36,7 +37,7 @@ const RestoringState = () => {
         if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
           setIsCompleted(true)
         } else {
-          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+          if (ref) invalidateProjectDetailsQuery(queryClient, slug as string, ref)
         }
       },
     }
@@ -66,7 +67,7 @@ const RestoringState = () => {
     if (!project) return console.error('Project is required')
 
     setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, slug as string, ref)
   }
 
   return (

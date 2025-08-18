@@ -51,7 +51,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (response.error) {
     const { code, message } = response.error
-    return res.status(code).json({ message })
+    return res.status(code || 500).json({ message })
   } else {
     return res.status(200).json(response)
   }

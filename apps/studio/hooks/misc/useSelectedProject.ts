@@ -4,6 +4,7 @@ import { useIsLoggedIn, useParams } from 'common'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { PROVIDERS } from 'lib/constants'
+import { getPathReferences } from '../../data/vela/path-references'
 
 /**
  * @deprecated Use useSelectedProjectQuery instead for access to loading states etc
@@ -18,8 +19,9 @@ import { PROVIDERS } from 'lib/constants'
  * ```
  */
 export function useSelectedProject({ enabled = true } = {}) {
-  const { ref } = useParams()
-  const { data } = useProjectDetailQuery({ ref }, { enabled })
+  const { slug, ref } = getPathReferences()
+  console.log(`[useSelectedProject] slug: ${slug}`)
+  const { data } = useProjectDetailQuery({ slug, ref }, { enabled })
 
   return useMemo(
     () => data && { ...data, parentRef: data?.parent_project_ref ?? data?.ref },
@@ -28,10 +30,10 @@ export function useSelectedProject({ enabled = true } = {}) {
 }
 
 export function useSelectedProjectQuery({ enabled = true } = {}) {
-  const { ref } = useParams()
-
+  const { slug, ref } = getPathReferences()
+  console.log(`[useSelectedProjectQuery] slug: ${slug}`)
   return useProjectDetailQuery(
-    { ref },
+    { slug, ref },
     {
       enabled,
       select: (data) => {
@@ -58,11 +60,13 @@ export function useProjectByRef(
   enabled: boolean = true
 ): Omit<ProjectInfo, 'organization_slug' | 'preview_branch_refs'> | undefined {
   const isLoggedIn = useIsLoggedIn()
+  const { slug } = getPathReferences()
   // [Alaister]: This is here for the purpose of improving performance.
   // Chances are, the user will already have the list of projects in the cache.
   // We can't exclusively rely on this method, as useProjectsQuery does not return branch projects.
+  console.log(`[useProjectByRef] slug: ${slug}`)
   const { data: project } = useProjectDetailQuery(
-    { ref },
+    { slug, ref },
     { enabled: !!ref && isLoggedIn && enabled }
   )
 
@@ -80,7 +84,9 @@ export function useProjectByRef(
 export function useProjectByRefQuery(ref?: string) {
   const isLoggedIn = useIsLoggedIn()
 
-  const projectQuery = useProjectDetailQuery({ ref }, { enabled: isLoggedIn })
+  const { slug } = getPathReferences()
+  console.log(`[useProjectByRefQuery] slug: ${slug}`)
+  const projectQuery = useProjectDetailQuery({ slug, ref }, { enabled: isLoggedIn })
 
   // [Alaister]: This is here for the purpose of improving performance.
   // Chances are, the user will already have the list of projects in the cache.

@@ -9,13 +9,14 @@ import { invalidateProjectDetailsQuery, type Project } from 'data/projects/proje
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import pingPostgrest from 'lib/pingPostgrest'
 import { Loader, Monitor, Server, ExternalLink } from 'lucide-react'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 export interface ConnectingStateProps {
   project: Project
 }
 
 const ConnectingState = ({ project }: ConnectingStateProps) => {
-  const { slug, ref } = useParams()
+  const { slug, ref } = getPathReferences()
   const queryClient = useQueryClient()
   const checkProjectConnectionIntervalRef = useRef<number>()
 
@@ -35,7 +36,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
       setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')
-      await invalidateProjectDetailsQuery(queryClient, project.ref)
+      await invalidateProjectDetailsQuery(queryClient, slug as string, project.ref)
     }
   }
 

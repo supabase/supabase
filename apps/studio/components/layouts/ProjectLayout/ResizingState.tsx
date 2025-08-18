@@ -1,13 +1,14 @@
-import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 export const ResizingState = () => {
-  const { ref } = useParams()
+  const { slug, ref } = getPathReferences()
+  console.log(`[ResizingState] slug: ${slug}`)
   useProjectDetailQuery(
-    { ref },
+    { slug, ref },
     {
       // setting a refetch interval here will cause the `useSelectedProject()` in `ProjectLayout.tsx` to
       // rerender every 4 seconds while the project is resizing. Once resizing is complete, it will

@@ -4,7 +4,7 @@ import { partition } from 'lodash'
 import { NextRouter } from 'next/router'
 import { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
-import { useOrganizationSlug } from '../data/organizations/organization-path-slug'
+import { getOrganizationSlug } from '../data/vela/organization-path-slug'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
@@ -401,7 +401,7 @@ export const TabsStateContext = createContext<TabsState>(createTabsState('', '')
 
 export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
-  const slug = useOrganizationSlug()
+  const slug = getOrganizationSlug()
   const [state, setState] = useState(createTabsState(slug || '', project?.ref ?? ''))
 
   useEffect(() => {

@@ -17,6 +17,7 @@ import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-stat
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 import { useParams } from 'next/navigation'
+import { getOrganizationSlug } from '../vela/organization-path-slug'
 
 interface PrefetchEditorTablePageArgs {
   queryClient: QueryClient
@@ -64,7 +65,7 @@ export function prefetchEditorTablePage({
 
 export function usePrefetchEditorTablePage() {
   const router = useRouter()
-  const { slug } = useParams()
+  const slug = getOrganizationSlug()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()

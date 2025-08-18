@@ -22,12 +22,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  const response = await fetchPost(`${PG_META_URL}/query`, { query }, { headers })
 
-  if (response.error) {
-    const { code, message } = response.error
-    return res.status(code).json({ message, formattedError: message })
-  } else {
-    return res.status(200).json(response)
+  try {
+    const response = await fetchPost(`${PG_META_URL}/query`, { query }, { headers })
+
+    if (response.error) {
+      const { code, message } = response.error
+      return res.status(code).json({ message, formattedError: message })
+    } else {
+      return res.status(200).json(response)
+    }
+  } catch (error: any) {
+    return res.status(500).json({ error: { message: error.message } })
   }
 }

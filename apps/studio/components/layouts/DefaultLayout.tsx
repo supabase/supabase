@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
@@ -10,8 +10,19 @@ import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
-import { setOrganizationCookie } from '../../data/vela/vela'
+import {
+  deleteOrganizationCookie,
+  deleteProjectCookie,
+  setOrganizationCookie,
+  setProjectCookie,
+} from '../../data/vela/vela'
 import { useOrganizationQuery } from '../../data/organizations/organization-query'
+import { useSelectedProjectQuery } from '../../hooks/misc/useSelectedProject'
+import { useProjectDetailQuery } from '../../data/projects/project-detail-query'
+import { useProjectsQuery } from '../../data/projects/projects-query'
+import { OrganizationContextProvider } from './OrganizationContext'
+import { getOrganizationSlug } from '../../data/vela/organization-path-slug'
+import { getProjectRef } from '../../data/vela/project-path-ref'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -28,38 +39,49 @@ export interface DefaultLayoutProps {
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
 const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
-  const { ref, slug } = useParams()
+  const [ isInitialized, setInitialized ] = useState<boolean>(false);
+
+  useEffect(() => {
+    setInitialized(true);
+  }, [])
+
+  const slug = getOrganizationSlug()
+  const ref = getProjectRef()
+  console.log(`DefaultLayout: slug=${slug}, ref=${ref}`)
   const router = useRouter()
   const showProductMenu = !!ref && router.pathname !== '/org/[slug]/project/[ref]'
 
-  const { data: organization } = useOrganizationQuery({ slug })
-  if (organization) {
-    setOrganizationCookie(organization.id)
-  }
-
   useCheckLatestDeploy()
+
+  if (!isInitialized) {
+    return (
+      <div>BAM FUCKER</div>
+    )
+  }
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <ProjectContextProvider projectRef={ref}>
-        <AppBannerContextProvider>
-          <div className="flex flex-col h-screen w-screen">
-            {/* Top Banner */}
-            <AppBannerWrapper />
-            <div className="flex-shrink-0">
-              <MobileNavigationBar />
-              <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
+      <OrganizationContextProvider organizationSlug={slug}>
+        <ProjectContextProvider projectRef={ref}>
+          <AppBannerContextProvider>
+            <div className="flex flex-col h-screen w-screen">
+              {/* Top Banner */}
+              <AppBannerWrapper />
+              <div className="flex-shrink-0">
+                <MobileNavigationBar />
+                <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
+              </div>
+              {/* Main Content Area */}
+              <div className="flex flex-1 w-full overflow-y-hidden">
+                {/* Sidebar */}
+                <Sidebar />
+                {/* Main Content */}
+                <div className="flex-grow h-full overflow-y-auto">{children}</div>
+              </div>
             </div>
-            {/* Main Content Area */}
-            <div className="flex flex-1 w-full overflow-y-hidden">
-              {/* Sidebar */}
-              <Sidebar />
-              {/* Main Content */}
-              <div className="flex-grow h-full overflow-y-auto">{children}</div>
-            </div>
-          </div>
-        </AppBannerContextProvider>
-      </ProjectContextProvider>
+          </AppBannerContextProvider>
+        </ProjectContextProvider>
+      </OrganizationContextProvider>
     </SidebarProvider>
   )
 }

@@ -8,13 +8,14 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useEffect, useState } from 'react'
 import { Loader, Circle } from 'lucide-react'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 export interface PausingStateProps {
   project: Project
 }
 
 const PausingState = ({ project }: PausingStateProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = getPathReferences()
   const queryClient = useQueryClient()
   const [startPolling, setStartPolling] = useState(false)
 
@@ -27,7 +28,7 @@ const PausingState = ({ project }: PausingStateProps) => {
       },
       onSuccess: async (res) => {
         if (res.status === PROJECT_STATUS.INACTIVE) {
-          if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+          if (ref) await invalidateProjectDetailsQuery(queryClient, slug as string, ref)
           await invalidateProjectsQuery(queryClient)
         }
       },

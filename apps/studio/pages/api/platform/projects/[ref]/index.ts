@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
 import { DEFAULT_PROJECT, DEFAULT_PROJECT_2, IS_VELA_PLATFORM, PROJECT_REST_URL } from 'pages/api/constants'
-import { getVelaClient, mustOrganizationId } from '../../../../../data/vela/vela'
+import { getVelaClient, mustOrganizationId, mustProjectId } from '../../../../../data/vela/vela'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -43,7 +43,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = getVelaClient()
-  const projectId = parseInt(req.query.ref as string)
+  const projectId = mustProjectId(req)
   const organizationId = mustOrganizationId(req)
 
   const response = await client.GET("/organizations/{organization_id}/projects/{project_id}/", {

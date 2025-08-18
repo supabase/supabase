@@ -8,6 +8,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
+import { getPathReferences } from '../../data/vela/path-references'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -179,9 +180,10 @@ export function usePermissionsLoaded() {
   const { isFetched: isPermissionsFetched } = usePermissionsQuery({ enabled: isLoggedIn })
   const { isFetched: isOrganizationsFetched } = useOrganizationsQuery({ enabled: isLoggedIn })
 
-  const { ref } = useParams()
+  const { slug, ref } = getPathReferences()
+  console.log(`[usePermissionsLoaded] slug: ${slug}`)
   const { isFetched: isProjectDetailFetched } = useProjectDetailQuery(
-    { ref },
+    { slug, ref },
     { enabled: !!ref && isLoggedIn }
   )
 

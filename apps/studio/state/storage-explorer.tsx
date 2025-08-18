@@ -46,7 +46,7 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
-import { useOrganizationSlug } from '../data/organizations/organization-path-slug'
+import { getOrganizationSlug } from '../data/vela/organization-path-slug'
 
 type UploadProgress = {
   percentage: number
@@ -1742,7 +1742,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
-  const slug = useOrganizationSlug()
+  const slug = getOrganizationSlug()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })

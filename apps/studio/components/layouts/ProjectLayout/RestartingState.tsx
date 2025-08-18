@@ -1,13 +1,13 @@
-import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 const RestartingState = () => {
-  const { ref } = useParams()
+  const { slug, ref } = getPathReferences()
   useProjectDetailQuery(
-    { ref },
+    { slug, ref },
     {
       // setting a refetch interval here will cause the `useSelectedProject()` in `ProjectLayout.tsx` to
       // rerender every 4 seconds while the project is restarting. Once restarting is complete, it will

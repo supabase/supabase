@@ -5,7 +5,7 @@ import { get, handleError, isValidConnString } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
-export type ProjectDetailVariables = { ref?: string }
+export type ProjectDetailVariables = { slug?: string; ref?: string }
 
 export type ProjectMinimal = components['schemas']['ProjectInfo']
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
@@ -20,11 +20,25 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
   status: components['schemas']['ProjectDetailResponse']['status']
 }
 
-export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
+export async function getProjectDetail(
+  { slug, ref }: ProjectDetailVariables,
+  signal?: AbortSignal
+) {
+  console.log(`Slug=${slug}, ref=${ref}`)
+  if (slug !== undefined) {
+    try {
+      throw new Error('Organization slug is required')
+    } catch (error) {
+      console.log(error.stack)
+    }
+  }
   if (!ref) throw new Error('Project ref is required')
 
   const { data, error } = await get('/platform/projects/{ref}', {
     params: { path: { ref } },
+    headers: {
+      "X-Vela-Organization-Ref": slug
+    },
     signal,
   })
 
@@ -36,12 +50,12 @@ export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>
 export type ProjectDetailError = ResponseError
 
 export const useProjectDetailQuery = <TData = ProjectDetailData>(
-  { ref }: ProjectDetailVariables,
+  { slug, ref }: ProjectDetailVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
-) =>
-  useQuery<ProjectDetailData, ProjectDetailError, TData>(
-    projectKeys.detail(ref),
-    ({ signal }) => getProjectDetail({ ref }, signal),
+) => {
+  return useQuery<ProjectDetailData, ProjectDetailError, TData>(
+    projectKeys.detail(slug, ref),
+    ({ signal }) => getProjectDetail({ ref, slug }, signal),
     {
       enabled: enabled && typeof ref !== 'undefined',
       staleTime: 30 * 1000, // 30 seconds
@@ -63,13 +77,14 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
       ...options,
     }
   )
-
-export function invalidateProjectDetailsQuery(client: QueryClient, ref: string) {
-  return client.invalidateQueries(projectKeys.detail(ref))
 }
 
-export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
-  return client.fetchQuery(projectKeys.detail(ref), ({ signal }) =>
-    getProjectDetail({ ref }, signal)
+export function invalidateProjectDetailsQuery(client: QueryClient, slug: string,  ref: string) {
+  return client.invalidateQueries(projectKeys.detail(slug, ref))
+}
+
+export function prefetchProjectDetail(client: QueryClient, { slug, ref }: ProjectDetailVariables) {
+  return client.fetchQuery(projectKeys.detail(slug, ref), ({ signal }) =>
+    getProjectDetail({ slug, ref }, signal)
   )
 }

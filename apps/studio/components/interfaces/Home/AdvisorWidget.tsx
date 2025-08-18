@@ -47,11 +47,11 @@ export const AdvisorWidget = () => {
   const snap = useAiAssistantStateSnapshot()
 
   const securityLints = useMemo(
-    () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
+    () => (Array.isArray(lints) && lints || []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
     [lints]
   )
   const performanceLints = useMemo(
-    () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('PERFORMANCE')),
+    () => (Array.isArray(lints) && lints || []).filter((lint: Lint) => lint.categories.includes('PERFORMANCE')),
     [lints]
   )
 
@@ -69,7 +69,7 @@ export const AdvisorWidget = () => {
   ).length
 
   const top5SlowestQueries = useMemo(
-    () => ((slowestQueriesData ?? []) as SlowQuery[]).slice(0, 5),
+    () => ((Array.isArray(slowestQueriesData) && slowestQueriesData || []) as SlowQuery[]).slice(0, 5),
     [slowestQueriesData]
   )
 

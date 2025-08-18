@@ -8,6 +8,8 @@ import { uuidv4 } from 'lib/helpers'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { getOrganizationSlug } from './vela/organization-path-slug'
+import { getProjectRef } from './vela/project-path-ref'
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
@@ -49,12 +51,17 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   const requestId = uuidv4()
   const headers = new Headers(headersInit)
 
-  if (typeof window !== 'undefined') {
-    const pathSegments = window.location.pathname.substring(1).split('/')
-    if (pathSegments.length >= 2 && pathSegments[0] === 'org') {
-      headers.set('X-Vela-Organization-Id', pathSegments[1])
+  /*if (typeof document !== 'undefined') {
+    const organizationRef = getOrganizationSlug()
+    const projectRef = getProjectRef()
+
+    if (organizationRef !== undefined) {
+      headers.set('X-Vela-Organization-Ref', organizationRef)
     }
-  }
+    if (projectRef !== undefined) {
+      headers.set('X-Vela-Project-Ref', projectRef)
+    }
+  }*/
 
   headers.set('X-Request-Id', requestId)
 
@@ -180,7 +187,7 @@ export const handleError = (
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
-  throw new ResponseError(undefined)
+  throw new ResponseError(undefined, 500)
 }
 
 // [Joshen] The methods below are brought over from lib/common/fetch because we still need them

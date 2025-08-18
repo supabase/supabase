@@ -123,8 +123,9 @@ const DeployNewReplicaPanel = ({
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
   const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
 
+  console.log(`[DeployNewReplicaPanel] slug: ${slug}`)
   useProjectDetailQuery(
-    { ref: projectRef },
+    { slug, ref: projectRef },
     {
       refetchInterval,
       refetchOnWindowFocus: false,

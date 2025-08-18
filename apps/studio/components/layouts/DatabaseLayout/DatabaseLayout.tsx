@@ -10,7 +10,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useOrganizationSlug } from '../../../data/organizations/organization-path-slug'
+import { getOrganizationSlug } from '../../../data/vela/organization-path-slug'
 
 export interface DatabaseLayoutProps {
   title?: string
@@ -19,7 +19,7 @@ export interface DatabaseLayoutProps {
 const DatabaseProductMenu = () => {
   const router = useRouter()
   const project = useSelectedProject()
-  const slug = useOrganizationSlug() || 'unknown'
+  const slug = getOrganizationSlug() || 'unknown'
 
   const page = router.pathname.split('/')[6]
 

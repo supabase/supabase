@@ -8,6 +8,7 @@ import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-
 import { StorageExplorerStateContextProvider } from 'state/storage-explorer'
 import { TableEditorStateContextProvider } from 'state/table-editor'
 import { TabsStateContextProvider } from 'state/tabs'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 export interface ProjectContextType {
   project?: Project
@@ -31,7 +32,9 @@ export const ProjectContextProvider = ({
   projectRef,
   children,
 }: PropsWithChildren<ProjectContextProviderProps>) => {
-  const { data: selectedProject, isLoading } = useProjectDetailQuery({ ref: projectRef })
+  const { slug } = getPathReferences()
+  console.log(`[ProjectContextProvider] slug: ${slug}`)
+  const { data: selectedProject, isLoading } = useProjectDetailQuery({ ref: projectRef, slug })
 
   const value = useMemo<ProjectContextType>(() => {
     return {

@@ -18,7 +18,7 @@ export const useLints = () => {
     projectRef: ref,
   })
 
-  const securityLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  const securityLints = (Array.isArray(data) && data || []).filter((lint) => lint.categories.includes('SECURITY'))
   const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
 
   return { securityLints, errorLints }

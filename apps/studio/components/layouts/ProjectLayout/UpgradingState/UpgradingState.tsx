@@ -22,9 +22,10 @@ import { IS_PLATFORM } from 'lib/constants'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 const UpgradingState = () => {
-  const { ref } = useParams()
+  const { slug, ref } = getPathReferences()
   const queryParams = useSearchParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
@@ -61,7 +62,7 @@ const UpgradingState = () => {
   const refetchProjectDetails = async () => {
     setLoading(true)
 
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, slug as string, ref)
   }
 
   const subject = 'Upgrade%20failed%20for%20project'
