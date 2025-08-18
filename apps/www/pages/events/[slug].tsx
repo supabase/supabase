@@ -10,7 +10,6 @@ import utc from 'dayjs/plugin/utc'
 
 import { mdxSerialize } from 'lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
-import { getAllCMSEvents, getAllCMSEventSlugs, getCMSEventBySlug } from 'lib/get-cms-events'
 
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import type { Event, EventData, PostReturnType } from 'types/post'
