@@ -22,7 +22,7 @@ interface Props {
 
 function Events({ events: staticEvents, onDemandEvents, categories: staticCategories }: Props) {
   const [lumaEvents, setLumaEvents] = useState<BlogPost[]>([])
-  const [cmsEvents, setCmsEvents] = useState<BlogPost[]>([])
+  // const [cmsEvents, setCmsEvents] = useState<BlogPost[]>([])
   const [events, setEvents] = useState(staticEvents)
   const router = useRouter()
 
@@ -72,29 +72,31 @@ function Events({ events: staticEvents, onDemandEvents, categories: staticCatego
   }, [])
 
   // Fetch CMS events on client-side
-  useEffect(() => {
-    const fetchCmsEvents = async () => {
-      try {
-        const url = new URL('/api-v2/cms-events', window.location.origin)
-        const res = await fetch(url.toString())
-        const data = await res.json()
-        if (data.success && Array.isArray(data.events)) {
-          setCmsEvents(data.events)
-        }
-      } catch (error) {
-        console.error('Error fetching CMS events:', error)
-      }
-    }
-    fetchCmsEvents()
-  }, [])
+  // useEffect(() => {
+  //   const fetchCmsEvents = async () => {
+  //     try {
+  //       const url = new URL('/api-v2/cms-events', window.location.origin)
+  //       const res = await fetch(url.toString())
+  //       const data = await res.json()
+  //       if (data.success && Array.isArray(data.events)) {
+  //         setCmsEvents(data.events)
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching CMS events:', error)
+  //     }
+  //   }
+  //   fetchCmsEvents()
+  // }, [])
 
   // Combine static and Luma events
   const allEvents = useMemo(() => {
-    const combined = [...staticEvents, ...cmsEvents, ...lumaEvents]
+    // const combined = [...staticEvents, ...cmsEvents, ...lumaEvents]
+    const combined = [...staticEvents, ...lumaEvents]
     return combined.filter((event: BlogPost) =>
       event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
     )
-  }, [staticEvents, cmsEvents, lumaEvents])
+    // }, [staticEvents, cmsEvents, lumaEvents])
+  }, [staticEvents, lumaEvents])
 
   // Keep displayed events in sync with combined list
   useEffect(() => {
@@ -113,16 +115,17 @@ function Events({ events: staticEvents, onDemandEvents, categories: staticCatego
       })
     })
 
-    cmsEvents.forEach((event) => {
-      updatedCategories.all = (updatedCategories.all || 0) + 1
+    // cmsEvents.forEach((event) => {
+    //   updatedCategories.all = (updatedCategories.all || 0) + 1
 
-      event.categories?.forEach((category) => {
-        updatedCategories[category] = (updatedCategories[category] || 0) + 1
-      })
-    })
+    //   event.categories?.forEach((category) => {
+    //     updatedCategories[category] = (updatedCategories[category] || 0) + 1
+    //   })
+    // })
 
     return updatedCategories
-  }, [staticCategories, lumaEvents, cmsEvents])
+    // }, [staticCategories, lumaEvents, cmsEvents])
+  }, [staticCategories, lumaEvents])
 
   const meta_title = 'Supabase Events: webinars, talks, hackathons, and meetups'
   const meta_description = 'Join Supabase and the open-source community at the upcoming events.'
