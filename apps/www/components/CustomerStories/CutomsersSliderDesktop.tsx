@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { range } from 'lodash'
 import { cn } from 'ui'

@@ -1,3 +1,5 @@
+'use client'
+
 import authors from 'lib/authors.json'
 import Link from 'next/link'
 import React from 'react'

@@ -1,3 +1,5 @@
+'use client'
+
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lodash'

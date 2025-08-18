@@ -18,6 +18,7 @@ export const BlogPost = defineDocumentType(() => ({
     author_url: { type: 'string', required: false },
     author_image_url: { type: 'string', required: false },
     video: { type: 'string', required: false },
+    youtubeHero: { type: 'string', required: false },
     toc_depth: { type: 'number', required: false },
     launchweek: { type: 'string', required: false },
   },

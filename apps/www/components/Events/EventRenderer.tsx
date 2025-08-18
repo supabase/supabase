@@ -1,3 +1,5 @@
+'use client'
+
 import dayjs from 'dayjs'
 import capitalize from 'lodash/capitalize'
 import { ChevronLeft, X as XIcon } from 'lucide-react'
@@ -6,6 +8,7 @@ import NextImage from 'next/image'
 import { MDXRemote } from 'next-mdx-remote'
 import { Button, Image } from 'ui'
 
+import DefaultLayout from 'components/Layouts/Default'
 import ShareArticleActions from 'components/Blog/ShareArticleActions'
 import SectionContainer from 'components/Layouts/SectionContainer'
 
@@ -19,7 +22,6 @@ import type { Event, EventData } from 'types/post'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import DefaultLayout from '../Layouts/Default'
 
 const EventRenderer = ({ event }: { event: Event & EventData }) => {
   const content = event.content
@@ -31,9 +33,9 @@ const EventRenderer = ({ event }: { event: Event & EventData }) => {
     .filter(isNotNullOrUndefined) as Author[]
   const hadEndDate = event.end_date?.length
 
-  const IS_REGISTRATION_OPEN =
-    event.onDemand ||
-    (hadEndDate ? Date.parse(event.end_date!) > Date.now() : Date.parse(event.date) > Date.now())
+  const IS_REGISTRATION_OPEN = event.onDemand
+  // event.onDemand ||
+  // (hadEndDate ? Date.parse(event.end_date!) > Date.now() : Date.parse(event.date) > Date.now())
 
   const ogImageUrl = event.og_image
     ? event.og_image
