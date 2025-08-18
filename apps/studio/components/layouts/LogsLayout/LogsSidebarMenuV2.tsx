@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight, CircleHelpIcon, FilePlus, Plus } from 'lucide-react'
+import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -13,13 +12,14 @@ import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQuer
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useContentQuery } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
+  cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -33,7 +33,6 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -235,7 +234,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
-      {IS_PLATFORM && (
+      {IS_PLATFORM && !isUnifiedLogsPreviewAvailable && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           illustration={<Badge variant="default">Coming soon</Badge>}
@@ -280,7 +279,12 @@ export function LogsSidebarMenuV2() {
         />
       )}
 
-      <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-[1]">
+      <div
+        className={cn(
+          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-[1] px-4',
+          !templatesEnabled ? 'pt-4' : 'py-4'
+        )}
+      >
         <InnerSideBarFilters className="w-full p-0 gap-0">
           <InnerSideBarFilterSearchInput
             name="search-collections"
