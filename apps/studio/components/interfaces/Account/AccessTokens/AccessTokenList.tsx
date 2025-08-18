@@ -3,6 +3,7 @@ import { MoreVertical, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import AlertError from 'components/ui/AlertError'
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { DATETIME_FORMAT } from 'lib/constants'
@@ -10,7 +11,6 @@ import {
   Button,
   Card,
   CardContent,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -18,7 +18,6 @@ import {
   Skeleton,
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -32,13 +31,59 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 import { ViewTokenPermissionsPanel } from './ViewTokenPermissionsPanel'
 
+const RowLoading = () => (
+  <TableRow>
+    <TableCell>
+      <Skeleton className="max-w-60 h-4 rounded-full" />
+    </TableCell>
+    <TableCell>
+      <Skeleton className="max-w-40 h-4 rounded-full" />
+    </TableCell>
+    <TableCell>
+      <Skeleton className="max-w-32 h-4 rounded-full" />
+    </TableCell>
+    <TableCell>
+      <Skeleton className="w-20 h-8 rounded-md" />
+    </TableCell>
+  </TableRow>
+)
+
+const TableContainer = ({ children }: { children: React.ReactNode }) => (
+  <Card className="w-full overflow-hidden">
+    <CardContent className="p-0">
+      <Table className="p-5 table-auto">
+        <TableHeader>
+          <TableRow className="bg-200">
+            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+              Name
+            </TableHead>
+            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+              Token
+            </TableHead>
+            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+              Created
+            </TableHead>
+            <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />
+          </TableRow>
+        </TableHeader>
+        <TableBody>{children}</TableBody>
+      </Table>
+    </CardContent>
+  </Card>
+)
+
 export interface AccessTokenListProps {
   searchString?: string
   onDeleteSuccess: (id: number) => void
 }
 
 export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenListProps) => {
-  const { data: tokens, isLoading, error } = useAccessTokensQuery()
+  const [isOpen, setIsOpen] = useState(false)
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const [token, setToken] = useState<AccessToken | undefined>(undefined)
+
+  const { data: tokens, error, isLoading, isError } = useAccessTokensQuery()
+
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
       onDeleteSuccess(vars.id)
@@ -49,10 +94,6 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
       toast.error(`Failed to delete access token: ${error.message}`)
     },
   })
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [isPanelOpen, setIsPanelOpen] = useState(false)
-  const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
   const onDeleteToken = async (tokenId: number) => {
     deleteToken({ id: tokenId })
@@ -68,54 +109,18 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   const empty = filteredTokens?.length === 0 && !isLoading
 
-  const RowLoading = () => (
-    <TableRow>
-      <TableCell>
-        <Skeleton className="max-w-60 h-4 rounded-full" />
-      </TableCell>
-      <TableCell>
-        <Skeleton className="max-w-40 h-4 rounded-full" />
-      </TableCell>
-      <TableCell>
-        <Skeleton className="max-w-32 h-4 rounded-full" />
-      </TableCell>
-      <TableCell>
-        <Skeleton className="w-20 h-8 rounded-md" />
-      </TableCell>
-    </TableRow>
-  )
-
-  const TableContainer = ({ children }: { children: React.ReactNode }) => (
-    <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
-      <CardContent className="p-0">
-        <Table className="p-5 table-auto">
-          <TableHeader>
-            <TableRow className={cn('bg-200', empty && 'hidden')}>
-              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                Name
-              </TableHead>
-              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                Token
-              </TableHead>
-              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                Created
-              </TableHead>
-              <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />
-            </TableRow>
-          </TableHeader>
-          <TableBody className="">{children}</TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  )
-
-  if (error) {
+  if (isError) {
     return (
       <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <p className="text-sm text-foreground">Failed to load access tokens</p>
-          <p className="text-sm text-foreground-light">Please try refreshing the page</p>
-        </div>
+        <TableRow>
+          <TableCell colSpan={4} className="p-0">
+            <AlertError
+              error={error}
+              subject="Failed to retrieve access tokens"
+              className="rounded-none border-0"
+            />
+          </TableCell>
+        </TableRow>
       </TableContainer>
     )
   }
@@ -132,42 +137,45 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
   if (empty) {
     return (
       <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <p className="text-sm text-foreground">No access tokens found</p>
-          <p className="text-sm text-foreground-light">You do not have any tokens created yet</p>
-        </div>
+        <TableRow>
+          <TableCell colSpan={4} className="py-12">
+            <p className="text-sm text-center text-foreground">No access tokens found</p>
+            <p className="text-sm text-center text-foreground-light">
+              You do not have any tokens created yet
+            </p>
+          </TableCell>
+        </TableRow>
       </TableContainer>
     )
   }
 
   return (
     <>
-      <TooltipProvider>
-        <TableContainer>
-          {filteredTokens?.map((x) => {
-            return (
-              <TableRow key={x.token_alias}>
-                <TableCell className="w-48">
-                  <p className="truncate">{x.name}</p>
-                </TableCell>
-                <TableCell>
-                  <span className="font-mono text-foreground-light">{x.token_alias}</span>
-                </TableCell>
-                <TableCell>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="text-foreground-light">
-                        {dayjs(x.created_at).format('D MMM YYYY')}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Created on {dayjs(x.created_at).format(DATETIME_FORMAT)}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-end gap-x-2">
-                    {/* <Button
+      <TableContainer>
+        {filteredTokens?.map((x) => {
+          return (
+            <TableRow key={x.token_alias}>
+              <TableCell className="w-48">
+                <p className="truncate">{x.name}</p>
+              </TableCell>
+              <TableCell>
+                <span className="font-mono text-foreground-light">{x.token_alias}</span>
+              </TableCell>
+              <TableCell>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="text-foreground-light">
+                      {dayjs(x.created_at).format('D MMM YYYY')}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Created on {dayjs(x.created_at).format(DATETIME_FORMAT)}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center justify-end gap-x-2">
+                  {/* <Button
                       type="default"
                       title="View access"
                       onClick={() => {
@@ -177,37 +185,36 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                     >
                       View access
                     </Button> */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          type="text"
-                          title="More options"
-                          className="px-1.5"
-                          disabled={isLoading}
-                          loading={isLoading}
-                          icon={<MoreVertical />}
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent side="bottom" align="end" className="w-40">
-                        <DropdownMenuItem
-                          className="gap-x-2"
-                          onClick={() => {
-                            setToken(x)
-                            setIsOpen(true)
-                          }}
-                        >
-                          <Trash size={12} />
-                          <p>Delete token</p>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableContainer>
-      </TooltipProvider>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="text"
+                        title="More options"
+                        className="px-1.5"
+                        disabled={isLoading}
+                        loading={isLoading}
+                        icon={<MoreVertical />}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end" className="w-40">
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        onClick={() => {
+                          setToken(x)
+                          setIsOpen(true)
+                        }}
+                      >
+                        <Trash size={12} />
+                        <p>Delete token</p>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableContainer>
 
       <ViewTokenPermissionsPanel
         visible={isPanelOpen}
@@ -232,7 +239,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         }}
       >
         <p className="py-4 text-sm text-foreground-light">
-          {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
+          This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
         </p>
       </ConfirmationModal>
     </>
