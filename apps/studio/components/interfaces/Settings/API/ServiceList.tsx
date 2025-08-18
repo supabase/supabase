@@ -1,6 +1,7 @@
 import { AlertCircle } from 'lucide-react'
 
 import { useParams } from 'common'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
@@ -9,11 +10,10 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Card, CardHeader, CardContent, Badge } from 'ui'
-import { PostgrestConfig } from './PostgrestConfig'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Badge, Card, CardContent, CardHeader } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { PostgrestConfig } from './PostgrestConfig'
 
 export const ServiceList = () => {
   const { data: project, isLoading } = useSelectedProjectQuery()
@@ -38,7 +38,7 @@ export const ServiceList = () => {
         : selectedDatabase?.restUrl
 
   return (
-    <ScaffoldSection id="api-settings" className="gap-6">
+    <ScaffoldSection isFullWidth id="api-settings" className="gap-6">
       {isLoading ? (
         <Card>
           <CardContent>
