@@ -302,17 +302,18 @@ export const PostgrestConfig = () => {
                                 className="mt-2"
                                 description={
                                   <>
-                                    <p>
+                                    <p className="prose text-sm">
                                       You will not be able to query tables and views in the{' '}
-                                      <code>public</code> schema via supabase-js or HTTP clients.
+                                      <code className="text-xs">public</code> schema via supabase-js
+                                      or HTTP clients.
                                     </p>
                                     {isGraphqlExtensionEnabled && (
                                       <>
-                                        <p>
+                                        <p className="prose text-sm mt-2">
                                           Tables in the <code className="text-xs">public</code>{' '}
                                           schema are still exposed over our GraphQL endpoints.
                                         </p>
-                                        <Button asChild type="default">
+                                        <Button asChild type="default" className="mt-2">
                                           <Link href={`/project/${projectRef}/database/extensions`}>
                                             Disable the pg_graphql extension
                                           </Link>
