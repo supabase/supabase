@@ -77,10 +77,12 @@ const data: () => {
           <span className="block text-foreground">
             Prototype fast, integrate with your data, scale when ready.
           </span>
-          <span className="block md:ml-0">Prototype in an afternoon, scale to millions.</span>
         </>
       ),
       subheader: [
+        <>
+          Prototype in an afternoon, scale to millions.
+        </>,
         <>
           You need to move fast without battling red tape, complex infrastructure, or data silos.
           Supabase gives you a fully managed Postgres backend with everything you need to prove your

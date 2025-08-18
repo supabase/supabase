@@ -3,6 +3,8 @@ import {
   BotIcon,
   Building2Icon,
   Code2Icon,
+  HammerIcon,
+  LightbulbIcon,
   PointerIcon,
   PuzzleIcon,
   TrendingUpIcon,
@@ -16,9 +18,12 @@ export enum Solutions {
   beginners = 'beginners',
   developers = 'developers',
   postgresDevs = 'postgres-developers',
+  firebase = 'firebase',
   neon = 'neon',
   startups = 'startups',
   enterprise = 'enterprise',
+  hackathon = 'hackathon',
+  innovationTeams = 'innovation-teams',
 }
 
 export const skillBasedSolutions = {
@@ -93,11 +98,11 @@ export const useCaseSolutions = {
   label: 'Solutions',
   solutions: [
     {
-      id: Solutions.neon,
-      text: 'Switch From Neon',
+      id: Solutions.hackathon,
+      text: 'Hackathon Contestants',
       description: '',
-      url: '/solutions/switch-from-neon',
-      icon: ArrowLeftRight,
+      url: '/solutions/hackathon',
+      icon: HammerIcon,
     },
     {
       id: Solutions.startups,
@@ -112,6 +117,33 @@ export const useCaseSolutions = {
       description: '',
       url: '/solutions/enterprise',
       icon: Building2Icon,
+    },
+    {
+      id: Solutions.innovationTeams,
+      text: 'Innovation Teams',
+      description: '',
+      url: '/solutions/innovation-teams',
+      icon: LightbulbIcon,
+    },
+  ],
+}
+
+export const migrationSolutions = {
+  label: 'Solutions',
+  solutions: [
+    {
+      id: Solutions.firebase,
+      text: 'Switch from Firebase',
+      description: '',
+      url: '/solutions/switch-from-firebase',
+      icon: ArrowLeftRight,
+    },
+    {
+      id: Solutions.neon,
+      text: 'Switch From Neon',
+      description: '',
+      url: '/solutions/switch-from-neon',
+      icon: ArrowLeftRight,
     },
   ],
 }
@@ -132,6 +164,16 @@ export const navData = {
       label: "Who it's for",
       links: [
         ...useCaseSolutions.solutions.map((solution) => ({
+          text: solution.text,
+          url: solution.url,
+          icon: solution.icon,
+        })),
+      ],
+    },
+    {
+      label: 'Migration',
+      links: [
+        ...migrationSolutions.solutions.map((solution) => ({
           text: solution.text,
           url: solution.url,
           icon: solution.icon,

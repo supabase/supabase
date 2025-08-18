@@ -54,7 +54,7 @@ const data = {
     ],
     ctas: [
       {
-        label: 'Read the Firebase vs. Supabase comparison',
+        label: 'Compare Firebase and Supabase',
         href: 'https://supabase.com/alternatives/supabase-vs-firebase',
         type: 'default' as any,
         icon: <ArrowUpRight className="w-4 h-4 text-current" />,
@@ -83,14 +83,14 @@ const data = {
   quote: {
     id: 'quote',
     className: '[&_q]:md:max-w-2xl',
-    text: 'We migrated 200,000+ users from Firebase to Supabase and immediately saw faster auth performance, no more surprise API costs, and better developer velocity.',
-    author: 'Brendan Moore',
-    role: 'CTO, Mobbin',
+    text: 'Migrating to Supabase meant that we could instantly fix our Auth problems and save money. Just being on Supabase alone gives us confidence we can deliver on whatever users need in the future.',
+    author: 'Jian Jie Liau',
+    role: 'Co-Founder & CTO, Mobbin',
     avatar: (
       <Image
         draggable={false}
-        src="/images/customers/logos/mobbin.png"
-        alt="Mobbin logo"
+        src="/images/blog/avatars/jian-mobbin.jpg"
+        alt="Jian Jie Liau"
         className="dark:invert object-contain opacity-50 hover:!opacity-60 max-w-20 max-h-10 !w-10 !h-10"
         width={28}
         height={28}
