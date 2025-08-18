@@ -53,6 +53,13 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         defaultHidden: true,
       },
       {
+        id: 'nav-database-tests',
+        name: 'Tests',
+        value: 'Database: Tests',
+        route: `/project/${ref}/database/tests`,
+        defaultHidden: true,
+      },
+      {
         id: 'nav-database-extensions',
         name: 'Extensions',
         value: 'Database: Extensions',

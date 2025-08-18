@@ -135,6 +135,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     return snippetInfo
   }, [privateSnippetsPages?.pages, subResults, isLoading, isPreviousData, isFetching, snippet])
 
+  // Folders (no longer excluding test folders)
+  const folders = useSnippetFolders(projectRef as string)
+
   const privateSnippets = useMemo(
     () =>
       filteredSnippets.snippets
@@ -145,7 +148,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         }) ?? [],
     [filteredSnippets.snippets, sort]
   )
-  const folders = useSnippetFolders(projectRef as string)
 
   const { data: snippetCountData } = useContentCountQuery({
     projectRef,
