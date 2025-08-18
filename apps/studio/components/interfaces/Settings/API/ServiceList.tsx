@@ -21,7 +21,11 @@ export const ServiceList = () => {
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-  const { data: databases, isError } = useReadReplicasQuery({ projectRef })
+  const {
+    data: databases,
+    isError,
+    isLoading: isLoadingDatabases,
+  } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
   // Get the API service
@@ -39,13 +43,7 @@ export const ServiceList = () => {
 
   return (
     <ScaffoldSection isFullWidth id="api-settings" className="gap-6">
-      {isLoading ? (
-        <Card>
-          <CardContent>
-            <GenericSkeletonLoader />
-          </CardContent>
-        </Card>
-      ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
+      {!isLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
         <Alert_Shadcn_ variant="destructive">
           <AlertCircle size={16} />
           <AlertTitle_Shadcn_>
@@ -66,7 +64,9 @@ export const ServiceList = () => {
               />
             </CardHeader>
             <CardContent>
-              {isError ? (
+              {isLoading || isLoadingDatabases ? (
+                <GenericSkeletonLoader />
+              ) : isError ? (
                 <Alert_Shadcn_ variant="destructive">
                   <AlertCircle size={16} />
                   <AlertTitle_Shadcn_>Failed to retrieve project URL</AlertTitle_Shadcn_>
