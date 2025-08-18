@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import {
   AuthProvider,
   FeatureFlagProvider,
@@ -27,7 +28,7 @@ function Providers({ children }: { children: React.ReactNode }) {
             <CommandProvider>
               <TelemetryTagManager />
               <SonnerToaster position="top-right" />
-              {children}
+              <Suspense fallback={null}>{children}</Suspense>
               <WwwCommandMenu />
               <PageTelemetry
                 API_URL={API_URL}
