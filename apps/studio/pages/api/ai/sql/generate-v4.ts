@@ -1,9 +1,15 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText, wrapLanguageModel } from 'ai'
+import {
+  convertToModelMessages,
+  ModelMessage,
+  stepCountIs,
+  streamText,
+  wrapLanguageModel,
+} from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-import { initLogger, traced, BraintrustMiddleware, currentSpan } from 'braintrust'
+import { initLogger, traced, BraintrustMiddleware, currentSpan, wrapTraced } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -206,6 +212,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
+    // Trace tool calls
+    const tracedTools = Object.fromEntries(
+      Object.entries(tools).map(([name, t]: any) => [
+        name,
+        {
+          ...t,
+          execute: wrapTraced(async (...args: any[]) => t.execute(...args), { type: 'tool', name }),
+        },
+      ])
+    ) as typeof tools
+
     return traced(async (span) => {
       // log things scorers consume
       span.log({
@@ -223,7 +240,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         model,
         stopWhen: stepCountIs(5),
         messages: coreMessages,
-        tools,
+        tools: tracedTools,
         onFinish: ({ text }) => currentSpan().log({ output: text }),
         abortSignal: abortController.signal,
       })
