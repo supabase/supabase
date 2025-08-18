@@ -115,11 +115,6 @@ export function LogsSidebarMenuV2() {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
-  const isUnifiedLogsPreviewAvailable =
-    unifiedLogsFlagEnabled &&
-    !isOrgPlanLoading &&
-    ['team', 'enterprise'].includes(orgPlan?.id ?? '')
-
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
@@ -234,7 +229,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
-      {IS_PLATFORM && !isUnifiedLogsPreviewAvailable && (
+      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           illustration={<Badge variant="default">Coming soon</Badge>}
@@ -249,7 +244,7 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {isUnifiedLogsPreviewAvailable && (
+      {unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           title="New Logs Interface"
