@@ -1,0 +1,63 @@
+name: Config (Preview)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - master
+    paths:
+      - "supabase/**"
+  workflow_dispatch:
+
+jobs:
+  wait:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.check.outputs.conclusion }}
+    steps:
+      - uses: fountainhead/action-wait-for-check@v1.2.0
+        id: check
+        with:
+          checkName: Supabase
+          ref: ${{ github.event.pull_request.head.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  apply:
+    needs:
+      - wait
+    if: ${{ needs.wait.outputs.status == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      TF_VAR_linked_project: xguihxuzqibwxjnimxev
+      TF_VAR_git_branch: ${{ github.head_ref }}
+      TF_CLI_ARGS_apply: -target=supabase_settings.preview
+    defaults:
+      run:
+        working-directory: supabase/remotes
+    outputs:
+      db_user: ${{ steps.branch.outputs.user }}
+      db_pass: ${{ steps.branch.outputs.password }}
+      db_host: ${{ steps.branch.outputs.host }}
+      db_port: ${{ steps.branch.outputs.port }}
+      jwt_secret: ${{ steps.branch.outputs.jwt_secret }}
+      ref: ${{ steps.branch.outputs.id }}
+      status: ${{ steps.branch.outputs.status }}
+      version: ${{ steps.branch.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - run: terraform init
+      - run: terraform apply -auto-approve -no-color
+      - id: branch
+        run: |
+          terraform output -json branch_database \
+          | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" \
+          >> "$GITHUB_OUTPUT"

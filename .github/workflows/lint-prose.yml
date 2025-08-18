@@ -1,0 +1,25 @@
+name: reviewdog
+on:
+  pull_request:
+    paths:
+      - '.vale.ini'
+      - 'vale/**'
+      - 'apps/docs/content/**'
+
+jobs:
+  vale:
+    name: runner / vale
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          sparse-checkout: |
+            .vale.ini
+            vale
+            apps/docs/content
+      - uses: errata-ai/vale-action@reviewdog
+        with:
+          files: apps/docs/content
+          # [Charis] Temporary because we still have to go through giant backlog of existing errors
+          # Don't want people to worry about this (just want them looking at the specific PR comments)
+          # fail_on_error: true

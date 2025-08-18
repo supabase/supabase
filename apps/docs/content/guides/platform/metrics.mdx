@@ -1,0 +1,31 @@
+---
+id: 'metrics'
+title: 'Metrics'
+description: 'Observability for your Supabase project'
+---
+
+In addition to the reports and charts built in to the Supabase dashboard, each project hosted on the Supabase platform comes with a [Prometheus](https://prometheus.io/)-compatible metrics endpoint, which can be used to gather insight into the health and status of your project.
+
+You can use this endpoint to ingest data into your own monitoring and alerting infrastructure, as long as it is capable of scraping Prometheus-compatible endpoints, in order to set up custom rules beyond those supported by the Supabase dashboard.
+
+<Admonition type="note">
+
+The endpoint discussed in this article is in beta, and the metrics returned by it might evolve or be changed in the future to increase its utility.
+
+</Admonition>
+
+<Admonition type="note">
+
+The endpoint discussed in this article is not available on self-hosted.
+
+</Admonition>
+
+## Accessing the metrics endpoint
+
+Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Access to the endpoint is secured via HTTP Basic Auth; the username is `service_role`, while the password is the service role JWT available through the Supabase dashboard.
+
+```shell
+> curl https://<project-ref>.supabase.co/customer/v1/privileged/metrics --user 'service_role:<service-role-jwt>'
+```
+
+Additionally, we [maintain a guide](https://github.com/supabase/supabase-grafana) on quickly setting up a scraping agent to work with Grafana Cloud.

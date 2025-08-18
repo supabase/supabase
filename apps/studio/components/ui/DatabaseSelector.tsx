@@ -82,6 +82,7 @@ const DatabaseSelector = ({
           </span>
           <Button
             type="default"
+            disabled={isLoading}
             icon={isLoading && <Loader2 className="animate-spin" />}
             iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
             {...buttonProps}
