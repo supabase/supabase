@@ -56,12 +56,7 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
   // [Joshen] Only for local/self-hosted, hosted should always only use bedrock
   if (hasOpenAIKey) {
     return {
-      model: wrapLanguageModel({
-        model: openai(OPENAI_MODEL),
-        // Wrap a model with Braintrust middleware
-        // @see https://www.braintrust.dev/docs/guides/integrations#vercel-ai-sdk-v5
-        middleware: BraintrustMiddleware({ debug: true }),
-      }),
+      model: openAIModel,
     }
   }
 
