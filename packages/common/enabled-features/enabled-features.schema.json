@@ -28,11 +28,6 @@
       "description": "Enable billing"
     },
 
-    "client_libraries:show_all": {
-      "type": "boolean",
-      "description": "Show all client libraries. When false, the JavaScript client library will still be shown."
-    },
-
     "integrations:vercel": {
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
@@ -51,9 +46,9 @@
       "type": "boolean",
       "description": "Show the user's email address in the toolbar"
     },
-    "profile:update": {
+    "profile:show_information": {
       "type": "boolean",
-      "description": "Allow the user to change their profile information (first name, last name)"
+      "description": "Shows the user's profile information (first name, last name) in account preferences"
     },
 
     "project_connection:javascript_example": {
@@ -67,7 +62,7 @@
 
     "project_creation:show_advanced_config": {
       "type": "boolean",
-      "description": "Show the advanced config option in the project creation flow"
+      "description": "Show the advanced configuration option in the project creation flow"
     },
 
     "project_homepage:show_instance_size": {
@@ -76,7 +71,11 @@
     },
     "project_homepage:show_examples": {
       "type": "boolean",
-      "description": "Show the examples in the project homepage"
+      "description": "Show the example projects in the project homepage"
+    },
+    "project_homepage:show_all_client_libraries": {
+      "type": "boolean",
+      "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
     }
   },
   "required": [
@@ -85,15 +84,15 @@
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
     "billing:all",
-    "client_libraries:show_all",
     "integrations:vercel",
+    "profile:show_email",
+    "profile:show_information",
     "logs:templates",
     "logs:collections",
-    "profile:show_email",
-    "profile:update",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
+    "project_homepage:show_all_client_libraries",
     "project_connection:javascript_example",
     "project_connection:dart_example"
   ],

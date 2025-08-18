@@ -22,9 +22,12 @@ const BuildingState = () => {
   const queryClient = useQueryClient()
 
   const {
-    clientLibrariesShowAll: showAllClientLibraries,
+    projectHomepageShowAllClientLibraries: showAllClientLibraries,
     projectHomepageShowExamples: showExamples,
-  } = useIsFeatureEnabled(['client_libraries:show_all', 'project_homepage:show_examples'])
+  } = useIsFeatureEnabled([
+    'project_homepage:show_all_client_libraries',
+    'project_homepage:show_examples',
+  ])
 
   const clientLibraries = useMemo(() => {
     if (showAllClientLibraries) {

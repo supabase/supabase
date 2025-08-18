@@ -30,7 +30,7 @@ Future<void> main() async {
 }`,
 })
 
-const APIKeys = () => {
+export const APIKeys = () => {
   const { ref: projectRef } = useParams()
 
   const {
@@ -87,7 +87,9 @@ const APIKeys = () => {
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
-  const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
+  const selectedLanguageSnippet = !!selectedLanguage
+    ? clientInitSnippet[selectedLanguage.key]
+    : 'No snippet available'
 
   return (
     <Panel
@@ -186,34 +188,34 @@ const APIKeys = () => {
               }
             />
           </Panel.Content>
-          <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="flex items-center bg-studio">
-              {availableLanguages.map((language) => {
-                const isSelected = selectedLanguage.key === language.key
-                return (
-                  <div
-                    key={language.key}
-                    className={[
-                      'px-3 py-1 text-sm cursor-pointer transition',
-                      `${!isSelected ? 'bg-studio text-foreground-light' : 'bg-surface-100'}`,
-                    ].join(' ')}
-                    onClick={() => setSelectedLanguage(language)}
-                  >
-                    {language.name}
-                  </div>
-                )
-              })}
+          {availableLanguages.length > 0 && (
+            <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <div className="flex items-center bg-studio">
+                {availableLanguages.map((language) => {
+                  const isSelected = selectedLanguage.key === language.key
+                  return (
+                    <div
+                      key={language.key}
+                      className={[
+                        'px-3 py-1 text-sm cursor-pointer transition',
+                        `${!isSelected ? 'bg-studio text-foreground-light' : 'bg-surface-100'}`,
+                      ].join(' ')}
+                      onClick={() => setSelectedLanguage(language)}
+                    >
+                      {language.name}
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="bg-surface-100 px-4 py-6 min-h-[200px]">
+                <SimpleCodeBlock className={selectedLanguage.key}>
+                  {selectedLanguageSnippet}
+                </SimpleCodeBlock>
+              </div>
             </div>
-            <div className="bg-surface-100 px-4 py-6 min-h-[200px]">
-              <SimpleCodeBlock className={selectedLanguage.key}>
-                {selectedLanguageSnippet}
-              </SimpleCodeBlock>
-            </div>
-          </div>
+          )}
         </>
       )}
     </Panel>
   )
 }
-
-export default APIKeys

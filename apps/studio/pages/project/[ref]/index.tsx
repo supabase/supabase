@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
-import { ClientLibrary, ExampleProject, NewProjectPanel } from 'components/interfaces/Home'
+import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { NewProjectPanel } from 'components/interfaces/Home/NewProjectPanel/NewProjectPanel'
 import { ProjectUsageSection } from 'components/interfaces/Home/ProjectUsageSection'
 import { ServiceStatus } from 'components/interfaces/Home/ServiceStatus'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -50,11 +51,11 @@ const Home: NextPageWithLayout = () => {
   const { ref, enableBranching } = useParams()
 
   const {
-    clientLibrariesShowAll: showAllClientLibraries,
+    projectHomepageShowAllClientLibraries: showAllClientLibraries,
     projectHomepageShowInstanceSize: showInstanceSize,
     projectHomepageShowExamples: showExamples,
   } = useIsFeatureEnabled([
-    'client_libraries:show_all',
+    'project_homepage:show_all_client_libraries',
     'project_homepage:show_instance_size',
     'project_homepage:show_examples',
   ])
