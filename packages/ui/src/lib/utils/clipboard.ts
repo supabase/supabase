@@ -15,7 +15,9 @@ export const copyToClipboard = async (str: string | Promise<string>, callback = 
   if (focused) {
     if (typeof ClipboardItem && navigator.clipboard?.write) {
       if (window.location.protocol === 'http:') {
-        throw new Error('Safari only allows copying to the clipboard in secure contexts (HTTPS), not HTTP.')
+        throw new Error(
+          'Safari only allows copying to the clipboard in secure contexts (HTTPS), not HTTP.'
+        )
       }
 
       // NOTE: Safari locks down the clipboard API to only work when triggered
