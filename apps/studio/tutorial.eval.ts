@@ -10,7 +10,7 @@ Eval('Say Hi Bot', {
       },
       {
         input: 'Bar',
-        expected: 'Hello Bar',
+        expected: 'Hi Bar',
       },
     ] // Replace with your eval dataset
   },
