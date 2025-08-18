@@ -9,7 +9,7 @@ import {
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-import { initLogger, traced, BraintrustMiddleware, currentSpan, wrapTraced } from 'braintrust'
+import { traced, BraintrustMiddleware, currentSpan, wrapTraced } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -60,12 +60,6 @@ const requestBodySchema = z.object({
   table: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
-})
-
-const logger = initLogger({
-  projectName: 'supabase-studio-ai-assistant',
-  apiKey: process.env.BRAINTRUST_API_KEY,
-  // In Vercel, async flushing is handled via waitUntil, so default is fine.
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -223,46 +217,49 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ])
     ) as typeof tools
 
-    return traced(async (span) => {
-      // log things scorers consume
-      span.log({
-        input: coreMessages,
-        metadata: {
-          route: '/api/ai/sql/generate-v4',
-          task_type: 'text2sql',
-          projectRef,
-          orgSlug,
-          chatName,
-        },
-      })
+    return traced(
+      async (span) => {
+        // log things scorers consume
+        span.log({
+          input: coreMessages,
+          metadata: {
+            route: '/api/ai/sql/generate-v4',
+            task_type: 'text2sql',
+            projectRef,
+            orgSlug,
+            chatName,
+          },
+        })
 
-      const result = streamText({
-        model,
-        stopWhen: stepCountIs(5),
-        messages: coreMessages,
-        tools: tracedTools,
-        onFinish: ({ text }) => currentSpan().log({ output: text }),
-        abortSignal: abortController.signal,
-      })
+        const result = streamText({
+          model,
+          stopWhen: stepCountIs(5),
+          messages: coreMessages,
+          tools: tracedTools,
+          onFinish: ({ text }) => currentSpan().log({ output: text }),
+          abortSignal: abortController.signal,
+        })
 
-      result.pipeUIMessageStreamToResponse(res, {
-        onError: (error) => {
-          if (error == null) {
-            return 'unknown error'
-          }
+        result.pipeUIMessageStreamToResponse(res, {
+          onError: (error) => {
+            if (error == null) {
+              return 'unknown error'
+            }
 
-          if (typeof error === 'string') {
-            return error
-          }
+            if (typeof error === 'string') {
+              return error
+            }
 
-          if (error instanceof Error) {
-            return error.message
-          }
+            if (error instanceof Error) {
+              return error.message
+            }
 
-          return JSON.stringify(error)
-        },
-      })
-    }, logger)
+            return JSON.stringify(error)
+          },
+        })
+      },
+      { name: 'AI Assistant' }
+    )
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
