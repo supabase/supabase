@@ -19,9 +19,9 @@
       "type": "boolean",
       "description": "Show the user's email address in the toolbar"
     },
-    "profile:update": {
+    "profile:show_information": {
       "type": "boolean",
-      "description": "Allow the user to change their profile information (first name, last name)"
+      "description": "Shows the user's profile information (first name, last name) in account preferences"
     },
 
     "project_connection:javascript_example": {
@@ -53,7 +53,7 @@
   },
   "required": [
     "profile:show_email",
-    "profile:update",
+    "profile:show_information",
     "logs:templates",
     "logs:collections",
     "project_creation:show_advanced_config",
