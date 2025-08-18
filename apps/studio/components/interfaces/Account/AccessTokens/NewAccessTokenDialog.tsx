@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -35,11 +34,11 @@ export interface NewAccessTokenDialogProps {
   onCreateToken: (token: any) => void
 }
 
-const NewAccessTokenDialog = ({ 
-  open, 
-  onOpenChange, 
+const NewAccessTokenDialog = ({
+  open,
+  onOpenChange,
   tokenScope,
-  onCreateToken 
+  onCreateToken,
 }: NewAccessTokenDialogProps) => {
   const form = useForm<z.infer<typeof TokenSchema>>({
     resolver: zodResolver(TokenSchema),
@@ -103,11 +102,7 @@ const NewAccessTokenDialog = ({
                   </p>
                   <div className="mt-4">
                     <Button asChild type="default" icon={<ExternalLink />}>
-                      <Link
-                        href="https://api.supabase.com/api/v0"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                      <Link href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                         Experimental API documentation
                       </Link>
                     </Button>

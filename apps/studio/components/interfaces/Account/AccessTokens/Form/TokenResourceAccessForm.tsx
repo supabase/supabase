@@ -1,5 +1,9 @@
+import { Box, Check } from 'lucide-react'
 import { Control } from 'react-hook-form'
-import { FormField_Shadcn_, FormControl_Shadcn_, cn } from 'ui'
+
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { FormControl_Shadcn_, FormField_Shadcn_, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -8,9 +12,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { Check, Box } from 'lucide-react'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 
 interface TokenResourceAccessFormProps {
   control: Control<any>
@@ -23,8 +24,6 @@ export const TokenResourceAccessForm = ({
 }: TokenResourceAccessFormProps) => {
   const { data: organizations = [], isLoading: isLoadingOrgs } = useOrganizationsQuery()
   const { data: projects = [], isLoading: isLoadingProjects } = useProjectsQuery()
-
-
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">

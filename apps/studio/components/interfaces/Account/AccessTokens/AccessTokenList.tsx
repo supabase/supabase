@@ -1,25 +1,27 @@
+import dayjs from 'dayjs'
+import { MoreVertical, Trash } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
+
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { Trash, MoreVertical } from 'lucide-react'
-import { useState, useMemo } from 'react'
-import { toast } from 'sonner'
-import dayjs from 'dayjs'
 import { DATETIME_FORMAT } from 'lib/constants'
 import {
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
   Card,
   CardContent,
-  Skeleton,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Skeleton,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   Table,
   TableBody,
@@ -28,7 +30,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ViewTokenPermissionsPanel } from './ViewTokenPermissionsPanel'
 
 export interface AccessTokenListProps {
@@ -142,7 +143,6 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
       <TooltipProvider>
         <TableContainer>
           {filteredTokens?.map((x) => {
-
             return (
               <TableRow key={x.token_alias}>
                 <TableCell className="w-48">
@@ -159,9 +159,7 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
                       </p>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>
-                        Created on {dayjs(x.created_at).format(DATETIME_FORMAT)}
-                      </p>
+                      <p>Created on {dayjs(x.created_at).format(DATETIME_FORMAT)}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TableCell>

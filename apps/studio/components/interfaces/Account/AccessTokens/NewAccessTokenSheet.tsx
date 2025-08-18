@@ -8,21 +8,20 @@ import { z } from 'zod'
 
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
+  Button,
+  Form_Shadcn_,
+  ScrollArea,
+  Separator,
   Sheet,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  Button,
-  Form_Shadcn_,
-  ScrollArea,
-  Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-
 import { TokenBasicInfoForm } from './Form/TokenBasicInfoForm'
-import { TokenResourceAccessForm } from './Form/TokenResourceAccessForm'
 import { TokenPermissionsForm } from './Form/TokenPermissionsForm'
+import { TokenResourceAccessForm } from './Form/TokenResourceAccessForm'
 
 const PermissionRowSchema = z.object({
   resource: z.string().min(1, 'Please select a resource'),
@@ -47,11 +46,11 @@ export interface NewAccessTokenSheetProps {
   onCreateToken: (token: any) => void
 }
 
-const NewAccessTokenSheet = ({ 
-  visible, 
-  onOpenChange, 
-  tokenScope, 
-  onCreateToken 
+const NewAccessTokenSheet = ({
+  visible,
+  onOpenChange,
+  tokenScope,
+  onCreateToken,
 }: NewAccessTokenSheetProps) => {
   const [resourceSearchOpen, setResourceSearchOpen] = useState(false)
 
@@ -146,8 +145,8 @@ const NewAccessTokenSheet = ({
                   description={
                     <>
                       <p>
-                        These include deleting organizations and projects which cannot be undone.
-                        As such, be very careful when using this API.
+                        These include deleting organizations and projects which cannot be undone. As
+                        such, be very careful when using this API.
                       </p>
                       <div className="mt-4">
                         <Button asChild type="default" icon={<ExternalLink />}>
