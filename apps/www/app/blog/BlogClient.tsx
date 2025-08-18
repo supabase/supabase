@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import DefaultLayout from 'components/Layouts/Default'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
@@ -20,9 +20,6 @@ export default function BlogClient(props: { blogs: any[] }) {
   const [blogs, setBlogs] = useState(props.blogs)
   const [view, setView] = useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
-
-  const meta_title = 'Supabase Blog: the Postgres development platform'
-  const meta_description = 'Get all your Supabase News on the Supabase blog.'
 
   const allPosts = [...props.blogs, ...cmsPosts].sort(
     (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -60,7 +57,9 @@ export default function BlogClient(props: { blogs: any[] }) {
 
         <div className="border-default border-t">
           <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
-            <BlogFilters allPosts={allPosts} setPosts={setBlogs} view={view} setView={setView} />
+            <Suspense>
+              <BlogFilters allPosts={allPosts} setPosts={setBlogs} view={view} setView={setView} />
+            </Suspense>
 
             <ol
               className={cn(
