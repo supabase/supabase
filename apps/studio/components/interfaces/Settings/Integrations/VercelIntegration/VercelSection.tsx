@@ -18,6 +18,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -25,14 +26,13 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Button, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 
@@ -43,13 +43,18 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
   const isBranch = project?.parent_project_ref !== undefined
 
-  const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'integrations.vercel_connections')
-  const { can: canCreateVercelConnection } = useAsyncCheckProjectPermissions(
+  // placeholder for isLoading state when a useAsyncCheckOrgPermissions hook is added
+  // This component in used both in /org/[slug]/integrations and /project/[slug]/settings/integrations
+  const isLoadingPermissions = false
+  const canReadVercelConnection = useCheckPermissions(
+    PermissionAction.READ,
+    'integrations.vercel_connections'
+  )
+  const canCreateVercelConnection = useCheckPermissions(
     PermissionAction.CREATE,
     'integrations.vercel_connections'
   )
-  const { can: canUpdateVercelConnection } = useAsyncCheckProjectPermissions(
+  const canUpdateVercelConnection = useCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
