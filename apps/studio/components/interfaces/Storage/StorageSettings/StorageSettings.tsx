@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Clock } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
@@ -15,14 +15,15 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { formatBytes } from 'lib/helpers'
 import {
   Button,
+  Card,
+  CardContent,
+  CardFooter,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   SelectContent_Shadcn_,
@@ -32,7 +33,13 @@ import {
   Select_Shadcn_,
   Switch,
 } from 'ui'
-import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN,
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
+  StorageSizeUnits,
+} from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 interface StorageSettingsState {
@@ -54,8 +61,10 @@ const StorageSettings = () => {
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
 
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isFreeTier = organization?.plan.id === 'free'
+  const isSpendCapOn =
+    organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
 
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
@@ -84,9 +93,15 @@ const StorageSettings = () => {
     }
   }, [isSuccess, config])
 
-  const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
-    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
-  )} bytes`
+  const maxBytes = useMemo(() => {
+    if (organization?.plan.id === 'free') {
+      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
+    } else if (organization?.usage_billing_enabled) {
+      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+    } else {
+      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
+    }
+  }, [organization])
 
   const FormSchema = z
     .object({
@@ -96,7 +111,7 @@ const StorageSettings = () => {
     })
     .superRefine((data, ctx) => {
       const { unit, fileSizeLimit } = data
-      const { value: formattedMaxLimit } = convertFromBytes(STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, unit)
+      const { value: formattedMaxLimit } = convertFromBytes(maxBytes, unit)
 
       if (fileSizeLimit > formattedMaxLimit) {
         ctx.addIssue({
@@ -141,55 +156,50 @@ const StorageSettings = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
-      {isLoading && <GenericSkeletonLoader />}
-      {isError && (
-        <AlertError error={error} subject="Failed to retrieve project's storage configuration" />
-      )}
-      {isSuccess && (
-        <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="bg-surface-100  overflow-hidden border-muted rounded-md border shadow">
-            <div className="flex flex-col gap-0 divide-y divide-border">
-              <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
-                <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
-                  <p className="text-sm">Upload file size limit</p>
-                </div>
-
-                <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
-                  <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
-                    <div className="col-span-8">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="fileSizeLimit"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_>
-                            <FormLabel_Shadcn_ className="text-foreground-light hidden">
-                              size
-                            </FormLabel_Shadcn_>
-                            <FormControl_Shadcn_ className="col-span-8">
-                              <Input_Shadcn_
-                                type="number"
-                                {...field}
-                                className="w-full"
-                                disabled={isFreeTier || !canUpdateStorageSettings}
-                              />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                    </div>
-                    <div className="col-span-4">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="unit"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_>
-                            <FormLabel_Shadcn_ className="hidden">Unit</FormLabel_Shadcn_>
-                            <FormControl_Shadcn_ className="col-span-8">
+    <ScaffoldSection isFullWidth>
+      <Form_Shadcn_ {...form}>
+        {isLoading && <GenericSkeletonLoader />}
+        {isError && (
+          <AlertError error={error} subject="Failed to retrieve project's storage configuration" />
+        )}
+        {isSuccess && (
+          <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
+            <Card>
+              <CardContent className="pt-6">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="fileSizeLimit"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Upload file size limit"
+                      description={
+                        <>
+                          {storageUnit !== StorageSizeUnits.BYTES && (
+                            <>
+                              Equivalent to {convertToBytes(limit, storageUnit).toLocaleString()}{' '}
+                              bytes.{' '}
+                            </>
+                          )}
+                          Maximum upload file size is {formatBytes(maxBytes)}.
+                        </>
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <div className="flex items-center gap-2">
+                          <Input_Shadcn_
+                            type="number"
+                            {...field}
+                            className="w-full"
+                            disabled={isFreeTier || !canUpdateStorageSettings}
+                          />
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="unit"
+                            render={({ field: unitField }) => (
                               <Select_Shadcn_
-                                value={field.value}
-                                onValueChange={field.onChange}
+                                value={unitField.value}
+                                onValueChange={unitField.onChange}
                                 disabled={isFreeTier || !canUpdateStorageSettings}
                               >
                                 <SelectTrigger_Shadcn_ className="w-[180px]">
@@ -209,76 +219,80 @@ const StorageSettings = () => {
                                   ))}
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                    </div>
-                  </div>
-                  <p className="text-sm text-foreground-light">
-                    {storageUnit !== StorageSizeUnits.BYTES &&
-                      `Equivalent to ${convertToBytes(
-                        limit,
-                        storageUnit
-                      ).toLocaleString()} bytes. `}
-                    Maximum size in bytes of a file that can be uploaded is 50 GB (
-                    {formattedMaxSizeBytes}).
-                  </p>
-                </div>
-              </div>
+                            )}
+                          />
+                        </div>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
 
-              <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
-                <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
-                  <p className="text-sm">Enable Image Transformation</p>
-                </div>
-                <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
-                  <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="imageTransformationEnabled"
-                      render={({ field }) => (
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="imageTransformationEnabled"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Enable Image Transformation"
+                      description={
+                        <>
+                          Optimize and resize images on the fly.{' '}
+                          <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                            Learn more
+                          </InlineLink>
+                          .
+                        </>
+                      }
+                    >
+                      <FormControl_Shadcn_>
                         <Switch
                           size="large"
                           disabled={isFreeTier}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      )}
-                    />
-                  </div>
-                  <p className="text-sm text-foreground-light">
-                    Optimize and resize images on the fly.{' '}
-                    <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
-                      Learn more
-                    </InlineLink>
-                    .
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {isFreeTier && (
-              <div className="px-6 pb-6">
-                <UpgradeToPro
-                  icon={<Clock size={14} className="text-foreground-muted" />}
-                  primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                  secondaryText="Upgrade to the Pro Plan for a configurable upload file size limit of up to 50 GB."
-                  source="storageSizeLimit"
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
                 />
-              </div>
-            )}
-            <div className="border-t border-overlay" />
-            <div className="flex justify-between px-8 py-4">
-              <div className="flex items-center justify-between w-full gap-2">
-                {!canUpdateStorageSettings ? (
+              </CardContent>
+
+              {isFreeTier && (
+                <CardContent className="pt-0">
+                  <UpgradeToPro
+                    primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                    secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
+                      STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                    )} and unlock image transformations.`}
+                    source="storageSizeLimit"
+                  />
+                </CardContent>
+              )}
+              {isSpendCapOn && (
+                <CardContent className="pt-0">
+                  <UpgradeToPro
+                    buttonText="Disable Spend Cap"
+                    primaryText="Reduced max upload file size limit due to Spend Cap"
+                    secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
+                      STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                    )}.`}
+                    source="storageSizeLimit"
+                  />
+                </CardContent>
+              )}
+
+              {!canUpdateStorageSettings && (
+                <CardContent className="pt-0">
                   <p className="text-sm text-foreground-light">
                     You need additional permissions to update storage settings
                   </p>
-                ) : (
-                  <div />
-                )}
-                <div className="flex gap-2">
+                </CardContent>
+              )}
+
+              <CardFooter className="justify-end space-x-2">
+                {form.formState.isDirty && (
                   <Button
                     type="default"
                     htmlType="reset"
@@ -287,21 +301,21 @@ const StorageSettings = () => {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isUpdating}
-                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
-                  >
-                    Save
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      )}
-    </Form_Shadcn_>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isUpdating}
+                  disabled={!canUpdateStorageSettings || isUpdating || !form.formState.isDirty}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        )}
+      </Form_Shadcn_>
+    </ScaffoldSection>
   )
 }
 

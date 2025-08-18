@@ -31,7 +31,7 @@ functions:
         name: Initialize Client with custom options
         code: |
           ```swift
-          let client = SupabaseClient(
+          let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "publishable-or-anon-key",
             options: SupabaseClientOptions(

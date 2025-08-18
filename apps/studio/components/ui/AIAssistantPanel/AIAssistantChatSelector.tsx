@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Edit, MessageSquare, Plus, Trash, X } from 'lucide-react'
+import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -18,17 +18,12 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { ButtonTooltip } from '../ButtonTooltip'
 
 interface AIAssistantChatSelectorProps {
-  className?: string
   disabled?: boolean
 }
 
-export const AIAssistantChatSelector = ({
-  className,
-  disabled = false,
-}: AIAssistantChatSelectorProps) => {
+export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
   const currentChat = snap.activeChat?.name
 
@@ -211,7 +206,7 @@ export const AIAssistantChatSelector = ({
                 disabled={disabled}
               >
                 <Plus size={14} strokeWidth={1.5} />
-                <span>New chat</span>
+                <span>Start a new chat</span>
               </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>

@@ -25,8 +25,8 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
-import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -44,8 +44,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
@@ -54,7 +54,7 @@ const MergePage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
 
-  const parentProject = useProjectByRef(parentProjectRef)
+  const { data: parentProject } = useProjectByRefQuery(parentProjectRef)
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },

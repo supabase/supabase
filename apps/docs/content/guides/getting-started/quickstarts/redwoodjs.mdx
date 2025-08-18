@@ -27,11 +27,11 @@ hideToc: true
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Gather Database Connection Strings">
 
-    Go to the [database settings page](https://supabase.com/dashboard/project/_/settings/database). In this quickstart, we are going to connect via the connection pooler. If your network supports IPv6, you can connect to the database directly without using the connection pooler.
+    Go to the [Database Settings page](https://supabase.com/dashboard/project/_/database/settings). In this quickstart, we are going to connect via the connection pooler. If your network supports IPv6, you can connect to the database directly without using the connection pooler.
 
     We will use the pooler both in `Transaction` and `Session` mode. `Transaction` mode is used for application queries and `Session` mode is used for running migrations with Prisma.
 
-    To do this, set the connection mode to `Transaction` in the [database settings page](https://supabase.com/dashboard/project/_/settings/database) and copy the connection string and append `?pgbouncer=true&&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
+    To do this, set the connection mode to `Transaction` in the [Database Settings page](https://supabase.com/dashboard/project/_/database/settings) and copy the connection string and append `?pgbouncer=true&&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
 
     To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
 

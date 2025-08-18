@@ -37,7 +37,6 @@ hideToc: true
 
     ```bash name=Terminal
     npm create vite@latest my-app -- --template react
-
     ```
 
   </StepHikeCompact.Code>
@@ -65,14 +64,14 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Set up your login component">
 
-    In `App.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    In `App.jsx`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
 
     You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
-      ```js name=src/App.js
+      ```jsx name=src/App.jsx
         import './index.css'
         import { useState, useEffect } from 'react'
         import { createClient } from '@supabase/supabase-js'
@@ -121,7 +120,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash name=Terminal
-      npm start
+      npm run dev
       ```
 
     </StepHikeCompact.Code>

@@ -91,7 +91,18 @@ In this example we'll set up a database table, secure it with Row Level Security
 
       Go to your project's [Publications settings](https://supabase.com/dashboard/project/_/database/publications), and under `supabase_realtime`, toggle on the tables you want to listen to.
 
+      Alternatively, add tables to the `supabase_realtime` publication by running the given SQL:
+
     </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      alter publication supabase_realtime
+      add table your_table_name;
+      ```
+
+    </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 

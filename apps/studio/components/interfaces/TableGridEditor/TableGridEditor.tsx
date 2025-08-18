@@ -14,7 +14,7 @@ import {
 } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -71,6 +71,8 @@ export const TableGridEditor = ({
       tabs.handleTabClose({ id: tabId, router, editor: 'table', onClearDashboardHistory })
     }
   }, [onClearDashboardHistory, router, selectedTable, tabs])
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
@@ -138,8 +140,8 @@ export const TableGridEditor = ({
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
-  const canEditViaTableEditor = isTableSelected && !isLocked
+
+  const canEditViaTableEditor = isTableSelected && !isSchemaLocked
   const editable = !isReadOnly && canEditViaTableEditor
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`

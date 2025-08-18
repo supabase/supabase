@@ -1,6 +1,6 @@
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -26,13 +26,19 @@ export default defineConfig({
     environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
     setupFiles: [
       resolve(dirname, './tests/vitestSetup.ts'),
-      resolve(dirname, './tests/setup/polyfills.js'),
+      resolve(dirname, './tests/setup/polyfills.ts'),
       resolve(dirname, './tests/setup/radix.js'),
     ],
+    // Don't look for tests in the nextjs output directory
+    exclude: [...configDefaults.exclude, `.next/*`],
     reporters: [['default']],
     coverage: {
       reporter: ['lcov'],
-      exclude: ['**/*.test.ts', '**/*.test.tsx'],
+      exclude: [
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/base64url.ts', // [Jordi] Tests for this file exist in https://github.com/supabase-community/base64url-js/blob/main/src/base64url.test.ts so we can ignore.
+      ],
       include: ['lib/**/*.ts'],
     },
   },

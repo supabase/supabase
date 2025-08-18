@@ -35,7 +35,7 @@ functions:
           ```swift
           import Supabase
 
-          let client = SupabaseClient(
+          let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "publishable-or-anon-key",
             options: SupabaseClientOptions(
@@ -65,7 +65,7 @@ functions:
             }
           }
 
-          let client = SupabaseClient(
+          let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "publishable-or-anon-key",
             options: SupabaseClientOptions(

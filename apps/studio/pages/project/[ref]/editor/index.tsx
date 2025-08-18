@@ -6,7 +6,7 @@ import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEdit
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
-import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
+import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useAppStateSnapshot } from 'state/app-state'
 import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
@@ -47,7 +47,11 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<TableEditorMenu />} product="Table Editor">
+    <EditorBaseLayout
+      productMenu={<TableEditorMenu />}
+      product="Table Editor"
+      productMenuClassName="overflow-y-hidden"
+    >
       <TableEditorLayout>{page}</TableEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>

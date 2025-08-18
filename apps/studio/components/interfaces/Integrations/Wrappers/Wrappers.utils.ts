@@ -12,7 +12,7 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   )
   const requiredArrayOptions = Array.from(requiredArrayOptionsSet)
 
-  return (values: any) => {
+  return (values: Record<string, any>) => {
     const errors = Object.fromEntries(
       Object.entries(values)
         .flatMap(([key, value]) =>

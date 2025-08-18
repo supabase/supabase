@@ -26,7 +26,9 @@ Chris Caruso
 Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
 Chris Stockton
+Chris Ward
 Craig Cannon
 Danny White
 Darren Cunningham
@@ -36,13 +38,16 @@ Deepthi Sigireddi
 Deji I
 Div Arora
 Divit D
+Douglas Hunley
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Emmett Folger
 Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
 Francesco Sansalvadore
+Greg Kress
 Greg P
 Greg Richardson
 Guilherme Souza
@@ -81,7 +86,9 @@ Luca Forstner
 Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
+Matt Rossman
 Monica Khoury
+Mykhailo Mischa Lieibenson
 Nyannyacha
 Oli R
 Pamela Chia
@@ -92,6 +99,7 @@ Pavel Borisov
 Paweł Gulbinowicz
 Peter Lyn
 Qiao Han
+Rafael Chacón
 Raminder Singh
 Riccardo Busetti
 Rodrigo Mansueli
@@ -105,6 +113,7 @@ Stanislav M
 Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taryn King
 Terry Sutton
