@@ -14,7 +14,7 @@ export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
 }
 
-const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
+export const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [visible, setVisible] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
@@ -71,5 +71,3 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
     </>
   )
 }
-
-export default NewAccessTokenButton

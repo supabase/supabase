@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { render } from 'tests/helpers'
 import { addAPIMock } from 'tests/lib/msw'
-import NewAccessTokenButton from './NewAccessTokenButton'
+import { NewAccessTokenButton } from './NewAccessTokenButton'
 
 describe(`NewAccessTokenButton`, () => {
   beforeEach(() => {

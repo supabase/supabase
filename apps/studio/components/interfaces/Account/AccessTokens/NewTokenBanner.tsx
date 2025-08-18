@@ -1,13 +1,13 @@
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { toast } from 'sonner'
 import { Input } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { toast } from 'sonner'
 
 interface NewTokenBannerProps {
   token: NewAccessToken
 }
 
-const NewTokenBanner = ({ token }: NewTokenBannerProps) => {
+export const NewTokenBanner = ({ token }: NewTokenBannerProps) => {
   return (
     <Admonition
       type="default"
@@ -35,5 +35,3 @@ const NewTokenBanner = ({ token }: NewTokenBannerProps) => {
     />
   )
 }
-
-export default NewTokenBanner

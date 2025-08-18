@@ -1,27 +1,24 @@
 import { ExternalLink, Search } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
-import {
-  AccessTokenList,
-  NewAccessTokenButton,
-  NewTokenBanner,
-} from 'components/interfaces/Account/AccessTokens'
+import { AccessTokenList } from 'components/interfaces/Account/AccessTokens/AccessTokenList'
+import { NewAccessTokenButton } from 'components/interfaces/Account/AccessTokens/NewAccessTokenButton'
+import { NewTokenBanner } from 'components/interfaces/Account/AccessTokens/NewTokenBanner'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
-import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
   ScaffoldHeader,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
+import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -53,25 +50,24 @@ const UserAccessTokens: NextPageWithLayout = () => {
               placeholder="Filter tokens"
             />
             <div className="flex items-center gap-x-2">
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                <Link
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <a
                   href="https://supabase.com/docs/reference/api/introduction"
                   target="_blank"
                   rel="noreferrer"
                 >
                   API Docs
-                </Link>
+                </a>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                <Link
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <a
                   href="https://supabase.com/docs/reference/cli/start"
                   target="_blank"
                   rel="noreferrer"
                 >
                   CLI docs
-                </Link>
+                </a>
               </Button>
-
               <NewAccessTokenButton onCreateToken={setNewToken} />
             </div>
           </div>

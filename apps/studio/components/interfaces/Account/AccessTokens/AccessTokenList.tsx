@@ -36,7 +36,7 @@ export interface AccessTokenListProps {
   searchString?: string
 }
 
-const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
+export const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
   const { data: tokens, isLoading, error } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
@@ -236,5 +236,3 @@ const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
     </>
   )
 }
-
-export default AccessTokenList
