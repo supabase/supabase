@@ -3,7 +3,8 @@
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Dispatch, SetStateAction } from 'react'
+import { useEffect } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 
 import { Accordion, Button, TextLink } from 'ui'
 import { DEFAULT_EASE } from '~/lib/animations'
@@ -13,7 +14,6 @@ import { useIsLoggedIn, useIsUserLoading } from 'common'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { ChevronRight } from 'lucide-react'
-import { useKey } from 'react-use'
 import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 import ProductModulesData from '~/data/ProductModules'
 
@@ -43,7 +43,15 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     exit: { opacity: 0, transition: { duration: 0.05 } },
   }
 
-  useKey('Escape', () => setOpen(false))
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [setOpen])
 
   const AccordionMenuItem = ({ menuItem }: any) => (
     <>

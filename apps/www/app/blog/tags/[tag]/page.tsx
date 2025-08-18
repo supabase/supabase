@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { getSortedPosts, getAllTags } from '~/lib/posts'
-import { getAllCMSPosts } from '~/lib/get-cms-posts'
+import { getSortedPosts, getAllTags } from 'lib/posts'
+import { getAllCMSPosts } from 'lib/get-cms-posts'
 import Link from 'next/link'
-import { startCase } from 'lodash'
-import DefaultLayout from '~/components/Layouts/Default'
-import BlogGridItem from '~/components/Blog/BlogGridItem'
-import type PostTypes from '~/types/post'
+import DefaultLayout from 'components/Layouts/Default'
+import BlogGridItem from 'components/Blog/BlogGridItem'
+import { capitalize } from 'lib/helpers'
+import type PostTypes from 'types/post'
 
 type Params = { tag: string }
 
@@ -28,7 +28,7 @@ export default async function TagPage({ params }: { params: Params }) {
   const staticPosts = getSortedPosts({ directory: '_blog', limit: 0, tags: [params.tag] })
   const cmsPosts = await getAllCMSPosts({ tags: [params.tag] })
   const blogs = [...(staticPosts as any[]), ...(cmsPosts as any[])] as unknown as PostTypes[]
-  const capitalizedTag = startCase(params.tag.replaceAll('-', ' '))
+  const capitalizedTag = capitalize(params.tag.replaceAll('-', ' '))
 
   return (
     <>

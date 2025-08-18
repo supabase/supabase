@@ -1,6 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import { KeyboardEvent, ReactNode, useRef } from 'react'
-import { useKey } from 'react-use'
+import { ReactNode, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import { useCommandMenuOpen } from 'ui-patterns'
 
@@ -75,10 +74,15 @@ export const ActionButton = ({
   }
 
   const isCommandMenuOpen = useCommandMenuOpen()
-  useKey(icon.toLowerCase(), () => !isCommandMenuOpen && onClick?.(), { event: 'keydown' }, [
-    isCommandMenuOpen,
-    onClick,
-  ])
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key && e.key.toLowerCase() === icon.toLowerCase() && !isCommandMenuOpen) {
+        onClick?.()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [icon, isCommandMenuOpen, onClick])
 
   return (
     <div

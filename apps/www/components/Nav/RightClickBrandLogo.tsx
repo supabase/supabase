@@ -4,8 +4,8 @@ import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/compat/router'
-import { Fragment, MouseEvent, ReactNode, useRef, useState } from 'react'
-import { useClickAway, useKey } from 'react-use'
+import { Fragment, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { useClickAway } from 'react-use'
 import {
   cn,
   copyToClipboard,
@@ -38,7 +38,15 @@ const RightClickBrandLogo = () => {
   /**
    * Close dropdown by using the Escape key
    */
-  useKey('Escape', () => setOpen(false))
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [setOpen])
 
   /**
    * Open dropdown by right clicking on the Supabase logo
