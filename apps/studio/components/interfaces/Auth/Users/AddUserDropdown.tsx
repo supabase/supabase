@@ -3,6 +3,7 @@ import { ChevronDown, Mail, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
   DropdownMenu,
@@ -17,6 +18,8 @@ import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
 const AddUserDropdown = () => {
+  const showCreateUser = useIsFeatureEnabled('authentication:show_create_user')
+
   const { can: canInviteUsers } = useAsyncCheckProjectPermissions(
     PermissionAction.AUTH_EXECUTE,
     'invite_user'
@@ -58,25 +61,27 @@ const AddUserDropdown = () => {
             )}
           </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuItem
-                className="space-x-2 !pointer-events-auto"
-                disabled={!canCreateUsers}
-                onClick={() => {
-                  if (canCreateUsers) setCreateVisible(true)
-                }}
-              >
-                <UserPlus size={14} />
-                <p>Create new user</p>
-              </DropdownMenuItem>
-            </TooltipTrigger>
-            {!canCreateUsers && (
-              <TooltipContent side="left">
-                You need additional permissions to create users
-              </TooltipContent>
-            )}
-          </Tooltip>
+          {showCreateUser && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuItem
+                  className="space-x-2 !pointer-events-auto"
+                  disabled={!canCreateUsers}
+                  onClick={() => {
+                    if (canCreateUsers) setCreateVisible(true)
+                  }}
+                >
+                  <UserPlus size={14} />
+                  <p>Create new user</p>
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              {!canCreateUsers && (
+                <TooltipContent side="left">
+                  You need additional permissions to create users
+                </TooltipContent>
+              )}
+            </Tooltip>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
