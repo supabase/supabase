@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
@@ -34,7 +33,7 @@ export interface NewAccessTokenDialogProps {
   onCreateToken: (token: any) => void
 }
 
-const NewAccessTokenDialog = ({
+export const NewAccessTokenDialog = ({
   open,
   onOpenChange,
   tokenScope,
@@ -155,5 +154,3 @@ const NewAccessTokenDialog = ({
     </Dialog>
   )
 }
-
-export default NewAccessTokenDialog

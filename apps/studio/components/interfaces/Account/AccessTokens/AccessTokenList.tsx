@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { MoreVertical, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
 import AlertError from 'components/ui/AlertError'
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
@@ -29,7 +28,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import { ViewTokenPermissionsPanel } from './ViewTokenPermissionsPanel'
 
 const RowLoading = () => (
   <TableRow>
@@ -79,7 +77,6 @@ export interface AccessTokenListProps {
 
 export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenListProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
   const { data: tokens, error, isLoading, isError } = useAccessTokensQuery()
@@ -175,16 +172,6 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-end gap-x-2">
-                  {/* <Button
-                      type="default"
-                      title="View access"
-                      onClick={() => {
-                        setIsPanelOpen(true)
-                        setToken(x)
-                      }}
-                    >
-                      View access
-                    </Button> */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -215,17 +202,6 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
           )
         })}
       </TableContainer>
-
-      <ViewTokenPermissionsPanel
-        visible={isPanelOpen}
-        token={token}
-        onClose={() => {
-          setIsPanelOpen(false)
-        }}
-        onDeleteToken={() => {
-          if (token) onDeleteToken(token.id)
-        }}
-      />
 
       <ConfirmationModal
         visible={isOpen}

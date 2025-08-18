@@ -1,6 +1,5 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-
 import {
   Button,
   DropdownMenu,
@@ -8,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import NewAccessTokenDialog from './NewAccessTokenDialog'
+import { NewAccessTokenDialog } from './NewAccessTokenDialog'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
@@ -54,13 +53,6 @@ export const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProp
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
-      {/* <NewAccessTokenSheet
-        visible={visible}
-        onOpenChange={setVisible}
-        tokenScope={tokenScope}
-        onCreateToken={onCreateToken}
-      /> */}
 
       <NewAccessTokenDialog
         open={visible}
