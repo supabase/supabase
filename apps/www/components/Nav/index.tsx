@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
@@ -25,6 +24,7 @@ import { useSendTelemetryEvent } from 'lib/telemetry'
 import useDropdownMenu from './useDropdownMenu'
 
 import { getMenu } from 'data/nav'
+import { usePathname } from 'next/navigation'
 
 interface Props {
   hideNavbar: boolean
@@ -32,7 +32,7 @@ interface Props {
 }
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
-  const router = useRouter()
+  const pathname = usePathname()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
@@ -41,9 +41,9 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const user = useUser()
   const userMenu = useDropdownMenu(user)
 
-  const isLaunchWeekPage = router.pathname.includes('/launch-week')
-  const isLaunchWeekXPage = router.pathname === '/launch-week/x'
-  const isGAWeekSection = router.pathname.startsWith('/ga-week')
+  const isLaunchWeekPage = pathname?.includes('/launch-week')
+  const isLaunchWeekXPage = pathname === '/launch-week/x'
+  const isGAWeekSection = pathname?.startsWith('/ga-week')
   const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
   const showLaunchWeekNavMode = !isLaunchWeekXPage && (isLaunchWeekPage || isGAWeekSection) && !open
 

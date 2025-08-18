@@ -1,6 +1,6 @@
 import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
-const toc = require('markdown-toc')
+import { generateTocFromMarkdown } from './toc'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
@@ -280,7 +280,7 @@ export async function getCMSCustomerBySlug(slug: string, preview = false) {
 }
 
 // Helper function to process customer data
-function processCustomerData(customer: any) {
+async function processCustomerData(customer: any) {
   const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
   const formattedDate = new Date(customer.date || new Date()).toLocaleDateString('en-IN', options)
   const markdownContent = convertRichTextToMarkdown(customer.content)
@@ -292,9 +292,10 @@ function processCustomerData(customer: any) {
   const logoUrl = customer.logo?.url ? `${PAYLOAD_URL}${customer.logo.url}` : null
 
   // Generate TOC from content for CMS customers
-  const tocResult = toc(markdownContent, {
-    maxdepth: customer.toc_depth ? customer.toc_depth : 2,
-  })
+  const tocResult = await generateTocFromMarkdown(
+    markdownContent,
+    customer.toc_depth ? customer.toc_depth : 2
+  )
 
   return {
     slug: customer.slug,

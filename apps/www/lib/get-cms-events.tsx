@@ -1,6 +1,6 @@
 import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
-const toc = require('markdown-toc')
+import { generateTocFromMarkdown } from './toc'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
@@ -274,7 +274,7 @@ export async function getCMSEventBySlug(slug: string, preview = false) {
 }
 
 // Helper function to process event data
-function processEventData(event: any) {
+async function processEventData(event: any) {
   const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
   const formattedDate = new Date(event.date || new Date()).toLocaleDateString('en-IN', options)
   const markdownContent = convertRichTextToMarkdown(event.content)
@@ -285,9 +285,10 @@ function processEventData(event: any) {
   const imageUrl = event.image?.url ? `${PAYLOAD_URL}${event.image.url}` : null
 
   // Generate TOC from content for CMS events
-  const tocResult = toc(markdownContent, {
-    maxdepth: event.toc_depth ? event.toc_depth : 2,
-  })
+  const tocResult = await generateTocFromMarkdown(
+    markdownContent,
+    event.toc_depth ? event.toc_depth : 2
+  )
 
   return {
     slug: event.slug,

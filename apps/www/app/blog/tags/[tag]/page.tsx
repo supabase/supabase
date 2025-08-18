@@ -1,43 +1,30 @@
 import { NextSeo } from 'next-seo'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import { getSortedPosts, getAllTags } from '~/lib/posts'
 import Link from 'next/link'
 import { startCase } from 'lodash'
-
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogGridItem from '~/components/Blog/BlogGridItem'
 import type PostTypes from '~/types/post'
 
-export async function getStaticProps({ params }: any) {
-  const posts = getSortedPosts({ directory: '_blog', limit: 0, categories: [params.category] })
-  return {
-    props: {
-      category: params.category,
-      blogs: posts,
-    },
-  }
+type Params = { tag: string }
+
+export async function generateStaticParams() {
+  const tags = getAllTags('_blog')
+  return tags.map((tag: string) => ({ tag }))
 }
 
-export async function getStaticPaths() {
-  const categories = getAllCategories('_blog')
-  return {
-    paths: categories.map((category: any) => ({ params: { category: category } })),
-    fallback: false,
-  }
-}
-
-interface Props {
-  category: string
-  blogs: PostTypes[]
-}
-
-function CategoriesIndex(props: Props) {
-  const { blogs, category } = props
-  const capitalizedCategory = startCase(category.replaceAll('-', ' '))
+export default async function TagPage({ params }: { params: Params }) {
+  const blogs = getSortedPosts({
+    directory: '_blog',
+    limit: 0,
+    tags: [params.tag],
+  }) as unknown as PostTypes[]
+  const capitalizedTag = startCase(params.tag.replaceAll('-', ' '))
 
   return (
     <>
       <NextSeo
-        title={`Blog | ${capitalizedCategory}`}
+        title={`Blog | ${capitalizedTag}`}
         description="Latest news from the Supabase team."
       />
       <DefaultLayout>
@@ -46,14 +33,14 @@ function CategoriesIndex(props: Props) {
             <h1 className="cursor-pointer">
               <Link href="/blog">Blog</Link>
               <span className="px-2">/</span>
-              <span>{`${capitalizedCategory}`}</span>
+              <span>{capitalizedTag}</span>
             </h1>
           </div>
           <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
-            {blogs.map((blog: PostTypes, idx: number) => (
+            {blogs.map((blog: PostTypes) => (
               <div
                 className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                key={idx}
+                key={blog.slug}
               >
                 <BlogGridItem post={blog} />
               </div>
@@ -64,5 +51,3 @@ function CategoriesIndex(props: Props) {
     </>
   )
 }
-
-export default CategoriesIndex

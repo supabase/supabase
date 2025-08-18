@@ -1,6 +1,6 @@
 import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
-const toc = require('markdown-toc')
+import { generateTocFromMarkdown } from './toc'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
@@ -287,7 +287,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     // console.log(`[getCMSPostBySlug] About to call processPostData...`)
 
     try {
-      const processedPost = processPostData(post)
+      const processedPost = await processPostData(post)
       // console.log(`[getCMSPostBySlug] Successfully processed post:`, {
       //   slug: processedPost.slug,
       //   title: processedPost.title,
@@ -305,7 +305,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
 }
 
 // Helper function to process post data
-function processPostData(post: any) {
+async function processPostData(post: any) {
   // console.log(`[processPostData] Starting to process post:`, {
   //   id: post.id,
   //   title: post.title,
@@ -324,9 +324,10 @@ function processPostData(post: any) {
     const readingTime = post.readingTime || generateReadingTime(markdownContent)
 
     // Generate TOC from content for CMS blog posts
-    const tocResult = toc(markdownContent, {
-      maxdepth: post.toc_depth ? post.toc_depth : 2,
-    })
+    const tocResult = await generateTocFromMarkdown(
+      markdownContent,
+      post.toc_depth ? post.toc_depth : 2
+    )
 
     // Extract thumb and image URLs from the nested structure
     const thumbUrl = post.thumb?.url ? `${PAYLOAD_URL}${post.thumb.url}` : null
@@ -364,7 +365,7 @@ function processPostData(post: any) {
       richContent: post.content,
       tags: post.tags || [],
       toc: {
-        content: tocResult.content.replace(/%23/g, ''),
+        content: tocResult.content,
         json: tocResult.json,
       },
     }

@@ -9,7 +9,7 @@ import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 // for instance, if you use a button, you must add `Button` in the components object below.
 
 // table of contents extractor
-const toc = require('markdown-toc')
+const toc = require('markdown-toc-unlazy')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_alternatives')

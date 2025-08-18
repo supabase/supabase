@@ -14,7 +14,7 @@ import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
 // table of contents extractor
-const toc = require('markdown-toc')
+const toc = require('markdown-toc-unlazy')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_customers')

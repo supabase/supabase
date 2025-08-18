@@ -1,7 +1,7 @@
 import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { Fragment, MouseEvent, ReactNode, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import {
@@ -84,7 +84,7 @@ const RightClickBrandLogo = () => {
           href="/"
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
-          onKeyDown={(e) => e.key === 'Enter' && router.push('/')}
+          onKeyDown={(e) => e.key === 'Enter' && router?.push('/')}
           className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
         >
           <Image
