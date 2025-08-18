@@ -37,6 +37,15 @@ beforeAll(() => {
 
   vi.mock('next/compat/router', () => require('next-router-mock'))
 
+  // Mock the useParams hook from common module globally
+  vi.mock('common', async (importOriginal) => {
+    const actual = await importOriginal()
+    return {
+      ...(typeof actual === 'object' ? actual : {}),
+      useParams: () => ({ ref: 'default' }),
+    }
+  })
+
   routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
 })
 
