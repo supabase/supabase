@@ -17,13 +17,13 @@ export default function BlogClient(props: { blogs: any[] }) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
   const [cmsPosts, setCmsPosts] = useState<any[]>([])
-  const [blogs, setBlogs] = useState(props.blogs.slice(0, 4))
+  const [blogs, setBlogs] = useState(props.blogs)
   const [view, setView] = useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
 
-  const allPosts = [...props.blogs, ...cmsPosts]
-    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 4)
+  const allPosts = [...props.blogs, ...cmsPosts].sort(
+    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
 
   useEffect(() => {
     setBlogs((prev: any[]) => (prev.length === props.blogs.length ? allPosts : prev))

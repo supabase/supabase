@@ -21,17 +21,15 @@ export default async function BlogPage() {
   // Get static blog posts at build time
   const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
 
-  const allPostsData = [...staticPostsData]
-    .sort((a: any, b: any) => {
-      const dateA = (a as any).date
-        ? new Date((a as any).date).getTime()
-        : new Date((a as any).formattedDate).getTime()
-      const dateB = (b as any).date
-        ? new Date((b as any).date).getTime()
-        : new Date((b as any).formattedDate).getTime()
-      return dateB - dateA
-    })
-    .slice(0, 10)
+  const allPostsData = [...staticPostsData].sort((a: any, b: any) => {
+    const dateA = (a as any).date
+      ? new Date((a as any).date).getTime()
+      : new Date((a as any).formattedDate).getTime()
+    const dateB = (b as any).date
+      ? new Date((b as any).date).getTime()
+      : new Date((b as any).formattedDate).getTime()
+    return dateB - dateA
+  })
 
   // Generate RSS feed from static posts
   const rss = generateRss(allPostsData)

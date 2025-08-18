@@ -226,32 +226,32 @@ function Events({ events: staticEvents, onDemandEvents, categories: staticCatego
 }
 
 export async function getStaticProps() {
-  const { data: meetups, error } = await supabase
-    .from('meetups')
-    .select('id, city, country, link, start_at, timezone, launch_week')
-    .eq('is_published', true)
+  // const { data: meetups, error } = await supabase
+  //   .from('meetups')
+  //   .select('id, city, country, link, start_at, timezone, launch_week')
+  //   .eq('is_published', true)
 
-  if (error) console.log('meetups error: ', error)
+  // if (error) console.log('meetups error: ', error)
 
-  const meetupEvents: BlogPost[] =
-    meetups?.map((meetup: any) => ({
-      slug: '',
-      type: 'event',
-      title: `Launch Week ${meetup.launch_week.slice(2)} Meetup: ${meetup.city}, ${meetup.country}`,
-      date: meetup.start_at,
-      description: '',
-      thumb: '',
-      path: '',
-      url: meetup.link ?? '',
-      tags: ['meetup', 'launch-week'],
-      categories: ['meetup'],
-      timezone: meetup.timezone ?? 'America/Los_Angeles',
-      disable_page_build: true,
-      link: {
-        href: meetup.link ?? '#',
-        target: '_blank',
-      },
-    })) ?? []
+  // const meetupEvents: BlogPost[] =
+  //   meetups?.map((meetup: any) => ({
+  //     slug: '',
+  //     type: 'event',
+  //     title: `Launch Week ${meetup.launch_week.slice(2)} Meetup: ${meetup.city}, ${meetup.country}`,
+  //     date: meetup.start_at,
+  //     description: '',
+  //     thumb: '',
+  //     path: '',
+  //     url: meetup.link ?? '',
+  //     tags: ['meetup', 'launch-week'],
+  //     categories: ['meetup'],
+  //     timezone: meetup.timezone ?? 'America/Los_Angeles',
+  //     disable_page_build: true,
+  //     link: {
+  //       href: meetup.link ?? '#',
+  //       target: '_blank',
+  //     },
+  //   })) ?? []
 
   const staticEvents = getSortedPosts({
     directory: '_events',
@@ -259,7 +259,8 @@ export async function getStaticProps() {
   }) as BlogPost[]
 
   // Get CMS blog posts
-  const allEvents = [...staticEvents, ...meetupEvents].sort((a: any, b: any) => {
+  // const allEvents = [...staticEvents, ...meetupEvents].sort((a: any, b: any) => {
+  const allEvents = [...staticEvents].sort((a: any, b: any) => {
     const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
     const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
     return dateB - dateA
