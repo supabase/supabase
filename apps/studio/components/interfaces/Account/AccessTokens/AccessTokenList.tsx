@@ -34,12 +34,14 @@ import { ViewTokenPermissionsPanel } from './ViewTokenPermissionsPanel'
 
 export interface AccessTokenListProps {
   searchString?: string
+  onDeleteSuccess: (id: number) => void
 }
 
-export const AccessTokenList = ({ searchString = '' }: AccessTokenListProps) => {
+export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenListProps) => {
   const { data: tokens, isLoading, error } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
+      onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsOpen(false)
     },

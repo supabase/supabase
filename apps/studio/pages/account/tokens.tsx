@@ -71,7 +71,12 @@ const UserAccessTokens: NextPageWithLayout = () => {
               <NewAccessTokenButton onCreateToken={setNewToken} />
             </div>
           </div>
-          <AccessTokenList searchString={searchString} />
+          <AccessTokenList
+            searchString={searchString}
+            onDeleteSuccess={(id) => {
+              if (id === newToken?.id) setNewToken(undefined)
+            }}
+          />
         </div>
       </ScaffoldContainer>
     </>
