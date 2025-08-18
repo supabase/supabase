@@ -14,7 +14,7 @@ export async function generateStaticParams() {
   return tags.map((tag: string) => ({ tag }))
 }
 
-export const revalidate = 600
+export const dynamic = 'force-static'
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const capitalizedTag = startCase(params.tag.replaceAll('-', ' '))

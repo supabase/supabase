@@ -1,9 +1,7 @@
-import fs from 'fs'
-import type { Metadata } from 'next'
-import { generateRss } from 'lib/rss'
+import BlogClient from './BlogClient'
 import { getSortedPosts } from 'lib/posts'
 import { getAllCMSPosts } from 'lib/get-cms-posts'
-import BlogClient from './BlogClient'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
 
@@ -33,25 +31,7 @@ export default async function BlogPage() {
     return dateB - dateA
   })
 
-  // Generate RSS feed from static posts
-  const rss = generateRss(allPostsData)
-  try {
-    fs.writeFileSync('./public/rss.xml', rss)
-  } catch {}
-
-  // Generate PlanetPG author feeds
-  try {
-    const planetPgPosts = allPostsData.filter((post: any) => post.tags?.includes('planetpg'))
-    const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
-    const uniquePlanetPgAuthors = new Set(([] as string[]).concat(...(planetPgAuthors as any)))
-    uniquePlanetPgAuthors.forEach((author) => {
-      const authorPosts = planetPgPosts.filter((post: any) => post.author.includes(author))
-      if (authorPosts.length > 0) {
-        const authorRss = generateRss(authorPosts, author as string)
-        fs.writeFileSync(`./public/planetpg-${author}-rss.xml`, authorRss)
-      }
-    })
-  } catch {}
+  // RSS writing moved out of runtime to avoid tracing the entire public directory into serverless bundles
 
   return <BlogClient blogs={allPostsData as any} />
 }

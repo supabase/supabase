@@ -1,10 +1,9 @@
-import { draftMode } from 'next/headers'
+import BlogPostClient from './BlogPostClient'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
+import { draftMode } from 'next/headers'
 
 import type { Blog, BlogData, PostReturnType } from 'types/post'
-
-import BlogPostClient from './BlogPostClient'
 
 type MatterReturn = {
   data: BlogData
