@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
@@ -22,6 +22,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+const formId = 'new-access-token-form'
 const TokenSchema = z.object({
   tokenName: z.string().min(1, 'Please enter a name for the token'),
 })
@@ -41,9 +42,7 @@ export const NewAccessTokenDialog = ({
 }: NewAccessTokenDialogProps) => {
   const form = useForm<z.infer<typeof TokenSchema>>({
     resolver: zodResolver(TokenSchema),
-    defaultValues: {
-      tokenName: '',
-    },
+    defaultValues: { tokenName: '' },
     mode: 'onChange',
   })
   const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
@@ -65,13 +64,9 @@ export const NewAccessTokenDialog = ({
   }
 
   const handleClose = () => {
-    form.reset({
-      tokenName: '',
-    })
+    form.reset({ tokenName: '' })
     onOpenChange(false)
   }
-
-  const formId = 'new-access-token-form'
 
   return (
     <Dialog
@@ -101,9 +96,9 @@ export const NewAccessTokenDialog = ({
                   </p>
                   <div className="mt-4">
                     <Button asChild type="default" icon={<ExternalLink />}>
-                      <Link href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
+                      <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                         Experimental API documentation
-                      </Link>
+                      </a>
                     </Button>
                   </div>
                 </>
