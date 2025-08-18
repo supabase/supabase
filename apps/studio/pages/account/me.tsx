@@ -5,7 +5,6 @@ import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/Ana
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
@@ -14,6 +13,8 @@ import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
@@ -24,9 +25,7 @@ User.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout title="Preferences">
-          <AccountSettingsLayout>{page}</AccountSettingsLayout>
-        </AccountLayout>
+        <AccountLayout title="Account Settings">{page}</AccountLayout>
       </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>
@@ -39,43 +38,54 @@ const ProfileCard = () => {
   const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article>
-      {isLoading && (
-        <Panel>
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        </Panel>
-      )}
-      {isError && (
-        <Panel>
-          <div className="p-4">
-            <AlertError error={error} subject="Failed to retrieve account information" />
-          </div>
-        </Panel>
-      )}
-      {isSuccess && (
-        <>
-          {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
-          <AccountIdentities />
-        </>
-      )}
+    <>
+      <ScaffoldContainer>
+        <FormHeader
+          title="Preferences"
+          description="Manage your account preferences, profile information, and personal settings."
+        />
+      </ScaffoldContainer>
+      
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+        <article>
+          {isLoading && (
+            <Panel>
+              <div className="p-4">
+                <GenericSkeletonLoader />
+              </div>
+            </Panel>
+          )}
+          {isError && (
+            <Panel>
+              <div className="p-4">
+                <AlertError error={error} subject="Failed to retrieve account information" />
+              </div>
+            </Panel>
+          )}
+          {isSuccess && (
+            <>
+              {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
+              <AccountIdentities />
+            </>
+          )}
 
-      <section>
-        <AccountConnections />
-      </section>
+          <section>
+            <AccountConnections />
+          </section>
 
-      <section>
-        <ThemeSettings />
-      </section>
+          <section>
+            <ThemeSettings />
+          </section>
 
-      <section>
-        <AnalyticsSettings />
-      </section>
+          <section>
+            <AnalyticsSettings />
+          </section>
 
-      <section>
-        <AccountDeletion />
-      </section>
-    </article>
+          <section>
+            <AccountDeletion />
+          </section>
+        </article>
+      </ScaffoldContainer>
+    </>
   )
 }

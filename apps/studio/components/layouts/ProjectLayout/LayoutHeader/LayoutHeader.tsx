@@ -21,6 +21,7 @@ import { useHotKey } from 'hooks/ui/useHotKey'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
+import { useRouter } from 'next/router'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
@@ -61,10 +62,13 @@ const LayoutHeader = ({
   showProductMenu,
 }: LayoutHeaderProps) => {
   const { ref: projectRef, slug } = useParams()
+  const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
+  
+  const isAccountPage = router.pathname.startsWith('/account')
 
   const [showEditorPanel, setShowEditorPanel] = useState(false)
   useHotKey(
@@ -95,7 +99,7 @@ const LayoutHeader = ({
   return (
     <>
       <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
-        {showProductMenu && (
+        {(showProductMenu || isAccountPage) && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <button
               title="Menu dropdown button"

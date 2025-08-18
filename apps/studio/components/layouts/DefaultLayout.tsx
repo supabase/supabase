@@ -45,8 +45,8 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">
-              {/* Sidebar */}
-              <Sidebar />
+              {/* Sidebar - Only show for project pages, not account pages */}
+              {!router.pathname.startsWith('/account') && <Sidebar />}
               {/* Main Content */}
               <div className="flex-grow h-full overflow-y-auto">{children}</div>
             </div>

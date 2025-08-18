@@ -16,6 +16,7 @@ import {
   ScaffoldContainerLegacy,
   ScaffoldTitle,
 } from '../Scaffold'
+import WithSidebar from './WithSidebar'
 
 export interface AccountLayoutProps {
   title: string
@@ -37,19 +38,6 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         ? `/org/${lastVisitedOrganization}`
         : '/organizations'
 
-  const accountLinks = [
-    {
-      label: 'Account Settings',
-      href: `/account/me`,
-      keys: [`/account/me`, `/account/tokens`, `/account/security`],
-    },
-    {
-      label: 'Audit Logs',
-      href: `/account/audit`,
-      key: `/account/audit`,
-    },
-  ]
-
   const currentPath = router.pathname
 
   useEffect(() => {
@@ -65,32 +53,51 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className={cn('flex flex-col h-screen w-screen')}>
-        <ScaffoldContainerLegacy>
-          <Link
-            href={backToDashboardURL}
-            className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
-          >
-            <ArrowLeft strokeWidth={1.5} size={14} />
-            Back to dashboard
-          </Link>
-          <ScaffoldTitle>Account settings</ScaffoldTitle>
-        </ScaffoldContainerLegacy>
-        <div className="border-b">
-          <NavMenu
-            className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
-            aria-label="Organization menu navigation"
-          >
-            {accountLinks.map((item, i) => (
-              <NavMenuItem
-                key={`${item.key}-${i}`}
-                active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
-              >
-                <Link href={item.href}>{item.label}</Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </div>
-        {children}
+        <WithSidebar
+          title="Account Settings"
+          breadcrumbs={[]}
+          backToDashboardURL={backToDashboardURL}
+          sections={[
+            {
+              key: 'account-settings',
+              heading: 'Settings',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+                {
+                  key: 'access-tokens',
+                  label: 'Access Tokens',
+                  href: '/account/tokens',
+                  isActive: currentPath === '/account/tokens',
+                },
+                {
+                  key: 'security',
+                  label: 'Security',
+                  href: '/account/security',
+                  isActive: currentPath === '/account/security',
+                },
+              ],
+            },
+            {
+              key: 'logs',
+              heading: 'Logs',
+              links: [
+                {
+                  key: 'audit-logs',
+                  label: 'Audit Logs',
+                  href: '/account/audit',
+                  isActive: currentPath === '/account/audit',
+                },
+              ],
+            },
+          ]}
+        >
+          {children}
+        </WithSidebar>
       </div>
     </>
   )
