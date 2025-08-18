@@ -25,7 +25,7 @@
 
     "billing:all": {
       "type": "boolean",
-      "description": "Enable billing"
+      "description": "Enable the billing settings page"
     },
 
     "integrations:vercel": {

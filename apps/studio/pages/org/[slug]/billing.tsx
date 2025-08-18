@@ -5,8 +5,8 @@ import { BillingSettings } from 'components/interfaces/Organization/BillingSetti
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import Error404 from 'pages/404'
 import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
@@ -14,7 +14,7 @@ import {
 import type { NextPageWithLayout } from 'types'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
-  const { panel } = useParams()
+  const { panel, slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
 
   const showBilling = useIsFeatureEnabled('billing:all')
@@ -29,7 +29,7 @@ const OrgBillingSettings: NextPageWithLayout = () => {
   }, [panel])
 
   if (!showBilling) {
-    return <Error404 />
+    return <UnknownInterface urlBack={`/org/${slug}`} />
   }
 
   return <BillingSettings />

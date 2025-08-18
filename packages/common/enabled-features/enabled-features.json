@@ -6,7 +6,7 @@
   "ai:opt_in_level_schema_and_log": true,
   "ai:opt_in_level_schema_and_log_and_data": true,
 
-  "billing:all": true,
+  "billing:all": false,
 
   "integrations:vercel": true,
 
