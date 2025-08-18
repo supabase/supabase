@@ -157,7 +157,7 @@ function StateOfStartupsPage() {
                       href={`#chapter-${chapterIndex + 1}`}
                       onClick={() => setIsTocOpen(false)}
                       className={cn(
-                        'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-widest text-center text-foreground-light hover:text-brand-link hover:bg-brand-300/25',
+                        'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-wider text-center text-foreground-light hover:text-brand-link hover:bg-brand-300/25',
                         chapterIndex + 1 === activeChapter &&
                           'bg-brand-300/40 text-brand-link dark:text-brand'
                       )}
@@ -306,9 +306,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
       ref={ref}
     >
       <div className="flex flex-col items-center gap-4 max-w-prose">
-        <h2 className="text-foreground-light text-5xl text-balance">
-          The majority of builders <span className="text-foreground">choose Supabase</span>
-        </h2>
+        <h2 className="text-foreground text-5xl text-balance">Builders choose Supabase</h2>
         <p className="text-foreground-light text-lg">
           Supabase is the Postgres development platform. Build your startup with a Postgres
           database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage,
