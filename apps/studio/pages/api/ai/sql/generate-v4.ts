@@ -3,6 +3,7 @@ import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'a
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
+import { initLogger, traced } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -53,6 +54,12 @@ const requestBodySchema = z.object({
   table: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
+})
+
+const logger = initLogger({
+  projectName: 'supabase-studio-ai-assistant',
+  apiKey: process.env.BRAINTRUST_API_KEY,
+  // In Vercel, async flushing is handled via waitUntil, so default is fine.
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -193,31 +200,36 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
-      model,
-      stopWhen: stepCountIs(5),
-      messages: coreMessages,
-      tools,
-      abortSignal: abortController.signal,
-    })
+    return traced(async (span) => {
+      // log things scorers consume
+      // span.log({ input: coreMessages, metadata: { route: '/api/chat' } })
 
-    result.pipeUIMessageStreamToResponse(res, {
-      onError: (error) => {
-        if (error == null) {
-          return 'unknown error'
-        }
+      const result = streamText({
+        model,
+        stopWhen: stepCountIs(5),
+        messages: coreMessages,
+        tools,
+        abortSignal: abortController.signal,
+      })
 
-        if (typeof error === 'string') {
-          return error
-        }
+      result.pipeUIMessageStreamToResponse(res, {
+        onError: (error) => {
+          if (error == null) {
+            return 'unknown error'
+          }
 
-        if (error instanceof Error) {
-          return error.message
-        }
+          if (typeof error === 'string') {
+            return error
+          }
 
-        return JSON.stringify(error)
-      },
-    })
+          if (error instanceof Error) {
+            return error.message
+          }
+
+          return JSON.stringify(error)
+        },
+      })
+    }, logger)
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
