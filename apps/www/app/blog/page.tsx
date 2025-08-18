@@ -2,6 +2,7 @@ import fs from 'fs'
 import type { Metadata } from 'next'
 import { generateRss } from 'lib/rss'
 import { getSortedPosts } from 'lib/posts'
+import { getAllCMSPosts } from 'lib/get-cms-posts'
 import BlogClient from './BlogClient'
 
 export const dynamic = 'force-static'
@@ -20,8 +21,9 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
   // Get static blog posts at build time
   const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
+  const cmsPosts = await getAllCMSPosts()
 
-  const allPostsData = [...staticPostsData].sort((a: any, b: any) => {
+  const allPostsData = [...staticPostsData, ...cmsPosts].sort((a: any, b: any) => {
     const dateA = (a as any).date
       ? new Date((a as any).date).getTime()
       : new Date((a as any).formattedDate).getTime()

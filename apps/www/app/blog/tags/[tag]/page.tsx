@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getSortedPosts, getAllTags } from '~/lib/posts'
+import { getAllCMSPosts } from '~/lib/get-cms-posts'
 import Link from 'next/link'
 import { startCase } from 'lodash'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -13,6 +14,8 @@ export async function generateStaticParams() {
   return tags.map((tag: string) => ({ tag }))
 }
 
+export const revalidate = 600
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const capitalizedTag = startCase(params.tag.replaceAll('-', ' '))
   return {
@@ -22,11 +25,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function TagPage({ params }: { params: Params }) {
-  const blogs = getSortedPosts({
-    directory: '_blog',
-    limit: 0,
-    tags: [params.tag],
-  }) as unknown as PostTypes[]
+  const staticPosts = getSortedPosts({ directory: '_blog', limit: 0, tags: [params.tag] })
+  const cmsPosts = await getAllCMSPosts({ tags: [params.tag] })
+  const blogs = [...(staticPosts as any[]), ...(cmsPosts as any[])] as unknown as PostTypes[]
   const capitalizedTag = startCase(params.tag.replaceAll('-', ' '))
 
   return (

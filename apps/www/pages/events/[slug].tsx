@@ -167,7 +167,7 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({
     console.log('[getStaticProps] Static post not found, trying CMS post...')
   }
 
-  return { notFound: true }
+  return
 
   // Try CMS post (handle preview/draft logic)
   // const cmsPost = await getCMSEventBySlug(slug, preview)

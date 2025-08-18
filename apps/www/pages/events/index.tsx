@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
 import { getSortedPosts } from 'lib/posts'
-import supabase from 'lib/supabase'
 
 import { cn } from 'ui'
 import DefaultLayout from 'components/Layouts/Default'
