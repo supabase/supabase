@@ -4,7 +4,7 @@ import { FILENAME_SUBSTRING } from './lib/posts'
 export const BlogPost = defineDocumentType(() => ({
   name: 'BlogPost',
   filePathPattern: `**/*.mdx`,
-  // contentType: 'mdx',
+  contentType: 'mdx',
   fields: {
     date: { type: 'string', required: true },
     description: { type: 'string', required: true },
@@ -13,6 +13,12 @@ export const BlogPost = defineDocumentType(() => ({
     tags: { type: 'list', of: { type: 'string' }, required: false },
     title: { type: 'string', required: true },
     thumb: { type: 'string', required: false },
+    author: { type: 'string', required: true },
+    author_title: { type: 'string', required: false },
+    author_url: { type: 'string', required: false },
+    author_image_url: { type: 'string', required: false },
+    video: { type: 'string', required: false },
+    toc_depth: { type: 'number', required: false },
   },
   computedFields: {
     url: {

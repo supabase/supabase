@@ -4,7 +4,7 @@ import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 
 import type { Blog, BlogData, PostReturnType } from 'types/post'
 
-import BlogPostClient from '~/app/blog/[slug]/BlogPostClient'
+import BlogPostClient from './BlogPostClient'
 
 type MatterReturn = {
   data: BlogData
@@ -30,12 +30,11 @@ export async function generateStaticParams() {
 }
 
 export default async function BlogPostPage({ params }: { params: Params }) {
-  const { slug } = await params
-
-  if (!slug) {
+  if (!params?.slug) {
     throw new Error('Missing slug for app/blog/[slug]/page.tsx')
   }
 
+  const slug = params.slug
   const { isEnabled: isDraft } = await draftMode()
 
   const matter = (await import('gray-matter')).default

@@ -5,15 +5,15 @@ import {
   FeatureFlagProvider,
   IS_PLATFORM,
   PageTelemetry,
+  TelemetryTagManager,
   ThemeProvider,
   useThemeSandbox,
-  TelemetryTagManager,
 } from 'common'
+import { WwwCommandMenu } from 'components/CommandMenu'
+import { API_URL } from 'lib/constants'
 import { themes, TooltipProvider, SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
-import { API_URL } from '~/lib/constants'
-import { WwwCommandMenu } from '~/components/CommandMenu'
 
 function Providers({ children }: { children: React.ReactNode }) {
   useThemeSandbox()

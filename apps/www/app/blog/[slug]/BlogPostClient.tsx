@@ -1,7 +1,6 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
 import { useState, useMemo } from 'react'
 import { useLivePreview } from '@payloadcms/live-preview-react'
 
@@ -90,37 +89,7 @@ export default function BlogPostClient(props: BlogPostPageProps) {
 
   return (
     <>
-      <NextSeo
-        title={meta.title}
-        description={meta.description}
-        openGraph={{
-          title: meta.title,
-          description: meta.description,
-          url: meta.url,
-          type: 'article',
-          videos: (blogMetaData as any).video
-            ? [
-                {
-                  url: (blogMetaData as any).video,
-                  type: 'application/x-shockwave-flash',
-                  width: 640,
-                  height: 385,
-                },
-              ]
-            : undefined,
-          article: {
-            publishedTime: (blogMetaData as any).date,
-            authors: authorUrls as any,
-            tags: tags as any,
-          },
-          images: [
-            {
-              url: imageUrl,
-              alt: `${(blogMetaData as any).title} thumbnail`,
-            },
-          ],
-        }}
-      />
+      {/* Head metadata handled at layout/page level now */}
       <BlogPostRenderer
         blog={props.blog as any}
         blogMetaData={blogMetaData as any}

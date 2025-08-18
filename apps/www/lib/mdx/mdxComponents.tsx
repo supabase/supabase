@@ -1,3 +1,5 @@
+'use client'
+
 import { PropsWithChildren } from 'react'
 import { CH } from '@code-hike/mdx/components'
 import dynamic from 'next/dynamic'

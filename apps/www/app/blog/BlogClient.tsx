@@ -1,16 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { NextSeo } from 'next-seo'
-import DefaultLayout from '~/components/Layouts/Default'
-import BlogGridItem from '~/components/Blog/BlogGridItem'
-import BlogListItem from '~/components/Blog/BlogListItem'
-import BlogFilters from '~/components/Blog/BlogFilters'
-import FeaturedThumb from '~/components/Blog/FeaturedThumb'
+import DefaultLayout from 'components/Layouts/Default'
+import BlogGridItem from 'components/Blog/BlogGridItem'
+import BlogListItem from 'components/Blog/BlogListItem'
+import BlogFilters from 'components/Blog/BlogFilters'
+import FeaturedThumb from 'components/Blog/FeaturedThumb'
 import { cn } from 'ui'
 import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 
-import type PostTypes from '~/types/post'
+import type PostTypes from 'types/post'
 
 export type BlogView = 'list' | 'grid'
 
@@ -51,27 +50,6 @@ export default function BlogClient(props: { blogs: any[] }) {
 
   return (
     <>
-      <NextSeo
-        title={meta_title}
-        description={meta_description}
-        openGraph={{
-          title: meta_title,
-          description: meta_description,
-          url: `https://supabase.com/blog`,
-          images: [
-            {
-              url: `https://supabase.com/images/og/supabase-og.png`,
-            },
-          ],
-        }}
-        additionalLinkTags={[
-          {
-            rel: 'alternate',
-            type: 'application/rss+xml',
-            href: `https://supabase.com/rss.xml`,
-          },
-        ]}
-      />
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
         <div className="md:container mx-auto py-4 lg:py-10 px-4 sm:px-12 xl:px-16">

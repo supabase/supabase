@@ -1,4 +1,4 @@
-import { NextSeo } from 'next-seo'
+import type { Metadata } from 'next'
 import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import Link from 'next/link'
 import { startCase } from 'lodash'
@@ -13,6 +13,14 @@ export async function generateStaticParams() {
   return categories.map((category: string) => ({ category }))
 }
 
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const capitalizedCategory = startCase(params.category.replaceAll('-', ' '))
+  return {
+    title: `Blog | ${capitalizedCategory}`,
+    description: 'Latest news from the Supabase team.',
+  }
+}
+
 export default async function CategoriesPage({ params }: { params: Params }) {
   const blogs = getSortedPosts({
     directory: '_blog',
@@ -23,10 +31,6 @@ export default async function CategoriesPage({ params }: { params: Params }) {
 
   return (
     <>
-      <NextSeo
-        title={`Blog | ${capitalizedCategory}`}
-        description="Latest news from the Supabase team."
-      />
       <DefaultLayout>
         <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
           <div className="text-foreground-lighter flex space-x-1">
