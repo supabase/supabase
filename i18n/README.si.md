@@ -30,7 +30,7 @@
 
 ## ප්‍රලේඛනය
 
-සම්පූර්ණ විස්තරය කියවන්න ,මෙතනින් [supabase.com/docs](https://supabase.com/docs)
+ මෙතනින් සම්පූර්ණ විස්තරය කියවන්න [supabase.com/docs](https://supabase.com/docs)
 
 දායක වන ආකාරය බැලීමට, ආරම්භ කිරීම වෙත [පිවිසෙන්න](./DEVELOPERS.md)
 
@@ -41,7 +41,7 @@
 - [Email Support](https://supabase.com/docs/support#business-support). වඩාත්ම සුදුසු: database හා infrastructure පිළිබඳ ඔබේ ඇති ප්‍රශ්න.
 - [Discord](https://discord.supabase.com). වඩාත්ම සුදුසු: ඔබගේ applications බෙදාගැනීම සහ community සමඟ රැඳී සිටීම.
 
-## කොහොමද මෙය වැඩකරන්නෙ
+## මෙය වැඩකරන අකාරය
 
 Supabase යනු විවෘත පරිශීලක උපාංග කිහිපයක එකතුවකි.අප Firebase වල ඇති පහසුකම් enterprise-grade, විවෘත පරිශීලක උපාංග භාවිතා කරමින් නිපදවයි.උපාංග හා communities ඇත්නම්,ඒවා MIT,Apache 2, හෝ ඒ ආකාරයේ open license නම් අප ඒවා භාවිතා කර සහයෝගය දක්වනවා.එවැනි උපාංග නොමැතිනම්,අප ඒවා විවෘත පරිශීලක විදියට නිපදවනවා.Supabase යනු 1-ට-1 Firebase වලට සමාන දෙයක් නොවේ.අපේ අරමුණ developers ලට Firebase වැනි අත්දැකීමක් විවෘත පරිශීලක උපාංග මඟින් ලබාදීමයි.
 
