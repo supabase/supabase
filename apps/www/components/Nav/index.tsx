@@ -7,6 +7,7 @@ import { useWindowSize } from 'react-use'
 
 import { useIsLoggedIn, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
+import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -17,9 +18,6 @@ import useDropdownMenu from './useDropdownMenu'
 import { getMenu } from 'data/nav'
 import { usePathname } from 'next/navigation'
 
-const AuthenticatedDropdownMenu = dynamic(() =>
-  import('ui-patterns').then((mod) => mod.AuthenticatedDropdownMenu)
-)
 const MenuItem = dynamic(() => import('./MenuItem'))
 const MobileMenu = dynamic(() => import('./MobileMenu'))
 const NavigationMenu = dynamic(() =>
