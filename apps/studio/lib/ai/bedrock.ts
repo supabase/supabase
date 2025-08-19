@@ -78,7 +78,7 @@ const modelRegionWeights: Record<BedrockModel, RegionWeights> = {
   ['openai.gpt-oss-120b-1:0']: {
     use1: 0,
     use2: 0,
-    usw2: 40,
+    usw2: 30,
     euc1: 0,
   },
 }
