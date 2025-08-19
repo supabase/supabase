@@ -152,6 +152,11 @@ export default withSentryConfig(configExport, {
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
+  outputFileTracingExcludes: {
+    '/api-v2/cms-posts': ['./public/**/*'],
+    '/api-v2/cms': ['./public/**/*'],
+    '/api-v2/luma-events': ['./public/**/*'],
+  },
 })
 
 function getAssetPrefix() {
