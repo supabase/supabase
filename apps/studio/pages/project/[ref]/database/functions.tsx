@@ -11,7 +11,7 @@ import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
@@ -26,8 +26,10 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
     DatabaseFunction | undefined
   >()
 
-  const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'functions'
+  )
 
   const createFunction = () => {
     if (isInlineEditorEnabled) {

@@ -187,11 +187,11 @@ export const SubscriptionPlanUpdateDialog = ({
     })
   }
 
-  const features = subscriptionPlanMeta?.features?.[0]?.features || []
+  const features = subscriptionPlanMeta?.features || []
   const topFeatures = features
 
   // Get current plan features for downgrade comparison
-  const currentPlanFeatures = currentPlanMeta?.features?.[0]?.features || []
+  const currentPlanFeatures = currentPlanMeta?.features || []
 
   // Features that will be lost when downgrading
   const featuresToLose =

@@ -15,7 +15,7 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
 import Link from 'next/link'
@@ -56,7 +56,10 @@ const InstanceConfigurationUI = () => {
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'projects'
+  )
 
   const {
     data: loadBalancers,

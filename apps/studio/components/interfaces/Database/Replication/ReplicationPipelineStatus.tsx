@@ -1,3 +1,7 @@
+// @ts-nocheck [Joshen] Temporarily silencing the TS checks here but please eventually remove
+// it's cause the API types are conflicting a bit - API types have probably been updated for the UI here
+// but the UI hasn't been updated yet to fit the new API types
+
 import { Activity, ChevronLeft, ExternalLink, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -170,6 +174,9 @@ export const ReplicationPipelineStatus = () => {
               }
             />
           </div>
+          <Button asChild type="default">
+            <Link href={`/project/${projectRef}/logs/etl-replication-logs`}>View logs</Link>
+          </Button>
           <Button
             type={statusName === 'stopped' ? 'primary' : 'default'}
             onClick={() => onTogglePipeline()}

@@ -1,23 +1,24 @@
 import pgMeta from '@supabase/pg-meta'
-import { ModelMessage, streamText, stepCountIs } from 'ai'
-import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { ModelMessage, stepCountIs, generateText, Output } from 'ai'
 import { IS_PLATFORM } from 'common'
+import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { getModel } from 'lib/ai/model'
-import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { getTools } from 'lib/ai/tools'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { getModel } from 'lib/ai/model'
+import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
-  GENERAL_PROMPT,
-  PG_BEST_PRACTICES,
   EDGE_FUNCTION_PROMPT,
-  RLS_PROMPT,
+  GENERAL_PROMPT,
   OUTPUT_ONLY_PROMPT,
+  PG_BEST_PRACTICES,
+  RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
+import { getTools } from 'lib/ai/tools'
+import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod/v4'
 
 export const maxDuration = 60
 
@@ -62,8 +63,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       aiOptInLevel = orgAIOptInLevel
     }
 
-    // for code completions we use a different model for speed and cost
-    const { model, error: modelError } = await getModel(projectRef, true)
+    const { model, error: modelError } = await getModel(projectRef)
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
@@ -102,8 +102,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ${language === 'sql' && RLS_PROMPT}
       ${SECURITY_PROMPT}
     `
-
-    console.log('system', system)
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
@@ -151,14 +149,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
+    const { experimental_output } = await generateText({
       model,
       stopWhen: stepCountIs(5),
+      experimental_output: Output.object({
+        schema: z.object({
+          code: z.string().describe('The modified code'),
+        }),
+      }),
       messages: coreMessages,
       tools,
     })
 
-    return result.pipeUIMessageStreamToResponse(res)
+    return res.status(200).json(experimental_output?.code)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({

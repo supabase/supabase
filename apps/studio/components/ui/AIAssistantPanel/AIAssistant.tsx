@@ -1,8 +1,8 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
 import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, Info, RefreshCw, Settings, X } from 'lucide-react'
+import { ArrowDown, Eraser, Info, Pencil, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -18,12 +18,13 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useHotKey } from 'hooks/ui/useHotKey'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import type { AssistantMessageType } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, cn } from 'ui'
+import { AiIconAnimation, Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary'
@@ -41,6 +42,10 @@ const MemoizedMessage = memo(
     message,
     isLoading,
     onResults,
+    onEdit,
+    isAfterEditedMessage,
+    isBeingEdited,
+    onCancelEdit,
   }: {
     message: MessageType
     isLoading: boolean
@@ -53,15 +58,22 @@ const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
+    onEdit: (id: string) => void
+    isAfterEditedMessage: boolean
+    isBeingEdited: boolean
+    onCancelEdit: () => void
   }) => {
     return (
       <Message
-        key={message.id}
         id={message.id}
         message={message}
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
+        onEdit={onEdit}
+        isAfterEditedMessage={isAfterEditedMessage}
+        isBeingEdited={isBeingEdited}
+        onCancelEdit={onCancelEdit}
       />
     )
   }
@@ -80,6 +92,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
+
+  useHotKey(() => cancelEdit(), 'Escape')
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -104,6 +118,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -146,10 +161,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const {
     messages: chatMessages,
     status: chatStatus,
+    error,
     sendMessage,
     setMessages,
     addToolResult,
-    error,
+    stop,
     regenerate,
   } = useChat({
     id: snap.activeChatId,
@@ -233,25 +249,74 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
+  const editMessage = useCallback(
+    (messageId: string) => {
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      // Target message
+      const messageToEdit = chatMessages[messageIndex]
+
+      // Activate editing mode
+      setEditingMessageId(messageId)
+      const textContent =
+        messageToEdit.parts
+          ?.filter((part) => part.type === 'text')
+          .map((part) => part.text)
+          .join('') ?? ''
+      setValue(textContent)
+
+      if (inputRef.current) {
+        inputRef.current.focus()
+      }
+    },
+    [chatMessages, setValue]
+  )
+
+  const cancelEdit = useCallback(() => {
+    setEditingMessageId(null)
+    setValue('')
+  }, [setValue])
+
   const renderedMessages = useMemo(
     () =>
-      chatMessages.map((message) => {
+      chatMessages.map((message, index) => {
+        const isBeingEdited = editingMessageId === message.id
+        const isAfterEditedMessage = editingMessageId
+          ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
+          : false
+
         return (
           <MemoizedMessage
             key={message.id}
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
+            onEdit={editMessage}
+            isAfterEditedMessage={isAfterEditedMessage}
+            isBeingEdited={isBeingEdited}
+            onCancelEdit={cancelEdit}
           />
         )
       }),
-    [chatMessages, isChatLoading]
+    [chatMessages, isChatLoading, updateMessage, editMessage, editingMessageId, cancelEdit]
   )
 
   const hasMessages = chatMessages.length > 0
   const isShowingOnboarding = !hasMessages && isApiKeySet
 
   const sendMessageToAssistant = (finalContent: string) => {
+    if (editingMessageId) {
+      // Handling when the user is in edit mode
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
+      if (messageIndex === -1) return
+
+      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+      setEditingMessageId(null)
+    }
+
     const payload = {
       role: 'user',
       createdAt: new Date(),
@@ -287,6 +352,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     snap.clearMessages()
     setMessages([])
     lastUserMessageRef.current = null
+    setEditingMessageId(null)
   }
 
   // Update scroll behavior for new messages
@@ -362,7 +428,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <ButtonTooltip
                     type="text"
                     size="tiny"
-                    icon={<Settings strokeWidth={1.5} size={14} />}
+                    icon={<Settings strokeWidth={1.5} />}
                     onClick={() => setIsConfirmOptInModalOpen(true)}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
@@ -376,7 +442,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <ButtonTooltip
                     type="text"
                     size="tiny"
-                    icon={<RefreshCw strokeWidth={1.5} size={14} />}
+                    icon={<Eraser strokeWidth={1.5} />}
                     onClick={handleClearMessages}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
@@ -386,7 +452,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     type="text"
                     className="w-7 h-7"
                     onClick={snap.closeAssistant}
-                    icon={<X strokeWidth={1.5} size={14} />}
+                    icon={<X strokeWidth={1.5} />}
                     tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
                   />
                 </div>
@@ -430,17 +496,39 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
           </div>
           {hasMessages ? (
-            <div className="w-full px-7 py-8 space-y-6">
+            <div className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               {error && (
-                <div className="border rounded-md pl-2 pr-1 py-1 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-foreground-light text-sm">
-                    <Info size={16} />
-                    <p>Sorry, I'm having trouble responding right now</p>
+                <div className="border rounded-md px-2 py-2 flex items-center justify-between gap-x-4">
+                  <div className="flex items-start gap-2 text-foreground-light text-sm">
+                    <div>
+                      <Info size={16} className="mt-0.5" />
+                    </div>
+                    <div>
+                      <p>
+                        Sorry, I'm having trouble responding right now. If the error persists while
+                        retrying, you may try clearing the conversation's messages and try again.
+                      </p>
+                    </div>
                   </div>
-                  <Button type="text" size="tiny" onClick={() => regenerate()} className="text-xs">
-                    Retry
-                  </Button>
+                  <div className="flex items-center gap-x-2">
+                    <Button
+                      type="default"
+                      size="tiny"
+                      onClick={() => regenerate()}
+                      className="text-xs"
+                    >
+                      Retry
+                    </Button>
+                    <ButtonTooltip
+                      type="default"
+                      size="tiny"
+                      onClick={handleClearMessages}
+                      className="w-7 h-7"
+                      icon={<Eraser />}
+                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                    />
+                  </div>
                 </div>
               )}
               <AnimatePresence>
@@ -504,40 +592,79 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         </div>
 
         <AnimatePresence>
-          {!isSticky && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="pointer-events-none z-10 -mt-24"
-              >
-                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
-                  <motion.div
-                    className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
-                    variants={{
-                      hidden: { y: 5, opacity: 0 },
-                      show: { y: 0, opacity: 1 },
-                    }}
-                    transition={{ duration: 0.1 }}
-                    initial="hidden"
-                    animate="show"
-                    exit="hidden"
-                  >
-                    <Button
-                      type="default"
-                      className="rounded-full w-8 h-8 p-1.5"
-                      onClick={() => {
-                        scrollToEnd()
-                        if (inputRef.current) inputRef.current.focus()
+          {editingMessageId && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                <motion.div
+                  className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
+                  variants={{
+                    hidden: { y: 5, opacity: 0 },
+                    show: { y: 0, opacity: 1 },
+                  }}
+                  transition={{ duration: 0.1 }}
+                  initial="hidden"
+                  animate="show"
+                  exit="hidden"
+                >
+                  <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
+                    <div className="flex items-center gap-x-2 text-sm text-foreground">
+                      <Pencil size={14} />
+                      <span>Editing message</span>
+                    </div>
+                    <ButtonTooltip
+                      type="outline"
+                      size="tiny"
+                      icon={<X size={14} />}
+                      onClick={cancelEdit}
+                      className="w-6 h-6 p-0"
+                      title="Cancel editing"
+                      aria-label="Cancel editing"
+                      tooltip={{
+                        content: { side: 'top', text: <KeyboardShortcut keys={['Meta', 'Esc']} /> },
                       }}
-                    >
-                      <ArrowDown size={16} />
-                    </Button>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </>
+                    />
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+          {!isSticky && !editingMessageId && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                <motion.div
+                  className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
+                  variants={{
+                    hidden: { y: 5, opacity: 0 },
+                    show: { y: 0, opacity: 1 },
+                  }}
+                  transition={{ duration: 0.1 }}
+                  initial="hidden"
+                  animate="show"
+                  exit="hidden"
+                >
+                  <Button
+                    type="default"
+                    className="rounded-full w-8 h-8 p-1.5"
+                    onClick={() => {
+                      scrollToEnd()
+                      if (inputRef.current) inputRef.current.focus()
+                    }}
+                  >
+                    <ArrowDown size={16} />
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
 
@@ -585,6 +712,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               onSubmit={(finalMessage) => {
                 sendMessageToAssistant(finalMessage)
                 scrollToEnd()
+              }}
+              onStop={() => {
+                stop()
+                // to save partial responses from the AI
+                const lastMessage = chatMessages[chatMessages.length - 1]
+                if (lastMessage && lastMessage.role === 'assistant') {
+                  handleChatFinish({ message: lastMessage })
+                }
               }}
               sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
               onRemoveSnippet={(index) => {

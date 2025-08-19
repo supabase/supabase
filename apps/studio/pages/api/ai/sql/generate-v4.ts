@@ -1,25 +1,25 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, streamText, stepCountIs } from 'ai'
+import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
+import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 
 import {
-  GENERAL_PROMPT,
-  RLS_PROMPT,
-  PG_BEST_PRACTICES,
   CHAT_PROMPT,
-  SECURITY_PROMPT,
   EDGE_FUNCTION_PROMPT,
+  GENERAL_PROMPT,
+  PG_BEST_PRACTICES,
+  RLS_PROMPT,
+  SECURITY_PROMPT,
 } from 'lib/ai/prompts'
 
 export const maxDuration = 120
@@ -80,6 +80,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       const cleanedMsg = { ...msg }
       delete cleanedMsg.results
       return cleanedMsg
+    }
+    // [Joshen] Am also filtering out any tool calls which state is "input-streaming"
+    // this happens when a user stops the assistant response while the tool is being called
+    if (msg && msg.role === 'assistant' && msg.parts) {
+      const cleanedParts = msg.parts.filter((part: any) => {
+        return !(part.type.startsWith('tool-') && part.state === 'input-streaming')
+      })
+      return { ...msg, parts: cleanedParts }
     }
     return msg
   })
@@ -172,6 +180,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...convertToModelMessages(messages),
     ]
 
+    const abortController = new AbortController()
+    req.on('close', () => abortController.abort())
+    req.on('aborted', () => abortController.abort())
+
     // Get tools
     const tools = await getTools({
       projectRef,
@@ -186,6 +198,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,
+      abortSignal: abortController.signal,
     })
 
     result.pipeUIMessageStreamToResponse(res, {

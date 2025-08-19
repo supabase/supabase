@@ -92,14 +92,13 @@ export const useIsInlineEditorEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const { data: organization } = useSelectedOrganizationQuery()
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
 
-  const isTeamsOrEnterprise = ['team', 'enterprise'].includes(organization?.plan.id ?? '')
-  const isEnabled = isTeamsOrEnterprise && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
+
   return { isEnabled, enable, disable }
 }
 
