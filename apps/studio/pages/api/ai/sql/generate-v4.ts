@@ -9,7 +9,7 @@ import {
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-import { traced, BraintrustMiddleware, currentSpan, wrapTraced } from 'braintrust'
+import { traced, BraintrustMiddleware, wrapTraced } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -253,7 +253,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           stopWhen: stepCountIs(5),
           messages: coreMessages,
           tools: tracedTools,
-          onFinish: ({ text }) => currentSpan().log({ output: text }),
+          onFinish: ({ text }) => span.log({ output: text }),
           abortSignal: abortController.signal,
         })
 
