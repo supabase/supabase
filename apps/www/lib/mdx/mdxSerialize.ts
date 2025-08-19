@@ -10,6 +10,11 @@ import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 // we need to fix this before running them through mdx
 // also checks for <br> and <hr>
 function addSelfClosingTags(htmlString: string): string {
+  // Handle cases where htmlString might be undefined, null, or not a string
+  if (!htmlString || typeof htmlString !== 'string') {
+    return ''
+  }
+
   const modifiedHTML = htmlString.replace(/<img[^>]*>|<br[^>]*>|<hr[^>]*>/g, (match) => {
     if (match.endsWith('/>')) {
       return match
