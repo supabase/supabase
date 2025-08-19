@@ -126,9 +126,12 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
 
     const responses = await Promise.all(
       filesToUpload.map(async (file) => {
+        // Set a safe filename to avoid issues with special characters
+        const safeFilename = generateSafeFilename(file.name)
+
         const { error } = await supabase.storage
           .from(bucketName)
-          .upload(!!path ? `${path}/${file.name}` : file.name, file, {
+          .upload(!!path ? `${path}/${safeFilename}` : safeFilename, file, {
             cacheControl: cacheControl.toString(),
             upsert,
           })
@@ -152,6 +155,22 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
 
     setLoading(false)
   }, [files, path, bucketName, errors, successes])
+
+  // Sanitize filename to make it safe for Supabase storage
+  const generateSafeFilename = (filename: string): string => {
+    const nameParts = filename.split('.')
+    const ext = nameParts.pop() || ''
+    const name = nameParts.join('.')
+
+    const sanitizedName = name
+      .normalize('NFD') // Normalize unicode (convert accents to ASCII equivalents where possible)
+      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics (e.g. é -> e)
+      .replace(/[^\w\s-]/g, '-') // Replace non-word chars with hyphens (e.g. # -> -)
+      .replace(/\s+/g, '-') // Replace spaces with hyphens (e.g. "hello world" -> "hello-world")
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen (e.g. "hello--world" -> "hello-world")
+      .replace(/^-+|-+$/g, '') // Trim hyphens from start and end (e.g. "-hello-world-" -> "hello-world")
+    return `${sanitizedName}.${ext}`
+  }
 
   useEffect(() => {
     if (files.length === 0) {
