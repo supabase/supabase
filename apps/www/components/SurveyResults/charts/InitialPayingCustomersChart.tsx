@@ -8,7 +8,7 @@ function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>
   COUNT(DISTINCT id) AS respondents
 FROM (
   SELECT id, unnest(initial_paying_customers) AS source
-  FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+  FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 ) sub
 GROUP BY source
 ORDER BY respondents DESC;`

@@ -13,7 +13,7 @@ function generateBiggestChallengeSQL(activeFilters: Record<string, string>) {
       WHEN biggest_challenge IN ('Customer acquisition', 'Technical complexity', 'Product-market fit', 'Product-market fit', 'Fundraising', 'Hiring', 'Other') THEN biggest_challenge
       ELSE 'Other'
     END AS biggest_challenge_clean
-  FROM responses_b_2025
+  FROM responses_c_2025
   ${whereClause}
 )
 SELECT 

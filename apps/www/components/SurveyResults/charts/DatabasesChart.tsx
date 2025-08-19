@@ -6,7 +6,7 @@ function generateDatabasesSQL(activeFilters: Record<string, string>) {
   return `SELECT 
   unnest(databases) AS technology,
   COUNT(*) AS total
-FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
 ORDER BY total DESC;`
 }

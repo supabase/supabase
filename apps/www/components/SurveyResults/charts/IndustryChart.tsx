@@ -13,7 +13,7 @@ function generateIndustrySQL(activeFilters: Record<string, string>) {
       WHEN industry IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry
       ELSE 'Other'
     END AS industry_clean
-  FROM responses_b_2025
+  FROM responses_c_2025
   ${whereClause}
 )
 SELECT 
