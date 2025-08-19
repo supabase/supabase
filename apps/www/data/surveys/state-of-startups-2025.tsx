@@ -77,7 +77,7 @@ const stateOfStartupsData = {
           'We’re building an end-to-end system for wedding planners, all running as one SvelteKit / Supabase instance.',
         author: 'Waldemar Pross',
         authorPosition: 'CTO, Peach Perfect Weddings',
-        authorAvatar: '/images/state-of-startups/quote-avatars/robert-w-120x120.jpg',
+        authorAvatar: '/images/state-of-startups/quote-avatars/waldemar-k-120x120.jpg',
       },
       sections: [
         {
