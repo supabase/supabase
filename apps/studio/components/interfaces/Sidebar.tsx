@@ -41,7 +41,10 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useUnifiedLogsPreview,
+} from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -243,7 +246,12 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project)
+
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+
+  const otherRoutes = generateOtherRoutes(ref, project, {
+    unifiedLogs: isUnifiedLogsEnabled,
+  })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
@@ -347,6 +355,8 @@ const OrganizationLinks = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
+  const showBilling = useIsFeatureEnabled('billing:all')
+
   const activeRoute = router.pathname.split('/')[3]
 
   const navMenuItems = [
@@ -374,12 +384,16 @@ const OrganizationLinks = () => {
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-      key: 'billing',
-      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
+    ...(showBilling
+      ? [
+          {
+            label: 'Billing',
+            href: `/org/${slug}/billing`,
+            key: 'billing',
+            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          },
+        ]
+      : []),
     {
       label: 'Organization settings',
       href: `/org/${slug}/general`,

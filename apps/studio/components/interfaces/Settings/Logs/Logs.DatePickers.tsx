@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight, Clock, HistoryIcon, XIcon } from 'lucide-react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
 import { Label } from '@ui/components/shadcn/ui/label'
@@ -20,6 +20,7 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type DatePickerValue = {
   to: string
@@ -34,6 +35,7 @@ interface Props {
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
   popoverContentProps?: typeof PopoverContent_Shadcn_
+  hideWarnings?: boolean
 }
 
 export const LogsDatePicker = ({
@@ -42,8 +44,11 @@ export const LogsDatePicker = ({
   value,
   buttonTriggerProps,
   popoverContentProps,
+  hideWarnings,
 }: PropsWithChildren<Props>) => {
   const [open, setOpen] = useState(false)
+
+  const todayButtonRef = useRef<HTMLButtonElement>(null)
 
   // Reset the state when the popover closes
   useEffect(() => {
@@ -315,8 +320,13 @@ export const LogsDatePicker = ({
               />
             </div>
             <div className="flex-shrink">
-              <Button
-                icon={<XIcon size={14} />}
+              <ButtonTooltip
+                tooltip={{
+                  content: {
+                    text: 'Clear time range',
+                  },
+                }}
+                icon={<HistoryIcon size={14} />}
                 type="text"
                 size="tiny"
                 className="px-1.5"
@@ -324,13 +334,20 @@ export const LogsDatePicker = ({
                   setStartTime({ HH: '00', mm: '00', ss: '00' })
                   setEndTime({ HH: '00', mm: '00', ss: '00' })
                 }}
-              ></Button>
+              ></ButtonTooltip>
             </div>
           </div>
           <div className="p-2 border-t">
             <DatePicker
               inline
               selectsRange
+              todayButton={
+                <div className="sr-only">
+                  <Button type="text" size="tiny" ref={todayButtonRef}>
+                    Go to today
+                  </Button>
+                </div>
+              }
               onChange={(dates) => {
                 handleDatePickerChange(dates)
               }}
@@ -371,7 +388,7 @@ export const LogsDatePicker = ({
               )}
             />
           </div>
-          {isLargeRange && (
+          {isLargeRange && !hideWarnings && (
             <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
               Large ranges may result in memory errors for <br /> big projects.
             </div>
@@ -393,6 +410,10 @@ export const LogsDatePicker = ({
             <Button
               type="default"
               onClick={() => {
+                // [Jordi]: Workaround so that if the user is in a different month, the datepicker will move the view to the current month
+                if (todayButtonRef.current) {
+                  todayButtonRef.current.click()
+                }
                 setStartDate(new Date())
                 setEndDate(new Date())
               }}

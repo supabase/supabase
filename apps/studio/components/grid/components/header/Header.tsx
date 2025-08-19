@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Link from 'next/link'
-import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -28,6 +27,7 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -37,6 +37,7 @@ import {
 } from 'ui'
 import { ExportDialog } from './ExportDialog'
 import { FilterPopover } from './filter/FilterPopover'
+import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -281,6 +282,25 @@ const RowHeader = () => {
     })
   }
 
+  const onCopyRows = (type: 'csv' | 'json' | 'sql') => {
+    const rows = allRows.filter((x) => snap.selectedRows.has(x.idx))
+
+    if (type === 'csv') {
+      const csv = formatRowsForCSV({
+        rows,
+        columns: snap.table!.columns.map((column) => column.name),
+      })
+      copyToClipboard(csv)
+    } else if (type === 'sql') {
+      const sqlStatements = formatTableRowsToSQL(snap.table, rows)
+      copyToClipboard(sqlStatements)
+    } else if (type === 'json') {
+      copyToClipboard(JSON.stringify(rows))
+    }
+
+    toast.success('Copied rows to clipboard')
+  }
+
   const onRowsExportCSV = async () => {
     setIsExporting(true)
 
@@ -340,16 +360,8 @@ const RowHeader = () => {
       return
     }
 
-    const formattedRows = rows.map((row) => {
-      const formattedRow = row
-      Object.keys(row).map((column) => {
-        if (typeof row[column] === 'object' && row[column] !== null)
-          formattedRow[column] = JSON.stringify(formattedRow[column])
-      })
-      return formattedRow
-    })
-
-    const csv = Papa.unparse(formattedRows, {
+    const csv = formatRowsForCSV({
+      rows,
       columns: snap.table!.columns.map((column) => column.name),
     })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -494,6 +506,42 @@ const RowHeader = () => {
                 : `Delete ${snap.selectedRows.size} row`}
           </ButtonTooltip>
         )}
+
+        {!snap.allRowsSelected ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="default"
+                size="tiny"
+                iconRight={<ChevronDown />}
+                loading={isExporting}
+                disabled={isExporting}
+              >
+                Copy
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-40">
+              <DropdownMenuItem onClick={() => onCopyRows('csv')}>Copy as CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCopyRows('sql')}>Copy as SQL</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCopyRows('json')}>Copy as JSON</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <ButtonTooltip
+            disabled
+            type="default"
+            tooltip={{
+              content: {
+                side: 'bottom',
+                className: 'w-64 text-center',
+                text: 'Copy to clipboard is not supported while all rows in the table are selected',
+              },
+            }}
+          >
+            Copy
+          </ButtonTooltip>
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
