@@ -1,7 +1,7 @@
 import BlogPostClient from './BlogPostClient'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
-import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { draftMode } from 'next/headers'
+import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
 
 import type { Blog, BlogData, PostReturnType } from 'types/post'
 

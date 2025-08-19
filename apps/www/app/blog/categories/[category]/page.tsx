@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
-import { getAllCMSPosts } from '~/lib/get-cms-posts'
 import Link from 'next/link'
-import { startCase } from 'lodash'
-import DefaultLayout from '~/components/Layouts/Default'
-import BlogGridItem from '~/components/Blog/BlogGridItem'
-import type PostTypes from '~/types/post'
+import DefaultLayout from 'components/Layouts/Default'
+import BlogGridItem from 'components/Blog/BlogGridItem'
+
+import { getAllCMSPosts } from 'lib/get-cms-posts'
+import { capitalize } from 'lib/helpers'
+import { getSortedPosts, getAllCategories } from 'lib/posts'
+import type PostTypes from 'types/post'
 
 type Params = { category: string }
 
@@ -17,7 +18,7 @@ export async function generateStaticParams() {
 export const dynamic = 'force-static'
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const capitalizedCategory = startCase(params.category.replaceAll('-', ' '))
+  const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
   return {
     title: `Blog | ${capitalizedCategory}`,
     description: 'Latest news from the Supabase team.',
@@ -35,7 +36,7 @@ export default async function CategoriesPage({ params }: { params: Params }) {
     ...(staticPosts as any[]),
     ...(cmsPosts as any[]).filter((p) => (p.categories || []).includes(params.category)),
   ] as unknown as PostTypes[]
-  const capitalizedCategory = startCase(params.category.replaceAll('-', ' '))
+  const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
 
   return (
     <>
