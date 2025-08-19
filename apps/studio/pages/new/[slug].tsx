@@ -36,6 +36,7 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
@@ -151,6 +152,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -213,26 +215,34 @@ const Wizard: NextPageWithLayout = () => {
     components['schemas']['ProjectInfo'][] | undefined
   >(undefined)
 
-  useEffect(() => {
-    // Only set once to ensure compute credits dont change while project is being created
-    if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi)
-    }
-  }, [allProjectsFromApi, allProjects, setAllProjects])
-
   const organizationProjects =
     allProjects?.filter(
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
 
-  const { data: availableRegionsData, error: defaultRegionError } =
+  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+    {
+      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+    },
+    {
+      enabled: !smartRegionEnabled,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+      retry: false,
+    }
+  )
+
+  const { data: availableRegionsData, error: availableRegionsError } =
     useOrganizationAvailableRegionsQuery(
       {
         slug: slug,
         cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       },
       {
+        enabled: smartRegionEnabled,
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchInterval: false,
@@ -240,7 +250,10 @@ const Wizard: NextPageWithLayout = () => {
       }
     )
 
-  const defaultRegion = availableRegionsData?.recommendations.specific[0]?.name
+  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.specific[0]?.name
+    : _defaultRegion
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
@@ -309,7 +322,7 @@ const Wizard: NextPageWithLayout = () => {
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion: dbRegionExact,
+      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
       organizationSlug: organization,
     },
     { enabled: currentOrg !== null && !isManagedByVercel }
@@ -409,6 +422,13 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
+    // Only set once to ensure compute credits dont change while project is being created
+    if (allProjectsFromApi && !allProjects) {
+      setAllProjects(allProjectsFromApi)
+    }
+  }, [allProjectsFromApi, allProjects, setAllProjects])
+
+  useEffect(() => {
     // Handle no org: redirect to new org route
     if (isEmptyOrganizations) {
       router.push(`/new`)
@@ -429,10 +449,10 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion])
 
   useEffect(() => {
-    if (defaultRegionError) {
+    if (regionError) {
       form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
     }
-  }, [defaultRegionError])
+  }, [regionError])
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
