@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
+import { useParams } from 'common'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -21,7 +22,6 @@ interface RegionSelectorProps {
   field: ControllerRenderProps<any, 'dbRegion'>
   form: UseFormReturn<any>
   layout?: 'vertical' | 'horizontal'
-  organizationSlug?: string
 }
 
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
@@ -32,12 +32,12 @@ export const RegionSelector = ({
   cloudProvider,
   field,
   layout = 'horizontal',
-  organizationSlug,
 }: RegionSelectorProps) => {
   const router = useRouter()
+  const { slug } = useParams()
 
   const { data: availableRegionsData, isLoading } = useOrganizationAvailableRegionsQuery({
-    slug: organizationSlug,
+    slug,
     cloudProvider,
   })
 
@@ -85,7 +85,7 @@ export const RegionSelector = ({
                   className="w-full [&>:nth-child(2)]:w-full"
                 >
                   <div className="flex flex-row items-center justify-between w-full">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-x-3">
                       <img
                         alt="region icon"
                         className="w-5 rounded-sm"
@@ -119,7 +119,7 @@ export const RegionSelector = ({
                   className="w-full [&>:nth-child(2)]:w-full"
                 >
                   <div className="flex flex-row items-center justify-between w-full">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-x-3">
                       <img
                         alt="region icon"
                         className="w-5 rounded-sm"

@@ -869,7 +869,6 @@ const Wizard: NextPageWithLayout = () => {
                             field={field}
                             form={form}
                             cloudProvider={form.getValues('cloudProvider') as CloudProvider}
-                            organizationSlug={slug}
                           />
                         )}
                       />
