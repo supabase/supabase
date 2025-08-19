@@ -1,6 +1,4 @@
-import { ArrowLeft } from 'lucide-react'
 import Head from 'next/head'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
@@ -9,14 +7,8 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { cn, NavMenu, NavMenuItem } from 'ui'
-import {
-  MAX_WIDTH_CLASSES,
-  PADDING_CLASSES,
-  ScaffoldContainerLegacy,
-  ScaffoldTitle,
-} from '../Scaffold'
-import WithSidebar from './WithSidebar'
+import { cn } from 'ui'
+import { WithSidebar } from './WithSidebar'
 
 export interface AccountLayoutProps {
   title: string

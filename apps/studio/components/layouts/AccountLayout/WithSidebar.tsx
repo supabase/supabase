@@ -20,7 +20,7 @@ interface WithSidebarProps {
   backToDashboardURL?: string
 }
 
-const WithSidebar = ({
+export const WithSidebar = ({
   title,
   header,
   breadcrumbs = [],
@@ -70,7 +70,6 @@ const WithSidebar = ({
     </div>
   )
 }
-export default WithSidebar
 
 export const SidebarContent = ({
   title,
@@ -182,12 +181,7 @@ const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWit
         {section.links.map((link, i: number) => {
           const isActive = link.isActive && !subitems
           return (
-            <Menu.Item
-              key={`${link.key}-${i}`}
-              rounded
-              active={isActive}
-              icon={link.icon}
-            >
+            <Menu.Item key={`${link.key}-${i}`} rounded active={isActive} icon={link.icon}>
               <Link href={link.href || ''} className="block">
                 <div className="flex w-full items-center justify-between gap-1">
                   <div className="flex items-center gap-2 truncate w-full">
@@ -202,4 +196,3 @@ const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWit
     </div>
   </div>
 )
-
