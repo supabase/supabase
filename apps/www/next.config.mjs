@@ -71,7 +71,7 @@ const nextConfig = {
       'node_modules/@babel/**/*',
       'node_modules/typescript/**/*',
       'node_modules/@types/**/*',
-      'node_modules/.pnpm/**/*',
+      // Remove this line as it's too aggressive: 'node_modules/.pnpm/**/*',
       '.next/cache/**/*',
       '.next/static/**/*',
       '.next/server/**/*.js.map',
@@ -84,7 +84,8 @@ const nextConfig = {
       '**/*.spec.*',
       '**/*.stories.*',
       '**/node_modules/.cache/**/*',
-      '**/node_modules/@sentry/**/*',
+      // Be more specific with Sentry exclusions
+      '**/node_modules/@sentry/webpack-plugin/**/*',
       '**/node_modules/framer-motion/**/*',
       '**/node_modules/highlight.js/**/*',
       '**/node_modules/refractor/**/*',
@@ -101,11 +102,11 @@ const nextConfig = {
       'node_modules/highlight.js/**/*',
       'node_modules/refractor/**/*',
       'node_modules/@code-hike/**/*',
-      '**/node_modules/.pnpm/**/*',
+      // Remove this line as it's too aggressive: '**/node_modules/.pnpm/**/*',
     ],
   },
   // Additional optimizations for smaller serverless functions
-  serverExternalPackages: ['@code-hike/mdx', 'highlight.js', 'refractor', '@sentry/nextjs'],
+  serverExternalPackages: ['@code-hike/mdx', 'highlight.js', 'refractor'],
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
