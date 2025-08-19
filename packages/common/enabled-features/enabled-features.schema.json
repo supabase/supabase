@@ -6,6 +6,33 @@
       "type": "string"
     },
 
+    "ai:opt_in_level_disabled": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'disabled'"
+    },
+    "ai:opt_in_level_schema": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema'"
+    },
+    "ai:opt_in_level_schema_and_log": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log'"
+    },
+    "ai:opt_in_level_schema_and_log_and_data": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log_and_data'"
+    },
+
+    "billing:all": {
+      "type": "boolean",
+      "description": "Enable the billing settings page"
+    },
+
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
+    },
+
     "logs:templates": {
       "type": "boolean",
       "description": "Enable the logs templates page"
@@ -52,6 +79,12 @@
     }
   },
   "required": [
+    "ai:opt_in_level_disabled",
+    "ai:opt_in_level_schema",
+    "ai:opt_in_level_schema_and_log",
+    "ai:opt_in_level_schema_and_log_and_data",
+    "billing:all",
+    "integrations:vercel",
     "profile:show_email",
     "profile:show_information",
     "logs:templates",
