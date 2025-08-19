@@ -1148,6 +1148,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/cloud-marketplace/redirect': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the AWS Marketplace redirect url */
+    get: operations['ClazarController_getRedirectUrl']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/customer': {
     parameters: {
       query?: never
@@ -4321,7 +4338,9 @@ export interface components {
     }
     AccessToken: {
       created_at: string
+      expires_at: string | null
       id: number
+      last_used_at: string | null
       name: string
       /** @enum {string} */
       scope?: 'V0'
@@ -4506,13 +4525,17 @@ export interface components {
       path: string
     }
     CreateAccessTokenBody: {
+      /** Format: date-time */
+      expires_at?: string
       name: string
       /** @enum {string} */
       scope?: 'V0'
     }
     CreateAccessTokenResponse: {
       created_at: string
+      expires_at: string | null
       id: number
+      last_used_at: string | null
       name: string
       /** @enum {string} */
       scope?: 'V0'
@@ -4828,7 +4851,7 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
+          billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -5517,6 +5540,9 @@ export interface components {
       file_url: string
       fileUrl: string
     }
+    GetCloudMarketplaceRedirectUrlResponse: {
+      url: string
+    }
     GetContentCountResponse: {
       count: number
     }
@@ -5816,7 +5842,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
       cached_egress_enabled: boolean
       current_period_end: number
@@ -6662,7 +6688,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -6716,7 +6742,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -11928,6 +11954,41 @@ export interface operations {
         content?: never
       }
       /** @description Failed to make organization being billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ClazarController_getRedirectUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetCloudMarketplaceRedirectUrlResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get AWS Marketplace redirect url */
       500: {
         headers: {
           [name: string]: unknown
