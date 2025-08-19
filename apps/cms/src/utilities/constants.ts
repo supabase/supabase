@@ -4,5 +4,5 @@ export const WWW_SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
     ? 'https://supabase.com'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('//cms-', '//zone-www-dot-com-')}`
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('cms-', 'zone-www-dot-com-')}`
       : 'http://localhost:3000'
