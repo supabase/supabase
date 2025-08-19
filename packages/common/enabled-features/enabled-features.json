@@ -1,6 +1,24 @@
 {
   "$schema": "./enabled-features.schema.json",
 
+  "ai:opt_in_level_disabled": true,
+  "ai:opt_in_level_schema": true,
+  "ai:opt_in_level_schema_and_log": true,
+  "ai:opt_in_level_schema_and_log_and_data": true,
+
+  "authentication:show_send_invitation": true,
+  "authentication:show_provider_filter": true,
+  "authentication:show_sort_by_email": true,
+  "authentication:show_sort_by_phone": true,
+  "authentication:show_user_type_filter": true,
+
+  "billing:all": true,
+
+  "database:replication": true,
+  "database:roles": true,
+
+  "integrations:vercel": true,
+
   "logs:templates": true,
   "logs:collections": true,
 
@@ -14,5 +32,7 @@
 
   "project_homepage:show_all_client_libraries": true,
   "project_homepage:show_instance_size": true,
-  "project_homepage:show_examples": true
+  "project_homepage:show_examples": true,
+
+  "table_editor:enable_rls_toggle": true
 }
