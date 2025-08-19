@@ -77,7 +77,7 @@ const stateOfStartupsData = {
           'We’re building an end-to-end system for wedding planners, all running as one SvelteKit / Supabase instance.',
         author: 'Waldemar Pross',
         authorPosition: 'CTO, Peach Perfect Weddings',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+        authorAvatar: '/images/state-of-startups/quote-avatars/robert-w-120x120.jpg',
       },
       sections: [
         {
@@ -140,7 +140,7 @@ const stateOfStartupsData = {
           'Cursor has been my favourite tool so far. It’s made my life easier by documenting code on my behalf.',
         author: 'Kevinton B',
         authorPosition: 'Engineer, FlutterFlow',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+        authorAvatar: '/images/state-of-startups/quote-avatars/kevinton-b-120x120.jpg',
       },
       sections: [
         {
@@ -244,7 +244,7 @@ const stateOfStartupsData = {
           'AI is embedded in how we build and scale. From using Claude and Cursor in dev, to voice AI in product for smarter, faster recruiting (which is our business).',
         author: 'Jinal Jhaveri',
         authorPosition: 'Founder, Mismo',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+        authorAvatar: '/images/state-of-startups/quote-avatars/jinal-j-120x120.jpg',
       },
       sections: [
         {
