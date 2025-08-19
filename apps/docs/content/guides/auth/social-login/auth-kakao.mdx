@@ -64,6 +64,26 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ![Consent items needs to be set.](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
+### For Individual Developers
+
+If you're an individual developer (not business-verified), you may encounter error `KOE205` when using the `account_email` scope. This error occurs because the `account_email` scope is restricted to business-verified applications by default.
+
+To resolve this issue:
+
+1. Go to **App Settings** > **App** > **General** in your Kakao Developer Console
+2. Upload an **App Icon** if you haven't already (required for business app conversion)
+3. In the **Business Information** section, click **"개인 개발자 비즈 앱 전환"** (Individual Developer Business App Conversion)
+4. Complete personal verification and agree to Kakao Business integrated service terms
+5. After conversion, your app will show "비즈 앱" status and you can set `account_email` as a required consent item under **제품 설정** (Product Settings) > **카카오 로그인** (Kakao Login) > **동의항목** (Consent Items)
+
+This allows individual developers to use Kakao OAuth with email access without requiring a business license.
+
+<Admonition type="note">
+
+The app icon upload is a prerequisite for business app conversion. Without an app icon, the conversion option will not be available.
+
+</Admonition>
+
 ## Add your OAuth credentials to Supabase
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Kakao" }} />
