@@ -205,4 +205,18 @@ export interface EventData {
   isCMS?: boolean
 }
 
+export interface CMSPostTypes extends PostTypes {
+  isCMS?: boolean
+  authors?: Array<{
+    author: string
+    author_id: string
+    position: string
+    author_url: string
+    author_image_url: {
+      url: string
+    }
+    username: string
+  }>
+}
+
 export type PostReturnType = ReturnType<typeof getSortedPosts>[number]
