@@ -95,7 +95,7 @@ function convertRichTextToMarkdown(content: CMSBlogPost['content']): string {
   return content.root.children
     .map((node) => {
       if (node.type === 'heading') {
-        const level = node.tag?.replace('h', '') || '1'
+        const level = node.tag && typeof node.tag === 'string' ? node.tag.replace('h', '') : '1'
         const text = node.children?.map((child) => child.text).join('') || ''
         return `${'#'.repeat(Number(level))} ${text}`
       }
@@ -330,8 +330,16 @@ async function processPostData(post: any) {
     )
 
     // Extract thumb and image URLs from the nested structure
-    const thumbUrl = post.thumb?.url ? `${PAYLOAD_URL}${post.thumb.url}` : null
-    const imageUrl = post.image?.url ? `${PAYLOAD_URL}${post.image.url}` : null
+    const thumbUrl = post.thumb?.url
+      ? typeof post.thumb.url === 'string' && post.thumb.url.includes('http')
+        ? post.thumb.url
+        : `${PAYLOAD_URL}${post.thumb.url}`
+      : null
+    const imageUrl = post.image?.url
+      ? typeof post.image.url === 'string' && post.image.url.includes('http')
+        ? post.image.url
+        : `${PAYLOAD_URL}${post.image.url}`
+      : null
 
     // console.log(`[processPostData] About to return processed data...`)
     const processedData = {
@@ -349,7 +357,8 @@ async function processPostData(post: any) {
           position: author.position || '',
           author_url: author.author_url || '#',
           author_image_url: author.author_image_url?.url
-            ? author.author_image_url.url.includes('http')
+            ? typeof author.author_image_url.url === 'string' &&
+              author.author_image_url.url.includes('http')
               ? author.author_image_url?.url
               : `${PAYLOAD_URL}${author.author_image_url.url}`
             : null,
@@ -432,12 +441,12 @@ export async function getAllCMSPosts({
 
         // Extract thumb and image URLs from the nested structure (handle absolute and relative)
         const thumbUrl = post.thumb?.url
-          ? post.thumb.url.includes('http')
+          ? typeof post.thumb.url === 'string' && post.thumb.url.includes('http')
             ? post.thumb.url
             : `${PAYLOAD_URL}${post.thumb.url}`
           : null
         const imageUrl = post.image?.url
-          ? post.image.url.includes('http')
+          ? typeof post.image.url === 'string' && post.image.url.includes('http')
             ? post.image.url
             : `${PAYLOAD_URL}${post.image.url}`
           : null
@@ -456,7 +465,8 @@ export async function getAllCMSPosts({
               position: author.position || '',
               author_url: author.author_url || '#',
               author_image_url: author.author_image_url?.url
-                ? author.author_image_url.url.includes('http')
+                ? typeof author.author_image_url.url === 'string' &&
+                  author.author_image_url.url.includes('http')
                   ? author.author_image_url.url
                   : `${PAYLOAD_URL}${author.author_image_url.url}`
                 : null,

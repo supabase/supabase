@@ -111,8 +111,16 @@ export async function GET(request: NextRequest) {
     const posts = docs
       .filter((p: any) => !!p?.slug)
       .map((p: any) => {
-        const thumbUrl = p?.thumb?.url ? `${baseUrl}${p.thumb.url}` : ''
-        const imageUrl = p?.image?.url ? `${baseUrl}${p.image.url}` : ''
+        const thumbUrl = p?.thumb?.url
+          ? typeof p.thumb.url === 'string' && p.thumb.url.includes('http')
+            ? p.thumb.url
+            : `${baseUrl}${p.thumb.url}`
+          : ''
+        const imageUrl = p?.image?.url
+          ? typeof p.image.url === 'string' && p.image.url.includes('http')
+            ? p.image.url
+            : `${baseUrl}${p.image.url}`
+          : ''
         const date = p.date || p.createdAt || new Date().toISOString()
         const formattedDate = new Date(date).toLocaleDateString('en-IN', dateFmt)
         const plain = richTextToPlainText(p?.content)
@@ -125,7 +133,8 @@ export async function GET(request: NextRequest) {
               position: a?.position || '',
               author_url: a?.author_url || '#',
               author_image_url: a?.author_image_url?.url
-                ? a.author_image_url.url.includes('http')
+                ? typeof a.author_image_url.url === 'string' &&
+                  a.author_image_url.url.includes('http')
                   ? a.author_image_url.url
                   : `${baseUrl}${a.author_image_url.url}`
                 : null,
