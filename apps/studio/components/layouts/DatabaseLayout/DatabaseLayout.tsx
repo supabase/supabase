@@ -5,6 +5,7 @@ import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/Fea
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -32,6 +33,11 @@ const DatabaseProductMenu = () => {
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
   const enablePgReplicate = useFlag('enablePgReplicate')
 
+  const { databaseReplication: showPgReplicate, databaseRoles: showRoles } = useIsFeatureEnabled([
+    'database:replication',
+    'database:roles',
+  ])
+
   return (
     <>
       <ProductMenu
@@ -41,6 +47,8 @@ const DatabaseProductMenu = () => {
           pitrEnabled,
           columnLevelPrivileges,
           enablePgReplicate,
+          showPgReplicate,
+          showRoles,
         })}
       />
     </>

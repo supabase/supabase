@@ -112,8 +112,8 @@ export function LogsSidebarMenuV2() {
   // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
   const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  const { plan: orgPlan } = useCurrentOrgPlan()
+  const isFreePlan = orgPlan?.id === 'free'
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,

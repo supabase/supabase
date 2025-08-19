@@ -6,6 +6,63 @@
       "type": "string"
     },
 
+    "ai:opt_in_level_disabled": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'disabled'"
+    },
+    "ai:opt_in_level_schema": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema'"
+    },
+    "ai:opt_in_level_schema_and_log": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log'"
+    },
+    "ai:opt_in_level_schema_and_log_and_data": {
+      "type": "boolean",
+      "description": "Enable the AI opt in level 'schema_and_log_and_data'"
+    },
+
+    "authentication:show_send_invitation": {
+      "type": "boolean",
+      "description": "Show the send invitation option in the authentication users page"
+    },
+    "authentication:show_provider_filter": {
+      "type": "boolean",
+      "description": "Show the provider filter in the authentication users page"
+    },
+    "authentication:show_sort_by_email": {
+      "type": "boolean",
+      "description": "Show the sort by email option in the authentication users page"
+    },
+    "authentication:show_sort_by_phone": {
+      "type": "boolean",
+      "description": "Show the sort by phone option in the authentication users page"
+    },
+    "authentication:show_user_type_filter": {
+      "type": "boolean",
+      "description": "Show the user type filter in the authentication users page"
+    },
+
+    "billing:all": {
+      "type": "boolean",
+      "description": "Enable the billing settings page"
+    },
+
+    "database:replication": {
+      "type": "boolean",
+      "description": "Enable the database replication page"
+    },
+    "database:roles": {
+      "type": "boolean",
+      "description": "Enable the database roles page"
+    },
+
+    "integrations:vercel": {
+      "type": "boolean",
+      "description": "Enable the vercel integration section in the organization and project settings pages"
+    },
+
     "logs:templates": {
       "type": "boolean",
       "description": "Enable the logs templates page"
@@ -49,9 +106,27 @@
     "project_homepage:show_all_client_libraries": {
       "type": "boolean",
       "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
+    },
+
+    "table_editor:enable_rls_toggle": {
+      "type": "boolean",
+      "description": "Show the RLS toggle in the table creation flow and table editor header"
     }
   },
   "required": [
+    "ai:opt_in_level_disabled",
+    "ai:opt_in_level_schema",
+    "ai:opt_in_level_schema_and_log",
+    "ai:opt_in_level_schema_and_log_and_data",
+    "authentication:show_provider_filter",
+    "authentication:show_send_invitation",
+    "authentication:show_sort_by_email",
+    "authentication:show_sort_by_phone",
+    "authentication:show_user_type_filter",
+    "billing:all",
+    "database:replication",
+    "database:roles",
+    "integrations:vercel",
     "profile:show_email",
     "profile:show_information",
     "logs:templates",
@@ -61,7 +136,8 @@
     "project_homepage:show_examples",
     "project_homepage:show_all_client_libraries",
     "project_connection:javascript_example",
-    "project_connection:dart_example"
+    "project_connection:dart_example",
+    "table_editor:enable_rls_toggle"
   ],
   "additionalProperties": false
 }
