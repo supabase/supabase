@@ -13,9 +13,20 @@ const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
 
-  const { authenticationPolicies, authenticationRateLimits } = useIsFeatureEnabled([
+  const {
+    authenticationPolicies,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationAdvanced,
+  } = useIsFeatureEnabled([
     'authentication:policies',
     'authentication:rate_limits',
+    'authentication:emails',
+    'authentication:multi_factor',
+    'authentication:attack_protection',
+    'authentication:advanced',
   ])
 
   useAuthConfigPrefetch({ projectRef })
@@ -24,7 +35,14 @@ const AuthProductMenu = () => {
   return (
     <ProductMenu
       page={page}
-      menu={generateAuthMenu(projectRef, { authenticationPolicies, authenticationRateLimits })}
+      menu={generateAuthMenu(projectRef, {
+        authenticationPolicies,
+        authenticationRateLimits,
+        authenticationEmails,
+        authenticationMultiFactor,
+        authenticationAttackProtection,
+        authenticationAdvanced,
+      })}
     />
   )
 }

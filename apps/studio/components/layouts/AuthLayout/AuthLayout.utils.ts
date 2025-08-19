@@ -6,9 +6,20 @@ export const generateAuthMenu = (
   flags?: {
     authenticationPolicies: boolean
     authenticationRateLimits: boolean
+    authenticationEmails: boolean
+    authenticationMultiFactor: boolean
+    authenticationAttackProtection: boolean
+    authenticationAdvanced: boolean
   }
 ): ProductMenuGroup[] => {
-  const { authenticationPolicies, authenticationRateLimits } = flags ?? {}
+  const {
+    authenticationPolicies,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationAdvanced,
+  } = flags ?? {}
 
   return [
     {
@@ -53,31 +64,43 @@ export const generateAuthMenu = (
                     },
                   ]
                 : []),
-              {
-                name: 'Emails',
-                key: 'emails',
-                pages: ['templates', 'smtp'],
-                url: `/project/${ref}/auth/templates`,
-                items: [],
-              },
-              {
-                name: 'Multi-Factor',
-                key: 'mfa',
-                url: `/project/${ref}/auth/mfa`,
-                items: [],
-              },
+              ...(authenticationEmails
+                ? [
+                    {
+                      name: 'Emails',
+                      key: 'emails',
+                      pages: ['templates', 'smtp'],
+                      url: `/project/${ref}/auth/templates`,
+                      items: [],
+                    },
+                  ]
+                : []),
+              ...(authenticationMultiFactor
+                ? [
+                    {
+                      name: 'Multi-Factor',
+                      key: 'mfa',
+                      url: `/project/${ref}/auth/mfa`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'URL Configuration',
                 key: 'url-configuration',
                 url: `/project/${ref}/auth/url-configuration`,
                 items: [],
               },
-              {
-                name: 'Attack Protection',
-                key: 'protection',
-                url: `/project/${ref}/auth/protection`,
-                items: [],
-              },
+              ...(authenticationAttackProtection
+                ? [
+                    {
+                      name: 'Attack Protection',
+                      key: 'protection',
+                      url: `/project/${ref}/auth/protection`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Auth Hooks',
                 key: 'hooks',
@@ -85,12 +108,16 @@ export const generateAuthMenu = (
                 items: [],
                 label: 'BETA',
               },
-              {
-                name: 'Advanced',
-                key: 'advanced',
-                url: `/project/${ref}/auth/advanced`,
-                items: [],
-              },
+              ...(authenticationAdvanced
+                ? [
+                    {
+                      name: 'Advanced',
+                      key: 'advanced',
+                      url: `/project/${ref}/auth/advanced`,
+                      items: [],
+                    },
+                  ]
+                : []),
             ]
           : []),
       ],

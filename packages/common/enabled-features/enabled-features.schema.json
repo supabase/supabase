@@ -35,6 +35,23 @@
       "type": "boolean",
       "description": "Enable the authentication rate limits page"
     },
+    "authentication:emails": {
+      "type": "boolean",
+      "description": "Enable the authentication emails page"
+    },
+    "authentication:multi_factor": {
+      "type": "boolean",
+      "description": "Enable the authentication multi factor page"
+    },
+    "authentication:attack_protection": {
+      "type": "boolean",
+      "description": "Enable the authentication attack protection page"
+    },
+    "authentication:advanced": {
+      "type": "boolean",
+      "description": "Enable the authentication advanced page"
+    },
+
     "authentication:show_providers": {
       "type": "boolean",
       "description": "Show the providers section in the authentication Sign In / Providers page"
@@ -141,6 +158,10 @@
     "authentication:policies",
     "authentication:third_party_auth",
     "authentication:rate_limits",
+    "authentication:emails",
+    "authentication:multi_factor",
+    "authentication:attack_protection",
+    "authentication:advanced",
     "authentication:show_providers",
     "authentication:show_manual_linking",
     "authentication:show_provider_filter",
