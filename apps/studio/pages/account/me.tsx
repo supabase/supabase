@@ -15,6 +15,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 
 const User: NextPageWithLayout = () => {
   return <ProfileCard />
@@ -39,43 +44,52 @@ const ProfileCard = () => {
   const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article>
-      {isLoading && (
-        <Panel>
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        </Panel>
-      )}
-      {isError && (
-        <Panel>
-          <div className="p-4">
-            <AlertError error={error} subject="Failed to retrieve account information" />
-          </div>
-        </Panel>
-      )}
-      {isSuccess && (
-        <>
-          {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
-          <AccountIdentities />
-        </>
-      )}
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader className="pt-0">
+          <ScaffoldSectionTitle>Preferences</ScaffoldSectionTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
+        <article>
+          {isLoading && (
+            <Panel>
+              <div className="p-4">
+                <GenericSkeletonLoader />
+              </div>
+            </Panel>
+          )}
+          {isError && (
+            <Panel>
+              <div className="p-4">
+                <AlertError error={error} subject="Failed to retrieve account information" />
+              </div>
+            </Panel>
+          )}
+          {isSuccess && (
+            <>
+              {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
+              <AccountIdentities />
+            </>
+          )}
 
-      <section>
-        <AccountConnections />
-      </section>
+          <section>
+            <AccountConnections />
+          </section>
 
-      <section>
-        <ThemeSettings />
-      </section>
+          <section>
+            <ThemeSettings />
+          </section>
 
-      <section>
-        <AnalyticsSettings />
-      </section>
+          <section>
+            <AnalyticsSettings />
+          </section>
 
-      <section>
-        <AccountDeletion />
-      </section>
-    </article>
+          <section>
+            <AccountDeletion />
+          </section>
+        </article>
+      </ScaffoldContainer>
+    </>
   )
 }
