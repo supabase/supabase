@@ -25,7 +25,7 @@
 
     "authentication:policies": {
       "type": "boolean",
-      "description": "Enable the authentication policies page"
+      "description": "Enable the authentication policies page (as well as all other product's policies page)"
     },
     "authentication:third_party_auth": {
       "type": "boolean",
