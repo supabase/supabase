@@ -140,11 +140,24 @@ export interface UserAuthOperations {
 export interface Author {
   id: number;
   author: string;
-  author_id?: string | null;
+  /**
+   * Unique identifier for the author
+   */
+  author_id: string;
+  /**
+   * GitHub/social username
+   */
+  username?: string | null;
   position?: string | null;
+  /**
+   * Company name (for external/guest authors)
+   */
+  company?: string | null;
+  /**
+   * Link to GitHub, Twitter, LinkedIn, etc.
+   */
   author_url?: string | null;
   author_image_url?: (number | null) | Media;
-  username?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1180,10 +1193,11 @@ export interface PayloadMigration {
 export interface AuthorsSelect<T extends boolean = true> {
   author?: T;
   author_id?: T;
+  username?: T;
   position?: T;
+  company?: T;
   author_url?: T;
   author_image_url?: T;
-  username?: T;
   updatedAt?: T;
   createdAt?: T;
 }

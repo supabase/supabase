@@ -1,6 +1,7 @@
-import * as migration_20250619_155345 from './20250619_155345.ts';
-import * as migration_20250619_160549 from './20250619_160549.ts';
-import * as migration_20250808_145722_update_payload_migrations from './20250808_145722_update_payload_migrations.ts';
+import * as migration_20250619_155345 from './20250619_155345';
+import * as migration_20250619_160549 from './20250619_160549';
+import * as migration_20250808_145722_update_payload_migrations from './20250808_145722_update_payload_migrations';
+import * as migration_20250819_222013_update_authors from './20250819_222013_update_authors';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20250808_145722_update_payload_migrations.up,
     down: migration_20250808_145722_update_payload_migrations.down,
-    name: '20250808_145722_update_payload_migrations'
+    name: '20250808_145722_update_payload_migrations',
+  },
+  {
+    up: migration_20250819_222013_update_authors.up,
+    down: migration_20250819_222013_update_authors.down,
+    name: '20250819_222013_update_authors',
   },
 ];
