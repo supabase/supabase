@@ -50,7 +50,7 @@ hideToc: true
 
         ```text name=.env.local
         NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
         ```
 
       </$CodeTabs>
@@ -81,7 +81,7 @@ hideToc: true
 
         return createServerClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
           {
             cookies: {
               getAll() {

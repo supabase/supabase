@@ -112,7 +112,7 @@ const Home: NextPageWithLayout = () => {
   const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
   return (
-    <div className="w-full">
+    <div className="w-full px-4">
       <div className={cn('py-16 ', !isPaused && 'border-b border-muted ')}>
         <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
