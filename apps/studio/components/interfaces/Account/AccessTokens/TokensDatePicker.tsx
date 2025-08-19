@@ -2,7 +2,8 @@ import dayjs from 'dayjs'
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+
+import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
 import {
   Button,
   ButtonProps,
@@ -15,23 +16,21 @@ export type TokenDatePickerValue = {
   date: string
 }
 
-
-
-interface Props {
+interface TokensDatePickerProps {
   value: TokenDatePickerValue
-  onSubmit: (value: TokenDatePickerValue) => void
   buttonTriggerProps?: ButtonProps
   popoverContentProps?: typeof PopoverContent_Shadcn_
+  onSubmit: (value: TokenDatePickerValue) => void
   disabled?: (date: Date) => boolean
 }
 
 export const TokensDatePicker = ({
-  onSubmit,
   value,
   buttonTriggerProps,
   popoverContentProps,
+  onSubmit,
   disabled,
-}: PropsWithChildren<Props>) => {
+}: PropsWithChildren<TokensDatePickerProps>) => {
   const [open, setOpen] = useState(false)
   const todayButtonRef = useRef<HTMLButtonElement>(null)
   const timeInputRef = useRef<HTMLDivElement>(null)
@@ -41,7 +40,7 @@ export const TokensDatePicker = ({
     if (!open) {
       const dateToSet = value.date ? new Date(value.date) : new Date()
       setSelectedDate(dateToSet)
-      
+
       // If there's an existing value, use its time, otherwise default to 23:59:59
       if (value.date) {
         setSelectedTime({
@@ -78,12 +77,12 @@ export const TokensDatePicker = ({
       const handleFocusIn = (event: FocusEvent) => {
         const target = event.target as HTMLElement
         const popover = timeInputRef.current?.closest('[data-radix-popper-content-wrapper]')
-        
+
         // If focus is moving outside the popover, prevent it
         if (popover && !popover.contains(target)) {
           event.preventDefault()
           event.stopPropagation()
-          
+
           // Refocus the first time input
           const firstInput = timeInputRef.current?.querySelector('input')
           if (firstInput) {
@@ -93,7 +92,7 @@ export const TokensDatePicker = ({
       }
 
       document.addEventListener('focusin', handleFocusIn, true)
-      
+
       return () => {
         document.removeEventListener('focusin', handleFocusIn, true)
       }
@@ -127,7 +126,9 @@ export const TokensDatePicker = ({
     if (!selectedDate) return
 
     // Add Time to the date
-    const finalDate = new Date(selectedDate.setHours(+selectedTime.HH, +selectedTime.mm, +selectedTime.ss))
+    const finalDate = new Date(
+      selectedDate.setHours(+selectedTime.HH, +selectedTime.mm, +selectedTime.ss)
+    )
 
     onSubmit({
       date: finalDate.toISOString(),
@@ -140,9 +141,7 @@ export const TokensDatePicker = ({
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type="default" icon={<Clock />} {...buttonTriggerProps}>
-          {selectedDate
-            ? `${dayjs(selectedDate).format('DD MMM, HH:mm')}`
-            : 'Select date'}
+          {selectedDate ? `${dayjs(selectedDate).format('DD MMM, HH:mm')}` : 'Select date'}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_

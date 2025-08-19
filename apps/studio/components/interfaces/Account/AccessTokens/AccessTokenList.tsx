@@ -1,15 +1,15 @@
+import AlertError from 'components/ui/AlertError'
+import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
+import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import dayjs from 'dayjs'
 import { MoreVertical, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import AlertError from 'components/ui/AlertError'
-import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
-import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { DATETIME_FORMAT } from 'lib/constants'
 import {
   Button,
   Card,
   CardContent,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -28,7 +28,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import { T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp'
 
 const RowLoading = () => (
   <TableRow>
@@ -50,25 +49,18 @@ const RowLoading = () => (
   </TableRow>
 )
 
+const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2'
 const TableContainer = ({ children }: { children: React.ReactNode }) => (
   <Card className="w-full overflow-hidden">
     <CardContent className="p-0">
       <Table className="p-5 table-auto">
         <TableHeader>
           <TableRow className="bg-200">
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-              Name
-            </TableHead>
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-              Token
-            </TableHead>
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-              Last used
-            </TableHead>
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-              Expires
-            </TableHead>
-            <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />
+            <TableHead className={tableHeaderClass}>Name</TableHead>
+            <TableHead className={tableHeaderClass}>Token</TableHead>
+            <TableHead className={tableHeaderClass}>Last used</TableHead>
+            <TableHead className={tableHeaderClass}>Expires</TableHead>
+            <TableHead className={cn(tableHeaderClass, '!text-right')} />
           </TableRow>
         </TableHeader>
         <TableBody>{children}</TableBody>

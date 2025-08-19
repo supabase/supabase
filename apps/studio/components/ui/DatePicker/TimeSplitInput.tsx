@@ -2,13 +2,19 @@ import { format } from 'date-fns'
 import { Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
+import { cn } from 'ui'
+import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
 
-const TimeSplitInput = ({
+const inputStyle = cn(
+  'w-6 p-0 text-center text-xs text-foreground outline-none cursor-text',
+  'ring-0 focus:ring-0 ring-none border-none bg-transparent'
+)
+
+export const TimeSplitInput = ({
   type,
   time,
   setTime,
@@ -166,11 +172,11 @@ const TimeSplitInput = ({
     // Allow only numbers and navigation keys
     const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter']
     const isNumber = /^[0-9]$/.test(event.key)
-    
+
     if (!isNumber && !allowedKeys.includes(event.key)) {
       event.preventDefault()
     }
-    
+
     // Prevent parent dialog from stealing focus on keydown
     event.stopPropagation()
   }
@@ -179,8 +185,6 @@ const TimeSplitInput = ({
     // Prevent parent dialog from stealing focus on input
     event.stopPropagation()
   }
-
-
 
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
@@ -246,18 +250,7 @@ const TimeSplitInput = ({
         placeholder="00"
         onChange={(e) => handleOnChange(e.target.value, 'HH')}
         aria-label="Hours"
-        className="
-            ring-none
-            w-6
-            border-none
-            bg-transparent
-            p-0 text-center text-xs
-            text-foreground
-            outline-none
-            ring-0
-            focus:ring-0
-            cursor-text
-        "
+        className={inputStyle}
         value={time.HH}
       />
       <span className="text-foreground-lighter">:</span>
@@ -272,18 +265,7 @@ const TimeSplitInput = ({
         placeholder="00"
         onChange={(e) => handleOnChange(e.target.value, 'mm')}
         aria-label="Minutes"
-        className="
-            ring-none
-            w-6
-            border-none
-            bg-transparent
-            p-0 text-center text-xs
-            text-foreground
-            outline-none
-            ring-0
-            focus:ring-0
-            cursor-text
-        "
+        className={inputStyle}
         value={time.mm}
       />
       <span className="text-foreground-lighter">:</span>
@@ -298,22 +280,9 @@ const TimeSplitInput = ({
         placeholder="00"
         onChange={(e) => handleOnChange(e.target.value, 'ss')}
         aria-label="Seconds"
-        className="
-            ring-none
-            w-6
-            border-none
-            bg-transparent
-            p-0 text-center text-xs
-            text-foreground
-            outline-none
-            ring-0
-            focus:ring-0
-            cursor-text
-        "
+        className={inputStyle}
         value={time.ss}
       />
     </div>
   )
 }
-
-export default TimeSplitInput

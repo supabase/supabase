@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
+import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { useState } from 'react'
 
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
@@ -28,40 +29,14 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import dayjs from 'dayjs'
-import { TokensDatePicker, TokenDatePickerValue } from './TokensDatePicker'
+import {
+  CUSTOM_EXPIRY_VALUE,
+  ExpiresAtOptions,
+  NON_EXPIRING_TOKEN_VALUE,
+} from './AccessTokens.constants'
+import { TokenDatePickerValue, TokensDatePicker } from './TokensDatePicker'
 
 const formId = 'new-access-token-form'
-
-const NON_EXPIRING_TOKEN_VALUE = 'never'
-const CUSTOM_EXPIRY_VALUE = 'custom'
-
-const ExpiresAtOptions: Record<string, { value: string; label: string }> = {
-  hour: {
-    value: dayjs().add(1, 'hour').toISOString(),
-    label: '1 hour',
-  },
-  day: {
-    value: dayjs().add(1, 'days').toISOString(),
-    label: '1 day',
-  },
-  week: {
-    value: dayjs().add(7, 'days').toISOString(),
-    label: '7 days',
-  },
-  month: {
-    value: dayjs().add(30, 'days').toISOString(),
-    label: '30 days',
-  },
-  never: {
-    value: NON_EXPIRING_TOKEN_VALUE,
-    label: 'Never',
-  },
-  custom: {
-    value: CUSTOM_EXPIRY_VALUE,
-    label: 'Custom',
-  },
-}
 
 const TokenSchema = z.object({
   tokenName: z.string().min(1, 'Please enter a name for the token'),

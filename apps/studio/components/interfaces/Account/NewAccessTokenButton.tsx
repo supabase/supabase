@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronDown, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -32,34 +31,10 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import dayjs from 'dayjs'
+import { ExpiresAtOptions, NON_EXPIRING_TOKEN_VALUE } from './AccessTokens/AccessTokens.constants'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
-}
-
-const NON_EXPIRING_TOKEN_VALUE = 'never'
-const ExpiresAtOptions: Record<string, { value: string; label: string }> = {
-  hour: {
-    value: dayjs().add(1, 'hour').toISOString(),
-    label: '1 hour',
-  },
-  day: {
-    value: dayjs().add(1, 'days').toISOString(),
-    label: '1 day',
-  },
-  week: {
-    value: dayjs().add(7, 'days').toISOString(),
-    label: '7 days',
-  },
-  month: {
-    value: dayjs().add(30, 'days').toISOString(),
-    label: '30 days',
-  },
-  never: {
-    value: NON_EXPIRING_TOKEN_VALUE,
-    label: 'Never',
-  },
 }
 
 const TokenSchema = z.object({
@@ -126,9 +101,7 @@ export const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProp
                 setVisible(true)
               }}
             >
-              <div className="space-y-1">
-                <p className="block text-foreground">Generate token for experimental API</p>
-              </div>
+              Generate token for experimental API
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -161,13 +134,9 @@ export const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProp
                     </p>
                     <div className="mt-4">
                       <Button asChild type="default" icon={<ExternalLink />}>
-                        <Link
-                          href="https://api.supabase.com/api/v0"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                           Experimental API documentation
-                        </Link>
+                        </a>
                       </Button>
                     </div>
                   </>
