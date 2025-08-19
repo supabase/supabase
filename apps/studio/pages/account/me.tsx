@@ -13,9 +13,12 @@ import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 
 const User: NextPageWithLayout = () => {
   return <ProfileCard />
@@ -40,13 +43,11 @@ const ProfileCard = () => {
   return (
     <>
       <ScaffoldContainer>
-        <FormHeader
-          title="Preferences"
-          description="Manage your account preferences, profile information, and personal settings."
-        />
+        <ScaffoldHeader className="pt-0">
+          <ScaffoldSectionTitle>Preferences</ScaffoldSectionTitle>
+        </ScaffoldHeader>
       </ScaffoldContainer>
-      
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+      <ScaffoldContainer bottomPadding>
         <article>
           {isLoading && (
             <Panel>

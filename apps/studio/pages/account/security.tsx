@@ -6,8 +6,6 @@ import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -16,6 +14,11 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -36,13 +39,11 @@ const Security: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainer>
-        <FormHeader
-          title="Security"
-          description="Manage your account security settings, including multi-factor authentication."
-        />
+        <ScaffoldHeader className="pt-0">
+          <ScaffoldSectionTitle>Security</ScaffoldSectionTitle>
+        </ScaffoldHeader>
       </ScaffoldContainer>
-      
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+      <ScaffoldContainer bottomPadding>
         <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
           <CollapsibleTrigger_Shadcn_ asChild>
             <button
