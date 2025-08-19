@@ -1654,7 +1654,9 @@ function createStorageExplorerState({
       const currentColumnItems = currentColumn.items.filter(
         (item) => item.status !== STORAGE_ROW_STATUS.EDITING
       )
-      const hasSameNameInColumn = currentColumnItems.filter((item) => item.name === name).length > 0
+      const hasSameNameInColumn =
+        currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length >
+        0
 
       if (hasSameNameInColumn) {
         if (autofix) {
