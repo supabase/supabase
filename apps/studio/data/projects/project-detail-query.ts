@@ -25,7 +25,7 @@ export async function getProjectDetail(
   signal?: AbortSignal
 ) {
   console.log(`Slug=${slug}, ref=${ref}`)
-  if (slug !== undefined) {
+  if (!slug) {
     try {
       throw new Error('Organization slug is required')
     } catch (error) {
@@ -37,7 +37,7 @@ export async function getProjectDetail(
   const { data, error } = await get('/platform/projects/{ref}', {
     params: { path: { ref } },
     headers: {
-      "X-Vela-Organization-Ref": slug
+      'X-Vela-Organization-Ref': slug,
     },
     signal,
   })
@@ -79,7 +79,7 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
   )
 }
 
-export function invalidateProjectDetailsQuery(client: QueryClient, slug: string,  ref: string) {
+export function invalidateProjectDetailsQuery(client: QueryClient, slug: string, ref: string) {
   return client.invalidateQueries(projectKeys.detail(slug, ref))
 }
 

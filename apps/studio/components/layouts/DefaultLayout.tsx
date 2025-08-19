@@ -39,10 +39,10 @@ export interface DefaultLayoutProps {
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
 const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
-  const [ isInitialized, setInitialized ] = useState<boolean>(false);
+  const [isInitialized, setInitialized] = useState<boolean>(false)
 
   useEffect(() => {
-    setInitialized(true);
+    setInitialized(true)
   }, [])
 
   const slug = getOrganizationSlug()
@@ -54,9 +54,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
   useCheckLatestDeploy()
 
   if (!isInitialized) {
-    return (
-      <div>BAM FUCKER</div>
-    )
+    return <></>
   }
 
   return (
