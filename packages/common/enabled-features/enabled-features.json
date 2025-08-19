@@ -28,5 +28,5 @@
   "project_homepage:show_instance_size": true,
   "project_homepage:show_examples": true,
 
-  "table_editor:creation_enable_rls_toggle": true
+  "table_editor:enable_rls_toggle": true
 }

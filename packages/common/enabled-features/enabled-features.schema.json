@@ -87,9 +87,9 @@
       "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
     },
 
-    "table_editor:creation_enable_rls_toggle": {
+    "table_editor:enable_rls_toggle": {
       "type": "boolean",
-      "description": "Show the RLS toggle in the table creation flow"
+      "description": "Show the RLS toggle in the table creation flow and table editor header"
     }
   },
   "required": [
@@ -111,7 +111,7 @@
     "project_homepage:show_all_client_libraries",
     "project_connection:javascript_example",
     "project_connection:dart_example",
-    "table_editor:creation_enable_rls_toggle"
+    "table_editor:enable_rls_toggle"
   ],
   "additionalProperties": false
 }

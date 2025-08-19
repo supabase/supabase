@@ -85,8 +85,8 @@ const TableEditor = ({
   const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const { realtimeAll: realtimeEnabled, tableEditorCreationEnableRlsToggle: enableRlsToggle } =
-    useIsFeatureEnabled(['realtime:all', 'table_editor:creation_enable_rls_toggle'])
+  const { realtimeAll: realtimeEnabled, tableEditorEnableRlsToggle: enableRlsToggle } =
+    useIsFeatureEnabled(['realtime:all', 'table_editor:enable_rls_toggle'])
   const { mutate: sendEvent } = useSendEventMutation()
 
   const [params, setParams] = useUrlState()
