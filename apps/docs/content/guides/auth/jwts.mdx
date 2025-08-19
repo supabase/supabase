@@ -93,11 +93,15 @@ If you wish to send a JWT from a Third-Party Auth provider, or one you made your
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    return '<your JWT here>'
-  },
-})
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return '<your JWT here>'
+    },
+  }
+)
 ```
 
 </TabPanel>
@@ -124,7 +128,7 @@ import Supabase
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
-  supabaseKey: "SUPABASE_ANON_KEY",
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
@@ -142,7 +146,7 @@ let supabase = SupabaseClient(
 ```kotlin
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         "<your JWT here>"

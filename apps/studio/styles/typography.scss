@@ -35,32 +35,32 @@
 @layer utilities {
   /* Heading */
   .heading-title {
-    @apply scroll-m-20 text-2xl tracking-tight text-foreground;
+    @apply scroll-m-20 text-2xl tracking-tight;
   }
 
   .heading-section {
-    @apply scroll-m-20 text-xl text-foreground;
+    @apply scroll-m-20 text-xl;
   }
 
   .heading-subSection {
-    @apply scroll-m-20 text-base text-foreground;
+    @apply scroll-m-20 text-base;
   }
 
   .heading-default {
-    @apply scroll-m-20 text-sm font-medium text-foreground;
+    @apply scroll-m-20 text-sm font-medium;
   }
 
   .heading-compact {
-    @apply scroll-m-20 text-xs font-medium text-foreground;
+    @apply scroll-m-20 text-xs font-medium;
   }
 
   .heading-meta {
-    @apply text-xs font-mono uppercase tracking-wider font-medium text-foreground-light;
+    @apply text-xs font-mono uppercase tracking-wider font-medium;
   }
 
   /* Text */
   .text-default {
-    @apply text-base text-foreground-light;
+    @apply text-base;
   }
 
   .text-subTitle {

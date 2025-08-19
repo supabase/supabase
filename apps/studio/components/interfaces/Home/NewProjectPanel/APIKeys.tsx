@@ -10,6 +10,7 @@ import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Input, SimpleCodeBlock } from 'ui'
 
 const generateInitSnippet = (endpoint: string) => ({
@@ -29,12 +30,20 @@ Future<void> main() async {
 }`,
 })
 
-const APIKeys = () => {
+export const APIKeys = () => {
   const { ref: projectRef } = useParams()
 
+  const {
+    projectConnectionJavascriptExample: javascriptExampleEnabled,
+    projectConnectionDartExample: dartExampleEnabled,
+  } = useIsFeatureEnabled([
+    'project_connection:javascript_example',
+    'project_connection:dart_example',
+  ])
+
   const availableLanguages = [
-    { name: 'Javascript', key: 'js' },
-    { name: 'Dart', key: 'dart' },
+    ...(javascriptExampleEnabled ? [{ name: 'Javascript', key: 'js' }] : []),
+    ...(dartExampleEnabled ? [{ name: 'Dart', key: 'dart' }] : []),
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
 
@@ -78,7 +87,9 @@ const APIKeys = () => {
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
-  const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
+  const selectedLanguageSnippet = !!selectedLanguage
+    ? clientInitSnippet[selectedLanguage.key]
+    : 'No snippet available'
 
   return (
     <Panel
@@ -177,34 +188,34 @@ const APIKeys = () => {
               }
             />
           </Panel.Content>
-          <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="flex items-center bg-studio">
-              {availableLanguages.map((language) => {
-                const isSelected = selectedLanguage.key === language.key
-                return (
-                  <div
-                    key={language.key}
-                    className={[
-                      'px-3 py-1 text-sm cursor-pointer transition',
-                      `${!isSelected ? 'bg-studio text-foreground-light' : 'bg-surface-100'}`,
-                    ].join(' ')}
-                    onClick={() => setSelectedLanguage(language)}
-                  >
-                    {language.name}
-                  </div>
-                )
-              })}
+          {availableLanguages.length > 0 && (
+            <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <div className="flex items-center bg-studio">
+                {availableLanguages.map((language) => {
+                  const isSelected = selectedLanguage.key === language.key
+                  return (
+                    <div
+                      key={language.key}
+                      className={[
+                        'px-3 py-1 text-sm cursor-pointer transition',
+                        `${!isSelected ? 'bg-studio text-foreground-light' : 'bg-surface-100'}`,
+                      ].join(' ')}
+                      onClick={() => setSelectedLanguage(language)}
+                    >
+                      {language.name}
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="bg-surface-100 px-4 py-6 min-h-[200px]">
+                <SimpleCodeBlock className={selectedLanguage.key}>
+                  {selectedLanguageSnippet}
+                </SimpleCodeBlock>
+              </div>
             </div>
-            <div className="bg-surface-100 px-4 py-6 min-h-[200px]">
-              <SimpleCodeBlock className={selectedLanguage.key}>
-                {selectedLanguageSnippet}
-              </SimpleCodeBlock>
-            </div>
-          </div>
+          )}
         </>
       )}
     </Panel>
   )
 }
-
-export default APIKeys

@@ -141,7 +141,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
           <img
             alt="region icon"
             className="w-8 rounded-sm mt-0.5"
-            src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+            src={`${BASE_PATH}/img/regions/${region.region}.svg`}
           />
         </div>
         {numReplicas > 0 && (

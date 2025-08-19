@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { debounce } from 'lodash'
-import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
@@ -17,7 +16,7 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PROVIDERS } from 'lib/constants'
+import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
@@ -54,7 +53,6 @@ VercelIntegration.getLayout = (page) => (
 )
 
 const CreateProject = () => {
-  const router = useRouter()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -258,11 +256,11 @@ const CreateProject = () => {
                   key={option}
                   label={label}
                   value={label}
-                  addOnBefore={({ active, selected }: any) => (
+                  addOnBefore={() => (
                     <img
                       alt="region icon"
                       className="w-5 rounded-sm"
-                      src={`${router.basePath}/img/regions/${Object.keys(AWS_REGIONS)[i]}.svg`}
+                      src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
                     />
                   )}
                 >

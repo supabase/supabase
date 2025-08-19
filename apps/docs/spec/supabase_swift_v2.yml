@@ -27,7 +27,7 @@ functions:
           ```swift
           import Supabase
 
-          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
+          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "publishable-or-anon-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
@@ -37,7 +37,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "public-anon-key",
+            supabaseKey: "publishable-or-anon-key",
             options: SupabaseClientOptions(
               db: .init(
                 schema: "public"
@@ -67,7 +67,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "public-anon-key",
+            supabaseKey: "publishable-or-anon-key",
             options: SupabaseClientOptions(
               global: SupabaseClientOptions.GlobalOptions(
                 logger: AppLogger()
@@ -83,7 +83,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "public-anon-key",
+            supabaseKey: "publishable-or-anon-key",
             options: SupabaseClientOptions(
               db: .init(
                 // Provide a custom schema. Defaults to "public".
@@ -155,7 +155,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
+          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "publishable-or-anon-key")
           let auth = supabase.auth
           ```
       - id: create-auth-client-with-custom-storage
@@ -165,7 +165,7 @@ functions:
           ```swift
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "public-anon-key",
+            supabaseKey: "publishable-or-anon-key",
             options: .init(
               auth: .init(
                 MyCustomLocalStorage()
