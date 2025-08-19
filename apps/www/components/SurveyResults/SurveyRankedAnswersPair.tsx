@@ -6,9 +6,15 @@ export function SurveyRankedAnswersPair({
   return (
     <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-y divide-muted divide-opacity-50">
       {rankedAnswersPair.map((item, index) => (
-        <div key={index} className="flex gap-6 md:gap-12 flex-1 flex-col">
+        <div
+          key={index}
+          className={`flex gap-6 md:gap-12 flex-1 ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'}`}
+        >
           {/* Decorative progress bar */}
-          <div aria-hidden="true" className="flex items-start">
+          <div
+            aria-hidden="true"
+            className={`flex ${index % 2 === 0 ? 'flex-row items-start' : 'flex-row-reverse items-start sm:items-end'}`}
+          >
             {item.answers.map((answer, answerIndex) => (
               <div
                 key={answerIndex}
@@ -24,7 +30,9 @@ export function SurveyRankedAnswersPair({
           </div>
 
           {/* Text content */}
-          <div className="px-6 py-8 flex flex-col gap-12">
+          <div
+            className={`px-6 py-8 flex ${index % 2 === 0 ? 'flex-col' : 'flex-col sm:flex-col-reverse'} gap-12`}
+          >
             <ol className="flex flex-col gap-3">
               {item.answers.map((answer, answerIndex) => (
                 <li key={answerIndex} className="flex flex-col gap-2">
