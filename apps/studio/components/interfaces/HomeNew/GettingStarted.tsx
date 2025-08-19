@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Check } from 'lucide-react'
-import { cn, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { cn, Button, Card, CardContent, CardHeader, CardTitle, Badge } from 'ui'
 import { Row } from 'ui-patterns'
 
 export type GettingStartedAction = {
@@ -14,8 +14,7 @@ export type GettingStartedAction = {
 export type GettingStartedStep = {
   key: string
   status: 'complete' | 'incomplete'
-  imageUrl?: string
-  imageAlt?: string
+  icon?: React.ReactNode
   title: string
   description: string
   actions: GettingStartedAction[]
@@ -38,27 +37,20 @@ export function GettingStarted({ steps, className }: GettingStartedProps) {
       <Row columns={[3, 2, 1]} className="items-stretch">
         {steps.map((step) => (
           <Card key={step.key} className="overflow-hidden h-full">
-            <CardHeader className={cn('py-3 px-4 border-b', 'bg-surface-100')}>
-              <CardTitle
-                className={cn(
-                  'text-xs font-mono uppercase flex items-center gap-1',
-                  step.status === 'complete' ? 'text-brand' : 'text-foreground-light'
-                )}
-              >
-                {step.status === 'complete' && <Check size={14} className="text-brand" />}
-                <span>{step.status}</span>
-              </CardTitle>
-            </CardHeader>
-            {step.imageUrl ? (
-              <img src={step.imageUrl} alt={step.imageAlt ?? ''} className="w-full object-cover" />
-            ) : (
-              <div className="w-full h-28 bg-surface-200" />
-            )}
-            <CardContent className="space-y-3">
-              <div className="space-y-1">
-                <h4 className="text-sm text-foreground">{step.title}</h4>
-                <p className="text-sm text-foreground-light">{step.description}</p>
+            <CardHeader className="flex flex-row space-y-0 justify-between items-center border-b-0">
+              <div className="flex flex-row items-center gap-3">
+                {step.icon && <div>{step.icon}</div>}
+                <CardTitle className="text-foreground-light">{step.title}</CardTitle>
               </div>
+              <Badge
+                variant={step.status === 'complete' ? 'success' : 'default'}
+                className="capitalize"
+              >
+                {step.status}
+              </Badge>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-16">
+              <p className="text-base text-foreground">{step.description}</p>
               <div className="flex flex-wrap gap-2">
                 {step.actions.map((action, i) => {
                   const content = (

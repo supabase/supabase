@@ -6,6 +6,7 @@ import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requ
 import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ProjectUsage from './ProjectUsage'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 export const ProjectUsageSection = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -18,7 +19,17 @@ export const ProjectUsageSection = () => {
   })
 
   if (isLoading || isLogsStatsLoading) {
-    return <ProjectUsageLoadingState />
+    return (
+      <div className="space-y-6">
+        <ShimmeringLoader className="w-40 h-7" />
+        <div className="flex flex-col md:flex-row gap-2 md:gap-4">
+          <ShimmeringLoader className="w-full h-[258px] py-0" />
+          <ShimmeringLoader className="w-full h-[258px] py-0" />
+          <ShimmeringLoader className="w-full h-[258px] py-0" />
+          <ShimmeringLoader className="w-full h-[258px] py-0" />
+        </div>
+      </div>
+    )
   }
 
   if (error) {

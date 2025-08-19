@@ -83,7 +83,7 @@ const TopSection = ({
                   className="h-[500px] scale-[0.8] origin-top-left pointer-events-none"
                   style={{ width: 'calc(100% / 0.8)' }}
                 >
-                  <InstanceConfiguration />
+                  <InstanceConfiguration diagramOnly />
                 </div>
               </div>
             </Link>

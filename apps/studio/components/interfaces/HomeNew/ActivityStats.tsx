@@ -5,6 +5,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useBackupsQuery } from 'data/database/backups-query'
+import { Skeleton } from 'ui'
 import { ServiceStatus } from './ServiceStatus'
 
 export default function ActivityStats() {
@@ -47,35 +48,41 @@ export default function ActivityStats() {
         <Link href={`/project/${ref}/branches`} className="block">
           <h4 className="heading-meta text-foreground-light mb-1">Last branch</h4>
           <p className="text-foreground">
-            {isLoadingBranches
-              ? 'Loading...'
-              : latestBranch?.created_at
-                ? dayjs(latestBranch.created_at).fromNow()
-                : latestBranch?.updated_at
-                  ? dayjs(latestBranch.updated_at).fromNow()
-                  : 'No branches'}
+            {isLoadingBranches ? (
+              <Skeleton className="h-4 w-16 mt-2" />
+            ) : latestBranch?.created_at ? (
+              dayjs(latestBranch.created_at).fromNow()
+            ) : latestBranch?.updated_at ? (
+              dayjs(latestBranch.updated_at).fromNow()
+            ) : (
+              'No branches'
+            )}
           </p>
         </Link>
         <Link href={`/project/${ref}/database/migrations`} className="block">
           <p className="heading-meta text-foreground-light mb-1">Last migration</p>
           <p className="text-foreground">
-            {isLoadingMigrations
-              ? 'Loading...'
-              : latestMigration
-                ? dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
-                : 'No migrations'}
+            {isLoadingMigrations ? (
+              <Skeleton className="h-4 w-16 mt-2" />
+            ) : latestMigration ? (
+              dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
+            ) : (
+              'No migrations'
+            )}
           </p>
         </Link>
         <Link href={`/project/${ref}/database/backups/scheduled`} className="block">
           <p className="heading-meta text-foreground-light mb-1">Last backup</p>
           <p className="text-foreground">
-            {isLoadingBackups
-              ? 'Loading...'
-              : backupsData?.pitr_enabled
-                ? 'PITR enabled'
-                : latestBackup
-                  ? dayjs(latestBackup.inserted_at).fromNow()
-                  : 'No backups'}
+            {isLoadingBackups ? (
+              <Skeleton className="h-4 w-16 mt-2" />
+            ) : backupsData?.pitr_enabled ? (
+              'PITR enabled'
+            ) : latestBackup ? (
+              dayjs(latestBackup.inserted_at).fromNow()
+            ) : (
+              'No backups'
+            )}
           </p>
         </Link>
       </div>

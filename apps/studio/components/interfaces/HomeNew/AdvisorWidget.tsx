@@ -1,4 +1,4 @@
-import { Shield } from 'lucide-react'
+import { BarChart, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
@@ -118,10 +118,16 @@ export const AdvisorWidget = () => {
             const levelLabel = 'Error'
             return (
               <Card key={lint.cache_key} className="h-full flex flex-col items-stretch h-64">
-                <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center py-2">
+                <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">
                   <Link
                     href={`/project/${projectRef}/advisors/${advisor}?id=${lint.cache_key}&preset=${lint.level}`}
+                    className="flex flex-row items-center gap-3"
                   >
+                    {lint.categories[0] === 'SECURITY' ? (
+                      <Shield size={16} strokeWidth={1.5} className="text-foreground-muted" />
+                    ) : (
+                      <BarChart size={16} strokeWidth={1.5} className="text-foreground-muted" />
+                    )}
                     <CardTitle className="text-foreground-light">{lint.categories[0]}</CardTitle>
                   </Link>
                   <ButtonTooltip

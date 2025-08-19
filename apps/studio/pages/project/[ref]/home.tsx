@@ -8,6 +8,7 @@ import {
   useProjectByRefQuery,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
@@ -64,12 +65,10 @@ const Home: NextPageWithLayout = () => {
     projectName = project.name
   }
 
-  const [sectionOrder, setSectionOrder] = useState<string[]>([
-    'getting-started',
-    'usage',
-    'advisor',
-    'custom-report',
-  ])
+  const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
+    `home-section-order-${project?.ref || 'default'}`,
+    ['getting-started', 'usage', 'advisor', 'custom-report']
+  )
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -106,11 +105,7 @@ const Home: NextPageWithLayout = () => {
       {!isPaused && (
         <div className="py-16 px-8">
           <div className="mx-auto max-w-7xl space-y-16">
-            <DndContext
-              sensors={sensors}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-            >
+            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
               <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
                 {sectionOrder.map((id) => {
                   if (id === 'getting-started') {

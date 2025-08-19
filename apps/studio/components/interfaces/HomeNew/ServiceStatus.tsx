@@ -19,6 +19,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  Skeleton,
 } from 'ui'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
@@ -280,13 +281,15 @@ export const ServiceStatus = () => {
 
   const anyUnhealthy = services.some((service) => !service.isHealthy)
   const anyComingUp = services.some((service) => service.status === 'COMING_UP')
-  const overallStatusLabel = isLoadingChecks
-    ? 'Checking status'
-    : anyUnhealthy
-      ? 'Unhealthy'
-      : anyComingUp || isProjectNew
-        ? 'Coming up...'
-        : 'Healthy'
+  const overallStatusLabel = isLoadingChecks ? (
+    <Skeleton className="h-4 w-16 mt-2" />
+  ) : anyUnhealthy ? (
+    'Unhealthy'
+  ) : anyComingUp || isProjectNew ? (
+    'Coming up...'
+  ) : (
+    'Healthy'
+  )
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -294,9 +297,8 @@ export const ServiceStatus = () => {
         <Button
           className="p-0 border-0 h-auto text-base"
           icon={
-            isLoadingChecks || (!allServicesOperational && isProjectNew && isMigrationLoading) ? (
-              <LoaderIcon />
-            ) : (
+            isLoadingChecks ||
+            (!allServicesOperational && isProjectNew && isMigrationLoading) ? null : (
               <div
                 className={`w-2 h-2 rounded-full ${
                   allServicesOperational ? 'bg-brand' : 'bg-warning'
