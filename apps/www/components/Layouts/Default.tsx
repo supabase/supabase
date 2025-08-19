@@ -1,3 +1,5 @@
+'use client'
+
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
 import { cn } from 'ui'

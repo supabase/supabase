@@ -6,6 +6,12 @@ module.exports = [
     pathname: '**',
   },
   {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '3030',
+    pathname: '**',
+  },
+  {
     protocol: 'https',
     hostname: 'avatars.githubusercontent.com',
     port: '',

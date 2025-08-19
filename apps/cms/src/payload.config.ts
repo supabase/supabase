@@ -116,6 +116,6 @@ export default buildConfig({
     },
     // schemaName: 'cms-payload',
   }),
-  sharp,
+  // sharp,
   plugins,
 })

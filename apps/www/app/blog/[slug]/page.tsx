@@ -1,0 +1,135 @@
+import BlogPostClient from './BlogPostClient'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
+import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
+import { draftMode } from 'next/headers'
+
+import type { Blog, BlogData, PostReturnType } from 'types/post'
+
+type MatterReturn = {
+  data: BlogData
+  content: string
+}
+
+type BlogPostPageProps = {
+  prevPost: PostReturnType | null
+  nextPost: PostReturnType | null
+  relatedPosts: (PostReturnType & BlogData)[]
+  blog: Blog & BlogData
+  isDraftMode: boolean
+}
+
+type Params = {
+  slug: string
+}
+
+export async function generateStaticParams() {
+  const staticPaths = getAllPostSlugs('_blog')
+  const cmsPaths = await getAllCMSPostSlugs()
+  return [...staticPaths, ...cmsPaths].map((p) => ({ slug: p.params.slug }))
+}
+
+export default async function BlogPostPage({ params }: { params: Params }) {
+  const { slug } = await params
+
+  if (!params?.slug) {
+    throw new Error('Missing slug for app/blog/[slug]/page.tsx')
+  }
+
+  const { isEnabled: isDraft } = await draftMode()
+
+  const matter = (await import('gray-matter')).default
+  const { mdxSerialize } = await import('lib/mdx/mdxSerialize')
+
+  try {
+    const postContent = await getPostdata(slug, '_blog')
+    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const content = parsedContent.content
+    const tocDepth = (parsedContent.data as any)?.toc_depth ?? 2
+    const mdxSource = await mdxSerialize(content, { tocDepth })
+    const blogPost = { ...parsedContent.data }
+
+    const allStaticPosts = getSortedPosts({ directory: '_blog' })
+    const allPosts = [...allStaticPosts].sort((a, b) => {
+      const aDate = new Date((a as unknown as { date: string }).date).getTime()
+      const bDate = new Date((b as unknown as { date: string }).date).getTime()
+      return bDate - aDate
+    })
+    const currentIndex = allPosts.findIndex((post) => post.slug === slug)
+    const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
+    const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
+    const tocResult = (mdxSource as any).scope?.toc || { content: '' }
+    const processedContent = tocResult.content
+    const relatedPosts = getSortedPosts({
+      directory: '_blog',
+      limit: 3,
+      tags: (mdxSource as { scope: { tags?: string[] } }).scope.tags,
+      currentPostSlug: slug,
+    }) as unknown as (BlogData & PostReturnType)[]
+
+    const props: BlogPostPageProps = {
+      prevPost,
+      nextPost,
+      relatedPosts,
+      blog: {
+        ...(blogPost as any),
+        content: mdxSource,
+        toc: {
+          ...tocResult,
+          content: processedContent,
+        },
+      } as any,
+      isDraftMode: isDraft,
+    }
+
+    return <BlogPostClient {...props} />
+  } catch {}
+
+  const cmsPost = await getCMSPostBySlug(slug, isDraft)
+
+  if (!cmsPost) {
+    if (isDraft) {
+      const publishedPost = await getCMSPostBySlug(slug, false)
+      if (!publishedPost) return null
+      const mdxSource = await mdxSerialize(publishedPost.content || '')
+      const props: BlogPostPageProps = {
+        prevPost: null,
+        nextPost: null,
+        relatedPosts: [],
+        blog: {
+          ...publishedPost,
+          tags: publishedPost.tags || [],
+          authors: publishedPost.authors || [],
+          isCMS: true,
+          content: mdxSource,
+          toc: publishedPost.toc,
+          image: publishedPost.image ?? undefined,
+          thumb: publishedPost.thumb ?? undefined,
+        } as any,
+        isDraftMode: isDraft,
+      }
+      return <BlogPostClient {...props} />
+    }
+    return null
+  }
+
+  const mdxSource = await mdxSerialize(cmsPost.content || '')
+
+  const props: BlogPostPageProps = {
+    prevPost: null,
+    nextPost: null,
+    relatedPosts: [],
+    blog: {
+      ...cmsPost,
+      tags: cmsPost.tags || [],
+      authors: cmsPost.authors || [],
+      isCMS: true,
+      content: mdxSource,
+      toc: cmsPost.toc,
+      image: cmsPost.image ?? undefined,
+      thumb: cmsPost.thumb ?? undefined,
+    } as any,
+    isDraftMode: isDraft,
+  }
+
+  return <BlogPostClient {...props} />
+}

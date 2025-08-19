@@ -27,6 +27,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '../../fields/slug/index.ts'
+import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
 
 const industryOptions = [
   { label: 'Healthcare', value: 'healthcare' },
@@ -73,7 +74,7 @@ export const Customers: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'updatedAt'],
     preview: (data) => {
-      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+      const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
       const isDraft = data?._status === 'draft'
       return `${baseUrl}/customers/${data?.slug}${isDraft ? '?preview=true' : ''}`
     },
