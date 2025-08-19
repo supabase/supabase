@@ -109,7 +109,8 @@ export function createRoutedBedrock(routingKey?: string) {
     })
 
     // Cross-region models require the region prefix
-    const modelName = `${regionPrefixMap[bedrockRegion]}.${modelId}`
+    const activeRegions = Object.values(regionWeights).filter((weight) => weight > 0).length
+    const modelName = activeRegions > 1 ? `${regionPrefixMap[bedrockRegion]}.${modelId}` : modelId
 
     return bedrock(modelName)
   }
