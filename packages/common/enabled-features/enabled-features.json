@@ -6,6 +6,12 @@
   "ai:opt_in_level_schema_and_log": true,
   "ai:opt_in_level_schema_and_log_and_data": true,
 
+  "authentication:show_send_invitation": true,
+  "authentication:show_provider_filter": true,
+  "authentication:show_sort_by_email": true,
+  "authentication:show_sort_by_phone": true,
+  "authentication:show_user_type_filter": true,
+
   "billing:all": true,
 
   "database:replication": true,
