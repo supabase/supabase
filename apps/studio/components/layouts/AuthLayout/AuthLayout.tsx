@@ -13,12 +13,20 @@ const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
 
-  const showPolicies = useIsFeatureEnabled('authentication:policies')
+  const { authenticationPolicies, authenticationRateLimits } = useIsFeatureEnabled([
+    'authentication:policies',
+    'authentication:rate_limits',
+  ])
 
   useAuthConfigPrefetch({ projectRef })
   const page = router.pathname.split('/')[4]
 
-  return <ProductMenu page={page} menu={generateAuthMenu(projectRef, { showPolicies })} />
+  return (
+    <ProductMenu
+      page={page}
+      menu={generateAuthMenu(projectRef, { authenticationPolicies, authenticationRateLimits })}
+    />
+  )
 }
 
 const AuthLayout = ({ children }: PropsWithChildren<{}>) => {

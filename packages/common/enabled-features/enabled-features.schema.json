@@ -29,7 +29,11 @@
     },
     "authentication:third_party_auth": {
       "type": "boolean",
-      "description": "Enable the third party auth page in the authentication Sign In / Providers page"
+      "description": "Enable the authentication third party auth page"
+    },
+    "authentication:rate_limits": {
+      "type": "boolean",
+      "description": "Enable the authentication rate limits page"
     },
     "authentication:show_providers": {
       "type": "boolean",
@@ -136,6 +140,7 @@
     "ai:opt_in_level_schema_and_log_and_data",
     "authentication:policies",
     "authentication:third_party_auth",
+    "authentication:rate_limits",
     "authentication:show_providers",
     "authentication:show_manual_linking",
     "authentication:show_provider_filter",

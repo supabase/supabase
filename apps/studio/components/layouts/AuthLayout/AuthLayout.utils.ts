@@ -4,10 +4,11 @@ import { IS_PLATFORM } from 'lib/constants'
 export const generateAuthMenu = (
   ref: string,
   flags?: {
-    showPolicies: boolean
+    authenticationPolicies: boolean
+    authenticationRateLimits: boolean
   }
 ): ProductMenuGroup[] => {
-  const { showPolicies } = flags ?? {}
+  const { authenticationPolicies, authenticationRateLimits } = flags ?? {}
 
   return [
     {
@@ -17,7 +18,7 @@ export const generateAuthMenu = (
     {
       title: 'Configuration',
       items: [
-        ...(showPolicies
+        ...(authenticationPolicies
           ? [
               {
                 name: 'Policies',
@@ -42,12 +43,16 @@ export const generateAuthMenu = (
                 url: `/project/${ref}/auth/sessions`,
                 items: [],
               },
-              {
-                name: 'Rate Limits',
-                key: 'rate-limits',
-                url: `/project/${ref}/auth/rate-limits`,
-                items: [],
-              },
+              ...(authenticationRateLimits
+                ? [
+                    {
+                      name: 'Rate Limits',
+                      key: 'rate-limits',
+                      url: `/project/${ref}/auth/rate-limits`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Emails',
                 key: 'emails',
