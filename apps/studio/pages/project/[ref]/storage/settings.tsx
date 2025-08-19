@@ -1,35 +1,27 @@
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { StorageSettings } from 'components/interfaces/Storage'
 import { S3Connection } from 'components/interfaces/Storage/StorageSettings/S3Connection'
 import type { NextPageWithLayout } from 'types'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 
-const PageLayout: NextPageWithLayout = () => {
+const StorageSettingsPage: NextPageWithLayout = () => {
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Storage Settings</ScaffoldTitle>
-          <ScaffoldDescription>Configure your project's storage settings</ScaffoldDescription>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
-        <StorageSettings />
-        <S3Connection />
-      </ScaffoldContainer>
+      <StorageSettings />
+      <S3Connection />
     </>
   )
 }
 
-PageLayout.getLayout = (page) => (
+StorageSettingsPage.getLayout = (page) => (
   <DefaultLayout>
-    <StorageLayout title="Settings">{page}</StorageLayout>
+    <StorageLayout title="Settings">
+      <PageLayout title="Storage settings" subtitle="Configure your project's storage settings">
+        <ScaffoldContainer>{page}</ScaffoldContainer>
+      </PageLayout>
+    </StorageLayout>
   </DefaultLayout>
 )
-export default PageLayout
+export default StorageSettingsPage
