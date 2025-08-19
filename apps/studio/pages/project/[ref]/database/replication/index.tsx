@@ -12,9 +12,9 @@ import { PipelineRequestStatusProvider } from 'state/replication-pipeline-reques
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
+  const { ref } = useParams()
   const enablePgReplicate = useFlag('enablePgReplicate')
   const showPgReplicate = useIsFeatureEnabled('database:replication')
-  const { ref } = useParams()
 
   if (!showPgReplicate) {
     return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />

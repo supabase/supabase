@@ -74,24 +74,13 @@ export const generateDatabaseMenu = (
         },
         ...(showPgReplicate
           ? [
-              ...(enablePgReplicate
-                ? [
-                    {
-                      name: 'Replication',
-                      key: 'replication',
-                      url: `/project/${ref}/database/replication`,
-                      items: [],
-                    },
-                  ]
-                : [
-                    {
-                      name: 'Replication',
-                      key: 'replication',
-                      url: `/project/${ref}/database/replication`,
-                      label: 'Coming Soon',
-                      items: [],
-                    },
-                  ]),
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                label: !enablePgReplicate ? 'Coming soon' : undefined,
+                items: [],
+              },
             ]
           : []),
       ],

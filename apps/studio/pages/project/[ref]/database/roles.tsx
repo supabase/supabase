@@ -9,8 +9,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseRoles: NextPageWithLayout = () => {
-  const showRoles = useIsFeatureEnabled('database:roles')
   const { ref } = useParams()
+  const showRoles = useIsFeatureEnabled('database:roles')
 
   if (!showRoles) {
     return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />
