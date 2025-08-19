@@ -5,7 +5,7 @@ function generateRegularSocialMediaUseSQL(activeFilters: Record<string, string>)
 
   return `WITH founders AS (
   SELECT id, regular_social_media_use
-  FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+  FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 )
 SELECT
   platform AS label,
@@ -22,7 +22,7 @@ ORDER BY total DESC;
 // SELECT
 //   unnest(regular_social_media_use) AS social_media,
 //   COUNT(*) AS total
-// FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+// FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 // GROUP BY social_media
 // ORDER BY total DESC;
 

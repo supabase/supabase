@@ -11,7 +11,7 @@ function generateRoleSQL(activeFilters: Record<string, string>) {
     ELSE 'Other'
   END AS role, 
   COUNT(*) AS total
-FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY CASE 
     WHEN role = 'Founder / Co-founder' THEN 'Founder'
     WHEN role IN ('Engineer', 'Founder / Co-founder') THEN role
@@ -24,7 +24,7 @@ ORDER BY total DESC;
 // SELECT
 //   person_role_normalized,
 //   COUNT(*) AS total
-// FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+// FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 // GROUP BY person_role_normalized
 // ORDER BY total DESC
 

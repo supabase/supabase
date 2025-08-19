@@ -6,7 +6,7 @@ function generateAIModelsSQL(activeFilters: Record<string, string>) {
   return `SELECT 
   unnest(ai_models_used) AS model,
   COUNT(*) AS total
-FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY model
 ORDER BY total DESC;`
 }

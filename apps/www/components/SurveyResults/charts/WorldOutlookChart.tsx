@@ -8,7 +8,7 @@ function generateWorldOutlookSQL(activeFilters: Record<string, string>) {
   world_outlook, 
   COUNT(*) AS total
   --ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage
-FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY world_outlook
 ORDER BY total DESC;`
 }
