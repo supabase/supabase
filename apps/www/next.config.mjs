@@ -63,6 +63,7 @@ const nextConfig = {
   // Exclude huge directories from being traced into serverless functions
   outputFileTracingExcludes: {
     '*': [
+      // Build-time only dependencies
       'node_modules/@swc/**/*',
       'node_modules/@esbuild/**/*',
       'node_modules/rollup/**/*',
@@ -71,42 +72,32 @@ const nextConfig = {
       'node_modules/@babel/**/*',
       'node_modules/typescript/**/*',
       'node_modules/@types/**/*',
-      // Remove this line as it's too aggressive: 'node_modules/.pnpm/**/*',
+      // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
       '.next/server/**/*.js.map',
       '.next/trace',
+      // Static assets
       'public/**/*',
       '_blog/**/*',
+      // Test and story files
       'components/**/*.stories.*',
       'components/**/*.test.*',
       '**/*.test.*',
       '**/*.spec.*',
       '**/*.stories.*',
+      // Cache directories
       '**/node_modules/.cache/**/*',
-      // Be more specific with Sentry exclusions
+      // Build-time Sentry plugin only
       '**/node_modules/@sentry/webpack-plugin/**/*',
+      // Large optional dependencies
       '**/node_modules/framer-motion/**/*',
-      '**/node_modules/highlight.js/**/*',
-      '**/node_modules/refractor/**/*',
-      '**/node_modules/@code-hike/**/*',
-      '**/node_modules/rehype/**/*',
-      '**/node_modules/remark/**/*',
-      '**/node_modules/unified/**/*',
     ],
-    // Specific exclusions for blog pages that cause the most issues
-    '/blog/**/*': [
-      '_blog/**/*',
-      'public/**/*',
-      '.next/static/**/*',
-      'node_modules/highlight.js/**/*',
-      'node_modules/refractor/**/*',
-      'node_modules/@code-hike/**/*',
-      // Remove this line as it's too aggressive: '**/node_modules/.pnpm/**/*',
-    ],
+    // More conservative exclusions for blog pages
+    '/blog/**/*': ['_blog/**/*', 'public/**/*', '.next/static/**/*'],
   },
   // Additional optimizations for smaller serverless functions
-  serverExternalPackages: ['@code-hike/mdx', 'highlight.js', 'refractor'],
+  serverExternalPackages: [],
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
