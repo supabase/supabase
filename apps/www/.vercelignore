@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build artifacts
+.next/cache
+.turbo
+.eslintcache
+
+# Development files
+*.log
+.env.local
+.env.*.local
+
+# Documentation
+README.md
+*.md
+docs
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Other apps (since we're only deploying CMS)
+../cms
+../design-system
+../docs
+../studio
+../ui-library
+../../examples
+../../tests
+../../supabase
+../../packages/ui-patterns
+../../packages/ui
+../../packages/shared-data 
