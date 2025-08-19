@@ -296,6 +296,7 @@ const GitHubIntegrationConnectionForm = ({
         id: prodBranch.id,
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
+        branchName: data.branchName || 'main',
       })
     }
 
