@@ -4,15 +4,28 @@ import { toast } from 'sonner'
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
+import UserManagement from 'components/interfaces/Docs/Pages/UserManagement'
 
 export type ProfileUpdateVariables = {
   firstName: string
   lastName: string
+  username: string
+  primaryEmail: string
 }
 
-export async function updateProfile({ firstName, lastName }: ProfileUpdateVariables) {
+export async function updateProfile({
+  firstName,
+  lastName,
+  username,
+  primaryEmail,
+}: ProfileUpdateVariables) {
   const { data, error } = await patch('/platform/profile', {
-    body: { first_name: firstName, last_name: lastName },
+    body: {
+      first_name: firstName,
+      last_name: lastName,
+      username: username,
+      primary_email: primaryEmail,
+    },
   })
 
   if (error) handleError(error)
