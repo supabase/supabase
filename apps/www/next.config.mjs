@@ -120,10 +120,18 @@ const nextConfig = {
     // We are already running linting via GH action, this will skip linting during production build on Vercel.
     ignoreDuringBuilds: true,
   },
-  outputFileTracingExcludes: {
-    '/api-v2/cms-posts': ['./public/**/*'],
-    '/api-v2/cms': ['./public/**/*'],
-    '/api-v2/luma-events': ['./public/**/*'],
+  webpack: (config, { webpack }) => {
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        __SENTRY_DEBUG__: false,
+        __SENTRY_TRACING__: false,
+        __RRWEB_EXCLUDE_IFRAME__: true,
+        __RRWEB_EXCLUDE_SHADOW_DOM__: true,
+        __SENTRY_EXCLUDE_REPLAY_WORKER__: true,
+      })
+    )
+    // return the modified config
+    return config
   },
 }
 
