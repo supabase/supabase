@@ -44,7 +44,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className={cn('flex flex-col h-screen w-screen')}>
+      <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
         <WithSidebar
           title="Account Settings"
           breadcrumbs={[]}
