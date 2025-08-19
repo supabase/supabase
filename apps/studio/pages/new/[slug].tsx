@@ -395,7 +395,7 @@ const Wizard: NextPageWithLayout = () => {
       organizationSlug: currentOrg.slug,
       name: projectName,
       dbPass: dbPass,
-      dbRegion: dbRegion,
+      dbRegion: dbRegionExact,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
