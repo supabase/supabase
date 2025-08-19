@@ -1,20 +1,38 @@
 import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
 function generateNewIdeasSQL(activeFilters: Record<string, string>) {
-  const whereClause = buildWhereClause(activeFilters, [
-    'must_have_dev_tools IS NOT NULL',
-    "must_have_dev_tools != ''",
-  ])
+  const whereClause = buildWhereClause(activeFilters)
 
-  return `SELECT 
-  avenue,
-  COUNT(DISTINCT id) AS respondents
-FROM (
-  SELECT id, unnest(new_ideas) AS avenue
-  FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
-) sub
-GROUP BY avenue
-ORDER BY respondents DESC;`
+  return `WITH new_ideas_mapping AS (
+    SELECT 
+      id,
+      CASE 
+        WHEN avenue IN (
+          'Hacker News',
+          'GitHub',
+          'Product Hunt',
+          'Twitter/X',
+          'Reddit',
+          'YouTube',
+          'Podcasts',
+          'Blogs / Newsletters',
+          'Discord / Slack communities',
+          'Conferences / Meetups'
+        ) THEN avenue
+        ELSE 'Other'
+      END AS avenue_clean
+    FROM (
+      SELECT id, unnest(new_ideas) AS avenue
+      FROM responses_2025
+      ${whereClause}
+    ) sub
+  )
+  SELECT 
+    avenue_clean AS avenue,
+    COUNT(DISTINCT id) AS total
+  FROM new_ideas_mapping
+  GROUP BY avenue_clean
+  ORDER BY total DESC;`
 }
 
 export function NewIdeasChart() {

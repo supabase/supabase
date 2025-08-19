@@ -6,7 +6,7 @@ function generateFundingStageSQL(activeFilters: Record<string, string>) {
   return `SELECT
     funding_stage,
     COUNT(*) AS total
-  FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
+  FROM responses_2025${whereClause ? '\n' + whereClause : ''}
   GROUP BY funding_stage
   ORDER BY CASE 
       WHEN funding_stage = 'Bootstrapped' THEN 1
