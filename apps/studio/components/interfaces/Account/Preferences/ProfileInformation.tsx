@@ -134,34 +134,36 @@ export const ProfileInformation = () => {
                     Primary Email
                   </FormLabel_Shadcn_>
                   <FormControl_Shadcn_ className="col-span-8">
-                    <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger_Shadcn_ className="col-span-8">
-                        <SelectValue_Shadcn_ placeholder="Select primary email" />
-                      </SelectTrigger_Shadcn_>
-
-                      <SelectContent_Shadcn_ className="col-span-8">
-                        {isIdentitiesSuccess &&
-                          identities.map((identity) => {
-                            const getProviderName = (provider: string) =>
-                              provider === 'github'
-                                ? 'GitHub'
-                                : provider.startsWith('sso')
-                                  ? 'SSO'
-                                  : provider
-                            const { identity_id, provider } = identity
-                            const email = identity.identity_data?.email
-                            const providerName = getProviderName(provider)
-
-                            return (
-                              <SelectItem_Shadcn_ key={identity_id} value={email}>
-                                {email} ({providerName})
-                              </SelectItem_Shadcn_>
-                            )
-                          })}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                    <div className="flex flex-col gap-1">
+                      <Select_Shadcn_
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={profile?.is_sso_user}
+                      >
+                        <SelectTrigger_Shadcn_ className="col-span-8">
+                          <SelectValue_Shadcn_ placeholder="Select primary email" />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_ className="col-span-8">
+                          {isIdentitiesSuccess &&
+                            identities.map((identity) => {
+                              const email = identity.identity_data?.email
+                              if (!email) return null
+                              const providerName = identity.provider
+                              return (
+                                <SelectItem_Shadcn_ key={identity.identity_id} value={email}>
+                                  {email} ({providerName})
+                                </SelectItem_Shadcn_>
+                              )
+                            })}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                      {profile?.is_sso_user && (
+                        <p className="text-xs text-foreground-light">
+                          Primary email is managed by your SSO provider and cannot be changed here.
+                        </p>
+                      )}
+                    </div>
                   </FormControl_Shadcn_>
-
                   <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                 </FormItem_Shadcn_>
               )}
@@ -175,7 +177,18 @@ export const ProfileInformation = () => {
                     Username
                   </FormLabel_Shadcn_>
                   <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-full" />
+                    <div className="flex flex-col gap-1">
+                      <Input_Shadcn_
+                        {...field}
+                        className="w-full"
+                        disabled={profile?.is_sso_user}
+                      />
+                      {profile?.is_sso_user && (
+                        <p className="text-xs text-foreground-light">
+                          Username is managed by your SSO provider and cannot be changed here.
+                        </p>
+                      )}
+                    </div>
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                 </FormItem_Shadcn_>
