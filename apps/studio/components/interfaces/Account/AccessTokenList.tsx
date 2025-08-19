@@ -1,10 +1,23 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
+import dayjs from 'dayjs'
 import { Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Button,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const AccessTokenList = () => {
@@ -53,11 +66,28 @@ const AccessTokenList = () => {
                     <TableCell>{x.name}</TableCell>
                     <TableCell>
                       <p>
-                        {x.last_used_at ? new Date(x.last_used_at).toLocaleString() : 'Never used'}
+                        {x.last_used_at
+                          ? dayjs(x.last_used_at).format('DD MMM, YYYY HH:mm')
+                          : 'Never used'}
                       </p>
                     </TableCell>
                     <TableCell>
-                      <p>{x.expires_at ? new Date(x.expires_at).toLocaleString() : 'Never'}</p>
+                      <p>
+                        {x.expires_at ? (
+                          dayjs(x.expires_at).isBefore(dayjs()) ? (
+                            <Tooltip>
+                              <TooltipTrigger>Expired</TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm')}
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            dayjs(x.expires_at).format('DD MMM, YYYY HH:mm')
+                          )
+                        ) : (
+                          'Never'
+                        )}
+                      </p>
                     </TableCell>
                     <TableCell>
                       <Button

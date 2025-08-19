@@ -216,6 +216,13 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
                       </FormControl_Shadcn_>
+                      {field.value === NON_EXPIRING_TOKEN_VALUE && (
+                        <Admonition
+                          type="warning"
+                          title="Make sure to keep your non-expiring token safe and secure."
+                          className="mt-6 w-full"
+                        />
+                      )}
                     </FormItemLayout>
                   )}
                 />
