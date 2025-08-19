@@ -42,7 +42,7 @@ export const CMS_SITE_ORIGIN =
     ? // In production, require env or fall back to localhost to avoid hitting supabase.com
       'http://localhost:3030'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('zone-www-dot-com-', 'cms-')}`
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
       : 'http://localhost:3030')
 
 export const LW_URL = `${SITE_ORIGIN}/launch-week/13`
