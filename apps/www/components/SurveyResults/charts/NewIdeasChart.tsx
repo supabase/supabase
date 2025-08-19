@@ -11,7 +11,7 @@ function generateNewIdeasSQL(activeFilters: Record<string, string>) {
   COUNT(DISTINCT id) AS respondents
 FROM (
   SELECT id, unnest(new_ideas) AS avenue
-  FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+  FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
 ) sub
 GROUP BY avenue
 ORDER BY respondents DESC;`

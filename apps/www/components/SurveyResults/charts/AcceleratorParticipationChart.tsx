@@ -11,7 +11,7 @@ function generateAcceleratorParticipationSQL(activeFilters: Record<string, strin
       WHEN accelerator_participation = 'Did not participate in an accelerator' THEN NULL
       ELSE 'Other'
     END AS accelerator_clean
-  FROM responses_b_2025
+  FROM responses_c_2025
   ${whereClause}
 )
 SELECT 
