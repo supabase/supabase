@@ -112,13 +112,8 @@ export function LogsSidebarMenuV2() {
   // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
   const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-
-  const isUnifiedLogsPreviewAvailable =
-    unifiedLogsFlagEnabled &&
-    !isOrgPlanLoading &&
-    ['team', 'enterprise'].includes(orgPlan?.id ?? '')
+  const { plan: orgPlan } = useCurrentOrgPlan()
+  const isFreePlan = orgPlan?.id === 'free'
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -234,7 +229,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
-      {IS_PLATFORM && !isUnifiedLogsPreviewAvailable && (
+      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           illustration={<Badge variant="default">Coming soon</Badge>}
@@ -249,7 +244,7 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {isUnifiedLogsPreviewAvailable && (
+      {unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           title="New Logs Interface"
