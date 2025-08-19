@@ -27,7 +27,7 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = getVelaClient(req)
-  const createResponse = await client.POST('/organizations/', {
+  const createResponse = await client.post('/organizations/', {
     body: {
       name: req.body.name,
     },
@@ -43,7 +43,7 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const orgId = location.split('/').pop()
-  const readResponse = await client.GET('/organizations/{organization_id}/', {
+  const readResponse = await client.get('/organizations/{organization_id}/', {
     params: {
       path: {
         organization_id: parseInt(orgId!),
@@ -66,7 +66,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = getVelaClient(req)
-  const response = await client.GET('/organizations/')
+  const response = await client.get('/organizations/')
 
   if (response.response.status !== 200 || !response.data) {
     return res.status(response.response.status).send(response.error)

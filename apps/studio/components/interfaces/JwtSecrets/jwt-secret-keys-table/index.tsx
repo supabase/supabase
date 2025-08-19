@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
@@ -14,13 +13,6 @@ import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/lega
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   Button,
   Card,
   CardContent,
@@ -64,8 +56,6 @@ export default function JWTSecretKeysTable() {
   const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery({
     projectRef,
   })
-  const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
-    useLegacyAPIKeysStatusQuery({ projectRef })
 
   const { mutate: migrateJWTSecret, isLoading: isMigrating } = useLegacyJWTSigningKeyCreateMutation(
     {
@@ -87,8 +77,7 @@ export default function JWTSecretKeysTable() {
     useJWTSigningKeyDeleteMutation({ onSuccess: () => resetDialog(), onError: () => resetDialog() })
 
   const isLoadingMutation = isUpdatingJWTSigningKey || isDeletingJWTSigningKey || isMigrating
-  const isLoading =
-    isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
+  const isLoading = isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey
 
   const sortedKeys = useMemo(() => {
     if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
@@ -474,7 +463,7 @@ export default function JWTSecretKeysTable() {
 
       {selectedKey &&
         selectedKey.status === 'previously_used' &&
-        (legacyKey?.id !== selectedKey.id || !(legacyAPIKeysStatus?.enabled ?? false)) && (
+        legacyKey?.id !== selectedKey.id && (
           <TextConfirmModal
             visible={shownDialog === 'revoke'}
             loading={isLoadingMutation}
@@ -491,27 +480,6 @@ export default function JWTSecretKeysTable() {
                 'By revoking a signing key, all applications trusting it will no longer do so. If there are JWTs (access tokens) that are valid at the time of revocation, they will no longer be trusted, causing users with such JWTs to be signed out.',
             }}
           />
-        )}
-
-      {selectedKey &&
-        selectedKey.status === 'previously_used' &&
-        legacyKey?.id === selectedKey.id &&
-        (legacyAPIKeysStatus?.enabled ?? true) && (
-          <AlertDialog open={shownDialog === 'revoke'} onOpenChange={() => resetDialog()}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Disable JWT-based legacy API keys first</AlertDialogTitle>
-              </AlertDialogHeader>
-              <AlertDialogDescription>
-                It's not possible to revoke the legacy JWT secret unless you have already disabled
-                JWT-based legacy API keys. This is because revoking the JWT secret invalidates the
-                JWT-based legacy API keys.
-              </AlertDialogDescription>
-              <AlertDialogFooter>
-                <AlertDialogCancel>OK</AlertDialogCancel>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         )}
 
       {selectedKey && selectedKey.status === 'revoked' && (

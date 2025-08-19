@@ -48,7 +48,7 @@ const SCHEMA = z.object({
 
 const CreateSecretAPIKeyDialog = () => {
   const [visible, setVisible] = useState(false)
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
 
   const onClose = (value: boolean) => {
     setVisible(value)
@@ -67,6 +67,7 @@ const CreateSecretAPIKeyDialog = () => {
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
     createAPIKey(
       {
+        orgSlug,
         projectRef,
         type: 'secret',
         name: values.name,

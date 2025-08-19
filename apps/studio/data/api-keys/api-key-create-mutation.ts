@@ -6,6 +6,7 @@ import type { ResponseError } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type APIKeyCreateVariables = {
+  orgSlug?: string
   projectRef?: string
   name: string
   description?: string
@@ -22,11 +23,12 @@ export type APIKeyCreateVariables = {
 )
 
 export async function createAPIKey(payload: APIKeyCreateVariables) {
+  if (!payload.orgSlug) throw new Error('orgSlug is required')
   if (!payload.projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post('/v1/projects/{ref}/api-keys', {
+  const { data, error } = await post('/v1/organizations/{slug}/projects/{ref}/api-keys', {
     params: {
-      path: { ref: payload.projectRef },
+      path: { slug: payload.orgSlug, ref: payload.projectRef },
       query: {
         reveal: false,
       },

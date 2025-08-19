@@ -13,7 +13,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
-import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -241,7 +240,6 @@ export const DisplayApiSettings = ({
           )
         ) : null}
       </Panel>
-      {newApiKeysInRollOut && !showNotice && <ToggleLegacyApiKeysPanel />}
     </>
   )
 }

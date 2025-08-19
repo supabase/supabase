@@ -8,7 +8,6 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
@@ -88,7 +87,6 @@ const JWTSettings = () => {
   const { data: legacyKey } = useLegacyJWTSigningKeyQuery({
     projectRef,
   })
-  const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery({ projectRef })
 
   const {
     data: authConfig,
@@ -200,16 +198,6 @@ const JWTSettings = () => {
                           </em>{' '}
                           JSON Web Tokens by Supabase products.
                         </p>
-
-                        {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
-                          <p className="!leading-normal">
-                            <em className="text-warning not-italic">
-                              This includes the <code>anon</code> and <code>service_role</code> JWT
-                              based API keys.
-                            </em>{' '}
-                            Consider switching to publishable and secret API keys to disable them.
-                          </p>
-                        )}
 
                         <Button type="default" asChild icon={<ExternalLink className="size-4" />}>
                           <Link href={`/org/${slug}/project/${projectRef}/settings/api-keys`}>

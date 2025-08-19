@@ -19,9 +19,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+import { useParams } from 'common'
 
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { useParams } from 'next/navigation'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -34,8 +34,7 @@ export interface CreatePublishableAPIKeyDialogProps {
 }
 
 function CreatePublishableAPIKeyDialog() {
-  const params = useParams()
-  const projectRef = params?.ref as string
+  const { slug: orgSlug, ref: projectRef } = useParams()
 
   const [visible, setVisible] = useState(false)
 
@@ -54,8 +53,10 @@ function CreatePublishableAPIKeyDialog() {
   const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    if (!projectRef) return
     createAPIKey(
       {
+        orgSlug,
         projectRef,
         type: 'publishable',
         name: values.name,

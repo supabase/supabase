@@ -18,7 +18,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const organizationId = parseInt(slug)
   const client = getVelaClient(req)
-  const createResponse = await client.GET('/organizations/{organization_id}/', {
+  const createResponse = await client.get('/organizations/{organization_id}/', {
     params: {
       path: {
         organization_id: organizationId
@@ -47,7 +47,7 @@ const handleUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
   const client = getVelaClient(req)
   const organizationId = parseInt(req.headers['X-Vela-Organization-Id'] as string)
 
-  const createResponse = await client.PUT('/organizations/{organization_id}/', {
+  const createResponse = await client.put('/organizations/{organization_id}/', {
     params: {
       path: {
         organization_id: organizationId

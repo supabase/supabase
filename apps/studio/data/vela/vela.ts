@@ -1,5 +1,5 @@
 import createClient, {
-  Client,
+  ClientMethod,
   FetchResponse,
   HeadersOptions,
   InitParam,
@@ -8,7 +8,18 @@ import createClient, {
 import { paths } from './vela-schema'
 import { VELA_PLATFORM_URL } from '../../pages/api/constants'
 import { NextApiRequest } from 'next'
-import type { PathsWithMethod } from 'openapi-typescript-helpers'
+import type { MediaType, PathsWithMethod } from 'openapi-typescript-helpers'
+
+export interface Client<Paths extends {}, Media extends MediaType = MediaType> {
+  get: ClientMethod<Paths, 'get', Media>
+  put: ClientMethod<Paths, 'put', Media>
+  post: ClientMethod<Paths, 'post', Media>
+  delete: ClientMethod<Paths, 'delete', Media>
+  options: ClientMethod<Paths, 'options', Media>
+  head: ClientMethod<Paths, 'head', Media>
+  patch: ClientMethod<Paths, 'patch', Media>
+  trace: ClientMethod<Paths, 'trace', Media>
+}
 
 const velaClient = createClient<paths>({
   baseUrl: VELA_PLATFORM_URL,
@@ -28,12 +39,9 @@ const mergeHeaders = (req: NextApiRequest, headers: HeadersOptions[]) => {
   return newHeader as HeadersOptions
 }
 
-export function getVelaClient(
-  req: NextApiRequest
-): Omit<Omit<Client<paths, `${string}/${string}`>, 'eject'>, 'use'> {
-
+export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${string}`> {
   return {
-    DELETE<
+    delete<
       Path extends PathsWithMethod<paths, 'delete'>,
       Init extends MaybeOptionalInit<paths[Path], 'delete'>,
     >(
@@ -51,7 +59,7 @@ export function getVelaClient(
         headers: headers,
       } as any)
     },
-    GET<
+    get<
       Path extends PathsWithMethod<paths, 'get'>,
       Init extends MaybeOptionalInit<paths[Path], 'get'>,
     >(
@@ -69,7 +77,7 @@ export function getVelaClient(
         headers: headers,
       } as any)
     },
-    HEAD<
+    head<
       Path extends PathsWithMethod<paths, 'head'>,
       Init extends MaybeOptionalInit<paths[Path], 'head'>,
     >(
@@ -87,7 +95,7 @@ export function getVelaClient(
         headers: headers,
       } as any)
     },
-    OPTIONS<
+    options<
       Path extends PathsWithMethod<paths, 'options'>,
       Init extends MaybeOptionalInit<paths[Path], 'options'>,
     >(
@@ -105,7 +113,7 @@ export function getVelaClient(
         headers: headers,
       } as any)
     },
-    PATCH<
+    patch<
       Path extends PathsWithMethod<paths, 'patch'>,
       Init extends MaybeOptionalInit<paths[Path], 'patch'>,
     >(
@@ -123,7 +131,7 @@ export function getVelaClient(
         headers: headers,
       } as any)
     },
-    POST<
+    post<
       Path extends PathsWithMethod<paths, 'post'>,
       Init extends MaybeOptionalInit<paths[Path], 'post'>,
     >(
@@ -141,7 +149,7 @@ export function getVelaClient(
         headers: headers,
       } as any)
     },
-    PUT<
+    put<
       Path extends PathsWithMethod<paths, 'put'>,
       Init extends MaybeOptionalInit<paths[Path], 'put'>,
     >(
@@ -159,7 +167,7 @@ export function getVelaClient(
         headers: headers,
       } as any)
     },
-    TRACE<
+    trace<
       Path extends PathsWithMethod<paths, 'trace'>,
       Init extends MaybeOptionalInit<paths[Path], 'trace'>,
     >(

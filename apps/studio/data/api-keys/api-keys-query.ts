@@ -44,17 +44,19 @@ type PublishableKeys = {
 }
 
 interface APIKeysVariables {
+  orgSlug?: string
   projectRef?: string
   reveal?: boolean
 }
 
 type APIKey = LegacyKeys | SecretKeys | PublishableKeys
 
-async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
+async function getAPIKeys({ orgSlug, projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
+  if (!orgSlug) throw new Error('orgSlug is required')
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref: projectRef }, query: { reveal } },
+  const { data, error } = await get(`/v1/organizations/{slug}/projects/{ref}/api-keys`, {
+    params: { path: { slug: orgSlug, ref: projectRef }, query: { reveal } },
     signal,
   })
 
@@ -69,12 +71,12 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
-  { projectRef, reveal = false }: APIKeysVariables,
+  { orgSlug, projectRef, reveal = false }: APIKeysVariables,
   { enabled, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
 ) =>
   useQuery<APIKeysData, ResponseError, TData>(
     apiKeysKeys.list(projectRef, reveal),
-    ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
+    ({ signal }) => getAPIKeys({ orgSlug, projectRef, reveal }, signal),
     {
       enabled: enabled && projectRef !== 'undefined',
       ...options,

@@ -15,6 +15,7 @@ import {
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 import { useParams } from 'next/navigation'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
@@ -22,7 +23,7 @@ export function useApiKeysCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 
-  const { slug } = useParams()
+  const { slug } = getPathReferences()
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 

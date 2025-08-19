@@ -15,7 +15,7 @@ import {
 } from 'ui'
 
 export const CreateNewAPIKeysButton = () => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const [createKeysDialogOpen, setCreateKeysDialogOpen] = useState(false)
   const [isCreatingKeys, setIsCreatingKeys] = useState(false)
 
@@ -28,6 +28,7 @@ export const CreateNewAPIKeysButton = () => {
     try {
       // Create publishable key
       await createAPIKey({
+        orgSlug,
         projectRef,
         type: 'publishable',
         name: 'default',
@@ -35,6 +36,7 @@ export const CreateNewAPIKeysButton = () => {
 
       // Create secret key
       await createAPIKey({
+        orgSlug,
         projectRef,
         type: 'secret',
         name: 'default',

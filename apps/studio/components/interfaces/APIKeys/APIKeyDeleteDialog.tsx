@@ -16,7 +16,7 @@ interface APIKeyDeleteDialogProps {
 }
 
 export const APIKeyDeleteDialog = ({ apiKey, lastSeen }: APIKeyDeleteDialogProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
   const canDeleteAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
@@ -29,8 +29,9 @@ export const APIKeyDeleteDialog = ({ apiKey, lastSeen }: APIKeyDeleteDialogProps
   })
 
   const onDeleteAPIKey = () => {
+    if (!orgSlug) return console.error('Organization slug is required')
     if (!projectRef) return console.error('Project ref is required')
-    deleteAPIKey({ projectRef, id: apiKey.id })
+    deleteAPIKey({ orgSlug, projectRef, id: apiKey.id })
   }
 
   return (

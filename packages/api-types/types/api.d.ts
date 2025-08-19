@@ -396,7 +396,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/projects/{ref}/api-keys': {
+  '/v1/organizations/{slug}/projects/{ref}/api-keys': {
     parameters: {
       query?: never
       header?: never
@@ -414,7 +414,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/projects/{ref}/api-keys/{id}': {
+  '/v1/organizations/{slug}/projects/{ref}/api-keys/{id}': {
     parameters: {
       query?: never
       header?: never
@@ -431,24 +431,6 @@ export interface paths {
     head?: never
     /** Updates an API key for the project */
     patch: operations['v1-update-project-api-key']
-    trace?: never
-  }
-  '/v1/projects/{ref}/api-keys/legacy': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
-    get: operations['v1-get-project-legacy-api-keys']
-    /** Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
-    put: operations['v1-update-project-legacy-api-keys']
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
     trace?: never
   }
   '/v1/projects/{ref}/billing/addons': {
@@ -4236,6 +4218,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -4267,6 +4250,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -4303,6 +4287,7 @@ export interface operations {
         id: string
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -4338,6 +4323,7 @@ export interface operations {
         id: string
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -4370,6 +4356,7 @@ export interface operations {
         id: string
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }

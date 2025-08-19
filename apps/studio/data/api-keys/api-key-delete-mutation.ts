@@ -5,16 +5,18 @@ import type { ResponseError } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type APIKeyDeleteVariables = {
+  orgSlug?: string
   projectRef?: string
   id: string
 }
 
 export async function deleteAPIKey(payload: APIKeyDeleteVariables) {
+  if (!payload.orgSlug) throw new Error('orgSlug is required')
   if (!payload.projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await del('/v1/projects/{ref}/api-keys/{id}', {
+  const { data, error } = await del('/v1/organizations/{slug}/projects/{ref}/api-keys/{id}', {
     params: {
-      path: { ref: payload.projectRef, id: payload.id },
+      path: { slug: payload.orgSlug, ref: payload.projectRef, id: payload.id },
       query: { reveal: false },
     },
   })
