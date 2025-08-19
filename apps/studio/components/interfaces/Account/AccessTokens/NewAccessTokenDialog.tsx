@@ -84,7 +84,9 @@ export const NewAccessTokenDialog = ({
   onOpenChange,
   onCreateToken,
 }: NewAccessTokenDialogProps) => {
-  const [customExpiryDate, setCustomExpiryDate] = useState<TokenDatePickerValue | undefined>(undefined)
+  const [customExpiryDate, setCustomExpiryDate] = useState<TokenDatePickerValue | undefined>(
+    undefined
+  )
   const [isCustomExpiry, setIsCustomExpiry] = useState(false)
 
   const form = useForm<z.infer<typeof TokenSchema>>({
@@ -242,16 +244,28 @@ export const NewAccessTokenDialog = ({
                             const today = new Date()
                             const maxDate = new Date()
                             maxDate.setDate(today.getDate() + 364) // 364 days instead of 365
-                            
+
                             // Normalize dates to ignore time
-                            const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-                            const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-                            const maxDateOnly = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate())
-                            
+                            const dateOnly = new Date(
+                              date.getFullYear(),
+                              date.getMonth(),
+                              date.getDate()
+                            )
+                            const todayOnly = new Date(
+                              today.getFullYear(),
+                              today.getMonth(),
+                              today.getDate()
+                            )
+                            const maxDateOnly = new Date(
+                              maxDate.getFullYear(),
+                              maxDate.getMonth(),
+                              maxDate.getDate()
+                            )
+
                             return dateOnly < todayOnly || dateOnly > maxDateOnly
                           }}
                           buttonTriggerProps={{
-                            size: "small"
+                            size: 'small',
                           }}
                         />
                       )}
