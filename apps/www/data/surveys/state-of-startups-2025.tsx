@@ -60,7 +60,7 @@ const stateOfStartupsData = {
             { percent: 19, label: 'North American startups based in San Francisco' },
             { percent: 9, label: 'North American startups based in New York City' },
           ],
-          charts: ['HeadquartersChart'],
+          charts: ['LocationChart'],
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,

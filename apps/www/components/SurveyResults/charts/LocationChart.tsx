@@ -1,23 +1,23 @@
 import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
-function generateDatabasesSQL(activeFilters: Record<string, string>) {
+function generateLocationSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
 
-  return `SELECT 
-  unnest(databases) AS technology,
+  return `SELECT
+  location,
   COUNT(*) AS total
 FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
-GROUP BY technology
+GROUP BY location
 ORDER BY total DESC;`
 }
 
-export function DatabasesChart() {
+export function LocationChart() {
   return (
     <SurveyChart
-      title="Which database(s) is your startup using?"
-      targetColumn="databases"
+      title="Where is your startup headquartered?"
+      targetColumn="location"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      generateSQLQuery={generateDatabasesSQL}
+      generateSQLQuery={generateLocationSQL}
     />
   )
 }

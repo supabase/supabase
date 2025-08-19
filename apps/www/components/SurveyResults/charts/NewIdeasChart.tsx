@@ -11,7 +11,7 @@ function generateNewIdeasSQL(activeFilters: Record<string, string>) {
   COUNT(DISTINCT id) AS respondents
 FROM (
   SELECT id, unnest(new_ideas) AS avenue
-  FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+  FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
 ) sub
 GROUP BY avenue
 ORDER BY respondents DESC;`
@@ -22,7 +22,7 @@ export function NewIdeasChart() {
     <SurveyChart
       title="Where do you usually discover new dev tools or startup ideas?"
       targetColumn="new_ideas"
-      filterColumns={['person_age', 'headquarters', 'money_raised']}
+      filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateNewIdeasSQL}
     />
   )

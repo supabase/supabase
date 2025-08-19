@@ -7,7 +7,7 @@ function generateAICodingToolsSQL(activeFilters: Record<string, string>) {
 SELECT 
   unnest(ai_coding_tools) AS technology,
   COUNT(*) AS total
-FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
 ORDER BY total DESC;
 `
@@ -18,7 +18,7 @@ export function AICodingToolsChart() {
     <SurveyChart
       title="Which AI coding tools do you use?"
       targetColumn="ai_coding_tools"
-      filterColumns={['person_age', 'team_count', 'money_raised']}
+      filterColumns={['person_age', 'team_size', 'money_raised']}
       generateSQLQuery={generateAICodingToolsSQL}
     />
   )

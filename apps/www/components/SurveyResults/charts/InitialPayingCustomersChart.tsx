@@ -8,7 +8,7 @@ function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>
   COUNT(DISTINCT id) AS respondents
 FROM (
   SELECT id, unnest(initial_paying_customers) AS source
-  FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+  FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
 ) sub
 GROUP BY source
 ORDER BY respondents DESC;`
@@ -19,7 +19,7 @@ export function InitialPayingCustomersChart() {
     <SurveyChart
       title="Where did your startup’s initial paying customers come from?"
       targetColumn="initial_paying_customers"
-      filterColumns={['person_age', 'headquarters', 'team_count']}
+      filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateInitialPayingCustomersSQL}
     />
   )

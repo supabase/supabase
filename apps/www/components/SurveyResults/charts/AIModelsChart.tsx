@@ -6,7 +6,7 @@ function generateAIModelsSQL(activeFilters: Record<string, string>) {
   return `SELECT 
   unnest(ai_models_used) AS model,
   COUNT(*) AS total
-FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY model
 ORDER BY total DESC;`
 }
@@ -16,7 +16,7 @@ export function AIModelsChart() {
     <SurveyChart
       title="Which AI models are you using or planning to use?"
       targetColumn="ai_models_used"
-      filterColumns={['person_age', 'team_count', 'money_raised']}
+      filterColumns={['person_age', 'team_size', 'money_raised']}
       generateSQLQuery={generateAIModelsSQL}
     />
   )
