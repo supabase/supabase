@@ -2,22 +2,22 @@ import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
 // Generate SQL query for team count chart
 function generateIndustrySQL(activeFilters: Record<string, string>) {
-  const whereClause = buildWhereClause(activeFilters, ['industry_normalized IS NOT NULL'])
+  const whereClause = buildWhereClause(activeFilters, ['industry IS NOT NULL'])
 
   return `WITH industry_mapping AS (
   SELECT 
-    industry_normalized,
+    industry,
     CASE 
-      WHEN industry_normalized = 'Developer tools and platforms' THEN 'Dev tools'
-      WHEN industry_normalized = 'AI / ML tools' THEN 'AI / ML'
-      WHEN industry_normalized IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry_normalized
+      WHEN industry = 'Developer tools and platforms' THEN 'Dev tools'
+      WHEN industry = 'AI / ML tools' THEN 'AI / ML'
+      WHEN industry IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry
       ELSE 'Other'
     END AS industry_clean
-  FROM responses_2025
+  FROM responses_b_2025
   ${whereClause}
 )
 SELECT 
-  industry_clean AS industry_normalized,
+  industry_clean AS industry,
   COUNT(*) AS total
 FROM industry_mapping
 GROUP BY industry_clean
@@ -28,8 +28,8 @@ export function IndustryChart() {
   return (
     <SurveyChart
       title="What is your startup’s primary industry or target customer segment?"
-      targetColumn="industry_normalized"
-      filterColumns={['person_age', 'headquarters', 'money_raised']}
+      targetColumn="industry"
+      filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateIndustrySQL}
     />
   )
