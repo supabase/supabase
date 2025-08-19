@@ -3,17 +3,27 @@ import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Alert_Shadcn_,
+  AlertTitle_Shadcn_,
+  Badge,
+  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
   resourceWarnings?: ResourceWarning
   projectStatus: InferredProjectStatus
+  renderMode?: 'alert' | 'badge' // New prop to control rendering mode
 }
 
 export const ProjectCardStatus = ({
   resourceWarnings: allResourceWarnings,
   projectStatus,
+  renderMode = 'alert',
 }: ProjectCardWarningsProps) => {
   const showResourceExhaustionWarnings = false
 
@@ -47,17 +57,27 @@ export const ProjectCardStatus = ({
       : undefined
 
   const getTitle = () => {
-    if (projectStatus === 'isPaused') return 'Project is paused'
-    if (projectStatus === 'isPausing') return 'Project is pausing'
-    if (projectStatus === 'isRestarting') return 'Project is restarting'
-    if (projectStatus === 'isResizing') return 'Project is resizing'
-    if (projectStatus === 'isComingUp') return 'Project is coming up'
-    if (projectStatus === 'isRestoring') return 'Project is restoring'
-    if (projectStatus === 'isUpgrading') return 'Project is upgrading'
-    if (projectStatus === 'isRestoreFailed') return 'Project restore failed'
-    if (projectStatus === 'isPauseFailed') return 'Project pause failed'
+    if (projectStatus === 'isPaused') return renderMode === 'badge' ? 'Paused' : 'Project is paused'
+    if (projectStatus === 'isPausing')
+      return renderMode === 'badge' ? 'Pausing' : 'Project is pausing'
+    if (projectStatus === 'isRestarting')
+      return renderMode === 'badge' ? 'Restarting' : 'Project is restarting'
+    if (projectStatus === 'isResizing')
+      return renderMode === 'badge' ? 'Resizing' : 'Project is resizing'
+    if (projectStatus === 'isComingUp')
+      return renderMode === 'badge' ? 'Starting' : 'Project is coming up'
+    if (projectStatus === 'isRestoring')
+      return renderMode === 'badge' ? 'Restoring' : 'Project is restoring'
+    if (projectStatus === 'isUpgrading')
+      return renderMode === 'badge' ? 'Upgrading' : 'Project is upgrading'
+    if (projectStatus === 'isRestoreFailed')
+      return renderMode === 'badge' ? 'Restore Failed' : 'Project restore failed'
+    if (projectStatus === 'isPauseFailed')
+      return renderMode === 'badge' ? 'Pause Failed' : 'Project pause failed'
 
-    if (!resourceWarnings) return undefined
+    if (!resourceWarnings) {
+      return renderMode === 'badge' && projectStatus === 'isHealthy' ? 'Active' : undefined
+    }
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1
@@ -106,7 +126,39 @@ export const ProjectCardStatus = ({
     (activeWarnings.length === 0 || warningContent === undefined) &&
     projectStatus === 'isHealthy'
   ) {
+    if (renderMode === 'badge') {
+      return (
+        <Badge variant="success" className="rounded-md">
+          Active
+        </Badge>
+      )
+    }
     return null
+  }
+
+  if (renderMode === 'badge') {
+    const badgeVariant = isCritical
+      ? 'destructive'
+      : projectStatus !== 'isHealthy'
+        ? 'warning'
+        : activeWarnings.length > 0
+          ? 'warning'
+          : 'success'
+
+    return alertDescription ? (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge className="rounded-md" variant={badgeVariant}>
+            {alertTitle}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{alertDescription}</TooltipContent>
+      </Tooltip>
+    ) : (
+      <Badge className="rounded-md" variant={badgeVariant}>
+        {alertTitle}
+      </Badge>
+    )
   }
 
   return (

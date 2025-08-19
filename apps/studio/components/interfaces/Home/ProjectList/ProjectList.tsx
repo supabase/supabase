@@ -13,8 +13,20 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import type { Organization, ResponseError } from 'types'
-import { Button, cn } from 'ui'
+import {
+  Button,
+  Card,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  cn,
+} from 'ui'
 import ProjectCard from './ProjectCard'
+import ProjectTableRow from './ProjectTableRow'
 import ShimmeringCard from './ShimmeringCard'
 
 export interface ProjectListProps {
@@ -23,6 +35,7 @@ export interface ProjectListProps {
   search?: string
   filterStatus?: string[]
   resetFilterStatus?: () => void
+  viewMode?: 'grid' | 'table'
 }
 
 const ProjectList = ({
@@ -31,6 +44,7 @@ const ProjectList = ({
   rewriteHref,
   filterStatus,
   resetFilterStatus,
+  viewMode = 'grid',
 }: ProjectListProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const organization = organization_ ?? selectedOrganization
@@ -48,6 +62,10 @@ const ProjectList = ({
     error: permissionsError,
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
+
+  // Move all hooks to the top to comply with Rules of Hooks
+  const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
+  const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
 
   const orgProjects = allProjects.filter((x) => x.organization_slug === organization?.slug)
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
@@ -68,6 +86,42 @@ const ProjectList = ({
     orgProjects.filter((project) => filterStatus.includes(project.status)).length === 0
 
   if (isLoadingProjects || !organization) {
+    if (viewMode === 'table') {
+      return (
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Project</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Compute</TableHead>
+                <TableHead>Region</TableHead>
+                <TableHead>Created</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(3)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <div className="animate-pulse h-4 bg-border rounded w-32"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="animate-pulse h-4 bg-border rounded w-16"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="animate-pulse h-4 bg-border rounded w-20"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="animate-pulse h-4 bg-border rounded w-24"></div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )
+    }
+
     return (
       <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <ShimmeringCard />
@@ -107,58 +161,8 @@ const ProjectList = ({
     )
   }
 
-  return (
-    <OrganizationProjects
-      key={organization.slug}
-      organization={organization}
-      projects={orgProjects}
-      resourceWarnings={resourceWarnings ?? []}
-      rewriteHref={rewriteHref}
-      isLoadingPermissions={isLoadingPermissions}
-      isErrorPermissions={isErrorPermissions}
-      permissionsError={permissionsError}
-      isLoadingProjects={isLoadingProjects}
-      isErrorProjects={isErrorProjects}
-      projectsError={projectsError}
-      search={search}
-      filterStatus={filterStatus}
-    />
-  )
-}
-
-export default ProjectList
-
-type OrganizationProjectsProps = {
-  organization: Organization
-  projects: ProjectInfo[]
-  resourceWarnings: ResourceWarning[]
-  isLoadingPermissions: boolean
-  isErrorPermissions: boolean
-  permissionsError: ResponseError | null
-  isLoadingProjects: boolean
-  isErrorProjects: boolean
-  projectsError: ResponseError | null
-  rewriteHref?: (projectRef: string) => string
-  search: string
-  filterStatus?: string[]
-}
-
-const OrganizationProjects = ({
-  organization,
-  projects,
-  resourceWarnings,
-  isLoadingPermissions,
-  isErrorPermissions,
-  permissionsError,
-  isLoadingProjects,
-  isErrorProjects,
-  projectsError,
-  rewriteHref,
-  search,
-  filterStatus,
-}: OrganizationProjectsProps) => {
-  const isEmpty = !projects || projects.length === 0
-  const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
+  const isEmpty = !orgProjects || orgProjects.length === 0
+  const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
   const filteredProjects =
     search.length > 0
       ? sortedProjects.filter((project) => {
@@ -169,7 +173,6 @@ const OrganizationProjects = ({
         })
       : sortedProjects
 
-  // [Joshen] Just a UI thing, but we take all projects other than paused as "active"
   const filteredProjectsByStatus =
     filterStatus !== undefined
       ? filterStatus.length === 2
@@ -177,8 +180,6 @@ const OrganizationProjects = ({
         : filteredProjects.filter((project) => filterStatus.includes(project.status))
       : filteredProjects
 
-  const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
-  const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
     added_by: {
@@ -205,38 +206,97 @@ const OrganizationProjects = ({
   )
     return null
 
-  return (
-    <div className="space-y-3" key={organization.slug}>
-      {isLoadingPermissions || isLoadingProjects ? (
-        <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          <ShimmeringCard />
-          <ShimmeringCard />
-        </ul>
-      ) : (
-        <ul className="mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {isErrorPermissions ? (
-            <div className="col-span-3">
-              <AlertError
-                subject="Failed to retrieve permissions for your account"
-                error={permissionsError}
-              />
-            </div>
-          ) : isErrorProjects ? (
-            <div className="col-span-3">
-              <AlertError
-                subject={`Failed to retrieve projects under ${name}`}
-                error={projectsError}
-              />
-            </div>
-          ) : isEmpty ? (
-            <NoProjectsState slug={organization.slug} />
-          ) : (
-            filteredProjectsByStatus?.map((project) => (
-              <ProjectCard
-                key={makeRandomString(5)}
+  if (isLoadingPermissions || isLoadingProjects) {
+    if (viewMode === 'table') {
+      return (
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Project</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Compute</TableHead>
+                <TableHead>Region</TableHead>
+                <TableHead>Created</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(3)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="bg-surface-400 h-4 w-32"></Skeleton>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="bg-surface-400 h-4 w-16"></Skeleton>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="bg-surface-400 h-4 w-24"></Skeleton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )
+    }
+
+    return (
+      <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <ShimmeringCard />
+        <ShimmeringCard />
+      </ul>
+    )
+  }
+
+  if (isErrorPermissions) {
+    return (
+      <AlertError
+        subject="Failed to retrieve permissions for your account"
+        error={permissionsError}
+      />
+    )
+  }
+
+  if (isErrorProjects) {
+    return (
+      <AlertError
+        subject={`Failed to retrieve projects under ${organization.name}`}
+        error={projectsError}
+      />
+    )
+  }
+
+  if (isEmpty) {
+    return <NoProjectsState slug={organization.slug} />
+  }
+
+
+  if (viewMode === 'table') {
+    return (
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Project</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Compute</TableHead>
+              <TableHead>Region</TableHead>
+              <TableHead>Created</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredProjectsByStatus?.map((project) => (
+              <ProjectTableRow
+                key={project.ref}
                 project={project}
                 rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-                resourceWarnings={resourceWarnings.find(
+                resourceWarnings={resourceWarnings?.find(
                   (resourceWarning) => resourceWarning.project === project.ref
                 )}
                 githubIntegration={githubConnections?.find(
@@ -246,10 +306,33 @@ const OrganizationProjects = ({
                   (connection) => connection.supabase_project_ref === project.ref
                 )}
               />
-            ))
-          )}
-        </ul>
-      )}
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+    )
+  }
+
+  return (
+    <div className="space-y-3" key={organization.slug}>
+      <ul className="mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        {filteredProjectsByStatus?.map((project) => (
+          <ProjectCard
+            key={makeRandomString(5)}
+            project={project}
+            rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+            resourceWarnings={resourceWarnings?.find(
+              (resourceWarning) => resourceWarning.project === project.ref
+            )}
+            githubIntegration={githubConnections?.find(
+              (connection) => connection.supabase_project_ref === project.ref
+            )}
+            vercelIntegration={vercelConnections?.find(
+              (connection) => connection.supabase_project_ref === project.ref
+            )}
+          />
+        ))}
+      </ul>
     </div>
   )
 }
@@ -272,3 +355,5 @@ const NoProjectsState = ({ slug }: { slug: string }) => {
     </div>
   )
 }
+
+export default ProjectList
