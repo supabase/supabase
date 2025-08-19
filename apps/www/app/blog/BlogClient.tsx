@@ -10,12 +10,14 @@ import { cn } from 'ui'
 import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 
 import type PostTypes from 'types/post'
+import { Loader2 } from 'lucide-react'
 
 export type BlogView = 'list' | 'grid'
 
 export default function BlogClient(props: { blogs: any[] }) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
+  const [isLoading, setIsLoading] = useState(true)
   const [cmsPosts, setCmsPosts] = useState<any[]>([])
   const [blogs, setBlogs] = useState(props.blogs)
   const [view, setView] = useState<BlogView>(localView ?? 'list')
@@ -36,9 +38,10 @@ export default function BlogClient(props: { blogs: any[] }) {
   useEffect(() => {
     const fetchCmsPosts = async () => {
       try {
-        const res = await fetch('/api-v2/cms-blog-posts')
+        // Use new unified API with preview mode for blog listing
+        const res = await fetch('/api-v2/cms-posts?mode=preview&limit=100')
         const data = await res.json()
-        if (Array.isArray(data.posts)) {
+        if (data.success && Array.isArray(data.posts)) {
           setCmsPosts(data.posts)
         }
       } catch (e) {
@@ -46,20 +49,26 @@ export default function BlogClient(props: { blogs: any[] }) {
       }
     }
     fetchCmsPosts()
+    setIsLoading(false)
   }, [])
 
   return (
     <>
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
-        <div className="md:container mx-auto py-4 lg:py-10 px-4 sm:px-12 xl:px-16">
+        <div className="container relative mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
+          {isLoading && (
+            <div className="w-4 h-4 absolute z-20 top-4 right-4 sm:right-16 xl:right-20 flex items-end justify-center">
+              <Loader2 className="w-4 h-4 transform animate-spinner text-foreground-muted" />
+            </div>
+          )}
           {allPosts.slice(0, 1).map((blog: any) => (
             <FeaturedThumb key={blog.slug} {...blog} />
           ))}
         </div>
 
         <div className="border-default border-t">
-          <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
+          <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
             <BlogFilters allPosts={allPosts} setPosts={setBlogs} view={view} setView={setView} />
 
             <ol

@@ -2,8 +2,31 @@ import BlogPostClient from './BlogPostClient'
 import { draftMode } from 'next/headers'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
+import { SITE_ORIGIN } from '~/lib/constants'
 
 import type { Blog, BlogData, PostReturnType } from 'types/post'
+
+// Helper function to fetch CMS post using our unified API
+async function getCMSPostFromAPI(slug: string, mode: 'preview' | 'full' = 'full') {
+  try {
+    // Use SITE_ORIGIN to call our own api-v2 CMS API endpoint
+    const response = await fetch(`${SITE_ORIGIN}/api-v2/cms-posts?slug=${slug}&mode=${mode}`, {
+      // Add cache with revalidation
+      next: { revalidate: 300 },
+    })
+
+    if (!response.ok) {
+      console.error('[getCMSPostFromAPI] Non-OK response:', response.status)
+      return null
+    }
+
+    const data = await response.json()
+    return data.success ? data.post : null
+  } catch (error) {
+    console.error('[getCMSPostFromAPI] Error:', error)
+    return null
+  }
+}
 
 type MatterReturn = {
   data: BlogData
@@ -84,12 +107,24 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     return <BlogPostClient {...props} />
   } catch {}
 
-  const cmsPost = await getCMSPostBySlug(slug, isDraft)
+  // Try to fetch CMS post using our new unified API first
+  let cmsPost = await getCMSPostFromAPI(slug, 'full')
+
+  // Fallback to the original method if the API doesn't return the post
+  if (!cmsPost) {
+    cmsPost = await getCMSPostBySlug(slug, isDraft)
+  }
 
   if (!cmsPost) {
     if (isDraft) {
-      const publishedPost = await getCMSPostBySlug(slug, false)
+      // Try to fetch published version for draft mode
+      let publishedPost = await getCMSPostFromAPI(slug, 'full')
+      if (!publishedPost) {
+        publishedPost = await getCMSPostBySlug(slug, false)
+      }
+
       if (!publishedPost) return null
+
       const mdxSource = await mdxSerialize(publishedPost.content || '')
       const props: BlogPostPageProps = {
         prevPost: null,

@@ -1,3 +1,43 @@
+// Get CMS_SITE_ORIGIN from environment or use the same logic as constants.ts
+const ENV_CMS_ORIGIN = process.env.CMS_SITE_ORIGIN || process.env.CMS_URL
+let CMS_SITE_ORIGIN =
+  ENV_CMS_ORIGIN ||
+  (process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? 'http://localhost:3030' // fallback for production
+    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('zone-www-dot-com-', 'cms-')}`
+      : 'http://localhost:3030')
+
+// Function to generate CMS remote patterns from CMS_SITE_ORIGIN
+function generateCMSRemotePatterns() {
+  const patterns = []
+
+  try {
+    const cmsUrl = new URL(CMS_SITE_ORIGIN)
+    const cmsHostname = cmsUrl.hostname
+    const cmsProtocol = cmsUrl.protocol.replace(':', '')
+    const cmsPort = cmsUrl.port || ''
+
+    // Add patterns for the current CMS hostname
+    const pathPatterns = ['/media/**', '/api/media/**', '/api/media/file/**']
+
+    pathPatterns.forEach((pathname) => {
+      patterns.push({
+        protocol: cmsProtocol,
+        hostname: cmsHostname,
+        port: cmsPort,
+        pathname,
+      })
+    })
+
+    console.log(`[remotePatterns] Added patterns for CMS: ${cmsHostname}`)
+  } catch (error) {
+    console.warn(`[remotePatterns] Failed to parse CMS_SITE_ORIGIN: ${CMS_SITE_ORIGIN}`, error)
+  }
+
+  return patterns
+}
+
 module.exports = [
   {
     protocol: 'https',
@@ -107,4 +147,6 @@ module.exports = [
     port: '',
     pathname: '/dms/image/**',
   },
+  // Dynamically generated CMS patterns based on CMS_SITE_ORIGIN
+  ...generateCMSRemotePatterns(),
 ]

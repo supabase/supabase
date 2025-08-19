@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { CMS_SITE_ORIGIN } from '~/lib/constants'
 import { generateReadingTime } from '~/lib/helpers'
 
+// Lightweight runtime for better performance
+export const runtime = 'edge'
+
 // Minimal rich-text to plain text for reading time
 function richTextToPlainText(content: any): string {
   try {
@@ -43,33 +46,46 @@ function richTextToPlainText(content: any): string {
   }
 }
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const baseUrl = CMS_SITE_ORIGIN || 'http://localhost:3030'
+    const { searchParams } = new URL(request.url)
+    const mode = searchParams.get('mode') || 'preview' // 'preview' or 'full'
+    const limit = searchParams.get('limit') || '100'
+    const slug = searchParams.get('slug') // For fetching specific post
+
+    const baseUrl = CMS_SITE_ORIGIN
     const apiKey = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
     const url = new URL('/api/posts', baseUrl)
     url.searchParams.set('depth', '2')
     url.searchParams.set('draft', 'false')
-    url.searchParams.set('limit', '200')
+    url.searchParams.set('limit', limit)
     url.searchParams.set('where[_status][equals]', 'published')
+
+    // If fetching specific post by slug
+    if (slug) {
+      url.searchParams.set('where[slug][equals]', slug)
+      url.searchParams.set('limit', '1')
+    }
 
     const response = await fetch(url.toString(), {
       headers: {
         'Content-Type': 'application/json',
         ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
       },
-      cache: 'no-store',
+      // Add cache with revalidation for better performance
+      next: {
+        revalidate: 300, // 5 minutes cache
+      },
     })
 
     if (!response.ok) {
-      const body = await response.text()
+      console.error('[cms-posts] Non-OK response:', response.status, response.statusText)
       return NextResponse.json(
         {
           success: false,
           error: 'Failed to fetch posts from CMS',
           status: response.status,
-          body: body.slice(0, 200),
         },
         { status: response.status }
       )
@@ -77,13 +93,12 @@ export async function GET(_request: NextRequest) {
 
     const contentType = response.headers.get('content-type') || ''
     if (!contentType.toLowerCase().includes('application/json')) {
-      const body = await response.text()
+      console.error('[cms-posts] Non-JSON response, content-type:', contentType)
       return NextResponse.json(
         {
           success: false,
           error: 'CMS returned non-JSON response',
           contentType,
-          body: body.slice(0, 200),
         },
         { status: 502 }
       )
@@ -118,7 +133,8 @@ export async function GET(_request: NextRequest) {
             }))
           : []
 
-        return {
+        // Base post structure (always included)
+        const basePost = {
           type: 'blog' as const,
           slug: p.slug,
           title: p.title || '',
@@ -135,11 +151,37 @@ export async function GET(_request: NextRequest) {
           categories: [],
           isCMS: true,
         }
+
+        // Add content for full mode
+        if (mode === 'full') {
+          return {
+            ...basePost,
+            content: p.content, // Include full content for individual post fetches
+          }
+        }
+
+        return basePost
       })
       .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-    return NextResponse.json({ success: true, posts, total: posts.length })
+    // For single post requests, return the post directly
+    if (slug && posts.length > 0) {
+      return NextResponse.json({
+        success: true,
+        post: posts[0],
+        mode,
+      })
+    }
+
+    return NextResponse.json({
+      success: true,
+      posts,
+      total: posts.length,
+      mode,
+      cached: true,
+    })
   } catch (error) {
+    console.error('[cms-posts] Error:', error)
     return NextResponse.json(
       {
         success: false,
