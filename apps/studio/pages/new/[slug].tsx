@@ -390,12 +390,16 @@ const Wizard: NextPageWithLayout = () => {
     const { postgresEngine, releaseChannel } =
       extractPostgresVersionDetails(postgresVersionSelection)
 
+    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const selectedRegion = smartRegionEnabled
+      ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+      : undefined
+
     const data: ProjectCreateVariables = {
-      cloudProvider: cloudProvider,
+      dbPass,
+      cloudProvider,
       organizationSlug: currentOrg.slug,
       name: projectName,
-      dbPass: dbPass,
-      dbRegion: dbRegionExact,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
@@ -404,6 +408,7 @@ const Wizard: NextPageWithLayout = () => {
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
     }
 
     if (postgresVersion) {
