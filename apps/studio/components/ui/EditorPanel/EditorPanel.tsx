@@ -51,7 +51,6 @@ import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { InlineLink } from '../InlineLink'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 type Template = {
   name: string
