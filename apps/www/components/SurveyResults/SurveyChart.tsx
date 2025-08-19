@@ -48,37 +48,37 @@ interface FilterColumnConfig {
 }
 
 const FILTER_COLUMN_CONFIGS: Record<string, FilterColumnConfig> = {
-  team_count: {
+  team_size: {
     label: 'Team Size',
     options: [
-      { value: '1-10', label: '1-10' },
-      { value: '11-50', label: '11-50' },
-      { value: '51-100', label: '51-100' },
-      { value: '101-250', label: '101-250' },
+      { value: '1–10', label: '1–10' },
+      { value: '11–50', label: '11–50' },
+      { value: '51–100', label: '51–100' },
+      { value: '101–250', label: '101–250' },
       { value: '250+', label: '250+' },
     ],
   },
   money_raised: {
     label: 'Money Raised',
     options: [
-      { value: 'USD $0-10M', label: 'USD $0-10M' },
-      { value: 'USD $11-50M', label: 'USD $11-50M' },
-      { value: 'USD $51-100M', label: 'USD $51-100M' },
-      { value: '> USD $100M', label: 'USD $100M+' },
+      { value: 'USD $0–10M', label: 'USD $0-10M' },
+      { value: 'USD $11–50M', label: 'USD $11–50M' },
+      { value: 'USD $51–100M', label: 'USD $51–100M' },
+      { value: 'USD $100M+', label: 'USD $100M+' },
     ],
   },
   person_age: {
     label: 'Age',
     options: [
-      { value: '18-21', label: '18–21' },
-      { value: '22-29', label: '22–29' },
-      { value: '30-39', label: '30–39' },
-      { value: '40-49', label: '40–49' },
-      { value: '50-59', label: '50–59' },
+      { value: '18–21', label: '18–21' },
+      { value: '22–29', label: '22–29' },
+      { value: '30–39', label: '30–39' },
+      { value: '40–49', label: '40–49' },
+      { value: '50–59', label: '50–59' },
       { value: '60+', label: '60+' },
     ],
   },
-  headquarters: {
+  location: {
     label: 'Location',
     options: [
       { value: 'Africa', label: 'Africa' },
@@ -92,7 +92,7 @@ const FILTER_COLUMN_CONFIGS: Record<string, FilterColumnConfig> = {
   },
 }
 
-// Simplified hook - no more async, no more loading states
+// Simplified hook – no more async, no more loading states
 function useFilterOptions(filterColumns: string[]) {
   // Build filters synchronously since everything is predefined
   const filters: Filters = {}

@@ -3,25 +3,20 @@ import { SurveyChart, buildWhereClause } from '../SurveyChart'
 function generateFundingStageSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
 
-  return `SELECT * FROM (
-    SELECT
-      CASE 
-        WHEN funding_stage IN ('Series A', 'Series B', 'Series C', 'Series D or later') THEN 'Series A+'
-        ELSE funding_stage
-      END AS funding_stage,
-      COUNT(*) AS total
-    FROM responses_2025${whereClause ? '\n' + whereClause : ''}
-    GROUP BY CASE 
-        WHEN funding_stage IN ('Series A', 'Series B', 'Series C', 'Series D or later') THEN 'Series A+'
-        ELSE funding_stage
-      END
-  ) subquery
+  return `SELECT
+    funding_stage,
+    COUNT(*) AS total
+  FROM responses_b_2025${whereClause ? '\n' + whereClause : ''}
+  GROUP BY funding_stage
   ORDER BY CASE 
       WHEN funding_stage = 'Bootstrapped' THEN 1
       WHEN funding_stage = 'Pre-seed' THEN 2
       WHEN funding_stage = 'Seed' THEN 3
-      WHEN funding_stage = 'Series A+' THEN 4
-      ELSE 5
+      WHEN funding_stage = 'Series A' THEN 4
+      WHEN funding_stage = 'Series B' THEN 5
+      WHEN funding_stage = 'Series C' THEN 6
+      WHEN funding_stage = 'Series D or later' THEN 7
+      ELSE 8
     END;`
 }
 
@@ -30,7 +25,7 @@ export function FundingStageChart() {
     <SurveyChart
       title="What stage of funding is your startup in?"
       targetColumn="funding_stage"
-      filterColumns={['person_age', 'headquarters', 'team_count']}
+      filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateFundingStageSQL}
     />
   )

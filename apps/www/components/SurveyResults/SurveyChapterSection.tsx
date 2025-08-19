@@ -9,7 +9,7 @@ import { IndustryChart } from './charts/IndustryChart'
 import { FundingStageChart } from './charts/FundingStageChart'
 import { DatabasesChart } from './charts/DatabasesChart'
 import { AIModelsChart } from './charts/AIModelsChart'
-import { HeadquartersChart } from '~/components/SurveyResults/charts/HeadquartersChart'
+import { LocationChart } from '~/components/SurveyResults/charts/LocationChart'
 import { SalesToolsChart } from '~/components/SurveyResults/charts/SalesToolsChart'
 import { AICodingToolsChart } from './charts/AICodingToolsChart'
 import { RegularSocialMediaUseChart } from '~/components/SurveyResults/charts/RegularSocialMediaUseChart'
@@ -68,7 +68,7 @@ export function SurveyChapterSection({
     SalesToolsChart,
     WorldOutlookChart,
     BiggestChallengeChart,
-    HeadquartersChart,
+    LocationChart,
   }
 
   return (
