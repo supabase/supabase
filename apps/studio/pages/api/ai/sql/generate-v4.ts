@@ -260,19 +260,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         result.pipeUIMessageStreamToResponse(res, {
           onError: (error) => {
+            let errorMessage: string
             if (error == null) {
-              return 'unknown error'
+              errorMessage = 'unknown error'
             }
 
             if (typeof error === 'string') {
-              return error
+              errorMessage = error
             }
 
             if (error instanceof Error) {
-              return error.message
+              errorMessage = error.message
             }
 
-            return JSON.stringify(error)
+            errorMessage = JSON.stringify(error)
+
+            // Log error to Braintrust
+            span.log({
+              error: errorMessage,
+              metadata: {
+                error_type: 'stream_error',
+                error_name: error instanceof Error ? error.name : 'unknown',
+                error_stack: error instanceof Error ? error.stack : undefined,
+              },
+            })
+
+            return errorMessage
           },
         })
       },
