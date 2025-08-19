@@ -1,6 +1,5 @@
 import BlogClient from './BlogClient'
 import { getSortedPosts } from 'lib/posts'
-import { getAllCMSPosts } from 'lib/get-cms-posts'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
@@ -17,21 +16,9 @@ export const metadata: Metadata = {
 }
 
 export default async function BlogPage() {
-  // Get static blog posts at build time
+  // Get static blog posts at build time only
   const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
-  const cmsPosts = await getAllCMSPosts()
 
-  const allPostsData = [...staticPostsData, ...cmsPosts].sort((a: any, b: any) => {
-    const dateA = (a as any).date
-      ? new Date((a as any).date).getTime()
-      : new Date((a as any).formattedDate).getTime()
-    const dateB = (b as any).date
-      ? new Date((b as any).date).getTime()
-      : new Date((b as any).formattedDate).getTime()
-    return dateB - dateA
-  })
-
-  // RSS writing moved out of runtime to avoid tracing the entire public directory into serverless bundles
-
-  return <BlogClient blogs={allPostsData as any} />
+  // Pass only static posts to client - CMS posts will be fetched at runtime
+  return <BlogClient blogs={staticPostsData as any} />
 }

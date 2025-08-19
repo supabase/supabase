@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DefaultLayout from 'components/Layouts/Default'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
@@ -16,34 +16,37 @@ export type BlogView = 'list' | 'grid'
 export default function BlogClient(props: { blogs: any[] }) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
-  // const [cmsPosts, setCmsPosts] = useState<any[]>([])
+  const [cmsPosts, setCmsPosts] = useState<any[]>([])
   const [blogs, setBlogs] = useState(props.blogs)
   const [view, setView] = useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
 
-  const allPosts = props.blogs?.sort(
-    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
+  // Combine static and CMS posts and sort by date
+  const allPosts = [...props.blogs, ...cmsPosts]?.sort((a: any, b: any) => {
+    const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
+    const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
+    return dateB - dateA
+  })
 
-  // useEffect(() => {
-  //   setBlogs((prev: any[]) => (prev.length === props.blogs.length ? allPosts : prev))
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [cmsPosts])
+  useEffect(() => {
+    setBlogs((prev: any[]) => (prev.length === props.blogs.length ? allPosts : prev))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cmsPosts])
 
-  // useEffect(() => {
-  //   const fetchCmsPosts = async () => {
-  //     try {
-  //       const res = await fetch('/api-v2/cms-posts')
-  //       const data = await res.json()
-  //       if (data.success && Array.isArray(data.posts)) {
-  //         setCmsPosts(data.posts)
-  //       }
-  //     } catch (e) {
-  //       console.error('Failed to load CMS posts', e)
-  //     }
-  //   }
-  //   fetchCmsPosts()
-  // }, [])
+  useEffect(() => {
+    const fetchCmsPosts = async () => {
+      try {
+        const res = await fetch('/api-v2/cms-blog-posts')
+        const data = await res.json()
+        if (Array.isArray(data.posts)) {
+          setCmsPosts(data.posts)
+        }
+      } catch (e) {
+        console.error('Failed to load CMS posts', e)
+      }
+    }
+    fetchCmsPosts()
+  }, [])
 
   return (
     <>

@@ -57,7 +57,55 @@ const nextConfig = {
   experimental: {
     // needed to make the octokit packages work in /changelog
     esmExternals: 'loose',
+    // Optimize bundle sizes
+    optimizePackageImports: ['lucide-react', '@heroicons/react'],
   },
+  // Exclude huge directories from being traced into serverless functions
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@swc/**/*',
+      'node_modules/@esbuild/**/*',
+      'node_modules/rollup/**/*',
+      'node_modules/webpack/**/*',
+      'node_modules/terser/**/*',
+      'node_modules/@babel/**/*',
+      'node_modules/typescript/**/*',
+      'node_modules/@types/**/*',
+      'node_modules/.pnpm/**/*',
+      '.next/cache/**/*',
+      '.next/static/**/*',
+      '.next/server/**/*.js.map',
+      '.next/trace',
+      'public/**/*',
+      '_blog/**/*',
+      'components/**/*.stories.*',
+      'components/**/*.test.*',
+      '**/*.test.*',
+      '**/*.spec.*',
+      '**/*.stories.*',
+      '**/node_modules/.cache/**/*',
+      '**/node_modules/@sentry/**/*',
+      '**/node_modules/framer-motion/**/*',
+      '**/node_modules/highlight.js/**/*',
+      '**/node_modules/refractor/**/*',
+      '**/node_modules/@code-hike/**/*',
+      '**/node_modules/rehype/**/*',
+      '**/node_modules/remark/**/*',
+      '**/node_modules/unified/**/*',
+    ],
+    // Specific exclusions for blog pages that cause the most issues
+    '/blog/**/*': [
+      '_blog/**/*',
+      'public/**/*',
+      '.next/static/**/*',
+      'node_modules/highlight.js/**/*',
+      'node_modules/refractor/**/*',
+      'node_modules/@code-hike/**/*',
+      '**/node_modules/.pnpm/**/*',
+    ],
+  },
+  // Additional optimizations for smaller serverless functions
+  serverExternalPackages: ['@code-hike/mdx', 'highlight.js', 'refractor', '@sentry/nextjs'],
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
