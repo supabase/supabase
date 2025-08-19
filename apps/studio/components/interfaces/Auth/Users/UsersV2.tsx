@@ -347,6 +347,7 @@ export const UsersV2 = () => {
                     activeOptions={selectedProviders}
                     labelClass="text-xs"
                     maxHeightClass="h-[190px]"
+                    className="w-52"
                     onSaveFilters={setSelectedProviders}
                   />
                 )}
