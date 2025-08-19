@@ -23,25 +23,25 @@
       "description": "Enable the AI opt in level 'schema_and_log_and_data'"
     },
 
-    "authentication:show_create_user": {
+    "authentication:show_send_invitation": {
       "type": "boolean",
-      "description": "Show the create user option in the authentication settings page"
+      "description": "Show the send invitation option in the authentication users page"
     },
     "authentication:show_provider_filter": {
       "type": "boolean",
-      "description": "Show the provider filter in the authentication settings page"
+      "description": "Show the provider filter in the authentication users page"
     },
     "authentication:show_sort_by_email": {
       "type": "boolean",
-      "description": "Show the sort by email option in the authentication settings page"
+      "description": "Show the sort by email option in the authentication users page"
     },
     "authentication:show_sort_by_phone": {
       "type": "boolean",
-      "description": "Show the sort by phone option in the authentication settings page"
+      "description": "Show the sort by phone option in the authentication users page"
     },
     "authentication:show_user_type_filter": {
       "type": "boolean",
-      "description": "Show the user type filter in the authentication settings page"
+      "description": "Show the user type filter in the authentication users page"
     },
 
     "billing:all": {
@@ -119,7 +119,7 @@
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
     "authentication:show_provider_filter",
-    "authentication:show_create_user",
+    "authentication:show_send_invitation",
     "authentication:show_sort_by_email",
     "authentication:show_sort_by_phone",
     "authentication:show_user_type_filter",
