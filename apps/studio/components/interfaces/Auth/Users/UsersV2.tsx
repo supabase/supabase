@@ -44,7 +44,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import AddUserDropdown from './AddUserDropdown'
+import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserPanel } from './UserPanel'
 import {
