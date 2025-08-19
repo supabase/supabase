@@ -301,7 +301,7 @@ const stateOfStartupsData = {
         {
           title: 'Inspiration Stack',
           description:
-            'Founders follow newsletters like TLDR and Lenny’s, listen to The Diary of a CEO and Founders Podcasts. Tool discovery happens quite often via YouTube or GitHub. Physical event participation remains low.',
+            'Founders follow newsletters like TLDR and Lenny’s, and they listen to podcasts like The Diary of a CEO and Founders. Tool discovery happens quite often via YouTube or GitHub. Physical event participation remains low.',
           stats: [
             { percent: 45, label: 'Respondents that listen to industry podcasts' },
             { percent: 36, label: 'Respondents that have built a developer community' },
@@ -316,7 +316,7 @@ const stateOfStartupsData = {
           rankedAnswersPair: [
             {
               label: 'Top podcasts listened to',
-              answers: ['The Diary of a CEO', 'Founders Podcasts', 'Lightcone'],
+              answers: ['The Diary of a CEO', 'Founders', 'Lightcone Podcast'],
             },
             {
               label: 'Top newsletters subscribed to',
