@@ -11,7 +11,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import {
   ScaffoldContainer,
-  ScaffoldDescription,
   ScaffoldHeader,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
@@ -27,12 +26,8 @@ const UserAccessTokens: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainer>
-        <ScaffoldHeader className="pt-0 mb-6">
+        <ScaffoldHeader className="pt-0">
           <ScaffoldSectionTitle>Access Tokens</ScaffoldSectionTitle>
-          <ScaffoldDescription>
-            Personal access tokens can be used to control your whole account and use features added
-            in the future. Be careful when sharing them!
-          </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer bottomPadding>
