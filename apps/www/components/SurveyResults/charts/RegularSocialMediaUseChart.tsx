@@ -3,28 +3,38 @@ import { SurveyChart, buildWhereClause } from '../SurveyChart'
 function generateRegularSocialMediaUseSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
 
-  return `WITH founders AS (
-  SELECT id, regular_social_media_use
-  FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
-)
-SELECT
-  platform AS label,
-  COUNT(*) AS total
-FROM (
-  SELECT id, unnest(regular_social_media_use) AS platform
-  FROM founders
-) t
-GROUP BY platform
-ORDER BY total DESC;
-`
+  return `WITH regular_social_media_use_mapping AS (
+    SELECT 
+      id,
+      CASE 
+        WHEN platform IN (
+          'X (Twitter)',
+          'Threads',
+          'BlueSky',
+          'LinkedIn',
+          'Reddit',
+          'TikTok',
+          'Instagram',
+          'YouTube',
+          'Mastodon',
+          'Discord',
+          'I’ve given up social media'
+        ) THEN platform
+        ELSE 'Other'
+      END AS platform_clean
+    FROM (
+      SELECT id, unnest(regular_social_media_use) AS platform
+      FROM responses_2025
+      ${whereClause}
+    ) sub
+  )
+  SELECT 
+    platform_clean AS platform,
+    COUNT(DISTINCT id) AS total
+  FROM regular_social_media_use_mapping
+  GROUP BY platform_clean
+  ORDER BY total DESC;`
 }
-
-// SELECT
-//   unnest(regular_social_media_use) AS social_media,
-//   COUNT(*) AS total
-// FROM responses_c_2025${whereClause ? '\n' + whereClause : ''}
-// GROUP BY social_media
-// ORDER BY total DESC;
 
 export function RegularSocialMediaUseChart() {
   return (
