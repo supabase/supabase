@@ -48,6 +48,7 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -91,18 +92,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const sizes: DesiredInstanceSize[] = [
-  'micro',
-  'small',
-  'medium',
-  'large',
-  'xlarge',
-  '2xlarge',
-  '4xlarge',
-  '8xlarge',
-  '12xlarge',
-  '16xlarge',
-]
+const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -147,6 +137,8 @@ const Wizard: NextPageWithLayout = () => {
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
+
+  const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -320,7 +312,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: dbRegionExact,
       organizationSlug: organization,
     },
-    { enabled: currentOrg != null && !isManagedByVercel }
+    { enabled: currentOrg !== null && !isManagedByVercel }
   )
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
@@ -789,7 +781,7 @@ const Wizard: NextPageWithLayout = () => {
                                                   CPU
                                                 </span>
                                                 <p
-                                                  className="text-xs text-muted instance-details"
+                                                  className="text-xs text-foreground-light instance-details"
                                                   translate="no"
                                                 >
                                                   ${instanceSizeSpecs[option].priceHourly}/hour (~$
@@ -800,6 +792,15 @@ const Wizard: NextPageWithLayout = () => {
                                           </SelectItem_Shadcn_>
                                         )
                                       })}
+                                    <SelectItem_Shadcn_
+                                      key={'disabled'}
+                                      value={'disabled'}
+                                      disabled
+                                    >
+                                      <div className="flex items-center justify-center w-full">
+                                        <span>Larger instance sizes available after creation</span>
+                                      </div>
+                                    </SelectItem_Shadcn_>
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
@@ -917,7 +918,9 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     <SecurityOptions form={form} />
-                    {!!availableOrioleVersion && <AdvancedConfiguration form={form} />}
+                    {showAdvancedConfig && !!availableOrioleVersion && (
+                      <AdvancedConfiguration form={form} />
+                    )}
                   </>
                 )}
 

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { Check } from 'lucide-react'
-import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
+import { plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
@@ -23,8 +23,8 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
             const isProPlan = plan.name === 'Pro'
             const isTeamPlan = plan.name === 'Team'
             const isUpgradablePlan = isProPlan || isTeamPlan
-            const features = pickFeatures(plan)
-            const footer = pickFooter(plan)
+            const features = plan.features
+            const footer = plan.footer
 
             const sendPricingEvent = () => {
               sendTelemetryEvent({

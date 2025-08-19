@@ -1,4 +1,4 @@
-import type { Message as MessageType } from 'ai/react'
+import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
@@ -247,7 +247,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
-        name: options?.name ?? 'Untitled',
+        name: options?.name ?? 'New chat',
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -302,6 +302,19 @@ export const createAiAssistantState = (): AiAssistantState => {
         state.sqlSnippets = []
         state.initialInput = ''
       }
+    },
+
+    deleteMessagesAfter: (id: string, { includeSelf = true } = {}) => {
+      const chat = state.activeChat
+      if (!chat) return
+
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
+      if (messageIndex === -1) return
+
+      // Delete all messages from the target message (optionally including) to the end
+      const startIndex = includeSelf ? messageIndex : messageIndex + 1
+      chat.messages.splice(startIndex)
+      chat.updatedAt = new Date()
     },
 
     saveMessage: (message: MessageType | MessageType[]) => {
@@ -420,6 +433,7 @@ export type AiAssistantState = AiAssistantData & {
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
   clearMessages: () => void
+  deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
   saveMessage: (message: MessageType | MessageType[]) => void
   updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
