@@ -3,7 +3,6 @@ import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -11,7 +10,8 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   Button,
@@ -68,18 +68,22 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 
 const NetworkRestrictions = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
-  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []

@@ -1,6 +1,6 @@
 import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useState, forwardRef } from 'react'
+import { forwardRef, ReactNode, useState } from 'react'
 
 import { Button } from 'ui'
 
@@ -47,7 +47,7 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
             <div className="flex w-full space-x-3 items-center">
               {icon && <span className="text-foreground-lighter">{icon}</span>}
               <div className="flex-grow">
-                <h5 className="text-sm text-foreground">{title}</h5>
+                <h5 className="text-foreground">{title}</h5>
               </div>
             </div>
             {description && !hideCollapse ? (

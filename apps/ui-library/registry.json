@@ -88,7 +88,12 @@
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "name": "password-based-auth-react",
@@ -118,7 +123,12 @@
           "type": "registry:lib"
         }
       ],
-      "dependencies": ["@supabase/supabase-js@latest"]
+      "dependencies": ["@supabase/supabase-js@latest"],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "name": "password-based-auth-react-router",
@@ -186,7 +196,12 @@
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "name": "password-based-auth-tanstack",
@@ -269,7 +284,12 @@
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "name": "social-auth-nextjs",
@@ -324,7 +344,12 @@
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "name": "social-auth-react",
@@ -342,7 +367,12 @@
           "type": "registry:lib"
         }
       ],
-      "dependencies": ["@supabase/supabase-js@latest"]
+      "dependencies": ["@supabase/supabase-js@latest"],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "name": "social-auth-react-router",
@@ -395,7 +425,12 @@
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "name": "social-auth-tanstack",
@@ -446,7 +481,12 @@
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -482,7 +522,12 @@
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -505,7 +550,12 @@
           "path": "registry/default/clients/react/lib/supabase/client.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -537,7 +587,12 @@
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -569,7 +624,12 @@
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -604,7 +664,12 @@
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -631,7 +696,12 @@
           "path": "registry/default/clients/react/lib/supabase/client.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -662,7 +732,12 @@
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -693,7 +768,12 @@
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -728,7 +808,12 @@
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -755,7 +840,12 @@
           "path": "registry/default/clients/react/lib/supabase/client.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -786,7 +876,12 @@
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -817,7 +912,12 @@
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -860,7 +960,12 @@
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -895,7 +1000,12 @@
           "path": "registry/default/clients/react/lib/supabase/client.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -934,7 +1044,12 @@
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -973,7 +1088,12 @@
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -1012,7 +1132,12 @@
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -1043,7 +1168,12 @@
           "path": "registry/default/clients/react/lib/supabase/client.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -1078,7 +1208,12 @@
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -1113,7 +1248,12 @@
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      }
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -1138,7 +1278,11 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
       "files": [
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
@@ -1162,7 +1306,11 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
       "files": [
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
@@ -1178,7 +1326,11 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
       "files": [
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
@@ -1198,7 +1350,11 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+      },
       "files": [
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",

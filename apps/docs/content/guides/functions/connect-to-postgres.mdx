@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '',
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
@@ -115,7 +115,7 @@ Deployed edge functions are pre-configured to use SSL for connections to the Sup
 
 If you want to use SSL connections during local development, follow these steps:
 
-1. Download the SSL certificate from [Database settings](https://supabase.com/dashboard/project/_/settings/database)
+1. Download the SSL certificate from [Database Settings](https://supabase.com/dashboard/project/_/database/settings)
 2. Add to your [local .env file](https://supabase.com/docs/guides/functions/secrets), add these two variables:
 
 ```bash

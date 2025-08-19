@@ -16,10 +16,10 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { debounce } from 'lodash'
-import { Loader, Code, Check } from 'lucide-react'
+import { Check, Code, Loader } from 'lucide-react'
 
 interface TableSelectorProps {
   className?: string
@@ -40,7 +40,7 @@ const TableSelector = ({
 }: TableSelectorProps) => {
   const [open, setOpen] = useState(false)
   const [initiallyLoaded, setInitiallyLoaded] = useState(false)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [searchInput, setSearchInput] = useState('')
 
   const { data, isLoading, isSuccess, isError, error, refetch } = useEntityTypesQuery({

@@ -4,18 +4,18 @@ import { type PropsWithChildren } from 'react'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
 const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data, isSuccess } = useVercelRedirectQuery({
     installationId: selectedOrganization?.partner_id,
   })
 
   return (
-    <div className={cn('w-full flex flex-col overflow-hidden')}>
+    <div className={cn('h-full w-full flex flex-col overflow-hidden')}>
       {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
         <Alert_Shadcn_
           variant="default"

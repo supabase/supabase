@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Loader2, PlusIcon } from 'lucide-react'
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -9,16 +9,16 @@ import * as z from 'zod'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
+import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { GitHubConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import {
@@ -27,20 +27,20 @@ import {
   CardContent,
   CardFooter,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Switch,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -65,24 +65,23 @@ const GitHubIntegrationConnectionForm = ({
   disabled = false,
   connection,
 }: GitHubIntegrationConnectionFormProps) => {
-  const selectedProject = useSelectedProject()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
   const isParentProject = !Boolean(selectedProject?.parent_project_ref)
 
-  const canUpdateGitHubConnection = useCheckPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
-  const canCreateGitHubConnection = useCheckPermissions(
+  const { can: canCreateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
     any[]
@@ -90,8 +89,15 @@ const GitHubIntegrationConnectionForm = ({
     enabled: Boolean(gitHubAuthorization),
   })
 
-  const { mutate: updateBranch } = useBranchUpdateMutation()
+  const { mutate: updateBranch } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Production branch settings successfully updated')
+    },
+  })
   const { mutate: createBranch } = useBranchCreateMutation({
+    onSuccess: () => {
+      toast.success('Production branch settings successfully updated')
+    },
     onError: (error) => {
       console.error('Failed to enable branching:', error)
     },
@@ -106,7 +112,11 @@ const GitHubIntegrationConnectionForm = ({
     useCheckGithubBranchValidity({ onError: () => {} })
 
   const { mutate: createConnection, isLoading: isCreatingConnection } =
-    useGitHubConnectionCreateMutation()
+    useGitHubConnectionCreateMutation({
+      onSuccess: () => {
+        toast.success('GitHub integration successfully updated')
+      },
+    })
 
   const { mutateAsync: deleteConnection, isLoading: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
@@ -246,7 +256,6 @@ const GitHubIntegrationConnectionForm = ({
         gitBranch: data.branchName,
       })
     }
-    toast.success('GitHub integration successfully updated')
   }
 
   const handleUpdateConnection = async (
@@ -287,10 +296,10 @@ const GitHubIntegrationConnectionForm = ({
         id: prodBranch.id,
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
+        branchName: data.branchName || 'main',
       })
     }
 
-    toast.success('GitHub integration successfully updated')
     setIsConfirmingBranchChange(false)
   }
 
@@ -344,15 +353,6 @@ const GitHubIntegrationConnectionForm = ({
       toast.error('Failed to change repository')
     }
   }
-
-  useEffect(() => {
-    if (selectedRepository) {
-      githubSettingsForm.setValue(
-        'branchName',
-        githubRepos.find((repo) => repo.id === selectedRepository.id)?.default_branch || 'main'
-      )
-    }
-  }, [selectedRepository])
 
   useEffect(() => {
     if (connection) {
@@ -464,6 +464,10 @@ const GitHubIntegrationConnectionForm = ({
                                   onSelect={() => {
                                     field.onChange(repo.id)
                                     setRepoComboboxOpen(false)
+                                    githubSettingsForm.setValue(
+                                      'branchName',
+                                      repo.default_branch || 'main'
+                                    )
                                   }}
                                 >
                                   <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">

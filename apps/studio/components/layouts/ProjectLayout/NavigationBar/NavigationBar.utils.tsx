@@ -116,9 +116,15 @@ export const generateProductRoutes = (
   ]
 }
 
-export const generateOtherRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
+export const generateOtherRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: { unifiedLogs?: boolean }
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
+
+  const unifiedLogsEnabled = features?.unifiedLogs ?? false
 
   return [
     {
@@ -141,7 +147,13 @@ export const generateOtherRoutes = (ref?: string, project?: Project, features?: 
       key: 'logs',
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs`),
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : unifiedLogsEnabled
+            ? `/project/${ref}/logs`
+            : `/project/${ref}/logs/explorer`),
     },
     {
       key: 'api',

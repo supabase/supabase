@@ -113,6 +113,11 @@ export class Result<Ok, Error> {
     return this as unknown as Result<Mapped, Error>
   }
 
+  async mapAsync<Mapped>(fn: (data: Ok) => Promise<Mapped>): Promise<Result<Mapped, Error>> {
+    if (this.isOk()) return Result.ok(await fn(this.internal.data!))
+    return this as unknown as Result<Mapped, Error>
+  }
+
   mapError<MappedError>(fn: (error: Error) => MappedError): Result<Ok, MappedError> {
     if (this.isOk()) return this as unknown as Result<Ok, MappedError>
     return Result.error(fn(this.internal.error!))
@@ -147,6 +152,27 @@ export class Result<Ok, Error> {
     return this.internal.data!
   }
 
+  unwrapOr(deflt: () => Ok): Ok {
+    if (this.isOk()) return this.internal.data!
+    return deflt()
+  }
+
+  unwrapError(): Error {
+    if (this.isOk()) {
+      throw new Error(`UnwrapError called on Ok`)
+    }
+    return this.internal.error!
+  }
+
+  unwrapErrorSafe(): Error | null {
+    return this.internal.error
+  }
+
+  unwrapEither(): Ok | Error {
+    if (this.isOk()) return this.unwrap()
+    return this.unwrapError()
+  }
+
   join<OtherOk, OtherError>(
     other: Result<OtherOk, OtherError>
   ): Result<[Ok, OtherOk], [Error, OtherError]> {
@@ -156,5 +182,49 @@ export class Result<Ok, Error> {
         [Error, OtherError]
       >
     return Result.ok([this.internal.data!, other.internal.data!])
+  }
+}
+
+export class Both<Left, Right> {
+  private internal: {
+    left: Left
+    right: Right
+  }
+
+  constructor(left: Left, right: Right) {
+    this.internal = {
+      left,
+      right,
+    }
+  }
+
+  mapLeft<NewLeft>(fn: (left: Left) => NewLeft): Both<NewLeft, Right> {
+    return new Both(fn(this.internal.left), this.internal.right)
+  }
+
+  mapRight<NewRight>(fn: (right: Right) => NewRight): Both<Left, NewRight> {
+    return new Both(this.internal.left, fn(this.internal.right))
+  }
+
+  async mapLeftAsync<NewLeft>(fn: (left: Left) => Promise<NewLeft>): Promise<Both<NewLeft, Right>> {
+    const res = await fn(this.internal.left)
+    return new Both(res, this.internal.right)
+  }
+
+  unwrapLeft(): Left {
+    return this.internal.left
+  }
+
+  unwrapRight(): Right {
+    return this.internal.right
+  }
+
+  combine<Output>(fn: (left: Left, right: Right) => Output): Output {
+    return fn(this.internal.left, this.internal.right)
+  }
+
+  intoResult(): Result<Left, Right> {
+    if (this.internal.right) return Result.error(this.internal.right)
+    return Result.ok(this.internal.left)
   }
 }

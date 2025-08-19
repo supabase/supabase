@@ -47,7 +47,7 @@ const ForgotPasswordLayout = ({
         <main className="max-w-[448px] w-full flex flex-col px-5">
           {showHeadings && (
             <div className="mb-6">
-              <h1 className="text-2xl lg:text-3xl mt-8 mb-2">{heading}</h1>
+              <h1 className="lg:text-3xl mt-8 mb-2">{heading}</h1>
               <h2 className="text-foreground-light text-sm">{subheading}</h2>
             </div>
           )}

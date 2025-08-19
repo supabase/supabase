@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -13,17 +12,22 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { InlineLink } from 'components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const ComplianceConfig = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isSensitive, setIsSensitive] = useState(false)
 
-  const canUpdateComplianceConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canUpdateComplianceConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: { project_id: project?.id },
+    }
+  )
 
   const {
     data: settings,

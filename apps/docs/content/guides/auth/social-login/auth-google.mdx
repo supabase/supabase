@@ -95,7 +95,7 @@ To use Google's pre-built signin buttons:
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
         - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-          - You will have a different set of SHA-1 certificate fingerprint for testing locally and going to production. Make sure to add both to the Google Cloud Console. and add all of the Client IDs to Supabase dashboard.
+          - You will have a different set of SHA-1 certificate fingerprints for testing locally and going to production. Make sure to add both to the Google Cloud Console, and add all of the Client IDs to the Supabase dashboard.
         - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_.
@@ -270,7 +270,7 @@ Google does not send out a refresh token by default, so you will need to pass pa
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
 
 // ---cut---
 const { data, error } = await supabase.auth.signInWithOAuth({
@@ -397,7 +397,7 @@ const OneTapComponent = () => {
   const supabase = createClient()
   const router = useRouter()
 
-  const initializeGoogleOneTap = () => {
+  const initializeGoogleOneTap = async () => {
     console.log('Initializing Google One Tap')
     const [nonce, hashedNonce] = await generateNonce()
     console.log('Nonce: ', nonce, hashedNonce)
@@ -712,7 +712,7 @@ val supabaseClient = createSupabaseClient(
 **Use the Compose Auth plugin in your Auth Screen**
 
 ```kotlin
-val authState = supabaseClient.composeAuth.rememberLoginWithGoogle(
+val authState = supabaseClient.composeAuth.rememberSignInWithGoogle(
     onResult = {
         when(it) { //handle errors
             NativeSignInResult.ClosedByUser -> TODO()
@@ -801,4 +801,5 @@ chrome.identity.launchWebAuthFlow(
 
 By default, the Google consent screen shows the root domain of the callback URL, where Google will send the authentication response. With Supabase Auth, it is your Supabase project's domain `(https://<your-project-ref>.supabase.co)`.
 
-If that is not preferable, you can use a [Custom Domain](https://supabase.com/docs/guides/platform/custom-domains) with your Supabase project. You can use it as your project's domain when creating the Supabase client in your application and initiating the authentication flow. It will then show up in the Google consent screen. If you want your app name and the logo on the consent screen, [you must submit your app to Google for verification](https://support.google.com/cloud/answer/10311615).
+You can change this domain in the settings for your Google app. Go to Google App Platform, click on Branding, and then set your application home page, privacy policy, and terms of use. You can also add your logo.
+Next, go to Audience and click publish. Google will need to verify the app, which usually takes around 24 hours.

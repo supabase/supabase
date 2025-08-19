@@ -3,7 +3,6 @@ import { isEmpty, isUndefined, noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
@@ -16,10 +15,13 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -41,8 +43,6 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -81,11 +81,12 @@ const TableEditor = ({
   updateEditorDirty = noop,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  const { realtimeAll: realtimeEnabled, tableEditorEnableRlsToggle: enableRlsToggle } =
+    useIsFeatureEnabled(['realtime:all', 'table_editor:enable_rls_toggle'])
   const { mutate: sendEvent } = useSendEventMutation()
 
   const [params, setParams] = useUrlState()
@@ -100,8 +101,9 @@ const TableEditor = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
-    (type) => !PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
   )
 
   const { data: publications } = useDatabasePublicationsQuery({
@@ -291,64 +293,68 @@ const TableEditor = ({
       </SidePanel.Content>
       <SidePanel.Separator />
       <SidePanel.Content className="space-y-10 py-6">
-        <Checkbox
-          id="enable-rls"
-          // @ts-ignore
-          label={
-            <div className="flex items-center space-x-2">
-              <span>Enable Row Level Security (RLS)</span>
-              <Badge>Recommended</Badge>
-            </div>
-          }
-          description="Restrict access to your table by enabling RLS and writing Postgres policies."
-          checked={tableFields.isRLSEnabled}
-          onChange={() => {
-            // if isEnabled, show confirm modal to turn off
-            // if not enabled, allow turning on without modal confirmation
-            tableFields.isRLSEnabled
-              ? setRlsConfirmVisible(true)
-              : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-          }}
-          size="medium"
-        />
-        {tableFields.isRLSEnabled ? (
-          <Admonition
-            type="default"
-            className="!mt-3"
-            title="Policies are required to query data"
-            description={
-              <>
-                You need to create an access policy before you can query data from this table.
-                Without a policy, querying this table will return an{' '}
-                <u className="text-foreground">empty array</u> of results.{' '}
-                {isNewRecord ? 'You can create policies after saving this table.' : ''}
-              </>
-            }
-          >
-            <DocsButton
-              abbrev={false}
-              className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+        {enableRlsToggle && (
+          <>
+            <Checkbox
+              id="enable-rls"
+              // @ts-ignore
+              label={
+                <div className="flex items-center space-x-2">
+                  <span>Enable Row Level Security (RLS)</span>
+                  <Badge>Recommended</Badge>
+                </div>
+              }
+              description="Restrict access to your table by enabling RLS and writing Postgres policies."
+              checked={tableFields.isRLSEnabled}
+              onChange={() => {
+                // if isEnabled, show confirm modal to turn off
+                // if not enabled, allow turning on without modal confirmation
+                tableFields.isRLSEnabled
+                  ? setRlsConfirmVisible(true)
+                  : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+              }}
+              size="medium"
             />
-          </Admonition>
-        ) : (
-          <Admonition
-            type="warning"
-            className="!mt-3"
-            title="You are allowing anonymous access to your table"
-            description={
-              <>
-                {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
-                writable and readable
-              </>
-            }
-          >
-            <DocsButton
-              abbrev={false}
-              className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
-            />
-          </Admonition>
+            {tableFields.isRLSEnabled ? (
+              <Admonition
+                type="default"
+                className="!mt-3"
+                title="Policies are required to query data"
+                description={
+                  <>
+                    You need to create an access policy before you can query data from this table.
+                    Without a policy, querying this table will return an{' '}
+                    <u className="text-foreground">empty array</u> of results.{' '}
+                    {isNewRecord ? 'You can create policies after saving this table.' : ''}
+                  </>
+                }
+              >
+                <DocsButton
+                  abbrev={false}
+                  className="mt-2"
+                  href="https://supabase.com/docs/guides/auth/row-level-security"
+                />
+              </Admonition>
+            ) : (
+              <Admonition
+                type="warning"
+                className="!mt-3"
+                title="You are allowing anonymous access to your table"
+                description={
+                  <>
+                    {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
+                    publicly writable and readable
+                  </>
+                }
+              >
+                <DocsButton
+                  abbrev={false}
+                  className="mt-2"
+                  href="https://supabase.com/docs/guides/auth/row-level-security"
+                />
+              </Admonition>
+            )}
+          </>
         )}
         {realtimeEnabled && (
           <Checkbox

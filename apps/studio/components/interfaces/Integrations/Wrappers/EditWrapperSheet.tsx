@@ -4,13 +4,13 @@ import { Edit, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InputField from './InputField'
@@ -41,7 +41,7 @@ export const EditWrapperSheet = ({
   onClose,
 }: EditWrapperSheetProps) => {
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
     projectRef: project?.ref,

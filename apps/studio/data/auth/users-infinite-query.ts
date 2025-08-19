@@ -2,7 +2,7 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 
 import type { components } from 'data/api'
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { authKeys } from './keys'
 
@@ -91,7 +91,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
   { projectRef, connectionString, keywords, filter, providers, sort, order }: UsersVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useInfiniteQuery<UsersData, UsersError, TData>(
