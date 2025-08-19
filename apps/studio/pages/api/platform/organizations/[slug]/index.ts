@@ -3,6 +3,7 @@ import { DEFAULT_ORGANIZATION, IS_VELA_PLATFORM } from '../../../constants'
 import { getVelaClient } from '../../../../../data/vela/vela'
 import { apiBuilder } from '../../../../../lib/api/apiBuilder'
 import { getPlatformQueryParams } from '../../../../../lib/api/platformQueryParams'
+import { mapOrganization } from '../../../../../data/vela/api-mappers'
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const { slug } = getPlatformQueryParams(req, 'slug')
@@ -18,7 +19,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = getVelaClient(req)
-  const createResponse = await client.get('/organizations/{organization_slug}/', {
+  const response = await client.get('/organizations/{organization_slug}/', {
     params: {
       path: {
         organization_slug: slug,
@@ -26,9 +27,11 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
     },
   })
 
-  if (createResponse.response.status !== 201) {
-    return res.status(createResponse.response.status).send(createResponse.error)
+  if (response.response.status !== 200 || response.data === undefined) {
+    return res.status(response.response.status).send(response.error)
   }
+
+  return res.status(200).json(mapOrganization(response.data))
 }
 
 const handleUpdate = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -8,6 +8,7 @@ import {
 import { getVelaClient } from '../../../../../../../data/vela/vela'
 import { apiBuilder } from '../../../../../../../lib/api/apiBuilder'
 import { getPlatformQueryParams } from '../../../../../../../lib/api/platformQueryParams'
+import { mapProject } from '../../../../../../../data/vela/api-mappers'
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!IS_VELA_PLATFORM) {
@@ -45,7 +46,11 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
     },
   })
 
-  return res.status(200).json(response)
+  if (response.response.status !== 200 || response.data === undefined) {
+    return res.status(response.response.status).send(response.error)
+  }
+
+  return res.status(200).json(mapProject(response.data))
 }
 
 const apiHandler = apiBuilder((builder) => builder.get(handleGet))
