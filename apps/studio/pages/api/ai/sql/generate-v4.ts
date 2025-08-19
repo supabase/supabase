@@ -220,7 +220,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           input: coreMessages,
           metadata: {
             route: '/api/ai/sql/generate-v4',
-            task_type: 'text2sql',
             projectRef,
             orgSlug,
             chatName,
