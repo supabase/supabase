@@ -162,7 +162,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                   {x.last_used_at ? (
                     <Tooltip>
                       <TooltipTrigger>{dayjs(x.last_used_at).format('DD MMM YYYY')}</TooltipTrigger>
-                      <TooltipContent side="top">
+                      <TooltipContent side="bottom">
                         Last used on {dayjs(x.last_used_at).format('DD MMM, YYYY HH:mm')}
                       </TooltipContent>
                     </Tooltip>
@@ -178,7 +178,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                       <TooltipTrigger>
                         <p className="text-foreground-light">Expired</p>
                       </TooltipTrigger>
-                      <TooltipContent side="top">
+                      <TooltipContent side="bottom">
                         Expired on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm')}
                       </TooltipContent>
                     </Tooltip>
@@ -189,7 +189,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                           {dayjs(x.expires_at).format('DD MMM YYYY')}
                         </p>
                       </TooltipTrigger>
-                      <TooltipContent side="top">
+                      <TooltipContent side="bottom">
                         Expires on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm')}
                       </TooltipContent>
                     </Tooltip>
