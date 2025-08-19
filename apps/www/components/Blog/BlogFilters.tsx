@@ -76,7 +76,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
   const handleReplaceRouter = () => {
     if (!searchTerm && category !== 'all' && router) {
       router.query.category = category
-      router.replace(router, undefined, { shallow: true, scroll: false })
+      router?.replace(router, undefined, { shallow: true, scroll: false })
     }
   }
 
