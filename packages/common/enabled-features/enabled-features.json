@@ -8,6 +8,9 @@
 
   "billing:all": true,
 
+  "database:replication": true,
+  "database:roles": true,
+
   "integrations:vercel": true,
 
   "logs:templates": true,
@@ -23,5 +26,7 @@
 
   "project_homepage:show_all_client_libraries": true,
   "project_homepage:show_instance_size": true,
-  "project_homepage:show_examples": true
+  "project_homepage:show_examples": true,
+
+  "table_editor:enable_rls_toggle": true
 }
