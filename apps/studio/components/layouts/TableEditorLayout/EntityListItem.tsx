@@ -210,11 +210,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         connectionString: project?.connectionString,
         table: supaTable,
       })
+
       const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
+        const formattedRow = { ...row }
+        Object.keys(row).forEach((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null) {
+            formattedRow[column] = JSON.stringify(row[column])
+          }
         })
         return formattedRow
       })
