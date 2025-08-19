@@ -72,7 +72,7 @@ const TokenSchema = z.object({
 
 const formId = 'new-access-token-form'
 
-const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
+export const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [visible, setVisible] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
@@ -249,5 +249,3 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
     </>
   )
 }
-
-export default NewAccessTokenButton
