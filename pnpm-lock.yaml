@@ -1604,9 +1604,6 @@ importers:
       icons:
         specifier: workspace:*
         version: link:../../packages/icons
-      lodash:
-        specifier: ^4.0.0
-        version: 4.17.21
       lucide-react:
         specifier: '*'
         version: 0.511.0(react@18.3.1)
@@ -1710,9 +1707,6 @@ importers:
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
-      '@types/lodash':
-        specifier: ^4.0.0
-        version: 4.17.16
       '@types/mdx-js__react':
         specifier: ^1.5.6
         version: 1.5.6
@@ -10238,6 +10232,7 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
+    bundledDependencies: []
 
   eslint-plugin-import@2.31.0:
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}

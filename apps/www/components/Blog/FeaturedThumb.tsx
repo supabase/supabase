@@ -19,7 +19,6 @@ interface CMSPostTypes extends PostTypes {
 }
 
 function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
-  console.log('blog', blog)
   // First check if this is a CMS post
   if ('isCMS' in blog && blog.isCMS) {
     // For CMS posts, display author directly from the blog data
@@ -51,8 +50,6 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
 }
 
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
-  console.log('blog', blog)
-  console.log('author', author)
   // const imageUrl = blog.isCMS
   //   ? blog.thumb
   //     ? `${CMS_API_URL}${blog.thumb}`

@@ -6,7 +6,7 @@ import {
 } from '@heroicons/react/solid'
 import dayjs from 'dayjs'
 import matter from 'gray-matter'
-import capitalize from 'lodash/capitalize'
+import { capitalize } from 'lib/helpers'
 import { ChevronLeft, X as XIcon } from 'lucide-react'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'

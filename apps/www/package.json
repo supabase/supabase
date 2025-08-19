@@ -48,7 +48,6 @@
     "globby": "^13.2.2",
     "gray-matter": "^4.0.3",
     "icons": "workspace:*",
-    "lodash": "^4.0.0",
     "lucide-react": "*",
     "markdown-toc": "^1.2.0",
     "next": "catalog:",
@@ -85,7 +84,7 @@
     "@types/animejs": "^3.1.12",
     "@types/classnames": "^2.3.1",
     "@types/common-tags": "^1.8.4",
-    "@types/lodash": "^4.0.0",
+
     "@types/mdx-js__react": "^1.5.6",
     "@types/parse-numeric-range": "^0.0.1",
     "@types/react": "catalog:",

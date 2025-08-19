@@ -120,6 +120,11 @@ const nextConfig = {
     // We are already running linting via GH action, this will skip linting during production build on Vercel.
     ignoreDuringBuilds: true,
   },
+  outputFileTracingExcludes: {
+    '/api-v2/cms-posts': ['./public/**/*'],
+    '/api-v2/cms': ['./public/**/*'],
+    '/api-v2/luma-events': ['./public/**/*'],
+  },
 }
 
 // next.config.js.
@@ -152,11 +157,6 @@ export default withSentryConfig(configExport, {
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
-  outputFileTracingExcludes: {
-    '/api-v2/cms-posts': ['./public/**/*'],
-    '/api-v2/cms': ['./public/**/*'],
-    '/api-v2/luma-events': ['./public/**/*'],
-  },
 })
 
 function getAssetPrefix() {
