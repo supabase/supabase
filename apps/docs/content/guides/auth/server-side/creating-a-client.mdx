@@ -249,6 +249,12 @@ language="typescript"
 >
 <TabPanel id="hooks" label="Hooks">
 
+Set up server-side hooks in `src/hooks.server.ts`. The hooks:
+
+- Create a request-specific Supabase client, using the user credentials from the request cookie. This client is used for server-only code.
+- Check user authentication.
+- Guard protected pages.
+
 ```ts hooks.server.ts
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 import { createServerClient } from '@supabase/ssr'
