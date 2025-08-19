@@ -17,10 +17,10 @@ const stateOfStartupsData = {
         "Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams. They've done this before.",
       pullQuote: {
         quote:
-          "We’re a two-person team, both technical. It's not our first rodeo, and that experience helped us move way faster this time.",
-        author: 'John Doe',
-        authorPosition: 'Founder',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
+          'Our team is just two people at the moment. We’re funding the proof-of-concept stage out of our own pockets.',
+        author: 'Richard Kranendonk',
+        authorPosition: 'CEO, Thinking Security Works',
+        authorAvatar: '/images/state-of-startups/quote-avatars/richard-k-120x120.jpg',
       },
       sections: [
         {
@@ -74,9 +74,9 @@ const stateOfStartupsData = {
         'Startups are still experimenting. They’re building a diverse mix of software products, iterating quickly, and pursuing monetization selectively.',
       pullQuote: {
         quote:
-          'We’re experimenting in edtech for underserved regions. It’s early, but we’re learning fast.',
-        author: 'Sarah Johnson',
-        authorPosition: 'Founder',
+          'We’re building an end-to-end system for wedding planners, all running as one SvelteKit / Supabase instance.',
+        author: 'Waldemar Pross',
+        authorPosition: 'CTO, Peach Perfect Weddings',
         authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
       },
       sections: [
@@ -137,9 +137,9 @@ const stateOfStartupsData = {
         'The modern stack centers around open tools, modular infrastructure, and cautious spending.',
       pullQuote: {
         quote:
-          'We’re experimenting in edtech for underserved regions. It’s early, but we’re learning fast.',
-        author: 'Sarah Johnson',
-        authorPosition: 'Founder',
+          'Cursor has been my favourite tool so far. It’s made my life easier by documenting code on my behalf.',
+        author: 'Kevinton B',
+        authorPosition: 'Engineer, FlutterFlow',
         authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
       },
       sections: [
@@ -241,9 +241,9 @@ const stateOfStartupsData = {
         'AI is a core product capability, not an afterthought. Most teams are using models like OpenAI or Claude for real features, not just demos.',
       pullQuote: {
         quote:
-          'AI is baked into the core. Semantic search and summarisation are what make the product usable.',
-        author: 'Tom Anderson',
-        authorPosition: 'Founder',
+          'AI is embedded in how we build and scale. From using Claude and Cursor in dev, to voice AI in product for smarter, faster recruiting (which is our business).',
+        author: 'Jinal Jhaveri',
+        authorPosition: 'Founder, Mismo',
         authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
       },
       sections: [
@@ -282,13 +282,7 @@ const stateOfStartupsData = {
       title: 'Where Startups Go to Learn',
       shortTitle: 'Influence',
       description: 'Online communities are the learning engine behind every early-stage startup.',
-      pullQuote: {
-        quote:
-          'I mostly lurk, but Twitter and Discord have been where I find the best tools and smartest minds.',
-        author: 'Emma Davis',
-        authorPosition: 'Founder',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-      },
+      pullQuote: undefined,
       sections: [
         {
           title: 'Online Communities',
@@ -337,13 +331,7 @@ const stateOfStartupsData = {
       shortTitle: 'Go-To-Market',
       description:
         'Startups start selling through their networks and dev communities. Only when they grow do they layer in more structured growth via CRMs and sales.',
-      pullQuote: {
-        quote:
-          'Our first 10 customers came from one tweet. No landing page, no funnel. Just good timing and network.',
-        author: 'Sophie Lee',
-        authorPosition: 'Founder',
-        authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
-      },
+      pullQuote: undefined,
       sections: [
         {
           title: 'Initial Customers',
@@ -389,6 +377,13 @@ const stateOfStartupsData = {
       shortTitle: 'Outlook',
       description:
         'Startups remain optimistic about the future but are weighed down by technical complexity, customer acquisition hurdles, and a wish list of tools that still don’t exist.',
+      pullQuote: {
+        quote:
+          'There’s plenty of uncertainty, but we’re building something that feels deeply worth it. That gives us a lot of confidence in the long run.',
+        author: 'Robert Wolski',
+        authorPosition: 'Founder, Keepsake',
+        authorAvatar: '/images/state-of-startups/quote-avatars/robert-w-120x120.jpg',
+      },
       sections: [
         {
           title: 'The Road Ahead',
@@ -418,6 +413,7 @@ const stateOfStartupsData = {
           title: 'Worldview and Optimism',
           description:
             "Most startup founders remain upbeat about the future, but that confidence isn't shared equally. Engineers and marketers show more caution.",
+
           stats: [
             { percent: 61, label: 'Founders that are optimistic' },
             { percent: 32, label: 'Operations leads that are optimistic' },
