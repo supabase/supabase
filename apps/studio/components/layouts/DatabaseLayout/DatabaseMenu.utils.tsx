@@ -1,7 +1,8 @@
+import { ArrowUpRight } from 'lucide-react'
+
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { ArrowUpRight } from 'lucide-react'
 
 export const generateDatabaseMenu = (
   project?: Project,
@@ -74,24 +75,13 @@ export const generateDatabaseMenu = (
         },
         ...(showPgReplicate
           ? [
-              ...(enablePgReplicate
-                ? [
-                    {
-                      name: 'Replication',
-                      key: 'replication',
-                      url: `/project/${ref}/database/replication`,
-                      items: [],
-                    },
-                  ]
-                : [
-                    {
-                      name: 'Replication',
-                      key: 'replication',
-                      url: `/project/${ref}/database/replication`,
-                      label: 'Coming Soon',
-                      items: [],
-                    },
-                  ]),
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                label: !enablePgReplicate ? 'Coming soon' : undefined,
+                items: [],
+              },
             ]
           : []),
       ],
