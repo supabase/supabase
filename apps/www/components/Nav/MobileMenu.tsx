@@ -3,7 +3,7 @@
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 
 import { Accordion, Button, TextLink } from 'ui'
@@ -15,7 +15,7 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { ChevronRight } from 'lucide-react'
 import ProductModulesData from '~/data/ProductModules'
-import { getJobsCount } from '~/lib/static-content'
+import staticContent from '.generated/staticContent/_index.json'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
@@ -29,7 +29,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const jobsCount = getJobsCount()
+  const { jobsCount } = staticContent
 
   const container = {
     hidden: { opacity: 0 },

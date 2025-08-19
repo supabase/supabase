@@ -1,10 +1,10 @@
 import { Button } from 'ui'
-import { getGitHubStars } from '~/lib/static-content'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import staticContent from '.generated/staticContent/_index.json'
 
 const GitHubButton = () => {
-  const githubStars = getGitHubStars()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const githubStars = staticContent.githubStars
 
   const kFormatter = (num: number) => {
     const kFormat = Math.floor(num / 1000)
