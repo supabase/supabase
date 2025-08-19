@@ -2159,12 +2159,10 @@ export interface paths {
       cookie?: never
     }
     /**
-     * Gets all projects that belong to the authenticated user (paginated)
-     * @description Returns a paginated list of projects across all organizations the user has access to.
-     *
-     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     * Gets all projects that belong to the authenticated user
+     * @description Only returns the minimal project info
      */
-    get: operations['ProjectsController_getProjectsPaginated']
+    get: operations['ProjectsController_getProjects']
     put?: never
     /** Creates a project */
     post: operations['ProjectsController_createProject']
@@ -4891,7 +4889,7 @@ export interface components {
     CreateProjectBody: {
       auth_site_url?: string
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       custom_supabase_internal_requests?: {
         ami: {
           search_tags?: {
@@ -5336,7 +5334,7 @@ export interface components {
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       /** @default null */
       connection_string_read_only?: string | null
       /** @default null */
@@ -6727,7 +6725,7 @@ export interface components {
     }
     OrganizationSlugAvailableVersionsBody: {
       /** @enum {string} */
-      provider: 'AWS' | 'FLY' | 'AWS_K8S'
+      provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       region: string
     }
     OrganizationSlugAvailableVersionsResponse: {
@@ -7628,7 +7626,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'FLY' | 'AWS_K8S'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -7647,7 +7645,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'FLY' | 'AWS_K8S'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -15649,18 +15647,9 @@ export interface operations {
       }
     }
   }
-  ProjectsController_getProjectsPaginated: {
+  ProjectsController_getProjects: {
     parameters: {
-      query?: {
-        /** @description Number of projects to return per page */
-        limit?: number
-        /** @description Number of projects to skip */
-        offset?: number
-        /** @description Search projects by name */
-        search?: string
-        /** @description Sort order for projects */
-        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
-      }
+      query?: never
       header?: never
       path?: never
       cookie?: never
@@ -15672,7 +15661,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListProjectsPaginatedResponse']
+          'application/json': components['schemas']['ProjectInfo'][]
         }
       }
     }
@@ -19148,7 +19137,7 @@ export interface operations {
   ProjectsController_getRegions: {
     parameters: {
       query: {
-        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
         organization_slug: string
       }
       header?: never
