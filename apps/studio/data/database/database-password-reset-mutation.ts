@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { handleError, patch } from 'data/fetchers'
 import { projectKeys } from 'data/projects/keys'
 import type { ResponseError } from 'types'
+import { getPathReferences } from '../vela/path-references'
 
 export type DatabasePasswordResetVariables = {
   ref: string
@@ -33,12 +34,13 @@ export const useDatabasePasswordResetMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { slug } = getPathReferences()
 
   return useMutation<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>(
     (vars) => resetDatabasePassword(vars),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.detail(variables.ref))
+        await queryClient.invalidateQueries(projectKeys.detail(slug as string, variables.ref))
 
         await onSuccess?.(data, variables, context)
       },

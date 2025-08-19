@@ -37,7 +37,7 @@ const BackupsList = () => {
     onSuccess: () => {
       if (projectRef) {
         setTimeout(() => {
-          setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+          setProjectStatus(queryClient, slug, projectRef, PROJECT_STATUS.RESTORING)
           toast.success(
             `Restoring database back to ${dayjs(selectedBackup?.inserted_at).format(
               'DD MMM YYYY HH:mm:ss'

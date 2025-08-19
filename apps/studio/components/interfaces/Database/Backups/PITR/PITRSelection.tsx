@@ -51,7 +51,7 @@ const PITRSelection = () => {
     onSuccess: (res, variables) => {
       setTimeout(() => {
         setShowConfirmation(false)
-        setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+        setProjectStatus(queryClient, slug as string, variables.ref, PROJECT_STATUS.RESTORING)
         router.push(`/org/${slug}/project/${variables.ref}`)
       }, 3000)
     },

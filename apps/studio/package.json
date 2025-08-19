@@ -101,6 +101,7 @@
     "nuqs": "^2.4.1",
     "openai": "^4.20.1",
     "openapi-fetch": "0.12.4",
+    "openapi-typescript-helpers": "^0.0.15",
     "papaparse": "^5.3.1",
     "path-to-regexp": "^8.0.0",
     "pg-minify": "^1.6.3",

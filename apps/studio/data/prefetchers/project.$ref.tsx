@@ -5,19 +5,19 @@ import { PropsWithChildren, useCallback } from 'react'
 import { prefetchProjectDetail } from 'data/projects/project-detail-query'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 import { useParams } from 'next/navigation'
+import { getPathReferences } from '../vela/path-references'
 
 export function usePrefetchProjectIndexPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { slug } = useParams()
-
   return useCallback(
-    ({ projectRef }: { projectRef?: string }) => {
+    ({ slug, projectRef }: { slug: string, projectRef?: string }) => {
       // Prefetch code
       router.prefetch(`/org/${slug}/project/${projectRef}`)
 
       // Prefetch data
       prefetchProjectDetail(queryClient, {
+        slug,
         ref: projectRef,
       }).catch(() => {
         // eat prefetching errors as they are not critical
@@ -45,7 +45,7 @@ export function ProjectIndexPageLink({
   return (
     <PrefetchableLink
       href={href || `/org/${slug}/project/${projectRef}`}
-      prefetcher={() => prefetch({ projectRef })}
+      prefetcher={() => prefetch({ slug, projectRef })}
       {...props}
     >
       {children}

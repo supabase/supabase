@@ -26,13 +26,10 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).send('Not implemented')
   }
 
-  const client = getVelaClient()
+  const client = getVelaClient(req)
   const createResponse = await client.POST('/organizations/', {
     body: {
       name: req.body.name,
-    },
-    headers: {
-      Authorization: req.headers.authorization,
     },
   })
 
@@ -52,9 +49,6 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
         organization_id: parseInt(orgId!),
       },
     },
-    headers: {
-      Authorization: req.headers.authorization,
-    },
   })
 
   if (readResponse.response.status !== 200 || !readResponse.data) {
@@ -71,12 +65,8 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json(response)
   }
 
-  const client = getVelaClient()
-  const response = await client.GET('/organizations/', {
-    headers: {
-      Authorization: req.headers.authorization,
-    },
-  })
+  const client = getVelaClient(req)
+  const response = await client.GET('/organizations/')
 
   if (response.response.status !== 200 || !response.data) {
     return res.status(response.response.status).send(response.error)

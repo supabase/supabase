@@ -76,7 +76,7 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
     apiKeysKeys.list(projectRef, reveal),
     ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: enabled && projectRef !== 'undefined',
       ...options,
     }
   )

@@ -1744,7 +1744,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const stateRef = useLatest(state)
   const slug = getOrganizationSlug()
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true }, { enabled: !!(project?.ref) })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
 
   const { serviceKey } = getKeys(apiKeys)

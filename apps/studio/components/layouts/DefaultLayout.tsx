@@ -47,7 +47,6 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
 
   const slug = getOrganizationSlug()
   const ref = getProjectRef()
-  console.log(`DefaultLayout: slug=${slug}, ref=${ref}`)
   const router = useRouter()
   const showProductMenu = !!ref && router.pathname !== '/org/[slug]/project/[ref]'
 

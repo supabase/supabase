@@ -181,7 +181,6 @@ export function usePermissionsLoaded() {
   const { isFetched: isOrganizationsFetched } = useOrganizationsQuery({ enabled: isLoggedIn })
 
   const { slug, ref } = getPathReferences()
-  console.log(`[usePermissionsLoaded] slug: ${slug}`)
   const { isFetched: isProjectDetailFetched } = useProjectDetailQuery(
     { slug, ref },
     { enabled: !!ref && isLoggedIn }

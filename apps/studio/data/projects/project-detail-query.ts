@@ -24,14 +24,7 @@ export async function getProjectDetail(
   { slug, ref }: ProjectDetailVariables,
   signal?: AbortSignal
 ) {
-  console.log(`Slug=${slug}, ref=${ref}`)
-  if (slug !== undefined) {
-    try {
-      throw new Error('Organization slug is required')
-    } catch (error) {
-      console.log(error.stack)
-    }
-  }
+  if (!slug) throw new Error('Organization slug is required')
   if (!ref) throw new Error('Project ref is required')
 
   const { data, error } = await get('/platform/projects/{ref}', {

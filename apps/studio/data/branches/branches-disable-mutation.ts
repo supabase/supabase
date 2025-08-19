@@ -6,6 +6,7 @@ import { projectKeys } from 'data/projects/keys'
 import type { ResponseError } from 'types'
 import { deleteBranch } from './branch-delete-mutation'
 import { branchKeys } from './keys'
+import { getPathReferences } from '../vela/path-references'
 
 export type BranchesDisableVariables = {
   branchIds: string[]
@@ -47,13 +48,14 @@ export const useBranchesDisableMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { slug } = getPathReferences()
   return useMutation<BranchesDisableData, ResponseError, BranchesDisableVariables>(
     (vars) => disableBranching(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(branchKeys.list(projectRef))
-        await queryClient.invalidateQueries(projectKeys.detail(projectRef))
+        await queryClient.invalidateQueries(projectKeys.detail(slug as string, projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

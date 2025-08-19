@@ -85,6 +85,7 @@ export function invalidateProjectsQuery(client: QueryClient) {
 
 export function setProjectStatus(
   client: QueryClient,
+  slug: Organization['slug'],
   projectRef: Project['ref'],
   status: Project['status']
 ) {
@@ -104,7 +105,7 @@ export function setProjectStatus(
   )
 
   client.setQueriesData<Project>(
-    projectKeys.detail(projectRef),
+    projectKeys.detail(slug, projectRef),
     (old) => {
       if (!old) return old
 
@@ -116,11 +117,12 @@ export function setProjectStatus(
 
 export function setProjectPostgrestStatus(
   client: QueryClient,
+  slug: Organization['slug'],
   projectRef: Project['ref'],
   status: Project['postgrestStatus']
 ) {
   client.setQueriesData<Project>(
-    projectKeys.detail(projectRef),
+    projectKeys.detail(slug, projectRef),
     (old) => {
       if (!old) return old
 

@@ -88,7 +88,7 @@ const ProjectUpgradeAlert = () => {
 
   const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
     onSuccess: (res, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.UPGRADING)
+      setProjectStatus(queryClient, slug as string, variables.ref, PROJECT_STATUS.UPGRADING)
       toast.success('Upgrading project')
       router.push(`/org/${slug}/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`)
     },

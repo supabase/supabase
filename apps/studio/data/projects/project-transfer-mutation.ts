@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { handleError, post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { getPathReferences } from '../vela/path-references'
 
 export type ProjectTransferVariables = {
   projectRef?: string
@@ -40,6 +41,7 @@ export const useProjectTransferMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { slug } = getPathReferences()
 
   return useMutation<ProjectTransferData, ResponseError, ProjectTransferVariables>(
     (vars) => transferProject(vars),
@@ -50,7 +52,7 @@ export const useProjectTransferMutation = ({
           queryClient.invalidateQueries(
             projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug)
           ),
-          queryClient.invalidateQueries(projectKeys.detail(projectRef)),
+          queryClient.invalidateQueries(projectKeys.detail(slug as string, projectRef)),
           queryClient.invalidateQueries(projectKeys.list()),
         ])
         await onSuccess?.(data, variables, context)

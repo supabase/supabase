@@ -88,7 +88,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const { mutate: restoreProject, isLoading: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, slug as string, variables.ref, PROJECT_STATUS.RESTORING)
       toast.success('Restoring project')
     },
   })

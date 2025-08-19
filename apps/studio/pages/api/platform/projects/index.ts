@@ -27,7 +27,7 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).send('Not implemented')
   }
 
-  const client = getVelaClient()
+  const client = getVelaClient(req)
   const organizationId = mustOrganizationId(req)
 
   const creationRequest = req.body as ProjectCreateVariables
@@ -75,7 +75,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json(response)
   }
 
-  const client = getVelaClient()
+  const client = getVelaClient(req)
   const organizationId = mustOrganizationId(req)
 
   const response = await client.GET('/organizations/{organization_id}/projects/', {

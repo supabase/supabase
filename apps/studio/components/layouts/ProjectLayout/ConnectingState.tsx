@@ -35,7 +35,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
     const result = await pingPostgrest(project.ref)
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
-      setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')
+      setProjectPostgrestStatus(queryClient, slug as string, project.ref, 'ONLINE')
       await invalidateProjectDetailsQuery(queryClient, slug as string, project.ref)
     }
   }

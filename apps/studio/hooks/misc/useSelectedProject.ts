@@ -20,7 +20,6 @@ import { getPathReferences } from '../../data/vela/path-references'
  */
 export function useSelectedProject({ enabled = true } = {}) {
   const { slug, ref } = getPathReferences()
-  console.log(`[useSelectedProject] slug: ${slug}`)
   const { data } = useProjectDetailQuery({ slug, ref }, { enabled })
 
   return useMemo(
@@ -31,7 +30,6 @@ export function useSelectedProject({ enabled = true } = {}) {
 
 export function useSelectedProjectQuery({ enabled = true } = {}) {
   const { slug, ref } = getPathReferences()
-  console.log(`[useSelectedProjectQuery] slug: ${slug}`)
   return useProjectDetailQuery(
     { slug, ref },
     {

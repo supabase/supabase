@@ -42,7 +42,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
     })
   }
 
-  const client = getVelaClient()
+  const client = getVelaClient(req)
   const projectId = mustProjectId(req)
   const organizationId = mustOrganizationId(req)
 

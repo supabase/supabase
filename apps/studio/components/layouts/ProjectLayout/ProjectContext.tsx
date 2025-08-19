@@ -33,7 +33,6 @@ export const ProjectContextProvider = ({
   children,
 }: PropsWithChildren<ProjectContextProviderProps>) => {
   const { slug } = getPathReferences()
-  console.log(`[ProjectContextProvider] slug: ${slug}`)
   const { data: selectedProject, isLoading } = useProjectDetailQuery({ ref: projectRef, slug })
 
   const value = useMemo<ProjectContextType>(() => {

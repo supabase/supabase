@@ -82,7 +82,7 @@ const RestartServerButton = () => {
   }
 
   const onRestartSuccess = () => {
-    setProjectStatus(queryClient, projectRef, 'RESTARTING')
+    setProjectStatus(queryClient, slug as string, projectRef, 'RESTARTING')
     toast.success('Restarting server...')
     router.push(`/org/${slug}/project/${projectRef}`)
     setServiceToRestart(undefined)

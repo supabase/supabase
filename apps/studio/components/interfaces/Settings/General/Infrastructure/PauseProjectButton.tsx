@@ -41,7 +41,7 @@ const PauseProjectButton = () => {
 
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.PAUSING)
+      setProjectStatus(queryClient, slug as string, variables.ref, PROJECT_STATUS.PAUSING)
       toast.success('Pausing project...')
       router.push(`/org/${slug}/project/${projectRef}`)
     },

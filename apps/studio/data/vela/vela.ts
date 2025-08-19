@@ -1,7 +1,14 @@
-import createClient from 'openapi-fetch'
+import createClient, {
+  Client,
+  FetchResponse,
+  HeadersOptions,
+  InitParam,
+  MaybeOptionalInit,
+} from 'openapi-fetch'
 import { paths } from './vela-schema'
 import { VELA_PLATFORM_URL } from '../../pages/api/constants'
 import { NextApiRequest } from 'next'
+import type { PathsWithMethod } from 'openapi-typescript-helpers'
 
 const velaClient = createClient<paths>({
   baseUrl: VELA_PLATFORM_URL,
@@ -12,8 +19,165 @@ const velaClient = createClient<paths>({
   },
 })
 
-export function getVelaClient() {
-  return velaClient
+const mergeHeaders = (req: NextApiRequest, headers: HeadersOptions[]) => {
+  const authorization = req.headers.authorization
+  const newHeader = {
+    ...headers.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+    ...(authorization ? { Authorization: authorization } : {}),
+  }
+  return newHeader as HeadersOptions
+}
+
+export function getVelaClient(
+  req: NextApiRequest
+): Omit<Omit<Client<paths, `${string}/${string}`>, 'eject'>, 'use'> {
+
+  return {
+    DELETE<
+      Path extends PathsWithMethod<paths, 'delete'>,
+      Init extends MaybeOptionalInit<paths[Path], 'delete'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['delete'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.DELETE(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+    GET<
+      Path extends PathsWithMethod<paths, 'get'>,
+      Init extends MaybeOptionalInit<paths[Path], 'get'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['get'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.GET(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+    HEAD<
+      Path extends PathsWithMethod<paths, 'head'>,
+      Init extends MaybeOptionalInit<paths[Path], 'head'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['head'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.HEAD(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+    OPTIONS<
+      Path extends PathsWithMethod<paths, 'options'>,
+      Init extends MaybeOptionalInit<paths[Path], 'options'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['options'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.OPTIONS(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+    PATCH<
+      Path extends PathsWithMethod<paths, 'patch'>,
+      Init extends MaybeOptionalInit<paths[Path], 'patch'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['patch'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.PATCH(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+    POST<
+      Path extends PathsWithMethod<paths, 'post'>,
+      Init extends MaybeOptionalInit<paths[Path], 'post'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['post'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.POST(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+    PUT<
+      Path extends PathsWithMethod<paths, 'put'>,
+      Init extends MaybeOptionalInit<paths[Path], 'put'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['put'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.PUT(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+    TRACE<
+      Path extends PathsWithMethod<paths, 'trace'>,
+      Init extends MaybeOptionalInit<paths[Path], 'trace'>,
+    >(
+      url: Path,
+      ...init: InitParam<Init>
+    ): Promise<FetchResponse<paths[Path]['trace'], Init, `${string}/${string}`>> {
+      const origHeaders = init
+        .filter((x) => x !== undefined && 'headers' in x)
+        .map((x) => x?.headers)
+        .filter((x) => x !== undefined)
+
+      const headers = mergeHeaders(req, origHeaders)
+      return velaClient.TRACE(url, {
+        ...init,
+        headers: headers,
+      } as any)
+    },
+  }
 }
 
 export function mustOrganizationId(req: NextApiRequest): number {
@@ -63,9 +227,11 @@ export function setOrganizationCookie(organizationId: number) {
 }
 
 export function getOrganizationCookie(req?: NextApiRequest): number {
-  let cookie: string | undefined = undefined;
+  let cookie: string | undefined = undefined
   if (typeof document !== 'undefined') {
-    const entry = document.cookie.split(';').find(c => c.trim().startsWith('x-vela-organization-id='))
+    const entry = document.cookie
+      .split(';')
+      .find((c) => c.trim().startsWith('x-vela-organization-id='))
     if (entry) cookie = entry.split('=')[1]
   }
   if (req) {
@@ -86,9 +252,9 @@ export function setProjectCookie(projectId: number) {
 }
 
 export function getProjectCookie(req?: NextApiRequest): number {
-  let cookie: string | undefined = undefined;
+  let cookie: string | undefined = undefined
   if (typeof document !== 'undefined') {
-    const entry = document.cookie.split(';').find(c => c.trim().startsWith('x-vela-project-id='))
+    const entry = document.cookie.split(';').find((c) => c.trim().startsWith('x-vela-project-id='))
     if (entry) cookie = entry.split('=')[1]
   }
   if (req) {

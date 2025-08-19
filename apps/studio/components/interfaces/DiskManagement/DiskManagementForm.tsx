@@ -239,7 +239,7 @@ export function DiskManagementForm() {
       onError: () => {},
       onSuccess: () => {
         //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
-        setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
+        setProjectStatus(queryClient, org!.slug, projectRef!, PROJECT_STATUS.RESIZING)
       },
     })
   const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =

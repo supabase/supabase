@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { getPathReferences } from '../vela/path-references'
 
 export type ProjectUpdateVariables = {
   ref: string
@@ -36,6 +37,7 @@ export const useProjectUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { slug } = getPathReferences()
 
   return useMutation<ProjectUpdateData, ResponseError, ProjectUpdateVariables>(
     (vars) => updateProject(vars),
@@ -44,7 +46,7 @@ export const useProjectUpdateMutation = ({
         const { ref } = variables
         await Promise.all([
           queryClient.invalidateQueries(projectKeys.list()),
-          queryClient.invalidateQueries(projectKeys.detail(ref)),
+          queryClient.invalidateQueries(projectKeys.detail(slug as string, ref)),
         ])
         await onSuccess?.(data, variables, context)
       },

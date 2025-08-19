@@ -93,7 +93,7 @@ export const CreateBranchModal = () => {
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
-        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
+        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(slug, projectRef))])
       }
       sendEvent({
         action: 'branch_create_button_clicked',
