@@ -193,10 +193,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...convertToModelMessages(messages),
     ]
 
-    const abortController = new AbortController()
-    req.on('close', () => abortController.abort())
-    req.on('aborted', () => abortController.abort())
-
     // Get tools
     const tools = await getTools({
       projectRef,
@@ -229,6 +225,28 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             orgSlug,
             chatName,
           },
+        })
+
+        const abortController = new AbortController()
+        let abortReason: string | undefined
+
+        req.once('aborted', () => {
+          abortReason = 'request_aborted'
+          abortController.abort()
+        })
+        req.once('close', () => {
+          abortReason = 'request_closed'
+          abortController.abort()
+        })
+
+        abortController.signal.addEventListener('abort', () => {
+          span.log({
+            error: 'Request aborted',
+            metadata: {
+              aborted: true,
+              abort_reason: abortReason ?? 'abort_signal',
+            },
+          })
         })
 
         const result = streamText({
