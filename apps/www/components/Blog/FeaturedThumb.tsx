@@ -111,7 +111,6 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
                   ? author.author_image_url
                   : (author.author_image_url as { url: string })?.url || ''
 
-              console.log('authorImageUrl', author, authorImageUrl)
               return (
                 <div
                   className="flex items-center space-x-2"

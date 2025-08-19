@@ -12,8 +12,6 @@ import rewrites from './lib/rewrites.js'
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
-import { withContentlayer } from 'next-contentlayer2'
-
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
@@ -126,7 +124,7 @@ const nextConfig = {
 
 // next.config.js.
 const configExport = () => {
-  const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
+  const plugins = [withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 
