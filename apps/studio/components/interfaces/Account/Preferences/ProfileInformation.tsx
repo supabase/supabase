@@ -42,9 +42,6 @@ export const ProfileInformation = () => {
     isSuccess: isIdentitiesSuccess,
   } = useProfileIdentitiesQuery()
   const identities = identityData?.identities ?? []
-  const primaryIdentityId = identities.find(
-    (identity) => identity.identity_data?.email === profile?.primary_email
-  )?.identity_id
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
