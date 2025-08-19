@@ -1,6 +1,23 @@
-import { createServerClient } from "@supabase/ssr"
+import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
+// Define the cookie interface
+interface Cookie {
+  name: string
+  value: string
+  options?: CookieOptions
+}
+
+/**
+ * Middleware function to handle authentication in Next.js applications using Supabase.
+ * This function:
+ * 1. Creates a Supabase client with server-side cookie handling
+ * 2. Checks if the user is authenticated
+ * 3. Redirects unauthenticated users to the login page if they try to access protected routes
+ * 4. Properly manages cookies to maintain the user's session
+ * @param request The incoming Next.js request
+ * @returns A response with the proper cookies set for authentication
+ */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -14,11 +31,12 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+        setAll(cookiesToSet: Cookie[]) {
+          // Create a new response with the updated request
           supabaseResponse = NextResponse.next({
             request,
           })
+          // Set cookies only on the response object
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -31,10 +49,19 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
+  // Get the current user, with error handling
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser()
+  
+  // Log authentication errors (but don't block the request)
+  if (error) {
+    console.error('Auth error:', error.message)
+  }
 
+  // Redirect unauthenticated users to login page if they try to access protected routes
+  // Public routes: /login and /auth paths are accessible without authentication
   if (
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
