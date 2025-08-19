@@ -276,7 +276,6 @@ const ProjectList = ({
     return <NoProjectsState slug={organization.slug} />
   }
 
-
   if (viewMode === 'table') {
     return (
       <Card>

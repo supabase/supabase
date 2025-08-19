@@ -35,7 +35,6 @@ const ProjectTableRow = ({
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
 
-
   return (
     <TableRow
       className="cursor-pointer hover:bg-surface-100"
@@ -75,8 +74,8 @@ const ProjectTableRow = ({
         </div>
       </TableCell>
       <TableCell>
-        <ProjectCardStatus 
-          projectStatus={projectStatus} 
+        <ProjectCardStatus
+          projectStatus={projectStatus}
           resourceWarnings={resourceWarnings}
           renderMode="badge"
         />
