@@ -1499,7 +1499,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/projects': {
+  '/platform/organizations/{slug}/org-projects': {
     parameters: {
       query?: never
       header?: never
@@ -2041,7 +2041,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects': {
+  '/platform/organizations/{slug}/projects': {
     parameters: {
       query?: never
       header?: never
@@ -2082,7 +2082,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}': {
+  '/platform/organizations/{slug}/projects/{ref}': {
     parameters: {
       query?: never
       header?: never
@@ -14818,7 +14818,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        slug: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -14837,7 +14839,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        slug: string
+      }
       cookie?: never
     }
     requestBody: {
@@ -14882,6 +14886,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -14910,6 +14915,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -14938,6 +14944,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }

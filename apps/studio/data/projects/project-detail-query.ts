@@ -27,11 +27,8 @@ export async function getProjectDetail(
   if (!slug) throw new Error('Organization slug is required')
   if (!ref) throw new Error('Project ref is required')
 
-  const { data, error } = await get('/platform/projects/{ref}', {
-    params: { path: { ref } },
-    headers: {
-      'X-Vela-Organization-Ref': slug,
-    },
+  const { data, error } = await get('/platform/organizations/{slug}/projects/{ref}', {
+    params: { path: { slug, ref } },
     signal,
   })
 

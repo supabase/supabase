@@ -1,25 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-
-import apiWrapper from 'lib/api/apiWrapper'
 import { DEFAULT_ORGANIZATION, IS_VELA_PLATFORM } from '../../constants'
 import { getVelaClient } from '../../../../data/vela/vela'
 import { mapOrganization } from '../../../../data/vela/api-mappers'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    case 'POST':
-      return handleCreate(req, res)
-    default:
-      res.setHeader('Allow', ['GET', 'POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
+import { apiBuilder } from '../../../../lib/api/apiBuilder'
 
 const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!IS_VELA_PLATFORM) {
@@ -42,11 +25,11 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(500).send('No location header')
   }
 
-  const orgId = location.split('/').pop()
-  const readResponse = await client.get('/organizations/{organization_id}/', {
+  const slug = location.split('/').pop()
+  const readResponse = await client.get('/organizations/{organization_slug}/', {
     params: {
       path: {
-        organization_id: parseInt(orgId!),
+        organization_slug: slug!,
       },
     },
   })
@@ -74,3 +57,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
 
   return res.status(200).json(response.data.map(mapOrganization))
 }
+
+const apiHandler = apiBuilder((builder) => builder.useAuth().get(handleGetAll).post(handleCreate))
+
+export default apiHandler

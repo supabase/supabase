@@ -19,17 +19,19 @@ export type ProjectInfo = components['schemas']['ProjectInfo']
 export async function getProjects({
   signal,
   headers,
-  organization
+  orgSlug
 }: {
   signal?: AbortSignal
   headers?: Record<string, string>
-  organization?: Organization
+  orgSlug?: string
 }) {
-  const { data, error } = await get('/platform/projects', {
+  if (!orgSlug) throw new Error('orgSlug is required')
+  const { data, error } = await get('/platform/organizations/{slug}/projects', {
     signal,
-    headers: {
-      ...headers,
-      ...(organization? {"X-Vela-Organization-Ref": organization.slug} : {})
+    params: {
+      path: {
+        slug: orgSlug
+      }
     },
   })
   if (error) handleError(error)
@@ -47,7 +49,7 @@ export const useProjectsQuery = <TData = ProjectsData>({
   const { organization } = useOrganizationContext()
   return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
-    ({ signal }) => getProjects({ signal, organization }),
+    ({ signal }) => getProjects({ signal, orgSlug: organization?.slug }),
     {
       enabled: enabled && profile !== undefined,
       staleTime: 30 * 60 * 1000, // 30 minutes
@@ -57,7 +59,7 @@ export const useProjectsQuery = <TData = ProjectsData>({
 }
 
 export function prefetchProjects(client: QueryClient, organization?: Organization | undefined) {
-  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal, organization }))
+  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal, orgSlug: organization?.slug }))
 }
 
 export function useProjectsPrefetch(organization?: Organization | undefined) {

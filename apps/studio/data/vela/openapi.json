@@ -85,37 +85,47 @@
               "detail": {
                 "operationId": "organizations:detail",
                 "parameters": {
-                  "organization_id": "$response.header.Location#regex:/organizations/(.+)/"
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
                 }
               },
               "update": {
                 "operationId": "organizations:update",
                 "parameters": {
-                  "organization_id": "$response.header.Location#regex:/organizations/(.+)/"
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
                 }
               },
               "delete": {
                 "operationId": "organizations:delete",
                 "parameters": {
-                  "organization_id": "$response.header.Location#regex:/organizations/(.+)/"
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
                 }
               },
               "create_project": {
                 "operationId": "organizations:projects:create",
                 "parameters": {
-                  "organization_id": "$response.header.Location#regex:/organizations/(.+)/"
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
                 }
               },
               "list_projects": {
                 "operationId": "organizations:projects:list",
                 "parameters": {
-                  "organization_id": "$response.header.Location#regex:/organizations/(.+)/"
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
                 }
               }
             }
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -142,7 +152,7 @@
         ]
       }
     },
-    "/organizations/{organization_id}/": {
+    "/organizations/{organization_slug}/": {
       "get": {
         "summary": "Organizations:Detail",
         "operationId": "organizations:detail",
@@ -153,14 +163,14 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           }
         ],
@@ -227,14 +237,14 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           }
         ],
@@ -250,7 +260,47 @@
         },
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "Successful Response",
+            "headers": {
+              "Location": {
+                "description": "URL of the created item",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "detail": {
+                "operationId": "organizations:detail",
+                "parameters": {
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
+                }
+              },
+              "update": {
+                "operationId": "organizations:update",
+                "parameters": {
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
+                }
+              },
+              "delete": {
+                "operationId": "organizations:delete",
+                "parameters": {
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
+                }
+              },
+              "create_project": {
+                "operationId": "organizations:projects:create",
+                "parameters": {
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
+                }
+              },
+              "list_projects": {
+                "operationId": "organizations:projects:list",
+                "parameters": {
+                  "organization_slug": "$response.header.Location#regex:/organizations/(.+)/"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -282,6 +332,16 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -304,14 +364,14 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           }
         ],
@@ -362,7 +422,7 @@
         }
       }
     },
-    "/organizations/{organization_id}/projects/": {
+    "/organizations/{organization_slug}/projects/": {
       "get": {
         "summary": "Organizations:Projects:List",
         "operationId": "organizations:projects:list",
@@ -373,14 +433,14 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           }
         ],
@@ -392,9 +452,9 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Project"
+                    "$ref": "#/components/schemas/ProjectPublic"
                   },
-                  "title": "Response Organizations Projects List Organizations  Organization Id  Projects  Get"
+                  "title": "Response Organizations Projects List Organizations  Organization Slug  Projects  Get"
                 }
               }
             }
@@ -451,14 +511,14 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           }
         ],
@@ -487,19 +547,19 @@
               "detail": {
                 "operationId": "organizations:projects:detail",
                 "parameters": {
-                  "project_id": "$response.header.Location#regex:/projects/(.+)/"
+                  "project_slug": "$response.header.Location#regex:/projects/(.+)/"
                 }
               },
               "update": {
                 "operationId": "organizations:projects:update",
                 "parameters": {
-                  "project_id": "$response.header.Location#regex:/projects/(.+)/"
+                  "project_slug": "$response.header.Location#regex:/projects/(.+)/"
                 }
               },
               "delete": {
                 "operationId": "organizations:projects:delete",
                 "parameters": {
-                  "project_id": "$response.header.Location#regex:/projects/(.+)/"
+                  "project_slug": "$response.header.Location#regex:/projects/(.+)/"
                 }
               }
             }
@@ -534,6 +594,16 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -547,7 +617,7 @@
         }
       }
     },
-    "/organizations/{organization_id}/projects/{project_id}/": {
+    "/organizations/{organization_slug}/projects/{project_slug}/": {
       "get": {
         "summary": "Organizations:Projects:Detail",
         "operationId": "organizations:projects:detail",
@@ -558,25 +628,25 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           },
           {
-            "name": "project_id",
+            "name": "project_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Project Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Project Slug"
             }
           }
         ],
@@ -586,7 +656,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Project"
+                  "$ref": "#/components/schemas/ProjectPublic"
                 }
               }
             }
@@ -643,25 +713,25 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           },
           {
-            "name": "project_id",
+            "name": "project_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Project Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Project Slug"
             }
           }
         ],
@@ -677,7 +747,35 @@
         },
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "Successful Response",
+            "headers": {
+              "Location": {
+                "description": "URL of the created item",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "links": {
+              "detail": {
+                "operationId": "organizations:projects:detail",
+                "parameters": {
+                  "project_slug": "$response.header.Location#regex:/projects/(.+)/"
+                }
+              },
+              "update": {
+                "operationId": "organizations:projects:update",
+                "parameters": {
+                  "project_slug": "$response.header.Location#regex:/projects/(.+)/"
+                }
+              },
+              "delete": {
+                "operationId": "organizations:projects:delete",
+                "parameters": {
+                  "project_slug": "$response.header.Location#regex:/projects/(.+)/"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -709,6 +807,16 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -731,36 +839,31 @@
         ],
         "parameters": [
           {
-            "name": "organization_id",
+            "name": "organization_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Organization Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Organization Slug"
             }
           },
           {
-            "name": "project_id",
+            "name": "project_slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "minimum": -9223372036854775808,
-              "exclusiveMaximum": 9223372036854775808,
-              "title": "Project Id"
+              "type": "string",
+              "maxLength": 50,
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "title": "Project Slug"
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
+          "204": {
+            "description": "Successful Response"
           },
           "401": {
             "description": "Not authenticated",
@@ -808,6 +911,86 @@
   },
   "components": {
     "schemas": {
+      "DeploymentParameters": {
+        "properties": {
+          "database": {
+            "type": "string",
+            "pattern": "^[^\\x00]*$",
+            "title": "Database"
+          },
+          "database_user": {
+            "type": "string",
+            "pattern": "^[^\\x00]*$",
+            "title": "Database User"
+          },
+          "database_password": {
+            "type": "string",
+            "pattern": "^[^\\x00]*$",
+            "title": "Database Password"
+          },
+          "database_size": {
+            "type": "integer",
+            "multipleOf": 1073741824.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Database Size"
+          },
+          "vcpu": {
+            "type": "integer",
+            "title": "Vcpu"
+          },
+          "memory": {
+            "type": "integer",
+            "multipleOf": 1073741824.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Memory"
+          },
+          "iops": {
+            "type": "integer",
+            "title": "Iops"
+          },
+          "database_image_tag": {
+            "type": "string",
+            "const": "15.1.0.147",
+            "title": "Database Image Tag"
+          }
+        },
+        "type": "object",
+        "required": [
+          "database",
+          "database_user",
+          "database_password",
+          "database_size",
+          "vcpu",
+          "memory",
+          "iops",
+          "database_image_tag"
+        ],
+        "title": "DeploymentParameters"
+      },
+      "DeploymentStatus": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "pods": {
+            "items": {},
+            "type": "array",
+            "title": "Pods"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "pods",
+          "message"
+        ],
+        "title": "DeploymentStatus"
+      },
       "HTTPError": {
         "properties": {
           "detail": {
@@ -923,43 +1106,6 @@
         "type": "object",
         "title": "OrganizationUpdate"
       },
-      "Project": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "maxLength": 50,
-            "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
-            "title": "Name"
-          },
-          "organization_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Organization Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "title": "Project"
-      },
       "ProjectCreate": {
         "properties": {
           "name": {
@@ -967,13 +1113,36 @@
             "maxLength": 50,
             "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
             "title": "Name"
+          },
+          "deployment": {
+            "$ref": "#/components/schemas/DeploymentParameters"
           }
         },
         "type": "object",
         "required": [
-          "name"
+          "name",
+          "deployment"
         ],
         "title": "ProjectCreate"
+      },
+      "ProjectPublic": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+            "title": "Name"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeploymentStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "ProjectPublic"
       },
       "ProjectUpdate": {
         "properties": {

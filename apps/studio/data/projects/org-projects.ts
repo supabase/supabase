@@ -16,7 +16,7 @@ export async function getOrgProjects(
   signal?: AbortSignal
 ): Promise<OrgProjectsResponse> {
   if (!orgSlug) throw new Error('orgSlug is required')
-  const { data, error } = await get(`/platform/organizations/{slug}/projects`, {
+  const { data, error } = await get(`/platform/organizations/{slug}/org-projects`, {
     params: {
       path: { slug: orgSlug },
     },

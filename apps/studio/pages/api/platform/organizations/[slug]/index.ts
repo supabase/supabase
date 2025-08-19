@@ -2,9 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { DEFAULT_ORGANIZATION, IS_VELA_PLATFORM } from '../../../constants'
 import { getVelaClient } from '../../../../../data/vela/vela'
 import { apiBuilder } from '../../../../../lib/api/apiBuilder'
+import { getPlatformQueryParams } from '../../../../../lib/api/platformQueryParams'
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
-  const slug = req.query.slug as string
+  const { slug } = getPlatformQueryParams(req, 'slug')
   if (!IS_VELA_PLATFORM) {
     switch (slug) {
       case 'default-org-slug':
@@ -16,13 +17,12 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 
-  const organizationId = parseInt(slug)
   const client = getVelaClient(req)
-  const createResponse = await client.get('/organizations/{organization_id}/', {
+  const createResponse = await client.get('/organizations/{organization_slug}/', {
     params: {
       path: {
-        organization_id: organizationId
-      }
+        organization_slug: slug,
+      },
     },
   })
 
@@ -32,7 +32,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handleUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
-  const slug = req.query.slug as string
+  const { slug } = getPlatformQueryParams(req, 'slug')
   if (!IS_VELA_PLATFORM) {
     switch (slug) {
       case 'default':
@@ -45,16 +45,13 @@ const handleUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = getVelaClient(req)
-  const organizationId = parseInt(req.headers['X-Vela-Organization-Id'] as string)
-
-  const createResponse = await client.put('/organizations/{organization_id}/', {
+  const createResponse = await client.put('/organizations/{organization_slug}/', {
     params: {
       path: {
-        organization_id: organizationId
-      }
+        organization_slug: slug,
+      },
     },
-    body: {
-    },
+    body: {},
   })
 
   if (createResponse.response.status !== 201) {

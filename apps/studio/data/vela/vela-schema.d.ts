@@ -39,7 +39,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/organizations/{organization_id}/": {
+    "/organizations/{organization_slug}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -58,7 +58,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/organizations/{organization_id}/projects/": {
+    "/organizations/{organization_slug}/projects/": {
         parameters: {
             query?: never;
             header?: never;
@@ -76,7 +76,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/organizations/{organization_id}/projects/{project_id}/": {
+    "/organizations/{organization_slug}/projects/{project_slug}/": {
         parameters: {
             query?: never;
             header?: never;
@@ -99,6 +99,37 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** DeploymentParameters */
+        DeploymentParameters: {
+            /** Database */
+            database: string;
+            /** Database User */
+            database_user: string;
+            /** Database Password */
+            database_password: string;
+            /** Database Size */
+            database_size: number;
+            /** Vcpu */
+            vcpu: number;
+            /** Memory */
+            memory: number;
+            /** Iops */
+            iops: number;
+            /**
+             * Database Image Tag
+             * @constant
+             */
+            database_image_tag: "15.1.0.147";
+        };
+        /** DeploymentStatus */
+        DeploymentStatus: {
+            /** Status */
+            status: string;
+            /** Pods */
+            pods: unknown[];
+            /** Message */
+            message: string;
+        };
         /** HTTPError */
         HTTPError: {
             /** Detail */
@@ -140,19 +171,17 @@ export interface components {
             /** Locked */
             locked?: boolean | null;
         };
-        /** Project */
-        Project: {
-            /** Id */
-            id?: number | null;
-            /** Name */
-            name: string;
-            /** Organization Id */
-            organization_id?: number | null;
-        };
         /** ProjectCreate */
         ProjectCreate: {
             /** Name */
             name: string;
+            deployment: components["schemas"]["DeploymentParameters"];
+        };
+        /** ProjectPublic */
+        ProjectPublic: {
+            /** Name */
+            name: string;
+            status: components["schemas"]["DeploymentStatus"];
         };
         /** ProjectUpdate */
         ProjectUpdate: {
@@ -257,6 +286,15 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPError"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPError"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -273,7 +311,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
+                organization_slug: string;
             };
             cookie?: never;
         };
@@ -331,7 +369,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
+                organization_slug: string;
             };
             cookie?: never;
         };
@@ -344,6 +382,8 @@ export interface operations {
             /** @description Successful Response */
             204: {
                 headers: {
+                    /** @description URL of the created item */
+                    Location?: string;
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -375,6 +415,15 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPError"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPError"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -391,7 +440,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
+                organization_slug: string;
             };
             cookie?: never;
         };
@@ -447,7 +496,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
+                organization_slug: string;
             };
             cookie?: never;
         };
@@ -459,7 +508,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Project"][];
+                    "application/json": components["schemas"]["ProjectPublic"][];
                 };
             };
             /** @description Not authenticated */
@@ -505,7 +554,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
+                organization_slug: string;
             };
             cookie?: never;
         };
@@ -551,6 +600,15 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPError"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPError"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -567,8 +625,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
-                project_id: number;
+                organization_slug: string;
+                project_slug: string;
             };
             cookie?: never;
         };
@@ -580,7 +638,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Project"];
+                    "application/json": components["schemas"]["ProjectPublic"];
                 };
             };
             /** @description Not authenticated */
@@ -626,8 +684,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
-                project_id: number;
+                organization_slug: string;
+                project_slug: string;
             };
             cookie?: never;
         };
@@ -640,6 +698,8 @@ export interface operations {
             /** @description Successful Response */
             204: {
                 headers: {
+                    /** @description URL of the created item */
+                    Location?: string;
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -671,6 +731,15 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPError"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPError"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -687,21 +756,19 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                organization_id: number;
-                project_id: number;
+                organization_slug: string;
+                project_slug: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
             /** @description Successful Response */
-            200: {
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": unknown;
-                };
+                content?: never;
             };
             /** @description Not authenticated */
             401: {
