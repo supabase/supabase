@@ -1,7 +1,14 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
+export const generateAuthMenu = (
+  ref: string,
+  flags?: {
+    showPolicies: boolean
+  }
+): ProductMenuGroup[] => {
+  const { showPolicies } = flags ?? {}
+
   return [
     {
       title: 'Manage',
@@ -10,12 +17,16 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
     {
       title: 'Configuration',
       items: [
-        {
-          name: 'Policies',
-          key: 'policies',
-          url: `/project/${ref}/auth/policies`,
-          items: [],
-        },
+        ...(showPolicies
+          ? [
+              {
+                name: 'Policies',
+                key: 'policies',
+                url: `/project/${ref}/auth/policies`,
+                items: [],
+              },
+            ]
+          : []),
         ...(IS_PLATFORM
           ? [
               {

@@ -6,6 +6,10 @@
   "ai:opt_in_level_schema_and_log": true,
   "ai:opt_in_level_schema_and_log_and_data": true,
 
+  "authentication:policies": false,
+  "authentication:third_party_auth": false,
+  "authentication:show_providers": false,
+  "authentication:show_manual_linking": false,
   "authentication:show_send_invitation": true,
   "authentication:show_provider_filter": true,
   "authentication:show_sort_by_email": true,
