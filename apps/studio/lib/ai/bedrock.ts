@@ -99,7 +99,9 @@ export function createRoutedBedrock(routingKey?: string) {
       ? await selectWeightedKey(routingKey, regionWeights)
       : // There's a few places where getModel is called without a routing key
         // Will cause disproportionate load on use1 region
-        'use1'
+        regionWeights['use1'] > 0
+        ? 'use1'
+        : 'usw2'
 
     const bedrock = createAmazonBedrock({
       credentialProvider,
