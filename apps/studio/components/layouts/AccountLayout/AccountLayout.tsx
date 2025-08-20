@@ -46,13 +46,13 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
       </Head>
       <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
         <WithSidebar
-          title="Account Settings"
+          title=""
           breadcrumbs={[]}
           backToDashboardURL={backToDashboardURL}
           sections={[
             {
               key: 'account-settings',
-              heading: 'Settings',
+              heading: 'Account Settings',
               links: [
                 {
                   key: 'preferences',

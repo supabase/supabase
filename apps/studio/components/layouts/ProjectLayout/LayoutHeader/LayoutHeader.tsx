@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useMemo, useState } from 'react'
 
@@ -53,6 +54,7 @@ interface LayoutHeaderProps {
   breadcrumbs?: any[]
   headerTitle?: string
   showProductMenu?: boolean
+  backToDashboardURL?: string
 }
 
 const LayoutHeader = ({
@@ -60,6 +62,7 @@ const LayoutHeader = ({
   breadcrumbs = [],
   headerTitle,
   showProductMenu,
+  backToDashboardURL,
 }: LayoutHeaderProps) => {
   const { ref: projectRef, slug } = useParams()
   const router = useRouter()
@@ -99,6 +102,16 @@ const LayoutHeader = ({
   return (
     <>
       <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
+        {backToDashboardURL && isAccountPage && (
+          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
+            <Link
+              href={backToDashboardURL}
+              className="flex items-center justify-center border-none !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
+            >
+              <ChevronLeft strokeWidth={1.5} size={16} />
+            </Link>
+          </div>
+        )}
         {(showProductMenu || isAccountPage) && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <button

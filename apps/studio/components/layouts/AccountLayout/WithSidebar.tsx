@@ -1,11 +1,9 @@
-import { isUndefined } from 'lodash'
-import { ArrowUpRight, LogOut, ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { PropsWithChildren, ReactNode, useState } from 'react'
-import { Badge, cn, Menu } from 'ui'
+import { PropsWithChildren, ReactNode } from 'react'
+import { cn, Menu } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
-import type { SidebarLink, SidebarSection } from './AccountLayout.types'
+import type { SidebarSection } from './AccountLayout.types'
 import { useAppStateSnapshot } from 'state/app-state'
 
 interface WithSidebarProps {
@@ -93,12 +91,16 @@ export const SidebarContent = ({
         )}
       >
         <div className="flex-1 flex flex-col">
-          {title && (
-            <div className="flex-shrink-0">
+          {backToDashboardURL && (
+            <div className="flex-shrink-0 hidden md:block">
               <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
-                <h4 className="mb-0 text-lg truncate" title={title}>
-                  {title}
-                </h4>
+                <Link
+                  href={backToDashboardURL}
+                  className="flex text-sm flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
+                >
+                  <ArrowLeft strokeWidth={1.5} size={16} />
+                  Back to dashboard
+                </Link>
               </div>
             </div>
           )}
@@ -148,17 +150,6 @@ export const SidebarContent = ({
             </div>
           </div>
         </div>
-        {backToDashboardURL && (
-          <div className="flex-shrink-0 px-6 py-6">
-            <Link
-              href={backToDashboardURL}
-              className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
-            >
-              <ArrowLeft strokeWidth={1.5} size={14} />
-              Back to dashboard
-            </Link>
-          </div>
-        )}
       </div>
     </>
   )
