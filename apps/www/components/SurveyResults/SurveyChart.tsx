@@ -648,6 +648,103 @@ export function buildWhereClause(
   return whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 }
 
+// Helper function to create custom aggregate functions for charts with specific categories
+export function createCategoryAggregator(
+  targetColumn: string,
+  categories: string[],
+  categoryMappings?: Record<string, string> // Optional mapping like 'Developer tools and platforms' -> 'Dev tools'
+) {
+  return async function (activeFilters: Record<string, string>, supabaseClient: any) {
+    const categoryCounts: Record<string, number> = {}
+
+    // Get counts for each specific category
+    for (const category of categories) {
+      let countQuery = supabaseClient
+        .from('responses_2025')
+        .select('*', { count: 'exact', head: true })
+        .eq(targetColumn, category)
+
+      // Apply additional filters
+      for (const [column, value] of Object.entries(activeFilters)) {
+        if (value && value !== NO_FILTER) {
+          countQuery = countQuery.eq(column, value)
+        }
+      }
+
+      const { count, error: countError } = await countQuery
+
+      if (countError) {
+        console.error(`Error getting count for ${category}:`, countError)
+        continue
+      }
+
+      const categoryCount = count || 0
+
+      // Apply category mapping if provided
+      if (categoryMappings && categoryMappings[category]) {
+        const mappedCategory = categoryMappings[category]
+        categoryCounts[mappedCategory] = (categoryCounts[mappedCategory] || 0) + categoryCount
+      } else {
+        categoryCounts[category] = (categoryCounts[category] || 0) + categoryCount
+      }
+    }
+
+    // Get count for "Other" (everything not in our specific categories)
+    let otherQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+      .not(targetColumn, 'in', categories)
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== NO_FILTER) {
+        otherQuery = otherQuery.eq(column, value)
+      }
+    }
+
+    const { count: otherCount, error: otherError } = await otherQuery
+
+    if (!otherError && otherCount) {
+      categoryCounts['Other'] = otherCount
+    } else {
+      // Fallback: calculate "Other" as total - known categories
+      try {
+        let totalQuery = supabaseClient
+          .from('responses_2025')
+          .select('*', { count: 'exact', head: true })
+
+        // Apply additional filters
+        for (const [column, value] of Object.entries(activeFilters)) {
+          if (value && value !== NO_FILTER) {
+            totalQuery = totalQuery.eq(column, value)
+          }
+        }
+
+        const { count: totalCount, error: totalError } = await totalQuery
+
+        if (!totalError && totalCount) {
+          const knownCategoriesTotal = Object.values(categoryCounts).reduce(
+            (sum, count) => sum + count,
+            0
+          )
+          const otherCount = totalCount - knownCategoriesTotal
+
+          if (otherCount > 0) {
+            categoryCounts['Other'] = otherCount
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback "Other" calculation failed:', fallbackError)
+      }
+    }
+
+    // Convert to array format and sort by count descending
+    return Object.entries(categoryCounts)
+      .map(([category, total]) => ({ label: category, total }))
+      .sort((a, b) => b.total - a.total)
+  }
+}
+
 function SurveyFilter({
   filterKey,
   filterConfig,
