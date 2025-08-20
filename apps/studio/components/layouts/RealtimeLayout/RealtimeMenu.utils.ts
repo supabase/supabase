@@ -8,6 +8,7 @@ export const generateRealtimeMenu = (
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
   const { enableRealtimeSettings, showPolicies } = flags || {}
+  const showRealtimeSettings = IS_PLATFORM && enableRealtimeSettings
 
   return [
     {
@@ -21,30 +22,34 @@ export const generateRealtimeMenu = (
         },
       ],
     },
-    {
-      title: 'Configuration',
-      items: [
-        ...(showPolicies
-          ? [
-              {
-                name: 'Policies',
-                key: 'policies',
-                url: `/project/${ref}/realtime/policies`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && enableRealtimeSettings
-          ? [
-              {
-                name: 'Settings',
-                key: 'settings',
-                url: `/project/${ref}/realtime/settings`,
-                items: [],
-              },
-            ]
-          : []),
-      ],
-    },
+    ...(showRealtimeSettings || showPolicies
+      ? [
+          {
+            title: 'Configuration',
+            items: [
+              ...(showPolicies
+                ? [
+                    {
+                      name: 'Policies',
+                      key: 'policies',
+                      url: `/project/${ref}/realtime/policies`,
+                      items: [],
+                    },
+                  ]
+                : []),
+              ...(showRealtimeSettings
+                ? [
+                    {
+                      name: 'Settings',
+                      key: 'settings',
+                      url: `/project/${ref}/realtime/settings`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
   ]
 }
