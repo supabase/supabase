@@ -32,29 +32,77 @@ function generateDatabasesSQL(activeFilters: Record<string, string>) {
   ORDER BY total DESC;`
 }
 
-function transformDatabasesData(data: any[]) {
-  // Raw data from Supabase: [{ id: 1, databases: ['tech1', 'tech2'] }, ...]
-  // Need to flatten array data and apply CASE logic
-  const technologyCounts: Record<string, number> = {}
+// Custom aggregate function for databases data
+async function aggregateDatabasesData(activeFilters: Record<string, string>, supabaseClient: any) {
+  const specificTechnologies = [
+    'Supabase',
+    'PostgreSQL',
+    'MySQL',
+    'MongoDB',
+    'Redis',
+    'Firebase',
+    'SQLite',
+  ]
 
-  data.forEach((row) => {
-    const technologies = row.databases || []
-    technologies.forEach((technology: string) => {
-      let cleanTechnology = technology
-      if (
-        !['Supabase', 'PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Firebase', 'SQLite'].includes(
-          technology
-        )
-      ) {
-        cleanTechnology = 'Other'
+  const categoryCounts: Record<string, number> = {}
+
+  // Get counts for each specific technology
+  for (const technology of specificTechnologies) {
+    let countQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+      .contains('databases', [technology])
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        countQuery = countQuery.eq(column, value)
       }
+    }
 
-      technologyCounts[cleanTechnology] = (technologyCounts[cleanTechnology] || 0) + 1
-    })
-  })
+    const { count, error: countError } = await countQuery
+
+    if (countError) {
+      console.error(`Error getting count for ${technology}:`, countError)
+      continue
+    }
+
+    categoryCounts[technology] = count || 0
+  }
+
+  // Get count for "Other" (everything not in our specific categories)
+  // This is complex for array fields, so we'll calculate it as total - known categories
+  try {
+    let totalQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        totalQuery = totalQuery.eq(column, value)
+      }
+    }
+
+    const { count: totalCount, error: totalError } = await totalQuery
+
+    if (!totalError && totalCount) {
+      const knownCategoriesTotal = Object.values(categoryCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      )
+      const otherCount = totalCount - knownCategoriesTotal
+
+      if (otherCount > 0) {
+        categoryCounts['Other'] = otherCount
+      }
+    }
+  } catch (fallbackError) {
+    console.error('Fallback "Other" calculation failed:', fallbackError)
+  }
 
   // Convert to array format and sort by count descending
-  return Object.entries(technologyCounts)
+  return Object.entries(categoryCounts)
     .map(([technology, total]) => ({ label: technology, total }))
     .sort((a, b) => b.total - a.total)
 }
@@ -66,7 +114,7 @@ export function DatabasesChart() {
       targetColumn="databases"
       filterColumns={['person_age', 'team_size', 'money_raised']}
       generateSQLQuery={generateDatabasesSQL}
-      transformData={transformDatabasesData}
+      customAggregateFunction={aggregateDatabasesData}
     />
   )
 }

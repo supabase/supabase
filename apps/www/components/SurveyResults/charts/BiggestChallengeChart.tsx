@@ -21,46 +21,78 @@ GROUP BY biggest_challenge_clean
 ORDER BY total DESC;`
 }
 
-function transformBiggestChallengeData(data: any[]) {
-  // Raw data from Supabase: [{ biggest_challenge: 'Customer acquisition' }, { biggest_challenge: 'Technical complexity' }, ...]
-  // Need to apply CASE logic and aggregate by counting occurrences
-  const challengeCounts: Record<string, number> = {}
+// Custom aggregate function for biggest challenge data
+async function aggregateBiggestChallengeData(
+  activeFilters: Record<string, string>,
+  supabaseClient: any
+) {
+  const specificChallenges = [
+    'Customer acquisition',
+    'Technical complexity',
+    'Product-market fit',
+    'Fundraising',
+    'Hiring',
+  ]
 
-  data.forEach((row) => {
-    const challenge = row.biggest_challenge
-    if (challenge) {
-      let cleanChallenge = challenge
+  const categoryCounts: Record<string, number> = {}
 
-      if (
-        ![
-          'Customer acquisition',
-          'Technical complexity',
-          'Product-market fit',
-          'Fundraising',
-          'Hiring',
-          'Other',
-        ].includes(challenge)
-      ) {
-        cleanChallenge = 'Other'
+  // Get counts for each specific challenge
+  for (const challenge of specificChallenges) {
+    let countQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+      .eq('biggest_challenge', challenge)
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        countQuery = countQuery.eq(column, value)
       }
-
-      challengeCounts[cleanChallenge] = (challengeCounts[cleanChallenge] || 0) + 1
     }
-  })
+
+    const { count, error: countError } = await countQuery
+
+    if (countError) {
+      console.error(`Error getting count for ${challenge}:`, countError)
+      continue
+    }
+
+    categoryCounts[challenge] = count || 0
+  }
+
+  // Get count for "Other" (everything not in our specific categories)
+  let otherQuery = supabaseClient
+    .from('responses_2025')
+    .select('*', { count: 'exact', head: true })
+    .not('biggest_challenge', 'in', specificChallenges)
+
+  // Apply additional filters
+  for (const [column, value] of Object.entries(activeFilters)) {
+    if (value && value !== 'unset') {
+      otherQuery = otherQuery.eq(column, value)
+    }
+  }
+
+  const { count: otherCount, error: otherError } = await otherQuery
+
+  if (!otherError && otherCount) {
+    categoryCounts['Other'] = otherCount
+  }
 
   // Convert to array format and sort by count descending
-  return Object.entries(challengeCounts)
-    .map(([biggest_challenge, total]) => ({ label: biggest_challenge, total }))
+  return Object.entries(categoryCounts)
+    .map(([challenge, total]) => ({ label: challenge, total }))
     .sort((a, b) => b.total - a.total)
 }
 
 export function BiggestChallengeChart() {
   return (
     <SurveyChart
+      title="What is your biggest challenge right now?"
       targetColumn="biggest_challenge"
       filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateBiggestChallengeSQL}
-      transformData={transformBiggestChallengeData}
+      customAggregateFunction={aggregateBiggestChallengeData}
     />
   )
 }

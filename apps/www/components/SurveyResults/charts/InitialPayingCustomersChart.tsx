@@ -33,36 +33,81 @@ function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>
   ORDER BY respondents DESC;`
 }
 
-function transformInitialPayingCustomersData(data: any[]) {
-  // Raw data from Supabase: [{ id: 1, initial_paying_customers: ['source1', 'source2'] }, ...]
-  // Need to flatten array data and apply CASE logic
-  const sourceCounts: Record<string, number> = {}
+// Custom aggregate function for initial paying customers data
+async function aggregateInitialPayingCustomersData(
+  activeFilters: Record<string, string>,
+  supabaseClient: any
+) {
+  const specificSources = [
+    'Personal/professional network',
+    'Inbound from social media (Twitter, LinkedIn, etc.)',
+    'Cold outreach or sales',
+    'Content (blog, newsletter, SEO)',
+    'Developer communities (Discord, Slack, Reddit, etc.)',
+    'Open source users who converted',
+    'Accelerators/incubators',
+    'Hacker News or Product Hunt',
+  ]
 
-  data.forEach((row) => {
-    const sources = row.initial_paying_customers || []
-    sources.forEach((source: string) => {
-      let cleanSource = source
-      if (
-        ![
-          'Personal/professional network',
-          'Inbound from social media (Twitter, LinkedIn, etc.)',
-          'Cold outreach or sales',
-          'Content (blog, newsletter, SEO)',
-          'Developer communities (Discord, Slack, Reddit, etc.)',
-          'Open source users who converted',
-          'Accelerators/incubators',
-          'Hacker News or Product Hunt',
-        ].includes(source)
-      ) {
-        cleanSource = 'Other'
+  const categoryCounts: Record<string, number> = {}
+
+  // Get counts for each specific source
+  for (const source of specificSources) {
+    let countQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+      .contains('initial_paying_customers', [source])
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        countQuery = countQuery.eq(column, value)
       }
+    }
 
-      sourceCounts[cleanSource] = (sourceCounts[cleanSource] || 0) + 1
-    })
-  })
+    const { count, error: countError } = await countQuery
+
+    if (countError) {
+      console.error(`Error getting count for ${source}:`, countError)
+      continue
+    }
+
+    categoryCounts[source] = count || 0
+  }
+
+  // Get count for "Other" (everything not in our specific categories)
+  // This is complex for array fields, so we'll calculate it as total - known categories
+  try {
+    let totalQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        totalQuery = totalQuery.eq(column, value)
+      }
+    }
+
+    const { count: totalCount, error: totalError } = await totalQuery
+
+    if (!totalError && totalCount) {
+      const knownCategoriesTotal = Object.values(categoryCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      )
+      const otherCount = totalCount - knownCategoriesTotal
+
+      if (otherCount > 0) {
+        categoryCounts['Other'] = otherCount
+      }
+    }
+  } catch (fallbackError) {
+    console.error('Fallback "Other" calculation failed:', fallbackError)
+  }
 
   // Convert to array format and sort by count descending
-  return Object.entries(sourceCounts)
+  return Object.entries(categoryCounts)
     .map(([source, total]) => ({ label: source, total }))
     .sort((a, b) => b.total - a.total)
 }
@@ -70,10 +115,11 @@ function transformInitialPayingCustomersData(data: any[]) {
 export function InitialPayingCustomersChart() {
   return (
     <SurveyChart
+      title="How did you get your first paying customers?"
       targetColumn="initial_paying_customers"
       filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateInitialPayingCustomersSQL}
-      transformData={transformInitialPayingCustomersData}
+      customAggregateFunction={aggregateInitialPayingCustomersData}
     />
   )
 }

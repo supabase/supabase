@@ -32,35 +32,77 @@ function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   ORDER BY respondents DESC;`
 }
 
-function transformSalesToolsData(data: any[]) {
-  // Raw data from Supabase: [{ id: 1, sales_tools: ['tool1', 'tool2'] }, ...]
-  // Need to flatten array data and apply CASE logic
-  const toolCounts: Record<string, number> = {}
+// Custom aggregate function for sales tools data
+async function aggregateSalesToolsData(activeFilters: Record<string, string>, supabaseClient: any) {
+  const specificTools = [
+    'HubSpot',
+    'Salesforce',
+    'Pipedrive',
+    'Close.com',
+    'Notion / Airtable',
+    'Google Sheets',
+    "We don't have a formal CRM or sales tool yet",
+  ]
 
-  data.forEach((row) => {
-    const tools = row.sales_tools || []
-    tools.forEach((tool: string) => {
-      let cleanTool = tool
-      if (
-        ![
-          'HubSpot',
-          'Salesforce',
-          'Pipedrive',
-          'Close.com',
-          'Notion / Airtable',
-          'Google Sheets',
-          "We don't have a formal CRM or sales tool yet",
-        ].includes(tool)
-      ) {
-        cleanTool = 'Other'
+  const categoryCounts: Record<string, number> = {}
+
+  // Get counts for each specific tool
+  for (const tool of specificTools) {
+    let countQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+      .contains('sales_tools', [tool])
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        countQuery = countQuery.eq(column, value)
       }
+    }
 
-      toolCounts[cleanTool] = (toolCounts[cleanTool] || 0) + 1
-    })
-  })
+    const { count, error: countError } = await countQuery
+
+    if (countError) {
+      console.error(`Error getting count for ${tool}:`, countError)
+      continue
+    }
+
+    categoryCounts[tool] = count || 0
+  }
+
+  // Get count for "Other" (everything not in our specific categories)
+  // This is complex for array fields, so we'll calculate it as total - known categories
+  try {
+    let totalQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        totalQuery = totalQuery.eq(column, value)
+      }
+    }
+
+    const { count: totalCount, error: totalError } = await totalQuery
+
+    if (!totalError && totalCount) {
+      const knownCategoriesTotal = Object.values(categoryCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      )
+      const otherCount = totalCount - knownCategoriesTotal
+
+      if (otherCount > 0) {
+        categoryCounts['Other'] = otherCount
+      }
+    }
+  } catch (fallbackError) {
+    console.error('Fallback "Other" calculation failed:', fallbackError)
+  }
 
   // Convert to array format and sort by count descending
-  return Object.entries(toolCounts)
+  return Object.entries(categoryCounts)
     .map(([tool, total]) => ({ label: tool, total }))
     .sort((a, b) => b.total - a.total)
 }
@@ -72,7 +114,7 @@ export function SalesToolsChart() {
       targetColumn="sales_tools"
       filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateSalesToolsSQL}
-      transformData={transformSalesToolsData}
+      customAggregateFunction={aggregateSalesToolsData}
     />
   )
 }

@@ -35,38 +35,80 @@ function generateNewIdeasSQL(activeFilters: Record<string, string>) {
   ORDER BY total DESC;`
 }
 
-function transformNewIdeasData(data: any[]) {
-  // Raw data from Supabase: [{ id: 1, new_ideas: ['avenue1', 'avenue2'] }, ...]
-  // Need to flatten array data and apply CASE logic
-  const avenueCounts: Record<string, number> = {}
+// Custom aggregate function for new ideas data
+async function aggregateNewIdeasData(activeFilters: Record<string, string>, supabaseClient: any) {
+  const specificAvenues = [
+    'Hacker News',
+    'GitHub',
+    'Product Hunt',
+    'Twitter/X',
+    'Reddit',
+    'YouTube',
+    'Podcasts',
+    'Blogs / Newsletters',
+    'Discord / Slack communities',
+    'Conferences / Meetups',
+  ]
 
-  data.forEach((row) => {
-    const avenues = row.new_ideas || []
-    avenues.forEach((avenue: string) => {
-      let cleanAvenue = avenue
-      if (
-        ![
-          'Hacker News',
-          'GitHub',
-          'Product Hunt',
-          'Twitter/X',
-          'Reddit',
-          'YouTube',
-          'Podcasts',
-          'Blogs / Newsletters',
-          'Discord / Slack communities',
-          'Conferences / Meetups',
-        ].includes(avenue)
-      ) {
-        cleanAvenue = 'Other'
+  const categoryCounts: Record<string, number> = {}
+
+  // Get counts for each specific avenue
+  for (const avenue of specificAvenues) {
+    let countQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+      .contains('new_ideas', [avenue])
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        countQuery = countQuery.eq(column, value)
       }
+    }
 
-      avenueCounts[cleanAvenue] = (avenueCounts[cleanAvenue] || 0) + 1
-    })
-  })
+    const { count, error: countError } = await countQuery
+
+    if (countError) {
+      console.error(`Error getting count for ${avenue}:`, countError)
+      continue
+    }
+
+    categoryCounts[avenue] = count || 0
+  }
+
+  // Get count for "Other" (everything not in our specific categories)
+  // This is complex for array fields, so we'll calculate it as total - known categories
+  try {
+    let totalQuery = supabaseClient
+      .from('responses_2025')
+      .select('*', { count: 'exact', head: true })
+
+    // Apply additional filters
+    for (const [column, value] of Object.entries(activeFilters)) {
+      if (value && value !== 'unset') {
+        totalQuery = totalQuery.eq(column, value)
+      }
+    }
+
+    const { count: totalCount, error: totalError } = await totalQuery
+
+    if (!totalError && totalCount) {
+      const knownCategoriesTotal = Object.values(categoryCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      )
+      const otherCount = totalCount - knownCategoriesTotal
+
+      if (otherCount > 0) {
+        categoryCounts['Other'] = otherCount
+      }
+    }
+  } catch (fallbackError) {
+    console.error('Fallback "Other" calculation failed:', fallbackError)
+  }
 
   // Convert to array format and sort by count descending
-  return Object.entries(avenueCounts)
+  return Object.entries(categoryCounts)
     .map(([avenue, total]) => ({ label: avenue, total }))
     .sort((a, b) => b.total - a.total)
 }
@@ -78,7 +120,7 @@ export function NewIdeasChart() {
       targetColumn="new_ideas"
       filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateNewIdeasSQL}
-      transformData={transformNewIdeasData}
+      customAggregateFunction={aggregateNewIdeasData}
     />
   )
 }
