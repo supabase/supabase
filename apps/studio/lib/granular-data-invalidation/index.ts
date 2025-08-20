@@ -3,19 +3,9 @@ import { type QueryClient } from '@tanstack/react-query'
 import { extractEntityInfo } from './extract-entity-info'
 import { handleInvalidation } from './handle-invalidation'
 
-export type EntityType =
-  | 'table'
-  | 'function'
-  | 'procedure'
-  | 'trigger'
-  | 'policy'
-  | 'index'
-  | 'cron'
-  | 'view'
-  | 'materialized_view'
-  | 'schema'
+export type EntityType = 'table' | 'function' | 'cron'
 
-export type ActionType = 'create' | 'alter' | 'drop' | 'enable' | 'disable'
+export type ActionType = 'create' | 'drop'
 
 export type InvalidationEvent = {
   projectRef: string
@@ -30,10 +20,7 @@ export type InvalidationEvent = {
  */
 function extractAction(sqlLower: string): ActionType | null {
   if (sqlLower.startsWith('create')) return 'create'
-  if (sqlLower.startsWith('alter')) return 'alter'
   if (sqlLower.startsWith('drop')) return 'drop'
-  if (sqlLower.includes('enable')) return 'enable'
-  if (sqlLower.includes('disable')) return 'disable'
 
   // Special handling for cron operations (uses SELECT statements)
   if (sqlLower.includes('cron.schedule')) return 'create'

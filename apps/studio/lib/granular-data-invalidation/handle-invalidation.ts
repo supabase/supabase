@@ -1,20 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import type { EntityType, InvalidationEvent } from '.'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { databaseTriggerKeys } from 'data/database-triggers/keys'
-import { databaseKeys } from 'data/database/keys'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { tableKeys } from 'data/tables/keys'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { viewKeys } from 'data/views/keys'
-import { materializedViewKeys } from 'data/materialized-views/keys'
+import { databaseKeys } from '../../data/database/keys'
+import { entityTypeKeys } from '../../data/entity-types/keys'
+import { tableKeys } from '../../data/tables/keys'
 
-const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = [
-  'table',
-  'view',
-  'materialized_view',
-]
+const ENTITY_TYPES_REQUIRING_LIST_INVALIDATION: EntityType[] = ['table']
 
 export async function invalidateTableQueries(
   queryClient: QueryClient,
@@ -69,103 +60,12 @@ export async function invalidateFunctionQueries(
   })
 }
 
-export async function invalidateTriggerQueries(
-  queryClient: QueryClient,
-  projectRef: string
-): Promise<void> {
-  await queryClient.invalidateQueries({
-    queryKey: databaseTriggerKeys.list(projectRef),
-    refetchType: 'active',
-  })
-}
-
-export async function invalidatePolicyQueries(
-  queryClient: QueryClient,
-  projectRef: string,
-  schema?: string,
-  table?: string
-): Promise<void> {
-  const promises: Promise<void>[] = []
-
-  promises.push(
-    queryClient.invalidateQueries({
-      queryKey: databasePoliciesKeys.list(projectRef),
-      refetchType: 'active',
-    })
-  )
-
-  // Also invalidate table's RLS status if active
-  if (table && schema) {
-    promises.push(
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.retrieve(projectRef, table, schema),
-        refetchType: 'active',
-      })
-    )
-  }
-
-  await Promise.allSettled(promises)
-}
-
-async function invalidateIndexQueries(
-  queryClient: QueryClient,
-  projectRef: string,
-  schema?: string
-): Promise<void> {
-  const queryKey = schema
-    ? databaseIndexesKeys.list(projectRef, schema)
-    : databaseIndexesKeys.list(projectRef)
-
-  await queryClient.invalidateQueries({
-    queryKey,
-    refetchType: 'active',
-  })
-}
-
 async function invalidateCronQueries(queryClient: QueryClient, projectRef: string): Promise<void> {
   await queryClient.invalidateQueries({
     // Use generic query key with `exact:false` to invalidate all cron job queries
     // regardless of `searchTerm` (which we can't access from here)
     queryKey: ['projects', projectRef, 'cron-jobs'],
     exact: false,
-    refetchType: 'active',
-  })
-}
-
-async function invalidateViewQueries(
-  queryClient: QueryClient,
-  projectRef: string,
-  schema?: string
-): Promise<void> {
-  const queryKey = schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef)
-
-  await queryClient.invalidateQueries({
-    queryKey,
-    refetchType: 'active',
-  })
-}
-
-async function invalidateSchemaQueries(
-  queryClient: QueryClient,
-  projectRef: string
-): Promise<void> {
-  await queryClient.invalidateQueries({
-    queryKey: databaseKeys.schemas(projectRef),
-    refetchType: 'active',
-  })
-}
-
-async function invalidateMaterializedViewQueries(
-  queryClient: QueryClient,
-  projectRef: string,
-  schema?: string
-): Promise<void> {
-  const queryKey = schema
-    ? materializedViewKeys.listBySchema(projectRef, schema)
-    : materializedViewKeys.list(projectRef)
-
-  await queryClient.invalidateQueries({
-    queryKey,
     refetchType: 'active',
   })
 }
@@ -192,14 +92,7 @@ async function executeInvalidationStrategy(
   const invalidationMap: Record<EntityType, () => Promise<void>> = {
     table: () => invalidateTableQueries(queryClient, projectRef, schema, table),
     function: () => invalidateFunctionQueries(queryClient, projectRef),
-    procedure: () => invalidateFunctionQueries(queryClient, projectRef),
-    trigger: () => invalidateTriggerQueries(queryClient, projectRef),
-    policy: () => invalidatePolicyQueries(queryClient, projectRef, schema, table),
-    index: () => invalidateIndexQueries(queryClient, projectRef, schema),
     cron: () => invalidateCronQueries(queryClient, projectRef),
-    view: () => invalidateViewQueries(queryClient, projectRef, schema),
-    materialized_view: () => invalidateMaterializedViewQueries(queryClient, projectRef, schema),
-    schema: () => invalidateSchemaQueries(queryClient, projectRef),
   }
 
   const strategy = invalidationMap[entityType]
