@@ -6,6 +6,7 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { DatePicker } from 'components/ui/DatePicker'
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
@@ -34,7 +35,6 @@ import {
   ExpiresAtOptions,
   NON_EXPIRING_TOKEN_VALUE,
 } from './AccessTokens.constants'
-import { TokenDatePickerValue, TokensDatePicker } from './TokensDatePicker'
 
 const formId = 'new-access-token-form'
 
@@ -59,9 +59,7 @@ export const NewAccessTokenDialog = ({
   onOpenChange,
   onCreateToken,
 }: NewAccessTokenDialogProps) => {
-  const [customExpiryDate, setCustomExpiryDate] = useState<TokenDatePickerValue | undefined>(
-    undefined
-  )
+  const [customExpiryDate, setCustomExpiryDate] = useState<{ date: string } | undefined>(undefined)
   const [isCustomExpiry, setIsCustomExpiry] = useState(false)
 
   const form = useForm<z.infer<typeof TokenSchema>>({
@@ -103,7 +101,7 @@ export const NewAccessTokenDialog = ({
     if (value === CUSTOM_EXPIRY_VALUE) {
       setIsCustomExpiry(true)
       // Set a default custom date (today at 23:59:59)
-      const defaultCustomDate: TokenDatePickerValue = {
+      const defaultCustomDate = {
         date: dayjs().endOf('day').toISOString(),
       }
       setCustomExpiryDate(defaultCustomDate)
@@ -115,7 +113,7 @@ export const NewAccessTokenDialog = ({
     }
   }
 
-  const handleCustomDateChange = (value: TokenDatePickerValue) => {
+  const handleCustomDateChange = (value: { date: string }) => {
     setCustomExpiryDate(value)
   }
 
@@ -212,37 +210,20 @@ export const NewAccessTokenDialog = ({
                         </Select_Shadcn_>
                       </FormControl_Shadcn_>
                       {isCustomExpiry && (
-                        <TokensDatePicker
-                          value={customExpiryDate || { date: '' }}
-                          onSubmit={handleCustomDateChange}
-                          disabled={(date) => {
-                            const today = new Date()
-                            const maxDate = new Date()
-                            maxDate.setDate(today.getDate() + 364) // 364 days instead of 365
-
-                            // Normalize dates to ignore time
-                            const dateOnly = new Date(
-                              date.getFullYear(),
-                              date.getMonth(),
-                              date.getDate()
-                            )
-                            const todayOnly = new Date(
-                              today.getFullYear(),
-                              today.getMonth(),
-                              today.getDate()
-                            )
-                            const maxDateOnly = new Date(
-                              maxDate.getFullYear(),
-                              maxDate.getMonth(),
-                              maxDate.getDate()
-                            )
-
-                            return dateOnly < todayOnly || dateOnly > maxDateOnly
+                        <DatePicker
+                          selectsRange={false}
+                          triggerButtonSize="small"
+                          contentSide="top"
+                          minDate={new Date()}
+                          maxDate={dayjs().add(1, 'year').toDate()}
+                          onChange={(date) => {
+                            if (date.to) handleCustomDateChange({ date: date.to })
                           }}
-                          buttonTriggerProps={{
-                            size: 'small',
-                          }}
-                        />
+                        >
+                          {customExpiryDate
+                            ? `${dayjs(customExpiryDate.date).format('DD MMM, HH:mm')}`
+                            : 'Select date'}
+                        </DatePicker>
                       )}
                     </div>
                     {field.value === NON_EXPIRING_TOKEN_VALUE && (
