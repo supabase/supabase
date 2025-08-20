@@ -126,6 +126,7 @@ export const generateOtherRoutes = (
 
   const { unifiedLogs, showReports } = features ?? {}
   const unifiedLogsEnabled = unifiedLogs ?? false
+  const reportsEnabled = showReports ?? true
 
   return [
     {
@@ -134,7 +135,7 @@ export const generateOtherRoutes = (
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
-    ...(IS_PLATFORM && showReports
+    ...(IS_PLATFORM && reportsEnabled
       ? [
           {
             key: 'reports',
