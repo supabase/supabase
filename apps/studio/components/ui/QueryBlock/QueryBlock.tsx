@@ -164,9 +164,17 @@ export const QueryBlock = ({
     : formattedQueryResult
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       onResults?.(data.result)
       setQueryResult(data.result)
+
+      try {
+        const { parseQuery } = await import('libpg-query')
+        const parsedResult = await parseQuery(sql || '')
+        console.log('Parsed SQL result:', parsedResult)
+      } catch (parseError) {
+        console.error('Error parsing SQL:', parseError)
+      }
 
       setReadOnlyError(false)
       setQueryError(undefined)
