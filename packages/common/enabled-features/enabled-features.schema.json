@@ -23,10 +23,6 @@
       "description": "Enable the AI opt in level 'schema_and_log_and_data'"
     },
 
-    "authentication:policies": {
-      "type": "boolean",
-      "description": "Enable the authentication policies page (as well as all other product's policies page)"
-    },
     "authentication:sign_in_providers": {
       "type": "boolean",
       "description": "Enable the authentication sign in / providers page"
@@ -125,6 +121,14 @@
       "type": "boolean",
       "description": "Shows the user's profile information (first name, last name) in account preferences"
     },
+    "profile:show_analytics_and_marketing": {
+      "type": "boolean",
+      "description": "Shows the analytics and marketing section in account preferences"
+    },
+    "profile:show_account_deletion": {
+      "type": "boolean",
+      "description": "Shows the account deletion section in account preferences"
+    },
 
     "project_connection:javascript_example": {
       "type": "boolean",
@@ -178,11 +182,6 @@
     "reports:all": {
       "type": "boolean",
       "description": "Enable the project reports page"
-    },
-
-    "table_editor:enable_rls_toggle": {
-      "type": "boolean",
-      "description": "Show the RLS toggle in the table creation flow and table editor header"
     }
   },
   "required": [
@@ -190,7 +189,6 @@
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
-    "authentication:policies",
     "authentication:sign_in_providers",
     "authentication:third_party_auth",
     "authentication:rate_limits",
@@ -212,6 +210,8 @@
     "integrations:show_stripe_wrapper",
     "profile:show_email",
     "profile:show_information",
+    "profile:show_analytics_and_marketing",
+    "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
     "project_creation:show_advanced_config",
@@ -225,8 +225,7 @@
     "project_settings:log_drains",
     "project_connection:javascript_example",
     "project_connection:dart_example",
-    "reports:all",
-    "table_editor:enable_rls_toggle"
+    "reports:all"
   ],
   "additionalProperties": false
 }

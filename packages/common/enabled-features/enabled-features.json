@@ -6,7 +6,6 @@
   "ai:opt_in_level_schema_and_log": true,
   "ai:opt_in_level_schema_and_log_and_data": true,
 
-  "authentication:policies": true,
   "authentication:sign_in_providers": true,
   "authentication:third_party_auth": true,
   "authentication:rate_limits": true,
@@ -36,6 +35,8 @@
 
   "profile:show_email": true,
   "profile:show_information": true,
+  "profile:show_analytics_and_marketing": true,
+  "profile:show_account_deletion": true,
 
   "project_connection:javascript_example": true,
   "project_connection:dart_example": true,
@@ -52,7 +53,5 @@
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
 
-  "reports:all": true,
-
-  "table_editor:enable_rls_toggle": true
+  "reports:all": true
 }

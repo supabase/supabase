@@ -65,8 +65,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
-  const { realtimeAll: realtimeEnabled, tableEditorEnableRlsToggle: enableRlsToggle } =
-    useIsFeatureEnabled(['realtime:all', 'table_editor:enable_rls_toggle'])
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
   const { mutate: updateTable } = useTableUpdateMutation({
@@ -212,7 +211,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Tooltip>
           )}
 
-          {enableRlsToggle && isTable && !isSchemaLocked ? (
+          {isTable && !isSchemaLocked ? (
             table.rls_enabled ? (
               <>
                 {policies.length < 1 && !isSchemaLocked ? (

@@ -3,7 +3,6 @@ import { PropsWithChildren } from 'react'
 
 import { useIsRealtimeSettingsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
@@ -18,7 +17,6 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
   const { data: project } = useSelectedProjectQuery()
   const enableRealtimeSettingsFF = useIsRealtimeSettingsFFEnabled()
   const enableRealtimeSettingsFP = useIsRealtimeSettingsEnabled()
-  const showPolicies = useIsFeatureEnabled('authentication:policies')
 
   const enableRealtimeSettings = enableRealtimeSettingsFF && enableRealtimeSettingsFP
 
@@ -32,7 +30,7 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateRealtimeMenu(project!, { enableRealtimeSettings, showPolicies })}
+          menu={generateRealtimeMenu(project!, { enableRealtimeSettings })}
         />
       }
     >
