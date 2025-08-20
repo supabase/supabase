@@ -1,22 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { InlineLink } from 'components/ui/InlineLink'
+import {
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+  ScaffoldSectionDescription,
+} from 'components/layouts/Scaffold'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-const ComplianceConfig = () => {
+export const ComplianceConfig = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isSensitive, setIsSensitive] = useState(false)
@@ -60,21 +62,27 @@ const ComplianceConfig = () => {
   }, [isLoading])
 
   return (
-    <div id="compliance-configuration">
-      <div className="flex items-center justify-between mb-6">
-        <FormHeader
-          className="mb-0"
-          title="High Compliance Configuration"
-          description="For projects storing and processing sensitive data (HIPAA)"
-        />
+    <ScaffoldSection id="compliance-configuration" className="gap-6">
+      <div className="flex items-center justify-between">
+        <ScaffoldSectionTitle className="mb-0">
+          High Compliance Configuration
+          <ScaffoldSectionDescription>
+            For projects storing and processing sensitive data (HIPAA)
+          </ScaffoldSectionDescription>
+        </ScaffoldSectionTitle>
         <DocsButton href="https://supabase.com/docs/guides/platform/hipaa-projects" />
       </div>
-      <FormPanel>
-        <FormSection
-          header={
-            <FormSectionLabel
-              className="lg:col-span-9"
-              description={
+
+      <Card>
+        <CardContent className="flex justify-between items-center">
+          {isLoading ? (
+            <GenericSkeletonLoader />
+          ) : isError ? (
+            <AlertError error={error} subject="Failed to retrieve project settings" />
+          ) : isSuccess ? (
+            <>
+              <div>
+                <p className="text-sm">Apply additional compliance controls to project</p>
                 <p className="text-sm text-foreground-light">
                   Enable security warnings in the{' '}
                   <InlineLink href={`/project/${ref}/advisors/security`}>
@@ -82,47 +90,30 @@ const ComplianceConfig = () => {
                   </InlineLink>{' '}
                   to enforce requirements for managing sensitive data
                 </p>
-              }
-            >
-              Apply additional compliance controls to project
-            </FormSectionLabel>
-          }
-        >
-          <FormSectionContent loading={false} className="lg:!col-span-3">
-            <div className="flex items-center justify-end mt-2.5 space-x-2">
-              {(isLoading || isSubmitting) && (
-                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
-              )}
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve project settings" />
-              )}
-              {isSuccess && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                    <div>
-                      <Switch
-                        size="large"
-                        checked={isSensitive}
-                        disabled={isLoading || isSubmitting || !canUpdateComplianceConfig}
-                        onCheckedChange={toggleIsSensitive}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  {!canUpdateComplianceConfig && (
-                    <TooltipContent side="bottom" className="w-64 text-center">
-                      You need additional permissions to update the compliance configuration for
-                      your project
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              )}
-            </div>
-          </FormSectionContent>
-        </FormSection>
-      </FormPanel>
-    </div>
+              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                  <div>
+                    <Switch
+                      size="large"
+                      checked={isSensitive}
+                      disabled={isLoading || isSubmitting || !canUpdateComplianceConfig}
+                      onCheckedChange={toggleIsSensitive}
+                    />
+                  </div>
+                </TooltipTrigger>
+                {!canUpdateComplianceConfig && (
+                  <TooltipContent side="bottom" className="w-64 text-center">
+                    You need additional permissions to update the compliance configuration for your
+                    project
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </>
+          ) : null}
+        </CardContent>
+      </Card>
+    </ScaffoldSection>
   )
 }
-
-export default ComplianceConfig

@@ -1,11 +1,11 @@
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
+  General,
   ComplianceConfig,
   CustomDomainConfig,
-  General,
   TransferProjectPanel,
+  DeleteProjectPanel,
 } from 'components/interfaces/Settings/General'
-import { DeleteProjectPanel } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
@@ -26,22 +26,17 @@ const ProjectSettings: NextPageWithLayout = () => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   return (
-    <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Project Settings</ScaffoldTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
-        <General />
-
-        {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
-        {!isBranch && hasHipaaAddon && <ComplianceConfig />}
-        <CustomDomainConfig />
-        {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
-        {!isBranch && <DeleteProjectPanel />}
-      </ScaffoldContainer>
-    </>
+    <ScaffoldContainer bottomPadding>
+      <ScaffoldHeader>
+        <ScaffoldTitle>Project Settings</ScaffoldTitle>
+      </ScaffoldHeader>
+      <General />
+      {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
+      {!isBranch && hasHipaaAddon && <ComplianceConfig />}
+      <CustomDomainConfig />
+      {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
+      {!isBranch && <DeleteProjectPanel />}
+    </ScaffoldContainer>
   )
 }
 
