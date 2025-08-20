@@ -86,6 +86,7 @@ export default function BlogPostClient(props: BlogPostPageProps) {
 
         generateTocFromMarkdown(markdownContent, tocDepth)
           .then((tocResult) => {
+            console.log('[BlogPostClient] Generated TOC:', tocResult)
             setProcessedToc(tocResult)
           })
           .catch((error) => {

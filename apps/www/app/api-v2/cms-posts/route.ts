@@ -229,6 +229,7 @@ export async function GET(request: NextRequest) {
                 content: markdownContent,
                 richContent: latestVersion.content,
                 toc: tocResult,
+                toc_depth: latestVersion.toc_depth || 2,
                 isDraft: true,
                 _status: latestVersion._status,
               }
@@ -320,6 +321,7 @@ export async function GET(request: NextRequest) {
               content: markdownContent,
               richContent: post.content,
               toc: tocResult,
+              toc_depth: post.toc_depth || 2,
               isDraft: true,
               _status: post._status,
             }
@@ -395,6 +397,7 @@ export async function GET(request: NextRequest) {
               content: markdownContent,
               richContent: post.content,
               toc: tocResult,
+              toc_depth: post.toc_depth || 2,
               isDraft: true,
               _status: post._status,
             }
@@ -495,6 +498,7 @@ export async function GET(request: NextRequest) {
               content: mode === 'full' ? markdownContent : undefined,
               richContent: mode === 'full' ? post.content : undefined,
               toc: tocResult,
+              toc_depth: post.toc_depth || 2,
             }
 
             return NextResponse.json({
@@ -726,6 +730,7 @@ export async function GET(request: NextRequest) {
           tags: p.tags || [],
           categories: [],
           isCMS: true,
+          toc_depth: p.toc_depth || 2,
         }
 
         // Add content for full mode
@@ -737,6 +742,7 @@ export async function GET(request: NextRequest) {
             content: markdownContent, // Convert rich text to markdown for MDX processing
             richContent: p.content, // Keep original rich text for reference
             toc: tocResult,
+            toc_depth: p.toc_depth || 2,
           }
         }
 
