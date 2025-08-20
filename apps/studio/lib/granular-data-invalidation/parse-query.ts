@@ -1,4 +1,4 @@
-import type { CreateFunctionStmt, CreateStmt, DropStmt } from 'libpg-query'
+import type { CreateFunctionStmt, CreateStmt, DropStmt, SelectStmt } from 'libpg-query'
 
 import type { Event } from '.'
 
@@ -29,17 +29,9 @@ export async function parseQuery(sql: string, sqlLower: string): Promise<Event[]
         event = parseCreateFunctionStatement(stmt.CreateFunctionStmt)
       } else if ('DropStmt' in stmt) {
         event = parseDropStatement(stmt.DropStmt)
-      } else if (
-        'SelectStmt' in stmt &&
-        (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule'))
-      ) {
-        // For cron, we need to parse the original SQL to get the job name
-        // since libpg-query doesn't provide structured access to function arguments
-        const stmtSql = sql.substring(
-          stmtWrapper.stmt_location || 0,
-          stmtWrapper.stmt_len ? (stmtWrapper.stmt_location || 0) + stmtWrapper.stmt_len : undefined
-        )
-        event = parseCronStatement(stmtSql || sql)
+      } else if ('SelectStmt' in stmt) {
+        // Check if this is a cron statement by examining the AST
+        event = parseCronFromSelectStmt(stmt.SelectStmt)
       } else {
         // Get the statement type for logging
         const stmtType = Object.keys(stmt)[0]
@@ -155,16 +147,37 @@ function parseDropStatement(dropStmt: DropStmt): Event | null {
   return null
 }
 
-function parseCronStatement(sql: string): Event | null {
-  // For cron statements, use simple regex to extract the job name since libpg-query
-  // might not provide structured access to function arguments
-  const cronMatch = sql.match(
-    /(?:select\s+)?cron\.(?:schedule|unschedule)\s*\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))/i
-  )
-  if (!cronMatch) return null
+function parseCronFromSelectStmt(selectStmt: SelectStmt): Event | null {
+  if (!selectStmt.targetList?.length) return null
 
-  return {
-    entityType: 'cron',
-    entityName: cronMatch[1] || cronMatch[2] || cronMatch[3],
+  for (const target of selectStmt.targetList) {
+    if (!('ResTarget' in target)) continue
+
+    const resTarget = target.ResTarget
+    if (!resTarget?.val || !('FuncCall' in resTarget.val)) continue
+
+    const funcCall = resTarget.val.FuncCall
+    if (!funcCall?.funcname?.length) continue
+
+    // Check if this is a cron function call
+    const funcNameParts: string[] = []
+    for (const nameNode of funcCall.funcname) {
+      if ('String' in nameNode && nameNode.String?.sval) {
+        funcNameParts.push(nameNode.String.sval)
+      }
+    }
+
+    if (
+      funcNameParts.length === 2 &&
+      funcNameParts[0] === 'cron' &&
+      (funcNameParts[1] === 'schedule' || funcNameParts[1] === 'unschedule')
+    ) {
+      return {
+        entityType: 'cron',
+        entityName: funcNameParts[1],
+      }
+    }
   }
+
+  return null
 }
