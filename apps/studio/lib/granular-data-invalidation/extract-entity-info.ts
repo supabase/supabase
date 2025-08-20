@@ -14,21 +14,23 @@ async function parseWithLibPgQuery(sql: string, sqlLower: string): Promise<Event
 
     const events: Event[] = []
 
-    // Process all statements, not just the first one
+    // Process all statements
     for (const stmtWrapper of parsed.stmts) {
-      const stmt = stmtWrapper.stmt as any
+      const stmt = stmtWrapper.stmt
 
       let event: Event | null = null
 
+      if (!stmt) continue
+
       // Handle different statement types
-      if (stmt?.CreateStmt) {
+      if ('CreateStmt' in stmt) {
         event = parseCreateStatement(stmt.CreateStmt)
-      } else if (stmt?.CreateFunctionStmt) {
+      } else if ('CreateFunctionStmt' in stmt) {
         event = parseCreateFunctionStatement(stmt.CreateFunctionStmt)
-      } else if (stmt?.DropStmt) {
+      } else if ('DropStmt' in stmt) {
         event = parseDropStatement(stmt.DropStmt)
       } else if (
-        stmt?.SelectStmt &&
+        'SelectStmt' in stmt &&
         (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule'))
       ) {
         // For cron, we need to parse the original SQL to get the job name
@@ -39,7 +41,9 @@ async function parseWithLibPgQuery(sql: string, sqlLower: string): Promise<Event
         )
         event = parseCronStatement(stmtSql || sql)
       } else {
-        console.log('Unhandled statement type:', Object.keys(stmt || {}))
+        // Get the statement type for logging
+        const stmtType = Object.keys(stmt)[0]
+        console.log('Unhandled statement type:', stmtType)
       }
 
       if (event) events.push(event)
