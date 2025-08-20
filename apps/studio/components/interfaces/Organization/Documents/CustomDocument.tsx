@@ -4,12 +4,12 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { CustomContentsDetails } from 'hooks/custom-content/useCustomContent'
+import { CustomContentTypes } from 'hooks/custom-content/CustomContent.types'
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 
 interface CustomDocumentProps {
-  doc: CustomContentsDetails['organization:legal_documents'][number]
+  doc: CustomContentTypes['organizationLegalDocuments'][number]
 }
 
 export const CustomDocument = ({ doc }: CustomDocumentProps) => {
