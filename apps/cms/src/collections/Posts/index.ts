@@ -47,33 +47,33 @@ export const Posts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
-    livePreview: {
-      url: ({ data }) => {
-        const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
-        // Always use the preview route for live preview to ensure draft mode is enabled
-        return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
-      },
-      breakpoints: [
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1920,
-          height: 1080,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-      ],
-    },
+    // livePreview: {
+    //   url: ({ data }) => {
+    //     const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
+    //     // Always use the preview route for live preview to ensure draft mode is enabled
+    //     return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
+    //   },
+    //   breakpoints: [
+    //     {
+    //       label: 'Desktop',
+    //       name: 'desktop',
+    //       width: 1920,
+    //       height: 1080,
+    //     },
+    //     {
+    //       label: 'Tablet',
+    //       name: 'tablet',
+    //       width: 768,
+    //       height: 1024,
+    //     },
+    //     {
+    //       label: 'Mobile',
+    //       name: 'mobile',
+    //       width: 375,
+    //       height: 667,
+    //     },
+    //   ],
+    // },
     preview: (data) => {
       const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
       // Always use the preview route to ensure draft mode is enabled

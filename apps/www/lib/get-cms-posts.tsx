@@ -216,18 +216,47 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     }
 
     // Fallback to regular API (for preview mode or if versions API fails)
-    url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2${preview ? '&draft=true' : ''}`
-    // console.log(`[getCMSPostBySlug] API URL: ${url}`)
+    if (preview) {
+      // In preview mode, always try to get the latest draft first
+      url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2&draft=true`
+      console.log(`[getCMSPostBySlug] Draft API URL: ${url}`)
 
-    response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-      },
-      // Always use no-store to get fresh data
-      cache: 'no-store',
-      next: { revalidate: 0 },
-    })
+      response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+        cache: 'no-store',
+        next: { revalidate: 0 },
+      })
+
+      // If no draft found, try published version
+      if (!response.ok || (await response.clone().json()).docs?.length === 0) {
+        console.log(`[getCMSPostBySlug] No draft found, trying published version`)
+        url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2&draft=false`
+        response = await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          },
+          cache: 'no-store',
+          next: { revalidate: 0 },
+        })
+      }
+    } else {
+      // For non-preview mode, get published version
+      url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2&draft=false`
+      console.log(`[getCMSPostBySlug] Published API URL: ${url}`)
+
+      response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+        cache: 'no-store',
+        next: { revalidate: 0 },
+      })
+    }
 
     if (!response.ok) {
       console.error(`[getCMSPostBySlug] HTTP error: ${response.status} ${response.statusText}`)

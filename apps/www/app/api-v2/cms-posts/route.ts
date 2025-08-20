@@ -90,22 +90,114 @@ export async function GET(request: NextRequest) {
     const mode = searchParams.get('mode') || 'preview' // 'preview' or 'full'
     const limit = searchParams.get('limit') || '100'
     const slug = searchParams.get('slug') // For fetching specific post
+    const draftParam = searchParams.get('draft') === 'true' // Explicit draft parameter
 
     const baseUrl = CMS_SITE_ORIGIN
     const apiKey = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
-    // Check if we're in draft mode
+    // Check if we're in draft mode (either Next.js draft mode OR explicit draft parameter)
     const { isEnabled: isDraftMode } = await draftMode()
+    const shouldFetchDraft = isDraftMode || draftParam
+
+    console.log('[cms-posts] Draft status:', { isDraftMode, draftParam, shouldFetchDraft })
 
     // When fetching a specific post, we need to handle versioning correctly
     if (slug) {
-      // If in draft mode, fetch draft content directly
-      if (isDraftMode) {
-        console.log('[cms-posts] Draft mode enabled, fetching draft content for slug:', slug)
+      // If in draft mode, fetch the latest version (draft or published)
+      if (shouldFetchDraft) {
+        console.log('[cms-posts] Draft mode enabled, fetching latest version for slug:', slug)
+
+        // Strategy 1: Try to get the latest version from versions API (including drafts)
+        const allVersionsUrl = new URL('/api/posts/versions', baseUrl)
+        allVersionsUrl.searchParams.set('where[version.slug][equals]', slug)
+        allVersionsUrl.searchParams.set('sort', '-updatedAt') // Get the most recent version regardless of status
+        allVersionsUrl.searchParams.set('limit', '1')
+        allVersionsUrl.searchParams.set('depth', '2')
+
+        console.log('[cms-posts] Trying all versions API:', allVersionsUrl.toString())
+
+        const allVersionsResponse = await fetch(allVersionsUrl.toString(), {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+          },
+          cache: 'no-store',
+        })
+
+        console.log('[cms-posts] All versions API response status:', allVersionsResponse.status)
+
+        if (allVersionsResponse.ok) {
+          const versionsData = await allVersionsResponse.json()
+          console.log('[cms-posts] All versions API data:', {
+            totalDocs: versionsData.totalDocs,
+            docsLength: versionsData.docs?.length,
+            firstVersionStatus: versionsData.docs?.[0]?.version?._status,
+            firstVersionSlug: versionsData.docs?.[0]?.version?.slug,
+            firstVersionId: versionsData.docs?.[0]?.version?.id,
+            firstVersionUpdatedAt: versionsData.docs?.[0]?.updatedAt,
+          })
+
+          if (versionsData.docs && versionsData.docs.length > 0) {
+            const latestVersion = versionsData.docs[0].version
+            if (latestVersion) {
+              const markdownContent = convertRichTextToMarkdown(latestVersion.content)
+              const readingTime = generateReadingTime(richTextToPlainText(latestVersion.content))
+
+              console.log(
+                '[cms-posts] Using latest version with ID:',
+                latestVersion.id,
+                'status:',
+                latestVersion._status
+              )
+
+              const processedPost = {
+                slug: latestVersion.slug || '',
+                title: latestVersion.title || '',
+                description: latestVersion.description || '',
+                date: latestVersion.date || new Date().toISOString(),
+                formattedDate: new Date(latestVersion.date || new Date()).toLocaleDateString(
+                  'en-US',
+                  {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  }
+                ),
+                readingTime,
+                authors: latestVersion.authors || [],
+                thumb: latestVersion.thumb?.url
+                  ? `${baseUrl}${latestVersion.thumb.url}`
+                  : undefined,
+                image: latestVersion.image?.url
+                  ? `${baseUrl}${latestVersion.image.url}`
+                  : undefined,
+                url: `/blog/${latestVersion.slug}`,
+                path: `/blog/${latestVersion.slug}`,
+                tags: latestVersion.tags || [],
+                categories: [],
+                isCMS: true,
+                content: markdownContent,
+                richContent: latestVersion.content,
+                isDraft: true,
+                _status: latestVersion._status,
+              }
+
+              return NextResponse.json({
+                success: true,
+                post: processedPost,
+                mode,
+                isDraft: shouldFetchDraft,
+              })
+            }
+          }
+        }
+
+        // Strategy 2: Try to get the most recent draft
         const draftUrl = new URL('/api/posts', baseUrl)
         draftUrl.searchParams.set('where[slug][equals]', slug)
         draftUrl.searchParams.set('depth', '2')
         draftUrl.searchParams.set('draft', 'true')
+        draftUrl.searchParams.set('sort', '-updatedAt') // Get the most recent version
 
         const draftResponse = await fetch(draftUrl.toString(), {
           headers: {
@@ -124,12 +216,20 @@ export async function GET(request: NextRequest) {
             docsLength: draftData.docs?.length,
             firstDocStatus: draftData.docs?.[0]?._status,
             firstDocSlug: draftData.docs?.[0]?.slug,
+            firstDocId: draftData.docs?.[0]?.id,
           })
 
           if (draftData.docs && draftData.docs.length > 0) {
             const post = draftData.docs[0]
             const markdownContent = convertRichTextToMarkdown(post.content)
             const readingTime = generateReadingTime(richTextToPlainText(post.content))
+
+            console.log(
+              '[cms-posts] Using draft/latest version with ID:',
+              post.id,
+              'status:',
+              post._status
+            )
 
             const processedPost = {
               slug: post.slug || '',
@@ -153,13 +253,72 @@ export async function GET(request: NextRequest) {
               content: markdownContent,
               richContent: post.content,
               isDraft: true,
+              _status: post._status,
             }
 
             return NextResponse.json({
               success: true,
               post: processedPost,
               mode,
+              isDraft: shouldFetchDraft,
+            })
+          }
+        }
+
+        // Strategy 3: If no draft found, try published version but still mark as draft mode
+        console.log('[cms-posts] No draft found, trying published version in draft mode')
+        const publishedUrl = new URL('/api/posts', baseUrl)
+        publishedUrl.searchParams.set('where[slug][equals]', slug)
+        publishedUrl.searchParams.set('depth', '2')
+        publishedUrl.searchParams.set('draft', 'false')
+
+        const publishedResponse = await fetch(publishedUrl.toString(), {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+          },
+          cache: 'no-store',
+        })
+
+        if (publishedResponse.ok) {
+          const publishedData = await publishedResponse.json()
+          if (publishedData.docs && publishedData.docs.length > 0) {
+            const post = publishedData.docs[0]
+            const markdownContent = convertRichTextToMarkdown(post.content)
+            const readingTime = generateReadingTime(richTextToPlainText(post.content))
+
+            console.log('[cms-posts] Using published version in draft mode with ID:', post.id)
+
+            const processedPost = {
+              slug: post.slug || '',
+              title: post.title || '',
+              description: post.description || '',
+              date: post.date || new Date().toISOString(),
+              formattedDate: new Date(post.date || new Date()).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              }),
+              readingTime,
+              authors: post.authors || [],
+              thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
+              image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
+              url: `/blog/${post.slug}`,
+              path: `/blog/${post.slug}`,
+              tags: post.tags || [],
+              categories: [],
+              isCMS: true,
+              content: markdownContent,
+              richContent: post.content,
               isDraft: true,
+              _status: post._status,
+            }
+
+            return NextResponse.json({
+              success: true,
+              post: processedPost,
+              mode,
+              isDraft: shouldFetchDraft,
             })
           }
         }

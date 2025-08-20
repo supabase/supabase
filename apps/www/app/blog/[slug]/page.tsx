@@ -9,10 +9,22 @@ import type { Blog, BlogData, PostReturnType } from 'types/post'
 export const revalidate = 30
 
 // Helper function to fetch CMS post using our unified API
-async function getCMSPostFromAPI(slug: string, mode: 'preview' | 'full' = 'full') {
+async function getCMSPostFromAPI(
+  slug: string,
+  mode: 'preview' | 'full' = 'full',
+  isDraft: boolean = false
+) {
   try {
-    // Use SITE_ORIGIN to call our own api-v2 CMS API endpoint
-    const response = await fetch(`${SITE_ORIGIN}/api-v2/cms-posts?slug=${slug}&mode=${mode}`, {
+    const url = new URL(`${SITE_ORIGIN}/api-v2/cms-posts`)
+    url.searchParams.set('slug', slug)
+    url.searchParams.set('mode', mode)
+    if (isDraft) {
+      url.searchParams.set('draft', 'true')
+    }
+
+    console.log('[getCMSPostFromAPI] Fetching:', url.toString(), 'isDraft:', isDraft)
+
+    const response = await fetch(url.toString(), {
       // Use no-store to always get fresh data
       cache: 'no-store',
       next: { revalidate: 0 },
@@ -24,6 +36,11 @@ async function getCMSPostFromAPI(slug: string, mode: 'preview' | 'full' = 'full'
     }
 
     const data = await response.json()
+    console.log('[getCMSPostFromAPI] Response:', {
+      success: data.success,
+      isDraft: data.isDraft,
+      status: data.post?._status,
+    })
     return data.success ? data.post : null
   } catch (error) {
     console.error('[getCMSPostFromAPI] Error:', error)
@@ -111,7 +128,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   } catch {}
 
   // Try to fetch CMS post using our new unified API first
-  let cmsPost = await getCMSPostFromAPI(slug, 'full')
+  let cmsPost = await getCMSPostFromAPI(slug, 'full', isDraft)
 
   // Fallback to the original method if the API doesn't return the post
   if (!cmsPost) {
@@ -121,7 +138,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   if (!cmsPost) {
     if (isDraft) {
       // Try to fetch published version for draft mode
-      let publishedPost = await getCMSPostFromAPI(slug, 'full')
+      let publishedPost = await getCMSPostFromAPI(slug, 'full', false)
       if (!publishedPost) {
         publishedPost = await getCMSPostBySlug(slug, false)
       }

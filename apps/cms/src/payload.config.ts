@@ -9,6 +9,7 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { buildConfig, type Plugin } from 'payload'
 import { defaultLexical } from './fields/defaultLexical.ts'
 import { getServerSideURL } from './utilities/getURL.ts'
+import { WWW_SITE_ORIGIN } from './utilities/constants.ts'
 
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import type { Customer, Event, Post } from './payload-types'
@@ -109,7 +110,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  cors: [getServerSideURL()].filter(Boolean),
+  cors: [getServerSideURL(), WWW_SITE_ORIGIN].filter(Boolean),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
