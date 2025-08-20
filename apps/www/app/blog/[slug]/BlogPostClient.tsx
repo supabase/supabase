@@ -1,14 +1,15 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useLivePreview } from '@payloadcms/live-preview-react'
 
 import authors from 'lib/authors.json'
 import { CMS_SITE_ORIGIN } from 'lib/constants'
 import { isNotNullOrUndefined } from 'lib/helpers'
+import { generateTocFromMarkdown } from 'lib/toc'
 
-import type { Blog, BlogData, CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
+import type { Blog, BlogData, CMSAuthor, PostReturnType, ProcessedBlogData } from 'types/post'
 
 const BlogPostRenderer = dynamic(() => import('components/Blog/BlogPostRenderer'))
 
@@ -20,10 +21,48 @@ type BlogPostPageProps = {
   isDraftMode: boolean
 }
 
+// Convert Payload rich text content to markdown (copied from get-cms-posts.tsx)
+function convertRichTextToMarkdown(content: any): string {
+  if (!content?.root?.children) return ''
+
+  return content.root.children
+    .map((node: any) => {
+      if (node.type === 'heading') {
+        const level = node.tag && typeof node.tag === 'string' ? node.tag.replace('h', '') : '1'
+        const text = node.children?.map((child: any) => child.text).join('') || ''
+        return `${'#'.repeat(Number(level))} ${text}`
+      }
+      if (node.type === 'paragraph') {
+        return node.children?.map((child: any) => child.text).join('') || ''
+      }
+      if (node.type === 'list') {
+        const items = node.children
+          ?.map((item: any) => {
+            if (item.type === 'list-item') {
+              return `- ${item.children?.map((child: any) => child.text).join('') || ''}`
+            }
+            return ''
+          })
+          .filter(Boolean)
+          .join('\n')
+        return items
+      }
+      if (node.type === 'link') {
+        const text = node.children?.map((child: any) => child.text).join('') || ''
+        const url = node.url || ''
+        return `[${text}](${url})`
+      }
+      return ''
+    })
+    .filter(Boolean)
+    .join('\n\n')
+}
+
 export default function BlogPostClient(props: BlogPostPageProps) {
   const isDraftMode = props.isDraftMode
   const [previewData] = useState<ProcessedBlogData>(props.blog)
-  const shouldUseLivePreview = isDraftMode && (props.blog as any).isCMS
+  const [processedToc, setProcessedToc] = useState<{ content: string; json: any[] } | null>(null)
+  const shouldUseLivePreview = isDraftMode && 'isCMS' in props.blog && props.blog.isCMS
 
   const { data: livePreviewData, isLoading: isLivePreviewLoading } = useLivePreview({
     initialData: props.blog,
@@ -31,70 +70,145 @@ export default function BlogPostClient(props: BlogPostPageProps) {
     depth: 2,
   })
 
+  // Generate TOC for LivePreview data when content changes
+  useEffect(() => {
+    if (isDraftMode && shouldUseLivePreview && livePreviewData?.content) {
+      // Check if content is rich text (object) or already converted to markdown (string)
+      let markdownContent = ''
+      if (typeof livePreviewData.content === 'string') {
+        markdownContent = livePreviewData.content
+      } else if (typeof livePreviewData.content === 'object') {
+        markdownContent = convertRichTextToMarkdown(livePreviewData.content)
+      }
+
+      if (markdownContent) {
+        const tocDepth = (livePreviewData as any).toc_depth || (props.blog as any).toc_depth || 2
+
+        generateTocFromMarkdown(markdownContent, tocDepth)
+          .then((tocResult) => {
+            setProcessedToc(tocResult)
+          })
+          .catch((error) => {
+            console.error('Error generating TOC:', error)
+            setProcessedToc(null)
+          })
+      }
+    }
+  }, [
+    isDraftMode,
+    shouldUseLivePreview,
+    livePreviewData?.content,
+    livePreviewData?.toc_depth,
+    props.blog.toc_depth,
+  ])
+
   const blogMetaData = useMemo(() => {
     if (isDraftMode && shouldUseLivePreview) {
       if (livePreviewData && typeof livePreviewData === 'object') {
-        return { ...props.blog, ...livePreviewData }
+        console.log('[BlogPostClient] BlogMetaData Debug:', {
+          hasProcessedToc: !!processedToc,
+          processedTocItems: processedToc?.json?.length || 0,
+          originalToc: props.blog.toc,
+          livePreviewTocDepth: (livePreviewData as any).toc_depth,
+          propsTocDepth: props.blog.toc_depth,
+        })
+        // Process LivePreview author data to match expected CMSAuthor structure
+        const processedAuthors =
+          livePreviewData.authors?.map((author: Record<string, unknown>) => {
+            // Handle both direct author objects and author references
+            if (typeof author === 'object' && author !== null) {
+              const authorName =
+                (author.author as string) || (author.name as string) || 'Unknown Author'
+              const authorId = (author.author_id as string) || (author.id as string) || ''
+              const position = (author.position as string) || ''
+              const authorUrl = (author.author_url as string) || '#'
+              const username = (author.username as string) || ''
+
+              // Handle author image URL with proper type checking
+              let authorImageUrl: string | null = null
+              const authorImage = author.author_image_url as
+                | { url?: string }
+                | string
+                | null
+                | undefined
+
+              if (authorImage) {
+                if (typeof authorImage === 'string') {
+                  authorImageUrl = authorImage
+                } else if (typeof authorImage === 'object' && authorImage.url) {
+                  const imageUrl = authorImage.url
+                  if (typeof imageUrl === 'string') {
+                    authorImageUrl = imageUrl.includes('http')
+                      ? imageUrl
+                      : `${CMS_SITE_ORIGIN}${imageUrl}`
+                  }
+                }
+              }
+
+              return {
+                author: authorName,
+                author_id: authorId,
+                position,
+                author_url: authorUrl,
+                author_image_url: authorImageUrl,
+                username,
+              }
+            }
+            return {
+              author: typeof author === 'string' ? author : 'Unknown Author',
+              author_id: '',
+              position: '',
+              author_url: '#',
+              author_image_url: null,
+              username: '',
+            }
+          }) ?? []
+
+        const processedLivePreviewData = {
+          ...props.blog,
+          ...livePreviewData,
+          authors: processedAuthors,
+          // Use processed TOC if available, otherwise fall back to original
+          toc: processedToc || props.blog.toc,
+          toc_depth: (livePreviewData as any).toc_depth || props.blog.toc_depth || 2,
+        }
+        return processedLivePreviewData
       }
       if (previewData !== props.blog) {
         return previewData
       }
     }
     return props.blog
-  }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, props.blog]) as any
+  }, [
+    isDraftMode,
+    shouldUseLivePreview,
+    livePreviewData,
+    previewData,
+    props.blog,
+    processedToc,
+  ]) as ProcessedBlogData
 
-  const isCMS = (blogMetaData as any).isCMS
-  const imageUrl = isCMS
-    ? (blogMetaData as any).thumb ?? ''
-    : (blogMetaData as any).thumb
-      ? `/images/blog/${(blogMetaData as any).thumb}`
-      : ''
-
-  const meta = {
-    title: (blogMetaData as any).meta_title ?? (blogMetaData as any).title,
-    description: (blogMetaData as any).meta_description ?? (blogMetaData as any).description,
-    url: `https://supabase.com/blog/${(blogMetaData as any).slug}`,
-  }
-
-  const processTag = (tag: any): string => {
-    return typeof tag === 'string' ? tag : tag.name
-  }
-
-  const tags = (blogMetaData as any).tags
-    ? Array.isArray((blogMetaData as any).tags)
-      ? ((blogMetaData as any).tags as Tag[]).map(processTag)
-      : []
-    : []
+  const isCMS = 'isCMS' in blogMetaData && blogMetaData.isCMS
 
   const blogAuthors = isCMS
-    ? ((blogMetaData as any).authors as CMSAuthor[]) || []
-    : ((blogMetaData as any).author as string)
+    ? ('authors' in blogMetaData ? (blogMetaData.authors as CMSAuthor[]) : []) || []
+    : ('author' in blogMetaData ? (blogMetaData.author as string) : '')
         ?.split(',')
         .map((authorId: string) => {
           const foundAuthor = authors.find((author) => author.author_id === authorId)
-          console.log('foundAuthor', foundAuthor)
           return foundAuthor ?? null
         })
         .filter(isNotNullOrUndefined) || []
 
-  console.log('blogAuthors from client', blogAuthors)
-
-  const authorUrls = (blogAuthors as any)
-    .map((author: any) => author?.author_url)
-    .filter(isNotNullOrUndefined)
-
   return (
-    <>
-      {/* Head metadata handled at layout/page level now */}
-      <BlogPostRenderer
-        blog={props.blog as any}
-        blogMetaData={blogMetaData as any}
-        isDraftMode={isDraftMode}
-        isLivePreviewLoading={isLivePreviewLoading}
-        prevPost={props.prevPost as any}
-        nextPost={props.nextPost as any}
-        authors={blogAuthors as any}
-      />
-    </>
+    <BlogPostRenderer
+      blog={props.blog as ProcessedBlogData}
+      blogMetaData={blogMetaData as ProcessedBlogData}
+      isDraftMode={isDraftMode}
+      isLivePreviewLoading={isLivePreviewLoading}
+      prevPost={props.prevPost}
+      nextPost={props.nextPost}
+      authors={blogAuthors}
+    />
   )
 }

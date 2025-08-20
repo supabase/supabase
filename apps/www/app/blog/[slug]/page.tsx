@@ -139,7 +139,10 @@ export default async function BlogPostPage({ params }: { params: Params }) {
 
       if (!publishedPost) return null
 
-      const mdxSource = await mdxSerialize(publishedPost.content || '')
+      const mdxSource = await mdxSerialize(publishedPost.content || '', {
+        tocDepth: publishedPost.toc_depth || 2,
+      })
+      const tocResult = (mdxSource as any).scope?.toc || publishedPost.toc || { content: '' }
       const props: BlogPostPageProps = {
         prevPost: null,
         nextPost: null,
@@ -150,7 +153,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           authors: publishedPost.authors || [],
           isCMS: true,
           content: mdxSource,
-          toc: publishedPost.toc,
+          toc: tocResult,
           image: publishedPost.image ?? undefined,
           thumb: publishedPost.thumb ?? undefined,
         } as any,
@@ -161,7 +164,9 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     return null
   }
 
-  const mdxSource = await mdxSerialize(cmsPost.content || '')
+  const tocDepth = cmsPost.toc_depth || 2
+  const mdxSource = await mdxSerialize(cmsPost.content || '', { tocDepth })
+  const tocResult = (mdxSource as any).scope?.toc || cmsPost.toc || { content: '' }
 
   const props: BlogPostPageProps = {
     prevPost: null,
@@ -173,7 +178,8 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       authors: cmsPost.authors || [],
       isCMS: true,
       content: mdxSource,
-      toc: cmsPost.toc,
+      toc: tocResult,
+      toc_depth: cmsPost.toc_depth || 2,
       image: cmsPost.image ?? undefined,
       thumb: cmsPost.thumb ?? undefined,
     } as any,

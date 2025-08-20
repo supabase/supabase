@@ -146,33 +146,16 @@ const BlogPostRenderer = ({
   }
 
   const toc = blogMetaData.toc && (
-    <div className="space-y-8 py-8 lg:py-0">
-      <div>
-        <div className="flex flex-wrap gap-2">
-          {(blogMetaData.tags as Tag[])?.map((tag) => {
-            const tagName = typeof tag === 'string' ? tag : tag.name
-            const tagId = typeof tag === 'string' ? tag : tag.id.toString()
-            return (
-              <Link href={`/blog/tags/${tagName}`} key={`category-badge-${tagId}`}>
-                <Badge>{tagName}</Badge>
-              </Link>
-            )
-          })}
-        </div>
-      </div>
-      <div>
-        <div>
-          <p className="text-foreground mb-4">On this page</p>
-          <div className="prose-toc">
-            {blogMetaData.toc && (
-              <ReactMarkdown>
-                {typeof blogMetaData.toc === 'string'
-                  ? (blogMetaData.toc as string)
-                  : (blogMetaData.toc as { content: string }).content}
-              </ReactMarkdown>
-            )}
-          </div>
-        </div>
+    <div>
+      <p className="text-foreground mb-4">On this page</p>
+      <div className="prose-toc">
+        {blogMetaData.toc && (
+          <ReactMarkdown>
+            {typeof blogMetaData.toc === 'string'
+              ? (blogMetaData.toc as string)
+              : (blogMetaData.toc as { content: string }).content}
+          </ReactMarkdown>
+        )}
       </div>
     </div>
   )
@@ -253,7 +236,7 @@ const BlogPostRenderer = ({
                                     <div className="w-10">
                                       <Image
                                         src={authorImageUrl}
-                                        className="border-default rounded-full border w-full aspect-square object-cover"
+                                        className="border-default rounded-full border w-full max-h-10 aspect-square object-cover"
                                         alt={`${author.author} avatar`}
                                         width={40}
                                         height={40}
@@ -364,6 +347,19 @@ const BlogPostRenderer = ({
                 {/* Sidebar */}
                 <div className="relative col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
                   <div className="space-y-6">
+                    <div className="hidden lg:block">
+                      <div className="flex flex-wrap gap-2">
+                        {(blogMetaData.tags as Tag[])?.map((tag) => {
+                          const tagName = typeof tag === 'string' ? tag : tag.name
+                          const tagId = typeof tag === 'string' ? tag : tag.id.toString()
+                          return (
+                            <Link href={`/blog/tags/${tagName}`} key={`category-badge-${tagId}`}>
+                              <Badge>{tagName}</Badge>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </div>
                     <div className="hidden lg:block">{toc}</div>
                     <div className="hidden lg:block">
                       <div className="text-foreground text-sm">Share this article</div>

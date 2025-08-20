@@ -6,6 +6,37 @@ import { generateReadingTime } from '~/lib/helpers'
 // Lightweight runtime for better performance
 export const runtime = 'edge'
 
+// Lightweight TOC generation for edge runtime
+type TocItem = { content: string; slug: string; lvl: number }
+
+function generateTocFromMarkdown(markdown: string, maxDepth: number = 2) {
+  const lines = markdown.split(/\r?\n/)
+  const items: TocItem[] = []
+
+  for (const line of lines) {
+    const match = /^(#{1,6})\s+(.*)$/.exec(line)
+    if (!match) continue
+    const depth = match[1].length
+    if (depth > maxDepth) continue
+    const text = match[2].trim()
+    if (!text) continue
+
+    const slug = text
+      .trim()
+      .toLowerCase()
+      .replace(/[`~!@#$%^&*()+=|{}\[\]\\:\";'<>?,./]+/g, '')
+      .replace(/\s+/g, '-')
+
+    items.push({ content: text, slug, lvl: depth })
+  }
+
+  const content = items
+    .map((h) => `${'  '.repeat(Math.max(0, h.lvl - 1))}- [${h.content}](#${h.slug})`)
+    .join('\n')
+
+  return { content, json: items }
+}
+
 // Minimal rich-text to plain text for reading time
 function richTextToPlainText(content: any): string {
   try {
@@ -150,6 +181,11 @@ export async function GET(request: NextRequest) {
                 latestVersion._status
               )
 
+              const tocResult = generateTocFromMarkdown(
+                markdownContent,
+                latestVersion.toc_depth || 2
+              )
+
               const processedPost = {
                 slug: latestVersion.slug || '',
                 title: latestVersion.title || '',
@@ -164,7 +200,21 @@ export async function GET(request: NextRequest) {
                   }
                 ),
                 readingTime,
-                authors: latestVersion.authors || [],
+                authors: Array.isArray(latestVersion.authors)
+                  ? latestVersion.authors.map((a: any) => ({
+                      author: a?.author || 'Unknown Author',
+                      author_id: a?.author_id || '',
+                      position: a?.position || '',
+                      author_url: a?.author_url || '#',
+                      author_image_url: a?.author_image_url?.url
+                        ? typeof a.author_image_url.url === 'string' &&
+                          a.author_image_url.url.includes('http')
+                          ? a.author_image_url.url
+                          : `${baseUrl}${a.author_image_url.url}`
+                        : null,
+                      username: a?.username || '',
+                    }))
+                  : [],
                 thumb: latestVersion.thumb?.url
                   ? `${baseUrl}${latestVersion.thumb.url}`
                   : undefined,
@@ -178,6 +228,7 @@ export async function GET(request: NextRequest) {
                 isCMS: true,
                 content: markdownContent,
                 richContent: latestVersion.content,
+                toc: tocResult,
                 isDraft: true,
                 _status: latestVersion._status,
               }
@@ -231,6 +282,8 @@ export async function GET(request: NextRequest) {
               post._status
             )
 
+            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
+
             const processedPost = {
               slug: post.slug || '',
               title: post.title || '',
@@ -242,7 +295,21 @@ export async function GET(request: NextRequest) {
                 year: 'numeric',
               }),
               readingTime,
-              authors: post.authors || [],
+              authors: Array.isArray(post.authors)
+                ? post.authors.map((a: any) => ({
+                    author: a?.author || 'Unknown Author',
+                    author_id: a?.author_id || '',
+                    position: a?.position || '',
+                    author_url: a?.author_url || '#',
+                    author_image_url: a?.author_image_url?.url
+                      ? typeof a.author_image_url.url === 'string' &&
+                        a.author_image_url.url.includes('http')
+                        ? a.author_image_url.url
+                        : `${baseUrl}${a.author_image_url.url}`
+                      : null,
+                    username: a?.username || '',
+                  }))
+                : [],
               thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
               image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
               url: `/blog/${post.slug}`,
@@ -252,6 +319,7 @@ export async function GET(request: NextRequest) {
               isCMS: true,
               content: markdownContent,
               richContent: post.content,
+              toc: tocResult,
               isDraft: true,
               _status: post._status,
             }
@@ -289,6 +357,8 @@ export async function GET(request: NextRequest) {
 
             console.log('[cms-posts] Using published version in draft mode with ID:', post.id)
 
+            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
+
             const processedPost = {
               slug: post.slug || '',
               title: post.title || '',
@@ -300,7 +370,21 @@ export async function GET(request: NextRequest) {
                 year: 'numeric',
               }),
               readingTime,
-              authors: post.authors || [],
+              authors: Array.isArray(post.authors)
+                ? post.authors.map((a: any) => ({
+                    author: a?.author || 'Unknown Author',
+                    author_id: a?.author_id || '',
+                    position: a?.position || '',
+                    author_url: a?.author_url || '#',
+                    author_image_url: a?.author_image_url?.url
+                      ? typeof a.author_image_url.url === 'string' &&
+                        a.author_image_url.url.includes('http')
+                        ? a.author_image_url.url
+                        : `${baseUrl}${a.author_image_url.url}`
+                      : null,
+                    username: a?.username || '',
+                  }))
+                : [],
               thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
               image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
               url: `/blog/${post.slug}`,
@@ -310,6 +394,7 @@ export async function GET(request: NextRequest) {
               isCMS: true,
               content: markdownContent,
               richContent: post.content,
+              toc: tocResult,
               isDraft: true,
               _status: post._status,
             }
@@ -364,6 +449,7 @@ export async function GET(request: NextRequest) {
             const markdownContent = convertRichTextToMarkdown(post.content)
             const plain = richTextToPlainText(post.content)
             const readingTime = generateReadingTime(plain)
+            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
 
             const processedPost = {
               type: 'blog' as const,
@@ -408,6 +494,7 @@ export async function GET(request: NextRequest) {
               isCMS: true,
               content: mode === 'full' ? markdownContent : undefined,
               richContent: mode === 'full' ? post.content : undefined,
+              toc: tocResult,
             }
 
             return NextResponse.json({
@@ -644,10 +731,12 @@ export async function GET(request: NextRequest) {
         // Add content for full mode
         if (mode === 'full') {
           const markdownContent = convertRichTextToMarkdown(p.content)
+          const tocResult = generateTocFromMarkdown(markdownContent, p.toc_depth || 2)
           return {
             ...basePost,
             content: markdownContent, // Convert rich text to markdown for MDX processing
             richContent: p.content, // Keep original rich text for reference
+            toc: tocResult,
           }
         }
 

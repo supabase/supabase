@@ -67,15 +67,15 @@ const nextConfig = {
       'node_modules/@swc/**/*',
       'node_modules/@esbuild/**/*',
       'node_modules/rollup/**/*',
-      'node_modules/webpack/**/*',
+      // 'node_modules/webpack/**/*',
       'node_modules/terser/**/*',
-      'node_modules/@babel/**/*',
+      // 'node_modules/@babel/**/*',
       'node_modules/typescript/**/*',
       'node_modules/@types/**/*',
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
-      '.next/server/**/*.js.map',
+      // '.next/server/**/*.js.map',
       '.next/trace',
       // Static assets
       'public/**/*',
