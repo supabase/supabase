@@ -86,8 +86,6 @@ const BlogPostRenderer = ({
 
     // Priority 2: Use data from postMessage updates
     if (isDraftMode && previewData !== blog) {
-      // console.log('[BlogPostPage] Using previewData from postMessage for content')
-
       // If content is a string, use it directly
       if (typeof (previewData as unknown as { content?: unknown }).content === 'string') {
         return (previewData as unknown as { content?: string }).content as string
@@ -212,7 +210,10 @@ const BlogPostRenderer = ({
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
                     <p>•</p>
-                    <p>{generateReadingTime(blogMetaData.source)}</p>
+                    <p>
+                      {(blogMetaData as any).readingTime ||
+                        generateReadingTime(blogMetaData.source)}
+                    </p>
                   </div>
                   {authors.length > 0 && (
                     <div className="hidden lg:flex justify-between">

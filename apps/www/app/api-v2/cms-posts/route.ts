@@ -130,22 +130,16 @@ export async function GET(request: NextRequest) {
     const { isEnabled: isDraftMode } = await draftMode()
     const shouldFetchDraft = isDraftMode || draftParam
 
-    console.log('[cms-posts] Draft status:', { isDraftMode, draftParam, shouldFetchDraft })
-
     // When fetching a specific post, we need to handle versioning correctly
     if (slug) {
       // If in draft mode, fetch the latest version (draft or published)
       if (shouldFetchDraft) {
-        console.log('[cms-posts] Draft mode enabled, fetching latest version for slug:', slug)
-
         // Strategy 1: Try to get the latest version from versions API (including drafts)
         const allVersionsUrl = new URL('/api/posts/versions', baseUrl)
         allVersionsUrl.searchParams.set('where[version.slug][equals]', slug)
         allVersionsUrl.searchParams.set('sort', '-updatedAt') // Get the most recent version regardless of status
         allVersionsUrl.searchParams.set('limit', '1')
         allVersionsUrl.searchParams.set('depth', '2')
-
-        console.log('[cms-posts] Trying all versions API:', allVersionsUrl.toString())
 
         const allVersionsResponse = await fetch(allVersionsUrl.toString(), {
           headers: {
@@ -155,31 +149,14 @@ export async function GET(request: NextRequest) {
           cache: 'no-store',
         })
 
-        console.log('[cms-posts] All versions API response status:', allVersionsResponse.status)
-
         if (allVersionsResponse.ok) {
           const versionsData = await allVersionsResponse.json()
-          console.log('[cms-posts] All versions API data:', {
-            totalDocs: versionsData.totalDocs,
-            docsLength: versionsData.docs?.length,
-            firstVersionStatus: versionsData.docs?.[0]?.version?._status,
-            firstVersionSlug: versionsData.docs?.[0]?.version?.slug,
-            firstVersionId: versionsData.docs?.[0]?.version?.id,
-            firstVersionUpdatedAt: versionsData.docs?.[0]?.updatedAt,
-          })
 
           if (versionsData.docs && versionsData.docs.length > 0) {
             const latestVersion = versionsData.docs[0].version
             if (latestVersion) {
               const markdownContent = convertRichTextToMarkdown(latestVersion.content)
               const readingTime = generateReadingTime(richTextToPlainText(latestVersion.content))
-
-              console.log(
-                '[cms-posts] Using latest version with ID:',
-                latestVersion.id,
-                'status:',
-                latestVersion._status
-              )
 
               const tocResult = generateTocFromMarkdown(
                 markdownContent,
@@ -259,29 +236,13 @@ export async function GET(request: NextRequest) {
           cache: 'no-store', // Never cache draft content
         })
 
-        console.log('[cms-posts] Draft API response status:', draftResponse.status)
-
         if (draftResponse.ok) {
           const draftData = await draftResponse.json()
-          console.log('[cms-posts] Draft API data:', {
-            totalDocs: draftData.totalDocs,
-            docsLength: draftData.docs?.length,
-            firstDocStatus: draftData.docs?.[0]?._status,
-            firstDocSlug: draftData.docs?.[0]?.slug,
-            firstDocId: draftData.docs?.[0]?.id,
-          })
 
           if (draftData.docs && draftData.docs.length > 0) {
             const post = draftData.docs[0]
             const markdownContent = convertRichTextToMarkdown(post.content)
             const readingTime = generateReadingTime(richTextToPlainText(post.content))
-
-            console.log(
-              '[cms-posts] Using draft/latest version with ID:',
-              post.id,
-              'status:',
-              post._status
-            )
 
             const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
 
@@ -336,7 +297,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Strategy 3: If no draft found, try published version but still mark as draft mode
-        console.log('[cms-posts] No draft found, trying published version in draft mode')
+
         const publishedUrl = new URL('/api/posts', baseUrl)
         publishedUrl.searchParams.set('where[slug][equals]', slug)
         publishedUrl.searchParams.set('depth', '2')
@@ -356,8 +317,6 @@ export async function GET(request: NextRequest) {
             const post = publishedData.docs[0]
             const markdownContent = convertRichTextToMarkdown(post.content)
             const readingTime = generateReadingTime(richTextToPlainText(post.content))
-
-            console.log('[cms-posts] Using published version in draft mode with ID:', post.id)
 
             const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
 
@@ -420,8 +379,6 @@ export async function GET(request: NextRequest) {
       versionsUrl.searchParams.set('limit', '1')
       versionsUrl.searchParams.set('depth', '2')
 
-      console.log('[cms-posts] Trying versions API:', versionsUrl.toString())
-
       const versionsResponse = await fetch(versionsUrl.toString(), {
         headers: {
           'Content-Type': 'application/json',
@@ -431,18 +388,8 @@ export async function GET(request: NextRequest) {
         cache: 'no-store',
       })
 
-      console.log('[cms-posts] Versions API response status:', versionsResponse.status)
-
       if (versionsResponse.ok) {
         const versionsData = await versionsResponse.json()
-        console.log('[cms-posts] Versions API data:', {
-          totalDocs: versionsData.totalDocs,
-          docsLength: versionsData.docs?.length,
-          firstDocId: versionsData.docs?.[0]?.id,
-          firstDocCreatedAt: versionsData.docs?.[0]?.createdAt,
-          versionStatus: versionsData.docs?.[0]?.version?._status,
-          versionSlug: versionsData.docs?.[0]?.version?.slug,
-        })
 
         if (versionsData.docs && versionsData.docs.length > 0) {
           const latestPublishedVersion = versionsData.docs[0].version
@@ -514,7 +461,6 @@ export async function GET(request: NextRequest) {
       }
 
       // Strategy 2: If versions API didn't work, try finding the parent post first, then get its latest published version
-      console.log('[cms-posts] Trying Strategy 2: Find parent post first')
 
       const parentUrl = new URL('/api/posts', baseUrl)
       parentUrl.searchParams.set('where[slug][equals]', slug)
@@ -533,7 +479,6 @@ export async function GET(request: NextRequest) {
         const parentData = await parentResponse.json()
         if (parentData.docs && parentData.docs.length > 0) {
           const parentId = parentData.docs[0].id
-          console.log('[cms-posts] Found parent post ID:', parentId)
 
           // Now get the latest published version of this specific post
           const versionsByParentUrl = new URL('/api/posts/versions', baseUrl)
@@ -542,8 +487,6 @@ export async function GET(request: NextRequest) {
           versionsByParentUrl.searchParams.set('sort', '-createdAt')
           versionsByParentUrl.searchParams.set('limit', '1')
           versionsByParentUrl.searchParams.set('depth', '2')
-
-          console.log('[cms-posts] Trying versions by parent ID:', versionsByParentUrl.toString())
 
           const versionsByParentResponse = await fetch(versionsByParentUrl.toString(), {
             headers: {
@@ -555,11 +498,6 @@ export async function GET(request: NextRequest) {
 
           if (versionsByParentResponse.ok) {
             const versionsByParentData = await versionsByParentResponse.json()
-            console.log('[cms-posts] Versions by parent data:', {
-              totalDocs: versionsByParentData.totalDocs,
-              docsLength: versionsByParentData.docs?.length,
-              firstDocCreatedAt: versionsByParentData.docs?.[0]?.createdAt,
-            })
 
             if (versionsByParentData.docs && versionsByParentData.docs.length > 0) {
               const latestPublishedVersion = versionsByParentData.docs[0].version
