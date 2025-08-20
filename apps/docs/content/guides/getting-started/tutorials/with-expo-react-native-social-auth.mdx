@@ -1,0 +1,391 @@
+---
+title: 'Build an Social Auth App with Expo React Native'
+description: 'Learn how to use Supabase in your React Native App for Social Authentication.'
+---
+
+<$Partial path="quickstart_intro.mdx" />
+
+![Supabase Social Auth example](/docs/img/supabase-flutter-demo.png)
+
+<Admonition type="note">
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/auth/expo-social-auth).
+
+</Admonition>
+
+<$Partial path="project_setup.mdx" />
+
+## Building the app
+
+Let's start building the React Native app from scratch.
+
+### Initialize a React Native app
+
+We can use [`expo`](https://docs.expo.dev/get-started/create-a-project/) to initialize
+an app called `expo-social-auth` with the [`standard template`](https://docs.expo.dev/more/create-expo/#--template):
+
+```bash
+npx create-expo-app@latest
+
+cd expo-social-auth
+```
+
+Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
+
+```bash
+npx expo install @supabase/supabase-js @react-native-async-storage/async-storage expo-secure-store expo-splash-screen
+```
+
+Now let's create a helper file to initialize the Supabase client for web and React Native, by using a specific [storage adapter](https://docs.expo.dev/develop/user-interface/store-data/) for each platform. We will use the [Expo SecureStore](https://docs.expo.dev/develop/user-interface/store-data/#async-storage) for mobile and the [async storage](https://docs.expo.dev/develop/user-interface/store-data/#async-storage) for web.
+
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="async-storage"
+  queryGroup="auth-store"
+>
+  <TabPanel id="async-storage" label="AsyncStorage">
+
+    <$CodeTabs>
+
+    ```ts name=lib/supabase.web.ts
+    import AsyncStorage from '@react-native-async-storage/async-storage';
+    import { createClient } from '@supabase/supabase-js';
+    import 'react-native-url-polyfill/auto';
+
+    const ExpoWebSecureStoreAdapter = {
+      getItem: (key: string) => {
+        console.debug("getItem", { key })
+        return AsyncStorage.getItem(key)
+      },
+      setItem: (key: string, value: string) => {
+        return AsyncStorage.setItem(key, value)
+      },
+      removeItem: (key: string) => {
+        return AsyncStorage.removeItem(key)
+      },
+    }
+
+    export const supabase = createClient(
+      process.env.EXPO_PUBLIC_SUPABASE_URL,
+      process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          storage: ExpoWebSecureStoreAdapter,
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: false,
+        },
+      },
+    );
+
+    ```
+
+    </$CodeTabs>
+
+  </TabPanel>
+  <TabPanel id="secure-store" label="SecureStore">
+
+    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+
+    Make sure that:
+    - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
+    - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
+    - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+
+    Implement a `ExpoSecureStoreAdapter` to pass in as Auth storage adapter for the `supabase-js` client:
+
+    <$CodeTabs>
+
+    ```ts name=lib/supabase.ts
+    import { createClient } from '@supabase/supabase-js';
+    import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
+
+    const ExpoSecureStoreAdapter = {
+      getItem: (key: string) => {
+        console.debug("getItem", { key, getItemAsync })
+        return getItemAsync(key)
+      },
+      setItem: (key: string, value: string) => {
+        return setItemAsync(key, value)
+      },
+      removeItem: (key: string) => {
+        return deleteItemAsync(key)
+      },
+    }
+
+    export const supabase = createClient(
+      process.env.EXPO_PUBLIC_SUPABASE_URL,
+      process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          storage: ExpoSecureStoreAdapter as any,
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: false,
+        },
+      },
+    );
+    ```
+
+    </$CodeTabs>
+
+  </TabPanel>
+</Tabs>
+
+### Create a dotenv file containing the Supabase public URL and the anon key
+
+We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+These variables are safe to expose in your Expo app since Supabase has [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled on your Database.
+
+So let's create a dotenv file containing the two variables:
+
+<$CodeTabs>
+
+```bash name=.env
+EXPO_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+</$CodeTabs>
+
+### Protect the navigation
+
+Now we need to protect the navigation so that users can't access the protected routes without being logged in. We will use the [Expo SplashScreen](https://docs.expo.dev/versions/latest/sdk/splash-screen/) to show a loading screen while fetching the user profile and checking if the user is logged in.
+
+#### Create the AuthContext
+
+Now let's create [a context](https://react.dev/learn/passing-data-deeply-with-context) to manage the authentication session, so that we can access it from any component:
+
+<$CodeTabs>
+
+```tsx name=hooks/useAuthContext.tsx
+import { Session } from '@supabase/supabase-js'
+import { createContext, useContext } from 'react'
+
+export type AuthData = {
+  session?: Session | null
+  profile?: any | null
+  isLoading: boolean
+  isLoggedIn: boolean
+}
+
+export const AuthContext = createContext<AuthData>({
+  session: undefined,
+  profile: undefined,
+  isLoading: true,
+  isLoggedIn: false
+})
+
+export const useAuthContext = () => useContext(AuthContext)
+
+```
+
+</$CodeTabs>
+
+#### Create the AuthProvider
+
+Now let's create a provider to manage the authentication session, so that we can access it from any component:
+
+<$CodeTabs>
+
+```tsx name=providers/AuthProvider.tsx
+import { AuthContext } from '@/hooks/useAuthContext'
+import { supabase } from '@/lib/supabase'
+import type { Session } from '@supabase/supabase-js'
+import { PropsWithChildren, useEffect, useState } from 'react'
+
+export default function AuthProvider({ children }: PropsWithChildren) {
+  const [session, setSession] = useState<Session | undefined | null>()
+  const [profile, setProfile] = useState<any>()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession()
+
+      if (error) {
+        console.error('Error fetching session:', error)
+      }
+
+      setSession(session)
+
+      if (session) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+
+        setProfile(data)
+      }
+
+      setIsLoading(false)
+    }
+
+    fetchSession()
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
+
+  return (
+    <AuthContext
+      value={{
+        session,
+        isLoading,
+        profile,
+        isLoggedIn: session != undefined
+      }}
+    >
+      {children}
+    </AuthContext>
+  )
+}
+```
+
+</$CodeTabs>
+
+
+#### Create the SplashScreenController
+
+Now let's create the `SplashScreenController` to use the Expo SplashScreen if the authentication session is loading, by using the `useAuthContext` hook.
+
+<$CodeTabs>
+
+```tsx name=components/SplashScreenController.tsx
+import { useAuthContext } from '@/hooks/useAuthContext';
+import { SplashScreen } from 'expo-router';
+
+SplashScreen.preventAutoHideAsync();
+
+export function SplashScreenController() {
+  const { isLoading } = useAuthContext();
+
+  if (!isLoading) {
+    SplashScreen.hideAsync();
+  }
+
+  return null;
+}
+```
+
+</$CodeTabs>
+
+### Set up a login component
+
+Let's set up a basic React Native component that we will use later to handle logins and sign ups.
+
+<$CodeTabs>
+
+```tsx name=app/login.tsx
+import { Link, Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
+
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+
+export default function LoginScreen() {
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Login' }} />
+      <ThemedView style={styles.container}>
+        <ThemedText type="title">Login</ThemedText>
+        <Link href="/" style={styles.link}>
+          <ThemedText type="link">Try to navigate to home screen!</ThemedText>
+        </Link>
+      </ThemedView>
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  link: {
+    marginTop: 15,
+    paddingVertical: 15,
+  },
+});
+```
+
+</$CodeTabs>
+
+#### Protect the navigation
+
+Now let's wrap the navigation with the `AuthProvider` and the `SplashScreenController`.
+
+By leveraging the [protected routes](https://docs.expo.dev/router/advanced/authentication/#using-protected-routes) of the Expo router, we can protect our navigation:
+
+<$CodeTabs>
+
+```tsx name=app/_layout.tsx
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import 'react-native-reanimated';
+
+import { SplashScreenController } from '../components/SplashScreenController';
+
+import { useAuthContext } from '@/hooks/useAuthContext';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import AuthProvider from '@/providers/AuthProvider';
+
+export default function RootLayout() {
+  const colorScheme = useColorScheme();
+  const { isLoggedIn } = useAuthContext();
+
+  const [loaded] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  });
+
+  if (!loaded) {
+    // Async font loading only occurs in development.
+    return null;
+  }
+
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <AuthProvider>
+        <SplashScreenController />
+        <Stack>
+          <Stack.Protected guard={isLoggedIn}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack.Protected>
+          <Stack.Protected guard={!isLoggedIn}>
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+          </Stack.Protected>
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+```
+
+</$CodeTabs>
+
+We can now test the app by running:
+
+```bash
+npx expo prebuild
+npx expo start --clear
+```
+
+and verify that the app is working as expected, that the splash screen is shown while fetching the user profile and that the login page is presented, even if we try to navigate to the home screen by using the `Link` button.
+
+<Admonition type="note">
+
+By default Supabase Auth requires email verification before a session is created for the users. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
+
+While testing, you can disable email confirmation in your [project's email auth provider settings](/dashboard/project/_/auth/providers).
+
+</Admonition>
