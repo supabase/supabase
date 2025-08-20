@@ -8,7 +8,7 @@ import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-an
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -33,7 +33,7 @@ interface HardenAPIModalProps {
 }
 
 export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,

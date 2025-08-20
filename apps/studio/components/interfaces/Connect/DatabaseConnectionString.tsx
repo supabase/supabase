@@ -12,7 +12,7 @@ import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configur
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -63,7 +63,7 @@ const StepLabel = ({
  */
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')

@@ -11,7 +11,7 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
 import type { ResponseError } from 'types'
 
@@ -30,7 +30,7 @@ export type AIOptInFormValues = z.infer<typeof AIOptInSchema>
  */
 export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const [_, setUpdatedOptInSinceMCP] = useLocalStorageQuery(

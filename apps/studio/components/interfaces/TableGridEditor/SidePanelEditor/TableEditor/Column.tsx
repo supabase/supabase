@@ -15,9 +15,9 @@ import {
   cn,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { useState } from 'react'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
@@ -71,7 +71,7 @@ const Column = ({
   onRemoveColumn,
   onEditForeignKey,
 }: ColumnProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 

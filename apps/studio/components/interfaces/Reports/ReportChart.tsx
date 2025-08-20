@@ -16,7 +16,7 @@ import LogChartHandler from 'components/ui/Charts/LogChartHandler'
 import Panel from 'components/ui/Panel'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useChartData } from 'hooks/useChartData'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import { Button, cn } from 'ui'
@@ -40,7 +40,7 @@ const ReportChart = ({
   isLoading?: boolean
   className?: string
 }) => {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
   const orgPlanId = orgPlan?.id
 

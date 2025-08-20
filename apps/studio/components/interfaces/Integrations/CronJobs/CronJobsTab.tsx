@@ -6,7 +6,6 @@ import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
@@ -17,6 +16,7 @@ import {
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isAtBottom } from 'lib/helpers'
 import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -28,7 +28,7 @@ const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
 export const CronjobsTab = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
   const xScroll = useRef<number>(0)

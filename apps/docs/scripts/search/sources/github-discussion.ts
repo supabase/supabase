@@ -104,7 +104,7 @@ export class GitHubDiscussionSource extends BaseSource {
     super(source, path)
   }
 
-  process() {
+  async process() {
     const { id, title, updatedAt, body, databaseId } = this.discussion
 
     const checksum = createHash('sha256').update(updatedAt).digest('base64')

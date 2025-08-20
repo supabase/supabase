@@ -5,7 +5,6 @@ import { UIEvent, useCallback, useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import {
   CronJobRun,
@@ -13,6 +12,7 @@ import {
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import dayjs from 'dayjs'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -155,7 +155,7 @@ function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
 
 export const PreviousRunsTab = () => {
   const { childId } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const jobId = Number(childId)
 

@@ -6,8 +6,8 @@ import { ComponentProps, ComponentType, useRef } from 'react'
 import { useBreakpoint, useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn, NavMenu, NavMenuItem } from 'ui'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 const MotionNavMenu = motion(NavMenu) as ComponentType<ComponentProps<typeof NavMenu> & MotionProps>
 
@@ -24,7 +24,7 @@ interface IntegrationTabsProps {
 
 export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
   const navRef = useRef(null)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { id, pageId, childId, childLabel } = useParams()
   const isMobile = useBreakpoint('md')
 

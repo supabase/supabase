@@ -653,7 +653,10 @@ export const auth = {
     },
     {
       name: 'Debugging',
-      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
+      items: [
+        { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
+        { name: 'Troubleshooting', url: '/guides/auth/troubleshooting' },
+      ],
     },
     {
       name: 'Third-party auth',
@@ -965,6 +968,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Supavisor',
           url: '/guides/database/supavisor',
+        },
+        {
+          name: 'Troubleshooting',
+          url: '/guides/database/troubleshooting',
         },
       ],
     },
@@ -1634,7 +1641,10 @@ export const realtime: NavMenuConstant = {
     {
       name: 'Debugging',
       url: undefined,
-      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
+      items: [
+        { name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] },
+        { name: 'Troubleshooting', url: '/guides/realtime/troubleshooting' },
+      ],
     },
   ],
 }
@@ -1756,6 +1766,7 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Logs', url: '/guides/storage/debugging/logs' },
         { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+        { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
       ],
     },
     {
@@ -2470,11 +2481,12 @@ export const deployment: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/deployment/branching' },
-        { name: 'GitHub integration', url: '/guides/deployment/branching/github-integration' },
+        { name: 'Branching via GitHub', url: '/guides/deployment/branching/github-integration' },
         {
-          name: 'Branching 2.0 (Alpha)',
-          url: '/guides/deployment/branching/branching-2',
+          name: 'Branching via dashboard',
+          url: '/guides/deployment/branching/dashboard',
         },
+
         {
           name: 'Working with branches',
           url: '/guides/deployment/branching/working-with-branches',

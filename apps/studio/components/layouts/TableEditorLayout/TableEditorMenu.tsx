@@ -19,6 +19,7 @@ import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-edi
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -36,7 +37,6 @@ import {
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
@@ -56,7 +56,7 @@ export const TableEditorMenu = () => {
     'alphabetical'
   )
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data,
     isLoading,

@@ -47,9 +47,7 @@ const PromoToast = () => {
       />
       <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full mb-2">
         <span className="mb-1">{announcement.text}</span>
-        <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7">
-          July 14—18
-        </p>
+        <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"></p>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
@@ -62,15 +60,6 @@ const PromoToast = () => {
           Dismiss
         </Button>
       </div>
-      {/* <Image
-        src={}
-        alt=""
-        fill
-        sizes="100%"
-        quality={100}
-        aria-hidden
-        className="absolute not-sr-only object-cover z-0 inset-0 w-full h-auto"
-      /> */}
     </div>
   )
 }

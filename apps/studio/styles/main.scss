@@ -70,6 +70,7 @@ body,
   @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 * {
