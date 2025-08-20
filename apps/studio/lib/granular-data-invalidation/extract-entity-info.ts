@@ -1,4 +1,4 @@
-import type { CreateStmt } from 'libpg-query'
+import type { CreateFunctionStmt, CreateStmt, String } from 'libpg-query'
 
 import type { Event } from '.'
 
@@ -68,19 +68,16 @@ function parseCreateStatement(createStmt: CreateStmt): Event | null {
   return null
 }
 
-function parseCreateFunctionStatement(createFunctionStmt: any): Event | null {
-  // Handle function creation - CREATE FUNCTION statements use CreateFunctionStmt
-  if (createFunctionStmt.funcname?.length > 0) {
-    // funcname is typically an array of String nodes
-    const funcNameNode = createFunctionStmt.funcname[createFunctionStmt.funcname.length - 1]
-    const funcName = funcNameNode.sval || funcNameNode.str || funcNameNode
+function parseCreateFunctionStatement(createFunctionStmt: CreateFunctionStmt): Event | null {
+  if (createFunctionStmt.funcname?.length && createFunctionStmt.funcname?.length > 0) {
+    const funcNameNode = createFunctionStmt.funcname[
+      createFunctionStmt.funcname.length - 1
+    ] as String
+    const funcName = funcNameNode.sval
 
-    // Schema might be in the first element if qualified name is used
     const schema =
       createFunctionStmt.funcname.length > 1
-        ? createFunctionStmt.funcname[0].sval ||
-          createFunctionStmt.funcname[0].str ||
-          createFunctionStmt.funcname[0]
+        ? (createFunctionStmt.funcname[0] as String).sval
         : DEFAULT_SCHEMA
 
     return {
