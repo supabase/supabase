@@ -60,6 +60,7 @@ export function FundingStageChart() {
       filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateFundingStageSQL}
       transformData={transformFundingStageData}
+      useAggregates={true} // Enable efficient counting
     />
   )
 }

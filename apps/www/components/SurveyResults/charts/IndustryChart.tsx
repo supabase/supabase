@@ -65,6 +65,7 @@ function transformIndustryData(data: any[]) {
 export function IndustryChart() {
   return (
     <SurveyChart
+      title="What is your startup’s primary industry or target customer segment?"
       targetColumn="industry"
       filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateIndustrySQL}
