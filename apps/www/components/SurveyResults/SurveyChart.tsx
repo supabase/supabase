@@ -115,8 +115,14 @@ function useFilterOptions(filterColumns: string[]) {
   return { filters }
 }
 
-// Custom hook to fetch survey data using SQL query via RPC
-function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
+// Custom hook to fetch survey data using SQL query via RPC or function call
+function useSurveyData(
+  sqlQuery: string,
+  shouldFetch: boolean,
+  functionName?: string,
+  functionParams?: (activeFilters: Record<string, string>) => Record<string, any>,
+  activeFilters?: Record<string, string>
+) {
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -131,10 +137,30 @@ function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
 
         // console.log('Executing SQL query:', sqlQuery)
 
-        // Execute the SQL query using Supabase RPC
-        const { data, error: fetchError } = await externalSupabase.rpc('execute_sql', {
-          query: sqlQuery,
-        })
+        let data, fetchError
+
+        if (functionName && functionParams && activeFilters) {
+          // Use the safer function approach
+          console.log('Active filters:', activeFilters)
+          const functionParamsData = functionParams(activeFilters)
+          console.log('Calling function:', functionName, 'with params:', functionParamsData)
+          const { data: functionData, error: functionError } = await externalSupabase.rpc(
+            functionName,
+            functionParamsData
+          )
+          console.log('Function response:', functionData, 'error:', functionError)
+          data = functionData
+          fetchError = functionError
+        } else if (sqlQuery) {
+          // Fallback to the original RPC approach (for backward compatibility)
+          const { data: sqlData, error: sqlError } = await externalSupabase.rpc('execute_sql', {
+            query: sqlQuery,
+          })
+          data = sqlData
+          fetchError = sqlError
+        } else {
+          throw new Error('No data source specified')
+        }
 
         if (fetchError) {
           console.error('Error executing SQL query:', fetchError)
@@ -145,15 +171,19 @@ function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
         console.log('Raw data from SQL query:', data)
 
         // Calculate total for percentage calculation
-        const total = data.reduce((sum: number, row: any) => sum + parseInt(row.total), 0)
+        const total = data.reduce(
+          (sum: number, row: any) => sum + parseInt(row.count || row.total),
+          0
+        )
 
         // Transform the data to match chart format
         const processedData = data.map((row: any) => {
-          const rawPercentage = total > 0 ? (parseInt(row.total) / total) * 100 : 0
+          const count = parseInt(row.count || row.total)
+          const rawPercentage = total > 0 ? (count / total) * 100 : 0
           const roundedPercentage = Math.round(rawPercentage)
 
           return {
-            label: row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
+            label: row.accelerator || row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
             value: roundedPercentage,
             rawValue: rawPercentage, // Keep the raw value for bar scaling
           }
@@ -170,7 +200,7 @@ function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
     }
 
     fetchData()
-  }, [sqlQuery, shouldFetch])
+  }, [sqlQuery, shouldFetch, functionName, activeFilters])
 
   return { chartData, isLoading, error }
 }
@@ -179,7 +209,9 @@ interface SurveyChartProps {
   title: string
   targetColumn: string
   filterColumns: string[]
-  generateSQLQuery: (activeFilters: Record<string, string>) => string
+  generateSQLQuery?: (activeFilters: Record<string, string>) => string
+  functionName?: string
+  functionParams?: (activeFilters: Record<string, string>) => Record<string, any>
 }
 
 export function SurveyChart({
@@ -187,6 +219,8 @@ export function SurveyChart({
   targetColumn,
   filterColumns,
   generateSQLQuery,
+  functionName,
+  functionParams,
 }: SurveyChartProps) {
   const [isInView, setIsInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -235,11 +269,15 @@ export function SurveyChart({
     )
   )
 
-  // Generate the SQL query string
-  const sqlQuery = generateSQLQuery(activeFilters)
+  // Generate the SQL query string or function parameters
+  const sqlQuery = generateSQLQuery ? generateSQLQuery(activeFilters) : ''
 
   // Use the custom hook to fetch data
-  const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(sqlQuery, isInView)
+  const {
+    chartData,
+    isLoading: dataLoading,
+    error: dataError,
+  } = useSurveyData(sqlQuery, isInView, functionName, functionParams, activeFilters)
 
   // Reset animation state when filters change
   useEffect(() => {
@@ -448,7 +486,13 @@ export function SurveyChart({
             </div>
           ) : (
             <div className="px-8 pt-4 pb-8">
-              <CodeBlock lang="sql">{sqlQuery}</CodeBlock>
+              {functionName ? (
+                <CodeBlock lang="ts">
+                  {`// Function call: ${functionName}(${JSON.stringify(functionParams ? functionParams(activeFilters) : {}, null, 2)})`}
+                </CodeBlock>
+              ) : (
+                <CodeBlock lang="sql">{sqlQuery}</CodeBlock>
+              )}
             </div>
           )}
 
