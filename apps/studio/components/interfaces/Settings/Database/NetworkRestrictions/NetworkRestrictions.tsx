@@ -105,7 +105,7 @@ export const NetworkRestrictions = () => {
   const isAllowedAll = restrictedIps.includes('0.0.0.0/0') && restrictedIps.includes('::/0')
   const isDisallowedAll = restrictedIps.length === 0
 
-  //if (!hasAccessToRestrictions) return null
+  if (!hasAccessToRestrictions) return null
 
   return (
     <>

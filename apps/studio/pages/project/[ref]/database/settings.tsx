@@ -12,12 +12,7 @@ import {
 } from 'components/interfaces/Settings/Database'
 import { DiskManagementPanelForm } from 'components/interfaces/DiskManagement/DiskManagementPanelForm'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldTitle,
-  ScaffoldSection,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const isAws = useIsAwsCloudProvider()

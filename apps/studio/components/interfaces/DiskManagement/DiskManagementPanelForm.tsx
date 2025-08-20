@@ -17,7 +17,7 @@ export const DiskManagementPanelForm = () => {
         <DocsButton href="https://supabase.com/docs/guides/platform/database-size#disk-management" />
       </ScaffoldSectionTitle>
 
-      <Admonition title="Disk Management has moved">
+      <Admonition type="default" title="Disk Management has moved">
         <p>
           Disk configuration is now managed alongside Project Compute on the new Compute and Disk
           page.

@@ -15,7 +15,6 @@ import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import {
   Card,
-  CardHeader,
   CardContent,
   Dialog,
   DialogTrigger,
@@ -137,6 +136,7 @@ export const ResetDbPassword = ({ disabled = false }) => {
                 Reset database password
               </ButtonTooltip>
             </DialogTrigger>
+
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Reset database password</DialogTitle>
@@ -163,6 +163,7 @@ export const ResetDbPassword = ({ disabled = false }) => {
                   />
                 </FormLayout>
               </DialogSection>
+
               <DialogFooter>
                 <Button
                   htmlType="reset"

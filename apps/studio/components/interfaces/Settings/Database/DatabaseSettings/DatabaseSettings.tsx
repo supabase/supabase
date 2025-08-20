@@ -1,8 +1,4 @@
-import {
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-  ScaffoldSectionDescription,
-} from 'components/layouts/Scaffold'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { DatabaseReadOnlyAlert } from './DatabaseReadOnlyAlert'
 import { ResetDbPassword } from './ResetDbPassword'
 

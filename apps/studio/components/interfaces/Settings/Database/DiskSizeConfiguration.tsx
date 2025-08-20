@@ -81,6 +81,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
           />
           <Card>
             <CardHeader>Disk Size Configuration</CardHeader>
+
             <CardContent className="flex justify-between items-center">
               <FormLayout
                 layout="flex-row-reverse"
@@ -106,6 +107,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
                 </Button>
               </FormLayout>
             </CardContent>
+
             <CardContent className="flex justify-between items-center">
               <FormLayout
                 layout="flex-row-reverse"
