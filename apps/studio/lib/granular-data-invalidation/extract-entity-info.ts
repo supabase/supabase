@@ -1,4 +1,4 @@
-import type { CreateFunctionStmt, CreateStmt, String } from 'libpg-query'
+import type { CreateFunctionStmt, CreateStmt, DropStmt } from 'libpg-query'
 
 import type { Event } from '.'
 
@@ -70,14 +70,16 @@ function parseCreateStatement(createStmt: CreateStmt): Event | null {
 
 function parseCreateFunctionStatement(createFunctionStmt: CreateFunctionStmt): Event | null {
   if (createFunctionStmt.funcname?.length && createFunctionStmt.funcname?.length > 0) {
-    const funcNameNode = createFunctionStmt.funcname[
-      createFunctionStmt.funcname.length - 1
-    ] as String
-    const funcName = funcNameNode.sval
+    const funcNameNode = createFunctionStmt.funcname[createFunctionStmt.funcname.length - 1]
+
+    if (!('String' in funcNameNode)) return null
+
+    const funcName = funcNameNode.String.sval
+    if (!funcName) return null
 
     const schema =
-      createFunctionStmt.funcname.length > 1
-        ? (createFunctionStmt.funcname[0] as String).sval
+      createFunctionStmt.funcname.length > 1 && 'String' in createFunctionStmt.funcname[0]
+        ? createFunctionStmt.funcname[0].String.sval
         : DEFAULT_SCHEMA
 
     return {
@@ -90,14 +92,28 @@ function parseCreateFunctionStatement(createFunctionStmt: CreateFunctionStmt): E
   return null
 }
 
-function parseDropStatement(dropStmt: any): Event | null {
+function parseDropStatement(dropStmt: DropStmt): Event | null {
   if (!dropStmt.objects?.length) return null
 
   // Handle table drop
   if (dropStmt.removeType === 'OBJECT_TABLE') {
-    const obj = dropStmt.objects[0]
-    const schema = obj[0]?.schemaname || DEFAULT_SCHEMA
-    const table = obj[obj.length - 1]?.relname || obj[obj.length - 1]?.objname
+    const firstObj = dropStmt.objects[0]
+    if (!('List' in firstObj)) return null
+
+    const listItems = firstObj.List?.items
+    if (!listItems) return null
+
+    const parts: string[] = []
+    for (const node of listItems) {
+      if ('String' in node && node.String?.sval) {
+        parts.push(node.String.sval)
+      }
+    }
+
+    const table = parts[parts.length - 1]
+    const schema = parts.length > 1 ? parts[0] : DEFAULT_SCHEMA
+    if (!table) return null
+
     return {
       entityType: 'table',
       schema,
@@ -108,9 +124,23 @@ function parseDropStatement(dropStmt: any): Event | null {
 
   // Handle function drop
   if (dropStmt.removeType === 'OBJECT_FUNCTION') {
-    const obj = dropStmt.objects[0]
-    const schema = obj[0]?.schemaname || DEFAULT_SCHEMA
-    const funcName = obj[obj.length - 1]?.relname || obj[obj.length - 1]?.objname
+    const firstObj = dropStmt.objects[0]
+    if (!('ObjectWithArgs' in firstObj)) return null
+
+    const objWithArgs = firstObj.ObjectWithArgs
+    if (!objWithArgs?.objname) return null
+
+    const parts: string[] = []
+    for (const node of objWithArgs.objname) {
+      if ('String' in node && node.String?.sval) {
+        parts.push(node.String.sval)
+      }
+    }
+
+    const funcName = parts[parts.length - 1]
+    const schema = parts.length > 1 ? parts[0] : DEFAULT_SCHEMA
+    if (!funcName) return null
+
     return {
       entityType: 'function',
       schema,
