@@ -1,5 +1,23 @@
 import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
+// Helper function to convert filters to the format expected by the database function
+function buildFunctionParams(activeFilters: Record<string, string>) {
+  const params: Record<string, any> = {}
+
+  // Convert single values to arrays for the function parameters
+  if (activeFilters.person_age && activeFilters.person_age !== 'unset') {
+    params.person_age_filter = [activeFilters.person_age]
+  }
+  if (activeFilters.location && activeFilters.location !== 'unset') {
+    params.location_filter = [activeFilters.location]
+  }
+  if (activeFilters.money_raised && activeFilters.money_raised !== 'unset') {
+    params.money_raised_filter = [activeFilters.money_raised]
+  }
+
+  return params
+}
+
 function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
 
@@ -38,6 +56,8 @@ export function SalesToolsChart() {
       title="What tools are you using to manage your sales process?"
       targetColumn="sales_tools"
       filterColumns={['person_age', 'location', 'team_size']}
+      functionName="get_sales_tools_stats"
+      functionParams={buildFunctionParams}
       generateSQLQuery={generateSalesToolsSQL}
     />
   )

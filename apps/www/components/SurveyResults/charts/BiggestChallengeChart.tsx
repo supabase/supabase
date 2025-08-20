@@ -1,5 +1,23 @@
 import { SurveyChart, buildWhereClause } from '../SurveyChart'
 
+// Helper function to convert filters to the format expected by the database function
+function buildFunctionParams(activeFilters: Record<string, string>) {
+  const params: Record<string, any> = {}
+
+  // Convert single values to arrays for the function parameters
+  if (activeFilters.person_age && activeFilters.person_age !== 'unset') {
+    params.person_age_filter = [activeFilters.person_age]
+  }
+  if (activeFilters.location && activeFilters.location !== 'unset') {
+    params.location_filter = [activeFilters.location]
+  }
+  if (activeFilters.money_raised && activeFilters.money_raised !== 'unset') {
+    params.money_raised_filter = [activeFilters.money_raised]
+  }
+
+  return params
+}
+
 function generateBiggestChallengeSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters, ['biggest_challenge IS NOT NULL'])
 
@@ -27,6 +45,8 @@ export function BiggestChallengeChart() {
       title="What’s the biggest business challenge your startup is facing today?"
       targetColumn="biggest_challenge"
       filterColumns={['person_age', 'location', 'money_raised']}
+      functionName="get_biggest_challenge_stats"
+      functionParams={buildFunctionParams}
       generateSQLQuery={generateBiggestChallengeSQL}
     />
   )

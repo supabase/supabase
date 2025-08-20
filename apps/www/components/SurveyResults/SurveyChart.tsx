@@ -115,13 +115,12 @@ function useFilterOptions(filterColumns: string[]) {
   return { filters }
 }
 
-// Custom hook to fetch survey data using SQL query via RPC or function call
+// Custom hook to fetch survey data using secure database functions
 function useSurveyData(
-  sqlQuery: string,
   shouldFetch: boolean,
-  functionName?: string,
-  functionParams?: (activeFilters: Record<string, string>) => Record<string, any>,
-  activeFilters?: Record<string, string>
+  functionName: string,
+  functionParams: (activeFilters: Record<string, string>) => Record<string, any>,
+  activeFilters: Record<string, string>
 ) {
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -135,32 +134,19 @@ function useSurveyData(
         setIsLoading(true)
         setError(null)
 
-        // console.log('Executing SQL query:', sqlQuery)
-
         let data, fetchError
 
-        if (functionName && functionParams && activeFilters) {
-          // Use the safer function approach
-          console.log('Active filters:', activeFilters)
-          const functionParamsData = functionParams(activeFilters)
-          console.log('Calling function:', functionName, 'with params:', functionParamsData)
-          const { data: functionData, error: functionError } = await externalSupabase.rpc(
-            functionName,
-            functionParamsData
-          )
-          console.log('Function response:', functionData, 'error:', functionError)
-          data = functionData
-          fetchError = functionError
-        } else if (sqlQuery) {
-          // Fallback to the original RPC approach (for backward compatibility)
-          const { data: sqlData, error: sqlError } = await externalSupabase.rpc('execute_sql', {
-            query: sqlQuery,
-          })
-          data = sqlData
-          fetchError = sqlError
-        } else {
-          throw new Error('No data source specified')
-        }
+        // Use the secure function approach
+        console.log('Active filters:', activeFilters)
+        const functionParamsData = functionParams(activeFilters)
+        console.log('Calling function:', functionName, 'with params:', functionParamsData)
+        const { data: functionData, error: functionError } = await externalSupabase.rpc(
+          functionName,
+          functionParamsData
+        )
+        console.log('Function response:', functionData, 'error:', functionError)
+        data = functionData
+        fetchError = functionError
 
         if (fetchError) {
           console.error('Error executing SQL query:', fetchError)
@@ -200,7 +186,7 @@ function useSurveyData(
     }
 
     fetchData()
-  }, [sqlQuery, shouldFetch, functionName, activeFilters])
+  }, [shouldFetch, functionName, functionParams, activeFilters])
 
   return { chartData, isLoading, error }
 }
@@ -210,8 +196,8 @@ interface SurveyChartProps {
   targetColumn: string
   filterColumns: string[]
   generateSQLQuery?: (activeFilters: Record<string, string>) => string
-  functionName?: string
-  functionParams?: (activeFilters: Record<string, string>) => Record<string, any>
+  functionName: string
+  functionParams: (activeFilters: Record<string, string>) => Record<string, any>
 }
 
 export function SurveyChart({
@@ -269,15 +255,12 @@ export function SurveyChart({
     )
   )
 
-  // Generate the SQL query string or function parameters
-  const sqlQuery = generateSQLQuery ? generateSQLQuery(activeFilters) : ''
-
   // Use the custom hook to fetch data
   const {
     chartData,
     isLoading: dataLoading,
     error: dataError,
-  } = useSurveyData(sqlQuery, isInView, functionName, functionParams, activeFilters)
+  } = useSurveyData(isInView, functionName, functionParams, activeFilters)
 
   // Reset animation state when filters change
   useEffect(() => {
@@ -488,12 +471,10 @@ export function SurveyChart({
             <div className="px-8 pt-4 pb-8">
               {generateSQLQuery ? (
                 <CodeBlock lang="sql">{generateSQLQuery(activeFilters)}</CodeBlock>
-              ) : functionName ? (
-                <CodeBlock lang="ts">
-                  {`// Function call: ${functionName}(${JSON.stringify(functionParams ? functionParams(activeFilters) : {}, null, 2)})`}
-                </CodeBlock>
               ) : (
-                <CodeBlock lang="sql">{sqlQuery}</CodeBlock>
+                <CodeBlock lang="ts">
+                  {`// Function call: ${functionName}(${JSON.stringify(functionParams(activeFilters), null, 2)})`}
+                </CodeBlock>
               )}
             </div>
           )}
