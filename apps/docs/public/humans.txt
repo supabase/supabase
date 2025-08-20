@@ -102,6 +102,7 @@ Peter Lyn
 Qiao Han
 Rafael Chacón
 Raminder Singh
+Raúl Barroso
 Riccardo Busetti
 Rodrigo Mansueli
 Ronan Lehane
