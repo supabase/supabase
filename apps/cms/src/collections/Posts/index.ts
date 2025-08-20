@@ -103,6 +103,14 @@ export const Posts: CollectionConfig = {
     },
     ...slugField(),
     {
+      name: 'description',
+      type: 'textarea',
+      label: 'Description / subtitle',
+      admin: {
+        description: 'Appears as subheading in the blog post preview',
+      },
+    },
+    {
       type: 'tabs',
       tabs: [
         {
@@ -181,10 +189,6 @@ export const Posts: CollectionConfig = {
               admin: {
                 position: 'sidebar',
               },
-            },
-            {
-              name: 'description',
-              type: 'textarea',
             },
             {
               name: 'authors',

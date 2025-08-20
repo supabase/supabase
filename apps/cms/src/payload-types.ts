@@ -933,6 +933,10 @@ export interface Post {
   title: string;
   slug?: string | null;
   slugLock?: boolean | null;
+  /**
+   * Appears as subheading in the blog post preview
+   */
+  description?: string | null;
   content: {
     root: {
       type: string;
@@ -958,7 +962,6 @@ export interface Post {
   readingTime?: number | null;
   date?: string | null;
   toc_depth?: number | null;
-  description?: string | null;
   authors?: (number | Author)[] | null;
   tags?: (number | Tag)[] | null;
   meta?: {
@@ -1428,6 +1431,7 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   slugLock?: T;
+  description?: T;
   content?: T;
   thumb?: T;
   image?: T;
@@ -1436,7 +1440,6 @@ export interface PostsSelect<T extends boolean = true> {
   readingTime?: T;
   date?: T;
   toc_depth?: T;
-  description?: T;
   authors?: T;
   tags?: T;
   meta?:
@@ -1562,10 +1565,6 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'events';
           value: number | Event;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
         } | null);
     global?: string | null;
     user?: (number | null) | User;
