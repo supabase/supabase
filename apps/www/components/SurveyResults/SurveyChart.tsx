@@ -486,7 +486,9 @@ export function SurveyChart({
             </div>
           ) : (
             <div className="px-8 pt-4 pb-8">
-              {functionName ? (
+              {generateSQLQuery ? (
+                <CodeBlock lang="sql">{generateSQLQuery(activeFilters)}</CodeBlock>
+              ) : functionName ? (
                 <CodeBlock lang="ts">
                   {`// Function call: ${functionName}(${JSON.stringify(functionParams ? functionParams(activeFilters) : {}, null, 2)})`}
                 </CodeBlock>
