@@ -1,7 +1,7 @@
 import type { getSortedPosts } from 'lib/posts'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 
-export default interface PostTypes {
+export interface PostTypes {
   type: 'casestudy' | 'blog' | 'event'
   slug?: string
   title: string
@@ -220,3 +220,5 @@ export interface CMSPostTypes extends PostTypes {
 }
 
 export type PostReturnType = ReturnType<typeof getSortedPosts>[number]
+
+export default PostTypes

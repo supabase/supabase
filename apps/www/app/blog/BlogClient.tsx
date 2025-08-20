@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import DefaultLayout from 'components/Layouts/Default'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
@@ -10,66 +10,29 @@ import { cn } from 'ui'
 import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 
 import type PostTypes from 'types/post'
-import { Loader2 } from 'lucide-react'
 
 export type BlogView = 'list' | 'grid'
 
 export default function BlogClient(props: { blogs: any[] }) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
-  const [isLoading, setIsLoading] = useState(true)
-  const [cmsPosts, setCmsPosts] = useState<any[]>([])
   const [blogs, setBlogs] = useState(props.blogs)
   const [view, setView] = useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
-
-  // Combine static and CMS posts and sort by date
-  const allPosts = [...props.blogs, ...cmsPosts]?.sort((a: any, b: any) => {
-    const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
-    const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
-    return dateB - dateA
-  })
-
-  useEffect(() => {
-    setBlogs((prev: any[]) => (prev.length === props.blogs.length ? allPosts : prev))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cmsPosts])
-
-  useEffect(() => {
-    const fetchCmsPosts = async () => {
-      try {
-        // Use new unified API with preview mode for blog listing
-        const res = await fetch('/api-v2/cms-posts?mode=preview&limit=100')
-        const data = await res.json()
-        if (data.success && Array.isArray(data.posts)) {
-          setCmsPosts(data.posts)
-        }
-      } catch (e) {
-        console.error('Failed to load CMS posts', e)
-      }
-    }
-    fetchCmsPosts()
-    setIsLoading(false)
-  }, [])
 
   return (
     <>
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
         <div className="container relative mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-          {isLoading && (
-            <div className="w-4 h-4 absolute z-20 top-4 right-4 sm:right-16 xl:right-20 flex items-end justify-center">
-              <Loader2 className="w-4 h-4 transform animate-spinner text-foreground-muted" />
-            </div>
-          )}
-          {allPosts.slice(0, 1).map((blog: any) => (
+          {props.blogs.slice(0, 1).map((blog) => (
             <FeaturedThumb key={blog.slug} {...blog} />
           ))}
         </div>
 
         <div className="border-default border-t">
           <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-            <BlogFilters allPosts={allPosts} setPosts={setBlogs} view={view} setView={setView} />
+            <BlogFilters allPosts={props.blogs} setPosts={setBlogs} view={view} setView={setView} />
 
             <ol
               className={cn(

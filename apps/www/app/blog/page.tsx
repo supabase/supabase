@@ -1,8 +1,9 @@
 import BlogClient from './BlogClient'
 import { getSortedPosts } from 'lib/posts'
+import { getAllCMSPosts } from 'lib/get-cms-posts'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-static'
+export const revalidate = 30
 
 export const metadata: Metadata = {
   title: 'Supabase Blog: the Postgres development platform',
@@ -16,9 +17,18 @@ export const metadata: Metadata = {
 }
 
 export default async function BlogPage() {
-  // Get static blog posts at build time only
+  // Get static blog posts
   const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
 
-  // Pass only static posts to client - CMS posts will be fetched at runtime
-  return <BlogClient blogs={staticPostsData as any} />
+  // Get CMS posts server-side with revalidation
+  const cmsPostsData = await getAllCMSPosts({ limit: 100 })
+
+  // Combine static and CMS posts and sort by date
+  const allPosts = [...staticPostsData, ...cmsPostsData].sort((a: any, b: any) => {
+    const dateA = new Date(a.date || a.formattedDate).getTime()
+    const dateB = new Date(b.date || b.formattedDate).getTime()
+    return dateB - dateA
+  })
+
+  return <BlogClient blogs={allPosts} />
 }
