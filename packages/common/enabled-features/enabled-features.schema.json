@@ -158,6 +158,11 @@
       "description": "Show the custom domain configuration section + custom domain addon"
     },
 
+    "project_addons:dedicated_ipv4_address": {
+      "type": "boolean",
+      "description": "Show the dedicated IPv4 address addon"
+    },
+
     "reports:all": {
       "type": "boolean",
       "description": "Enable the project reports page"
@@ -201,6 +206,8 @@
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
     "project_homepage:show_all_client_libraries",
+    "project_settings:custom_domains",
+    "project_addons:dedicated_ipv4_address",
     "project_connection:javascript_example",
     "project_connection:dart_example",
     "reports:all",
