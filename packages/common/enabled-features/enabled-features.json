@@ -7,6 +7,7 @@
   "ai:opt_in_level_schema_and_log_and_data": true,
 
   "authentication:policies": true,
+  "authentication:sign_in_providers": true,
   "authentication:third_party_auth": true,
   "authentication:rate_limits": true,
   "authentication:emails": true,

@@ -27,6 +27,10 @@
       "type": "boolean",
       "description": "Enable the authentication policies page (as well as all other product's policies page)"
     },
+    "authentication:sign_in_providers": {
+      "type": "boolean",
+      "description": "Enable the authentication sign in / providers page"
+    },
     "authentication:third_party_auth": {
       "type": "boolean",
       "description": "Enable the authentication third party auth page"
@@ -156,6 +160,7 @@
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
     "authentication:policies",
+    "authentication:sign_in_providers",
     "authentication:third_party_auth",
     "authentication:rate_limits",
     "authentication:emails",

@@ -5,6 +5,7 @@ export const generateAuthMenu = (
   ref: string,
   flags?: {
     authenticationPolicies: boolean
+    authenticationSignInProviders: boolean
     authenticationRateLimits: boolean
     authenticationEmails: boolean
     authenticationMultiFactor: boolean
@@ -14,6 +15,7 @@ export const generateAuthMenu = (
 ): ProductMenuGroup[] => {
   const {
     authenticationPolicies,
+    authenticationSignInProviders,
     authenticationRateLimits,
     authenticationEmails,
     authenticationMultiFactor,
@@ -41,13 +43,17 @@ export const generateAuthMenu = (
           : []),
         ...(IS_PLATFORM
           ? [
-              {
-                name: 'Sign In / Providers',
-                key: 'sign-in-up',
-                pages: ['providers', 'third-party'],
-                url: `/project/${ref}/auth/providers`,
-                items: [],
-              },
+              ...(authenticationSignInProviders
+                ? [
+                    {
+                      name: 'Sign In / Providers',
+                      key: 'sign-in-up',
+                      pages: ['providers', 'third-party'],
+                      url: `/project/${ref}/auth/providers`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Sessions',
                 key: 'sessions',
