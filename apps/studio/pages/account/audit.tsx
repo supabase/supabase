@@ -17,7 +17,7 @@ const Audit: NextPageWithLayout = () => {
           description="View a detailed history of account activities and security events."
         />
       </ScaffoldContainer>
-      
+
       <ScaffoldContainer className={cn('[&>div]:mt-8')} bottomPadding>
         <AuditLogs />
       </ScaffoldContainer>

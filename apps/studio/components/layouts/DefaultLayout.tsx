@@ -57,10 +57,12 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             <AppBannerWrapper />
             <div className="flex-shrink-0">
               <MobileNavigationBar />
-              <LayoutHeader 
-                showProductMenu={showProductMenu} 
-                headerTitle={headerTitle} 
-                backToDashboardURL={router.pathname.startsWith('/account') ? backToDashboardURL : undefined}
+              <LayoutHeader
+                showProductMenu={showProductMenu}
+                headerTitle={headerTitle}
+                backToDashboardURL={
+                  router.pathname.startsWith('/account') ? backToDashboardURL : undefined
+                }
               />
             </div>
             {/* Main Content Area */}

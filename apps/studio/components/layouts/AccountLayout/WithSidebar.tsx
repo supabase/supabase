@@ -50,7 +50,6 @@ export const WithSidebar = ({
       <div className="flex flex-1 flex-col">
         <div className="flex-1 flex-grow overflow-y-auto">
           <div className="mx-auto max-w-7xl w-full px-6 lg:px-14 xl:px-28 2xl:px-32 py-16">
-
             {children}
           </div>
         </div>
@@ -143,7 +142,9 @@ export const SidebarContent = ({
                         </div>
                       </div>
                     )}
-                    {idx !== sections.length - 1 && <div className="h-px w-full bg-border-overlay" />}
+                    {idx !== sections.length - 1 && (
+                      <div className="h-px w-full bg-border-overlay" />
+                    )}
                   </div>
                 ))}
               </Menu>
