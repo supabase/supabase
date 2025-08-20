@@ -31,8 +31,8 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
     name: 'values.httpHeaders',
   })
 
-  const { ref } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
+  const { slug, ref } = useParams()
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef: ref, reveal: true })
 
   const { serviceKey, secretKey } = getKeys(apiKeys)
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'

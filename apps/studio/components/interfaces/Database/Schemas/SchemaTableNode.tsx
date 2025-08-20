@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
 
 import { Button, cn } from 'ui'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 // ReactFlow is scaling everything by the factor of 2
 const TABLE_NODE_WIDTH = 320
@@ -42,7 +42,7 @@ const TableNode = ({
   return (
     <>
       {data.isForeign ? (
-        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative text-default flex gap-1 items-center">
+        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center">
           {data.name}
           {targetPosition && (
             <Handle
@@ -60,7 +60,7 @@ const TableNode = ({
         >
           <header
             className={cn(
-              'text-[0.55rem] pl-2 pr-1 bg-alternative text-default flex items-center justify-between',
+              'text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between',
               itemHeight
             )}
           >

@@ -1,4 +1,3 @@
-import { useParams } from 'next/navigation'
 
 export function getOrganizationSlug(): string | undefined {
   if (typeof window !== 'undefined') {

@@ -3,11 +3,11 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Button, Form, Input, Modal } from 'ui'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 type CustomReport = { name: string; description?: string }
 export interface CreateReportModal {
@@ -19,7 +19,7 @@ export interface CreateReportModal {
 export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
   const router = useRouter()
   const { profile } = useProfile()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref ?? 'default'
   const { slug } = useParams()
 

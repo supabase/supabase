@@ -5,10 +5,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
 import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -38,6 +37,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
 import { generateRuleDescription } from './AdvisorRules.utils'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 interface CreateRuleSheetProps {
   lint?: LintInfo
@@ -67,11 +67,10 @@ const defaultValues = {
  */
 export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetProps) => {
   const router = useRouter()
-  const { slug, ref: projectRef } = useParams()
-  // const [_, setExpandedLint] = useQueryState('lint')
+  const { slug, ref: projectRef } = getPathReferences()
 
   const routeCategory = router.pathname.split('/').pop()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
 
   const { mutate: createRule, isLoading: isCreating } = useLintRuleCreateMutation({

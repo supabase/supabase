@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
+import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
@@ -69,7 +69,7 @@ export const DestinationRow = ({
     : PipelineStatusRequestStatus.None
 
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
+  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
 
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
@@ -84,9 +84,11 @@ export const DestinationRow = ({
 
     try {
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      // deleting the destination also deletes the pipeline because of cascade delete
-      // so we don't need to call deletePipeline explicitly
-      await deleteDestination({ projectRef, destinationId: destinationId })
+      await deleteDestinationPipeline({
+        projectRef,
+        destinationId: destinationId,
+        pipelineId: pipeline.id,
+      })
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
     }

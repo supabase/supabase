@@ -1,9 +1,10 @@
-import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
-import SignInWithGoogle from 'components/interfaces/SignIn/SignInWithGoogle'
-import SignUpForm from 'components/interfaces/SignIn/SignUpForm'
-import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import Link from 'next/link'
+
+import { SignInWithGitHub } from 'components/interfaces/SignIn/SignInWithGitHub'
+import { SignUpForm } from 'components/interfaces/SignIn/SignUpForm'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import type { NextPageWithLayout } from 'types'
+import SignInWithGoogle from 'components/interfaces/SignIn/SignInWithGoogle'
 
 const SignUpPage: NextPageWithLayout = () => {
   return (

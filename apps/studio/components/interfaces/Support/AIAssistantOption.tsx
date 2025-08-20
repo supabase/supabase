@@ -5,7 +5,7 @@ import { MessageSquare, X } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from 'ui'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 interface AIAssistantOptionProps {
   projectRef: string

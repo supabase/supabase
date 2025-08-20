@@ -4,8 +4,8 @@ import { PropsWithChildren, useEffect } from 'react'
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
@@ -17,9 +17,9 @@ interface SettingsLayoutProps {
 
 const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   const router = useRouter()
-  const { slug, ref } = useParams() as { slug: string; ref?: string }
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { slug, ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
@@ -39,7 +39,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     'billing:invoices',
   ])
 
-  const menuRoutes = generateSettingsMenu(slug, ref, project, organization, {
+  const menuRoutes = generateSettingsMenu(slug!, ref, project, organization, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,

@@ -136,6 +136,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/org/:slug/project/:ref/settings/storage',
+        destination: '/org/:slug/project/:ref/storage/settings',
+        permanent: true,
+      },
+      {
+        source: '/org/:slug/project/:ref/settings/database',
+        destination: '/org/:slug/project/:ref/database/settings',
+        permanent: true,
+      },
+      {
         source: '/org/:slug/project/:ref/settings',
         destination: '/org/:slug/project/:ref/settings/general',
         permanent: true,

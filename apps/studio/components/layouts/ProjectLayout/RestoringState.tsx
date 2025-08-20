@@ -3,21 +3,20 @@ import { CheckCircle, Download, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
-import { useProjectContext } from './ProjectContext'
 import { getPathReferences } from '../../../data/vela/path-references'
 
 const RestoringState = () => {
   const { slug, ref } = getPathReferences()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)

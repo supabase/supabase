@@ -12,7 +12,7 @@ import type {
 import { EMPTY_ARR } from 'lib/void'
 import { basename } from 'path'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult

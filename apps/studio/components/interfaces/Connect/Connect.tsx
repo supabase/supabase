@@ -9,8 +9,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
@@ -34,8 +34,8 @@ import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 
 export const Connect = () => {
-  const { ref: projectRef } = useParams()
-  const selectedProject = useSelectedProject()
+  const { slug: orgSlug, ref: projectRef } = useParams()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [showConnect, setShowConnect] = useQueryState(
@@ -55,7 +55,10 @@ export const Connect = () => {
   )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
+  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
 
   const handleParentChange = (value: string) => {
     setSelectedParent(value)
@@ -138,7 +141,7 @@ export const Connect = () => {
     return []
   }
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug, projectRef })
   const { anonKey, publishableKey } = canReadAPIKeys
     ? getKeys(apiKeys)
     : { anonKey: null, publishableKey: null }

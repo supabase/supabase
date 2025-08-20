@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseQueuePurgeMutation } from 'data/database-queues/database-queues-purge-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 interface PurgeQueueProps {
   queueName: string
@@ -13,9 +13,9 @@ interface PurgeQueueProps {
 }
 
 const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
-  const { project } = useProjectContext()
   const { slug } = useParams()
   const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
 
   const { mutate: purgeDatabaseQueue, isLoading } = useDatabaseQueuePurgeMutation({
     onSuccess: () => {

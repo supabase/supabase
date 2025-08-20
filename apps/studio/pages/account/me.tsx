@@ -1,7 +1,7 @@
+import { AccountConnections } from 'components/interfaces/Account/Preferences/AccountConnections'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
-import { AccountConnections } from 'components/interfaces/Account/Preferences/AccountConnections'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
@@ -15,6 +15,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 
 const User: NextPageWithLayout = () => {
   return <ProfileCard />
@@ -35,47 +40,56 @@ User.getLayout = (page) => (
 export default User
 
 const ProfileCard = () => {
-  const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
+  const profileShowInformation = useIsFeatureEnabled('profile:show_information')
   const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article>
-      {isLoading && (
-        <Panel>
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        </Panel>
-      )}
-      {isError && (
-        <Panel>
-          <div className="p-4">
-            <AlertError error={error} subject="Failed to retrieve account information" />
-          </div>
-        </Panel>
-      )}
-      {isSuccess && (
-        <>
-          {profileUpdateEnabled && isSuccess ? <ProfileInformation /> : null}
-          <AccountIdentities />
-        </>
-      )}
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader className="pt-0">
+          <ScaffoldSectionTitle>Preferences</ScaffoldSectionTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
+        <article>
+          {isLoading && (
+            <Panel>
+              <div className="p-4">
+                <GenericSkeletonLoader />
+              </div>
+            </Panel>
+          )}
+          {isError && (
+            <Panel>
+              <div className="p-4">
+                <AlertError error={error} subject="Failed to retrieve account information" />
+              </div>
+            </Panel>
+          )}
+          {isSuccess && (
+            <>
+              {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
+              <AccountIdentities />
+            </>
+          )}
 
-      <section>
-        <AccountConnections />
-      </section>
+          <section>
+            <AccountConnections />
+          </section>
 
-      <section>
-        <ThemeSettings />
-      </section>
+          <section>
+            <ThemeSettings />
+          </section>
 
-      <section>
-        <AnalyticsSettings />
-      </section>
+          <section>
+            <AnalyticsSettings />
+          </section>
 
-      <section>
-        <AccountDeletion />
-      </section>
-    </article>
+          <section>
+            <AccountDeletion />
+          </section>
+        </article>
+      </ScaffoldContainer>
+    </>
   )
 }

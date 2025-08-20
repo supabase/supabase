@@ -11,8 +11,8 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -26,15 +26,16 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
+  PrePostTab,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   WarningIcon,
-  PrePostTab,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -87,10 +88,18 @@ const MfaAuthSettingsForm = () => {
   const [isUpdatingTotpForm, setIsUpdatingTotpForm] = useState(false)
   const [isUpdatingPhoneForm, setIsUpdatingPhoneForm] = useState(false)
 
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false)
 
-  const organization = useSelectedOrganization()
+  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
+  const { data: organization } = useSelectedOrganizationQuery()
   const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
@@ -222,6 +231,14 @@ const MfaAuthSettingsForm = () => {
   const hasUpgradedPhoneMFA =
     authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
 
+  const maybeConfirmPhoneMFAOrSubmit = () => {
+    if (hasUpgradedPhoneMFA) {
+      setIsConfirmationModalVisible(true)
+    } else {
+      phoneForm.handleSubmit(onSubmitPhoneForm)()
+    }
+  }
+
   return (
     <>
       <ScaffoldSection isFullWidth>
@@ -315,7 +332,13 @@ const MfaAuthSettingsForm = () => {
         <ScaffoldSectionTitle className="mb-4">SMS MFA</ScaffoldSectionTitle>
 
         <Form_Shadcn_ {...phoneForm}>
-          <form onSubmit={phoneForm.handleSubmit(onSubmitPhoneForm)} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              maybeConfirmPhoneMFAOrSubmit()
+            }}
+            className="space-y-4"
+          >
             <Card>
               <CardContent className="pt-6">
                 {promptProPlanUpgrade && (
@@ -414,20 +437,6 @@ const MfaAuthSettingsForm = () => {
                 />
               </CardContent>
 
-              {hasUpgradedPhoneMFA && (
-                <CardContent>
-                  <Alert_Shadcn_ variant="warning">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      Enabling advanced MFA with phone will result in an additional charge of{' '}
-                      <span translate="no">$75</span>
-                      per month for the first project in the organization and an additional{' '}
-                      <span translate="no">$10</span> per month for additional projects.
-                    </AlertTitle_Shadcn_>
-                  </Alert_Shadcn_>
-                </CardContent>
-              )}
-
               <CardFooter className="justify-end space-x-2">
                 {phoneForm.formState.isDirty && (
                   <Button type="default" onClick={() => phoneForm.reset()}>
@@ -452,6 +461,25 @@ const MfaAuthSettingsForm = () => {
           </form>
         </Form_Shadcn_>
       </ScaffoldSection>
+      <ConfirmationModal
+        visible={isConfirmationModalVisible}
+        title="Confirm SMS MFA"
+        confirmLabel="Confirm and save"
+        onCancel={() => setIsConfirmationModalVisible(false)}
+        onConfirm={() => {
+          setIsConfirmationModalVisible(false)
+          phoneForm.handleSubmit(onSubmitPhoneForm)()
+        }}
+        variant="warning"
+      >
+        Enabling SMS MFA will result in an additional charge of <span translate="no">$75</span> per
+        month for the first project in the organization and an additional{' '}
+        <span translate="no">$10</span> per month for additional projects.
+        <p className="mt-2">
+          Billing will start immediately upon enabling this add-on, regardless of whether your
+          customers are using SMS MFA.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

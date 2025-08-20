@@ -27,11 +27,11 @@ export const TerminalInstructions = forwardRef<
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   const { data: tokens } = useAccessTokensQuery()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug, projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 

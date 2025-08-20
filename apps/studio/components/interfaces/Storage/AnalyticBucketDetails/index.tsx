@@ -10,7 +10,6 @@ import {
   formatWrapperTables,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -28,6 +27,7 @@ import { Bucket } from 'data/storage/buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -48,11 +48,11 @@ import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceRow } from './NamespaceRow'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
-  const { project } = useProjectContext()
-  const { slug } = useParams() as { slug: string }
+  const { slug } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -159,7 +159,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           <ExtensionNotInstalled
             bucketName={bucket.name}
             projectRef={project?.ref!}
-            slug={slug}
+            slug={slug!}
             wrapperMeta={wrapperMeta}
             wrappersExtension={wrappersExtension!}
           />
@@ -168,7 +168,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           <ExtensionNeedsUpgrade
             bucketName={bucket.name}
             projectRef={project?.ref!}
-            slug={slug}
+            slug={slug!}
             wrapperMeta={wrapperMeta}
             wrappersExtension={wrappersExtension!}
           />

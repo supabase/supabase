@@ -11,12 +11,18 @@ import { useEditorType } from './EditorsLayout.hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
-  hideTabs?: boolean
   title?: string
   product?: string
+  productMenuClassName?: string
 }
 
-export const EditorBaseLayout = ({ children, title, product, ...props }: ExplorerLayoutProps) => {
+export const EditorBaseLayout = ({
+                                   children,
+                                   title,
+                                   product,
+                                   productMenuClassName,
+                                   productMenu,
+                                 }: ExplorerLayoutProps) => {
   const { slug, ref } = useParams()
   const pathname = usePathname()
   const editor = useEditorType()
@@ -28,7 +34,13 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
     pathname === `/org/${slug}/project/${ref}/editor` || pathname === `/org/${slug}/project/${ref}/sql` || hasNoOpenTabs
 
   return (
-    <ProjectLayoutWithAuth resizableSidebar title={title} product={product} {...props}>
+    <ProjectLayoutWithAuth
+      resizableSidebar
+      title={title}
+      product={product}
+      productMenuClassName={productMenuClassName}
+      productMenu={productMenu}
+    >
       <div className="flex flex-col h-full">
         <div
           className={cn(

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
@@ -33,6 +34,7 @@ export function UserDropdown() {
   const appStateSnapshot = useAppStateSnapshot()
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
+  const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
 
   return (
     <DropdownMenu>
@@ -61,7 +63,7 @@ export function UserDropdown() {
                   >
                     {profile.username}
                   </span>
-                  {profile.primary_email !== profile.username && (
+                  {profile.primary_email !== profile.username && profileShowEmailEnabled && (
                     <span
                       title={profile.primary_email}
                       className="w-full text-left text-foreground-light text-xs truncate"

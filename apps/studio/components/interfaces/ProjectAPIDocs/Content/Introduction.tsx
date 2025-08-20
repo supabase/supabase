@@ -10,8 +10,8 @@ import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
 const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
-  const { ref } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { slug: orgSlug, ref } = useParams()
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug, projectRef: ref })
   const { data } = useProjectSettingsV2Query({ projectRef: ref })
 
   const [copied, setCopied] = useState<'anon' | 'service'>()

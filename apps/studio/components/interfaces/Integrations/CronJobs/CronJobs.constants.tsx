@@ -47,4 +47,5 @@ export const CRON_TABLE_COLUMNS = [
   { id: 'next_run', name: 'Next run', minWidth: 180 },
   { id: 'command', name: 'Command', minWidth: 320 },
   { id: 'active', name: 'Active', width: 70, minWidth: 70, maxWidth: 70 },
+  { id: 'actions', name: '', minWidth: 75, width: 75 },
 ]

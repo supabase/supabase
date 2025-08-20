@@ -1,14 +1,14 @@
 import Link from '@ui/components/Typography/Link'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldSectionDescription, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Card } from 'ui'
 import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSettings.utils'
 import { DESCRIPTIONS } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 const wrapperMeta = {
   options: [
@@ -20,10 +20,10 @@ const wrapperMeta = {
 }
 
 export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string }) => {
-  const { project } = useProjectContext()
-  const { slug } = useParams() as { slug: string }
+  const { slug } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef: project?.ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
@@ -52,7 +52,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
       <Card className="flex flex-col gap-6 p-6 pb-0">
         <p className="text-sm text-foreground-light mb-4">
           To get AWS credentials, you can create them using the{' '}
-          <Link href={`/org/${slug}/project/${project?.ref}/settings/storage`}>
+          <Link href={`/org/${slug}/project/${project?.ref}/storage/settings`}>
             <a className="underline ">S3 Access Keys</a>
           </Link>{' '}
           feature.

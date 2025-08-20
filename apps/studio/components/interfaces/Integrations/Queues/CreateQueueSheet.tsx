@@ -4,10 +4,11 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
 import {
   Badge,
   Button,
@@ -29,8 +30,7 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
-import { useRouter } from 'next/router'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 export interface CreateQueueSheetProps {
   isClosing: boolean
@@ -75,13 +75,13 @@ const FORM_ID = 'create-queue-sidepanel'
 export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQueueSheetProps) => {
   // This is for enabling pg_partman extension which will be used for partitioned queues (3rd kind of queue)
   // const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
-  // const canToggleExtensions = useCheckPermissions(
+  // const { can: canToggleExtensions } = useAsyncCheckPermissions(
   //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
   //   'extensions'
   // )
   const router = useRouter()
   const { slug } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,

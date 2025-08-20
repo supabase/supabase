@@ -12,7 +12,7 @@ import { Notification, NotificationData } from 'data/notifications/notifications
 import { ProjectInfo } from 'data/projects/projects-query'
 import type { Organization } from 'types'
 import { CriticalIcon, WarningIcon } from 'ui'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void

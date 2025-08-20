@@ -35,7 +35,7 @@ import SecondLevelNav from './SecondLevelNav'
  */
 
 const ProjectAPIDocs = () => {
-  const { ref } = useParams()
+  const { slug: orgSlug, ref } = useParams()
   const snap = useAppStateSnapshot()
   const isIntroduction =
     snap.activeDocsSection.length === 1 && snap.activeDocsSection[0] === 'introduction'
@@ -46,7 +46,7 @@ const ProjectAPIDocs = () => {
   const language = snap.docsLanguage
 
   const { data: apiKeys } = useAPIKeysQuery(
-    { projectRef: ref },
+    { orgSlug, projectRef: ref },
     { enabled: snap.showProjectApiDocs }
   )
   const { data: settings } = useProjectSettingsV2Query(

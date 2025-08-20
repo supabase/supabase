@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, Skeleton, Button } from 'ui'
 import { toast } from 'sonner'
 
 import DiffViewer from 'components/ui/DiffViewer'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 interface DatabaseDiffPanelProps {
   diffContent?: string

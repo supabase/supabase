@@ -1,9 +1,7 @@
 import { type PropsWithChildren } from 'react'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+
 import { withAuth } from 'hooks/misc/withAuth'
 import { cn } from 'ui'
-import { setOrganizationCookie } from '../../data/vela/vela'
-import OrganizationContext from './OrganizationContext'
 
 const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
   return (

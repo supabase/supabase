@@ -3,13 +3,13 @@ import { includes, sortBy } from 'lodash'
 import { Check, ChevronRight, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metrics-query'
 import { PostgresQueue } from 'data/database-queues/database-queues-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DATETIME_FORMAT } from 'lib/constants'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 interface QueuesRowsProps {
   queues: PostgresQueue[]
@@ -19,7 +19,7 @@ interface QueuesRowsProps {
 const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
   const router = useRouter()
   const { slug } = useParams()
-  const { project: selectedProject } = useProjectContext()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
   const { data: queueTables } = useTablesQuery({
     projectRef: selectedProject?.ref,

@@ -8,7 +8,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { WorkflowLogs } from './WorkflowLogs'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode

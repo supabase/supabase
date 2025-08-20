@@ -2,7 +2,6 @@ import { PostgresTable } from '@supabase/postgres-meta'
 import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
 
-import { useParams } from 'common'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
@@ -11,9 +10,12 @@ import {
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { getPathReferences } from 'data/vela/path-references'
+import { useRouter } from 'next/router'
+import { DEFAULT_HOME } from '../../../../pages/api/constants'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
@@ -22,8 +24,10 @@ interface ReferenceRecordPeekProps {
 }
 
 export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
-  const { slug, ref } = useParams() as { slug: string; ref: string }
-  const project = useSelectedProject()
+  const { slug, ref } = getPathReferences()
+  const { data: project } = useSelectedProjectQuery()
+
+  const router = useRouter()
 
   const { data, error, isSuccess, isError, isLoading } = useTableRowsQuery(
     {
@@ -90,6 +94,10 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     }
     return res
   })
+
+  if (!slug || !ref) {
+    return router.push(DEFAULT_HOME)
+  }
 
   return (
     <>

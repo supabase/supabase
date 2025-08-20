@@ -2,10 +2,12 @@ import dayjs from 'dayjs'
 import { MoreVertical, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
+import { useQueryClient } from '@tanstack/react-query'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -13,9 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 interface ReviewRowProps {
   branch: Branch
@@ -23,8 +23,8 @@ interface ReviewRowProps {
 
 export const ReviewRow = ({ branch }: ReviewRowProps) => {
   const router = useRouter()
-  const project = useSelectedProject()
-  const { slug, ref: projectRef } = useParams()
+  const { slug, ref: projectRef } = getPathReferences()
+  const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({

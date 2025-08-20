@@ -1,4 +1,3 @@
-import { useParams } from 'next/navigation'
 
 export function getProjectRef(): string | undefined {
   if (typeof window !== 'undefined') {

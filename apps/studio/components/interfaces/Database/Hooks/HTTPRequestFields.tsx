@@ -1,12 +1,11 @@
 import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
@@ -21,6 +20,7 @@ import {
   SidePanel,
 } from 'ui'
 import { HTTPArgument } from './EditHookPanel'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 interface HTTPRequestFieldsProps {
   type: 'http_request' | 'supabase_function'
@@ -47,11 +47,11 @@ const HTTPRequestFields = ({
   onUpdateParameter,
   onRemoveParameter,
 }: HTTPRequestFieldsProps) => {
-  const { slug, ref } = useParams()
-  const { project: selectedProject } = useProjectContext()
+  const { slug, ref } = getPathReferences()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef: ref, reveal: true })
 
   const edgeFunctions = functions ?? []
   const { serviceKey, secretKey } = getKeys(apiKeys)

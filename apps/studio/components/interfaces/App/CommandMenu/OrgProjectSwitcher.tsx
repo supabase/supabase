@@ -5,7 +5,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
 const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'

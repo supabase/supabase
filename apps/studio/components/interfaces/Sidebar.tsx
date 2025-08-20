@@ -12,14 +12,13 @@ import {
   generateSettingsRoutes,
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -42,7 +41,10 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useUnifiedLogsPreview,
+} from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -218,7 +220,7 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
 const ProjectLinks = () => {
   const router = useRouter()
   const { slug, ref } = useParams() as { slug: string; ref?: string }
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useAppStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
@@ -244,7 +246,12 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(slug, ref, project)
+
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+
+  const otherRoutes = generateOtherRoutes(slug, ref, project, {
+    unifiedLogs: isUnifiedLogsEnabled,
+  })
   const settingsRoutes = generateSettingsRoutes(slug, ref, project)
 
   return (
@@ -344,7 +351,7 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
@@ -374,12 +381,6 @@ const OrganizationLinks = () => {
       href: `/org/${slug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-      key: 'billing',
-      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Organization settings',

@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { debounce } from 'lodash'
-import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
@@ -16,8 +15,8 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROVIDERS } from 'lib/constants'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
@@ -31,7 +30,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
           <header>
-            <h1 className="text-xl text-foreground">New project</h1>
+            <h2>New project</h2>
             <Markdown
               className="text-foreground-light"
               content={`Choose the Supabase organization you wish to install in`}
@@ -54,8 +53,7 @@ VercelIntegration.getLayout = (page) => (
 )
 
 const CreateProject = () => {
-  const router = useRouter()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
@@ -258,11 +256,11 @@ const CreateProject = () => {
                   key={option}
                   label={label}
                   value={label}
-                  addOnBefore={({ active, selected }: any) => (
+                  addOnBefore={() => (
                     <img
                       alt="region icon"
                       className="w-5 rounded-sm"
-                      src={`${router.basePath}/img/regions/${Object.keys(AWS_REGIONS)[i]}.svg`}
+                      src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
                     />
                   )}
                 >

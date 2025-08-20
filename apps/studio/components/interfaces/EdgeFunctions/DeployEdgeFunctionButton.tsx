@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -19,11 +19,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()
-  const { slug, ref } = useParams()
-  const org = useSelectedOrganization()
+  const { slug, ref } = getPathReferences()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()

@@ -14,7 +14,6 @@ import {
 } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
-import { useParams } from 'next/navigation'
 import { getPathReferences } from '../../../../data/vela/path-references'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
@@ -27,7 +26,7 @@ export function useApiKeysCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { data: apiKeys } = useAPIKeysQuery({ slug, projectRef: project?.ref, reveal: true })
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef: project?.ref, reveal: true })
   const { anonKey, serviceKey, publishableKey, allSecretKeys } = getKeys(apiKeys)
 
   const commands = useMemo(

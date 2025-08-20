@@ -14,7 +14,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
@@ -76,7 +76,7 @@ export const BranchDropdown = () => {
   const router = useRouter()
   const { slug, ref } = useParams()
   const snap = useAppStateSnapshot()
-  const projectDetails = useSelectedProject()
+  const { data: projectDetails } = useSelectedProjectQuery()
 
   const [open, setOpen] = useState(false)
 

@@ -1,4 +1,4 @@
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 

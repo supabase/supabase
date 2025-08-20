@@ -4,8 +4,6 @@ import { PropsWithChildren, useCallback } from 'react'
 
 import { prefetchProjectDetail } from 'data/projects/project-detail-query'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
-import { useParams } from 'next/navigation'
-import { getPathReferences } from '../vela/path-references'
 
 export function usePrefetchProjectIndexPage() {
   const router = useRouter()

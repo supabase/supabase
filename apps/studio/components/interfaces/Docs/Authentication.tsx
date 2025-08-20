@@ -13,7 +13,7 @@ interface AuthenticationProps {
 
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { slug, ref: projectRef } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
   const { anonKey, serviceKey } = getKeys(apiKeys)

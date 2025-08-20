@@ -3,16 +3,15 @@ import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,28 +23,32 @@ import {
 } from 'ui'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 const General = () => {
-  const { project } = useProjectContext()
-  const { slug } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const parentProject = useProjectByRef(project?.parent_project_ref)
+  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateProject } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const { mutate: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')
+    if (!organization?.slug) return console.error('Slug is required')
 
     updateProject(
       { ref: project.ref, name: values.name.trim() },
@@ -69,7 +72,7 @@ const General = () => {
           <AlertDescription_Shadcn_>
             Certain settings are not available while you're on a preview branch. To adjust your
             project settings, you may return to your{' '}
-            <Link href={`/org/${slug}/project/${parentProject.ref}/settings/general`} className="text-brand">
+            <Link href={`/org/${organization?.slug}/project/${parentProject.ref}/settings/general`} className="text-brand">
               main branch
             </Link>
             .

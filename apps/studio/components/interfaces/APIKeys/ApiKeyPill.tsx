@@ -20,7 +20,7 @@ export function ApiKeyPill({
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) {
   const queryClient = useQueryClient()
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
 
   // State that controls whether to show the full API key
   const [show, setShowState] = useState(false)
@@ -39,6 +39,7 @@ export function ApiKeyPill({
     refetch: refetchApiKey,
   } = useAPIKeyIdQuery(
     {
+      orgSlug,
       projectRef,
       id: apiKey.id as string,
       reveal: true, // Request the unmasked key

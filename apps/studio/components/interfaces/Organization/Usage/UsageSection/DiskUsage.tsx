@@ -19,7 +19,6 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import Panel from 'components/ui/Panel'
-import { useParams } from 'next/navigation'
 
 export interface DiskUsageProps {
   slug: string

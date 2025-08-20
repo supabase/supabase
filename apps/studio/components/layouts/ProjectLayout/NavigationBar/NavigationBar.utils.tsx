@@ -117,9 +117,16 @@ export const generateProductRoutes = (
   ]
 }
 
-export const generateOtherRoutes = (slug: string, ref?: string, project?: Project, features?: {}): Route[] => {
+export const generateOtherRoutes = (
+  slug: string,
+  ref?: string,
+  project?: Project,
+  features?: { unifiedLogs?: boolean }
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/org/${slug}/project/${ref}`
+
+  const unifiedLogsEnabled = features?.unifiedLogs ?? false
 
   return [
     {
@@ -142,7 +149,13 @@ export const generateOtherRoutes = (slug: string, ref?: string, project?: Projec
       key: 'logs',
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/logs`),
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : unifiedLogsEnabled
+            ? `/org/${slug}/project/${ref}/logs`
+            : `/org/${slug}/project/${ref}/logs/explorer`),
     },
     {
       key: 'api',

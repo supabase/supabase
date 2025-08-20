@@ -6,15 +6,15 @@ import {
   getCatalogURI,
   getConnectionURL,
 } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 
 export const useIcebergWrapperCreateMutation = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { secretKey, serviceKey } = getKeys(apiKeys)

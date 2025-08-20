@@ -14,7 +14,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 const Header = () => {
   const { slug } = useParams()
@@ -88,7 +88,7 @@ const GenericProjectPage: NextPage = () => {
     <>
       <Header />
       <div className="flex flex-col mx-auto w-full">
-        <h1 className="mt-8 text-2xl max-w-5xl mx-auto w-full">Select a project to continue</h1>
+        <h1 className="mt-8 max-w-5xl mx-auto w-full">Select a project to continue</h1>
         <div
           className="flex-grow py-6 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}

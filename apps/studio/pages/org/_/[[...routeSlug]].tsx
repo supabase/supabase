@@ -9,7 +9,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { Button, cn } from 'ui'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 const Header = () => {
   const { slug } = useParams()

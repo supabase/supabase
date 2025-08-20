@@ -28,14 +28,12 @@ export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVa
 export type FeatureFlagContextType = {
   API_URL?: string
   configcat: { [key: string]: boolean | number | string | null }
-  posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
 }
 
 export const FeatureFlagContext = createContext<FeatureFlagContextType>({
   API_URL: undefined,
   configcat: {},
-  posthog: {},
   hasLoaded: false,
 })
 
@@ -68,7 +66,6 @@ export const FeatureFlagProvider = ({
   const [store, setStore] = useState<FeatureFlagContextType>({
     API_URL,
     configcat: {},
-    posthog: {},
     hasLoaded: false,
   })
 
@@ -78,7 +75,7 @@ export const FeatureFlagProvider = ({
     async function processFlags() {
       if (!enabled) return
 
-      let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
+      let flagStore: FeatureFlagContextType = { configcat: {} }
 
       // Run both async operations in parallel
       const [flags, flagValues] = await Promise.all([
@@ -87,11 +84,6 @@ export const FeatureFlagProvider = ({
           ? getConfigCatFlags(user?.email)
           : Promise.resolve([]),
       ])
-
-      // Process PostHog flags
-      if (flags) {
-        flagStore.posthog = flags
-      }
 
       // Process ConfigCat flags
       if (typeof getConfigCatFlags === 'function') {

@@ -6,14 +6,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Card,
@@ -29,11 +28,18 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 const RateLimits = () => {
-  const { slug, ref: projectRef } = useParams()
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const { slug, ref: projectRef } = getPathReferences()
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
 
   const {
     data: authConfig,

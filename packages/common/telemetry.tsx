@@ -12,7 +12,7 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
-import { useTelemetryCookie } from './hooks'
+import { useParams, useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
 
@@ -46,18 +46,43 @@ export function handlePageTelemetry(
   featureFlags?: {
     [key: string]: unknown
   },
+  slug?: string,
+  ref?: string,
   telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2']
 ) {
-  return post(
-    `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
+  // Send to PostHog client-side (only in browser)
+  if (typeof window !== 'undefined') {
+    const pageData = getSharedTelemetryData(pathname)
+
+    // Align frontend and backend session IDs for correlation
+    if (pageData.session_id) {
+      document.cookie = `session_id=${pageData.session_id}; path=/; SameSite=Lax`
+    }
+  }
+
+  // Send to backend
+  // TODO: Remove this once migration to client-side page telemetry is complete
+  const sharedData = getSharedTelemetryData(pathname)
+  const { session_id, ...backendData } = sharedData // Remove session_id from backend payload (it's already in the cookie)
+
+  const payload =
     telemetryDataOverride !== undefined
       ? { feature_flags: featureFlags, ...telemetryDataOverride }
       : {
-          ...getSharedTelemetryData(pathname),
+          ...backendData,
+          ...(slug || ref
+            ? {
+                groups: {
+                  ...(slug ? { organization: slug } : {}),
+                  ...(ref ? { project: ref } : {}),
+                },
+              }
+            : {}),
           feature_flags: featureFlags,
-        },
-    { headers: { Version: '2' } }
-  )
+        }
+  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page`, payload, {
+    headers: { Version: '2' },
+  })
 }
 
 export function handlePageLeaveTelemetry(
@@ -65,15 +90,30 @@ export function handlePageLeaveTelemetry(
   pathname: string,
   featureFlags?: {
     [key: string]: unknown
-  }
+  },
+  slug?: string,
+  ref?: string
 ) {
+  // Send to PostHog client-side (only in browser)
+  if (typeof window !== 'undefined') {
+    const pageData = getSharedTelemetryData(pathname)
+  }
+
+  // Send to backend
+  // TODO: Remove this once migration to client-side page telemetry is complete
   return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    body: {
-      pathname,
-      page_url: isBrowser ? window.location.href : '',
-      page_title: isBrowser ? document?.title : '',
-      feature_flags: featureFlags,
-    },
+    pathname,
+    page_url: isBrowser ? window.location.href : '',
+    page_title: isBrowser ? document?.title : '',
+    feature_flags: featureFlags,
+    ...(slug || ref
+      ? {
+          groups: {
+            ...(slug ? { organization: slug } : {}),
+            ...(ref ? { project: ref } : {}),
+          },
+        }
+      : {}),
   })
 }
 
@@ -81,15 +121,24 @@ export const PageTelemetry = ({
   API_URL,
   hasAcceptedConsent,
   enabled = true,
+  organizationSlug,
+  projectRef,
 }: {
   API_URL: string
   hasAcceptedConsent: boolean
   enabled?: boolean
+  organizationSlug?: string
+  projectRef?: string
 }) => {
   const router = useRouter()
 
   const pagesPathname = router?.pathname
   const appPathname = usePathname()
+
+  // Get from props or try to extract from URL params
+  const params = useParams()
+  const slug = organizationSlug || params.slug
+  const ref = projectRef || params.ref
 
   const featureFlags = useFeatureFlags()
 
@@ -100,26 +149,40 @@ export const PageTelemetry = ({
   const pathname =
     pagesPathname ?? appPathname ?? (isBrowser ? window.location.pathname : undefined)
   const pathnameRef = useLatest(pathname)
-  const featureFlagsRef = useLatest(featureFlags.posthog)
 
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current).catch((e) => {
+    return handlePageTelemetry(
+      API_URL,
+      pathnameRef.current,
+      {},
+      slug,
+      ref
+    ).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
-  }, [API_URL, enabled, hasAcceptedConsent])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const sendPageLeaveTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current).catch((e) => {
+    if (!pathnameRef.current) return Promise.resolve()
+
+    return handlePageLeaveTelemetry(
+      API_URL,
+      pathnameRef.current,
+      {},
+      slug,
+      ref
+    ).catch((e) => {
       console.error('Problem sending telemetry page-leave:', e)
     })
-  }, [API_URL, enabled, hasAcceptedConsent])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   // Handle initial page telemetry event
   const hasSentInitialPageTelemetryRef = useRef(false)
+
   useEffect(() => {
     // Send page telemetry on first page load
     // Waiting for router ready before sending page_view
@@ -136,19 +199,26 @@ export const PageTelemetry = ({
         try {
           const encodedData = telemetryCookie.split('=')[1]
           const telemetryData = JSON.parse(decodeURIComponent(encodedData))
-          handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, telemetryData)
+          handlePageTelemetry(
+            API_URL,
+            pathnameRef.current,
+            {},
+            slug,
+            ref,
+            telemetryData
+          )
           // remove the telemetry cookie
           document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
         } catch (error) {
           console.error('Invalid telemetry data:', error)
         }
       } else {
-        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current)
+        handlePageTelemetry(API_URL, pathnameRef.current, {}, slug, ref)
       }
 
       hasSentInitialPageTelemetryRef.current = true
     }
-  }, [router?.isReady, hasAcceptedConsent, featureFlags.hasLoaded])
+  }, [router?.isReady, hasAcceptedConsent, featureFlags.hasLoaded, slug, ref])
 
   useEffect(() => {
     // For pages router
@@ -244,6 +314,7 @@ export function useTelemetryIdentify(API_URL: string) {
 
   useEffect(() => {
     if (user?.id) {
+      // Send to backend
       sendTelemetryIdentify(API_URL, {
         user_id: user.id,
       })

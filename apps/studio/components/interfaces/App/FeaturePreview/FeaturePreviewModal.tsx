@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
@@ -38,7 +38,7 @@ const FeaturePreviewModal = () => {
     closeFeaturePreviewModal,
     isFeaturePreviewReleasedToPublic,
   } = useFeaturePreviewModal()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 

@@ -1,7 +1,6 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { useParams } from 'next/navigation'
 
 export const generateRealtimeMenu = (
   slug: string,

@@ -31,9 +31,10 @@ const LangSelector = ({
   setSelectedLang,
   setSelectedApiKey,
 }: LangSelectorProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
 
   const { data: apiKeys = [], isLoading: isLoadingAPIKeys } = useAPIKeysQuery({
+    orgSlug,
     projectRef,
     reveal: false,
   })

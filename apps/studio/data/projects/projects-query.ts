@@ -9,6 +9,7 @@ import { projectKeys } from './keys'
 import type { Project } from './project-detail-query'
 import { useSelectedOrganizationQuery } from '../../hooks/misc/useSelectedOrganization'
 import { useOrganizationContext } from '../../components/layouts/OrganizationContext'
+import { getPathReferences } from '../vela/path-references'
 
 export type ProjectsVariables = {
   ref?: string
@@ -46,10 +47,10 @@ export const useProjectsQuery = <TData = ProjectsData>({
   ...options
 }: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
   const { profile } = useProfile()
-  const { organization } = useOrganizationContext()
+  const { slug } = getPathReferences()
   return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
-    ({ signal }) => getProjects({ signal, orgSlug: organization?.slug }),
+    ({ signal }) => getProjects({ signal, orgSlug: slug }),
     {
       enabled: enabled && profile !== undefined,
       staleTime: 30 * 60 * 1000, // 30 minutes
@@ -59,6 +60,7 @@ export const useProjectsQuery = <TData = ProjectsData>({
 }
 
 export function prefetchProjects(client: QueryClient, organization?: Organization | undefined) {
+  if (typeof organization === "undefined") return Promise.resolve();
   return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal, orgSlug: organization?.slug }))
 }
 
@@ -67,7 +69,7 @@ export function useProjectsPrefetch(organization?: Organization | undefined) {
 
   return useCallback(() => {
     prefetchProjects(client, organization)
-  }, [client])
+  }, [client, organization])
 }
 
 export function useAutoProjectsPrefetch() {

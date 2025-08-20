@@ -8,7 +8,7 @@ import PartnerIcon from 'components/ui/PartnerIcon'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -30,7 +30,7 @@ import { setOrganizationCookie } from '../../../data/vela/vela'
 export const OrganizationDropdown = () => {
   const router = useRouter()
   const { slug: routeSlug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')

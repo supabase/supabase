@@ -1,17 +1,16 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Link from 'next/link'
-import React from 'react'
 
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, NavMenu, NavMenuItem } from 'ui'
-import { useParams } from 'next/navigation'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 type Props = {
   active: 'pitr' | 'scheduled' | 'rtnp'
 }
 
 function DatabaseBackupsNav({ active }: Props) {
-  const { slug } = useParams()
-  const { ref, cloud_provider } = useProjectContext()?.project || {}
+  const { slug } = getPathReferences()
+  const { ref, cloud_provider } = useSelectedProjectQuery()?.data || {}
 
   const navMenuItems = [
     {

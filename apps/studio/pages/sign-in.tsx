@@ -1,14 +1,17 @@
-import { LastSignInWrapper } from 'components/interfaces/SignIn/LastSignInWrapper'
-import SignInForm from 'components/interfaces/SignIn/SignInForm'
-import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
-import SignInWithGoogle from 'components/interfaces/SignIn/SignInWithGoogle'
-import { AuthenticationLayout } from 'components/layouts/AuthenticationLayout'
-import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
+import { LastSignInWrapper } from 'components/interfaces/SignIn/LastSignInWrapper'
+import { SignInForm } from 'components/interfaces/SignIn/SignInForm'
+import { SignInWithGitHub } from 'components/interfaces/SignIn/SignInWithGitHub'
+import { AuthenticationLayout } from 'components/layouts/AuthenticationLayout'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
+import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+import SignInWithGoogle from 'components/interfaces/SignIn/SignInWithGoogle'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -46,7 +49,6 @@ const SignInPage: NextPageWithLayout = () => {
             <span className="px-2 text-sm bg-studio text-foreground">or</span>
           </div>
         </div>
-
         <SignInForm />
       </div>
 

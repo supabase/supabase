@@ -5,19 +5,19 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
 import {
   PolicyTableRow,
   PolicyTableRowProps,
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 interface PoliciesProps {
   schema: string
@@ -37,8 +37,8 @@ const Policies = ({
   onSelectEditPolicy: onSelectEditPolicyAI,
 }: PoliciesProps) => {
   const router = useRouter()
-  const { slug, ref } = useParams()
-  const { project } = useProjectContext()
+  const { slug, ref } = getPathReferences()
+  const { data: project } = useSelectedProjectQuery()
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
     id: number

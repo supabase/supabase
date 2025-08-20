@@ -1,11 +1,11 @@
 import { BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
@@ -40,8 +40,8 @@ export const IntegrationCard = ({
   description,
   isInstalled,
 }: IntegrationCardProps) => {
-  const { project } = useProjectContext()
   const { slug } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   return (
     <Link href={`/org/${slug}/project/${project?.ref}/integrations/${id}/overview`}>

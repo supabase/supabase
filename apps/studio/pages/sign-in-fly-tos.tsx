@@ -4,12 +4,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useIsLoggedIn } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organization-by-fly-organization-id-mutation'
 import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
 import { API_URL } from 'lib/constants'
 import { Button } from 'ui'
-import { useParams } from 'next/navigation'
 
 const SignInFlyTos = () => {
   const [loading, setLoading] = useState(true)

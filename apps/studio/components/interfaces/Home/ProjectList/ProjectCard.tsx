@@ -10,7 +10,7 @@ import { BASE_PATH } from 'lib/constants'
 import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { useParams } from 'next/navigation'
+import { useParams } from 'common'
 
 export interface ProjectCardProps {
   project: ProjectInfo
@@ -67,7 +67,7 @@ const ProjectCard = ({
                   <div className="w-fit p-1 border rounded-md flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs !ml-2 text-foreground-light">{githubRepository}</p>
+                  <p className="text-xs !ml-2 text-foreground-light truncate">{githubRepository}</p>
                 </>
               )}
             </div>

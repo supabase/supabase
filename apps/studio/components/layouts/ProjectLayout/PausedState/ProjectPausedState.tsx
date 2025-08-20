@@ -19,8 +19,9 @@ import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-q
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import {
@@ -33,7 +34,6 @@ import {
   Modal,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { useProjectContext } from '../ProjectContext'
 import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
 import { PauseDisabledState } from './PauseDisabledState'
 
@@ -54,10 +54,9 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { slug, ref } = useParams()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
-  const enableProBenefitWording = usePHFlag('proBenefitWording')
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
 
@@ -174,11 +173,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       <PauseDisabledState />
                     ) : isFreePlan ? (
                       <>
-                        <p className="text-sm text-foreground-light text-center">
-                          {enableProBenefitWording === 'variant-a'
-                            ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
-                            : 'To prevent future pauses, consider upgrading to Pro.'}
-                        </p>
                         <Alert_Shadcn_>
                           <AlertTitle_Shadcn_>
                             Project can be restored through the dashboard within the next{' '}

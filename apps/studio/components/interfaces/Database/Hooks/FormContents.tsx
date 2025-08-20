@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { Checkbox, Input, Listbox, Radio, SidePanel } from 'ui'
 import { HTTPArgument, isEdgeFunction } from './EditHookPanel'
@@ -44,13 +44,13 @@ export const FormContents = ({
   setHttpParameters,
   submitRef,
 }: FormContentsProps) => {
-  const { ref } = useParams()
-  const project = useSelectedProject()
+  const { slug, ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
-  const { data: keys = [] } = useAPIKeysQuery({ projectRef: ref, reveal: true })
+  const { data: keys = [] } = useAPIKeysQuery({ orgSlug: slug, projectRef: ref, reveal: true })
   const { data: functions = [] } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'

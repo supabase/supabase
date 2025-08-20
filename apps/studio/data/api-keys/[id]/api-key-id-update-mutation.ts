@@ -5,21 +5,27 @@ import { ResponseError } from 'types'
 import { apiKeysKeys } from '../keys'
 
 export interface UpdateAPIKeybyIdVariables {
+  orgSlug?: string
   projectRef?: string
   id?: string
   description?: string
 }
 
 export async function updateAPIKeysById(
-  { projectRef, id, description }: UpdateAPIKeybyIdVariables,
+  { orgSlug, projectRef, id, description }: UpdateAPIKeybyIdVariables,
   signal?: AbortSignal
 ) {
+  if (typeof orgSlug === 'undefined') throw new Error('orgSlug is required')
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
   if (typeof id === 'undefined') throw new Error('API key ID is required')
 
-  const { data, error } = await patch('/v1/projects/{ref}/api-keys/{id}', {
+  const { data, error } = await patch('/platform/organizations/{slug}/projects/{ref}/api-keys/{id}', {
     params: {
-      path: { ref: projectRef, id },
+      path: {
+        slug: orgSlug,
+        ref: projectRef,
+        id
+      },
       query: { reveal: false },
     },
     body: {

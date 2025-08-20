@@ -1,7 +1,5 @@
-import { ChevronDown } from 'lucide-react'
 import { HTMLAttributes, ReactNode, useMemo, useState } from 'react'
 
-import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -12,7 +10,7 @@ import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configur
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -43,6 +41,8 @@ import {
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
+import { getPathReferences } from '../../../data/vela/path-references'
+import { ChevronDown } from 'lucide-react'
 
 const StepLabel = ({
   number,
@@ -62,8 +62,8 @@ const StepLabel = ({
  * So session mode connection details are always using the shared pooler (Supavisor)
  */
 export const DatabaseConnectionString = () => {
-  const { slug, ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { slug, ref: projectRef } = getPathReferences()
+  const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
@@ -202,7 +202,7 @@ export const DatabaseConnectionString = () => {
   }
   const poolerSettingsUrl = {
     text: 'Pooler settings',
-    url: `/org/${slug}/project/${projectRef}/settings/database#connection-pooling`,
+    url: `/org/${slug}/project/${projectRef}/database/settings#connection-pooling`,
   }
   const buttonLinks = !ipv4Addon
     ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
@@ -526,7 +526,7 @@ export const DatabaseConnectionString = () => {
         <p className="text-sm text-foreground-lighter">
           You may reset your database password in your project's{' '}
           <InlineLink
-            href={`/org/${slug}/project/${projectRef}/settings/database`}
+            href={`/org/${slug}/project/${projectRef}/database/settings`}
             className="text-foreground-lighter hover:text-foreground"
           >
             Database Settings

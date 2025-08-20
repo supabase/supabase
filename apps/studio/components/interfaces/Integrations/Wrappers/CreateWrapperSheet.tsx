@@ -4,14 +4,14 @@ import { Edit, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { invalidateSchemasQuery, useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Form,
@@ -47,8 +47,8 @@ export const CreateWrapperSheet = ({
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
 
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const [newTables, setNewTables] = useState<any[]>([])

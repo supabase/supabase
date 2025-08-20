@@ -31,8 +31,8 @@ const ProjectList = ({
   filterStatus,
   resetFilterStatus,
 }: ProjectListProps) => {
-  const { data } = useSelectedOrganizationQuery()
-  const organization = organization_ ?? data
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const organization = organization_ ?? selectedOrganization
 
   const {
     data: allProjects = [],
