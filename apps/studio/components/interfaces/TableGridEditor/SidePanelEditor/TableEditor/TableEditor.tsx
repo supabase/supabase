@@ -72,7 +72,7 @@ export interface TableEditorProps {
   updateEditorDirty: () => void
 }
 
-const TableEditor = ({
+export const TableEditor = ({
   table,
   isDuplicating,
   visible = false,
@@ -85,8 +85,7 @@ const TableEditor = ({
   const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const { realtimeAll: realtimeEnabled, tableEditorEnableRlsToggle: enableRlsToggle } =
-    useIsFeatureEnabled(['realtime:all', 'table_editor:enable_rls_toggle'])
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
 
   const [params, setParams] = useUrlState()
@@ -293,69 +292,67 @@ const TableEditor = ({
       </SidePanel.Content>
       <SidePanel.Separator />
       <SidePanel.Content className="space-y-10 py-6">
-        {enableRlsToggle && (
-          <>
-            <Checkbox
-              id="enable-rls"
-              // @ts-ignore
-              label={
-                <div className="flex items-center space-x-2">
-                  <span>Enable Row Level Security (RLS)</span>
-                  <Badge>Recommended</Badge>
-                </div>
-              }
-              description="Restrict access to your table by enabling RLS and writing Postgres policies."
-              checked={tableFields.isRLSEnabled}
-              onChange={() => {
-                // if isEnabled, show confirm modal to turn off
-                // if not enabled, allow turning on without modal confirmation
-                tableFields.isRLSEnabled
-                  ? setRlsConfirmVisible(true)
-                  : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-              }}
-              size="medium"
+        <Checkbox
+          id="enable-rls"
+          // @ts-ignore
+          label={
+            <div className="flex items-center space-x-2">
+              <span>Enable Row Level Security (RLS)</span>
+              <Badge>Recommended</Badge>
+            </div>
+          }
+          description="Restrict access to your table by enabling RLS and writing Postgres policies."
+          checked={tableFields.isRLSEnabled}
+          onChange={() => {
+            // if isEnabled, show confirm modal to turn off
+            // if not enabled, allow turning on without modal confirmation
+            tableFields.isRLSEnabled
+              ? setRlsConfirmVisible(true)
+              : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+          }}
+          size="medium"
+        />
+
+        {tableFields.isRLSEnabled ? (
+          <Admonition
+            type="default"
+            className="!mt-3"
+            title="Policies are required to query data"
+            description={
+              <>
+                You need to create an access policy before you can query data from this table.
+                Without a policy, querying this table will return an{' '}
+                <u className="text-foreground">empty array</u> of results.{' '}
+                {isNewRecord ? 'You can create policies after saving this table.' : ''}
+              </>
+            }
+          >
+            <DocsButton
+              abbrev={false}
+              className="mt-2"
+              href="https://supabase.com/docs/guides/auth/row-level-security"
             />
-            {tableFields.isRLSEnabled ? (
-              <Admonition
-                type="default"
-                className="!mt-3"
-                title="Policies are required to query data"
-                description={
-                  <>
-                    You need to create an access policy before you can query data from this table.
-                    Without a policy, querying this table will return an{' '}
-                    <u className="text-foreground">empty array</u> of results.{' '}
-                    {isNewRecord ? 'You can create policies after saving this table.' : ''}
-                  </>
-                }
-              >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2"
-                  href="https://supabase.com/docs/guides/auth/row-level-security"
-                />
-              </Admonition>
-            ) : (
-              <Admonition
-                type="warning"
-                className="!mt-3"
-                title="You are allowing anonymous access to your table"
-                description={
-                  <>
-                    {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
-                    publicly writable and readable
-                  </>
-                }
-              >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2"
-                  href="https://supabase.com/docs/guides/auth/row-level-security"
-                />
-              </Admonition>
-            )}
-          </>
+          </Admonition>
+        ) : (
+          <Admonition
+            type="warning"
+            className="!mt-3"
+            title="You are allowing anonymous access to your table"
+            description={
+              <>
+                {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
+                writable and readable
+              </>
+            }
+          >
+            <DocsButton
+              abbrev={false}
+              className="mt-2"
+              href="https://supabase.com/docs/guides/auth/row-level-security"
+            />
+          </Admonition>
         )}
+
         {realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
@@ -380,7 +377,9 @@ const TableEditor = ({
           />
         )}
       </SidePanel.Content>
+
       <SidePanel.Separator />
+
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
           <ColumnManagement
@@ -455,5 +454,3 @@ const TableEditor = ({
     </SidePanel>
   )
 }
-
-export default TableEditor
