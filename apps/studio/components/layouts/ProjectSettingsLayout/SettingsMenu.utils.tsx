@@ -16,6 +16,7 @@ export const generateSettingsMenu = (
     invoices?: boolean
     legacyJwtKeys?: boolean
     logDrains?: boolean
+    billing?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -26,6 +27,7 @@ export const generateSettingsMenu = (
   const storageEnabled = features?.storage ?? true
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const logDrainsEnabled = features?.logDrains ?? true
+  const billingEnabled = features?.billing ?? true
 
   return [
     {
@@ -159,14 +161,17 @@ export const generateSettingsMenu = (
     {
       title: 'Billing',
       items: [
-        {
-          name: 'Subscription',
-          key: 'subscription',
-          url: `/org/${organization?.slug}/billing`,
-          items: [],
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-        },
-
+        ...(billingEnabled
+          ? [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: `/org/${organization?.slug}/billing`,
+                items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+              },
+            ]
+          : []),
         {
           name: 'Usage',
           key: 'usage',
