@@ -29,6 +29,7 @@ import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -66,9 +67,9 @@ const PaymentMethods = () => {
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           {selectedOrganization?.managed_by !== undefined &&
-          selectedOrganization?.managed_by !== 'supabase' ? (
+          selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE ? (
             <PartnerManagedResource
-              partner={selectedOrganization?.managed_by}
+              managedBy={selectedOrganization?.managed_by}
               resource="Payment Methods"
               cta={{
                 installationId: selectedOrganization?.partner_id,

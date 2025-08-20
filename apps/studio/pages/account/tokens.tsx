@@ -31,7 +31,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer bottomPadding>
         <div className="space-y-4">
-          {newToken && <NewTokenBanner token={newToken} />}
+          {newToken && <NewTokenBanner token={newToken} onClose={() => setNewToken(undefined)} />}
           <div className="flex items-center justify-between gap-x-2 mb-3">
             <Input
               size="tiny"
