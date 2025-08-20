@@ -17,7 +17,7 @@ function generateFundingStageSQL(activeFilters: Record<string, string>) {
       WHEN funding_stage = 'Series C' THEN 6
       WHEN funding_stage = 'Series D or later' THEN 7
       ELSE 8
-    END;`
+  END;`
 }
 
 export function FundingStageChart() {
