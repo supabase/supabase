@@ -89,7 +89,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   `,
     })
 
-    return res.json(object.feedback_category)
+    return res.json({ feedback_category: object.feedback_category })
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Classifying this feedback failed`)
