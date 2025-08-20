@@ -54,7 +54,7 @@ export async function generateStaticParams() {
 export default async function BlogPostPage({ params }: { params: Params }) {
   const { slug } = await params
 
-  if (!params?.slug) {
+  if (!slug) {
     throw new Error('Missing slug for app/blog/[slug]/page.tsx')
   }
 

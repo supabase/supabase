@@ -188,11 +188,38 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
   // )
 
   try {
-    // When in preview mode, specify draft=true to get the latest draft content
-    const url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2${preview ? '&draft=true' : ''}`
+    let url: string
+    let response: Response
+
+    if (!preview) {
+      // For published posts, try to get the latest published version using versions API
+      const versionsUrl = `${PAYLOAD_URL}/api/posts/versions?where[version.slug][equals]=${slug}&where[version._status][equals]=published&sort=-updatedAt&limit=1&depth=2`
+
+      response = await fetch(versionsUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+        cache: 'default',
+        next: { revalidate: 300 },
+      })
+
+      if (response.ok) {
+        const versionsData = await response.json()
+        if (versionsData.docs && versionsData.docs.length > 0) {
+          const latestPublishedVersion = versionsData.docs[0].version
+          if (latestPublishedVersion) {
+            return processPostData(latestPublishedVersion)
+          }
+        }
+      }
+    }
+
+    // Fallback to regular API (for preview mode or if versions API fails)
+    url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2${preview ? '&draft=true' : ''}`
     // console.log(`[getCMSPostBySlug] API URL: ${url}`)
 
-    const response = await fetch(url, {
+    response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),

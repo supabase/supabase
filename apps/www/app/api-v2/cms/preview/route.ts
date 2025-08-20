@@ -8,13 +8,35 @@ export async function GET(request: Request) {
   const slug = searchParams.get('slug')
   const path = searchParams.get('path') || 'blog'
 
-  if (secret !== process.env.PREVIEW_SECRET) {
-    return new Response('Invalid token', { status: 401 })
+  // Get the expected secret with fallback to match CMS configuration
+  const expectedSecret = process.env.PREVIEW_SECRET || 'secret'
+
+  console.log('[preview] Preview request:', {
+    receivedSecret: secret,
+    expectedSecret,
+    slug,
+    path,
+    url: request.url,
+    hasPreviewSecret: !!process.env.PREVIEW_SECRET,
+  })
+
+  if (secret !== expectedSecret) {
+    console.error('[preview] Token mismatch:', {
+      received: secret,
+      expected: expectedSecret,
+    })
+    return new Response(
+      `Invalid token. Expected: ${expectedSecret?.slice(0, 3)}..., Received: ${secret?.slice(0, 3)}...`,
+      { status: 401 }
+    )
   }
 
   if (!slug) {
+    console.error('[preview] No slug provided')
     return new Response('No slug in the request', { status: 401 })
   }
+
+  console.log('[preview] Enabling draft mode and redirecting to:', `/${path}/${slug}`)
 
   // Enable Draft Mode by setting the cookie
   draft.enable()
