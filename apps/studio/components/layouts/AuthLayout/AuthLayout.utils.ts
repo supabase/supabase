@@ -1,7 +1,28 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
+export const generateAuthMenu = (
+  ref: string,
+  flags?: {
+    authenticationPolicies: boolean
+    authenticationSignInProviders: boolean
+    authenticationRateLimits: boolean
+    authenticationEmails: boolean
+    authenticationMultiFactor: boolean
+    authenticationAttackProtection: boolean
+    authenticationAdvanced: boolean
+  }
+): ProductMenuGroup[] => {
+  const {
+    authenticationPolicies,
+    authenticationSignInProviders,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationAdvanced,
+  } = flags ?? {}
+
   return [
     {
       title: 'Manage',
@@ -10,58 +31,82 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
     {
       title: 'Configuration',
       items: [
-        {
-          name: 'Policies',
-          key: 'policies',
-          url: `/project/${ref}/auth/policies`,
-          items: [],
-        },
-        ...(IS_PLATFORM
+        ...(authenticationPolicies
           ? [
               {
-                name: 'Sign In / Providers',
-                key: 'sign-in-up',
-                pages: ['providers', 'third-party'],
-                url: `/project/${ref}/auth/providers`,
+                name: 'Policies',
+                key: 'policies',
+                url: `/project/${ref}/auth/policies`,
                 items: [],
               },
+            ]
+          : []),
+        ...(IS_PLATFORM
+          ? [
+              ...(authenticationSignInProviders
+                ? [
+                    {
+                      name: 'Sign In / Providers',
+                      key: 'sign-in-up',
+                      pages: ['providers', 'third-party'],
+                      url: `/project/${ref}/auth/providers`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Sessions',
                 key: 'sessions',
                 url: `/project/${ref}/auth/sessions`,
                 items: [],
               },
-              {
-                name: 'Rate Limits',
-                key: 'rate-limits',
-                url: `/project/${ref}/auth/rate-limits`,
-                items: [],
-              },
-              {
-                name: 'Emails',
-                key: 'emails',
-                pages: ['templates', 'smtp'],
-                url: `/project/${ref}/auth/templates`,
-                items: [],
-              },
-              {
-                name: 'Multi-Factor',
-                key: 'mfa',
-                url: `/project/${ref}/auth/mfa`,
-                items: [],
-              },
+              ...(authenticationRateLimits
+                ? [
+                    {
+                      name: 'Rate Limits',
+                      key: 'rate-limits',
+                      url: `/project/${ref}/auth/rate-limits`,
+                      items: [],
+                    },
+                  ]
+                : []),
+              ...(authenticationEmails
+                ? [
+                    {
+                      name: 'Emails',
+                      key: 'emails',
+                      pages: ['templates', 'smtp'],
+                      url: `/project/${ref}/auth/templates`,
+                      items: [],
+                    },
+                  ]
+                : []),
+              ...(authenticationMultiFactor
+                ? [
+                    {
+                      name: 'Multi-Factor',
+                      key: 'mfa',
+                      url: `/project/${ref}/auth/mfa`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'URL Configuration',
                 key: 'url-configuration',
                 url: `/project/${ref}/auth/url-configuration`,
                 items: [],
               },
-              {
-                name: 'Attack Protection',
-                key: 'protection',
-                url: `/project/${ref}/auth/protection`,
-                items: [],
-              },
+              ...(authenticationAttackProtection
+                ? [
+                    {
+                      name: 'Attack Protection',
+                      key: 'protection',
+                      url: `/project/${ref}/auth/protection`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Auth Hooks',
                 key: 'hooks',
@@ -69,12 +114,16 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
                 label: 'BETA',
               },
-              {
-                name: 'Advanced',
-                key: 'advanced',
-                url: `/project/${ref}/auth/advanced`,
-                items: [],
-              },
+              ...(authenticationAdvanced
+                ? [
+                    {
+                      name: 'Advanced',
+                      key: 'advanced',
+                      url: `/project/${ref}/auth/advanced`,
+                      items: [],
+                    },
+                  ]
+                : []),
             ]
           : []),
       ],

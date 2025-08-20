@@ -4,6 +4,7 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
@@ -12,10 +13,41 @@ const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
 
+  const {
+    authenticationPolicies,
+    authenticationSignInProviders,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationAdvanced,
+  } = useIsFeatureEnabled([
+    'authentication:policies',
+    'authentication:sign_in_providers',
+    'authentication:rate_limits',
+    'authentication:emails',
+    'authentication:multi_factor',
+    'authentication:attack_protection',
+    'authentication:advanced',
+  ])
+
   useAuthConfigPrefetch({ projectRef })
   const page = router.pathname.split('/')[4]
 
-  return <ProductMenu page={page} menu={generateAuthMenu(projectRef)} />
+  return (
+    <ProductMenu
+      page={page}
+      menu={generateAuthMenu(projectRef, {
+        authenticationPolicies,
+        authenticationSignInProviders,
+        authenticationRateLimits,
+        authenticationEmails,
+        authenticationMultiFactor,
+        authenticationAttackProtection,
+        authenticationAdvanced,
+      })}
+    />
+  )
 }
 
 const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
