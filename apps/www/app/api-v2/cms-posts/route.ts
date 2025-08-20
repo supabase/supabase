@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { draftMode } from 'next/headers'
 import { CMS_SITE_ORIGIN } from '~/lib/constants'
 import { generateReadingTime } from '~/lib/helpers'
 
@@ -93,8 +94,77 @@ export async function GET(request: NextRequest) {
     const baseUrl = CMS_SITE_ORIGIN
     const apiKey = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
+    // Check if we're in draft mode
+    const { isEnabled: isDraftMode } = await draftMode()
+
     // When fetching a specific post, we need to handle versioning correctly
     if (slug) {
+      // If in draft mode, fetch draft content directly
+      if (isDraftMode) {
+        console.log('[cms-posts] Draft mode enabled, fetching draft content for slug:', slug)
+        const draftUrl = new URL('/api/posts', baseUrl)
+        draftUrl.searchParams.set('where[slug][equals]', slug)
+        draftUrl.searchParams.set('depth', '2')
+        draftUrl.searchParams.set('draft', 'true')
+
+        const draftResponse = await fetch(draftUrl.toString(), {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+          },
+          cache: 'no-store', // Never cache draft content
+        })
+
+        console.log('[cms-posts] Draft API response status:', draftResponse.status)
+
+        if (draftResponse.ok) {
+          const draftData = await draftResponse.json()
+          console.log('[cms-posts] Draft API data:', {
+            totalDocs: draftData.totalDocs,
+            docsLength: draftData.docs?.length,
+            firstDocStatus: draftData.docs?.[0]?._status,
+            firstDocSlug: draftData.docs?.[0]?.slug,
+          })
+
+          if (draftData.docs && draftData.docs.length > 0) {
+            const post = draftData.docs[0]
+            const markdownContent = convertRichTextToMarkdown(post.content)
+            const readingTime = generateReadingTime(richTextToPlainText(post.content))
+
+            const processedPost = {
+              slug: post.slug || '',
+              title: post.title || '',
+              description: post.description || '',
+              date: post.date || new Date().toISOString(),
+              formattedDate: new Date(post.date || new Date()).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              }),
+              readingTime,
+              authors: post.authors || [],
+              thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
+              image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
+              url: `/blog/${post.slug}`,
+              path: `/blog/${post.slug}`,
+              tags: post.tags || [],
+              categories: [],
+              isCMS: true,
+              content: markdownContent,
+              richContent: post.content,
+              isDraft: true,
+            }
+
+            return NextResponse.json({
+              success: true,
+              post: processedPost,
+              mode,
+              isDraft: true,
+            })
+          }
+        }
+      }
+
       // Strategy 1: Try to get the latest published version using the versions API
       const versionsUrl = new URL('/api/posts/versions', baseUrl)
       versionsUrl.searchParams.set('where[version.slug][equals]', slug)

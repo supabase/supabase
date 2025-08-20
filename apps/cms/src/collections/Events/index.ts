@@ -54,10 +54,14 @@ export const Events: CollectionConfig = {
     },
   },
   access: {
-    create: isAuthenticated,
-    delete: isAuthenticated,
-    read: isAnyone,
-    update: isAuthenticated,
+    // create: isAuthenticated,
+    // delete: isAuthenticated,
+    // read: isAnyone,
+    // update: isAuthenticated,
+    create: () => false,
+    delete: () => false,
+    read: () => false,
+    update: () => false,
   },
   defaultPopulate: {
     title: true,
