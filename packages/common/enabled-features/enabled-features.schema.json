@@ -136,7 +136,7 @@
 
     "project_connection:javascript_example": {
       "type": "boolean",
-      "description": "Show the javascript example in the project connection settings"
+      "description": "Show the javascript example in the project connection settings. If off, it'll show up as Typescript example instead (both are the same code example)"
     },
     "project_connection:dart_example": {
       "type": "boolean",
