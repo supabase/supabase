@@ -122,7 +122,7 @@ export const QueryBlock = ({
   onDragStart,
   onResults,
 }: QueryBlockProps) => {
-  const { ref } = useParams()
+  const { slug: orgSlug, ref } = useParams()
 
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
   const { xKey, yKey, view = 'table' } = chartSettings
@@ -155,7 +155,7 @@ export const QueryBlock = ({
   // [Joshen] This is for when we introduced the concept of parameters into our reports
   // const combinedParameterValues = { ...extParameterValues, ...parameterValues }
 
-  const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
+  const { database: primaryDatabase } = usePrimaryDatabase({ orgSlug, projectRef: ref })
   const postgresConnectionString = primaryDatabase?.connectionString
   const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
 

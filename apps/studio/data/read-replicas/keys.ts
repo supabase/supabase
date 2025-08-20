@@ -1,5 +1,5 @@
 export const replicaKeys = {
-  list: (projectRef: string | undefined) => ['project', projectRef, 'replicas'] as const,
+  list: (orgSlug: string | undefined, projectRef: string | undefined) => ['project', orgSlug, projectRef, 'replicas'] as const,
   statuses: (projectRef: string | undefined) =>
     ['project', projectRef, 'replicas-statuses'] as const,
   loadBalancers: (projectRef: string | undefined) =>

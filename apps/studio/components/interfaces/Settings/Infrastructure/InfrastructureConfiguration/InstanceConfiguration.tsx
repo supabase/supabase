@@ -76,6 +76,7 @@ const InstanceConfigurationUI = () => {
     isError,
     isSuccess: isSuccessReplicas,
   } = useReadReplicasQuery({
+    orgSlug: slug,
     projectRef,
   })
   const [[primary], replicas] = useMemo(

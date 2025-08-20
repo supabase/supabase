@@ -33,7 +33,7 @@ import {
 } from './UpgradeWarnings'
 
 const InfrastructureInfo = () => {
-  const { ref } = useParams()
+  const { slug: orgSlug, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
@@ -56,7 +56,7 @@ const InfrastructureInfo = () => {
     isSuccess: isSuccessServiceVersions,
   } = useProjectServiceVersionsQuery({ projectRef: ref })
 
-  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef: ref })
   const { current_app_version, current_app_version_release_channel, latest_app_version } =
     data || {}
 

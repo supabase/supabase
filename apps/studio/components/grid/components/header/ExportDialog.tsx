@@ -44,12 +44,12 @@ export const ExportDialog = ({
   open,
   onOpenChange,
 }: ExportDialogProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<string>('csv')
 
-  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef })
   const primaryDatabase = (databases ?? []).find((db) => db.identifier === projectRef)
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }

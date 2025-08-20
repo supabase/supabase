@@ -32,13 +32,13 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
-  const { viewOngoingQueries } = useParams()
+  const { slug: orgSlug, viewOngoingQueries } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
   const appState = useAppStateSnapshot()
   const [selectedId, setSelectedId] = useState<number>()
 
-  const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef: project?.ref })
   const database = (databases ?? []).find((db) => db.identifier === state.selectedDatabaseId)
 
   const {

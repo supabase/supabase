@@ -136,6 +136,7 @@ export const SQLEditor = () => {
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
+      orgSlug: slug,
       projectRef: ref,
     },
     { enabled: isValidConnString(project?.connectionString) }

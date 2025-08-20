@@ -56,7 +56,7 @@ const DatabaseSelector = ({
   const state = useDatabaseSelectorStateSnapshot()
   const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
 
-  const { data, isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
+  const { data, isLoading, isSuccess } = useReadReplicasQuery({ orgSlug: slug, projectRef })
   const databases = data ?? []
   const sortedDatabases = databases
     .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))

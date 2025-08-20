@@ -88,6 +88,7 @@ const Home: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
   const { data: replicasData, isLoading: isLoadingReplicas } = useReadReplicasQuery({
+    orgSlug: slug,
     projectRef: project?.ref,
   })
 

@@ -22,9 +22,9 @@ const PITRStatus = ({
   onUpdateTimezone,
   onSetConfiguration,
 }: PITRStatusProps) => {
-  const { ref } = useParams()
-  const { data: backups } = useBackupsQuery({ projectRef: ref })
-  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+  const { slug: orgSlug, ref } = useParams()
+  const { data: backups } = useBackupsQuery({ orgSlug, projectRef: ref })
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef: ref })
 
   const hasReadReplicas = (databases ?? []).length > 1
 

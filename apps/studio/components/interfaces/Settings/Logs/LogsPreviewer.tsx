@@ -87,7 +87,7 @@ export const LogsPreviewer = ({
   }, [timestampStart, timestampEnd])
 
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
-  const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
+  const { data: databases, isSuccess } = useReadReplicasQuery({ orgSlug: slug, projectRef })
 
   // TODO: Move this to useLogsUrlState to simplify LogsPreviewer. - Jordi
   function getDefaultDatePickerValue() {

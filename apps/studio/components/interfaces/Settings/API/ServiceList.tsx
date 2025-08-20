@@ -17,7 +17,7 @@ import { PostgrestConfig } from './PostgrestConfig'
 
 export const ServiceList = () => {
   const { data: project, isLoading } = useSelectedProjectQuery()
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
@@ -25,7 +25,7 @@ export const ServiceList = () => {
     data: databases,
     isError,
     isLoading: isLoadingDatabases,
-  } = useReadReplicasQuery({ projectRef })
+  } = useReadReplicasQuery({ orgSlug, projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
   // Get the API service

@@ -42,7 +42,7 @@ export const QueryPerformance = ({
   queryHitRate,
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
-  const { ref } = useParams()
+  const { slug: orgSlug, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -69,7 +69,7 @@ export const QueryPerformance = ({
     queryHitRate.runQuery()
   }
 
-  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef: ref })
 
   const { data: mostTimeConsumingQueries, isLoading: isLoadingMTC } = useQueryPerformanceQuery({
     preset: 'mostTimeConsuming',

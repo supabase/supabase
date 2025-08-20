@@ -66,7 +66,7 @@ const MapView = ({
   )
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const { data } = useReadReplicasQuery({ projectRef: ref })
+  const { data } = useReadReplicasQuery({ orgSlug: slug, projectRef: ref })
   const databases = data ?? []
   const [[primary], replicas] = partition(databases, (db) => db.identifier === ref)
 

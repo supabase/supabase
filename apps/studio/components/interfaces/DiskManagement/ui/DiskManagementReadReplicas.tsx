@@ -29,9 +29,9 @@ export const DiskManagementDiskSizeReadReplicas = ({
   oldStorageType,
   newStorageType,
 }: DiskManagementDiskSizeReadReplicasProps) => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
 
-  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
   const beforePrice = totalSize * DISK_PRICING[oldStorageType]?.storage
   const afterPrice = newTotalSize * DISK_PRICING[newStorageType]?.storage
@@ -141,8 +141,8 @@ export const DiskManagementIOPSReadReplicas = ({
   oldStorageType: DiskType
   newStorageType: DiskType
 }) => {
-  const { ref: projectRef } = useParams()
-  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { slug: orgSlug, ref: projectRef } = useParams()
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
   const beforePrice =
@@ -198,8 +198,8 @@ export const DiskManagementThroughputReadReplicas = ({
   oldStorageType: DiskType
   newStorageType: DiskType
 }) => {
-  const { ref: projectRef } = useParams()
-  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { slug: orgSlug, ref: projectRef } = useParams()
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
   const beforePrice =

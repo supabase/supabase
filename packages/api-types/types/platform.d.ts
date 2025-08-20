@@ -2879,7 +2879,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/databases': {
+  '/platform/organizations/{slug}/projects/{ref}/databases': {
     parameters: {
       query?: never
       header?: never
@@ -2896,7 +2896,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/databases-statuses': {
+  '/platform/organizations/{slug}/projects/{ref}/databases-statuses': {
     parameters: {
       query?: never
       header?: never

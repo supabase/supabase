@@ -20,9 +20,9 @@ import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
 
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ orgSlug, projectRef })
 
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled

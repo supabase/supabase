@@ -68,7 +68,7 @@ import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 export function DiskManagementForm() {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const queryClient = useQueryClient()
 
   const { data: resourceWarnings } = useResourceWarningsQuery()
@@ -91,7 +91,7 @@ export function DiskManagementForm() {
   const [message, setMessageState] = useState<DiskManagementMessage | null>(null)
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
-  const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ projectRef })
+  const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ orgSlug, projectRef })
   const { data, isSuccess: isDiskAttributesSuccess } = useDiskAttributesQuery(
     { projectRef },
     {

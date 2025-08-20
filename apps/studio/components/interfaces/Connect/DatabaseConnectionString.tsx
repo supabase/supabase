@@ -93,7 +93,7 @@ export const DatabaseConnectionString = () => {
     isLoading: isLoadingReadReplicas,
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
-  } = useReadReplicasQuery({ projectRef })
+  } = useReadReplicasQuery({ orgSlug: slug, projectRef })
 
   const poolerError = sharedPoolerPreferred ? pgbouncerError : supavisorConfigError
   const isLoadingPoolerConfig = !IS_PLATFORM

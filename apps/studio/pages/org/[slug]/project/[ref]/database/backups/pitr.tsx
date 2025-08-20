@@ -47,11 +47,11 @@ DatabasePhysicalBackups.getLayout = (page) => (
 )
 
 const PITR = () => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const isOrioleDbInAws = useIsOrioleDbInAws()
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ orgSlug, projectRef })
 
   const plan = organization?.plan?.id
   const isEnabled = backups?.pitr_enabled

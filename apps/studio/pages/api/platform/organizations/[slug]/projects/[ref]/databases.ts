@@ -19,7 +19,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 type ResponseData =
-  paths['/platform/projects/{ref}/databases']['get']['responses']['200']['content']['application/json']
+  paths['/platform/organizations/{slug}/projects/{ref}/databases']['get']['responses']['200']['content']['application/json']
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   return res.status(200).json([

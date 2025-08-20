@@ -70,7 +70,7 @@ const DeployNewReplicaPanel = ({
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { data } = useReadReplicasQuery({ projectRef })
+  const { data } = useReadReplicasQuery({ orgSlug: slug, projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 

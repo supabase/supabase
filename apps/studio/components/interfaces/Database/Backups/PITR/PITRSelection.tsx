@@ -30,8 +30,8 @@ const PITRSelection = () => {
   const { slug, ref } = useParams()
   const queryClient = useQueryClient()
 
-  const { data: backups } = useBackupsQuery({ projectRef: ref })
-  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+  const { data: backups } = useBackupsQuery({ orgSlug: slug, projectRef: ref })
+  const { data: databases } = useReadReplicasQuery({ orgSlug: slug, projectRef: ref })
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())

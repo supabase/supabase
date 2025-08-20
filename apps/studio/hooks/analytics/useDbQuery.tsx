@@ -36,10 +36,11 @@ const useDbQuery = ({
   where?: string
   orderBy?: string
 }): DbQueryHook => {
+  const { slug: orgSlug } = getPathReference()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
+  const { data: databases } = useReadReplicasQuery({ orgSlug, projectRef: project?.ref })
   const connectionString = (databases || []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )?.connectionString
@@ -85,3 +86,7 @@ const useDbQuery = ({
 }
 
 export default useDbQuery
+function getPathReference(): { slug: any } {
+    throw new Error('Function not implemented.')
+}
+
