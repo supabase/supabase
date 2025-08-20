@@ -21,13 +21,29 @@ Supabase provides a globally distributed [Realtime](https://github.com/supabase/
       description: 'Mouse movements and chat messages.',
       href: 'https://multiplayer.dev',
     },
-  ].map((x) => (
-    <div className="col-span-12" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
+    {
+      name: 'Chat',
+      description: 'Supabase UI chat component',
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-cursor'
+    },
+    {
+      name: 'Avatar Stack',
+      description: 'Supabase UI avatar stack component',
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-avatar-stack'
+    },
+    {
+      name: 'Realtime Cursor',
+      description: 'Supabase UI realtime cursor',
+      href: 'https://supabase.com/ui/docs/nextjs/realtime-cursor'
+    }
+].map((x) => (
+  <div className="col-span-6" key={x.href}>
+    <Link href={x.href} target="_blank" passHref>
+      <GlassPanel title={x.name}>{x.description}</GlassPanel>
+    </Link>
+  </div>
+))}
+
 </div>
 
 ## Resources
