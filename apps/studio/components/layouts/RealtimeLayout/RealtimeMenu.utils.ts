@@ -4,10 +4,10 @@ import { IS_PLATFORM } from 'lib/constants'
 
 export const generateRealtimeMenu = (
   project: Project,
-  flags?: { enableRealtimeSettings: boolean }
+  flags?: { enableRealtimeSettings: boolean; showPolicies: boolean }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { enableRealtimeSettings } = flags || {}
+  const { enableRealtimeSettings, showPolicies } = flags || {}
 
   return [
     {
@@ -24,12 +24,16 @@ export const generateRealtimeMenu = (
     {
       title: 'Configuration',
       items: [
-        {
-          name: 'Policies',
-          key: 'policies',
-          url: `/project/${ref}/realtime/policies`,
-          items: [],
-        },
+        ...(showPolicies
+          ? [
+              {
+                name: 'Policies',
+                key: 'policies',
+                url: `/project/${ref}/realtime/policies`,
+                items: [],
+              },
+            ]
+          : []),
         ...(IS_PLATFORM && enableRealtimeSettings
           ? [
               {
