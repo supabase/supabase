@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
 import { ArrowRight, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import ReactDatePicker from 'react-datepicker'
 
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
@@ -11,6 +11,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
 import { TimeSplitInput } from './TimeSplitInput'
@@ -22,13 +23,14 @@ export interface DatePickerProps {
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
   triggerButtonTitle?: string
+  triggerButtonSize?: 'tiny' | 'small'
   minDate?: Date
   maxDate?: Date
   hideTime?: boolean
   hideClear?: boolean
   selectsRange?: boolean
-  renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
-  children?: React.ReactNode | React.ReactNode[] | null
+  renderFooter?: (args: DatePickerToFrom) => ReactNode | void
+  children?: ReactNode | ReactNode[] | null
 }
 
 const START_DATE_DEFAULT = new Date()
@@ -37,13 +39,14 @@ const END_DATE_DEFAULT = new Date()
 const START_TIME_DEFAULT = { HH: '00', mm: '00', ss: '00' }
 const END_TIME_DEFAULT = { HH: '23', mm: '59', ss: '59' }
 
-function DatePicker({
+export function DatePicker({
   to,
   from,
   onChange,
   triggerButtonType = 'default',
   triggerButtonClassName = '',
   triggerButtonTitle,
+  triggerButtonSize,
   minDate,
   maxDate,
   hideTime = false,
@@ -147,6 +150,7 @@ function DatePicker({
           title={triggerButtonTitle}
           type={triggerButtonType}
           icon={<Calendar />}
+          size={triggerButtonSize}
           className={triggerButtonClassName}
         >
           {children !== undefined ? (
@@ -175,10 +179,10 @@ function DatePicker({
         <>
           {hideTime ? null : (
             <>
-              <div className="flex items-stretch justify-between py-2">
+              <div className="flex items-stretch justify-between p-2">
                 {!selectsRange ? null : (
                   <>
-                    <div className="flex grow flex-col gap-1 pl-2">
+                    <div className="flex grow flex-col gap-1">
                       <TimeSplitInput
                         type="start"
                         startTime={startTime}
@@ -192,19 +196,15 @@ function DatePicker({
                       />
                     </div>
                     <div
-                      className={`
-                      flex 
-                      w-12 
-                      items-center 
-                      justify-center
-                      text-foreground-lighter
-                    `}
+                      className={cn(
+                        'flex items-center, justify-center w-12 text-foreground-lighter'
+                      )}
                     >
                       <ArrowRight strokeWidth={1.5} size={14} />
                     </div>
                   </>
                 )}
-                <div className="flex grow flex-col gap-1 pr-2">
+                <div className="flex grow flex-col gap-1">
                   <TimeSplitInput
                     type="end"
                     startTime={startTime}
