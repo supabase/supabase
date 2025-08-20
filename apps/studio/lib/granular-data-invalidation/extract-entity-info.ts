@@ -17,14 +17,10 @@ async function parseWithLibPgQuery(
 
     console.log({ stmt })
 
-    // Handle different statement types using a more flexible approach
-    if (stmt?.CreateStmt) {
-      return parseCreateStatement(stmt.CreateStmt)
-    }
+    // Handle different statement types
+    if (stmt?.CreateStmt) return parseCreateStatement(stmt.CreateStmt)
 
-    if (stmt?.DropStmt) {
-      return parseDropStatement(stmt.DropStmt)
-    }
+    if (stmt?.DropStmt) return parseDropStatement(stmt.DropStmt)
 
     if (
       stmt?.SelectStmt &&
