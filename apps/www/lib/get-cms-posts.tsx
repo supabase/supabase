@@ -434,6 +434,8 @@ export async function getAllCMSPosts({
           'Content-Type': 'application/json',
           ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
         },
+        cache: 'no-store', // Ensure we always get fresh data
+        next: { revalidate: 0 }, // Disable caching for this fetch
       }
     )
 
