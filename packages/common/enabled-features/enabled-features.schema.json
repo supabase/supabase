@@ -150,7 +150,7 @@
 
     "project_homepage:show_instance_size": {
       "type": "boolean",
-      "description": "Show the instance size badge in the project homepage"
+      "description": "Show the instance size badge in the project homepage and infrastructure settings"
     },
     "project_homepage:show_examples": {
       "type": "boolean",
