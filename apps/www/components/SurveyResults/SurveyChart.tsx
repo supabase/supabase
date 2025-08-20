@@ -121,7 +121,6 @@ function useSurveyData(
   activeFilters: Record<string, string>,
   shouldFetch: boolean,
   transformData?: (data: any[]) => any[],
-  useAggregates?: boolean,
   customAggregateFunction?: (
     activeFilters: Record<string, string>,
     supabaseClient: any
@@ -139,11 +138,10 @@ function useSurveyData(
         setIsLoading(true)
         setError(null)
 
-        let query
         let processedData: any[] = []
 
         if (customAggregateFunction) {
-          // Use custom aggregation function for complex logic
+          // Use custom aggregation function for chart-specific logic
           console.log('Using custom aggregate function for:', targetColumn)
           try {
             processedData = await customAggregateFunction(activeFilters, externalSupabase)
@@ -152,98 +150,14 @@ function useSurveyData(
             console.error('Error in custom aggregate function:', customError)
             throw customError
           }
-        } else if (useAggregates) {
-          // Use Supabase count: "exact" for efficient counting
-          // This is a generic approach that works for any chart type
-          console.log('Executing aggregate count queries for:', targetColumn)
-
-          try {
-            // Get the unique values for the target column to know what categories to count
-            const { data: uniqueValues, error: uniqueError } = await externalSupabase
-              .from('responses_2025')
-              .select(targetColumn)
-            // No limit - we want all unique values to get accurate counts
-
-            if (uniqueError) {
-              throw uniqueError
-            }
-
-            // Extract unique values and remove duplicates
-            const uniqueCategories = [
-              ...new Set(uniqueValues.map((row) => (row as any)[targetColumn]).filter(Boolean)),
-            ]
-            console.log('Unique categories found:', uniqueCategories)
-
-            // Get count for each category using count: "exact"
-            const categoryCounts: Record<string, number> = {}
-
-            for (const category of uniqueCategories) {
-              let countQuery = externalSupabase
-                .from('responses_2025')
-                .select('*', { count: 'exact', head: true })
-                .eq(targetColumn, category)
-
-              // Apply additional filters
-              for (const [column, value] of Object.entries(activeFilters)) {
-                if (value && value !== NO_FILTER) {
-                  countQuery = countQuery.eq(column, value)
-                }
-              }
-
-              const { count, error: countError } = await countQuery
-
-              if (countError) {
-                console.error(`Error getting count for ${category}:`, countError)
-                continue
-              }
-
-              categoryCounts[category] = count || 0
-            }
-
-            // Transform the counts into the expected format
-            // The chart expects data with the targetColumn name as the property key
-            processedData = Object.entries(categoryCounts)
-              .map(
-                ([category, total]) =>
-                  ({
-                    [targetColumn]: category,
-                    total: total,
-                  }) as any
-              )
-              .sort((a, b) => (b.total || 0) - (a.total || 0))
-
-            console.log('Aggregate counts from queries:', processedData)
-          } catch (aggregateError) {
-            console.error('Error in aggregate queries:', aggregateError)
-            // Fallback to filtered raw data approach
-            query = externalSupabase.from('responses_2025').select(targetColumn)
-
-            // Apply filters
-            for (const [column, value] of Object.entries(activeFilters)) {
-              if (value && value !== NO_FILTER) {
-                query = query.eq(column, value)
-              }
-            }
-
-            const { data, error: fetchError } = await query
-
-            if (fetchError) {
-              console.error('Error executing fallback query:', fetchError)
-              setError(fetchError.message)
-              return
-            }
-
-            processedData = data || []
-            console.log('Fallback filtered data from query:', processedData)
-          }
         } else {
-          // Fallback to fetching raw data (existing behavior)
-          query = externalSupabase.from('responses_2025').select(targetColumn)
+          // Fallback to fetching raw data (for backward compatibility)
+          const query = externalSupabase.from('responses_2025').select(targetColumn)
 
           // Apply filters
           for (const [column, value] of Object.entries(activeFilters)) {
             if (value && value !== NO_FILTER) {
-              query = query.eq(column, value)
+              query.eq(column, value)
             }
           }
 
@@ -260,14 +174,8 @@ function useSurveyData(
           console.log('Raw data from query:', processedData)
         }
 
-        // Apply data transformation if provided
-        // Skip transformData when using aggregates since we already have the right format
-        if (
-          transformData &&
-          processedData.length > 0 &&
-          !useAggregates &&
-          !customAggregateFunction
-        ) {
+        // Apply data transformation if provided (for backward compatibility)
+        if (transformData && processedData.length > 0 && !customAggregateFunction) {
           processedData = transformData(processedData)
         }
 
@@ -306,7 +214,6 @@ function useSurveyData(
     activeFilters,
     shouldFetch,
     transformData,
-    useAggregates,
     customAggregateFunction,
   ])
 
@@ -319,7 +226,6 @@ interface SurveyChartProps {
   filterColumns: string[]
   generateSQLQuery: (activeFilters: Record<string, string>) => string
   transformData?: (data: any[]) => any[]
-  useAggregates?: boolean // Enable PostgREST aggregate functions
   customAggregateFunction?: (
     activeFilters: Record<string, string>,
     supabaseClient: any
@@ -332,7 +238,6 @@ export function SurveyChart({
   filterColumns,
   generateSQLQuery,
   transformData,
-  useAggregates,
   customAggregateFunction,
 }: SurveyChartProps) {
   const [isInView, setIsInView] = useState(false)
@@ -396,7 +301,6 @@ export function SurveyChart({
     activeFilters,
     isInView,
     transformData,
-    useAggregates,
     customAggregateFunction
   )
 

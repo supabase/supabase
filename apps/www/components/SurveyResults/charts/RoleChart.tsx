@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { SurveyChart, buildWhereClause, createCategoryAggregator } from '../SurveyChart'
 
 function generateRoleSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -20,36 +20,20 @@ ORDER BY total DESC;
 `
 }
 
-// Efficient role aggregation using count: "exact" approach
-function transformRoleData(data: any[]) {
-  // If we have raw data, use the traditional approach
-  if (data && data.length > 0) {
-    const roleCounts: Record<string, number> = {}
+// Custom aggregate function that respects role grouping logic
+function aggregateRoleData(activeFilters: Record<string, string>, supabaseClient: any) {
+  // Define the specific categories we want to track
+  const specificRoles = ['Founder / Co-founder', 'Engineer']
 
-    data.forEach((row) => {
-      const role = row.role
-      if (role) {
-        let cleanRole = role
-
-        if (role === 'Founder / Co-founder') {
-          cleanRole = 'Founder'
-        } else if (!['Engineer', 'Founder / Co-founder'].includes(role)) {
-          cleanRole = 'Other'
-        }
-
-        roleCounts[cleanRole] = (roleCounts[cleanRole] || 0) + 1
-      }
-    })
-
-    // Convert to array format and sort by count descending
-    return Object.entries(roleCounts)
-      .map(([role, total]) => ({ label: role, total }))
-      .sort((a, b) => b.total - a.total)
+  // Define how to map the raw values to display values
+  const roleMappings = {
+    'Founder / Co-founder': 'Founder',
   }
 
-  // If no raw data, we'll return empty array
-  // The actual data fetching should happen in the parent component
-  return []
+  // Use the helper function to create our custom aggregator
+  const roleAggregator = createCategoryAggregator('role', specificRoles, roleMappings)
+
+  return roleAggregator(activeFilters, supabaseClient)
 }
 
 export function RoleChart() {
@@ -59,8 +43,7 @@ export function RoleChart() {
       targetColumn="role"
       filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateRoleSQL}
-      transformData={transformRoleData}
-      useAggregates={true} // Enable efficient counting
+      customAggregateFunction={aggregateRoleData}
     />
   )
 }

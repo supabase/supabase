@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { SurveyChart, buildWhereClause, createCategoryAggregator } from '../SurveyChart'
 
 function generateFundingStageSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -20,36 +20,40 @@ function generateFundingStageSQL(activeFilters: Record<string, string>) {
   END;`
 }
 
-function transformFundingStageData(data: any[]) {
-  // Raw data from Supabase: [{ funding_stage: 'Bootstrapped' }, { funding_stage: 'Seed' }, ...]
-  // Need to aggregate by counting occurrences and apply custom ordering
-  const stageCounts: Record<string, number> = {}
+// Custom aggregate function that respects funding stage ordering
+function aggregateFundingStageData(activeFilters: Record<string, string>, supabaseClient: any) {
+  // Define all the funding stages in the correct order
+  const fundingStages = [
+    'Bootstrapped',
+    'Pre-seed',
+    'Seed',
+    'Series A',
+    'Series B',
+    'Series C',
+    'Series D or later',
+  ]
 
-  data.forEach((row) => {
-    const stage = row.funding_stage
-    if (stage) {
-      stageCounts[stage] = (stageCounts[stage] || 0) + 1
+  // Use the helper function to create our custom aggregator
+  const stageAggregator = createCategoryAggregator('funding_stage', fundingStages)
+
+  return stageAggregator(activeFilters, supabaseClient).then((data) => {
+    // Sort the data according to our predefined order
+    const stageOrder = {
+      Bootstrapped: 1,
+      'Pre-seed': 2,
+      Seed: 3,
+      'Series A': 4,
+      'Series B': 5,
+      'Series C': 6,
+      'Series D or later': 7,
     }
-  })
 
-  const stageOrder = {
-    Bootstrapped: 1,
-    'Pre-seed': 2,
-    Seed: 3,
-    'Series A': 4,
-    'Series B': 5,
-    'Series C': 6,
-    'Series D or later': 7,
-  }
-
-  // Convert to array format and sort by custom order
-  return Object.entries(stageCounts)
-    .map(([stage, total]) => ({ label: stage, total }))
-    .sort((a, b) => {
+    return data.sort((a, b) => {
       const orderA = stageOrder[a.label as keyof typeof stageOrder] || 999
       const orderB = stageOrder[b.label as keyof typeof stageOrder] || 999
       return orderA - orderB
     })
+  })
 }
 
 export function FundingStageChart() {
@@ -59,8 +63,7 @@ export function FundingStageChart() {
       targetColumn="funding_stage"
       filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateFundingStageSQL}
-      transformData={transformFundingStageData}
-      useAggregates={true} // Enable efficient counting
+      customAggregateFunction={aggregateFundingStageData}
     />
   )
 }
