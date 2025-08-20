@@ -121,7 +121,11 @@ function useSurveyData(
   activeFilters: Record<string, string>,
   shouldFetch: boolean,
   transformData?: (data: any[]) => any[],
-  useAggregates?: boolean
+  useAggregates?: boolean,
+  customAggregateFunction?: (
+    activeFilters: Record<string, string>,
+    supabaseClient: any
+  ) => Promise<any[]>
 ) {
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -138,7 +142,17 @@ function useSurveyData(
         let query
         let processedData: any[] = []
 
-        if (useAggregates) {
+        if (customAggregateFunction) {
+          // Use custom aggregation function for complex logic
+          console.log('Using custom aggregate function for:', targetColumn)
+          try {
+            processedData = await customAggregateFunction(activeFilters, externalSupabase)
+            console.log('Custom aggregate data:', processedData)
+          } catch (customError) {
+            console.error('Error in custom aggregate function:', customError)
+            throw customError
+          }
+        } else if (useAggregates) {
           // Use Supabase count: "exact" for efficient counting
           // This is a generic approach that works for any chart type
           console.log('Executing aggregate count queries for:', targetColumn)
@@ -248,7 +262,12 @@ function useSurveyData(
 
         // Apply data transformation if provided
         // Skip transformData when using aggregates since we already have the right format
-        if (transformData && processedData.length > 0 && !useAggregates) {
+        if (
+          transformData &&
+          processedData.length > 0 &&
+          !useAggregates &&
+          !customAggregateFunction
+        ) {
           processedData = transformData(processedData)
         }
 
@@ -281,7 +300,15 @@ function useSurveyData(
     }
 
     fetchData()
-  }, [targetColumn, filterColumns, activeFilters, shouldFetch, transformData, useAggregates])
+  }, [
+    targetColumn,
+    filterColumns,
+    activeFilters,
+    shouldFetch,
+    transformData,
+    useAggregates,
+    customAggregateFunction,
+  ])
 
   return { chartData, isLoading, error }
 }
@@ -293,6 +320,10 @@ interface SurveyChartProps {
   generateSQLQuery: (activeFilters: Record<string, string>) => string
   transformData?: (data: any[]) => any[]
   useAggregates?: boolean // Enable PostgREST aggregate functions
+  customAggregateFunction?: (
+    activeFilters: Record<string, string>,
+    supabaseClient: any
+  ) => Promise<any[]> // Custom aggregation logic with client
 }
 
 export function SurveyChart({
@@ -302,6 +333,7 @@ export function SurveyChart({
   generateSQLQuery,
   transformData,
   useAggregates,
+  customAggregateFunction,
 }: SurveyChartProps) {
   const [isInView, setIsInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -364,7 +396,8 @@ export function SurveyChart({
     activeFilters,
     isInView,
     transformData,
-    useAggregates
+    useAggregates,
+    customAggregateFunction
   )
 
   // Reset animation state when filters change
