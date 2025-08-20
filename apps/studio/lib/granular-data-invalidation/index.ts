@@ -5,12 +5,15 @@ import { handleInvalidation } from './handle-invalidation'
 
 export type EntityType = 'table' | 'function' | 'cron'
 
-export type InvalidationEvent = {
-  projectRef: string
+export type Event = {
   entityType: EntityType
   schema?: string
   table?: string
   entityName?: string
+}
+
+export type InvalidationEvent = Event & {
+  projectRef: string
 }
 
 /**

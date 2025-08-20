@@ -1,8 +1,6 @@
 import type { CreateStmt } from 'libpg-query'
 
-import type { InvalidationEvent } from '.'
-
-type Event = Omit<InvalidationEvent, 'projectRef'>
+import type { Event } from '.'
 
 const DEFAULT_SCHEMA = 'public' as const
 
@@ -20,7 +18,7 @@ async function parseWithLibPgQuery(sql: string, sqlLower: string): Promise<Event
     for (const stmtWrapper of parsed.stmts) {
       const stmt = stmtWrapper.stmt as any
 
-      let event: Omit<InvalidationEvent, 'projectRef'> | null = null
+      let event: Event | null = null
 
       // Handle different statement types
       if (stmt?.CreateStmt) {
