@@ -31,8 +31,6 @@ function generateCMSRemotePatterns() {
         pathname,
       })
     })
-
-    console.log(`[remotePatterns] Added ${pathPatterns.length} patterns for CMS: ${cmsHostname}`)
   } catch (error) {
     console.warn(`[remotePatterns] Failed to parse CMS_SITE_ORIGIN: "${CMS_SITE_ORIGIN}"`, error)
   }

@@ -20,8 +20,6 @@ export default function BlogClient(props: { blogs: any[] }) {
   const [view, setView] = useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
 
-  console.log('blogs', blogs)
-
   return (
     <>
       <DefaultLayout>

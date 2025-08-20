@@ -220,7 +220,6 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     if (preview) {
       // In preview mode, always try to get the latest draft first
       url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2&draft=true`
-      console.log(`[getCMSPostBySlug] Draft API URL: ${url}`)
 
       response = await fetch(url, {
         headers: {
@@ -233,7 +232,6 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
 
       // If no draft found, try published version
       if (!response.ok || (await response.clone().json()).docs?.length === 0) {
-        console.log(`[getCMSPostBySlug] No draft found, trying published version`)
         url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2&draft=false`
         response = await fetch(url, {
           headers: {
@@ -247,7 +245,6 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     } else {
       // For non-preview mode, get published version
       url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2&draft=false`
-      console.log(`[getCMSPostBySlug] Published API URL: ${url}`)
 
       response = await fetch(url, {
         headers: {
@@ -278,15 +275,8 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       return null
     }
     const data = await response.json()
-    // console.log(
-    //   `[getCMSPostBySlug] API responded with ${data.docs?.length || 0} posts, draft mode: ${preview}`
-    // )
-    // console.log(`[getCMSPostBySlug] Full API response:`, JSON.stringify(data, null, 2))
 
-    // In preview mode, we want to return the draft even if it's not published
     if (!data.docs.length && !preview) {
-      // console.log(`[getCMSPostBySlug] No docs found, not in preview mode, returning null`)
-      // console.log(`[getCMSPostBySlug] Slug searched: '${slug}'`)
       return null
     }
 
@@ -328,25 +318,12 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       return processPostData(publishedData.docs[0])
     }
 
-    // console.log(`[getCMSPostBySlug] Found ${preview ? 'draft' : 'published'} post, processing data`)
-
     // If we have a post (either draft or published), process it
     const post = data.docs[0]
 
-    // Let's log some key data to ensure it's what we expect
-    // console.log(`[getCMSPostBySlug] Post title: ${post.title}`)
-    // console.log(`[getCMSPostBySlug] Post status: ${post._status || 'published'}`)
-    // console.log(`[getCMSPostBySlug] Post content type:`, typeof post.content)
-    // console.log(`[getCMSPostBySlug] Post slug: ${post.slug}`)
-    // console.log(`[getCMSPostBySlug] About to call processPostData...`)
-
     try {
       const processedPost = await processPostData(post)
-      // console.log(`[getCMSPostBySlug] Successfully processed post:`, {
-      //   slug: processedPost.slug,
-      //   title: processedPost.title,
-      //   isCMS: processedPost.isCMS,
-      // })
+
       return processedPost
     } catch (error) {
       console.error(`[getCMSPostBySlug] Error in processPostData:`, error)
@@ -360,20 +337,11 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
 
 // Helper function to process post data
 async function processPostData(post: any) {
-  // console.log(`[processPostData] Starting to process post:`, {
-  //   id: post.id,
-  //   title: post.title,
-  //   slug: post.slug,
-  //   _status: post._status,
-  // })
-
   try {
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
 
-    // console.log(`[processPostData] About to convert rich text to markdown...`)
     const markdownContent = convertRichTextToMarkdown(post.content)
-    // console.log(`[processPostData] Markdown conversion successful, length:`, markdownContent.length)
 
     const readingTime = post.readingTime || generateReadingTime(markdownContent)
 
@@ -395,7 +363,6 @@ async function processPostData(post: any) {
         : `${PAYLOAD_URL}${post.image.url}`
       : null
 
-    // console.log(`[processPostData] About to return processed data...`)
     const processedData = {
       slug: post.slug,
       source: markdownContent,
@@ -434,7 +401,6 @@ async function processPostData(post: any) {
       },
     }
 
-    // console.log(`[processPostData] Successfully processed data for:`, processedData.title)
     return processedData
   } catch (error) {
     console.error(`[processPostData] Error processing post data:`, error)
