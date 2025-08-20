@@ -14,7 +14,7 @@ function generateSalesToolsSQL(activeFilters: Record<string, string>) {
           'Close.com',
           'Notion / Airtable',
           'Google Sheets',
-          'We don’t have a formal CRM or sales tool yet'
+          'We don't have a formal CRM or sales tool yet'
         ) THEN tool
         ELSE 'Other'
       END AS tool_clean
@@ -32,6 +32,39 @@ function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   ORDER BY respondents DESC;`
 }
 
+function transformSalesToolsData(data: any[]) {
+  // Raw data from Supabase: [{ id: 1, sales_tools: ['tool1', 'tool2'] }, ...]
+  // Need to flatten array data and apply CASE logic
+  const toolCounts: Record<string, number> = {}
+
+  data.forEach((row) => {
+    const tools = row.sales_tools || []
+    tools.forEach((tool: string) => {
+      let cleanTool = tool
+      if (
+        ![
+          'HubSpot',
+          'Salesforce',
+          'Pipedrive',
+          'Close.com',
+          'Notion / Airtable',
+          'Google Sheets',
+          "We don't have a formal CRM or sales tool yet",
+        ].includes(tool)
+      ) {
+        cleanTool = 'Other'
+      }
+
+      toolCounts[cleanTool] = (toolCounts[cleanTool] || 0) + 1
+    })
+  })
+
+  // Convert to array format and sort by count descending
+  return Object.entries(toolCounts)
+    .map(([tool, total]) => ({ label: tool, total }))
+    .sort((a, b) => b.total - a.total)
+}
+
 export function SalesToolsChart() {
   return (
     <SurveyChart
@@ -39,6 +72,7 @@ export function SalesToolsChart() {
       targetColumn="sales_tools"
       filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateSalesToolsSQL}
+      transformData={transformSalesToolsData}
     />
   )
 }

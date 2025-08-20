@@ -20,6 +20,38 @@ function generateFundingStageSQL(activeFilters: Record<string, string>) {
   END;`
 }
 
+function transformFundingStageData(data: any[]) {
+  // Raw data from Supabase: [{ funding_stage: 'Bootstrapped' }, { funding_stage: 'Seed' }, ...]
+  // Need to aggregate by counting occurrences and apply custom ordering
+  const stageCounts: Record<string, number> = {}
+
+  data.forEach((row) => {
+    const stage = row.funding_stage
+    if (stage) {
+      stageCounts[stage] = (stageCounts[stage] || 0) + 1
+    }
+  })
+
+  const stageOrder = {
+    Bootstrapped: 1,
+    'Pre-seed': 2,
+    Seed: 3,
+    'Series A': 4,
+    'Series B': 5,
+    'Series C': 6,
+    'Series D or later': 7,
+  }
+
+  // Convert to array format and sort by custom order
+  return Object.entries(stageCounts)
+    .map(([stage, total]) => ({ label: stage, total }))
+    .sort((a, b) => {
+      const orderA = stageOrder[a.label as keyof typeof stageOrder] || 999
+      const orderB = stageOrder[b.label as keyof typeof stageOrder] || 999
+      return orderA - orderB
+    })
+}
+
 export function FundingStageChart() {
   return (
     <SurveyChart
@@ -27,6 +59,7 @@ export function FundingStageChart() {
       targetColumn="funding_stage"
       filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateFundingStageSQL}
+      transformData={transformFundingStageData}
     />
   )
 }

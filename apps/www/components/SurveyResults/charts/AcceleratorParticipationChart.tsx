@@ -23,6 +23,32 @@ GROUP BY accelerator_clean
 ORDER BY total DESC;`
 }
 
+function transformAcceleratorParticipationData(data: any[]) {
+  // Raw data from Supabase: [{ accelerator_participation: 'YC' }, { accelerator_participation: 'Techstars' }, ...]
+  // Need to apply CASE logic and aggregate by counting occurrences
+  const acceleratorCounts: Record<string, number> = {}
+
+  data.forEach((row) => {
+    const accelerator = row.accelerator_participation
+
+    if (accelerator === 'Did not participate in an accelerator') {
+      return // Skip this case
+    }
+
+    let cleanAccelerator = accelerator
+    if (!['YC', 'Techstars', 'EF', '500 Global', 'Plug and Play', 'Antler'].includes(accelerator)) {
+      cleanAccelerator = 'Other'
+    }
+
+    acceleratorCounts[cleanAccelerator] = (acceleratorCounts[cleanAccelerator] || 0) + 1
+  })
+
+  // Convert to array format and sort by count descending
+  return Object.entries(acceleratorCounts)
+    .map(([accelerator_participation, total]) => ({ label: accelerator_participation, total }))
+    .sort((a, b) => b.total - a.total)
+}
+
 export function AcceleratorParticipationChart() {
   return (
     <SurveyChart
@@ -30,6 +56,7 @@ export function AcceleratorParticipationChart() {
       targetColumn="accelerator_participation"
       filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateAcceleratorParticipationSQL}
+      transformData={transformAcceleratorParticipationData}
     />
   )
 }

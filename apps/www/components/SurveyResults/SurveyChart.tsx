@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
-// import { SupabaseClient } from '~/lib/supabase'
 import { motion } from 'framer-motion'
 import {
   Button,
@@ -115,8 +114,14 @@ function useFilterOptions(filterColumns: string[]) {
   return { filters }
 }
 
-// Custom hook to fetch survey data using SQL query via RPC
-function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
+// Custom hook to fetch survey data using Supabase JS queries
+function useSurveyData(
+  targetColumn: string,
+  filterColumns: string[],
+  activeFilters: Record<string, string>,
+  shouldFetch: boolean,
+  transformData?: (data: any[]) => any[]
+) {
   const [chartData, setChartData] = useState<ChartDataItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -129,38 +134,54 @@ function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
         setIsLoading(true)
         setError(null)
 
-        // console.log('Executing SQL query:', sqlQuery)
+        // Always fetch raw data and let transformData handle aggregation
+        // This avoids GROUP BY complexity in Supabase JS and works reliably
+        let query = externalSupabase.from('responses_2025').select(targetColumn)
 
-        // Execute the SQL query using Supabase RPC
-        const { data, error: fetchError } = await externalSupabase.rpc('execute_sql', {
-          query: sqlQuery,
-        })
+        // Apply filters
+        for (const [column, value] of Object.entries(activeFilters)) {
+          if (value && value !== NO_FILTER) {
+            query = query.eq(column, value)
+          }
+        }
+
+        console.log('Executing Supabase JS query for:', targetColumn)
+        const { data, error: fetchError } = await query
 
         if (fetchError) {
-          console.error('Error executing SQL query:', fetchError)
+          console.error('Error executing JS query:', fetchError)
           setError(fetchError.message)
           return
         }
 
-        console.log('Raw data from SQL query:', data)
+        let processedData = data || []
+        console.log('Raw data from JS query:', processedData)
+
+        // Apply data transformation if provided
+        if (transformData && processedData.length > 0) {
+          processedData = transformData(processedData)
+        }
 
         // Calculate total for percentage calculation
-        const total = data.reduce((sum: number, row: any) => sum + parseInt(row.total), 0)
+        const total = processedData.reduce((sum: number, row: any) => {
+          return sum + (row.total || 0)
+        }, 0)
 
         // Transform the data to match chart format
-        const processedData = data.map((row: any) => {
-          const rawPercentage = total > 0 ? (parseInt(row.total) / total) * 100 : 0
+        const finalData = processedData.map((row: any) => {
+          const count = row.total || 0
+          const rawPercentage = total > 0 ? (count / total) * 100 : 0
           const roundedPercentage = Math.round(rawPercentage)
 
           return {
-            label: row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
+            label: row.label || row[targetColumn] || 'Unknown',
             value: roundedPercentage,
-            rawValue: rawPercentage, // Keep the raw value for bar scaling
+            rawValue: rawPercentage,
           }
         })
 
-        console.log('Processed chart data:', processedData)
-        setChartData(processedData)
+        console.log('Processed chart data:', finalData)
+        setChartData(finalData)
       } catch (err: any) {
         console.error('Error in fetchData:', err)
         setError(err.message)
@@ -170,7 +191,7 @@ function useSurveyData(sqlQuery: string, shouldFetch: boolean) {
     }
 
     fetchData()
-  }, [sqlQuery, shouldFetch])
+  }, [targetColumn, filterColumns, activeFilters, shouldFetch, transformData])
 
   return { chartData, isLoading, error }
 }
@@ -180,6 +201,7 @@ interface SurveyChartProps {
   targetColumn: string
   filterColumns: string[]
   generateSQLQuery: (activeFilters: Record<string, string>) => string
+  transformData?: (data: any[]) => any[]
 }
 
 export function SurveyChart({
@@ -187,6 +209,7 @@ export function SurveyChart({
   targetColumn,
   filterColumns,
   generateSQLQuery,
+  transformData,
 }: SurveyChartProps) {
   const [isInView, setIsInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -235,11 +258,15 @@ export function SurveyChart({
     )
   )
 
-  // Generate the SQL query string
+  // Generate the SQL query string for display purposes only
   const sqlQuery = generateSQLQuery(activeFilters)
 
   // Use the custom hook to fetch data
-  const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(sqlQuery, isInView)
+  const {
+    chartData,
+    isLoading: dataLoading,
+    error: dataError,
+  } = useSurveyData(targetColumn, filterColumns, activeFilters, isInView, transformData)
 
   // Reset animation state when filters change
   useEffect(() => {

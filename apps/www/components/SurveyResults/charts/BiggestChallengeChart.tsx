@@ -21,13 +21,46 @@ GROUP BY biggest_challenge_clean
 ORDER BY total DESC;`
 }
 
+function transformBiggestChallengeData(data: any[]) {
+  // Raw data from Supabase: [{ biggest_challenge: 'Customer acquisition' }, { biggest_challenge: 'Technical complexity' }, ...]
+  // Need to apply CASE logic and aggregate by counting occurrences
+  const challengeCounts: Record<string, number> = {}
+
+  data.forEach((row) => {
+    const challenge = row.biggest_challenge
+    if (challenge) {
+      let cleanChallenge = challenge
+
+      if (
+        ![
+          'Customer acquisition',
+          'Technical complexity',
+          'Product-market fit',
+          'Fundraising',
+          'Hiring',
+          'Other',
+        ].includes(challenge)
+      ) {
+        cleanChallenge = 'Other'
+      }
+
+      challengeCounts[cleanChallenge] = (challengeCounts[cleanChallenge] || 0) + 1
+    }
+  })
+
+  // Convert to array format and sort by count descending
+  return Object.entries(challengeCounts)
+    .map(([biggest_challenge, total]) => ({ label: biggest_challenge, total }))
+    .sort((a, b) => b.total - a.total)
+}
+
 export function BiggestChallengeChart() {
   return (
     <SurveyChart
-      title="What’s the biggest business challenge your startup is facing today?"
       targetColumn="biggest_challenge"
       filterColumns={['person_age', 'location', 'money_raised']}
       generateSQLQuery={generateBiggestChallengeSQL}
+      transformData={transformBiggestChallengeData}
     />
   )
 }

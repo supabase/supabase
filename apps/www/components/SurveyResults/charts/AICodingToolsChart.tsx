@@ -36,6 +36,48 @@ function generateAICodingToolsSQL(activeFilters: Record<string, string>) {
   ORDER BY total DESC;`
 }
 
+function transformAICodingToolsData(data: any[]) {
+  // Raw data from Supabase: [{ id: 1, ai_coding_tools: ['tech1', 'tech2'] }, ...]
+  // Need to flatten array data and apply CASE logic
+  const technologyCounts: Record<string, number> = {}
+
+  data.forEach((row) => {
+    const technologies = row.ai_coding_tools || []
+    technologies.forEach((technology: string) => {
+      let cleanTechnology = technology
+
+      if (
+        [
+          'Cursor',
+          'Windsurf',
+          'Cline',
+          'Visual Studio Code',
+          'Lovable',
+          'Bolt',
+          'v0',
+          'Tempo',
+          'None',
+        ].includes(technology)
+      ) {
+        cleanTechnology = technology
+      } else if (technology.toLowerCase().includes('claude')) {
+        cleanTechnology = 'Claude or Claude Code'
+      } else if (technology.toLowerCase() === 'chatgpt') {
+        cleanTechnology = 'ChatGPT'
+      } else {
+        cleanTechnology = 'Other'
+      }
+
+      technologyCounts[cleanTechnology] = (technologyCounts[cleanTechnology] || 0) + 1
+    })
+  })
+
+  // Convert to array format and sort by count descending
+  return Object.entries(technologyCounts)
+    .map(([technology, total]) => ({ label: technology, total }))
+    .sort((a, b) => b.total - a.total)
+}
+
 export function AICodingToolsChart() {
   return (
     <SurveyChart
@@ -43,6 +85,7 @@ export function AICodingToolsChart() {
       targetColumn="ai_coding_tools"
       filterColumns={['person_age', 'team_size', 'money_raised']}
       generateSQLQuery={generateAICodingToolsSQL}
+      transformData={transformAICodingToolsData}
     />
   )
 }

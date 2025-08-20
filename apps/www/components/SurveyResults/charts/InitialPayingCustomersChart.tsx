@@ -33,13 +33,47 @@ function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>
   ORDER BY respondents DESC;`
 }
 
+function transformInitialPayingCustomersData(data: any[]) {
+  // Raw data from Supabase: [{ id: 1, initial_paying_customers: ['source1', 'source2'] }, ...]
+  // Need to flatten array data and apply CASE logic
+  const sourceCounts: Record<string, number> = {}
+
+  data.forEach((row) => {
+    const sources = row.initial_paying_customers || []
+    sources.forEach((source: string) => {
+      let cleanSource = source
+      if (
+        ![
+          'Personal/professional network',
+          'Inbound from social media (Twitter, LinkedIn, etc.)',
+          'Cold outreach or sales',
+          'Content (blog, newsletter, SEO)',
+          'Developer communities (Discord, Slack, Reddit, etc.)',
+          'Open source users who converted',
+          'Accelerators/incubators',
+          'Hacker News or Product Hunt',
+        ].includes(source)
+      ) {
+        cleanSource = 'Other'
+      }
+
+      sourceCounts[cleanSource] = (sourceCounts[cleanSource] || 0) + 1
+    })
+  })
+
+  // Convert to array format and sort by count descending
+  return Object.entries(sourceCounts)
+    .map(([source, total]) => ({ label: source, total }))
+    .sort((a, b) => b.total - a.total)
+}
+
 export function InitialPayingCustomersChart() {
   return (
     <SurveyChart
-      title="Where did your startup’s initial paying customers come from?"
       targetColumn="initial_paying_customers"
       filterColumns={['person_age', 'location', 'team_size']}
       generateSQLQuery={generateInitialPayingCustomersSQL}
+      transformData={transformInitialPayingCustomersData}
     />
   )
 }
