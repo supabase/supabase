@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { createClient } from '@supabase/supabase-js'
 // import { SupabaseClient } from '~/lib/supabase'
 import { motion } from 'framer-motion'
@@ -197,7 +197,6 @@ interface SurveyChartProps {
   filterColumns: string[]
   generateSQLQuery?: (activeFilters: Record<string, string>) => string
   functionName: string
-  functionParams: (activeFilters: Record<string, string>) => Record<string, any>
 }
 
 export function SurveyChart({
@@ -206,7 +205,6 @@ export function SurveyChart({
   filterColumns,
   generateSQLQuery,
   functionName,
-  functionParams,
 }: SurveyChartProps) {
   const [isInView, setIsInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -255,12 +253,33 @@ export function SurveyChart({
     )
   )
 
+  // Build function parameters based on filterColumns
+  const buildFunctionParams = useCallback((activeFilters: Record<string, string>) => {
+    const params: Record<string, any> = {}
+
+    // Convert single values to arrays for the function parameters
+    if (activeFilters.person_age && activeFilters.person_age !== 'unset') {
+      params.person_age_filter = [activeFilters.person_age]
+    }
+    if (activeFilters.location && activeFilters.location !== 'unset') {
+      params.location_filter = [activeFilters.location]
+    }
+    if (activeFilters.money_raised && activeFilters.money_raised !== 'unset') {
+      params.money_raised_filter = [activeFilters.money_raised]
+    }
+    if (activeFilters.team_size && activeFilters.team_size !== 'unset') {
+      params.team_size_filter = [activeFilters.team_size]
+    }
+
+    return params
+  }, [])
+
   // Use the custom hook to fetch data
   const {
     chartData,
     isLoading: dataLoading,
     error: dataError,
-  } = useSurveyData(isInView, functionName, functionParams, activeFilters)
+  } = useSurveyData(isInView, functionName, buildFunctionParams, activeFilters)
 
   // Reset animation state when filters change
   useEffect(() => {
@@ -473,7 +492,7 @@ export function SurveyChart({
                 <CodeBlock lang="sql">{generateSQLQuery(activeFilters)}</CodeBlock>
               ) : (
                 <CodeBlock lang="ts">
-                  {`// Function call: ${functionName}(${JSON.stringify(functionParams(activeFilters), null, 2)})`}
+                  {`// Function call: ${functionName}(${JSON.stringify(buildFunctionParams(activeFilters), null, 2)})`}
                 </CodeBlock>
               )}
             </div>
