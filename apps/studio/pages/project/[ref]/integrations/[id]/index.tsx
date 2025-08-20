@@ -3,6 +3,8 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { PageLayout, NavigationItem } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
 import { useEffect, useMemo } from 'react'
@@ -24,39 +26,22 @@ const IntegrationPage: NextPageWithLayout = () => {
   )
 
   // Get the corresponding component dynamically
-  const Component = useMemo(
-    () => integration?.navigate(id!, pageId, childId),
-    [integration, id, pageId, childId]
-  )
-
   useEffect(() => {
-    // if the integration is not installed, redirect to the overview page
-    if (
-      router &&
-      router?.isReady &&
-      !isIntegrationsLoading &&
-      !installation &&
-      pageId !== 'overview'
-    ) {
+    // Always redirect to the overview page since this route should not render content
+    if (router?.isReady) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [installation, isIntegrationsLoading, pageId, router])
+  }, [router, ref, id])
 
-  if (!router?.isReady || isIntegrationsLoading) {
-    return (
-      <div className="px-10 py-6">
-        <GenericSkeletonLoader />
-      </div>
-    )
-  }
-
-  if (!id || !integration) {
-    return <div>Integration not found</div>
-  }
-
-  if (!Component) return <div className="p-10 text-sm">Component not found</div>
-
-  return <Component />
+  return (
+    <PageLayout title="Loading...">
+      <ScaffoldContainer>
+        <div className="px-10 py-6">
+          <GenericSkeletonLoader />
+        </div>
+      </ScaffoldContainer>
+    </PageLayout>
+  )
 }
 
 IntegrationPage.getLayout = (page) => (
