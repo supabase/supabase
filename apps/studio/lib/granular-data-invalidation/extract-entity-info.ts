@@ -10,22 +10,31 @@ async function parseWithLibPgQuery(
   try {
     const { parseQuery } = await import('libpg-query')
     const parsed = await parseQuery(sql)
+    console.log({ sql })
 
     if (!parsed?.stmts?.length) return []
 
     const events: Omit<InvalidationEvent, 'projectRef'>[] = []
 
+    console.log({ parsed })
+
     // Process all statements, not just the first one
     for (const stmtWrapper of parsed.stmts) {
       const stmt = stmtWrapper.stmt as any
-      let event: Omit<InvalidationEvent, 'projectRef'> | null = null
 
       console.log({ stmt })
 
+      let event: Omit<InvalidationEvent, 'projectRef'> | null = null
+
       // Handle different statement types
       if (stmt?.CreateStmt) {
+        console.log('Processing CreateStmt (table)')
         event = parseCreateStatement(stmt.CreateStmt)
+      } else if (stmt?.CreateFunctionStmt) {
+        console.log('Processing CreateFunctionStmt (function)')
+        event = parseCreateFunctionStatement(stmt.CreateFunctionStmt)
       } else if (stmt?.DropStmt) {
+        console.log('Processing DropStmt')
         event = parseDropStatement(stmt.DropStmt)
       } else if (
         stmt?.SelectStmt &&
@@ -38,11 +47,11 @@ async function parseWithLibPgQuery(
           stmtWrapper.stmt_len ? (stmtWrapper.stmt_location || 0) + stmtWrapper.stmt_len : undefined
         )
         event = parseCronStatement(stmtSql || sql)
+      } else {
+        console.log('Unhandled statement type:', Object.keys(stmt || {}))
       }
 
-      if (event) {
-        events.push(event)
-      }
+      if (event) events.push(event)
     }
 
     return events
@@ -65,15 +74,30 @@ function parseCreateStatement(createStmt: any): Omit<InvalidationEvent, 'project
     }
   }
 
-  // Handle function creation
-  if (createStmt.funcname?.length > 0) {
-    const funcName = createStmt.funcname[0]
-    const schema = funcName.schemaname || DEFAULT_SCHEMA
-    const name = funcName.relname || funcName.objname
+  return null
+}
+
+function parseCreateFunctionStatement(
+  createFunctionStmt: any
+): Omit<InvalidationEvent, 'projectRef'> | null {
+  // Handle function creation - CREATE FUNCTION statements use CreateFunctionStmt
+  if (createFunctionStmt.funcname?.length > 0) {
+    // funcname is typically an array of String nodes
+    const funcNameNode = createFunctionStmt.funcname[createFunctionStmt.funcname.length - 1]
+    const funcName = funcNameNode.sval || funcNameNode.str || funcNameNode
+
+    // Schema might be in the first element if qualified name is used
+    const schema =
+      createFunctionStmt.funcname.length > 1
+        ? createFunctionStmt.funcname[0].sval ||
+          createFunctionStmt.funcname[0].str ||
+          createFunctionStmt.funcname[0]
+        : DEFAULT_SCHEMA
+
     return {
       entityType: 'function',
       schema,
-      entityName: name,
+      entityName: funcName,
     }
   }
 
