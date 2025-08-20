@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { motion, AnimatePresence } from 'framer-motion'
+// import { SupabaseClient } from '~/lib/supabase'
+import { motion } from 'framer-motion'
 import {
   Button,
   DropdownMenu,
@@ -194,6 +195,8 @@ export function SurveyChart({
 
   // Intersection observer to trigger data loading
   useEffect(() => {
+    const chartRefCurrent = chartRef.current
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -210,13 +213,13 @@ export function SurveyChart({
       }
     )
 
-    if (chartRef.current) {
-      observer.observe(chartRef.current)
+    if (chartRefCurrent) {
+      observer.observe(chartRefCurrent)
     }
 
     return () => {
-      if (chartRef.current) {
-        observer.unobserve(chartRef.current)
+      if (chartRefCurrent) {
+        observer.unobserve(chartRefCurrent)
       }
     }
   }, [hasLoadedOnce])
