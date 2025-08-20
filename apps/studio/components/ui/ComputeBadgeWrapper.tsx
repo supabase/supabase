@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { components } from 'api-types'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -11,7 +11,6 @@ import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
-import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -81,9 +80,9 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <Link href={`/project/${project?.ref}/settings/compute-and-disk`}>
+        <div>
           <ComputeBadge infraComputeSize={project.infra_compute_size} />
-        </Link>
+        </div>
       </HoverCardTrigger>
       <HoverCardContent
         side="bottom"

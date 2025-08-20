@@ -58,7 +58,7 @@ const MapView = ({
   const [tooltip, setTooltip] = useState<{
     x: number
     y: number
-    region: { key: string; country?: string; name?: string }
+    region: { key: string; country?: string; name?: string; region?: string }
   }>()
   const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
@@ -165,6 +165,7 @@ const MapView = ({
                     region: {
                       key: region.key,
                       country: region.name,
+                      region: region.region,
                       name: hasNoDatabases
                         ? undefined
                         : hasPrimary
@@ -213,17 +214,17 @@ const MapView = ({
             <Marker coordinates={[tooltip.x - 47, tooltip.y - 5]}>
               <foreignObject width={220} height={66.25}>
                 <div className="bg-studio/50 rounded border">
-                  <div className="px-3 py-2 flex flex-col gap-y-1">
+                  <div className="px-3 py-2 flex flex-col">
                     <div className="flex items-center gap-x-2">
                       <img
                         alt="region icon"
                         className="w-4 rounded-sm"
-                        src={`${BASE_PATH}/img/regions/${tooltip.region.key}.svg`}
+                        src={`${BASE_PATH}/img/regions/${tooltip.region.region}.svg`}
                       />
-                      <p className="text-[11px]">{tooltip.region.country}</p>
+                      <p className="text-[10px]">{tooltip.region.country}</p>
                     </div>
                     <p
-                      className={`text-[11px] ${
+                      className={`text-[10px] ${
                         tooltip.region.name === undefined ? 'text-foreground-light' : ''
                       }`}
                     >
@@ -250,7 +251,7 @@ const MapView = ({
             <img
               alt="region icon"
               className="w-10 rounded-sm"
-              src={`${BASE_PATH}/img/regions/${selectedRegion.key}.svg`}
+              src={`${BASE_PATH}/img/regions/${selectedRegion.region}.svg`}
             />
           </div>
 

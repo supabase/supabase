@@ -16,6 +16,7 @@ import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isAtBottom } from 'lib/helpers'
@@ -43,7 +44,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import AddUserDropdown from './AddUserDropdown'
+import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserPanel } from './UserPanel'
 import {
@@ -65,6 +66,18 @@ export const UsersV2 = () => {
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+
+  const {
+    authenticationShowProviderFilter: showProviderFilter,
+    authenticationShowSortByEmail: showSortByEmail,
+    authenticationShowSortByPhone: showSortByPhone,
+    authenticationShowUserTypeFilter: showUserTypeFilter,
+  } = useIsFeatureEnabled([
+    'authentication:show_provider_filter',
+    'authentication:show_sort_by_email',
+    'authentication:show_sort_by_phone',
+    'authentication:show_user_type_filter',
+  ])
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
@@ -294,42 +307,50 @@ export const UsersV2 = () => {
                   ]}
                 />
 
-                <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-                  <SelectTrigger_Shadcn_
-                    size="tiny"
-                    className={cn('w-[140px] !bg-transparent', filter === 'all' && 'border-dashed')}
-                  >
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
-                      <SelectItem_Shadcn_ value="all" className="text-xs">
-                        All users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="verified" className="text-xs">
-                        Verified users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="unverified" className="text-xs">
-                        Unverified users
-                      </SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="anonymous" className="text-xs">
-                        Anonymous users
-                      </SelectItem_Shadcn_>
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                {showUserTypeFilter && (
+                  <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
+                    <SelectTrigger_Shadcn_
+                      size="tiny"
+                      className={cn(
+                        'w-[140px] !bg-transparent',
+                        filter === 'all' && 'border-dashed'
+                      )}
+                    >
+                      <SelectValue_Shadcn_ />
+                    </SelectTrigger_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      <SelectGroup_Shadcn_>
+                        <SelectItem_Shadcn_ value="all" className="text-xs">
+                          All users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="verified" className="text-xs">
+                          Verified users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                          Unverified users
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                          Anonymous users
+                        </SelectItem_Shadcn_>
+                      </SelectGroup_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                )}
 
-                <FilterPopover
-                  name="Provider"
-                  options={PROVIDER_FILTER_OPTIONS}
-                  labelKey="name"
-                  valueKey="value"
-                  iconKey="icon"
-                  activeOptions={selectedProviders}
-                  labelClass="text-xs"
-                  maxHeightClass="h-[190px]"
-                  onSaveFilters={setSelectedProviders}
-                />
+                {showProviderFilter && (
+                  <FilterPopover
+                    name="Provider"
+                    options={PROVIDER_FILTER_OPTIONS}
+                    labelKey="name"
+                    valueKey="value"
+                    iconKey="icon"
+                    activeOptions={selectedProviders}
+                    labelClass="text-xs"
+                    maxHeightClass="h-[190px]"
+                    className="w-52"
+                    onSaveFilters={setSelectedProviders}
+                  />
+                )}
 
                 <div className="border-r border-strong h-6" />
 
@@ -408,24 +429,32 @@ export const UsersV2 = () => {
                           </DropdownMenuRadioItem>
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="email:asc">Ascending</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="email:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioItem value="phone:asc">Ascending</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="phone:desc">
-                            Descending
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
+                      {showSortByEmail && (
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuRadioItem value="email:asc">
+                              Ascending
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="email:desc">
+                              Descending
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                      )}
+                      {showSortByPhone && (
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuRadioItem value="phone:asc">
+                              Ascending
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="phone:desc">
+                              Descending
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                      )}
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>

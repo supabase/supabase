@@ -22,44 +22,44 @@ export const getStatusName = (
   return undefined
 }
 
-export const PIPELINE_STATE_MESSAGES = {
+const PIPELINE_STATE_MESSAGES = {
   enabling: {
-    title: 'Pipeline Enabling',
+    title: 'Pipeline enabling',
     message: 'Starting the pipeline. Table replication will resume once enabled.',
     badge: 'Enabling',
   },
   disabling: {
-    title: 'Pipeline Disabling',
+    title: 'Pipeline disabling',
     message: 'Stopping the pipeline. Table replication will be paused once disabled.',
     badge: 'Disabling',
   },
   failed: {
-    title: 'Pipeline Failed',
-    message: 'Replication has encountered an error. Check the logs for details.',
+    title: 'Pipeline failed',
+    message: 'Replication has encountered an error.',
     badge: 'Failed',
   },
   stopped: {
-    title: 'Pipeline Stopped',
+    title: 'Pipeline stopped',
     message: 'Replication is paused. Enable the pipeline to resume data synchronization.',
     badge: 'Stopped',
   },
   starting: {
-    title: 'Pipeline Starting',
+    title: 'Pipeline starting',
     message: 'Initializing replication. Table status will be available once running.',
     badge: 'Starting',
   },
   running: {
-    title: 'Pipeline Running',
+    title: 'Pipeline running',
     message: 'Replication is active and processing data',
     badge: 'Running',
   },
   unknown: {
-    title: 'Pipeline Status Unknown',
-    message: 'Unable to determine replication status. Check the logs for more information.',
+    title: 'Pipeline status unknown',
+    message: 'Unable to determine replication status.',
     badge: 'Unknown',
   },
   notRunning: {
-    title: 'Pipeline Not Running',
+    title: 'Pipeline not running',
     message: 'Replication is not active. Enable the pipeline to start data synchronization.',
     badge: 'Disabled',
   },

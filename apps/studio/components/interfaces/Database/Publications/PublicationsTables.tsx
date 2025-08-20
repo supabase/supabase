@@ -15,7 +15,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import PublicationsTableItem from './PublicationsTableItem'
+import { PublicationsTableItem } from './PublicationsTableItem'
 
 export const PublicationsTables = () => {
   const { ref, id } = useParams()
@@ -95,44 +95,42 @@ export const PublicationsTables = () => {
         (tables.length === 0 ? (
           <NoSearchResults />
         ) : (
-          <div>
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Schema</TableHead>
-                    <TableHead>Description</TableHead>
-                    {/* 
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Schema</TableHead>
+                  <TableHead>Description</TableHead>
+                  {/* 
                       We've disabled All tables toggle for publications. 
                       See https://github.com/supabase/supabase/pull/7233. 
                     */}
-                    <TableHead />
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {!!selectedPublication ? (
+                  tables.map((table) => (
+                    <PublicationsTableItem
+                      key={table.id}
+                      table={table}
+                      selectedPublication={selectedPublication}
+                    />
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p>The selected publication with ID {id} cannot be found</p>
+                      <p className="text-foreground-light">
+                        Head back to the list of publications to select one from there
+                      </p>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {!!selectedPublication ? (
-                    tables.map((table) => (
-                      <PublicationsTableItem
-                        key={table.id}
-                        table={table}
-                        selectedPublication={selectedPublication}
-                      />
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4}>
-                        <p>The selected publication with ID {id} cannot be found</p>
-                        <p className="text-foreground-light">
-                          Head back to the list of publications to select one from there
-                        </p>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </Card>
-          </div>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
         ))}
     </>
   )

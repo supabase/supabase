@@ -66,8 +66,8 @@ hideToc: true
       <$CodeTabs>
 
         ```text name=.env
-        PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+        VITE_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
         ```
 
       </$CodeTabs>
@@ -89,16 +89,16 @@ hideToc: true
 
         ```js name=src/lib/supabaseClient.js
           import { createClient } from '@supabase/supabase-js';
-        import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+        import { VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-        export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
+        export const supabase = createClient(VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
         ```
 
         ```ts name=src/lib/supabaseClient.ts
           import { createClient } from '@supabase/supabase-js';
-        import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+        import { VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-        export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
+        export const supabase = createClient(VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
         ```
 
       </$CodeTabs>
