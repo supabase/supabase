@@ -72,16 +72,12 @@ export default function BlogPostClient(props: BlogPostPageProps) {
         ?.split(',')
         .map((authorId: string) => {
           const foundAuthor = authors.find((author) => author.author_id === authorId)
-          return foundAuthor
-            ? {
-                author: foundAuthor.author || 'Author',
-                author_image_url: foundAuthor.author_image_url || null,
-                author_url: foundAuthor.author_url || '#',
-                position: foundAuthor.position || '',
-              }
-            : null
+          console.log('foundAuthor', foundAuthor)
+          return foundAuthor ?? null
         })
         .filter(isNotNullOrUndefined) || []
+
+  console.log('blogAuthors from client', blogAuthors)
 
   const authorUrls = (blogAuthors as any)
     .map((author: any) => author?.author_url)

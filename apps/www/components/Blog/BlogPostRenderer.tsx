@@ -236,7 +236,7 @@ const BlogPostRenderer = ({
                       <div className="flex-1 flex flex-col gap-3 pt-2 md:flex-row md:gap-0 lg:gap-3">
                         {authors.map((author, i: number) => {
                           // Handle both static and CMS author image formats
-                          const imageUrl =
+                          const authorImageUrl =
                             typeof author.author_image_url === 'string'
                               ? author.author_image_url
                               : (author.author_image_url as { url: string })?.url || ''
@@ -249,10 +249,10 @@ const BlogPostRenderer = ({
                                 className="cursor-pointer"
                               >
                                 <div className="flex items-center gap-3">
-                                  {imageUrl && (
+                                  {authorImageUrl && (
                                     <div className="w-10">
                                       <Image
-                                        src={imageUrl}
+                                        src={authorImageUrl}
                                         className="border-default rounded-full border w-full aspect-square object-cover"
                                         alt={`${author.author} avatar`}
                                         width={40}
