@@ -75,7 +75,7 @@ const nextConfig = {
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
-      // '.next/server/**/*.js.map',
+      '.next/server/**/*.js.map',
       '.next/trace',
       // Static assets
       'public/**/*',
