@@ -11,24 +11,6 @@ GROUP BY location
 ORDER BY total DESC;`
 }
 
-function transformLocationData(data: any[]) {
-  // Raw data from Supabase: [{ location: 'North America' }, { location: 'Europe' }, ...]
-  // Need to aggregate by counting occurrences
-  const counts: Record<string, number> = {}
-
-  data.forEach((row) => {
-    const location = row.location
-    if (location) {
-      counts[location] = (counts[location] || 0) + 1
-    }
-  })
-
-  // Convert to chart format and sort by count
-  return Object.entries(counts)
-    .map(([label, total]) => ({ label, total }))
-    .sort((a, b) => b.total - a.total)
-}
-
 export function LocationChart() {
   return (
     <SurveyChart
@@ -36,7 +18,7 @@ export function LocationChart() {
       targetColumn="location"
       filterColumns={['person_age', 'team_size', 'money_raised']}
       generateSQLQuery={generateLocationSQL}
-      transformData={transformLocationData}
+      useAggregates={true} // Enable efficient counting
     />
   )
 }
