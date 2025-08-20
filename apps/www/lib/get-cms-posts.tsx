@@ -200,8 +200,8 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
           'Content-Type': 'application/json',
           ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
         },
-        cache: 'default',
-        next: { revalidate: 300 },
+        cache: 'no-store',
+        next: { revalidate: 0 },
       })
 
       if (response.ok) {
@@ -224,12 +224,9 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
         'Content-Type': 'application/json',
         ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
       },
-      // Important: don't cache draft content
-      cache: preview ? 'no-store' : 'default',
-      // Add timestamp to prevent caching in preview mode
-      ...(preview && {
-        next: { revalidate: 0 },
-      }),
+      // Always use no-store to get fresh data
+      cache: 'no-store',
+      next: { revalidate: 0 },
     })
 
     if (!response.ok) {

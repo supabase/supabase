@@ -6,13 +6,16 @@ import { SITE_ORIGIN } from '~/lib/constants'
 
 import type { Blog, BlogData, PostReturnType } from 'types/post'
 
+export const revalidate = 30
+
 // Helper function to fetch CMS post using our unified API
 async function getCMSPostFromAPI(slug: string, mode: 'preview' | 'full' = 'full') {
   try {
     // Use SITE_ORIGIN to call our own api-v2 CMS API endpoint
     const response = await fetch(`${SITE_ORIGIN}/api-v2/cms-posts?slug=${slug}&mode=${mode}`, {
-      // Add cache with revalidation
-      next: { revalidate: 300 },
+      // Use no-store to always get fresh data
+      cache: 'no-store',
+      next: { revalidate: 0 },
     })
 
     if (!response.ok) {
