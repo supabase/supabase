@@ -75,11 +75,10 @@ const nextConfig = {
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
-      '.next/server/**/*.js.map',
+      // '.next/server/**/*.js.map',
       '.next/trace',
       // Static assets
       'public/**/*',
-      '_blog/**/*',
       // Test and story files
       'components/**/*.stories.*',
       'components/**/*.test.*',
@@ -94,7 +93,7 @@ const nextConfig = {
       '**/node_modules/framer-motion/**/*',
     ],
     // More conservative exclusions for blog pages
-    '/blog/**/*': ['_blog/**/*', 'public/**/*', '.next/static/**/*'],
+    '/blog/**/*': ['public/**/*', '.next/static/**/*'],
   },
   // Additional optimizations for smaller serverless functions
   serverExternalPackages: [],
