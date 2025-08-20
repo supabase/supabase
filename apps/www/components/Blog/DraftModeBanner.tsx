@@ -25,7 +25,7 @@ function DraftModeBanner({ onDismiss }: DraftModeBannerProps) {
           <div className="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
             <Button asChild type="secondary">
               <Link
-                href="/api/disable-draft"
+                href="/api-v2/cms/disable-draft"
                 className="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm"
               >
                 Exit Draft Mode
