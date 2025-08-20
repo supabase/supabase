@@ -366,6 +366,12 @@ This feature is in Public Beta. [Submit a support ticket](https://supabase.help)
 
 </Admonition>
 
+<Admonition type="note">
+
+All the messages sent using Broadcast from the Database are stored in `realtime.messages` table and will be deleted after 3 days.
+
+</Admonition>
+
 You can send messages directly from your database using the `realtime.send()` function:
 
 {/* prettier-ignore */}
