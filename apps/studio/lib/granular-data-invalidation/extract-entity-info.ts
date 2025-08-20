@@ -1,40 +1,33 @@
+import type { CreateStmt } from 'libpg-query'
+
 import type { InvalidationEvent } from '.'
+
+type Event = Omit<InvalidationEvent, 'projectRef'>
 
 const DEFAULT_SCHEMA = 'public' as const
 
 // Parse SQL using libpg-query - handles multiple statements
-async function parseWithLibPgQuery(
-  sql: string,
-  sqlLower: string
-): Promise<Omit<InvalidationEvent, 'projectRef'>[]> {
+async function parseWithLibPgQuery(sql: string, sqlLower: string): Promise<Event[]> {
   try {
     const { parseQuery } = await import('libpg-query')
     const parsed = await parseQuery(sql)
-    console.log({ sql })
 
     if (!parsed?.stmts?.length) return []
 
-    const events: Omit<InvalidationEvent, 'projectRef'>[] = []
-
-    console.log({ parsed })
+    const events: Event[] = []
 
     // Process all statements, not just the first one
     for (const stmtWrapper of parsed.stmts) {
       const stmt = stmtWrapper.stmt as any
 
-      console.log({ stmt })
-
       let event: Omit<InvalidationEvent, 'projectRef'> | null = null
 
       // Handle different statement types
       if (stmt?.CreateStmt) {
-        console.log('Processing CreateStmt (table)')
         event = parseCreateStatement(stmt.CreateStmt)
       } else if (stmt?.CreateFunctionStmt) {
-        console.log('Processing CreateFunctionStmt (function)')
         event = parseCreateFunctionStatement(stmt.CreateFunctionStmt)
       } else if (stmt?.DropStmt) {
-        console.log('Processing DropStmt')
         event = parseDropStatement(stmt.DropStmt)
       } else if (
         stmt?.SelectStmt &&
@@ -61,7 +54,7 @@ async function parseWithLibPgQuery(
   }
 }
 
-function parseCreateStatement(createStmt: any): Omit<InvalidationEvent, 'projectRef'> | null {
+function parseCreateStatement(createStmt: CreateStmt): Event | null {
   // Handle table creation
   if (createStmt.relation) {
     const schema = createStmt.relation.schemaname || DEFAULT_SCHEMA
@@ -77,9 +70,7 @@ function parseCreateStatement(createStmt: any): Omit<InvalidationEvent, 'project
   return null
 }
 
-function parseCreateFunctionStatement(
-  createFunctionStmt: any
-): Omit<InvalidationEvent, 'projectRef'> | null {
+function parseCreateFunctionStatement(createFunctionStmt: any): Event | null {
   // Handle function creation - CREATE FUNCTION statements use CreateFunctionStmt
   if (createFunctionStmt.funcname?.length > 0) {
     // funcname is typically an array of String nodes
@@ -104,7 +95,7 @@ function parseCreateFunctionStatement(
   return null
 }
 
-function parseDropStatement(dropStmt: any): Omit<InvalidationEvent, 'projectRef'> | null {
+function parseDropStatement(dropStmt: any): Event | null {
   if (!dropStmt.objects?.length) return null
 
   // Handle table drop
@@ -135,7 +126,7 @@ function parseDropStatement(dropStmt: any): Omit<InvalidationEvent, 'projectRef'
   return null
 }
 
-function parseCronStatement(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
+function parseCronStatement(sql: string): Event | null {
   // For cron statements, use simple regex to extract the job name since libpg-query
   // might not provide structured access to function arguments
   const cronMatch = sql.match(
@@ -153,9 +144,6 @@ function parseCronStatement(sql: string): Omit<InvalidationEvent, 'projectRef'> 
  * Extract entity information from SQL statement(s)
  * Uses libpg-query to handle multiple statements in a single call
  */
-export async function extractEntityInfo(
-  sql: string,
-  sqlLower: string
-): Promise<Omit<InvalidationEvent, 'projectRef'>[]> {
+export async function extractEntityInfo(sql: string, sqlLower: string): Promise<Event[]> {
   return await parseWithLibPgQuery(sql, sqlLower)
 }
