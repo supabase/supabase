@@ -153,14 +153,18 @@
       "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
     },
 
+    "project_addons:dedicated_ipv4_address": {
+      "type": "boolean",
+      "description": "Show the dedicated IPv4 address addon"
+    },
+
     "project_settings:custom_domains": {
       "type": "boolean",
       "description": "Show the custom domain configuration section + custom domain addon"
     },
-
-    "project_addons:dedicated_ipv4_address": {
+    "project_settings:show_disable_legacy_api_keys": {
       "type": "boolean",
-      "description": "Show the dedicated IPv4 address addon"
+      "description": "Show the disable legacy API keys section in project settings API Keys page"
     },
 
     "reports:all": {
@@ -206,8 +210,9 @@
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
     "project_homepage:show_all_client_libraries",
-    "project_settings:custom_domains",
     "project_addons:dedicated_ipv4_address",
+    "project_settings:custom_domains",
+    "project_settings:show_disable_legacy_api_keys",
     "project_connection:javascript_example",
     "project_connection:dart_example",
     "reports:all",
