@@ -30,7 +30,23 @@ import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { Organization } from 'types/base'
 
+const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
+  if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
+    return {
+      installationId: selectedOrganization?.partner_id,
+      path: '/settings',
+      message: 'Change Plan on Vercel Marketplace',
+    }
+  }
+  if (selectedOrganization.managed_by === MANAGED_BY.AWS_MARKETPLACE) {
+    return {
+      organizationSlug: selectedOrganization?.slug,
+    }
+  }
+}
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const { slug } = useParams()
@@ -144,16 +160,11 @@ const PlanUpdateSidePanel = () => {
           </div>
         }
       >
-        {selectedOrganization?.managed_by === 'vercel-marketplace' && (
+        {selectedOrganization && selectedOrganization.managed_by !== MANAGED_BY.SUPABASE && (
           <PartnerManagedResource
-            partner={selectedOrganization?.managed_by}
+            managedBy={selectedOrganization.managed_by}
             resource="Organization plans"
-            cta={{
-              installationId: selectedOrganization?.partner_id,
-              path: '/settings',
-              message: 'Change Plan on Vercel Marketplace',
-            }}
-            // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+            cta={getPartnerManagedResourceCta(selectedOrganization)}
           />
         )}
         <SidePanel.Content>
@@ -216,8 +227,10 @@ const PlanUpdateSidePanel = () => {
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
-                          (selectedOrganization?.managed_by !== 'supabase' &&
+                          (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
                             plan.id !== 'tier_free') ||
+                          // Orgs managed by AWS marketplace are not allowed to change the plan
+                          selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
@@ -243,7 +256,10 @@ const PlanUpdateSidePanel = () => {
                                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
                                   : !canUpdateSubscription
                                     ? 'You do not have permission to change the subscription plan'
-                                    : undefined,
+                                    : selectedOrganization?.managed_by ===
+                                        MANAGED_BY.AWS_MARKETPLACE
+                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                      : undefined,
                           },
                         }}
                       >
