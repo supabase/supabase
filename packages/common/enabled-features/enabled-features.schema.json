@@ -125,6 +125,14 @@
       "type": "boolean",
       "description": "Shows the user's profile information (first name, last name) in account preferences"
     },
+    "profile:show_analytics_and_marketing": {
+      "type": "boolean",
+      "description": "Shows the analytics and marketing section in account preferences"
+    },
+    "profile:show_account_deletion": {
+      "type": "boolean",
+      "description": "Shows the account deletion section in account preferences"
+    },
 
     "project_connection:javascript_example": {
       "type": "boolean",
@@ -212,6 +220,8 @@
     "integrations:show_stripe_wrapper",
     "profile:show_email",
     "profile:show_information",
+    "profile:show_analytics_and_marketing",
+    "profile:show_account_deletion",
     "logs:templates",
     "logs:collections",
     "project_creation:show_advanced_config",

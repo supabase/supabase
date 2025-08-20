@@ -35,7 +35,12 @@ User.getLayout = (page) => (
 export default User
 
 const ProfileCard = () => {
-  const profileShowInformation = useIsFeatureEnabled('profile:show_information')
+  const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
+    useIsFeatureEnabled([
+      'profile:show_information',
+      'profile:show_analytics_and_marketing',
+      'profile:show_account_deletion',
+    ])
   const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
@@ -69,13 +74,17 @@ const ProfileCard = () => {
         <ThemeSettings />
       </section>
 
-      <section>
-        <AnalyticsSettings />
-      </section>
+      {profileShowAnalyticsAndMarketing && (
+        <section>
+          <AnalyticsSettings />
+        </section>
+      )}
 
-      <section>
-        <AccountDeletion />
-      </section>
+      {profileShowAccountDeletion && (
+        <section>
+          <AccountDeletion />
+        </section>
+      )}
     </article>
   )
 }
