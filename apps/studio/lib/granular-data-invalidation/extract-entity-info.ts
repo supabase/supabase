@@ -2,72 +2,124 @@ import type { InvalidationEvent } from '.'
 
 const DEFAULT_SCHEMA = 'public' as const
 
-const SQL_PATTERNS = {
-  table: /table\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
-  function: /(?:function|procedure)\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
-  trigger: /trigger\s+"?(\w+)"?(?:[\s\S]*?on\s+"?(?:(\w+)\.)?"?(\w+)"?)?/i,
-  policy: /policy\s+(?:if\s+exists\s+)?(?:"([^"]+)"|(\w+))\s+on\s+(?:"?(\w+)"?\.)??"?(\w+)"?/i,
-  index:
-    /(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+(?:not\s+)?exists\s+)?(?:"?(\w+)"?\.)??"?(\w+)"?(?:\s+on\s+(?:"?(\w+)"?\.)?"?(\w+)"?)?/i,
-  cron: /(?:select\s+)?cron\.(?:schedule|unschedule)\s*\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))/i,
-  view: /view\s+(?:if\s+(?:not\s+)?exists\s+)?"?(?:(\w+)\.)?"?(\w+)"?/i,
-  schema: /schema\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"([^"]+)"|(\w+))/i,
-} as const
-
-function extractTableInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
-  const match = sql.match(SQL_PATTERNS.table)
-  if (!match) return null
-
-  return {
-    entityType: 'table',
-    schema: match[1] || DEFAULT_SCHEMA,
-    table: match[2],
-    entityName: match[2],
-  }
-}
-
-function extractFunctionInfo(
+// Parse SQL using libpg-query
+async function parseWithLibPgQuery(
   sql: string,
   sqlLower: string
-): Omit<InvalidationEvent, 'projectRef'> | null {
-  const match = sql.match(SQL_PATTERNS.function)
-  if (!match) return null
+): Promise<Omit<InvalidationEvent, 'projectRef'> | null> {
+  try {
+    const { parseQuery } = await import('libpg-query')
+    const parsed = await parseQuery(sql)
 
-  return {
-    entityType: 'function',
-    schema: match[1] || DEFAULT_SCHEMA,
-    entityName: match[2],
+    if (!parsed?.stmts?.length) return null
+
+    const stmt = parsed.stmts[0].stmt as any
+
+    console.log({ stmt })
+
+    // Handle different statement types using a more flexible approach
+    if (stmt?.CreateStmt) {
+      return parseCreateStatement(stmt.CreateStmt)
+    }
+
+    if (stmt?.DropStmt) {
+      return parseDropStatement(stmt.DropStmt)
+    }
+
+    if (
+      stmt?.SelectStmt &&
+      (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule'))
+    ) {
+      return parseCronStatement(sql)
+    }
+
+    return null
+  } catch (error) {
+    console.error('libpg-query parsing failed:', error)
+    return null
   }
 }
 
-function extractCronInfo(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
-  const match = sql.match(SQL_PATTERNS.cron)
-  if (!match) return null
+function parseCreateStatement(createStmt: any): Omit<InvalidationEvent, 'projectRef'> | null {
+  // Handle table creation
+  if (createStmt.relation) {
+    const schema = createStmt.relation.schemaname || DEFAULT_SCHEMA
+    const table = createStmt.relation.relname
+    return {
+      entityType: 'table',
+      schema,
+      table,
+      entityName: table,
+    }
+  }
+
+  // Handle function creation
+  if (createStmt.funcname?.length > 0) {
+    const funcName = createStmt.funcname[0]
+    const schema = funcName.schemaname || DEFAULT_SCHEMA
+    const name = funcName.relname || funcName.objname
+    return {
+      entityType: 'function',
+      schema,
+      entityName: name,
+    }
+  }
+
+  return null
+}
+
+function parseDropStatement(dropStmt: any): Omit<InvalidationEvent, 'projectRef'> | null {
+  if (!dropStmt.objects?.length) return null
+
+  // Handle table drop
+  if (dropStmt.removeType === 'OBJECT_TABLE') {
+    const obj = dropStmt.objects[0]
+    const schema = obj[0]?.schemaname || DEFAULT_SCHEMA
+    const table = obj[obj.length - 1]?.relname || obj[obj.length - 1]?.objname
+    return {
+      entityType: 'table',
+      schema,
+      table,
+      entityName: table,
+    }
+  }
+
+  // Handle function drop
+  if (dropStmt.removeType === 'OBJECT_FUNCTION') {
+    const obj = dropStmt.objects[0]
+    const schema = obj[0]?.schemaname || DEFAULT_SCHEMA
+    const funcName = obj[obj.length - 1]?.relname || obj[obj.length - 1]?.objname
+    return {
+      entityType: 'function',
+      schema,
+      entityName: funcName,
+    }
+  }
+
+  return null
+}
+
+function parseCronStatement(sql: string): Omit<InvalidationEvent, 'projectRef'> | null {
+  // For cron statements, use simple regex to extract the job name since libpg-query
+  // might not provide structured access to function arguments
+  const cronMatch = sql.match(
+    /(?:select\s+)?cron\.(?:schedule|unschedule)\s*\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))/i
+  )
+  if (!cronMatch) return null
 
   return {
     entityType: 'cron',
-    entityName: match[1] || match[2] || match[3], // match[1] for single quotes, match[2] for double quotes, match[3] for numeric ID
+    entityName: cronMatch[1] || cronMatch[2] || cronMatch[3],
   }
 }
 
 /**
  * Extract entity information from SQL statement
+ * Uses libpg-query as the primary parsing method
  */
-export function extractEntityInfo(
+export async function extractEntityInfo(
   sql: string,
   sqlLower: string
-): Omit<InvalidationEvent, 'projectRef'> | null {
-  if (sqlLower.includes(' table ')) {
-    return extractTableInfo(sql)
-  }
-
-  if (sqlLower.includes(' function ') || sqlLower.includes(' procedure ')) {
-    return extractFunctionInfo(sql, sqlLower)
-  }
-
-  if (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule')) {
-    return extractCronInfo(sql)
-  }
-
-  return null
+): Promise<Omit<InvalidationEvent, 'projectRef'> | null> {
+  return await parseWithLibPgQuery(sql, sqlLower)
 }

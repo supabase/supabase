@@ -29,7 +29,10 @@ function extractAction(sqlLower: string): ActionType | null {
   return null
 }
 
-export function parseSqlStatement(sql: string, projectRef: string): InvalidationEvent | null {
+export async function parseSqlStatement(
+  sql: string,
+  projectRef: string
+): Promise<InvalidationEvent | null> {
   if (!sql || !projectRef) return null
 
   const sqlLower = sql.toLowerCase().trim()
@@ -37,7 +40,7 @@ export function parseSqlStatement(sql: string, projectRef: string): Invalidation
 
   if (!action) return null
 
-  const entityInfo = extractEntityInfo(sql, sqlLower)
+  const entityInfo = await extractEntityInfo(sql, sqlLower)
 
   if (!entityInfo) return null
 
@@ -50,7 +53,10 @@ export function parseSqlStatement(sql: string, projectRef: string): Invalidation
 /**
  * Parse multiple SQL statements and return all invalidation events
  */
-export function parseSqlStatements(sql: string, projectRef: string): InvalidationEvent[] {
+export async function parseSqlStatements(
+  sql: string,
+  projectRef: string
+): Promise<InvalidationEvent[]> {
   if (!sql || !projectRef) return []
 
   // Split by semicolon but keep semicolons for proper parsing
@@ -63,7 +69,7 @@ export function parseSqlStatements(sql: string, projectRef: string): Invalidatio
   const events: InvalidationEvent[] = []
 
   for (const statement of statements) {
-    const event = parseSqlStatement(statement, projectRef)
+    const event = await parseSqlStatement(statement, projectRef)
     if (event) {
       events.push(event)
     }
@@ -87,7 +93,7 @@ export async function invalidateDataGranularly(
   }
 
   try {
-    const events = parseSqlStatements(sql, projectRef)
+    const events = await parseSqlStatements(sql, projectRef)
 
     // Fire off all invalidations without blocking
     // Each invalidation runs in its own setTimeout callback
