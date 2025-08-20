@@ -153,6 +153,28 @@
       "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
     },
 
+    "project_addons:dedicated_ipv4_address": {
+      "type": "boolean",
+      "description": "Show the dedicated IPv4 address addon"
+    },
+
+    "project_settings:custom_domains": {
+      "type": "boolean",
+      "description": "Show the custom domain configuration section + custom domain addon"
+    },
+    "project_settings:show_disable_legacy_api_keys": {
+      "type": "boolean",
+      "description": "Show the disable legacy API keys section in project settings API Keys page"
+    },
+    "project_settings:legacy_jwt_keys": {
+      "type": "boolean",
+      "description": "Enable the legacy JWT secret page in project settings"
+    },
+    "project_settings:log_drains": {
+      "type": "boolean",
+      "description": "Enable the log drains page in project settings"
+    },
+
     "reports:all": {
       "type": "boolean",
       "description": "Enable the project reports page"
@@ -196,6 +218,11 @@
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
     "project_homepage:show_all_client_libraries",
+    "project_addons:dedicated_ipv4_address",
+    "project_settings:custom_domains",
+    "project_settings:show_disable_legacy_api_keys",
+    "project_settings:legacy_jwt_keys",
+    "project_settings:log_drains",
     "project_connection:javascript_example",
     "project_connection:dart_example",
     "reports:all",

@@ -46,6 +46,12 @@
   "project_homepage:show_instance_size": true,
   "project_homepage:show_examples": true,
 
+  "project_addons:dedicated_ipv4_address": true,
+  "project_settings:custom_domains": true,
+  "project_settings:show_disable_legacy_api_keys": true,
+  "project_settings:legacy_jwt_keys": true,
+  "project_settings:log_drains": true,
+
   "reports:all": true,
 
   "table_editor:enable_rls_toggle": true
