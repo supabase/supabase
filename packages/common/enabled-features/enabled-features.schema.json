@@ -103,6 +103,10 @@
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
     },
+    "integrations:show_stripe_wrapper": {
+      "type": "boolean",
+      "description": "Show the Stripe wrapper under project integrations"
+    },
 
     "logs:templates": {
       "type": "boolean",
@@ -149,6 +153,11 @@
       "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
     },
 
+    "reports:all": {
+      "type": "boolean",
+      "description": "Enable the project reports page"
+    },
+
     "table_editor:enable_rls_toggle": {
       "type": "boolean",
       "description": "Show the RLS toggle in the table creation flow and table editor header"
@@ -178,6 +187,7 @@
     "database:replication",
     "database:roles",
     "integrations:vercel",
+    "integrations:show_stripe_wrapper",
     "profile:show_email",
     "profile:show_information",
     "logs:templates",
@@ -188,6 +198,7 @@
     "project_homepage:show_all_client_libraries",
     "project_connection:javascript_example",
     "project_connection:dart_example",
+    "reports:all",
     "table_editor:enable_rls_toggle"
   ],
   "additionalProperties": false
