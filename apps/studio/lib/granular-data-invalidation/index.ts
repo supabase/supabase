@@ -5,8 +5,6 @@ import { handleInvalidation } from './handle-invalidation'
 
 export type EntityType = 'table' | 'function' | 'cron'
 
-export type ActionType = 'create' | 'drop'
-
 export type InvalidationEvent = {
   projectRef: string
   entityType: EntityType
@@ -16,42 +14,8 @@ export type InvalidationEvent = {
 }
 
 /**
- * Extract the action type from SQL statement
- */
-function extractAction(sqlLower: string): ActionType | null {
-  if (sqlLower.startsWith('create')) return 'create'
-  if (sqlLower.startsWith('drop')) return 'drop'
-
-  // Special handling for cron operations (uses SELECT statements)
-  if (sqlLower.includes('cron.schedule')) return 'create'
-  if (sqlLower.includes('cron.unschedule')) return 'drop'
-
-  return null
-}
-
-export async function parseSqlStatement(
-  sql: string,
-  projectRef: string
-): Promise<InvalidationEvent | null> {
-  if (!sql || !projectRef) return null
-
-  const sqlLower = sql.toLowerCase().trim()
-  const action = extractAction(sqlLower)
-
-  if (!action) return null
-
-  const entityInfo = await extractEntityInfo(sql, sqlLower)
-
-  if (!entityInfo) return null
-
-  return {
-    ...entityInfo,
-    projectRef,
-  }
-}
-
-/**
- * Parse multiple SQL statements and return all invalidation events
+ * Parse SQL statements and return all invalidation events
+ * Uses libpg-query to handle multiple statements in a single call
  */
 export async function parseSqlStatements(
   sql: string,
@@ -59,23 +23,26 @@ export async function parseSqlStatements(
 ): Promise<InvalidationEvent[]> {
   if (!sql || !projectRef) return []
 
-  // Split by semicolon but keep semicolons for proper parsing
-  const statements = sql
-    .split(';')
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0)
-    .map((s) => s + ';')
+  const sqlLower = sql.toLowerCase().trim()
 
-  const events: InvalidationEvent[] = []
+  // Check if any statement contains supported actions
+  const hasValidAction = ['create ', 'drop ', 'cron.schedule', 'cron.unschedule'].some((action) =>
+    sqlLower.includes(action)
+  )
 
-  for (const statement of statements) {
-    const event = await parseSqlStatement(statement, projectRef)
-    if (event) {
-      events.push(event)
-    }
+  if (!hasValidAction) return []
+
+  try {
+    const entityInfos = await extractEntityInfo(sql, sqlLower)
+
+    return entityInfos.map((entityInfo) => ({
+      ...entityInfo,
+      projectRef,
+    }))
+  } catch (error) {
+    console.error('parseSqlStatements: Error parsing SQL', error)
+    return []
   }
-
-  return events
 }
 
 /**

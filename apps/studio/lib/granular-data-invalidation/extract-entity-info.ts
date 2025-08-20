@@ -2,37 +2,53 @@ import type { InvalidationEvent } from '.'
 
 const DEFAULT_SCHEMA = 'public' as const
 
-// Parse SQL using libpg-query
+// Parse SQL using libpg-query - handles multiple statements
 async function parseWithLibPgQuery(
   sql: string,
   sqlLower: string
-): Promise<Omit<InvalidationEvent, 'projectRef'> | null> {
+): Promise<Omit<InvalidationEvent, 'projectRef'>[]> {
   try {
     const { parseQuery } = await import('libpg-query')
     const parsed = await parseQuery(sql)
 
-    if (!parsed?.stmts?.length) return null
+    if (!parsed?.stmts?.length) return []
 
-    const stmt = parsed.stmts[0].stmt as any
+    const events: Omit<InvalidationEvent, 'projectRef'>[] = []
 
-    console.log({ stmt })
+    // Process all statements, not just the first one
+    for (const stmtWrapper of parsed.stmts) {
+      const stmt = stmtWrapper.stmt as any
+      let event: Omit<InvalidationEvent, 'projectRef'> | null = null
 
-    // Handle different statement types
-    if (stmt?.CreateStmt) return parseCreateStatement(stmt.CreateStmt)
+      console.log({ stmt })
 
-    if (stmt?.DropStmt) return parseDropStatement(stmt.DropStmt)
+      // Handle different statement types
+      if (stmt?.CreateStmt) {
+        event = parseCreateStatement(stmt.CreateStmt)
+      } else if (stmt?.DropStmt) {
+        event = parseDropStatement(stmt.DropStmt)
+      } else if (
+        stmt?.SelectStmt &&
+        (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule'))
+      ) {
+        // For cron, we need to parse the original SQL to get the job name
+        // since libpg-query doesn't provide structured access to function arguments
+        const stmtSql = sql.substring(
+          stmtWrapper.stmt_location || 0,
+          stmtWrapper.stmt_len ? (stmtWrapper.stmt_location || 0) + stmtWrapper.stmt_len : undefined
+        )
+        event = parseCronStatement(stmtSql || sql)
+      }
 
-    if (
-      stmt?.SelectStmt &&
-      (sqlLower.includes('cron.schedule') || sqlLower.includes('cron.unschedule'))
-    ) {
-      return parseCronStatement(sql)
+      if (event) {
+        events.push(event)
+      }
     }
 
-    return null
+    return events
   } catch (error) {
     console.error('libpg-query parsing failed:', error)
-    return null
+    return []
   }
 }
 
@@ -110,12 +126,12 @@ function parseCronStatement(sql: string): Omit<InvalidationEvent, 'projectRef'> 
 }
 
 /**
- * Extract entity information from SQL statement
- * Uses libpg-query as the primary parsing method
+ * Extract entity information from SQL statement(s)
+ * Uses libpg-query to handle multiple statements in a single call
  */
 export async function extractEntityInfo(
   sql: string,
   sqlLower: string
-): Promise<Omit<InvalidationEvent, 'projectRef'> | null> {
+): Promise<Omit<InvalidationEvent, 'projectRef'>[]> {
   return await parseWithLibPgQuery(sql, sqlLower)
 }
