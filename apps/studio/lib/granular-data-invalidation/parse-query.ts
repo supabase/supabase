@@ -5,7 +5,7 @@ import type { Event } from '.'
 const DEFAULT_SCHEMA = 'public' as const
 
 // Parse SQL using libpg-query - handles multiple statements
-async function parseWithLibPgQuery(sql: string, sqlLower: string): Promise<Event[]> {
+export async function parseQuery(sql: string, sqlLower: string): Promise<Event[]> {
   try {
     const { parseQuery } = await import('libpg-query')
     const parsed = await parseQuery(sql)
@@ -167,12 +167,4 @@ function parseCronStatement(sql: string): Event | null {
     entityType: 'cron',
     entityName: cronMatch[1] || cronMatch[2] || cronMatch[3],
   }
-}
-
-/**
- * Extract entity information from SQL statement(s)
- * Uses libpg-query to handle multiple statements in a single call
- */
-export async function extractEntityInfo(sql: string, sqlLower: string): Promise<Event[]> {
-  return await parseWithLibPgQuery(sql, sqlLower)
 }

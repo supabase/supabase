@@ -1,6 +1,6 @@
 import { type QueryClient } from '@tanstack/react-query'
 
-import { extractEntityInfo } from './extract-entity-info'
+import { parseQuery } from './parse-query'
 import { handleInvalidation } from './handle-invalidation'
 
 export type EntityType = 'table' | 'function' | 'cron'
@@ -36,7 +36,7 @@ export async function parseSqlStatements(
   if (!hasValidAction) return []
 
   try {
-    const entityInfos = await extractEntityInfo(sql, sqlLower)
+    const entityInfos = await parseQuery(sql, sqlLower)
 
     return entityInfos.map((entityInfo) => ({
       ...entityInfo,
