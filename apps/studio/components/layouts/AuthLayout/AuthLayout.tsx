@@ -15,6 +15,7 @@ const AuthProductMenu = () => {
 
   const {
     authenticationPolicies,
+    authenticationSignInProviders,
     authenticationRateLimits,
     authenticationEmails,
     authenticationMultiFactor,
@@ -22,6 +23,7 @@ const AuthProductMenu = () => {
     authenticationAdvanced,
   } = useIsFeatureEnabled([
     'authentication:policies',
+    'authentication:sign_in_providers',
     'authentication:rate_limits',
     'authentication:emails',
     'authentication:multi_factor',
@@ -37,6 +39,7 @@ const AuthProductMenu = () => {
       page={page}
       menu={generateAuthMenu(projectRef, {
         authenticationPolicies,
+        authenticationSignInProviders,
         authenticationRateLimits,
         authenticationEmails,
         authenticationMultiFactor,
