@@ -166,6 +166,10 @@
       "type": "boolean",
       "description": "Show the disable legacy API keys section in project settings API Keys page"
     },
+    "project_settings:legacy_jwt_keys": {
+      "type": "boolean",
+      "description": "Enable the legacy JWT secret page in project settings"
+    },
 
     "reports:all": {
       "type": "boolean",
@@ -213,6 +217,7 @@
     "project_addons:dedicated_ipv4_address",
     "project_settings:custom_domains",
     "project_settings:show_disable_legacy_api_keys",
+    "project_settings:legacy_jwt_keys",
     "project_connection:javascript_example",
     "project_connection:dart_example",
     "reports:all",

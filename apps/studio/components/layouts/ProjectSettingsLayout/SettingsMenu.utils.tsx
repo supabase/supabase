@@ -14,6 +14,7 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
+    legacyJwtKeys?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -22,6 +23,7 @@ export const generateSettingsMenu = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
+  const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
 
   return [
     {
@@ -79,7 +81,9 @@ export const generateSettingsMenu = (
               {
                 name: 'JWT Keys',
                 key: 'jwt',
-                url: `/project/${ref}/settings/jwt`,
+                url: legacyJwtKeysEnabled
+                  ? `/project/${ref}/settings/jwt`
+                  : `/project/${ref}/settings/jwt/signing-keys`,
                 items: [],
                 label: 'NEW',
               },
