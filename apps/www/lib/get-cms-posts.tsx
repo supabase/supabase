@@ -28,6 +28,7 @@ type CMSBlogPost = {
   launchweek?: string
   toc_depth?: number
   readingTime?: number
+  categories?: string[]
   tags?: string[]
   industry?: string[]
   supabase_products?: string[]
@@ -425,6 +426,7 @@ async function processPostData(post: any) {
       isCMS: true,
       content: markdownContent,
       richContent: post.content,
+      categories: post.categories?.map((category: any) => category.name) || [],
       tags: post.tags || [],
       toc: {
         content: tocResult.content,
@@ -533,6 +535,7 @@ export async function getAllCMSPosts({
           url: `/blog/${post.slug || ''}`,
           path: `/blog/${post.slug || ''}`,
           isCMS: true,
+          categories: post.categories?.map((category: any) => category.name) || [],
           tags: post.tags || [],
           content: markdownContent,
         }
