@@ -1,6 +1,5 @@
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
-
 import { AccessTokenList } from 'components/interfaces/Account/AccessTokens/AccessTokenList'
 import { NewAccessTokenButton } from 'components/interfaces/Account/AccessTokens/NewAccessTokenButton'
 import { NewTokenBanner } from 'components/interfaces/Account/AccessTokens/NewTokenBanner'
@@ -32,7 +31,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer bottomPadding>
         <div className="space-y-4">
-          {newToken && <NewTokenBanner token={newToken} />}
+          {newToken && <NewTokenBanner token={newToken} onClose={() => setNewToken(undefined)} />}
           <div className="flex items-center justify-between gap-x-2 mb-3">
             <Input
               size="tiny"

@@ -1,15 +1,15 @@
+import AlertError from 'components/ui/AlertError'
+import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
+import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import dayjs from 'dayjs'
 import { MoreVertical, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import AlertError from 'components/ui/AlertError'
-import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
-import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { DATETIME_FORMAT } from 'lib/constants'
 import {
   Button,
   Card,
   CardContent,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -32,36 +32,35 @@ import {
 const RowLoading = () => (
   <TableRow>
     <TableCell>
-      <Skeleton className="max-w-60 h-4 rounded-full" />
+      <Skeleton className="w-40 max-w-40 h-4 rounded-full" />
     </TableCell>
     <TableCell>
-      <Skeleton className="max-w-40 h-4 rounded-full" />
+      <Skeleton className="w-60 max-w-60 h-4 rounded-full" />
     </TableCell>
     <TableCell>
       <Skeleton className="max-w-32 h-4 rounded-full" />
     </TableCell>
     <TableCell>
-      <Skeleton className="w-20 h-8 rounded-md" />
+      <Skeleton className="max-w-32 h-4 rounded-full" />
+    </TableCell>
+    <TableCell>
+      <Skeleton className="w-4 h-4 rounded-md" />
     </TableCell>
   </TableRow>
 )
 
+const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2'
 const TableContainer = ({ children }: { children: React.ReactNode }) => (
   <Card className="w-full overflow-hidden">
     <CardContent className="p-0">
       <Table className="p-5 table-auto">
         <TableHeader>
           <TableRow className="bg-200">
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-              Name
-            </TableHead>
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-              Token
-            </TableHead>
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-              Created
-            </TableHead>
-            <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />
+            <TableHead className={tableHeaderClass}>Name</TableHead>
+            <TableHead className={tableHeaderClass}>Token</TableHead>
+            <TableHead className={tableHeaderClass}>Last used</TableHead>
+            <TableHead className={tableHeaderClass}>Expires</TableHead>
+            <TableHead className={cn(tableHeaderClass, '!text-right')} />
           </TableRow>
         </TableHeader>
         <TableBody>{children}</TableBody>
@@ -159,16 +158,45 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                 <span className="font-mono text-foreground-light">{x.token_alias}</span>
               </TableCell>
               <TableCell>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <p className="text-foreground-light">
-                      {dayjs(x.created_at).format('D MMM YYYY')}
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Created on {dayjs(x.created_at).format(DATETIME_FORMAT)}</p>
-                  </TooltipContent>
-                </Tooltip>
+                <p className="text-foreground-light">
+                  {x.last_used_at ? (
+                    <Tooltip>
+                      <TooltipTrigger>{dayjs(x.last_used_at).format('DD MMM YYYY')}</TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Last used on {dayjs(x.last_used_at).format('DD MMM, YYYY HH:mm')}
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    'Never used'
+                  )}
+                </p>
+              </TableCell>
+              <TableCell>
+                {x.expires_at ? (
+                  dayjs(x.expires_at).isBefore(dayjs()) ? (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <p className="text-foreground-light">Expired</p>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Expired on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm')}
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <p className="text-foreground-light">
+                          {dayjs(x.expires_at).format('DD MMM YYYY')}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Expires on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm')}
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                ) : (
+                  <p className="text-foreground-light">Never</p>
+                )}
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-end gap-x-2">

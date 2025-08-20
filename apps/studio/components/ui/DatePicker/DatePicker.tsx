@@ -13,7 +13,7 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
-import TimeSplitInput from './TimeSplitInput'
+import { TimeSplitInput } from './TimeSplitInput'
 
 export interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
