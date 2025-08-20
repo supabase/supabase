@@ -22,8 +22,6 @@ async function getCMSPostFromAPI(
       url.searchParams.set('draft', 'true')
     }
 
-    console.log('[getCMSPostFromAPI] Fetching:', url.toString(), 'isDraft:', isDraft)
-
     const response = await fetch(url.toString(), {
       // Use no-store to always get fresh data
       cache: 'no-store',
@@ -36,11 +34,7 @@ async function getCMSPostFromAPI(
     }
 
     const data = await response.json()
-    console.log('[getCMSPostFromAPI] Response:', {
-      success: data.success,
-      isDraft: data.isDraft,
-      status: data.post?._status,
-    })
+
     return data.success ? data.post : null
   } catch (error) {
     console.error('[getCMSPostFromAPI] Error:', error)
