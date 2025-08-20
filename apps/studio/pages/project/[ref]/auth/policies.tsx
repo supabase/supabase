@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
@@ -16,9 +17,11 @@ import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -61,6 +64,7 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
+  const { ref } = useParams()
   const [params, setParams] = useUrlState<{
     schema?: string
     search?: string
@@ -68,6 +72,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { schema = 'public', search: searchString = '' } = params
   const { data: project } = useSelectedProjectQuery()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const showPolicies = useIsFeatureEnabled('authentication:policies')
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -98,6 +103,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
   const isPermissionsLoaded = usePermissionsLoaded()
+
+  if (!showPolicies) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+  }
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />

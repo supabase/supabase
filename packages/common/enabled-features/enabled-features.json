@@ -6,6 +6,17 @@
   "ai:opt_in_level_schema_and_log": true,
   "ai:opt_in_level_schema_and_log_and_data": true,
 
+  "authentication:policies": true,
+  "authentication:sign_in_providers": true,
+  "authentication:third_party_auth": true,
+  "authentication:rate_limits": true,
+  "authentication:emails": true,
+  "authentication:multi_factor": true,
+  "authentication:attack_protection": true,
+  "authentication:advanced": true,
+
+  "authentication:show_providers": true,
+  "authentication:show_manual_linking": true,
   "authentication:show_send_invitation": true,
   "authentication:show_provider_filter": true,
   "authentication:show_sort_by_email": true,
