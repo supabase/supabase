@@ -9,6 +9,11 @@ import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountS
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -44,47 +49,56 @@ const ProfileCard = () => {
   const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article>
-      {isLoading && (
-        <Panel>
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        </Panel>
-      )}
-      {isError && (
-        <Panel>
-          <div className="p-4">
-            <AlertError error={error} subject="Failed to retrieve account information" />
-          </div>
-        </Panel>
-      )}
-      {isSuccess && (
-        <>
-          {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
-          <AccountIdentities />
-        </>
-      )}
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader className="pt-0">
+          <ScaffoldSectionTitle>Preferences</ScaffoldSectionTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
+        <article>
+          {isLoading && (
+            <Panel>
+              <div className="p-4">
+                <GenericSkeletonLoader />
+              </div>
+            </Panel>
+          )}
+          {isError && (
+            <Panel>
+              <div className="p-4">
+                <AlertError error={error} subject="Failed to retrieve account information" />
+              </div>
+            </Panel>
+          )}
+          {isSuccess && (
+            <>
+              {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
+              <AccountIdentities />
+            </>
+          )}
 
-      <section>
-        <AccountConnections />
-      </section>
+          <section>
+            <AccountConnections />
+          </section>
 
-      <section>
-        <ThemeSettings />
-      </section>
+          <section>
+            <ThemeSettings />
+          </section>
 
-      {profileShowAnalyticsAndMarketing && (
-        <section>
-          <AnalyticsSettings />
-        </section>
-      )}
+          {profileShowAnalyticsAndMarketing && (
+            <section>
+              <AnalyticsSettings />
+            </section>
+          )}
 
-      {profileShowAccountDeletion && (
-        <section>
-          <AccountDeletion />
-        </section>
-      )}
-    </article>
+          {profileShowAccountDeletion && (
+            <section>
+              <AccountDeletion />
+            </section>
+          )}
+        </article>
+      </ScaffoldContainer>
+    </>
   )
 }
