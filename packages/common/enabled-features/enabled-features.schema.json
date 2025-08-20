@@ -153,6 +153,11 @@
       "description": "Show all client libraries examples in the project homepage. When false, all client library examples will be hidden except the JavaScript client library."
     },
 
+    "project_settings:custom_domains": {
+      "type": "boolean",
+      "description": "Show the custom domain configuration section + custom domain addon"
+    },
+
     "reports:all": {
       "type": "boolean",
       "description": "Enable the project reports page"
