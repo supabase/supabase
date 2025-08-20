@@ -268,7 +268,7 @@ export const Posts: CollectionConfig = {
       autosave: {
         interval: 200,
       },
-      schedulePublish: true,
+      // schedulePublish: true,
     },
     maxPerDoc: 50,
   },
