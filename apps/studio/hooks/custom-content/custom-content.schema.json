@@ -6,11 +6,11 @@
       "type": "string"
     },
 
-    "test": {
-      "type": "object",
-      "description": "Test custom content"
+    "organization:legal_documents": {
+      "type": ["array", "null"],
+      "description": "Renders a provided set of documents under the organization legal documents page"
     }
   },
-  "required": ["test"],
+  "required": ["organization:legal_documents"],
   "additionalProperties": false
 }

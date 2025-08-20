@@ -1,0 +1,24 @@
+{
+  "$schema": "./custom-content.schema.json",
+
+  "organization:legal_documents": [
+    {
+      "id": "doc1",
+      "name": "Document 1",
+      "description": "This is a description of Document 1",
+      "action": {
+        "text": "Download document",
+        "url": "https://supabase.com"
+      }
+    },
+    {
+      "id": "doc2",
+      "name": "Document 2",
+      "description": "This is a description of Document 2",
+      "action": {
+        "text": "Download document",
+        "url": "https://supabase.com"
+      }
+    }
+  ]
+}
