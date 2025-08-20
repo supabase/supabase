@@ -213,7 +213,9 @@ export const NewAccessTokenDialog = ({
                         <DatePicker
                           selectsRange={false}
                           triggerButtonSize="small"
+                          contentSide="top"
                           minDate={new Date()}
+                          maxDate={dayjs().add(1, 'year').toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}

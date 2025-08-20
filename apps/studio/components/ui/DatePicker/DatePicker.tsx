@@ -23,6 +23,7 @@ export interface DatePickerProps {
   triggerButtonClassName?: string
   triggerButtonTitle?: string
   triggerButtonSize?: 'tiny' | 'small'
+  contentSide?: 'bottom' | 'top'
   minDate?: Date
   maxDate?: Date
   hideTime?: boolean
@@ -46,6 +47,7 @@ export function DatePicker({
   triggerButtonClassName = '',
   triggerButtonTitle,
   triggerButtonSize,
+  contentSide = 'bottom',
   minDate,
   maxDate,
   hideTime = false,
@@ -174,7 +176,7 @@ export function DatePicker({
           )}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="center" side="bottom" className="p-0">
+      <PopoverContent_Shadcn_ align="center" side={contentSide} className="p-0">
         <>
           {hideTime ? null : (
             <>
