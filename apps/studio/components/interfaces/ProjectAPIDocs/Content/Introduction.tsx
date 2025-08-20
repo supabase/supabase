@@ -12,7 +12,7 @@ import type { ContentProps } from './Content.types'
 const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { slug: orgSlug, ref } = useParams()
   const { data: apiKeys } = useAPIKeysQuery({ orgSlug, projectRef: ref })
-  const { data } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data } = useProjectSettingsV2Query({ orgSlug, projectRef: ref })
 
   const [copied, setCopied] = useState<'anon' | 'service'>()
 

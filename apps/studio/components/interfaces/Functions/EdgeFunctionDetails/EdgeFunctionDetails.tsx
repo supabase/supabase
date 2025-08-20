@@ -65,7 +65,7 @@ export const EdgeFunctionDetails = () => {
   )
 
   const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const {
     data: selectedFunction,

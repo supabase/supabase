@@ -3291,7 +3291,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/settings': {
+  '/platform/organizations/{slug}/projects/{ref}/settings': {
     parameters: {
       query?: never
       header?: never
@@ -18985,6 +18985,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }

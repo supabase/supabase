@@ -57,7 +57,7 @@ export const S3Connection = () => {
   const canReadS3Credentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
   const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
   const {
     data: config,
     error: configError,

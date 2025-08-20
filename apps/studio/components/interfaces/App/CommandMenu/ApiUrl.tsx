@@ -6,13 +6,16 @@ import { Badge, copyToClipboard } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 export function useApiUrlCommand() {
   const setIsOpen = useSetCommandMenuOpen()
 
+  const { slug: orgSlug } = getPathReferences()
+
   const { data: project } = useSelectedProjectQuery()
   const { data: settings } = useProjectSettingsV2Query(
-    { projectRef: project?.ref },
+    { orgSlug, projectRef: project?.ref },
     { enabled: !!project }
   )
 

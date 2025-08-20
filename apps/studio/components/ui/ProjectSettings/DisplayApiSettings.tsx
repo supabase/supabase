@@ -28,7 +28,7 @@ export const DisplayApiSettings = ({
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettingsV2Query({ projectRef })
+  } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
   const {
     data,
     isError: isJwtSecretUpdateStatusError,

@@ -1808,7 +1808,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const stateRef = useLatest(state)
   const slug = getOrganizationSlug()
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef: project?.ref })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint

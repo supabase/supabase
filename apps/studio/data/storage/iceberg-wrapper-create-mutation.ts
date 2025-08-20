@@ -12,14 +12,16 @@ import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mu
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
+import { getPathReferences } from '../vela/path-references'
 
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { secretKey, serviceKey } = getKeys(apiKeys)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
 

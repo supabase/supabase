@@ -14,7 +14,7 @@ interface Props {
 export default function Introduction({ selectedLang }: Props) {
   const { slug, ref: projectRef } = useParams()
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
   const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
 
   const protocol = settings?.app_config?.protocol ?? 'https'

@@ -7,17 +7,24 @@ const projectApiKeys = {
 }
 
 export interface ProjectApiVariables {
+  orgSlug?: string
   projectRef?: string
 }
 
-async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: AbortSignal) {
+async function getProjectApi({ orgSlug, projectRef }: ProjectApiVariables, signal?: AbortSignal) {
+  if (!orgSlug) {
+    throw Error('orgSlug is required')
+  }
   if (!projectRef) {
     throw Error('projectRef is required')
   }
 
-  const { data, error } = await get('/platform/projects/{ref}/settings', {
+  const { data, error } = await get('/platform/organizations/{slug}/projects/{ref}/settings', {
     params: {
-      path: { ref: projectRef },
+      path: {
+        slug: orgSlug,
+        ref: projectRef
+      },
     },
     signal,
   })

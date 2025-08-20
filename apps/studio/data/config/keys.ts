@@ -1,6 +1,6 @@
 export const configKeys = {
   settings: (projectRef: string | undefined) => ['projects', projectRef, 'settings'] as const,
-  settingsV2: (projectRef: string | undefined) => ['projects', projectRef, 'settings-v2'] as const,
+  settingsV2: (orgSlug: string | undefined, projectRef: string | undefined) => ['projects', orgSlug, projectRef, 'settings-v2'] as const,
   api: (projectRef: string | undefined) => ['projects', projectRef, 'settings', 'api'] as const,
   postgrest: (projectRef: string | undefined) => ['projects', projectRef, 'postgrest'] as const,
   jwtSecretUpdatingStatus: (projectRef: string | undefined) =>

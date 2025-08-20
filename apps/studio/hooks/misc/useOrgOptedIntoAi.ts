@@ -63,7 +63,10 @@ export function useOrgAiOptInLevel(): {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: selectedProject?.ref })
+  const { data: projectSettings } = useProjectSettingsV2Query({
+    orgSlug: selectedOrganization?.slug,
+    projectRef: selectedProject?.ref
+  })
   const isProjectSensitive = !!projectSettings?.is_sensitive
 
   const preventProjectFromUsingAI = hasHipaaAddon && isProjectSensitive

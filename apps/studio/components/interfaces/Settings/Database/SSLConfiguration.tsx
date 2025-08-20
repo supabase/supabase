@@ -18,11 +18,11 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SSLConfiguration = () => {
-  const { ref } = useParams()
+  const { slug: orgSlug, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isEnforced, setIsEnforced] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef: ref })
   const {
     data: sslEnforcementConfiguration,
     isLoading,

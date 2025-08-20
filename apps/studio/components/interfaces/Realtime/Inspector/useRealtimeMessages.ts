@@ -43,6 +43,7 @@ function reducer(
 export interface RealtimeConfig {
   enabled: boolean
   channelName: string
+  orgSlug: string
   projectRef: string
   logLevel: string
   token: string
@@ -63,6 +64,7 @@ export const useRealtimeMessages = (
   const {
     enabled,
     channelName,
+    orgSlug,
     projectRef,
     logLevel,
     token,
@@ -76,7 +78,7 @@ export const useRealtimeMessages = (
     enableBroadcast,
   } = config
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef: projectRef })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint

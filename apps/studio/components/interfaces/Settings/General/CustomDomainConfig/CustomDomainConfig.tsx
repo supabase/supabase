@@ -16,7 +16,7 @@ import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
 
 const CustomDomainConfig = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
@@ -108,6 +108,7 @@ const CustomDomainConfig = () => {
 
               {customDomainData.status === '4_origin_setup_completed' && (
                 <CustomDomainActivate
+                  orgSlug={slug}
                   projectRef={ref}
                   customDomain={customDomainData.customDomain}
                 />

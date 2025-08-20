@@ -12,12 +12,13 @@ import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
   const [sendMessageShown, setSendMessageShown] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
+    orgSlug: slug!,
     projectRef: ref!,
     channelName: '',
     logLevel: 'info',

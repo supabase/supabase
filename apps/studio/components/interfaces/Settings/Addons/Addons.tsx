@@ -57,7 +57,7 @@ const Addons = () => {
   const { data: parentProject } = useProjectByRefQuery(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')

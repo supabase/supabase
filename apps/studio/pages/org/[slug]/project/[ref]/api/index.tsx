@@ -27,11 +27,11 @@ const DocView = () => {
   const functionPath = 'rpc/'
   const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
-  const { ref: projectRef, page, resource, rpc } = useParams()
+  const { slug: orgSlug, ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [selectedApikey, setSelectedApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings, error: settingsError } = useProjectSettingsV2Query({ orgSlug, projectRef })
   const {
     data: jsonSchema,
     error: jsonSchemaError,

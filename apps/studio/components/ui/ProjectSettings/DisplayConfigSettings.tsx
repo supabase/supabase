@@ -10,13 +10,13 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { Input } from 'ui'
 
 const DisplayConfigSettings = () => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const {
     data: settings,
     isLoading: isProjectSettingsLoading,
     isError: isProjectSettingsError,
   } = useProjectSettingsV2Query({
-    projectRef,
+    orgSlug, projectRef,
   })
   const { data: config, isError: isPostgrestError } = useProjectPostgrestConfigQuery({ projectRef })
 

@@ -43,7 +43,7 @@ export const EdgeFunctionBlock = ({
   const { slug, ref } = useParams()
   const [isDeployed, setIsDeployed] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef: ref })
   const { data: existingFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionName })
 
   const { mutate: sendEvent } = useSendEventMutation()

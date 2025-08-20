@@ -14,7 +14,7 @@ interface AuthenticationProps {
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { slug, ref: projectRef } = useParams()
   const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
 
   const { anonKey, serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'

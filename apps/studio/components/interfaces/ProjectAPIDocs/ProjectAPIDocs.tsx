@@ -50,7 +50,7 @@ const ProjectAPIDocs = () => {
     { enabled: snap.showProjectApiDocs }
   )
   const { data: settings } = useProjectSettingsV2Query(
-    { projectRef: ref },
+    { orgSlug, projectRef: ref },
     { enabled: snap.showProjectApiDocs }
   )
   const { data: customDomainData } = useCustomDomainsQuery(

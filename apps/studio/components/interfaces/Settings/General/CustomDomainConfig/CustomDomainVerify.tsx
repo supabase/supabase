@@ -22,10 +22,10 @@ import DNSRecord from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
 
 const CustomDomainVerify = () => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef })
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const customDomain = customDomainData?.customDomain

@@ -24,7 +24,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
   const { data: project } = useSelectedProjectQuery()
 
   const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef: project?.ref })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
 

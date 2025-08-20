@@ -7,7 +7,10 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
-export type ProjectSettingsVariables = { projectRef?: string }
+export type ProjectSettingsVariables = {
+  orgSlug?: string
+  projectRef?: string
+}
 
 // Manually add the protocol property to the response - specifically just for the local/CLI environment
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
@@ -18,13 +21,19 @@ export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] &
 }
 
 export async function getProjectSettings(
-  { projectRef }: ProjectSettingsVariables,
+  { orgSlug, projectRef }: ProjectSettingsVariables,
   signal?: AbortSignal
 ) {
+  if (!orgSlug) throw new Error('orgSlug is required')
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get('/platform/projects/{ref}/settings', {
-    params: { path: { ref: projectRef } },
+  const { data, error } = await get('/platform/organizations/{slug}/projects/{ref}/settings', {
+    params: {
+      path: {
+        slug: orgSlug,
+        ref: projectRef
+      }
+    },
     signal,
   })
 
@@ -36,7 +45,7 @@ type ProjectSettingsData = Awaited<ReturnType<typeof getProjectSettings>>
 type ProjectSettingsError = ResponseError
 
 export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
-  { projectRef }: ProjectSettingsVariables,
+  { orgSlug, projectRef }: ProjectSettingsVariables,
   {
     enabled = true,
     ...options
@@ -47,10 +56,10 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
   const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   return useQuery<ProjectSettingsData, ProjectSettingsError, TData>(
-    configKeys.settingsV2(projectRef),
-    ({ signal }) => getProjectSettings({ projectRef }, signal),
+    configKeys.settingsV2(orgSlug, projectRef),
+    ({ signal }) => getProjectSettings({ orgSlug, projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof orgSlug !== 'undefined',
       refetchInterval(_data) {
         const data = _data as ProjectSettings | undefined
         const apiKeys = data?.service_api_keys ?? []

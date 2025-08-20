@@ -7,12 +7,14 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { copyToClipboard } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
+import { getPathReferences } from 'data/vela/path-references'
 
 export const useCopyUrl = () => {
+  const { slug: orgSlug } = getPathReferences()
   const { projectRef, selectedBucket, getPathAlongOpenedFolders } =
     useStorageExplorerStateSnapshot()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: projectRef })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef: projectRef })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint

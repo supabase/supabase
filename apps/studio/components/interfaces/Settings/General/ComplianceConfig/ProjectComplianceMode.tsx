@@ -35,7 +35,7 @@ const ComplianceConfig = () => {
     isError,
     isLoading,
     isSuccess,
-  } = useProjectSettingsV2Query({ projectRef: ref })
+  } = useProjectSettingsV2Query({ orgSlug: slug, projectRef: ref })
   const initialIsSensitive = settings?.is_sensitive || false
 
   const { mutate: updateComplianceConfig, isLoading: isSubmitting } =
@@ -50,9 +50,10 @@ const ComplianceConfig = () => {
     })
 
   const toggleIsSensitive = async () => {
+    if (!slug) return console.error('Organization slug is required')
     if (!ref) return console.error('Project ref is required')
     setIsSensitive(!isSensitive)
-    updateComplianceConfig({ projectRef: ref, isSensitive: !isSensitive })
+    updateComplianceConfig({ orgSlug: slug, projectRef: ref, isSensitive: !isSensitive })
   }
 
   useEffect(() => {

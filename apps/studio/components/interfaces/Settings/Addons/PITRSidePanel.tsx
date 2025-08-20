@@ -56,7 +56,7 @@ const PITRSidePanel = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
+  const { data: projectSettings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')

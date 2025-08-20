@@ -13,14 +13,15 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } f
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type CustomDomainActivateProps = {
+  orgSlug?: string
   projectRef?: string
   customDomain: CustomDomainResponse
 }
 
-const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
+const CustomDomainActivate = ({ orgSlug, projectRef, customDomain }: CustomDomainActivateProps) => {
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef })
   const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
     {

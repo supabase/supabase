@@ -54,7 +54,7 @@ export const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef }, { enabled: showConnect })
   const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
     PermissionAction.READ,
     'service_api_keys'

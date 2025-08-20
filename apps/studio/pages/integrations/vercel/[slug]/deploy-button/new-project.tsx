@@ -158,7 +158,7 @@ const CreateProject = () => {
 
   // Wait for the new project to be created before creating the connection
   useProjectSettingsV2Query(
-    { projectRef: newProjectRef },
+    { orgSlug: organization?.slug, projectRef: newProjectRef },
     {
       enabled: newProjectRef !== undefined,
       // refetch until the project is created

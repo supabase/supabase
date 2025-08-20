@@ -24,7 +24,7 @@ export type UtilityTabResultsProps = {
 
 const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
   ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
-    const { ref } = useParams()
+    const { slug: orgSlug, ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const { data: organization } = useSelectedOrganizationQuery()
     const snapV2 = useSqlEditorV2StateSnapshot()
@@ -34,7 +34,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
     // Customers on HIPAA plans should not have access to Supabase AI
-    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+    const { data: projectSettings } = useProjectSettingsV2Query({ orgSlug, projectRef: ref })
     const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
     const isTimeout =

@@ -32,7 +32,7 @@ export const TerminalInstructions = forwardRef<
 
   const { data: tokens } = useAccessTokensQuery()
   const { data: apiKeys } = useAPIKeysQuery({ orgSlug, projectRef })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const { anonKey, publishableKey } = getKeys(apiKeys)

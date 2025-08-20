@@ -6,6 +6,7 @@ import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ComplianceConfigUpdateVariables = {
+  orgSlug: string
   projectRef: string
   isSensitive: boolean
 }
@@ -41,8 +42,8 @@ export const useComplianceConfigUpdateMutation = ({
     (vars) => updateComplianceConfig(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(configKeys.settingsV2(projectRef))
+        const { orgSlug, projectRef } = variables
+        await queryClient.invalidateQueries(configKeys.settingsV2(orgSlug, projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

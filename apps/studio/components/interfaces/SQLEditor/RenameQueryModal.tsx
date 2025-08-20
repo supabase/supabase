@@ -41,7 +41,7 @@ const RenameQueryModal = ({
     { enabled: visible }
   )
   const isSQLSnippet = snippet.type === 'sql'
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: projectSettings } = useProjectSettingsV2Query({ orgSlug, projectRef: ref })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive

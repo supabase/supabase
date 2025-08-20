@@ -51,7 +51,7 @@ export const APIKeys = () => {
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettingsV2Query({ projectRef })
+  } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
 
   const { data: apiKeys } = useAPIKeysQuery({ orgSlug: slug, projectRef })
   const { anonKey, serviceKey } = getKeys(apiKeys)

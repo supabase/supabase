@@ -29,11 +29,11 @@ interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
 
 const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
   ({ projectKeys, filePath, ...props }, ref) => {
-    const { ref: projectRef } = useParams()
+    const { slug: orgSlug, ref: projectRef } = useParams()
     const { data: selectedOrg } = useSelectedOrganizationQuery()
     const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
 
-    const { data: settings } = useProjectSettingsV2Query({ projectRef })
+    const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef })
     const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
     const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
     const { data: addons } = useProjectAddonsQuery({ projectRef })
