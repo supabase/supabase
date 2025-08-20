@@ -12,7 +12,7 @@ import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
 const Entities = ({ language }: ContentProps) => {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef: ref })
@@ -20,7 +20,7 @@ const Entities = ({ language }: ContentProps) => {
   const onClickGenerateTypes = async () => {
     try {
       setIsGeneratingTypes(true)
-      const res = await generateTypes({ ref, included_schemas: config?.db_schema })
+      const res = await generateTypes({ slug, ref, included_schemas: config?.db_schema })
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
       element.setAttribute('download', 'supabase.ts')

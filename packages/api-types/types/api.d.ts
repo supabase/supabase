@@ -1455,7 +1455,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/projects/{ref}/types/typescript': {
+  '/platform/organizations/{slug}/projects/{ref}/types/typescript': {
     parameters: {
       query?: never
       header?: never
@@ -7649,6 +7649,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }

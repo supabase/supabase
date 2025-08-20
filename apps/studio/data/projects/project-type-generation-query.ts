@@ -4,16 +4,17 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
-export type GenerateTypesVariables = { ref?: string; included_schemas?: string }
+export type GenerateTypesVariables = { slug?: string, ref?: string; included_schemas?: string }
 
 export async function generateTypes(
-  { ref, included_schemas }: GenerateTypesVariables,
+  { slug, ref, included_schemas }: GenerateTypesVariables,
   signal?: AbortSignal
 ) {
+  if (!slug) throw new Error('Organization slug is required')
   if (!ref) throw new Error('Project ref is required')
 
-  const { data, error } = await get(`/v1/projects/{ref}/types/typescript`, {
-    params: { path: { ref }, query: { included_schemas } },
+  const { data, error } = await get(`/platform/organizations/{slug}/projects/{ref}/types/typescript`, {
+    params: { path: { slug, ref }, query: { included_schemas } },
     signal,
   })
 
@@ -25,11 +26,11 @@ export type GenerateTypesData = Awaited<ReturnType<typeof generateTypes>>
 export type GenerateTypesError = ResponseError
 
 export const useGenerateTypesQuery = <TData = GenerateTypesData>(
-  { ref, included_schemas }: GenerateTypesVariables,
+  { slug, ref, included_schemas }: GenerateTypesVariables,
   { enabled = true, ...options }: UseQueryOptions<GenerateTypesData, GenerateTypesError, TData> = {}
 ) =>
   useQuery<GenerateTypesData, GenerateTypesError, TData>(
-    projectKeys.types(ref),
-    ({ signal }) => generateTypes({ ref, included_schemas }, signal),
-    { enabled: enabled && typeof ref !== 'undefined', ...options }
+    projectKeys.types(slug, ref),
+    ({ signal }) => generateTypes({ slug, ref, included_schemas }, signal),
+    { enabled: enabled && typeof ref !== 'undefined' && typeof slug !== 'undefined', ...options }
   )

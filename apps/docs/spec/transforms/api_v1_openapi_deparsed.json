@@ -1572,7 +1572,7 @@
         ]
       }
     },
-    "/v1/projects/{ref}/api-keys": {
+    "/platform/organizations/{slug}/projects/{ref}/api-keys": {
       "get": {
         "operationId": "v1-get-project-api-keys",
         "summary": "Get project api keys",
@@ -1797,7 +1797,7 @@
         ]
       }
     },
-    "/v1/projects/{ref}/api-keys/legacy": {
+    "/platform/organizations/{slug}/projects/{ref}/api-keys/legacy": {
       "get": {
         "operationId": "v1-get-project-legacy-api-keys",
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
@@ -1898,7 +1898,7 @@
         ]
       }
     },
-    "/v1/projects/{ref}/api-keys/{id}": {
+    "/platform/organizations/{slug}/projects/{ref}/api-keys/{id}": {
       "patch": {
         "operationId": "v1-update-project-api-key",
         "summary": "Updates an API key for the project",
@@ -4538,7 +4538,7 @@
         ]
       }
     },
-    "/v1/projects/{ref}/types/typescript": {
+    "/platform/organizations/{slug}/projects/{ref}/types/typescript": {
       "get": {
         "operationId": "v1-generate-typescript-types",
         "summary": "Generate TypeScript types",

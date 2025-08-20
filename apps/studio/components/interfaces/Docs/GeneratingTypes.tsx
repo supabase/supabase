@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function GeneratingTypes({ selectedLang }: Props) {
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef: ref })
@@ -23,7 +23,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
   const onClickGenerateTypes = async () => {
     try {
       setIsGeneratingTypes(true)
-      const res = await generateTypes({ ref, included_schemas: config?.db_schema })
+      const res = await generateTypes({ slug, ref, included_schemas: config?.db_schema })
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
       element.setAttribute('download', 'supabase.ts')
