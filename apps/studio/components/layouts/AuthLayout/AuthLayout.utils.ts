@@ -70,6 +70,13 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 label: 'BETA',
               },
               {
+                name: 'Audit Logs',
+                key: 'audit-logs',
+                url: `/project/${ref}/auth/audit-logs`,
+                items: [],
+                label: 'BETA',
+              },
+              {
                 name: 'Advanced',
                 key: 'advanced',
                 url: `/project/${ref}/auth/advanced`,
