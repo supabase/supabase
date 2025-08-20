@@ -19,7 +19,12 @@ import {
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateToolRoutes = (slug: string, ref?: string, project?: Project, features?: {}): Route[] => {
+export const generateToolRoutes = (
+  slug: string,
+  ref?: string,
+  project?: Project,
+  features?: {}
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/org/[slug]/project/${ref}`
 
@@ -79,7 +84,8 @@ export const generateProductRoutes = (
             key: 'auth',
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/auth/users`),
+            link:
+              ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/auth/users`),
             items: authMenu,
           },
         ]
@@ -90,7 +96,9 @@ export const generateProductRoutes = (
             key: 'storage',
             label: 'Storage',
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/storage/buckets`),
+            link:
+              ref &&
+              (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/storage/buckets`),
           },
         ]
       : []),
@@ -100,7 +108,8 @@ export const generateProductRoutes = (
             key: 'functions',
             label: 'Edge Functions',
             icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/functions`),
+            link:
+              ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/functions`),
           },
         ]
       : []),
@@ -110,7 +119,9 @@ export const generateProductRoutes = (
             key: 'realtime',
             label: 'Realtime',
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/realtime/inspector`),
+            link:
+              ref &&
+              (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/realtime/inspector`),
           },
         ]
       : []),
@@ -133,18 +144,9 @@ export const generateOtherRoutes = (
       key: 'advisors',
       label: 'Advisors',
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/advisors/security`),
+      link:
+        ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/advisors/security`),
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'reports',
-            label: 'Reports',
-            icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/reports`),
-          },
-        ]
-      : []),
     {
       key: 'logs',
       label: 'Logs',
@@ -158,6 +160,19 @@ export const generateOtherRoutes = (
             : `/org/${slug}/project/${ref}/logs/explorer`),
     },
     {
+      key: 'reports',
+      label: 'Reports',
+      icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/reports`),
+    },
+
+    // {
+    //   key: 'logs',
+    //   label: 'Logs',
+    //   icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    //   link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/logs`),
+    // },
+    {
       key: 'api',
       label: 'API Docs',
       icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
@@ -168,6 +183,12 @@ export const generateOtherRoutes = (
       label: 'Integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/org/${slug}/project/${ref}/integrations`),
+    },
+        {
+      label: 'project settings',
+      link: `/org/${slug}/general`,
+      key: 'settings',
+      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
   ]
 }

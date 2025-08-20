@@ -1,6 +1,18 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
+import {
+  Blocks,
+  Boxes,
+  ChartArea,
+  FolderSync,
+  HardDrive,
+  MessageCircleQuestionIcon,
+  PanelLeftDashed,
+  Receipt,
+  Settings,
+  Shield,
+  Users,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
@@ -357,7 +369,7 @@ const OrganizationLinks = () => {
 
   const activeRoute = router.pathname.split('/')[5]
 
-  const navMenuItems = [
+  const ProjectSection = [
     {
       label: 'Projects',
       href: `/org/${slug}`,
@@ -365,11 +377,14 @@ const OrganizationLinks = () => {
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
-      label: 'Team',
+      label: 'RBAC',
       href: `/org/${slug}/team`,
       key: 'team',
-      icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <Shield size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
+  ]
+
+  const navMenuItems = [
     {
       label: 'Integrations',
       href: `/org/${slug}/integrations`,
@@ -377,10 +392,22 @@ const OrganizationLinks = () => {
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
-      label: 'Usage',
+      label: 'Metering',
       href: `/org/${slug}/usage`,
-      key: 'usage',
+      key: 'metering',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
+      label: 'Backups',
+      href: `/org/${slug}/usage`,
+      key: 'backups',
+      icon: <HardDrive size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
+      label: 'Support',
+      href: `/org/${slug}/usage`,
+      key: 'support',
+      icon: <MessageCircleQuestionIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Organization settings',
@@ -392,6 +419,26 @@ const OrganizationLinks = () => {
 
   return (
     <SidebarMenu className="flex flex-col gap-1 items-start">
+      <SidebarGroup className="gap-0.5">
+        {ProjectSection.map((item) => (
+          <SideBarNavLink
+            key={item.key}
+            disabled={disableAccessMfa && item.key === 'team'}
+            active={
+              item.key === 'projects'
+                ? isUndefined(activeRoute)
+                : activeRoute === item.key || router.pathname.includes(item.key)
+            }
+            route={{
+              label: item.label,
+              link: item.href,
+              key: item.key,
+              icon: item.icon,
+            }}
+          />
+        ))}
+      </SidebarGroup>
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {navMenuItems.map((item, i) => (
           <SideBarNavLink

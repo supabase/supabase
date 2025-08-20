@@ -7,7 +7,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   // @ts-ignore next-themes is old :/
 
   return (
-    <NextThemesProvider themes={['dark', 'light']} defaultTheme="dark" {...props}>
+    <NextThemesProvider themes={['dark', 'light']} defaultTheme="light" {...props}>
       {children}
     </NextThemesProvider>
   )
