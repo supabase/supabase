@@ -15,6 +15,7 @@ export const generateSettingsMenu = (
     storage?: boolean
     invoices?: boolean
     legacyJwtKeys?: boolean
+    logDrains?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -24,6 +25,7 @@ export const generateSettingsMenu = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
+  const logDrainsEnabled = features?.logDrains ?? true
 
   return [
     {
@@ -59,12 +61,16 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
-              {
-                name: `Log Drains`,
-                key: `log-drains`,
-                url: `/project/${ref}/settings/log-drains`,
-                items: [],
-              },
+              ...(logDrainsEnabled
+                ? [
+                    {
+                      name: `Log Drains`,
+                      key: `log-drains`,
+                      url: `/project/${ref}/settings/log-drains`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Data API',
                 key: 'api',

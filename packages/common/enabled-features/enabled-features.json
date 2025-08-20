@@ -50,6 +50,7 @@
   "project_settings:custom_domains": true,
   "project_settings:show_disable_legacy_api_keys": true,
   "project_settings:legacy_jwt_keys": true,
+  "project_settings:log_drains": true,
 
   "reports:all": true,
 

@@ -170,6 +170,10 @@
       "type": "boolean",
       "description": "Enable the legacy JWT secret page in project settings"
     },
+    "project_settings:log_drains": {
+      "type": "boolean",
+      "description": "Enable the log drains page in project settings"
+    },
 
     "reports:all": {
       "type": "boolean",
@@ -218,6 +222,7 @@
     "project_settings:custom_domains",
     "project_settings:show_disable_legacy_api_keys",
     "project_settings:legacy_jwt_keys",
+    "project_settings:log_drains",
     "project_connection:javascript_example",
     "project_connection:dart_example",
     "reports:all",

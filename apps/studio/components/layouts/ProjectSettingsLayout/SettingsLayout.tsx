@@ -39,12 +39,14 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     projectStorageAll: storageEnabled,
     billingInvoices: invoicesEnabled,
     projectSettingsLegacyJwtKeys: legacyJWTKeysEnabled,
+    projectSettingsLogDrains,
   } = useIsFeatureEnabled([
     'project_auth:all',
     'project_edge_function:all',
     'project_storage:all',
     'billing:invoices',
     'project_settings:legacy_jwt_keys',
+    'project_settings:log_drains',
   ])
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
@@ -53,6 +55,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     storage: storageEnabled,
     invoices: invoicesEnabled,
     legacyJwtKeys: legacyJWTKeysEnabled,
+    logDrains: projectSettingsLogDrains,
   })
 
   return (
