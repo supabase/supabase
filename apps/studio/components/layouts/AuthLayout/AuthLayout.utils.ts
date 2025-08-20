@@ -4,7 +4,6 @@ import { IS_PLATFORM } from 'lib/constants'
 export const generateAuthMenu = (
   ref: string,
   flags?: {
-    authenticationPolicies: boolean
     authenticationSignInProviders: boolean
     authenticationRateLimits: boolean
     authenticationEmails: boolean
@@ -14,7 +13,6 @@ export const generateAuthMenu = (
   }
 ): ProductMenuGroup[] => {
   const {
-    authenticationPolicies,
     authenticationSignInProviders,
     authenticationRateLimits,
     authenticationEmails,
@@ -31,16 +29,12 @@ export const generateAuthMenu = (
     {
       title: 'Configuration',
       items: [
-        ...(authenticationPolicies
-          ? [
-              {
-                name: 'Policies',
-                key: 'policies',
-                url: `/project/${ref}/auth/policies`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Policies',
+          key: 'policies',
+          url: `/project/${ref}/auth/policies`,
+          items: [],
+        },
         ...(IS_PLATFORM
           ? [
               ...(authenticationSignInProviders

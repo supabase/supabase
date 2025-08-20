@@ -17,11 +17,9 @@ import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -72,7 +70,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { schema = 'public', search: searchString = '' } = params
   const { data: project } = useSelectedProjectQuery()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const showPolicies = useIsFeatureEnabled('authentication:policies')
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -103,10 +100,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
   const isPermissionsLoaded = usePermissionsLoaded()
-
-  if (!showPolicies) {
-    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
-  }
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />

@@ -17,8 +17,6 @@ export const generateSettingsMenu = (
     legacyJwtKeys?: boolean
     logDrains?: boolean
     billing?: boolean
-    authPolicies?: boolean
-    authSignInProviders?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -30,12 +28,6 @@ export const generateSettingsMenu = (
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
   const logDrainsEnabled = features?.logDrains ?? true
   const billingEnabled = features?.billing ?? true
-
-  const authSettingsURL = features?.authPolicies
-    ? `/project/${ref}/auth/policies`
-    : features?.authSignInProviders
-      ? `/project/${ref}/auth/providers`
-      : `/project/${ref}/auth/sessions`
 
   return [
     {
@@ -136,7 +128,7 @@ export const generateSettingsMenu = (
               {
                 name: 'Authentication',
                 key: 'auth',
-                url: authSettingsURL,
+                url: `/project/${ref}/auth/policies`,
                 items: [],
                 rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },

@@ -41,8 +41,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     projectSettingsLegacyJwtKeys: legacyJWTKeysEnabled,
     projectSettingsLogDrains,
     billingAll,
-    authenticationPolicies,
-    authenticationSignInProviders,
   } = useIsFeatureEnabled([
     'project_auth:all',
     'project_edge_function:all',
@@ -51,8 +49,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     'project_settings:legacy_jwt_keys',
     'project_settings:log_drains',
     'billing:all',
-    'authentication:policies',
-    'authentication:sign_in_providers',
   ])
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
@@ -63,8 +59,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     legacyJwtKeys: legacyJWTKeysEnabled,
     logDrains: projectSettingsLogDrains,
     billing: billingAll,
-    authPolicies: authenticationPolicies,
-    authSignInProviders: authenticationSignInProviders,
   })
 
   return (
