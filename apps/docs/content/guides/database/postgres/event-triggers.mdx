@@ -10,6 +10,7 @@ In Postgres, an [event trigger](https://www.postgresql.org/docs/current/event-tr
 With our `Supautils` extension (installed automatically for all Supabase projects), the `postgres` user has the ability to create and manage event triggers.
 
 Some use cases for event triggers ares:
+
 - Capturing Data Definition Language (DDL) changes - these are changes to your database schema (though the [pgAudit](/docs/guides/database/extensions/pgaudit) extension provides a more complete solution)
 - Monitoring/preventing actions - such as preventing tables from being dropped in Production or enforcing RLS on all new tables
 
@@ -19,26 +20,15 @@ In this guide, we will go through an example event trigger that prevents acciden
 
 Event triggers can only be created by the `postgres` user so make sure you are authenticated as them. As with triggers, event triggers consist of 2 parts
 
-1. A [Function](/docs/guides/database/functions) which will be executed
-2. The actual Event Trigger object, with parameters around when the trigger should be run.
+1. A [Function](/docs/guides/database/functions) which will be executed when the triggering event occurs
+2. The actual Event Trigger object, with parameters around when the trigger should be run
 
-An example of a trigger is:
-
-```sql
-CREATE EVENT TRIGGER dont_drop_trigger
-ON sql_drop
-EXECUTE FUNCTION dont_drop_function();
-```
-
-## Trigger functions
-
-A trigger function is a user-defined [Function](/docs/guides/database/functions) that Postgres executes when the trigger is fired.
-
-### Example trigger function
+### Example trigger function - prevent dropping tables
 
 This example protects any table from being dropped. It can be overridden by temporarily disabling the event trigger: `ALTER EVENT TRIGGER dont_drop_trigger DISABLE;`
 
 ```sql
+-- Function
 CREATE OR REPLACE FUNCTION dont_drop_function()
   RETURNS event_trigger LANGUAGE plpgsql AS $$
 DECLARE
@@ -54,6 +44,7 @@ BEGIN
 END;
 $$;
 
+-- Event trigger
 CREATE EVENT TRIGGER dont_drop_trigger
 ON sql_drop
 EXECUTE FUNCTION dont_drop_function();
@@ -62,6 +53,7 @@ EXECUTE FUNCTION dont_drop_function();
 ### Event trigger Functions and firing Events
 
 Event triggers can be triggered on:
+
 - `ddl_command_start` - occurs just before a DDL command for almost all objects within a schema
 - `ddl_command_end` - occurs just after a DDL command for almost all objects within a schema
 - `sql_drop` - occurs just before `ddl_command_end` for any DDL commands that `DROP` a database object (note that altering a table can cause it to be dropped)
@@ -70,7 +62,6 @@ Event triggers can be triggered on:
 Within each event trigger, helper functions exist to view the objects being modified or the command being run. For example, our example calls `pg_event_trigger_dropped_objects()` to view the object(s) being dropped. For a more comprehensive overview of these functions, see the [official documentation](https://www.postgresql.org/docs/current/event-trigger-definition.html)
 
 To view the matrix commands that cause an event trigger to fire, see the [official documentation](https://www.postgresql.org/docs/current/event-trigger-matrix.html)
-
 
 ## Disabling an event trigger
 
@@ -90,6 +81,6 @@ DROP EVENT TRIGGER dont_drop_trigger;
 
 ## Resources
 
-- Official Postgres Docs: [Event Trigger Behavriours](https://www.postgresql.org/docs/current/event-trigger-definition.html)
+- Official Postgres Docs: [Event Trigger Behaviours](https://www.postgresql.org/docs/current/event-trigger-definition.html)
 - Official Postgres Docs: [Event Trigger Firing Matrix](https://www.postgresql.org/docs/current/event-trigger-matrix.html)
-- Supabase blog: [PostgreSQL Event Triggers without superuser access](https://supabase.com/blog/event-triggers-wo-superuser)
+- Supabase blog: [Postgres Event Triggers without superuser access](https://supabase.com/blog/event-triggers-wo-superuser)
