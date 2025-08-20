@@ -9,17 +9,17 @@ import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountS
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 
 const User: NextPageWithLayout = () => {
   return <ProfileCard />
@@ -40,7 +40,12 @@ User.getLayout = (page) => (
 export default User
 
 const ProfileCard = () => {
-  const profileShowInformation = useIsFeatureEnabled('profile:show_information')
+  const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
+    useIsFeatureEnabled([
+      'profile:show_information',
+      'profile:show_analytics_and_marketing',
+      'profile:show_account_deletion',
+    ])
   const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
@@ -81,13 +86,17 @@ const ProfileCard = () => {
             <ThemeSettings />
           </section>
 
-          <section>
-            <AnalyticsSettings />
-          </section>
+          {profileShowAnalyticsAndMarketing && (
+            <section>
+              <AnalyticsSettings />
+            </section>
+          )}
 
-          <section>
-            <AccountDeletion />
-          </section>
+          {profileShowAccountDeletion && (
+            <section>
+              <AccountDeletion />
+            </section>
+          )}
         </article>
       </ScaffoldContainer>
     </>

@@ -224,6 +224,7 @@ const ProjectLinks = () => {
   const snap = useAppStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
+  const showReports = useIsFeatureEnabled('reports:all')
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -251,6 +252,7 @@ const ProjectLinks = () => {
 
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
+    showReports,
   })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
