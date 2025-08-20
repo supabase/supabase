@@ -114,7 +114,6 @@ export const NewAccessTokenDialog = ({
   }
 
   const handleCustomDateChange = (value: { date: string }) => {
-    console.log(value)
     setCustomExpiryDate(value)
   }
 

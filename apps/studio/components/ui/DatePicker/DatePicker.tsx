@@ -11,7 +11,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
 } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
 import { TimeSplitInput } from './TimeSplitInput'
@@ -195,11 +194,7 @@ export function DatePicker({
                         endDate={endDate}
                       />
                     </div>
-                    <div
-                      className={cn(
-                        'flex items-center, justify-center w-12 text-foreground-lighter'
-                      )}
-                    >
+                    <div className="flex items-center justify-center w-12 text-foreground-lighter">
                       <ArrowRight strokeWidth={1.5} size={14} />
                     </div>
                   </>
