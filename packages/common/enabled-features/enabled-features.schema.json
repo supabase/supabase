@@ -103,6 +103,10 @@
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
     },
+    "integrations:show_stripe_wrapper": {
+      "type": "boolean",
+      "description": "Show the Stripe wrapper under project integrations"
+    },
 
     "logs:templates": {
       "type": "boolean",
@@ -183,6 +187,7 @@
     "database:replication",
     "database:roles",
     "integrations:vercel",
+    "integrations:show_stripe_wrapper",
     "profile:show_email",
     "profile:show_information",
     "logs:templates",

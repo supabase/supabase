@@ -29,6 +29,7 @@
   "database:roles": true,
 
   "integrations:vercel": true,
+  "integrations:show_stripe_wrapper": true,
 
   "logs:templates": true,
   "logs:collections": true,
@@ -45,7 +46,7 @@
   "project_homepage:show_instance_size": true,
   "project_homepage:show_examples": true,
 
-  "reports:all": false,
+  "reports:all": true,
 
   "table_editor:enable_rls_toggle": true
 }
