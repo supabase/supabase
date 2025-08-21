@@ -6,7 +6,6 @@ interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
   containerProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
-// Custom hook to detect horizontal scrolling
 const useHorizontalScroll = (ref: React.RefObject<HTMLDivElement>) => {
   const [hasHorizontalScroll, setHasHorizontalScroll] = React.useState(false)
   const [canScrollLeft, setCanScrollLeft] = React.useState(false)
@@ -60,7 +59,6 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
 
     return (
       <div className="relative">
-        {/* Fixed shadows positioned relative to the wrapper */}
         <div
           className={cn(
             'absolute inset-0 pointer-events-none z-10',
@@ -71,7 +69,6 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
             canScrollLeft && 'after:opacity-100'
           )}
         />
-        {/* Scrollable table container */}
         <div ref={containerRef} className={cn('w-full overflow-auto')} {...containerProps}>
           <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
         </div>
