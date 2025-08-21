@@ -1,12 +1,4 @@
 {
-  "functions": {
-    "**": {
-      "maxDuration": 60,
-      "memory": 512
-    }
-  },
-  "regions": ["iad1"],
-  "framework": "nextjs",
   "buildCommand": "pnpm vercel-build",
   "installCommand": "pnpm install",
   "env": {
