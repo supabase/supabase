@@ -151,16 +151,14 @@ const IntegrationsPage: NextPageWithLayout = () => {
     <PageLayout {...pageContent} size="large">
       <ScaffoldContainer size="large" className="container">
         <ScaffoldSection isFullWidth>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center mb-6">
-            <div className="flex-1 max-w-md">
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search integrations..."
-                icon={<Search size={14} />}
-                className="w-full"
-              />
-            </div>
+          <div className="flex-1 max-w-md mb-6">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search integrations..."
+              icon={<Search size={14} />}
+              className="w-full"
+            />
           </div>
 
           {isLoading && (
