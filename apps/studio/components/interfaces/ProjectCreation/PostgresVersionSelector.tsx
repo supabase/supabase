@@ -25,7 +25,7 @@ interface PostgresVersionDetails {
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
-  dbRegion: string
+  dbRegion?: string
   organizationSlug: string | undefined
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
@@ -55,7 +55,7 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 
 export const PostgresVersionSelector = ({
   cloudProvider,
-  dbRegion,
+  dbRegion = "",
   organizationSlug,
   field,
   form,

@@ -7,6 +7,8 @@ import { apiBuilder } from '../../../../../../lib/api/apiBuilder'
 import { getPlatformQueryParams } from '../../../../../../lib/api/platformQueryParams'
 
 const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log(JSON.stringify(req.body))
+
   if (!IS_VELA_PLATFORM) {
     return res.status(405).send('Not implemented')
   }
@@ -21,23 +23,26 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
         organization_slug: slug,
       },
     },
-    body: {
+    body: { // FIXME: get correct values from the UI (after implemented in new/[slug].tsx
       name: creationRequest.name,
       deployment: {
         database: '',
         database_user: '',
         database_password: '',
-        database_size: 0,
-        vcpu: 0,
-        memory: 0,
-        iops: 0,
+        database_size: 107374182400,
+        vcpu: 32,
+        memory: 68719476736,
+        iops: 1_000_000,
         database_image_tag: '15.1.0.147',
       },
     },
   })
 
   if (createResponse.response.status !== 201) {
-    return res.status(createResponse.response.status).send(createResponse.error)
+    return res
+      .status(createResponse.response.status)
+      .setHeader('Content-Type', createResponse.error?.detail ? 'application/json' : 'text/plain')
+      .send(createResponse.error?.detail || createResponse.error)
   }
 
   const location = createResponse.response.headers.get('location')
@@ -45,7 +50,7 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(500).send('No location header')
   }
 
-  const projectRef = location.split('/').pop()
+  const projectRef = location.slice(0, -1).split('/').pop()
   const readResponse = await client.get(
     '/organizations/{organization_slug}/projects/{project_slug}/',
     {

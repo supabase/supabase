@@ -9,7 +9,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
     actions: [PermissionAction.CREATE, PermissionAction.TENANT_SQL_ADMIN_WRITE],
     condition: true,
     organization_slug: 'foobar23213qweewqe1w',
-    resources: [],
+    resources: ['projects'],
     project_refs: []
   }])
 }

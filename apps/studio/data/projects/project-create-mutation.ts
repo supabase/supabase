@@ -75,7 +75,12 @@ export async function createProject({
     release_channel: releaseChannel,
   }
 
-  const { data, error } = await post(`/platform/projects`, {
+  const { data, error } = await post(`/platform/organizations/{slug}/projects`, {
+    params: {
+      path: {
+        slug: organizationSlug,
+      }
+    },
     body,
   })
 
@@ -96,7 +101,10 @@ export const useProjectCreateMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>(
-    (vars) => createProject(vars),
+    (vars) => {
+      console.log("TEST")
+      return createProject(vars)
+    },
     {
       async onSuccess(data, variables, context) {
         await queryClient.invalidateQueries(projectKeys.list()),

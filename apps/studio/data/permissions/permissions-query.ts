@@ -2,7 +2,6 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { useIsLoggedIn } from 'common'
 import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
 import type { Permission, ResponseError } from 'types'
 import { permissionKeys } from './keys'
 
@@ -30,7 +29,7 @@ export const usePermissionsQuery = <TData = PermissionsData>({
     ({ signal }) => getPermissions(signal),
     {
       ...options,
-      enabled: IS_PLATFORM && enabled && isLoggedIn, //FIXME: Needs permissions implementation
+      enabled: enabled && isLoggedIn,
       staleTime: 5 * 60 * 1000,
     }
   )

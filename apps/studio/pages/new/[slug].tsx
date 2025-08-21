@@ -4,7 +4,7 @@ import { debounce } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -23,7 +23,6 @@ import {
   PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
-import { smartRegionToExactRegion } from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -33,8 +32,6 @@ import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -53,10 +50,8 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
-  AWS_REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
-  FLY_REGIONS_DEFAULT,
   MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
@@ -85,7 +80,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -108,9 +102,6 @@ const FormSchema = z.object({
   postgresVersion: z.string({
     required_error: 'Please enter a Postgres version.',
   }),
-  dbRegion: z.string({
-    required_error: 'Please select a region.',
-  }),
   cloudProvider: z.string({
     required_error: 'Please select a cloud provider.',
   }),
@@ -122,7 +113,6 @@ const FormSchema = z.object({
   dataApi: z.boolean(),
   useApiSchema: z.boolean(),
   postgresVersionSelection: z.string(),
-  useOrioleDb: z.boolean(),
 })
 
 export type CreateProjectForm = z.infer<typeof FormSchema>
@@ -150,10 +140,8 @@ const Wizard: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
-  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
@@ -173,11 +161,6 @@ const Wizard: NextPageWithLayout = () => {
     useState(false)
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
-
-  const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
-    [currentOrg]
-  )
 
   const {
     mutate: createProject,
@@ -209,20 +192,6 @@ const Wizard: NextPageWithLayout = () => {
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-
-  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
-    {
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
-    },
-    {
-      enabled: !smartRegionEnabled,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchInterval: false,
-      refetchOnReconnect: false,
-      retry: false,
-    }
-  )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
@@ -276,26 +245,14 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
       dbPassStrength: 0,
-      dbRegion: undefined,
       instanceSize: sizes[0],
       dataApi: true,
       useApiSchema: false,
       postgresVersionSelection: '',
-      useOrioleDb: false,
     },
   })
 
-  const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
-  const dbRegionExact = smartRegionToExactRegion(dbRegion)
-
-  const availableOrioleVersion = useAvailableOrioleImageVersion(
-    {
-      cloudProvider: cloudProvider as CloudProvider,
-      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
-      organizationSlug: organization,
-    },
-    { enabled: currentOrg !== null && !isManagedByVercel }
-  )
+  const { instanceSize } = form.watch()
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -343,26 +300,15 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider,
       projectName,
       dbPass,
-      dbRegion,
       postgresVersion,
       instanceSize,
       dataApi,
       useApiSchema,
       postgresVersionSelection,
-      useOrioleDb,
     } = values
-
-    if (useOrioleDb && !availableOrioleVersion) {
-      return toast.error('No available OrioleDB image found, only Postgres is available')
-    }
 
     const { postgresEngine, releaseChannel } =
       extractPostgresVersionDetails(postgresVersionSelection)
-
-    const { smartGroup = [], specific = [] } = {}
-    const selectedRegion = smartRegionEnabled
-      ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
-      : undefined
 
     const data: ProjectCreateVariables = {
       dbPass,
@@ -375,9 +321,8 @@ const Wizard: NextPageWithLayout = () => {
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
-      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
-      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
-      ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
+      postgresEngine: postgresEngine,
+      releaseChannel: releaseChannel,
     }
 
     if (postgresVersion) {
@@ -638,50 +583,6 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {cloudProviderEnabled && showNonProdFields && (
-                      <Panel.Content>
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="cloudProvider"
-                          render={({ field }) => (
-                            <FormItemLayout label="Cloud provider" layout="horizontal">
-                              <Select_Shadcn_
-                                onValueChange={(value) => {
-                                  field.onChange(value)
-                                  form.setValue(
-                                    'dbRegion',
-                                    value === 'FLY'
-                                      ? FLY_REGIONS_DEFAULT.displayName
-                                      : AWS_REGIONS_DEFAULT.displayName
-                                  )
-                                }}
-                                defaultValue={field.value}
-                              >
-                                <FormControl_Shadcn_>
-                                  <SelectTrigger_Shadcn_>
-                                    <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
-                                  </SelectTrigger_Shadcn_>
-                                </FormControl_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectGroup_Shadcn_>
-                                    {Object.values(PROVIDERS).map((providerObj) => {
-                                      const label = providerObj['name']
-                                      const value = providerObj['id']
-                                      return (
-                                        <SelectItem_Shadcn_ key={value} value={value}>
-                                          {label}
-                                        </SelectItem_Shadcn_>
-                                      )
-                                    })}
-                                  </SelectGroup_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </Panel.Content>
-                    )}
-
                     {currentOrg?.plan && currentOrg?.plan.id !== 'free' && (
                       <Panel.Content>
                         <FormField_Shadcn_
@@ -853,7 +754,6 @@ const Wizard: NextPageWithLayout = () => {
                               form={form}
                               cloudProvider={form.getValues('cloudProvider') as CloudProvider}
                               organizationSlug={slug}
-                              dbRegion={form.getValues('dbRegion')}
                             />
                           )}
                         />
@@ -885,7 +785,7 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     <SecurityOptions form={form} />
-                    {showAdvancedConfig && !!availableOrioleVersion && (
+                    {/* //FIXME: Hard disabled for now */ false && showAdvancedConfig && (
                       <AdvancedConfiguration form={form} />
                     )}
                   </>
