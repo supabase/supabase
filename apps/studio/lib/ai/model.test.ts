@@ -9,7 +9,9 @@ vi.mock('@ai-sdk/openai', () => ({
 
 vi.mock('./bedrock', async () => ({
   ...(await vi.importActual('./bedrock')),
-  createRoutedBedrock: vi.fn(() => () => 'bedrock-model'),
+  createRoutedBedrock: vi.fn((routingKey, useOpenAI) => 
+    () => useOpenAI ? 'openai-bedrock-model' : 'bedrock-model'
+  ),
   checkAwsCredentials: vi.fn(),
 }))
 
@@ -25,12 +27,23 @@ describe('getModel', () => {
     process.env = { ...originalEnv }
   })
 
-  it('should return bedrock model when AWS credentials are available', async () => {
+  it('should return bedrock model when AWS credentials are available and not throttled', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
+    vi.stubEnv('IS_THROTTLED', 'false')
 
     const { model, error } = await getModel()
 
     expect(model).toEqual('bedrock-model')
+    expect(error).toBeUndefined()
+  })
+
+  it('should return openai bedrock model when AWS credentials are available and throttled', async () => {
+    vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
+    vi.stubEnv('IS_THROTTLED', 'true')
+
+    const { model, error } = await getModel()
+
+    expect(model).toEqual('openai-bedrock-model')
     expect(error).toBeUndefined()
   })
 
