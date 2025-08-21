@@ -135,6 +135,12 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.13.14
+      '@types/react':
+        specifier: 'catalog:'
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 18.3.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -192,13 +198,6 @@ importers:
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
-    devDependencies:
-      '@types/react':
-        specifier: 'catalog:'
-        version: 18.3.3
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 18.3.0
 
   apps/design-system:
     dependencies:

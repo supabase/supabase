@@ -36,6 +36,8 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "common": "workspace:*",
@@ -55,10 +57,6 @@
     "tailwind-merge": "^1.13.2",
     "tsx": "^4.19.3",
     "typescript": "~5.5.0"
-  },
-  "devDependencies": {
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:"
   },
   "externals": {
     "sharp": "commonjs sharp"
