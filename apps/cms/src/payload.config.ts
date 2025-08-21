@@ -115,7 +115,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
       // Connection pool configuration for serverless/Vercel
-      max: 2, // Maximum number of connections in the pool (keep low for serverless)
+      max: 25, // Maximum number of connections in the pool (keep low for serverless)
       min: 0, // Minimum number of connections in the pool
       idleTimeoutMillis: 30000, // Time a connection can be idle before being closed
       connectionTimeoutMillis: 30000, // Time to wait for connection creation
