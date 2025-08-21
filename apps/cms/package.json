@@ -51,23 +51,16 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "sharp": "0.32.6",
-    "tailwind-merge": "^1.13.2"
+    "tailwind-merge": "^1.13.2",
+    "tsx": "^4.19.3"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "tsx": "^4.19.3",
     "typescript": "5.7.3"
   },
   "externals": {
     "sharp": "commonjs sharp"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"],
-    "supportedArchitectures": {
-      "os": ["linux", "darwin"],
-      "cpu": ["x64", "arm64"]
-    }
   }
 }
