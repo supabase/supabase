@@ -45,6 +45,7 @@
     "image-size": "2.0.2",
     "lucide-react": "^0.511.0",
     "next": "catalog:",
+    "optional": "^0.1.4",
     "payload": "3.50.0",
     "pg": "^8.16.3",
     "prism-react-renderer": "^2.3.1",
