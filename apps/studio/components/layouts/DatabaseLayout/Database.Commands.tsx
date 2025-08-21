@@ -159,12 +159,16 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/indexes`,
         icon: () => <Database />,
       },
-      {
-        id: 'run-view-database-roles',
-        name: 'View your roles',
-        route: `/project/${ref}/database/roles`,
-        icon: () => <Database />,
-      },
+      ...(databaseRoles
+        ? [
+            {
+              id: 'run-view-database-roles',
+              name: 'View your roles',
+              route: `/project/${ref}/database/roles`,
+              icon: () => <Database />,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'run-view-database-backups',
         name: 'View your backups',
