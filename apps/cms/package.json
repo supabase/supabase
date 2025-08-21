@@ -59,5 +59,12 @@
     "@types/react-dom": "catalog:",
     "tsx": "^4.19.3",
     "typescript": "5.7.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild",
+      "unrs-resolver"
+    ]
   }
 }
