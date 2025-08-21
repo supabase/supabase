@@ -28,9 +28,9 @@ const stateOfStartupsData = {
           description:
             'Most builders are young, technical founders. Many are on their second or third company.',
           stats: [
-            { percent: 83, label: 'Founders that are technical' },
-            { percent: 82, label: 'Founders under age 40' },
-            { percent: 33, label: 'Founders that are repeat founders' },
+            { percent: 81, label: 'Founders that are technical' },
+            { percent: 82, label: 'Founders that are under 40' },
+            { percent: 36, label: 'Founders that are repeat founders' },
           ],
           charts: ['RoleChart'],
           wordCloud: undefined,
@@ -42,8 +42,8 @@ const stateOfStartupsData = {
           description:
             'Startups are mostly bootstrapped or at early stages of funding. They are small teams, and usually less than a year old.',
           stats: [
-            { percent: 91, label: 'Startups with less than 10 employees' },
-            { percent: 65, label: 'Startups under one year old' },
+            { percent: 91, label: 'Startups with 10 or fewer employees' },
+            { percent: 66, label: 'Startups under one year old' },
             { percent: 6, label: 'Startups over 5 years old' },
           ],
           charts: ['FundingStageChart'],
@@ -56,7 +56,7 @@ const stateOfStartupsData = {
           description:
             'Startups are building globally, but North America—especially San Francisco—remains overrepresented. Europe and Asia also feature prominently, with hubs like Toronto and NYC following close behind.',
           stats: [
-            { percent: 17, label: 'Global startups based in Europe' },
+            { percent: 25, label: 'Global startups based in Europe' },
             { percent: 19, label: 'North American startups based in San Francisco' },
             { percent: 9, label: 'North American startups based in New York City' },
           ],
@@ -85,9 +85,9 @@ const stateOfStartupsData = {
           description:
             'Under-30s gravitate toward AI-driven productivity, education, and social tools; areas where rapid iteration and novelty matter. Over-50s skew toward SaaS and consumer products, often bringing domain-specific experience into more established markets. Developer tools and infrastructure attract all age groups.',
           stats: [
-            { percent: 38, label: 'Founders under 30 building in AI/ML' },
-            { percent: 33, label: 'Startups building for developers' },
-            { percent: 24, label: 'Startups targeting consumers' },
+            { percent: 82, label: 'Founders under 30 building in AI/ML' },
+            { percent: 60, label: 'Startups building for end consumers' },
+            { percent: 16, label: 'Startups building for developers' },
           ],
           charts: ['IndustryChart'],
 
@@ -119,9 +119,9 @@ const stateOfStartupsData = {
           description:
             'One in five startups joined an accelerator. Y Combinator is the most common choice, especially in North America. Elsewhere, participation was more evenly distributed. Pivoting remains the norm, and less than half of startups are monetizing today.',
           stats: [
-            { percent: 59, label: 'Startups that have pivoted at least once' },
-            { percent: 58, label: 'Startups that are pre-revenue' },
-            { percent: 18, label: 'Startups that have joined accelerators' },
+            { percent: 64, label: 'Startups that are pre-revenue' },
+            { percent: 59, label: 'Startups that pivoted at least once' },
+            { percent: 19, label: 'Startups that joined accelerators' },
           ],
           charts: ['AcceleratorParticipationChart'],
           wordCloud: undefined,
@@ -149,16 +149,14 @@ const stateOfStartupsData = {
             'Supabase and Postgres dominate backend infra. React and Node top the frontend and backend respectively. Cursor, Claude, and VS Code lead AI-assisted development. Developer tools like GitHub, Stripe, and Postman round out the stack.',
           stats: [
             {
-              percent: 75,
-
+              percent: 83,
               label: 'Startups with a JavaScript framework in their frontend stack',
             },
             {
               percent: 62,
-
               label: 'Startups with Supabase in their cloud provider stack',
             },
-            { percent: 61, label: 'Startups with Node.js in their backend stack' },
+            { percent: 60, label: 'Startups with Node.js in their backend stack' },
           ],
           charts: ['DatabasesChart'],
 
@@ -173,7 +171,7 @@ const stateOfStartupsData = {
           stats: [
             { percent: 57, label: 'Startups that pay for OpenAI or ChatGPT' },
             { percent: 37, label: 'Startups that pay for Cursor' },
-            { percent: 5, label: 'Startups that don’t pay for AI tools at all' },
+            { percent: 12, label: 'Startups that don’t pay for AI tools at all' },
           ],
           charts: ['AICodingToolsChart'],
           wordCloud: {
@@ -253,13 +251,13 @@ const stateOfStartupsData = {
             'AI is increasingly embedded in product workflows, not bolted on. Most startups are already integrating models like OpenAI or Claude, especially for semantic search, summarisation, and customer support. Half are building agents to automate real tasks, from onboarding flows to sales triage.',
           stats: [
             {
-              percent: 74,
+              percent: 81,
               label: 'Startups using AI in their product',
             },
             { percent: 50, label: 'Startups building agents within their product' },
             {
               percent: 34,
-              label: 'Startups adding natural language interfaces to their product',
+              label: 'Startups with agents automating customer support',
             },
           ],
           charts: ['AIModelsChart'],
@@ -289,8 +287,8 @@ const stateOfStartupsData = {
           description:
             'There is a healthy diaspora of important online communities used by respondents. That said, many are just lurking; few actively contribute to the discussion.',
           stats: [
-            { percent: 58, label: 'Engineers using LinkedIn regularly' },
-            { percent: 46, label: 'Founders using X (Twitter) regularly' },
+            { percent: 55, label: 'Engineers using LinkedIn regularly' },
+            { percent: 45, label: 'Founders using X (Twitter) regularly' },
             { percent: 7, label: 'Respondents that don’t use social media at all' },
           ],
           charts: ['RegularSocialMediaUseChart'],
@@ -303,12 +301,12 @@ const stateOfStartupsData = {
           description:
             'Founders follow newsletters like TLDR and Lenny’s, and they listen to podcasts like The Diary of a CEO and Founders. Tool discovery happens quite often via YouTube or GitHub. Physical event participation remains low.',
           stats: [
-            { percent: 45, label: 'Respondents that listen to industry podcasts' },
-            { percent: 36, label: 'Respondents that have built a developer community' },
+            { percent: 47, label: 'Respondents that listen to industry podcasts' },
             {
               percent: 20,
-              label: 'Respondents that pay for at least one industry newsletter',
+              label: 'Respondents that subscribe to industry newsletters',
             },
+            { percent: 12, label: 'Founders that have built a developer community' },
           ],
           charts: ['NewIdeasChart'],
           wordCloud: undefined,
@@ -316,7 +314,7 @@ const stateOfStartupsData = {
           rankedAnswersPair: [
             {
               label: 'Top podcasts listened to',
-              answers: ['The Diary of a CEO', 'Founders', 'Lightcone Podcast'],
+              answers: ['The Diary of a CEO', 'Founders', 'My First Million'],
             },
             {
               label: 'Top newsletters subscribed to',
@@ -339,11 +337,12 @@ const stateOfStartupsData = {
             'Founders earn their earliest customers through networks, communities, and inbound content. Not performance marketing. Paid acquisition rarely works early on.',
           stats: [
             {
-              percent: 57,
-              label: 'Startups that find their initial customers through word of mouth',
+              percent: 58,
+              label:
+                'Startups that get their first customers via personal and professional networks',
             },
-            { percent: 47, label: 'Startups that engage users through social media' },
-            { percent: 39, label: 'Startups that are still experimenting with pricing' },
+            { percent: 48, label: 'Startups that engage users through social media' },
+            { percent: 39, label: 'Startups that are still experimenting with pricing models' },
           ],
           charts: ['InitialPayingCustomersChart'],
           wordCloud: undefined,
@@ -360,10 +359,10 @@ const stateOfStartupsData = {
               label: 'Startups with their founders still directly responsible for sales',
             },
             {
-              percent: 18,
+              percent: 58,
               label: 'Startups that got their initial customers from personal networks',
             },
-            { percent: 13, label: 'Startups that have a dedicated sales team' },
+            { percent: 7, label: 'Startups that have a dedicated sales team' },
           ],
           charts: ['SalesToolsChart'],
           wordCloud: undefined,
@@ -391,16 +390,17 @@ const stateOfStartupsData = {
             'The hardest problems are still the oldest ones: customer acquisition, product-market fit, and complexity. Startups cite AI-assisted coding and backend services as major time-savers, but many are still missing critical tools they want. Especially around onboarding, dashboards, and agents.',
           stats: [
             {
-              percent: 81,
-              label: 'Respondents that evaluate potential tools via hands-on experience',
+              percent: 82,
+              label: 'Founders that evaluate tools via hands-on experience',
             },
             {
-              percent: 29,
-              label: 'Respondents that saved the most time via AI coding assistance',
+              percent: 45,
+              label:
+                'Startups with over 250 employees whose biggest challenge is getting customers',
             },
             {
-              percent: 14,
-              label: 'Respondents that saved the most time via BaaS platforms like Supabase',
+              percent: 4,
+              label: 'Startups with under 10 employees whose biggest challenge is hiring',
             },
           ],
           charts: ['BiggestChallengeChart'],
@@ -416,7 +416,7 @@ const stateOfStartupsData = {
 
           stats: [
             { percent: 61, label: 'Founders that are optimistic' },
-            { percent: 32, label: 'Operations leads that are optimistic' },
+            { percent: 50, label: 'Engineers that are optimistic' },
             { percent: 42, label: 'Other roles that are optimistic' },
           ],
           charts: ['WorldOutlookChart'],

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
+// These values are calculated via static SQL queries under 'Key Stats' and rounded for display in data/surveys/state-of-startups-2025.tsx file
 export function SurveyStatCard({ label, percent }: { label: string; percent: number }) {
   const [displayValue, setDisplayValue] = useState(0)
   const [hasAnimated, setHasAnimated] = useState(false)
