@@ -1,8 +1,6 @@
 interface DecorativeProgressBarProps {
   /** Whether to reverse the animation direction */
   reverse?: boolean
-  /** Additional CSS classes */
-  className?: string
   /** Whether to align to start or end */
   align?: 'start' | 'end'
 }

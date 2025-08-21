@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+const ANIMATION_DURATION = 600
+
 // These values are calculated via static SQL queries under 'Key Stats' and rounded for display in data/surveys/state-of-startups-2025.tsx file
 export function SurveyStatCard({ label, percent }: { label: string; percent: number }) {
   const [displayValue, setDisplayValue] = useState(0)
@@ -19,7 +21,7 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
 
             // Start counting animation
             const startTime = Date.now()
-            const duration = 600
+            const duration = ANIMATION_DURATION
             const startValue = 0
             const endValue = percent
 
@@ -60,7 +62,6 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
   return (
     <div ref={cardRef} className="flex-1 px-8 py-8 flex flex-col gap-4">
       {/* Progress bar */}
-      {/* Entire bar (including background) */}
       <div
         className="h-2 relative overflow-hidden"
         style={

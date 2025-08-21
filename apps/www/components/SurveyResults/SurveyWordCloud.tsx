@@ -15,9 +15,7 @@ export function SurveyWordCloud({
 
   // Calculate the range within the current context
   const counts = answers.map((answer) => answer.count)
-  const minCount = Math.min(...counts)
   const maxCount = Math.max(...counts)
-  const range = maxCount - minCount
 
   // Initialize with first 12 items
   useEffect(() => {
@@ -133,7 +131,6 @@ export function SurveyWordCloud({
         {currentItems.map(({ text, count }, index) => (
           <li key={`${text}-${index}`} className="flex flex-col gap-2 items-start">
             {/* Progress bar */}
-            {/* Entire bar (including background) */}
             {count && (
               <div
                 className="w-full h-1 relative overflow-hidden"

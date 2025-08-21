@@ -14,7 +14,6 @@ interface SurveyChapterProps {
     authorAvatar: string
   }
   children: React.ReactNode
-  totalChapters?: number
 }
 
 export function SurveyChapter({
@@ -24,7 +23,6 @@ export function SurveyChapter({
   description,
   pullQuote,
   children,
-  totalChapters,
 }: SurveyChapterProps) {
   return (
     <section id={`chapter-${number}`} className="flex flex-col bg-alternative">

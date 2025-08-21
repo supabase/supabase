@@ -260,30 +260,27 @@ function StateOfStartupsPage() {
         </section>
 
         {pageData.pageChapters.map((chapter, chapterIndex) => (
-          <>
-            <SurveyChapter
-              key={chapterIndex + 1}
-              number={chapterIndex + 1}
-              totalChapters={pageData.pageChapters.length}
-              shortTitle={chapter.shortTitle}
-              title={chapter.title}
-              description={chapter.description}
-              pullQuote={chapter.pullQuote}
-            >
-              {chapter.sections.map((section, sectionIndex) => (
-                <SurveyChapterSection
-                  key={sectionIndex + 1}
-                  title={section.title}
-                  description={section.description}
-                  stats={section.stats}
-                  charts={section.charts}
-                  wordCloud={section.wordCloud}
-                  summarizedAnswer={section.summarizedAnswer}
-                  rankedAnswersPair={section.rankedAnswersPair}
-                />
-              ))}
-            </SurveyChapter>
-          </>
+          <SurveyChapter
+            key={chapterIndex + 1}
+            number={chapterIndex + 1}
+            shortTitle={chapter.shortTitle}
+            title={chapter.title}
+            description={chapter.description}
+            pullQuote={chapter.pullQuote}
+          >
+            {chapter.sections.map((section, sectionIndex) => (
+              <SurveyChapterSection
+                key={sectionIndex + 1}
+                title={section.title}
+                description={section.description}
+                stats={section.stats}
+                charts={section.charts}
+                wordCloud={section.wordCloud}
+                summarizedAnswer={section.summarizedAnswer}
+                rankedAnswersPair={section.rankedAnswersPair}
+              />
+            ))}
+          </SurveyChapter>
         ))}
         <CTABanner ref={ctaBannerRef} />
       </DefaultLayout>
