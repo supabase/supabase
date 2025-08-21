@@ -47,6 +47,12 @@ const nextConfig = {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    // Ensure compatibility with Turbopack and Sharp
+    serverComponentsExternalPackages: ['sharp'],
+  },
+  // Configure Sharp as an external package for server-side rendering
+  serverExternalPackages: ['sharp'],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })

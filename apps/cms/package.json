@@ -50,7 +50,7 @@
     "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "0.34.3",
+    "sharp": "0.32.6",
     "tailwind-merge": "^1.13.2"
   },
   "devDependencies": {
@@ -64,6 +64,10 @@
     "sharp": "commonjs sharp"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"]
+    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"],
+    "supportedArchitectures": {
+      "os": ["linux", "darwin"],
+      "cpu": ["x64", "arm64"]
+    }
   }
 }
