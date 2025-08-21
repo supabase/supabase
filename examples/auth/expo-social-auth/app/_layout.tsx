@@ -10,9 +10,25 @@ import { useAuthContext } from '@/hooks/useAuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AuthProvider from '@/providers/AuthProvider';
 
+// Separate RootNavigator so we can access the AuthContext
+function RootNavigator() {
+  const { isLoggedIn } = useAuthContext();
+
+  return (
+    <Stack>
+      <Stack.Protected guard={isLoggedIn}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack.Protected>
+      <Stack.Protected guard={!isLoggedIn}>
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+      </Stack.Protected>
+      <Stack.Screen name="+not-found" />
+    </Stack>
+  );
+}
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const { isLoggedIn } = useAuthContext();
 
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -27,17 +43,10 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AuthProvider>
         <SplashScreenController />
-        <Stack>
-          <Stack.Protected guard={isLoggedIn}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack.Protected>
-          <Stack.Protected guard={!isLoggedIn}>
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-          </Stack.Protected>
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <RootNavigator />
         <StatusBar style="auto" />
       </AuthProvider>
     </ThemeProvider>
   );
 }
+  

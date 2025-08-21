@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.exposocialauth"
+      "usesAppleSignIn": true,
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +37,8 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true
