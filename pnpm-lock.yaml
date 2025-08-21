@@ -183,6 +183,9 @@ importers:
       tailwind-merge:
         specifier: ^1.13.2
         version: 1.14.0
+      tsx:
+        specifier: ^4.19.3
+        version: 4.20.3
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -193,9 +196,6 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 18.3.0
-      tsx:
-        specifier: ^4.19.3
-        version: 4.20.3
       typescript:
         specifier: 5.7.3
         version: 5.7.3
