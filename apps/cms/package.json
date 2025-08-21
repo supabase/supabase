@@ -52,13 +52,13 @@
     "react-dom": "catalog:",
     "sharp": "0.32.6",
     "tailwind-merge": "^1.13.2",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "typescript": "~5.5.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
-    "typescript": "5.7.3"
+    "@types/react-dom": "catalog:"
   },
   "externals": {
     "sharp": "commonjs sharp"
