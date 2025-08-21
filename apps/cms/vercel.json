@@ -1,7 +1,4 @@
 {
   "buildCommand": "pnpm vercel-build",
-  "installCommand": "pnpm install",
-  "env": {
-    "NODE_OPTIONS": "--no-deprecation"
-  }
+  "installCommand": "pnpm install"
 }

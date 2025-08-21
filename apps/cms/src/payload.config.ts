@@ -120,7 +120,6 @@ export default buildConfig({
       idleTimeoutMillis: 30000, // Time a connection can be idle before being closed
       connectionTimeoutMillis: 30000, // Time to wait for connection creation
     },
-    migrationDir: path.resolve(dirname, 'migrations'),
   }),
   // Global configuration for better performance
   globals: [],
