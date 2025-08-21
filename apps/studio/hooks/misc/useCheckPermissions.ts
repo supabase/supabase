@@ -1,4 +1,5 @@
 import { useIsLoggedIn, useParams } from 'common'
+import { useMemo } from 'react'
 import jsonLogic from 'json-logic-js'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -120,7 +121,7 @@ export function useGetProjectPermissions(
     (organizationsQueryEnabled && isLoadingOrganization) ||
     (projectsQueryEnabled && isLoadingProject)
   const isSuccess =
-    isSuccessPermissions &&
+    (permissionsOverride !== undefined || isSuccessPermissions) &&
     (!organizationsQueryEnabled || isSuccessOrganization) &&
     (!projectsQueryEnabled || isSuccessProject)
 
@@ -222,6 +223,35 @@ export function useAsyncCheckProjectPermissions(
     isSuccess: isPermissionsSuccess,
   } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
 
+  const can = useMemo(() => {
+    if (!isLoggedIn) {
+      return false
+    }
+    if (!IS_PLATFORM) {
+      return true
+    }
+    if (!isPermissionsSuccess) {
+      return false
+    }
+    return doPermissionsCheck(
+      allPermissions,
+      action,
+      resource,
+      data,
+      _organizationSlug,
+      _projectRef
+    )
+  }, [
+    isLoggedIn,
+    isPermissionsSuccess,
+    allPermissions,
+    action,
+    resource,
+    data,
+    _organizationSlug,
+    _projectRef,
+  ])
+
   if (!isLoggedIn) {
     return {
       isLoading: true,
@@ -236,15 +266,6 @@ export function useAsyncCheckProjectPermissions(
       can: true,
     }
   }
-
-  const can = doPermissionsCheck(
-    allPermissions,
-    action,
-    resource,
-    data,
-    _organizationSlug,
-    _projectRef
-  )
 
   return {
     isLoading: isPermissionsLoading,
