@@ -34,5 +34,7 @@
       "iconUrl": "https://supabase.com/dashboard/img/supabase-logo.svg",
       "url": "https://supabase.com"
     }
-  ]
+  ],
+
+  "logs:default_query": "This is a sample query"
 }

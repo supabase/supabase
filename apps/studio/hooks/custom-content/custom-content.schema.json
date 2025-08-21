@@ -25,6 +25,7 @@
         }
       }
     },
+
     "project_homepage:example_projects": {
       "type": ["array", "null"],
       "description": "Renders a provided set of example projects under the project's home page",
@@ -37,6 +38,11 @@
           "url": { "type": "string" }
         }
       }
+    },
+
+    "logs:default_query": {
+      "type": ["string", "null"],
+      "description": "Renders a default query when landing on the logs explorer"
     }
   },
   "required": ["organization:legal_documents", "project_homepage:example_projects"],
