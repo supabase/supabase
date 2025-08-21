@@ -118,14 +118,11 @@ function useSurveyData(
 
         let data, fetchError
 
-        console.log('Active filters:', activeFilters)
         const functionParamsData = functionParams(activeFilters)
-        console.log('Calling function:', functionName, 'with params:', functionParamsData)
         const { data: functionData, error: functionError } = await externalSupabase.rpc(
           functionName,
           functionParamsData
         )
-        console.log('Function response:', functionData, 'error:', functionError)
         data = functionData
         fetchError = functionError
 
@@ -134,8 +131,6 @@ function useSurveyData(
           setError(fetchError.message)
           return
         }
-
-        console.log('Raw data from SQL query:', data)
 
         // Calculate total for percentage calculation
         const total = data.reduce(
@@ -156,7 +151,6 @@ function useSurveyData(
           }
         })
 
-        console.log('Processed chart data:', processedData)
         setChartData(processedData)
       } catch (err: any) {
         console.error('Error in fetchData:', err)
@@ -182,7 +176,7 @@ interface SurveyChartProps {
 
 export function SurveyChart({
   title,
-  targetColumn, // Was used for SQL query, but we're now doing this via a function call
+  targetColumn, // Used for SQL query generation when generateSQLQuery is provided
   filterColumns,
   generateSQLQuery,
   functionName,
@@ -223,7 +217,7 @@ export function SurveyChart({
     }
   }, [hasLoadedOnce])
 
-  // Each chart uses three of four possible filters, defined below
+  // Each chart uses a subset of available filters, defined below
   const { filters } = useFilterOptions(filterColumns)
 
   // Start with all filters unset (showing "all")
@@ -303,7 +297,7 @@ export function SurveyChart({
   // Fixed height for all states (loading, error, loaded collapsed)
   const FIXED_HEIGHT = 300 // px
   const BUTTON_AREA_HEIGHT = 40 // px
-  const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px (FIXED_HEIGHT - 40px for button area)
+  const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px
 
   const skeletonData = [
     { label: 'Loading', value: 0, rawValue: 0 },
@@ -499,6 +493,7 @@ export function SurveyChart({
 // Helper to build SQL WHERE clauses from active filters
 // Accepts optional initialClauses for charts that need extra constraints
 // (e.g., "column IS NOT NULL")
+// Note: This function is used by chart components that generate SQL queries
 export function buildWhereClause(
   activeFilters: Record<string, string>,
   initialClauses: string[] = []

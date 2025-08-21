@@ -16,8 +16,7 @@ GROUP BY CASE
     WHEN role IN ('Engineer', 'Founder / Co-founder') THEN role
     ELSE 'Other'
   END
-ORDER BY total DESC;
-`
+ORDER BY total DESC;`
 }
 
 export function RoleChart() {
