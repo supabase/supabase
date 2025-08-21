@@ -27,11 +27,7 @@ export function SurveyChapter({
   totalChapters,
 }: SurveyChapterProps) {
   return (
-    <section
-      id={`chapter-${number}`}
-      // border-t last-of-type:border-b
-      className="flex flex-col bg-alternative"
-    >
+    <section id={`chapter-${number}`} className="flex flex-col bg-alternative">
       <div className="flex flex-col">
         {/* Chapter header */}
         <header

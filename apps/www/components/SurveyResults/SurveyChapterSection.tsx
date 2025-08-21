@@ -9,17 +9,16 @@ import { IndustryChart } from './charts/IndustryChart'
 import { FundingStageChart } from './charts/FundingStageChart'
 import { DatabasesChart } from './charts/DatabasesChart'
 import { AIModelsChart } from './charts/AIModelsChart'
-import { LocationChart } from '~/components/SurveyResults/charts/LocationChart'
-import { SalesToolsChart } from '~/components/SurveyResults/charts/SalesToolsChart'
+import { LocationChart } from './charts/LocationChart'
+import { SalesToolsChart } from './charts/SalesToolsChart'
 import { AICodingToolsChart } from './charts/AICodingToolsChart'
-import { RegularSocialMediaUseChart } from '~/components/SurveyResults/charts/RegularSocialMediaUseChart'
-import { NewIdeasChart } from '~/components/SurveyResults/charts/NewIdeasChart'
-import { InitialPayingCustomersChart } from '~/components/SurveyResults/charts/InitialPayingCustomersChart'
-import { WorldOutlookChart } from '~/components/SurveyResults/charts/WorldOutlookChart'
-import { BiggestChallengeChart } from '~/components/SurveyResults/charts/BiggestChallengeChart'
+import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
+import { NewIdeasChart } from './charts/NewIdeasChart'
+import { InitialPayingCustomersChart } from './charts/InitialPayingCustomersChart'
+import { WorldOutlookChart } from './charts/WorldOutlookChart'
+import { BiggestChallengeChart } from './charts/BiggestChallengeChart'
 
 interface SurveyChapterSectionProps {
-  number: string
   title: string
   description: string
   stats?: Array<{ percent: number; label: string }>

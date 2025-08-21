@@ -11,6 +11,28 @@ export function DecorativeProgressBar({
   reverse = false,
   align = 'start',
 }: DecorativeProgressBarProps) {
+  // Define the three progress bar configurations
+  const progressBars = [
+    {
+      height: 'h-4',
+      bgColor: 'bg-foreground-muted/80',
+      fgColor: 'bg-brand',
+      animationDelay: '0s',
+    },
+    {
+      height: 'h-8',
+      bgColor: 'bg-foreground-muted/50',
+      fgColor: 'bg-brand-500',
+      animationDelay: '0.3s',
+    },
+    {
+      height: 'h-12',
+      bgColor: 'bg-foreground-muted/20',
+      fgColor: 'bg-brand-300',
+      animationDelay: '0.6s',
+    },
+  ]
+
   return (
     <div
       aria-hidden="true"
@@ -19,11 +41,11 @@ export function DecorativeProgressBar({
         maxWidth: 'calc(50% + 60rem / 2)',
       }}
     >
-      {[0, 1, 2].map((item, index) => (
-        <div key={index} className="relative">
+      {progressBars.map((bar, index) => (
+        <div key={`progress-bar-${index}`} className="relative">
           {/* Background bar (static) */}
           <div
-            className={`h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-foreground-muted/80' : index === 1 ? 'bg-foreground-muted/50' : 'bg-foreground-muted/20'}`}
+            className={`${bar.height} w-full ${bar.bgColor}`}
             style={{
               maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
               maskSize: '15px 15px',
@@ -34,13 +56,13 @@ export function DecorativeProgressBar({
 
           {/* Animated foreground bar */}
           <div
-            className={`absolute inset-0 h-${(index + 1) * 4} w-full ${index === 0 ? 'bg-brand' : index === 1 ? 'bg-brand-500' : 'bg-brand-300'}`}
+            className={`absolute inset-0 ${bar.height} w-full ${bar.fgColor}`}
             style={{
               maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
               maskSize: '14.5px 15px',
               maskRepeat: 'repeat',
               maskPosition: 'top left',
-              animation: `terminalLine 10s steps(8, end) ${index * 0.3}s infinite ${reverse ? 'reverse' : ''}`,
+              animation: `terminalLine 10s steps(8, end) ${bar.animationDelay} infinite ${reverse ? 'reverse' : ''}`,
             }}
           />
         </div>
