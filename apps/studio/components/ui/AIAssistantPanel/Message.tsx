@@ -9,6 +9,7 @@ import { ProfileImage } from 'components/ui/ProfileImage'
 import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
+import CopyButton from '../CopyButton'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import {
@@ -99,6 +100,38 @@ export const Message = function Message({
   const shouldUsePartsRendering = parts && parts.length > 0
 
   const hasTextContent = content && content.trim().length > 0
+
+  // Combine all message content for copying
+  const getCombinedText = () => {
+    if (shouldUsePartsRendering && parts) {
+      return parts
+        .map((part) => {
+          switch (part.type) {
+            case 'text':
+              return part.text
+            case 'tool-display_query':
+              if (part.state === 'output-available' && part.input) {
+                const input = part.input as any
+                return `\`\`\`sql\n${input.sql || ''}\n\`\`\``
+              }
+              return ''
+            case 'tool-display_edge_function':
+              if (part.state === 'output-available' && part.input) {
+                const input = part.input as any
+                return `\`\`\`javascript\n${input.code || ''}\n\`\`\``
+              }
+              return ''
+            default:
+              return ''
+          }
+        })
+        .filter(Boolean)
+        .join('\n\n')
+    }
+    return content || ''
+  }
+
+  console.log('message:', message)
 
   return (
     <MessageContext.Provider value={{ isLoading, readOnly }}>
@@ -237,8 +270,20 @@ export const Message = function Message({
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
 
-            {/* Action button - only show for user messages on hover */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Action buttons - only show for messages on hover */}
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+              <CopyButton
+                text={getCombinedText()}
+                iconOnly
+                type="text"
+                className="text-foreground-light hover:text-foreground p-1 rounded"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'Copy message',
+                  },
+                }}
+              />
               {message.role === 'user' && (
                 <ButtonTooltip
                   type="text"
