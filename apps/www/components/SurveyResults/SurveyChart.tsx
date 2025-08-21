@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { createClient } from '@supabase/supabase-js'
-// import { SupabaseClient } from '~/lib/supabase'
 import { motion } from 'framer-motion'
 import {
   Button,
@@ -14,7 +13,7 @@ import { ChevronsUpDown } from 'lucide-react'
 import TwoOptionToggle from '../../../studio/components/ui/TwoOptionToggle'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
-// Separate Supabase client for external project
+// Separate Supabase client for survey project
 const externalSupabase = createClient(
   process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY!
@@ -45,55 +44,38 @@ interface ChartDataItem {
 
 interface FilterColumnConfig {
   label: string
-  options: { value: string; label: string }[]
+  options: string[]
 }
 
+// Sometimes the label doesn't match the value, so we need to map them
+// Also, our options aren't always in a predicatable order, so we need to map them too
 const FILTER_COLUMN_CONFIGS: Record<string, FilterColumnConfig> = {
   team_size: {
     label: 'Team Size',
-    options: [
-      { value: '1–10', label: '1–10' },
-      { value: '11–50', label: '11–50' },
-      { value: '51–100', label: '51–100' },
-      { value: '101–250', label: '101–250' },
-      { value: '250+', label: '250+' },
-    ],
+    options: ['1–10', '11–50', '51–100', '101–250', '250+'],
   },
   money_raised: {
     label: 'Money Raised',
-    options: [
-      { value: 'USD $0–10M', label: 'USD $0-10M' },
-      { value: 'USD $11–50M', label: 'USD $11–50M' },
-      { value: 'USD $51–100M', label: 'USD $51–100M' },
-      { value: 'USD $100M+', label: 'USD $100M+' },
-    ],
+    options: ['USD $0–10M', 'USD $11–50M', 'USD $51–100M', 'USD $100M+'],
   },
   person_age: {
     label: 'Age',
-    options: [
-      { value: '18–21', label: '18–21' },
-      { value: '22–29', label: '22–29' },
-      { value: '30–39', label: '30–39' },
-      { value: '40–49', label: '40–49' },
-      { value: '50–59', label: '50–59' },
-      { value: '60+', label: '60+' },
-    ],
+    options: ['18–21', '22–29', '30–39', '40–49', '50–59', '60+'],
   },
   location: {
     label: 'Location',
     options: [
-      { value: 'Africa', label: 'Africa' },
-      { value: 'Asia', label: 'Asia' },
-      { value: 'Europe', label: 'Europe' },
-      { value: 'Middle East', label: 'Middle East' },
-      { value: 'North America', label: 'North America' },
-      { value: 'South America', label: 'South America' },
-      { value: 'Remote', label: 'Remote' },
+      'Africa',
+      'Asia',
+      'Europe',
+      'Middle East',
+      'North America',
+      'South America',
+      'Remote',
     ],
   },
 }
 
-// Simplified hook – no more async, no more loading states
 function useFilterOptions(filterColumns: string[]) {
   // Build filters synchronously since everything is predefined
   const filters: Filters = {}
@@ -108,14 +90,14 @@ function useFilterOptions(filterColumns: string[]) {
 
     filters[column] = {
       label: config.label,
-      options: [...config.options],
+      options: config.options.map((option) => ({ value: option, label: option })),
     }
   }
 
   return { filters }
 }
 
-// Custom hook to fetch survey data using secure database functions
+// Fetch survey data using secure database functions
 function useSurveyData(
   shouldFetch: boolean,
   functionName: string,
@@ -136,7 +118,6 @@ function useSurveyData(
 
         let data, fetchError
 
-        // Use the secure function approach
         console.log('Active filters:', activeFilters)
         const functionParamsData = functionParams(activeFilters)
         console.log('Calling function:', functionName, 'with params:', functionParamsData)
@@ -169,7 +150,7 @@ function useSurveyData(
           const roundedPercentage = Math.round(rawPercentage)
 
           return {
-            label: row.accelerator || row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
+            label: row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
             value: roundedPercentage,
             rawValue: rawPercentage, // Keep the raw value for bar scaling
           }
@@ -201,7 +182,7 @@ interface SurveyChartProps {
 
 export function SurveyChart({
   title,
-  targetColumn,
+  targetColumn, // Was used for SQL query, but we're now doing this via a function call
   filterColumns,
   generateSQLQuery,
   functionName,
@@ -211,7 +192,7 @@ export function SurveyChart({
   const [shouldAnimateBars, setShouldAnimateBars] = useState(false)
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
 
-  // Intersection observer to trigger data loading
+  // Intersection observer to trigger chart xdata loading via database function
   useEffect(() => {
     const chartRefCurrent = chartRef.current
 
@@ -242,7 +223,7 @@ export function SurveyChart({
     }
   }, [hasLoadedOnce])
 
-  // Get filter options - no more loading states needed
+  // Each chart uses three of four possible filters, defined below
   const { filters } = useFilterOptions(filterColumns)
 
   // Start with all filters unset (showing "all")
@@ -300,7 +281,7 @@ export function SurveyChart({
 
   const [view, setView] = useState<'chart' | 'sql'>('chart')
 
-  // Add a wrapper function to handle both view change and expansion
+  // Handle both view change and expansion via a wrapper function
   const handleViewChange = (newView: 'chart' | 'sql') => {
     setView(newView)
     setIsExpanded(true)
@@ -313,14 +294,10 @@ export function SurveyChart({
     }))
   }
 
-  // Simplified loading logic - only data loading matters now
-  const isLoading = dataLoading
-  const error = dataError
-
-  // Find the maximum value for scaling
+  // Find the maximum value for scaling the bars
   const maxValue = chartData.length > 0 ? Math.max(...chartData.map((item) => item.value)) : 0
 
-  // State for expand/collapse
+  // State for expand/collapse button
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Fixed height for all states (loading, error, loaded collapsed)
@@ -334,7 +311,7 @@ export function SurveyChart({
     { label: 'Loading', value: 0, rawValue: 0 },
   ]
 
-  const displayData = isLoading ? skeletonData : chartData || []
+  const displayData = dataLoading ? skeletonData : chartData || []
 
   return (
     <div
@@ -386,9 +363,9 @@ export function SurveyChart({
             ease: 'easeInOut',
           }}
         >
-          {error ? (
+          {dataError ? (
             <div className="flex items-center justify-center h-full">
-              <p className="text-danger">Error: {error}</p>
+              <p className="text-danger">Error: {dataError}</p>
             </div>
           ) : view === 'chart' ? (
             <div className="flex flex-col h-full w-full justify-between px-8 pt-4 pb-12 min-h-[300px]">
@@ -497,18 +474,22 @@ export function SurveyChart({
           )}
 
           {/* Expand button overlay - only show for chart view */}
-          {view === 'chart' && !isExpanded && !isLoading && !error && chartData.length > 3 && (
-            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
-              <Button
-                type="default"
-                size="tiny"
-                onClick={() => setIsExpanded(true)}
-                className="shadow-sm"
-              >
-                Show more
-              </Button>
-            </div>
-          )}
+          {view === 'chart' &&
+            !isExpanded &&
+            !dataLoading &&
+            !dataError &&
+            chartData.length > 3 && (
+              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
+                <Button
+                  type="default"
+                  size="tiny"
+                  onClick={() => setIsExpanded(true)}
+                  className="shadow-sm"
+                >
+                  Show more
+                </Button>
+              </div>
+            )}
         </motion.div>
       </div>
     </div>
@@ -533,6 +514,7 @@ export function buildWhereClause(
   return whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 }
 
+// Dropdown filter component
 function SurveyFilter({
   filterKey,
   filterConfig,

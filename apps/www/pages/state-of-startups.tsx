@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, forwardRef } from 'react'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Button, cn } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
@@ -273,7 +273,6 @@ function StateOfStartupsPage() {
               {chapter.sections.map((section, sectionIndex) => (
                 <SurveyChapterSection
                   key={sectionIndex + 1}
-                  number={`${chapterIndex + 1}.${sectionIndex + 1}`}
                   title={section.title}
                   description={section.description}
                   stats={section.stats}
@@ -294,6 +293,7 @@ function StateOfStartupsPage() {
 
 export default StateOfStartupsPage
 
+// Component for the 'Builders choose Supabase' CTA at the bottom of the page
 const CTABanner = forwardRef<HTMLElement>((props, ref) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
   return (

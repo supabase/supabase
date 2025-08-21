@@ -9,13 +9,12 @@ interface DecorativeProgressBarProps {
 
 export function DecorativeProgressBar({
   reverse = false,
-  className = '',
   align = 'start',
 }: DecorativeProgressBarProps) {
   return (
     <div
       aria-hidden="true"
-      className={`flex flex-col w-full ${align === 'start' ? 'self-start' : 'self-end'} ${className}`}
+      className={`flex flex-col w-full ${align === 'start' ? 'self-start' : 'self-end'}`}
       style={{
         maxWidth: 'calc(50% + 60rem / 2)',
       }}
