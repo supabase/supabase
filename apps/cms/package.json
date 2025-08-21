@@ -60,11 +60,10 @@
     "tsx": "^4.19.3",
     "typescript": "5.7.3"
   },
+  "externals": {
+    "sharp": "commonjs sharp"
+  },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "esbuild",
-      "unrs-resolver"
-    ]
+    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"]
   }
 }
