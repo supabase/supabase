@@ -3,6 +3,7 @@ import { draftMode } from 'next/headers'
 import { getAllCMSPostSlugs, getCMSPostBySlug } from 'lib/get-cms-posts'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
 import { SITE_ORIGIN } from '~/lib/constants'
+import { processCMSContent } from '~/lib/cms/processCMSContent'
 
 import type { Blog, BlogData, PostReturnType } from 'types/post'
 
@@ -165,8 +166,24 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   }
 
   const tocDepth = cmsPost.toc_depth || 3
-  const mdxSource = await mdxSerialize(cmsPost.content || '', { tocDepth })
-  const tocResult = (mdxSource as any).scope?.toc || cmsPost.toc || { content: '' }
+
+  // Use the new CMS content processor to handle blocks
+  let processedContent
+  try {
+    processedContent = await processCMSContent(cmsPost.richContent || cmsPost.content, tocDepth)
+  } catch (error) {
+    console.error('Error processing CMS content, falling back to legacy processing:', error)
+    // Fallback to legacy processing
+    const mdxSource = await mdxSerialize(cmsPost.content || '', { tocDepth })
+    processedContent = {
+      content: mdxSource,
+      blocks: [],
+      toc: (mdxSource as any).scope?.toc || cmsPost.toc || { content: '' },
+      plainMarkdown: cmsPost.content || '',
+    }
+  }
+
+  console.log('[BlogPostPage] processedContent:', processedContent)
 
   const props: BlogPostPageProps = {
     prevPost: null,
@@ -177,8 +194,8 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       tags: cmsPost.tags || [],
       authors: cmsPost.authors || [],
       isCMS: true,
-      content: mdxSource,
-      toc: tocResult,
+      content: processedContent.content,
+      toc: processedContent.toc,
       toc_depth: cmsPost.toc_depth || 3,
       image: cmsPost.image ?? undefined,
       thumb: cmsPost.thumb ?? undefined,

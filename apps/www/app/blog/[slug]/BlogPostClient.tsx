@@ -8,6 +8,7 @@ import authors from 'lib/authors.json'
 import { CMS_SITE_ORIGIN } from 'lib/constants'
 import { isNotNullOrUndefined } from 'lib/helpers'
 import { generateTocFromMarkdown } from 'lib/toc'
+import { convertRichTextToMarkdown } from '~/lib/cms/convertRichTextToMarkdown'
 
 import type { Blog, BlogData, CMSAuthor, PostReturnType, ProcessedBlogData } from 'types/post'
 
@@ -21,44 +22,10 @@ type BlogPostPageProps = {
   isDraftMode: boolean
 }
 
-// Convert Payload rich text content to markdown (copied from get-cms-posts.tsx)
-function convertRichTextToMarkdown(content: any): string {
-  if (!content?.root?.children) return ''
-
-  return content.root.children
-    .map((node: any) => {
-      if (node.type === 'heading') {
-        const level = node.tag && typeof node.tag === 'string' ? node.tag.replace('h', '') : '1'
-        const text = node.children?.map((child: any) => child.text).join('') || ''
-        return `${'#'.repeat(Number(level))} ${text}`
-      }
-      if (node.type === 'paragraph') {
-        return node.children?.map((child: any) => child.text).join('') || ''
-      }
-      if (node.type === 'list') {
-        const items = node.children
-          ?.map((item: any) => {
-            if (item.type === 'list-item') {
-              return `- ${item.children?.map((child: any) => child.text).join('') || ''}`
-            }
-            return ''
-          })
-          .filter(Boolean)
-          .join('\n')
-        return items
-      }
-      if (node.type === 'link') {
-        const text = node.children?.map((child: any) => child.text).join('') || ''
-        const url = node.url || ''
-        return `[${text}](${url})`
-      }
-      return ''
-    })
-    .filter(Boolean)
-    .join('\n\n')
-}
+// Note: convertRichTextToMarkdown is now imported from the shared utility
 
 export default function BlogPostClient(props: BlogPostPageProps) {
+  console.log('[BlogPostClient] Props:', props)
   const isDraftMode = props.isDraftMode
   const [previewData] = useState<ProcessedBlogData>(props.blog)
   const [processedToc, setProcessedToc] = useState<{ content: string; json: any[] } | null>(null)

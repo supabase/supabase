@@ -1,6 +1,7 @@
 import { CMS_SITE_ORIGIN } from './constants'
 import { generateReadingTime } from './helpers'
 import { generateTocFromMarkdown } from './toc'
+import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
@@ -85,45 +86,6 @@ type ProcessedPost = {
   isCMS: boolean
   tags: string[]
   content: string
-}
-
-/**
- * Convert Payload rich text content to markdown
- */
-function convertRichTextToMarkdown(content: CMSBlogPost['content']): string {
-  if (!content?.root?.children) return ''
-
-  return content.root.children
-    .map((node) => {
-      if (node.type === 'heading') {
-        const level = node.tag && typeof node.tag === 'string' ? node.tag.replace('h', '') : '1'
-        const text = node.children?.map((child) => child.text).join('') || ''
-        return `${'#'.repeat(Number(level))} ${text}`
-      }
-      if (node.type === 'paragraph') {
-        return node.children?.map((child) => child.text).join('') || ''
-      }
-      if (node.type === 'list') {
-        const items = node.children
-          ?.map((item) => {
-            if (item.type === 'list-item') {
-              return `- ${item.children?.map((child: { text: any }) => child.text).join('') || ''}`
-            }
-            return ''
-          })
-          .filter(Boolean)
-          .join('\n')
-        return items
-      }
-      if (node.type === 'link') {
-        const text = node.children?.map((child) => child.text).join('') || ''
-        const url = node.url || ''
-        return `[${text}](${url})`
-      }
-      return ''
-    })
-    .filter(Boolean)
-    .join('\n\n')
 }
 
 /**
