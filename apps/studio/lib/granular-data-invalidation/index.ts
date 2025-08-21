@@ -1,7 +1,6 @@
 import { type QueryClient } from '@tanstack/react-query'
 
 import { parseQuery } from './parse-query'
-import { handleInvalidation } from './handle-invalidation'
 import { databaseKeys } from '../../data/database/keys'
 import { entityTypeKeys } from '../../data/entity-types/keys'
 import { tableKeys } from '../../data/tables/keys'
@@ -138,17 +137,15 @@ export async function invalidateDataGranularly(
   projectRef: string
 ): Promise<void> {
   if (!sql || !projectRef) {
-    console.warn('invalidateCacheGranularly: Invalid input - SQL and projectRef are required')
+    console.warn('invalidateDataGranularly: Invalid input - SQL and projectRef are required')
     return
   }
 
   try {
     const events = await parseSqlStatements(sql, projectRef)
-
-    // Fire off all invalidations without blocking
-    // Each invalidation runs in its own setTimeout callback
-    events.forEach((event) => handleInvalidation(queryClient, event))
+    const plan = planInvalidationsFromEvents(events)
+    await applyInvalidationPlan(queryClient, plan)
   } catch (error) {
-    console.error('invalidateCacheGranularly: Error processing SQL', error)
+    console.error('invalidateDataGranularly: Error processing SQL', error)
   }
 }
