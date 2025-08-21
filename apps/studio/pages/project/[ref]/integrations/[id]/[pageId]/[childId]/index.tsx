@@ -13,6 +13,7 @@ import { NextPageWithLayout } from 'types'
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
+  const childLabel = router?.query?.['child-label'] as string
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
@@ -37,26 +38,16 @@ const IntegrationPage: NextPageWithLayout = () => {
       label: 'Integrations',
       href: `/project/${ref}/integrations`,
     },
+    {
+      label: integration?.name || id,
+      href: pageId
+        ? `/project/${ref}/integrations/${id}/${pageId}`
+        : `/project/${ref}/integrations/${id}`,
+    },
   ]
 
   // Create navigation items from integration navigation
-  const navigationItems: NavigationItem[] = useMemo(() => {
-    if (!integration?.navigation) return []
-
-    // Only show navigation if the integration is installed, or if we're on the overview page
-    const showNavigation = installation || pageId === 'overview'
-    if (!showNavigation) return []
-
-    const availableTabs = installation
-      ? integration.navigation
-      : integration.navigation.filter((tab) => tab.route === 'overview')
-
-    return availableTabs.map((nav) => ({
-      label: nav.label,
-      href: `/project/${ref}/integrations/${id}/${nav.route}`,
-      active: pageId === nav.route,
-    }))
-  }, [integration, ref, id, pageId, installation])
+  const navigationItems: NavigationItem[] = []
 
   useEffect(() => {
     // if the integration is not installed, redirect to the overview page
@@ -110,7 +101,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   return (
     <PageLayout
-      title={integration.name}
+      title={childLabel || childId}
       size="full"
       breadcrumbs={breadcrumbItems}
       navigationItems={navigationItems}

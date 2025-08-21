@@ -72,7 +72,7 @@ export const IntegrationCard = ({
             <div className="flex-col justify-start items-center text-center gap-y-0.5 flex">
               <h3 className="heading-subSection">{name}</h3>
               <p className="text-foreground-light">{description}</p>
-              <div className="flex items-center justify-center w-full mt-4">
+              <div className="flex items-center justify-center w-full mt-4 gap-x-2">
                 <div className="flex items-center gap-x-1">
                   {status && (
                     <Badge variant="warning" className="capitalize">
@@ -83,12 +83,6 @@ export const IntegrationCard = ({
                     <span>Official</span>
                   </Badge>
                 </div>
-                {isInstalled && (
-                  <div className="flex items-center gap-x-1">
-                    <BadgeCheck size={14} className="text-brand" />
-                    <span className=" text-brand text-xs">Installed</span>
-                  </div>
-                )}
               </div>
             </div>
           </CardContent>
@@ -100,9 +94,9 @@ export const IntegrationCard = ({
   return (
     <Link href={`/project/${project?.ref}/integrations/${id}/overview`} className="h-full">
       <Card className="h-full">
-        <CardContent className="p-4 @2xl:p-6">
-          <div className="flex items-start justify-between">
-            <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center mb-4">
+        <CardContent className="flex flex-col p-4 @2xl:p-6 h-full">
+          <div className="flex items-start justify-between mb-4">
+            <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
               {icon()}
             </div>
             {isInstalled && (
@@ -112,23 +106,19 @@ export const IntegrationCard = ({
               </div>
             )}
           </div>
-          <div className="flex items-start gap-4">
-            <div className="flex-col justify-start items-start gap-y-0.5 flex">
-              <h3 className="text-foreground text-sm">{name}</h3>
+          <div className="flex-col justify-start items-start gap-y-0.5 flex flex-1">
+            <h3 className="text-foreground text-sm">{name}</h3>
 
-              <p className="text-foreground-light text-xs">{description}</p>
-              <div className="flex items-center justify-between w-full mt-4">
-                <div className="flex items-center gap-x-1">
-                  {status && (
-                    <Badge variant="warning" className="capitalize">
-                      {status}
-                    </Badge>
-                  )}
-                  <Badge>
-                    <span>Official</span>
-                  </Badge>
-                </div>
-              </div>
+            <p className="text-foreground-light text-xs flex-1">{description}</p>
+            <div className="flex items-center gap-x-1 mt-4">
+              {status && (
+                <Badge variant="warning" className="capitalize">
+                  {status}
+                </Badge>
+              )}
+              <Badge>
+                <span>Official</span>
+              </Badge>
             </div>
           </div>
         </CardContent>
