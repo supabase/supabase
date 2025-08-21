@@ -100,6 +100,7 @@ export const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      index: true,
     },
     ...slugField(),
     {
@@ -153,9 +154,6 @@ export const Posts: CollectionConfig = {
             {
               name: 'categories',
               type: 'relationship',
-              admin: {
-                position: 'sidebar',
-              },
               hasMany: true,
               relationTo: 'categories',
             },
@@ -178,35 +176,23 @@ export const Posts: CollectionConfig = {
             {
               name: 'date',
               type: 'date',
-              admin: {
-                position: 'sidebar',
-              },
             },
             {
               name: 'toc_depth',
               type: 'number',
-              defaultValue: 2,
-              admin: {
-                position: 'sidebar',
-              },
+              defaultValue: 3,
             },
             {
               name: 'authors',
               type: 'relationship',
               relationTo: 'authors',
               hasMany: true,
-              admin: {
-                position: 'sidebar',
-              },
             },
             {
               name: 'tags',
               type: 'relationship',
               relationTo: 'tags',
               hasMany: true,
-              admin: {
-                position: 'sidebar',
-              },
             },
           ],
           label: 'Metadata',

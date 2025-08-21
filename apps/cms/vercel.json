@@ -1,5 +1,15 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "**": {
+      "maxDuration": 60,
+      "memory": 512
+    }
+  },
+  "regions": ["iad1"],
+  "framework": "nextjs",
   "buildCommand": "pnpm vercel-build",
-  "installCommand": "pnpm install"
+  "installCommand": "pnpm install",
+  "env": {
+    "NODE_OPTIONS": "--no-deprecation"
+  }
 }

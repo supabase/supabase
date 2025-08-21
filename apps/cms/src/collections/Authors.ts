@@ -15,6 +15,7 @@ export const Authors: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Author Name',
+      index: true,
     },
     {
       name: 'author_id',

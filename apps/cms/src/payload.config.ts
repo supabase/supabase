@@ -114,9 +114,19 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
+      // Connection pool configuration for serverless/Vercel
+      max: 2, // Maximum number of connections in the pool (keep low for serverless)
+      min: 0, // Minimum number of connections in the pool
+      idleTimeoutMillis: 30000, // Time a connection can be idle before being closed
+      connectionTimeoutMillis: 30000, // Time to wait for connection creation
     },
-    // schemaName: 'cms-payload',
+    migrationDir: path.resolve(dirname, 'migrations'),
   }),
+  // Global configuration for better performance
+  globals: [],
+  graphQL: {
+    disable: process.env.NODE_ENV !== 'development', // Disable GraphQL in production for better performance
+  },
   sharp,
   plugins,
 })
