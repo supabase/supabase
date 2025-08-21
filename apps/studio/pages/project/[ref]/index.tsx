@@ -112,7 +112,7 @@ const Home: NextPageWithLayout = () => {
   const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
   return (
-    <div className="w-full">
+    <div className="w-full px-4">
       <div className={cn('py-16 ', !isPaused && 'border-b border-muted ')}>
         <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
@@ -166,13 +166,12 @@ const Home: NextPageWithLayout = () => {
                     >
                       Tables
                     </Link>
-                    <p className="text-2xl tabular-nums">
-                      {isLoadingTables ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        tablesCount
-                      )}
-                    </p>
+
+                    {isLoadingTables ? (
+                      <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                    ) : (
+                      <p className="text-2xl tabular-nums">{tablesCount}</p>
+                    )}
                   </div>
 
                   {IS_PLATFORM && (
@@ -183,13 +182,11 @@ const Home: NextPageWithLayout = () => {
                       >
                         Functions
                       </Link>
-                      <p className="text-2xl tabular-nums">
-                        {isLoadingFunctions ? (
-                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                        ) : (
-                          functionsCount
-                        )}
-                      </p>
+                      {isLoadingFunctions ? (
+                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                      ) : (
+                        <p className="text-2xl tabular-nums">{functionsCount}</p>
+                      )}
                     </div>
                   )}
 
@@ -201,13 +198,11 @@ const Home: NextPageWithLayout = () => {
                       >
                         Replicas
                       </Link>
-                      <p className="text-2xl tabular-nums">
-                        {isLoadingReplicas ? (
-                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                        ) : (
-                          replicasCount
-                        )}
-                      </p>
+                      {isLoadingReplicas ? (
+                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                      ) : (
+                        <p className="text-2xl tabular-nums">{replicasCount}</p>
+                      )}
                     </div>
                   )}
                 </div>

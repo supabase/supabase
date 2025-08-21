@@ -10,6 +10,7 @@ import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
@@ -24,6 +25,9 @@ export const DisplayApiSettings = ({
   showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
+  const { projectSettingsShowDisableLegacyApiKeys } = useIsFeatureEnabled([
+    'project_settings:show_disable_legacy_api_keys',
+  ])
 
   const {
     data: settings,
@@ -213,21 +217,22 @@ export const DisplayApiSettings = ({
             </Panel.Content>
           ))
         )}
-        {showNotice ? (
-          <Panel.Notice
-            className="border-t"
-            title="API keys have moved"
-            badgeLabel="Changelog"
-            description={`
+      </Panel>
+
+      {showNotice ? (
+        <Panel.Notice
+          className="border-t"
+          title="API keys have moved"
+          badgeLabel="Changelog"
+          description={`
   \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.
   `}
-            href="https://github.com/orgs/supabase/discussions/29260"
-            buttonText="Read the announcement"
-          />
-        ) : (
-          <ToggleLegacyApiKeysPanel />
-        )}
-      </Panel>
+          href="https://github.com/orgs/supabase/discussions/29260"
+          buttonText="Read the announcement"
+        />
+      ) : projectSettingsShowDisableLegacyApiKeys ? (
+        <ToggleLegacyApiKeysPanel />
+      ) : null}
     </>
   )
 }

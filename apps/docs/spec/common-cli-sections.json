@@ -102,6 +102,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-gen-signing-key",
+        "title": "Generate a JWT signing key",
+        "slug": "supabase-gen-signing-key",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-gen-types",
         "title": "Generate types (Postgres schema)",
         "slug": "supabase-gen-types",
