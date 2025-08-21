@@ -8,14 +8,14 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const TransferProjectButton = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
   const [isOpen, setIsOpen] = useState(false)
@@ -58,7 +58,10 @@ const TransferProjectButton = () => {
     }
   }, [isOpen])
 
-  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canTransferProject } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const toggle = () => {
     setIsOpen(!isOpen)

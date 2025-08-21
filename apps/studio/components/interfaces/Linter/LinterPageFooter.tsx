@@ -21,7 +21,7 @@ const LinterPageFooter = ({
       >
         <p>Reset suggestions</p>
         <p className="text-xs text-foreground-light">
-          Consider resetting the analysis making any changes
+          Consider resetting the analysis after making any changes
         </p>
 
         <Button

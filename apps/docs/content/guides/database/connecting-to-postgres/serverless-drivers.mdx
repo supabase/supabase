@@ -64,7 +64,7 @@ Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integra
 
 ### Manual configuration
 
-In your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database), make sure `Use connection pooler` is checked and `Transaction` mode is selected, then copy the URI and save it as the `POSTGRES_URL` environment variable. Remember to replace the password placeholder with your actual database password and add the following suffix `?workaround=supabase-pooler.vercel`.
+In your [`Database Settings`](https://supabase.com/dashboard/project/_/database/settings), make sure `Use connection pooler` is checked and `Transaction` mode is selected, then copy the URI and save it as the `POSTGRES_URL` environment variable. Remember to replace the password placeholder with your actual database password and add the following suffix `?workaround=supabase-pooler.vercel`.
 
 ```txt .env.local
 POSTGRES_URL="postgres://postgres.cfcxynqnhdybqtbhjemm:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?workaround=supabase-pooler.vercel"

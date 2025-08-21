@@ -5,18 +5,19 @@ import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/Fea
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export interface DatabaseLayoutProps {
   title?: string
 }
 
 const DatabaseProductMenu = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -32,6 +33,11 @@ const DatabaseProductMenu = () => {
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
   const enablePgReplicate = useFlag('enablePgReplicate')
 
+  const { databaseReplication: showPgReplicate, databaseRoles: showRoles } = useIsFeatureEnabled([
+    'database:replication',
+    'database:roles',
+  ])
+
   return (
     <>
       <ProductMenu
@@ -41,6 +47,8 @@ const DatabaseProductMenu = () => {
           pitrEnabled,
           columnLevelPrivileges,
           enablePgReplicate,
+          showPgReplicate,
+          showRoles,
         })}
       />
     </>
