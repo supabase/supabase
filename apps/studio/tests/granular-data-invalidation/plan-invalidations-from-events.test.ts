@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import {
-  planInvalidationsFromEvents,
-  type InvalidationEvent,
-} from '../../lib/granular-data-invalidation'
+
+import type { InvalidationEvent } from '../../lib/granular-data-invalidation'
+import { planInvalidationsFromEvents } from '../../lib/granular-data-invalidation/plan-invalidations-from-events'
 
 describe('planInvalidationsFromEvents', () => {
   const projectRef = 'test-project-123'
@@ -23,7 +22,6 @@ describe('planInvalidationsFromEvents', () => {
 
       expect(result).toHaveLength(4)
 
-      // Should invalidate schema-specific table lists
       expect(result[0]).toEqual({
         key: ['projects', projectRef, 'tables', 'public', true],
         exact: true,
@@ -33,13 +31,11 @@ describe('planInvalidationsFromEvents', () => {
         exact: true,
       })
 
-      // Should invalidate specific table
       expect(result[2]).toEqual({
         key: ['projects', projectRef, 'tables', 'public', 'users'],
         refetchType: 'active',
       })
 
-      // Should invalidate entity types list
       expect(result[3]).toEqual({
         key: ['projects', projectRef, 'entity-types'],
         exact: false,
@@ -60,7 +56,6 @@ describe('planInvalidationsFromEvents', () => {
 
       expect(result).toHaveLength(3)
 
-      // Should invalidate schema-specific lists but not specific table
       expect(result[0]).toEqual({
         key: ['projects', projectRef, 'tables', 'public', true],
         exact: true,
@@ -70,7 +65,6 @@ describe('planInvalidationsFromEvents', () => {
         exact: true,
       })
 
-      // Should still invalidate entity types list
       expect(result[2]).toEqual({
         key: ['projects', projectRef, 'entity-types'],
         exact: false,
@@ -90,7 +84,6 @@ describe('planInvalidationsFromEvents', () => {
 
       expect(result).toHaveLength(2)
 
-      // Should invalidate all tables
       expect(result[0]).toEqual({
         key: ['projects', projectRef, 'tables'],
         exact: false,
@@ -174,7 +167,6 @@ describe('planInvalidationsFromEvents', () => {
       // Should have actions for table (4) + function (1) + cron (1) = 6
       expect(result).toHaveLength(6)
 
-      // Verify we have the expected action types
       const actionKeys = result.map((action) => action.key[2])
       expect(actionKeys).toContain('tables')
       expect(actionKeys).toContain('entity-types')

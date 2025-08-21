@@ -1,8 +1,40 @@
 import type { CreateFunctionStmt, CreateStmt, DropStmt, SelectStmt } from 'libpg-query'
 
-import type { Event } from '.'
+import type { Event, InvalidationEvent } from '.'
 
 const DEFAULT_SCHEMA = 'public' as const
+
+/**
+ * Parse SQL statements and return all invalidation events
+ * Uses libpg-query to handle multiple statements in a single call
+ */
+export async function parseSqlStatements(
+  sql: string,
+  projectRef: string
+): Promise<InvalidationEvent[]> {
+  if (!sql || !projectRef) return []
+
+  const sqlLower = sql.toLowerCase().trim()
+
+  // Check if any statement contains supported actions
+  const hasValidAction = ['create ', 'drop ', 'cron.schedule', 'cron.unschedule'].some((action) =>
+    sqlLower.includes(action)
+  )
+
+  if (!hasValidAction) return []
+
+  try {
+    const entityInfos = await parseQuery(sql, sqlLower)
+
+    return entityInfos.map((entityInfo) => ({
+      ...entityInfo,
+      projectRef,
+    }))
+  } catch (error) {
+    console.error('parseSqlStatements: Error parsing SQL', error)
+    return []
+  }
+}
 
 // Parse SQL using libpg-query - handles multiple statements
 export async function parseQuery(sql: string, sqlLower: string): Promise<Event[]> {
