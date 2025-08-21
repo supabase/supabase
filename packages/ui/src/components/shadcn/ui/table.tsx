@@ -6,12 +6,78 @@ interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
   containerProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
+// Custom hook to detect horizontal scrolling
+const useHorizontalScroll = (ref: React.RefObject<HTMLDivElement>) => {
+  const [hasHorizontalScroll, setHasHorizontalScroll] = React.useState(false)
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false)
+  const [canScrollRight, setCanScrollRight] = React.useState(false)
+
+  React.useEffect(() => {
+    const element = ref.current
+    if (!element) return
+
+    const checkScroll = () => {
+      const hasScroll = element.scrollWidth > element.clientWidth
+      setHasHorizontalScroll(hasScroll)
+
+      if (hasScroll) {
+        const canScrollLeft = element.scrollLeft > 0
+        const canScrollRight = element.scrollLeft < element.scrollWidth - element.clientWidth
+        setCanScrollLeft(canScrollLeft)
+        setCanScrollRight(canScrollRight)
+      } else {
+        setCanScrollLeft(false)
+        setCanScrollRight(false)
+      }
+    }
+
+    const handleScroll = () => {
+      if (hasHorizontalScroll) {
+        const canScrollLeft = element.scrollLeft > 0
+        const canScrollRight = element.scrollLeft < element.scrollWidth - element.clientWidth
+        setCanScrollLeft(canScrollLeft)
+        setCanScrollRight(canScrollRight)
+      }
+    }
+
+    checkScroll()
+    element.addEventListener('scroll', handleScroll)
+    window.addEventListener('resize', checkScroll)
+
+    return () => {
+      element.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', checkScroll)
+    }
+  }, [ref, hasHorizontalScroll])
+
+  return { hasHorizontalScroll, canScrollLeft, canScrollRight }
+}
+
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, containerProps, ...props }, ref) => (
-    <div className={cn('w-full overflow-auto')} {...containerProps}>
-      <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
-    </div>
-  )
+  ({ className, containerProps, ...props }, ref) => {
+    const containerRef = React.useRef<HTMLDivElement>(null)
+    const { hasHorizontalScroll, canScrollLeft, canScrollRight } = useHorizontalScroll(containerRef)
+
+    return (
+      <div className="relative">
+        {/* Fixed shadows positioned relative to the wrapper */}
+        <div
+          className={cn(
+            'absolute inset-0 pointer-events-none z-10',
+            'before:absolute before:top-0 before:right-0 before:bottom-0 before:w-4 before:bg-gradient-to-l before:from-black/20 before:to-transparent before:opacity-0 before:transition-opacity before:duration-200',
+            'after:absolute after:top-0 after:left-0 after:bottom-0 after:w-4 after:bg-gradient-to-r after:from-black/20 after:to-transparent after:opacity-0 after:transition-opacity after:duration-200',
+            hasHorizontalScroll && 'hover:before:opacity-100 hover:after:opacity-100',
+            canScrollRight && 'before:opacity-100',
+            canScrollLeft && 'after:opacity-100'
+          )}
+        />
+        {/* Scrollable table container */}
+        <div ref={containerRef} className={cn('w-full overflow-auto')} {...containerProps}>
+          <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+        </div>
+      </div>
+    )
+  }
 )
 Table.displayName = 'Table'
 
