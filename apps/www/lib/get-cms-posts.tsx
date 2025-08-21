@@ -163,8 +163,8 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
           'Content-Type': 'application/json',
           ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
         },
-        cache: 'no-store',
-        next: { revalidate: 0 },
+        // For published posts: allow static generation with revalidation
+        next: { revalidate: 60 }, // 1 minute
       })
 
       if (response.ok) {
@@ -213,8 +213,8 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
           'Content-Type': 'application/json',
           ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
         },
-        cache: 'no-store',
-        next: { revalidate: 0 },
+        // For published posts: allow static generation with revalidation
+        next: { revalidate: 60 }, // 1 minute
       })
     }
 
@@ -310,7 +310,7 @@ async function processPostData(post: any) {
     // Generate TOC from content for CMS blog posts
     const tocResult = await generateTocFromMarkdown(
       markdownContent,
-      post.toc_depth ? post.toc_depth : 2
+      post.toc_depth ? post.toc_depth : 3
     )
 
     // Extract thumb and image URLs from the nested structure
@@ -347,7 +347,7 @@ async function processPostData(post: any) {
             : null,
           username: author.username || '',
         })) || [],
-      toc_depth: post.toc_depth || 2,
+      toc_depth: post.toc_depth || 3,
       thumb: thumbUrl,
       image: imageUrl,
       url: `/blog/${post.slug}`,
@@ -457,7 +457,7 @@ export async function getAllCMSPosts({
                 : null,
               username: author.username || '',
             })) || [],
-          toc_depth: post.toc_depth || 2,
+          toc_depth: post.toc_depth || 3,
           thumb: thumbUrl,
           image: imageUrl,
           url: `/blog/${post.slug || ''}`,

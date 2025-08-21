@@ -23,11 +23,19 @@ async function getCMSPostFromAPI(
       url.searchParams.set('draft', 'true')
     }
 
-    const response = await fetch(url.toString(), {
-      // Use no-store to always get fresh data
-      cache: 'no-store',
-      next: { revalidate: 0 },
-    })
+    // Use different caching strategies based on draft mode
+    const fetchOptions = isDraft
+      ? {
+          // For draft mode: always fresh data, no caching
+          cache: 'no-store' as const,
+          next: { revalidate: 0 },
+        }
+      : {
+          // For published posts: allow static generation with revalidation
+          next: { revalidate: 60 }, // 1 minute
+        }
+
+    const response = await fetch(url.toString(), fetchOptions)
 
     if (!response.ok) {
       console.error('[getCMSPostFromAPI] Non-OK response:', response.status)
@@ -168,7 +176,8 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   const tocDepth = cmsPost.toc_depth || 3
 
   // Use the new CMS content processor to handle blocks
-  let processedContent
+  let processedContent: any
+
   try {
     processedContent = await processCMSContent(cmsPost.richContent || cmsPost.content, tocDepth)
   } catch (error) {
@@ -182,8 +191,6 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       plainMarkdown: cmsPost.content || '',
     }
   }
-
-  console.log('[BlogPostPage] processedContent:', processedContent)
 
   const props: BlogPostPageProps = {
     prevPost: null,

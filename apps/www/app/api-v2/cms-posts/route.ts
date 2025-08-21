@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
 
               const tocResult = generateTocFromMarkdown(
                 markdownContent,
-                latestVersion.toc_depth || 2
+                latestVersion.toc_depth || 3
               )
 
               const processedPost = {
@@ -206,7 +206,7 @@ export async function GET(request: NextRequest) {
                 content: markdownContent,
                 richContent: latestVersion.content,
                 toc: tocResult,
-                toc_depth: latestVersion.toc_depth || 2,
+                toc_depth: latestVersion.toc_depth || 3,
                 isDraft: true,
                 _status: latestVersion._status,
               }
@@ -244,7 +244,7 @@ export async function GET(request: NextRequest) {
             const markdownContent = convertRichTextToMarkdown(post.content)
             const readingTime = generateReadingTime(richTextToPlainText(post.content))
 
-            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
+            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 3)
 
             const processedPost = {
               slug: post.slug || '',
@@ -282,7 +282,7 @@ export async function GET(request: NextRequest) {
               content: markdownContent,
               richContent: post.content,
               toc: tocResult,
-              toc_depth: post.toc_depth || 2,
+              toc_depth: post.toc_depth || 3,
               isDraft: true,
               _status: post._status,
             }
@@ -318,7 +318,7 @@ export async function GET(request: NextRequest) {
             const markdownContent = convertRichTextToMarkdown(post.content)
             const readingTime = generateReadingTime(richTextToPlainText(post.content))
 
-            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
+            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 3)
 
             const processedPost = {
               slug: post.slug || '',
@@ -356,7 +356,7 @@ export async function GET(request: NextRequest) {
               content: markdownContent,
               richContent: post.content,
               toc: tocResult,
-              toc_depth: post.toc_depth || 2,
+              toc_depth: post.toc_depth || 3,
               isDraft: true,
               _status: post._status,
             }
@@ -384,8 +384,8 @@ export async function GET(request: NextRequest) {
           'Content-Type': 'application/json',
           ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
         },
-        // Force fresh data, no caching for individual post requests
-        cache: 'no-store',
+        // For published posts: allow caching with revalidation
+        next: { revalidate: 60 }, // 1 minute
       })
 
       if (versionsResponse.ok) {
@@ -399,7 +399,7 @@ export async function GET(request: NextRequest) {
             const markdownContent = convertRichTextToMarkdown(post.content)
             const plain = richTextToPlainText(post.content)
             const readingTime = generateReadingTime(plain)
-            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 2)
+            const tocResult = generateTocFromMarkdown(markdownContent, post.toc_depth || 3)
 
             const processedPost = {
               type: 'blog' as const,
@@ -445,7 +445,7 @@ export async function GET(request: NextRequest) {
               content: mode === 'full' ? markdownContent : undefined,
               richContent: mode === 'full' ? post.content : undefined,
               toc: tocResult,
-              toc_depth: post.toc_depth || 2,
+              toc_depth: post.toc_depth || 3,
             }
 
             return NextResponse.json({
@@ -472,7 +472,7 @@ export async function GET(request: NextRequest) {
           'Content-Type': 'application/json',
           ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
         },
-        cache: 'no-store',
+        next: { revalidate: 60 }, // 1 minute for published posts
       })
 
       if (parentResponse.ok) {
@@ -493,7 +493,7 @@ export async function GET(request: NextRequest) {
               'Content-Type': 'application/json',
               ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
             },
-            cache: 'no-store',
+            next: { revalidate: 60 }, // 1 minute for published posts
           })
 
           if (versionsByParentResponse.ok) {
@@ -668,19 +668,19 @@ export async function GET(request: NextRequest) {
           tags: p.tags || [],
           categories: [],
           isCMS: true,
-          toc_depth: p.toc_depth || 2,
+          toc_depth: p.toc_depth || 3,
         }
 
         // Add content for full mode
         if (mode === 'full') {
           const markdownContent = convertRichTextToMarkdown(p.content)
-          const tocResult = generateTocFromMarkdown(markdownContent, p.toc_depth || 2)
+          const tocResult = generateTocFromMarkdown(markdownContent, p.toc_depth || 3)
           return {
             ...basePost,
             content: markdownContent, // Convert rich text to markdown for MDX processing
             richContent: p.content, // Keep original rich text for reference
             toc: tocResult,
-            toc_depth: p.toc_depth || 2,
+            toc_depth: p.toc_depth || 3,
           }
         }
 
