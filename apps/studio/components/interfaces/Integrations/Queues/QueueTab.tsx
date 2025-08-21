@@ -100,7 +100,7 @@ export const QueueTab = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between gap-x-4 py-4 px-6 mb-0 bg-surface-200">
+      <div className="flex items-center justify-between gap-x-4 py-4 px-10 mb-0 bg-surface-200">
         <QueueFilters selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes} />
         <div className="flex gap-x-2">
           <QueueSettings />

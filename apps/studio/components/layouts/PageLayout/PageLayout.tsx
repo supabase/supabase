@@ -20,7 +20,7 @@ export interface NavigationItem {
 interface PageLayoutProps {
   children?: ReactNode
   title?: string | ReactNode
-  subtitle?: string
+  subtitle?: string | ReactNode
   icon?: ReactNode
   breadcrumbs?: Array<{
     label?: string

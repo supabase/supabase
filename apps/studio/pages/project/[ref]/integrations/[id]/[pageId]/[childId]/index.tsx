@@ -13,7 +13,6 @@ import { NextPageWithLayout } from 'types'
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
-  const childLabel = router?.query?.['child-label'] as string
 
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
@@ -32,23 +31,6 @@ const IntegrationPage: NextPageWithLayout = () => {
     [integration, id, pageId, childId]
   )
 
-  // Create breadcrumb items
-  const breadcrumbItems = [
-    {
-      label: 'Integrations',
-      href: `/project/${ref}/integrations`,
-    },
-    {
-      label: integration?.name || id,
-      href: pageId
-        ? `/project/${ref}/integrations/${id}/${pageId}`
-        : `/project/${ref}/integrations/${id}`,
-    },
-  ]
-
-  // Create navigation items from integration navigation
-  const navigationItems: NavigationItem[] = []
-
   useEffect(() => {
     // if the integration is not installed, redirect to the overview page
     if (
@@ -60,11 +42,11 @@ const IntegrationPage: NextPageWithLayout = () => {
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [installation, isIntegrationsLoading, pageId, router])
+  }, [installation, isIntegrationsLoading, pageId, router, ref, id])
 
   if (!router?.isReady || isIntegrationsLoading) {
     return (
-      <PageLayout title="Loading..." size="full" breadcrumbs={breadcrumbItems}>
+      <PageLayout title="Loading..." size="full" breadcrumbs={[]}>
         <ScaffoldContainer>
           <div className="px-10 py-6">
             <GenericSkeletonLoader />
@@ -76,7 +58,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   if (!id || !integration) {
     return (
-      <PageLayout title="Integration not found" size="full" breadcrumbs={breadcrumbItems}>
+      <PageLayout title="Integration not found" size="full" breadcrumbs={[]}>
         <ScaffoldContainer>
           <div>Integration not found</div>
         </ScaffoldContainer>
@@ -89,8 +71,8 @@ const IntegrationPage: NextPageWithLayout = () => {
       <PageLayout
         title={integration.name}
         size="full"
-        breadcrumbs={breadcrumbItems}
-        navigationItems={navigationItems}
+        breadcrumbs={[]}
+        navigationItems={[]}
       >
         <ScaffoldContainer>
           <div className="p-10 text-sm">Component not found</div>
@@ -99,16 +81,7 @@ const IntegrationPage: NextPageWithLayout = () => {
     )
   }
 
-  return (
-    <PageLayout
-      title={childLabel || childId}
-      size="full"
-      breadcrumbs={breadcrumbItems}
-      navigationItems={navigationItems}
-    >
-      <Component />
-    </PageLayout>
-  )
+  return <Component />
 }
 
 IntegrationPage.getLayout = (page) => (

@@ -4,11 +4,12 @@ import { useInstalledIntegrations } from 'components/interfaces/Integrations/Lan
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { PageLayout, NavigationItem } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
 import { useEffect, useMemo } from 'react'
 import { NextPageWithLayout } from 'types'
+import { Skeleton } from 'ui'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -38,6 +39,15 @@ const IntegrationPage: NextPageWithLayout = () => {
       href: `/project/${ref}/integrations`,
     },
   ]
+
+  // Get integration icon and subtitle
+  const integrationIcon = integration ? (
+    <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
+      {integration.icon()}
+    </div>
+  ) : null
+
+  const integrationSubtitle = integration?.description || null
 
   // Create navigation items from integration navigation
   const navigationItems: NavigationItem[] = useMemo(() => {
@@ -73,11 +83,15 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   if (!router?.isReady || isIntegrationsLoading) {
     return (
-      <PageLayout title="Loading..." size="full" breadcrumbs={breadcrumbItems}>
-        <ScaffoldContainer>
-          <div className="px-10 py-6">
+      <PageLayout
+        title={<Skeleton className="w-32 h-8" />}
+        size="full"
+        breadcrumbs={breadcrumbItems}
+      >
+        <ScaffoldContainer size="full">
+          <ScaffoldSection isFullWidth>
             <GenericSkeletonLoader />
-          </div>
+          </ScaffoldSection>
         </ScaffoldContainer>
       </PageLayout>
     )
@@ -96,7 +110,9 @@ const IntegrationPage: NextPageWithLayout = () => {
   if (!Component) {
     return (
       <PageLayout
-        title={integration.name}
+        title={integration?.name || 'Integration'}
+        icon={integrationIcon}
+        subtitle={integrationSubtitle}
         size="full"
         breadcrumbs={breadcrumbItems}
         navigationItems={navigationItems}
@@ -111,6 +127,8 @@ const IntegrationPage: NextPageWithLayout = () => {
   return (
     <PageLayout
       title={integration.name}
+      icon={integrationIcon}
+      subtitle={integrationSubtitle}
       size="full"
       breadcrumbs={breadcrumbItems}
       navigationItems={navigationItems}

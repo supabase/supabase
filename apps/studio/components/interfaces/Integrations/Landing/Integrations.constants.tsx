@@ -87,7 +87,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(() => import('../Queues/QueueTab').then((mod) => mod.QueueTab), {
+        return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
           loading: Loading,
         })
       }
@@ -144,7 +144,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
         return dynamic(
-          () => import('../CronJobs/PreviousRunsTab').then((mod) => mod.PreviousRunsTab),
+          () => import('../CronJobs/CronJobPage').then((mod) => mod.CronJobPage),
           {
             loading: Loading,
           }
