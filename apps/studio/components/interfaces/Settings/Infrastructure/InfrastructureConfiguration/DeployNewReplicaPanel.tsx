@@ -15,7 +15,6 @@ import {
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
 import {
@@ -78,13 +77,6 @@ const DeployNewReplicaPanel = ({
     () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
     [org]
   )
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
-  })
-  const overdueInvoices = (allOverdueInvoices ?? []).filter(
-    (x) => x.organization_id === project?.organization_id
-  )
-  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
@@ -183,7 +175,6 @@ const DeployNewReplicaPanel = ({
     !isFreePlan &&
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
-    !hasOverdueInvoices &&
     !isAwsK8s &&
     !isProWithSpendCapEnabled
 
@@ -231,22 +222,7 @@ const DeployNewReplicaPanel = ({
       confirmText="Deploy replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
-        {hasOverdueInvoices ? (
-          <Alert_Shadcn_>
-            <WarningIcon />
-            <AlertTitle_Shadcn_>Your organization has overdue invoices</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <span>
-                Please resolve all outstanding invoices first before deploying a new read replica
-              </span>
-              <div className="mt-3">
-                <Button asChild type="default">
-                  <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
-                </Button>
-              </div>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        ) : !isAWSProvider ? (
+        {!isAWSProvider ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>

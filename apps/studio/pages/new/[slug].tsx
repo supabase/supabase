@@ -24,7 +24,6 @@ import {
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { smartRegionToExactRegion } from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
-import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -35,11 +34,9 @@ import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
@@ -182,15 +179,6 @@ const Wizard: NextPageWithLayout = () => {
     [currentOrg]
   )
 
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
-  })
-
-  const overdueInvoices = (allOverdueInvoices ?? []).filter(
-    (x) => x.organization_id === currentOrg?.id
-  )
-  const hasOutstandingInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
-
   const {
     mutate: createProject,
     isLoading: isCreatingNewProject,
@@ -236,26 +224,6 @@ const Wizard: NextPageWithLayout = () => {
     }
   )
 
-  const { data: availableRegionsData, error: availableRegionsError } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug: slug,
-        cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
-      },
-      {
-        enabled: smartRegionEnabled,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchInterval: false,
-        refetchOnReconnect: false,
-      }
-    )
-
-  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.specific[0]?.name
-    : _defaultRegion
-
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
@@ -271,7 +239,7 @@ const Wizard: NextPageWithLayout = () => {
   const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
   const canCreateProject =
-    isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
+    isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -308,7 +276,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
       dbPassStrength: 0,
-      dbRegion: defaultRegion || undefined,
+      dbRegion: undefined,
       instanceSize: sizes[0],
       dataApi: true,
       useApiSchema: false,
@@ -391,7 +359,7 @@ const Wizard: NextPageWithLayout = () => {
     const { postgresEngine, releaseChannel } =
       extractPostgresVersionDetails(postgresVersionSelection)
 
-    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const { smartGroup = [], specific = [] } = {}
     const selectedRegion = smartRegionEnabled
       ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
       : undefined
@@ -447,18 +415,6 @@ const Wizard: NextPageWithLayout = () => {
     if (slug && slug !== '_') form.setValue('organization', slug)
     if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
-
-  useEffect(() => {
-    if (form.getValues('dbRegion') === undefined && defaultRegion) {
-      form.setValue('dbRegion', defaultRegion)
-    }
-  }, [defaultRegion])
-
-  useEffect(() => {
-    if (regionError) {
-      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
-    }
-  }, [regionError])
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
@@ -886,20 +842,6 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    <Panel.Content>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="dbRegion"
-                        render={({ field }) => (
-                          <RegionSelector
-                            field={field}
-                            form={form}
-                            cloudProvider={form.getValues('cloudProvider') as CloudProvider}
-                          />
-                        )}
-                      />
-                    </Panel.Content>
-
                     {showPostgresVersionSelector && (
                       <Panel.Content>
                         <FormField_Shadcn_
@@ -968,27 +910,6 @@ const Wizard: NextPageWithLayout = () => {
                         installationId: currentOrg?.partner_id,
                         message: 'Visit Vercel to create a project',
                       }}
-                    />
-                  </Panel.Content>
-                ) : hasOutstandingInvoices ? (
-                  <Panel.Content>
-                    <Admonition
-                      type="default"
-                      title="Your organization has overdue invoices"
-                      description={
-                        <div className="space-y-3">
-                          <p className="text-sm leading-normal">
-                            Please resolve all outstanding invoices first before creating a new
-                            project
-                          </p>
-
-                          <div>
-                            <Button asChild type="default">
-                              <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
-                            </Button>
-                          </div>
-                        </div>
-                      }
                     />
                   </Panel.Content>
                 ) : null}

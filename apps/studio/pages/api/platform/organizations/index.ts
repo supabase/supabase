@@ -17,7 +17,10 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 
   if (createResponse.response.status !== 201) {
-    return res.status(createResponse.response.status).send(createResponse.error)
+    return res
+      .status(createResponse.response.status)
+      .setHeader('Content-Type', createResponse.error?.detail ? 'application/json' : 'text/plain')
+      .send(createResponse.error?.detail || createResponse.error)
   }
 
   const location = createResponse.response.headers.get('location')
@@ -25,7 +28,8 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(500).send('No location header')
   }
 
-  const slug = location.split('/').pop()
+  const slug = location.slice(0, -1).split('/').pop()
+  console.log(slug)
   const readResponse = await client.get('/organizations/{organization_slug}/', {
     params: {
       path: {
@@ -35,6 +39,7 @@ const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 
   if (readResponse.response.status !== 200 || !readResponse.data) {
+    console.log(readResponse.error)
     return res.status(readResponse.response.status).send(readResponse.error)
   }
 

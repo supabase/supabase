@@ -19,10 +19,22 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/check-cname',
   '/edge-functions/test',
   '/edge-functions/body',
+  '/telemetry/feature-flags',
+  '/telemetry/identify',
+  '/telemetry/event',
+  '/telemetry/page',
+  '/telemetry/page-leave',
+  '/signup',
+  '/signin',
+  '/profile',
+  '/profile/permissions',
+  '/profile/audit-login',
+  '/notifications/summary',
+  '/organizations'
 ]
 
 export function middleware(request: NextRequest) {
-  if (
+  /*if (
     IS_PLATFORM &&
     !HOSTED_SUPPORTED_API_URLS.some((url) => request.nextUrl.pathname.endsWith(url))
   ) {
@@ -30,5 +42,5 @@ export function middleware(request: NextRequest) {
       { success: false, message: 'Endpoint not supported on hosted' },
       { status: 404 }
     )
-  }
+  }*/
 }

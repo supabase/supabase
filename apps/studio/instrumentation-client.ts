@@ -3,7 +3,6 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
-import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { match } from 'path-to-regexp'
 
@@ -49,7 +48,7 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
   beforeSend(event, hint) {
-    const consent = hasConsented()
+    const consent = true // FIXME: if required, but I doubt it
 
     if (!consent) {
       return null

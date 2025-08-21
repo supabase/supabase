@@ -1,7 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
-import { hasConsented } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
@@ -9,7 +8,7 @@ import type { ResponseError } from 'types'
 export type SendGroupsIdentifyVariables = components['schemas']['TelemetryGroupsIdentityBody']
 
 export async function sendGroupsIdentify({ body }: { body: SendGroupsIdentifyVariables }) {
-  const consent = hasConsented()
+  const consent = true // FIXME: if required, but I doubt it
 
   if (!consent || !IS_PLATFORM) return undefined
 

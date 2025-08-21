@@ -3,6 +3,8 @@ const PUBLIC_URL = new URL(process.env.SUPABASE_PUBLIC_URL || 'http://localhost:
 export const IS_VELA_PLATFORM = process.env.PUBLIC_PLATFORM === 'vela'
 export const VELA_PLATFORM_URL = process.env.VELA_PLATFORM_URL
 
+export const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
+
 // Use LOGFLARE_URL until analytics/v1/ routing is supported
 export const PROJECT_ANALYTICS_URL = `${process.env.LOGFLARE_URL}/api/`
 

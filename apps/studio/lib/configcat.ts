@@ -30,10 +30,10 @@ async function getClient() {
 }
 
 export async function getFlags(userEmail: string = '') {
-  if (userEmail) {
+  /*if (userEmail) {
     const client = await getClient()
     return client.getAllValuesAsync(new configcat.User(userEmail))
-  }
+  }*/  // FIXME: can be reactivated later if required
 
   return []
 }

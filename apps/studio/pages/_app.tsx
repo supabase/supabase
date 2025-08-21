@@ -46,7 +46,7 @@ import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
 import { getFlags as getConfigCatFlags } from 'lib/configcat'
-import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { API_URL, BASE_PATH, IS_PLATFORM, IS_VELA_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
 import { AppPropsWithLayout } from 'types'
@@ -103,7 +103,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
             <AuthProvider>
               <FeatureFlagProvider
                 API_URL={API_URL}
-                enabled={IS_PLATFORM}
+                enabled={IS_PLATFORM  && !IS_VELA_PLATFORM}
                 getConfigCatFlags={getConfigCatFlags}
               >
                 <ProfileProvider>

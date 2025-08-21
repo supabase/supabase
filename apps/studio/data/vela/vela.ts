@@ -73,7 +73,12 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
 
       const headers = mergeHeaders(req, origHeaders)
       return velaClient.GET(url, {
-        ...init,
+        ...init.reduce((acc, cur) => {
+          return {
+            ...acc,
+            ...cur
+          }
+        }, {}),
         headers: headers,
       } as any)
     },
@@ -145,7 +150,12 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
 
       const headers = mergeHeaders(req, origHeaders)
       return velaClient.POST(url, {
-        ...init,
+        ...init.reduce((acc, cur) => {
+          return {
+            ...acc,
+            ...cur
+          }
+        }, {}),
         headers: headers,
       } as any)
     },

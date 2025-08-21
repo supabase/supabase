@@ -434,10 +434,6 @@
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
     },
-    "./consent": {
-      "import": "./src/consent.tsx",
-      "types": "./src/consent.tsx"
-    },
     "./form/FormItemLayout/FormItemLayout": {
       "import": "./src/form/FormItemLayout/FormItemLayout.tsx",
       "types": "./src/form/FormItemLayout/FormItemLayout.tsx"

@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react'
 
-import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
+import { FeatureFlagProvider, IS_PLATFORM, IS_VELA_PLATFORM, ThemeProvider } from 'common'
 import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import SiteLayout from '~/layouts/SiteLayout'
@@ -19,7 +19,7 @@ function GlobalProviders({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider>
       <AuthContainer>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM && !IS_VELA_PLATFORM}>
           <PageTelemetry />
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
