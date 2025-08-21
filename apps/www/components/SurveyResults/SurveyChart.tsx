@@ -186,7 +186,7 @@ export function SurveyChart({
   const [shouldAnimateBars, setShouldAnimateBars] = useState(false)
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
 
-  // Intersection observer to trigger chart xdata loading via database function
+  // Intersection observer to trigger chart data loading via database function
   useEffect(() => {
     const chartRefCurrent = chartRef.current
 
@@ -370,7 +370,7 @@ export function SurveyChart({
                 >
                   {displayData.map((item, index) => (
                     <div key={index} className="flex flex-col">
-                      {/*  Text above the bar */}
+                      {/* Text above the bar */}
                       <div
                         className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums transition-colors duration-300 ${
                           shouldAnimateBars
@@ -384,7 +384,7 @@ export function SurveyChart({
                         <span>{item.value < 1 ? '<1%' : `${item.value}%`}</span>
                       </div>
 
-                      {/* Entire bar (including background) */}
+                      {/* Progress bar */}
                       <div
                         className="h-4 relative overflow-hidden"
                         style={

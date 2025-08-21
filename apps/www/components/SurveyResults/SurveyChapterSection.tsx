@@ -23,12 +23,7 @@ interface SurveyChapterSectionProps {
   description: string
   stats?: Array<{ percent: number; label: string }>
   charts?: string[]
-  pullQuote?: {
-    quote: string
-    author: string
-    authorPosition: string
-    authorAvatar: string
-  }
+
   wordCloud?: {
     label: string
     words: { text: string; count: number }[]

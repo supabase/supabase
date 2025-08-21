@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import './surveyResults.css'
 
+const ROTATION_DURATION = 4000
+
 export function SurveySummarizedAnswer({ label, answers }: { label: string; answers: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -11,7 +13,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % answers.length)
-    }, 4000)
+    }, ROTATION_DURATION)
 
     return () => clearInterval(interval)
   }, [answers.length])
@@ -39,7 +41,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
     // Stop blinking when text changes
     const stopBlinkTimer = setTimeout(() => {
       setIsBlinking(false)
-    }, 4000)
+    }, ROTATION_DURATION)
 
     return () => {
       clearTimeout(startTimer)
