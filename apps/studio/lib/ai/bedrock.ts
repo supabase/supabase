@@ -1,8 +1,13 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
-import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
+import {
+  createCredentialChain,
+  fromNodeProviderChain,
+  fromTemporaryCredentials,
+} from '@aws-sdk/credential-providers'
 import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
 import { selectWeightedKey } from './util'
+import { getTokenProvider } from '@aws/bedrock-token-generator'
 
 const credentialProvider = createCredentialChain(
   // Vercel OIDC provider will be used for staging/production
@@ -41,6 +46,21 @@ export async function checkAwsCredentials() {
     return !!credentials
   } catch (error) {
     return false
+  }
+}
+
+export async function getAwsBearerToken() {
+  try {
+    const credentials = await credentialProvider()
+
+    const provideToken = getTokenProvider({
+      credentials,
+      region: 'us-west-2',
+    })
+
+    return await provideToken()
+  } catch (error) {
+    throw new Error('Failed to get AWS bearer token')
   }
 }
 
