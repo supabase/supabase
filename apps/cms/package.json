@@ -45,13 +45,12 @@
     "image-size": "2.0.2",
     "lucide-react": "^0.511.0",
     "next": "catalog:",
-    "optional": "^0.1.4",
     "payload": "3.50.0",
     "pg": "^8.16.3",
     "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "0.34.3",
+    "sharp": "0.30.4",
     "tailwind-merge": "^1.13.2"
   },
   "devDependencies": {
