@@ -79,6 +79,24 @@ export function planInvalidationsFromEvents(events: InvalidationEvent[]): Invali
 }
 
 /**
+ * Apply invalidation plan to QueryClient
+ */
+export async function applyInvalidationPlan(
+  queryClient: QueryClient,
+  plan: InvalidationAction[]
+): Promise<void> {
+  const promises = plan.map((action) =>
+    queryClient.invalidateQueries({
+      queryKey: action.key,
+      exact: action.exact,
+      refetchType: action.refetchType,
+    })
+  )
+
+  await Promise.allSettled(promises)
+}
+
+/**
  * Parse SQL statements and return all invalidation events
  * Uses libpg-query to handle multiple statements in a single call
  */
