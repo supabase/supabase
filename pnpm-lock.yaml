@@ -132,6 +132,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.3
         version: 1.2.3(@types/react@18.3.3)(react@18.3.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -190,9 +193,6 @@ importers:
         specifier: ~5.5.0
         version: 5.5.2
     devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 22.13.14
       '@types/react':
         specifier: 'catalog:'
         version: 18.3.3
