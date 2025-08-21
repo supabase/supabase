@@ -308,9 +308,9 @@ export const Customers: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 100,
-      },
+      // autosave: {
+      //   interval: 100,
+      // },
       schedulePublish: true,
     },
     maxPerDoc: 50,

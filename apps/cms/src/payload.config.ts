@@ -81,28 +81,6 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    livePreview: {
-      breakpoints: [
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1440,
-          height: 900,
-        },
-      ],
-    },
   },
   collections: [Authors, Categories, Customers, Events, Media, Posts, Tags, Users],
   editor: defaultLexical,
@@ -126,6 +104,8 @@ export default buildConfig({
   graphQL: {
     disable: process.env.NODE_ENV !== 'development', // Disable GraphQL in production for better performance
   },
+  // Reduce payload init overhead
+  telemetry: false,
   sharp,
   plugins,
 })

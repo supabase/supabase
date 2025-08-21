@@ -255,9 +255,9 @@ export const Posts: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 200,
-      },
+      // autosave: {
+      //   interval: 200,
+      // },
       // schedulePublish: true,
     },
     maxPerDoc: 50,
