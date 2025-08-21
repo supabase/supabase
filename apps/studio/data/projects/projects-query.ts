@@ -52,7 +52,7 @@ export const useProjectsQuery = <TData = ProjectsData>({
     projectKeys.list(),
     ({ signal }) => getProjects({ signal, orgSlug: slug }),
     {
-      enabled: enabled && profile !== undefined,
+      enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
       staleTime: 30 * 60 * 1000, // 30 minutes
       ...options,
     }

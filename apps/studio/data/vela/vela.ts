@@ -8,7 +8,7 @@ import createClient, {
 import { paths } from './vela-schema'
 import { VELA_PLATFORM_URL } from '../../pages/api/constants'
 import { NextApiRequest } from 'next'
-import type { MediaType, PathsWithMethod } from 'openapi-typescript-helpers'
+import type { HttpMethod, MediaType, PathsWithMethod } from 'openapi-typescript-helpers'
 
 export interface Client<Paths extends {}, Media extends MediaType = MediaType> {
   get: ClientMethod<Paths, 'get', Media>
@@ -39,6 +39,30 @@ const mergeHeaders = (req: NextApiRequest, headers: HeadersOptions[]) => {
   return newHeader as HeadersOptions
 }
 
+const prepareOptions = (
+  req: NextApiRequest,
+  init: object | object[],
+) => {
+  const origOptions = Array.isArray(init) ? init : [init]
+  const origHeaders = origOptions
+    .filter((x) => x !== undefined && 'headers' in x)
+    .map((x) => x?.headers)
+    .filter((x) => x !== undefined)
+
+  const headers = mergeHeaders(req, origHeaders)
+  const options = origOptions.reduce((acc, cur) => {
+    return {
+      ...acc,
+      ...cur,
+    }
+  }, {})
+
+  return {
+    ...options,
+    headers: headers,
+  } as any
+}
+
 export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${string}`> {
   return {
     delete<
@@ -48,16 +72,7 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['delete'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
-
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.DELETE(url, {
-        ...init,
-        headers: headers,
-      } as any)
+      return velaClient.DELETE(url, prepareOptions(req, init))
     },
     get<
       Path extends PathsWithMethod<paths, 'get'>,
@@ -66,21 +81,7 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['get'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
-
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.GET(url, {
-        ...init.reduce((acc, cur) => {
-          return {
-            ...acc,
-            ...cur
-          }
-        }, {}),
-        headers: headers,
-      } as any)
+      return velaClient.GET(url, prepareOptions(req, init))
     },
     head<
       Path extends PathsWithMethod<paths, 'head'>,
@@ -89,16 +90,7 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['head'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
-
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.HEAD(url, {
-        ...init,
-        headers: headers,
-      } as any)
+      return velaClient.HEAD(url, prepareOptions(req, init))
     },
     options<
       Path extends PathsWithMethod<paths, 'options'>,
@@ -107,16 +99,7 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['options'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
-
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.OPTIONS(url, {
-        ...init,
-        headers: headers,
-      } as any)
+      return velaClient.OPTIONS(url, prepareOptions(req, init))
     },
     patch<
       Path extends PathsWithMethod<paths, 'patch'>,
@@ -125,16 +108,7 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['patch'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
-
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.PATCH(url, {
-        ...init,
-        headers: headers,
-      } as any)
+      return velaClient.PATCH(url, prepareOptions(req, init))
     },
     post<
       Path extends PathsWithMethod<paths, 'post'>,
@@ -143,21 +117,8 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['post'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
 
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.POST(url, {
-        ...init.reduce((acc, cur) => {
-          return {
-            ...acc,
-            ...cur
-          }
-        }, {}),
-        headers: headers,
-      } as any)
+      return velaClient.POST(url, prepareOptions(req, init))
     },
     put<
       Path extends PathsWithMethod<paths, 'put'>,
@@ -166,16 +127,7 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['put'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
-
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.PUT(url, {
-        ...init,
-        headers: headers,
-      } as any)
+      return velaClient.PUT(url, prepareOptions(req, init))
     },
     trace<
       Path extends PathsWithMethod<paths, 'trace'>,
@@ -184,58 +136,8 @@ export function getVelaClient(req: NextApiRequest): Client<paths, `${string}/${s
       url: Path,
       ...init: InitParam<Init>
     ): Promise<FetchResponse<paths[Path]['trace'], Init, `${string}/${string}`>> {
-      const origHeaders = init
-        .filter((x) => x !== undefined && 'headers' in x)
-        .map((x) => x?.headers)
-        .filter((x) => x !== undefined)
-
-      const headers = mergeHeaders(req, origHeaders)
-      return velaClient.TRACE(url, {
-        ...init,
-        headers: headers,
-      } as any)
+      return velaClient.TRACE(url, prepareOptions(req, init))
     },
-  }
-}
-
-export function mustOrganizationId(req: NextApiRequest): number {
-  const fromCookie = getOrganizationCookie(req)
-  if (fromCookie !== -1) return fromCookie
-
-  const header = req.headers['X-Vela-Organization-Id']
-  if (!header) {
-    throw new Error('Organization id not found')
-  }
-
-  if (typeof header !== 'string') {
-    throw new Error('Organization id is not a string')
-  }
-
-  try {
-    return parseInt(header)
-  } catch (e) {
-    throw new Error('Organization id is not a number')
-  }
-}
-
-export function mustProjectId(req: NextApiRequest): number {
-  const fromCookie = getProjectCookie(req)
-  if (fromCookie !== -1) return fromCookie
-
-  const header = req.headers['X-Vela-Project-Id']
-  if (!header) {
-    throw new Error('Project id not found')
-  }
-
-  if (typeof header !== 'string') {
-    throw new Error('Project id is not a string')
-  }
-
-  try {
-    console.log('header', header)
-    return parseInt(header)
-  } catch (e) {
-    throw new Error('Project id is not a number')
   }
 }
 
