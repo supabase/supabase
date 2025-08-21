@@ -2,7 +2,6 @@ import { Smartphone } from 'lucide-react'
 
 import { TOTPFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
@@ -76,9 +75,7 @@ Security.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout title="Security">
-          <AccountSettingsLayout>{page}</AccountSettingsLayout>
-        </AccountLayout>
+        <AccountLayout title="Security">{page}</AccountLayout>
       </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>
