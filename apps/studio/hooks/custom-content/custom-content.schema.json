@@ -65,8 +65,7 @@
                 "type": "array",
                 "properties": {
                   "name": { "type": "string" },
-                  "content": { "type": "string" },
-                  "format": { "type": "string" }
+                  "content": { "type": "string" }
                 }
               }
             }
