@@ -62,8 +62,8 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
         <div
           className={cn(
             'absolute inset-0 pointer-events-none z-10',
-            'before:absolute before:top-0 before:right-0 before:bottom-0 before:w-4 before:bg-gradient-to-l before:from-black/20 before:to-transparent before:opacity-0 before:transition-opacity before:duration-200',
-            'after:absolute after:top-0 after:left-0 after:bottom-0 after:w-4 after:bg-gradient-to-r after:from-black/20 after:to-transparent after:opacity-0 after:transition-opacity after:duration-200',
+            'before:absolute before:top-0 before:right-0 before:bottom-0 before:w-6 before:bg-gradient-to-l before:from-black/20 before:to-transparent before:opacity-0 before:transition-all before:duration-400 before:easing-[0.24, 0.25, 0.05, 1]',
+            'after:absolute after:top-0 after:left-0 after:bottom-0 after:w-6 after:bg-gradient-to-r after:from-black/20 after:to-transparent after:opacity-0 after:transition-all after:duration-400 after:easing-[0.24, 0.25, 0.05, 1]',
             hasHorizontalScroll && 'hover:before:opacity-100 hover:after:opacity-100',
             canScrollRight && 'before:opacity-100',
             canScrollLeft && 'after:opacity-100'
