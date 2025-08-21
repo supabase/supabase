@@ -81,7 +81,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const content = parsedContent.content
-    const tocDepth = (parsedContent.data as any)?.toc_depth ?? 2
+    const tocDepth = (parsedContent.data as any)?.toc_depth ?? 3
     const mdxSource = await mdxSerialize(content, { tocDepth })
     const blogPost = { ...parsedContent.data }
 
@@ -140,7 +140,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       if (!publishedPost) return null
 
       const mdxSource = await mdxSerialize(publishedPost.content || '', {
-        tocDepth: publishedPost.toc_depth || 2,
+        tocDepth: publishedPost.toc_depth || 3,
       })
       const tocResult = (mdxSource as any).scope?.toc || publishedPost.toc || { content: '' }
       const props: BlogPostPageProps = {
@@ -164,7 +164,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
     return null
   }
 
-  const tocDepth = cmsPost.toc_depth || 2
+  const tocDepth = cmsPost.toc_depth || 3
   const mdxSource = await mdxSerialize(cmsPost.content || '', { tocDepth })
   const tocResult = (mdxSource as any).scope?.toc || cmsPost.toc || { content: '' }
 
@@ -179,7 +179,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       isCMS: true,
       content: mdxSource,
       toc: tocResult,
-      toc_depth: cmsPost.toc_depth || 2,
+      toc_depth: cmsPost.toc_depth || 3,
       image: cmsPost.image ?? undefined,
       thumb: cmsPost.thumb ?? undefined,
     } as any,

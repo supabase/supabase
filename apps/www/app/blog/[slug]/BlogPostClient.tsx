@@ -82,7 +82,7 @@ export default function BlogPostClient(props: BlogPostPageProps) {
       }
 
       if (markdownContent) {
-        const tocDepth = (livePreviewData as any).toc_depth || (props.blog as any).toc_depth || 2
+        const tocDepth = (livePreviewData as any).toc_depth || (props.blog as any).toc_depth || 3
 
         generateTocFromMarkdown(markdownContent, tocDepth)
           .then((tocResult) => {
@@ -171,7 +171,7 @@ export default function BlogPostClient(props: BlogPostPageProps) {
           authors: processedAuthors,
           // Use processed TOC if available, otherwise fall back to original
           toc: processedToc || props.blog.toc,
-          toc_depth: (livePreviewData as any).toc_depth || props.blog.toc_depth || 2,
+          toc_depth: (livePreviewData as any).toc_depth || props.blog.toc_depth || 3,
         }
         return processedLivePreviewData
       }
