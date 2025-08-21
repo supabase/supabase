@@ -811,7 +811,7 @@ The `realtime.send` function provides the most flexibility by allowing you to br
 
 ```sql
 SELECT realtime.send (
-	to_jsonb ('{}'::text), -- JSONB Payload
+	'{}'::jsonb, -- JSONB Payload
 	'event', -- Event name
 	'topic', -- Topic
 	FALSE -- Public / Private flag

@@ -50,6 +50,7 @@ const RowLoading = () => (
 )
 
 const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2'
+
 const TableContainer = ({ children }: { children: React.ReactNode }) => (
   <Card className="w-full overflow-hidden">
     <CardContent className="p-0">
@@ -151,13 +152,15 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         {filteredTokens?.map((x) => {
           return (
             <TableRow key={x.token_alias}>
-              <TableCell className="w-48">
-                <p className="truncate">{x.name}</p>
+              <TableCell className="w-36 max-w-36">
+                <p className="truncate" title={x.name}>
+                  {x.name}
+                </p>
               </TableCell>
-              <TableCell>
-                <span className="font-mono text-foreground-light">{x.token_alias}</span>
+              <TableCell className="max-w-96">
+                <p className="font-mono text-foreground-light truncate">{x.token_alias}</p>
               </TableCell>
-              <TableCell>
+              <TableCell className="min-w-32">
                 <p className="text-foreground-light">
                   {x.last_used_at ? (
                     <Tooltip>
@@ -171,7 +174,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                   )}
                 </p>
               </TableCell>
-              <TableCell>
+              <TableCell className="min-w-32">
                 {x.expires_at ? (
                   dayjs(x.expires_at).isBefore(dayjs()) ? (
                     <Tooltip>
