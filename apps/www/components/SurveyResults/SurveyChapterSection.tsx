@@ -43,12 +43,10 @@ interface SurveyChapterSectionProps {
 }
 
 export function SurveyChapterSection({
-  number,
   title,
   description,
   stats,
   charts,
-  pullQuote,
   wordCloud,
   summarizedAnswer,
   rankedAnswersPair,
