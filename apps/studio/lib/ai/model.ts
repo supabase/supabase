@@ -1,6 +1,6 @@
-import { openai, createOpenAI } from '@ai-sdk/openai'
+import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
-import { checkAwsCredentials, createRoutedBedrock, getAwsBearerToken } from './bedrock'
+import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 
 // Default behaviour here is to be throttled (e.g if this env var is not available, IS_THROTTLED should be true, unless specified 'false')
 const IS_THROTTLED = process.env.IS_THROTTLED !== 'false'
@@ -38,18 +38,9 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
 
   if (hasAwsBedrockRoleArn && hasAwsCredentials) {
     const bedrockModel = IS_THROTTLED || isLimited ? BEDROCK_NORMAL_MODEL : BEDROCK_PRO_MODEL
-    const bedrock = createRoutedBedrock(routingKey)
-    const bedrockTempToken = await getAwsBearerToken()
-
-    const bedrockOpenAI = createOpenAI({
-      baseURL: 'https://bedrock-runtime.us-west-2.amazonaws.com/openai/v1',
-      apiKey: bedrockTempToken,
-    })
-
-    const model =
-      bedrockModel === BEDROCK_NORMAL_MODEL
-        ? bedrockOpenAI(bedrockModel)
-        : await bedrock(bedrockModel)
+    const useOpenAI = bedrockModel === BEDROCK_NORMAL_MODEL
+    const bedrock = createRoutedBedrock(routingKey, useOpenAI)
+    const model = await bedrock(bedrockModel)
 
     return {
       model,

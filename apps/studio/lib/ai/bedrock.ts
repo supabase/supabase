@@ -1,4 +1,5 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
+import { createOpenAI } from '@ai-sdk/openai'
 import {
   createCredentialChain,
   fromNodeProviderChain,
@@ -105,12 +106,12 @@ const modelRegionWeights: Record<BedrockModel, RegionWeights> = {
 
 /**
  * Creates a Bedrock client that routes requests to different regions
- * based on a routing key.
+ * based on a routing key, with optional OpenAI support.
  *
  * Used to load balance requests across multiple regions depending on
  * their capacities.
  */
-export function createRoutedBedrock(routingKey?: string) {
+export function createRoutedBedrock(routingKey?: string, useOpenAI = false) {
   return async (modelId: BedrockModel) => {
     const regionWeights = modelRegionWeights[modelId]
 
@@ -122,6 +123,18 @@ export function createRoutedBedrock(routingKey?: string) {
         regionWeights['use1'] > 0
         ? 'use1'
         : 'usw2'
+
+    if (useOpenAI) {
+      const bedrockTempToken = await getAwsBearerToken()
+      const region = bedrockRegionMap[bedrockRegion]
+      
+      const bedrockOpenAI = createOpenAI({
+        baseURL: `https://bedrock-runtime.${region}.amazonaws.com/openai/v1`,
+        apiKey: bedrockTempToken,
+      })
+
+      return bedrockOpenAI(modelId)
+    }
 
     const bedrock = createAmazonBedrock({
       credentialProvider,
