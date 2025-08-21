@@ -1,10 +1,6 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { createOpenAI } from '@ai-sdk/openai'
-import {
-  createCredentialChain,
-  fromNodeProviderChain,
-  fromTemporaryCredentials,
-} from '@aws-sdk/credential-providers'
+import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
 import { selectWeightedKey } from './util'
@@ -127,7 +123,7 @@ export function createRoutedBedrock(routingKey?: string, useOpenAI = false) {
     if (useOpenAI) {
       const bedrockTempToken = await getAwsBearerToken()
       const region = bedrockRegionMap[bedrockRegion]
-      
+
       const bedrockOpenAI = createOpenAI({
         baseURL: `https://bedrock-runtime.${region}.amazonaws.com/openai/v1`,
         apiKey: bedrockTempToken,
