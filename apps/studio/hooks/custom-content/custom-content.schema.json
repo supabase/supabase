@@ -24,8 +24,21 @@
           }
         }
       }
+    },
+    "project_homepage:example_projects": {
+      "type": ["array", "null"],
+      "description": "Renders a provided set of example projects under the project's home page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "iconUrl": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
     }
   },
-  "required": ["organization:legal_documents"],
+  "required": ["organization:legal_documents", "project_homepage:example_projects"],
   "additionalProperties": false
 }
