@@ -119,12 +119,14 @@ export const generateProductRoutes = (
 export const generateOtherRoutes = (
   ref?: string,
   project?: Project,
-  features?: { unifiedLogs?: boolean }
+  features?: { unifiedLogs?: boolean; showReports?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
-  const unifiedLogsEnabled = features?.unifiedLogs ?? false
+  const { unifiedLogs, showReports } = features ?? {}
+  const unifiedLogsEnabled = unifiedLogs ?? false
+  const reportsEnabled = showReports ?? true
 
   return [
     {
@@ -133,7 +135,7 @@ export const generateOtherRoutes = (
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
-    ...(IS_PLATFORM
+    ...(IS_PLATFORM && reportsEnabled
       ? [
           {
             key: 'reports',
