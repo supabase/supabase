@@ -10,10 +10,8 @@ import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
-import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -25,9 +23,6 @@ export const DisplayApiSettings = ({
   showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
-  const { projectSettingsShowDisableLegacyApiKeys } = useIsFeatureEnabled([
-    'project_settings:show_disable_legacy_api_keys',
-  ])
 
   const {
     data: settings,
@@ -74,151 +69,145 @@ export const DisplayApiSettings = ({
   }, [lastUsedLogData, apiKeys])
 
   return (
-    <>
-      <Panel
-        noMargin
-        title={
-          showTitle && (
-            <div className="space-y-3">
-              <h5 className="text-base">Project API Keys</h5>
-              <p className="text-sm text-foreground-light">
-                Your API is secured behind an API gateway which requires an API Key for every
-                request.
-                <br />
-                You can use the keys below in the Supabase client libraries.
-                <br />
-              </p>
-            </div>
-          )
-        }
-      >
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8 space-x-2">
-            <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
-            <p className="text-sm text-foreground-light">Retrieving API keys</p>
-          </div>
-        ) : !canReadAPIKeys ? (
-          <div className="flex items-center py-8 px-8 space-x-2">
-            <AlertCircle size={16} strokeWidth={1.5} />
+    <Panel
+      noMargin
+      title={
+        showTitle && (
+          <div className="space-y-3">
+            <h5 className="text-base">Project API Keys</h5>
             <p className="text-sm text-foreground-light">
-              You don't have permission to view API keys. These keys restricted to users with higher
-              access levels.
+              Your API is secured behind an API gateway which requires an API Key for every request.
+              <br />
+              You can use the keys below in the Supabase client libraries.
+              <br />
             </p>
           </div>
-        ) : isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-          <div className="flex items-center justify-center py-8 space-x-2">
-            <AlertCircle size={16} strokeWidth={1.5} />
-            <p className="text-sm text-foreground-light">
-              {isProjectSettingsError
-                ? 'Failed to retrieve API keys'
-                : 'Failed to update JWT secret'}
-            </p>
-          </div>
-        ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-          <div className="flex items-center justify-center py-8 space-x-2">
-            <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
-            <p className="text-sm text-foreground-light">
-              {isProjectSettingsLoading || isApiKeysEmpty
-                ? 'Retrieving API keys'
-                : 'JWT secret is being updated'}
-            </p>
-          </div>
-        ) : (
-          apiKeys.map((x, i: number) => (
-            <Panel.Content
-              key={x.api_key}
-              className={
-                i >= 1 &&
-                'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
-              }
-            >
-              <Input
-                readOnly
-                disabled
-                layout="horizontal"
-                className="input-mono"
-                // @ts-ignore
-                label={
-                  <>
-                    {x.tags?.split(',').map((x, i: number) => (
-                      <code key={`${x}${i}`} className="text-xs text-code">
-                        {x}
+        )
+      }
+    >
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">Retrieving API keys</p>
+        </div>
+      ) : !canReadAPIKeys ? (
+        <div className="flex items-center py-8 px-8 space-x-2">
+          <AlertCircle size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">
+            You don't have permission to view API keys. These keys restricted to users with higher
+            access levels.
+          </p>
+        </div>
+      ) : isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <AlertCircle size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">
+            {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
+          </p>
+        </div>
+      ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">
+            {isProjectSettingsLoading || isApiKeysEmpty
+              ? 'Retrieving API keys'
+              : 'JWT secret is being updated'}
+          </p>
+        </div>
+      ) : (
+        apiKeys.map((x, i: number) => (
+          <Panel.Content
+            key={x.api_key}
+            className={
+              i >= 1 &&
+              'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
+            }
+          >
+            <Input
+              readOnly
+              disabled
+              layout="horizontal"
+              className="input-mono"
+              // @ts-ignore
+              label={
+                <>
+                  {x.tags?.split(',').map((x, i: number) => (
+                    <code key={`${x}${i}`} className="text-xs text-code">
+                      {x}
+                    </code>
+                  ))}
+                  {x.tags === 'service_role' && (
+                    <>
+                      <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
+                        secret
                       </code>
-                    ))}
-                    {x.tags === 'service_role' && (
-                      <>
-                        <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
-                          secret
-                        </code>
-                      </>
+                    </>
+                  )}
+                  {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
+                </>
+              }
+              copy={canReadAPIKeys && isNotUpdatingJwtSecret}
+              reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+              value={
+                !canReadAPIKeys
+                  ? 'You need additional permissions to view API keys'
+                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                    ? 'JWT secret update failed, new API key may have issues'
+                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                      ? 'Updating JWT secret...'
+                      : x?.api_key ?? 'You need additional permissions to view API keys'
+              }
+              onChange={() => {}}
+              descriptionText={
+                x.tags === 'service_role' ? (
+                  <>
+                    This key has the ability to bypass Row Level Security. Never share it publicly.
+                    If leaked, generate a new JWT secret immediately.{' '}
+                    {showLegacyText && (
+                      <span>
+                        Prefer using{' '}
+                        <Link
+                          href={`/project/${projectRef}/settings/api-keys/new`}
+                          className="text-link underline"
+                        >
+                          Secret API keys
+                        </Link>{' '}
+                        instead.
+                      </span>
                     )}
-                    {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
                   </>
-                }
-                copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-                reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
-                value={
-                  !canReadAPIKeys
-                    ? 'You need additional permissions to view API keys'
-                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                      ? 'JWT secret update failed, new API key may have issues'
-                      : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                        ? 'Updating JWT secret...'
-                        : x?.api_key ?? 'You need additional permissions to view API keys'
-                }
-                onChange={() => {}}
-                descriptionText={
-                  x.tags === 'service_role' ? (
-                    <>
-                      This key has the ability to bypass Row Level Security. Never share it
-                      publicly. If leaked, generate a new JWT secret immediately.{' '}
-                      {showLegacyText && (
-                        <span>
-                          Prefer using{' '}
-                          <Link
-                            href={`/project/${projectRef}/settings/api-keys/new`}
-                            className="text-link underline"
-                          >
-                            Secret API keys
-                          </Link>{' '}
-                          instead.
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      This key is safe to use in a browser if you have enabled Row Level Security
-                      for your tables and configured policies.{' '}
-                      {showLegacyText && (
-                        <span>
-                          Prefer using{' '}
-                          <Link
-                            href={`/project/${projectRef}/settings/api-keys/new`}
-                            className="text-link underline"
-                          >
-                            Publishable API keys
-                          </Link>{' '}
-                          instead.
-                        </span>
-                      )}
-                    </>
-                  )
-                }
-              />
+                ) : (
+                  <>
+                    This key is safe to use in a browser if you have enabled Row Level Security for
+                    your tables and configured policies.{' '}
+                    {showLegacyText && (
+                      <span>
+                        Prefer using{' '}
+                        <Link
+                          href={`/project/${projectRef}/settings/api-keys/new`}
+                          className="text-link underline"
+                        >
+                          Publishable API keys
+                        </Link>{' '}
+                        instead.
+                      </span>
+                    )}
+                  </>
+                )
+              }
+            />
 
-              <div
-                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
-                data-invisible={isLoadingLastUsed}
-              >
-                {lastUsedAPIKeys[x.api_key]
-                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                  : 'No requests in the past 24 hours.'}
-              </div>
-            </Panel.Content>
-          ))
-        )}
-      </Panel>
-
+            <div
+              className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+              data-invisible={isLoadingLastUsed}
+            >
+              {lastUsedAPIKeys[x.api_key]
+                ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                : 'No requests in the past 24 hours.'}
+            </div>
+          </Panel.Content>
+        ))
+      )}
       {showNotice ? (
         <Panel.Notice
           className="border-t"
@@ -230,9 +219,7 @@ export const DisplayApiSettings = ({
           href="https://github.com/orgs/supabase/discussions/29260"
           buttonText="Read the announcement"
         />
-      ) : projectSettingsShowDisableLegacyApiKeys ? (
-        <ToggleLegacyApiKeysPanel />
       ) : null}
-    </>
+    </Panel>
   )
 }

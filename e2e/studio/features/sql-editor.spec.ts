@@ -5,6 +5,7 @@ import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
 import { waitForApiResponse } from '../utils/wait-for-response'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout'
+import { resetLocalStorage } from '../utils/reset-local-storage'
 
 const sqlSnippetName = 'pw_sql_snippet'
 const sqlSnippetNameDuplicate = 'pw_sql_snippet (Duplicate)'
@@ -58,10 +59,7 @@ test.describe('SQL Editor', () => {
     page = await browser.newPage()
     await page.goto(toUrl(`/project/${ref}/sql/new?skip=true`))
 
-    await page.evaluate((ref) => {
-      localStorage.removeItem('dashboard-history-default')
-      localStorage.removeItem(`dashboard-history-${ref}`)
-    }, ref)
+    await resetLocalStorage(page, ref)
 
     // intercept AI title generation to prevent flaky tests
     await page.route('**/dashboard/api/ai/sql/title-v2', async (route) => {
