@@ -5,5 +5,7 @@
 
   "project_homepage:example_projects": null,
 
-  "logs:default_query": null
+  "logs:default_query": null,
+
+  "connect:frameworks": null
 }
