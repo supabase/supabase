@@ -6,6 +6,8 @@ export const integrationKeys = {
     ['organizations', organization_integration_id, 'vercel-projects'] as const,
   vercelConnectionsList: (organization_integration_id: string | undefined) =>
     ['organizations', organization_integration_id, 'vercel-connections'] as const,
+  projectVercelConnections: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'vercel-connections'] as const,
   githubBranch: (
     organization_integration_id: string | undefined,
     repo_owner: string,

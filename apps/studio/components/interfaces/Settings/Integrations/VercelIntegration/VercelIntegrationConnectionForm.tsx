@@ -27,7 +27,7 @@ import {
   Switch,
 } from 'ui'
 
-const VercelIntegrationConnectionForm = ({
+export const VercelIntegrationConnectionForm = ({
   disabled,
   connection,
   integration,
@@ -272,5 +272,3 @@ const VercelIntegrationConnectionForm = ({
     </Form_Shadcn_>
   )
 }
-
-export default VercelIntegrationConnectionForm
