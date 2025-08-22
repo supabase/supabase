@@ -322,7 +322,7 @@ const ParticipantsList = () => {
         </p>
       </div>
 
-      <ul className="flex flex-wrap items-center justify-center gap-4 gap-y-4 md:gap-8 max-w-7xl mx-auto px-4">
+      <ul className="flex flex-wrap items-center justify-center gap-5 md:gap-7 max-w-7xl mx-auto px-4">
         {shuffledParticipants.map((participant, index) => (
           <li key={participant.company} className="">
             <Link
