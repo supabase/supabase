@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
-import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
+import { ClientLibrary } from 'components/interfaces/Home'
 import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
+import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { NewProjectPanel } from 'components/interfaces/Home/NewProjectPanel/NewProjectPanel'
 import { ProjectUsageSection } from 'components/interfaces/Home/ProjectUsageSection'
@@ -19,6 +20,7 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -49,6 +51,8 @@ const Home: NextPageWithLayout = () => {
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { ref, enableBranching } = useParams()
+
+  const { projectHomepageExampleProjects } = useCustomContent(['project_homepage:example_projects'])
 
   const {
     projectHomepageShowAllClientLibraries: showAllClientLibraries,
@@ -243,36 +247,46 @@ const Home: NextPageWithLayout = () => {
                     </div>
                   </div>
                   {showExamples && (
-                    <div className="space-y-8">
+                    <div className="flex flex-col gap-y-8">
                       <h4 className="text-lg">Example projects</h4>
-                      <div className="flex justify-center">
-                        <Tabs_Shadcn_ defaultValue="app" className="w-full">
-                          <TabsList_Shadcn_ className="flex gap-4 mb-8">
-                            <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
-                            <TabsTrigger_Shadcn_ value="mobile">
-                              Mobile Frameworks
-                            </TabsTrigger_Shadcn_>
-                          </TabsList_Shadcn_>
-                          <TabsContent_Shadcn_ value="app">
-                            <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                              {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
-                                .sort((a, b) => a.title.localeCompare(b.title))
-                                .map((project) => (
-                                  <ExampleProject key={project.url} {...project} />
-                                ))}
-                            </div>
-                          </TabsContent_Shadcn_>
-                          <TabsContent_Shadcn_ value="mobile">
-                            <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                              {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
-                                .sort((a, b) => a.title.localeCompare(b.title))
-                                .map((project) => (
-                                  <ExampleProject key={project.url} {...project} />
-                                ))}
-                            </div>
-                          </TabsContent_Shadcn_>
-                        </Tabs_Shadcn_>
-                      </div>
+                      {!!projectHomepageExampleProjects ? (
+                        <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                          {projectHomepageExampleProjects
+                            .sort((a, b) => a.title.localeCompare(b.title))
+                            .map((project) => (
+                              <ExampleProject key={project.url} {...project} />
+                            ))}
+                        </div>
+                      ) : (
+                        <div className="flex justify-center">
+                          <Tabs_Shadcn_ defaultValue="app" className="w-full">
+                            <TabsList_Shadcn_ className="flex gap-4 mb-8">
+                              <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
+                              <TabsTrigger_Shadcn_ value="mobile">
+                                Mobile Frameworks
+                              </TabsTrigger_Shadcn_>
+                            </TabsList_Shadcn_>
+                            <TabsContent_Shadcn_ value="app">
+                              <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                                {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
+                                  .sort((a, b) => a.title.localeCompare(b.title))
+                                  .map((project) => (
+                                    <ExampleProject key={project.url} {...project} />
+                                  ))}
+                              </div>
+                            </TabsContent_Shadcn_>
+                            <TabsContent_Shadcn_ value="mobile">
+                              <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                                {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
+                                  .sort((a, b) => a.title.localeCompare(b.title))
+                                  .map((project) => (
+                                    <ExampleProject key={project.url} {...project} />
+                                  ))}
+                              </div>
+                            </TabsContent_Shadcn_>
+                          </Tabs_Shadcn_>
+                        </div>
+                      )}
                     </div>
                   )}
                 </>
