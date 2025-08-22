@@ -60,37 +60,20 @@ const nextConfig = {
     // Optimize bundle sizes
     optimizePackageImports: ['lucide-react', '@heroicons/react'],
   },
-  // Exclude huge directories from being traced into serverless functions
+
+  /**
+   * Exclude huge directories from being traced into serverless functions
+   * to avoid the max size limit for Serverless Functions on Vercel:
+   * https://vercel.com/guides/troubleshooting-function-250mb-limit
+   */
   outputFileTracingExcludes: {
     '*': [
-      // Build-time only dependencies
-      // 'node_modules/@swc/**/*',
-      // 'node_modules/@esbuild/**/*',
-      // 'node_modules/rollup/**/*',
-      // // 'node_modules/webpack/**/*',
-      // 'node_modules/terser/**/*',
-      // // 'node_modules/@babel/**/*',
-      // 'node_modules/typescript/**/*',
-      // 'node_modules/@types/**/*',
-      // // Next.js build artifacts
+      // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
-      // // '.next/server/**/*.js.map',
       '.next/trace',
-      // // Static assets
+      // Static assets
       'public/**/*', // assets
-      // // Test and story files
-      // 'components/**/*.stories.*',
-      // 'components/**/*.test.*',
-      // '**/*.test.*',
-      // '**/*.spec.*',
-      // '**/*.stories.*',
-      // // Cache directories
-      // '**/node_modules/.cache/**/*',
-      // // Build-time Sentry plugin only
-      // '**/node_modules/@sentry/webpack-plugin/**/*',
-      // // Large optional dependencies
-      // '**/node_modules/framer-motion/**/*',
     ],
     // More conservative exclusions for blog pages
     '/blog/**/*': ['public/**/*', '.next/static/**/*'],
@@ -180,19 +163,6 @@ const nextConfig = {
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel.
     ignoreDuringBuilds: true,
-  },
-  webpack: (config, { webpack }) => {
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        __SENTRY_DEBUG__: false,
-        __SENTRY_TRACING__: false,
-        __RRWEB_EXCLUDE_IFRAME__: true,
-        __RRWEB_EXCLUDE_SHADOW_DOM__: true,
-        __SENTRY_EXCLUDE_REPLAY_WORKER__: true,
-      })
-    )
-    // return the modified config
-    return config
   },
 }
 
