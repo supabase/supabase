@@ -25,7 +25,6 @@
         }
       }
     },
-
     "project_homepage:example_projects": {
       "type": ["array", "null"],
       "description": "Renders a provided set of example projects under the project's home page",

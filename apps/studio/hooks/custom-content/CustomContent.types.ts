@@ -5,7 +5,6 @@ export type CustomContentTypes = {
     description: string
     action: { text: string; url: string }
   }[]
-
   projectHomepageExampleProjects: {
     title: string
     description: string
