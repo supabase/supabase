@@ -65,10 +65,10 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
       <div aria-hidden="true" className="w-24 h-1 relative overflow-hidden">
         {/* Background pattern for the entire bar */}
         <div
-          className="absolute inset-0 pointer-events-none bg-foreground-muted"
+          className="absolute inset-0 pointer-events-none bg-foreground-muted/80"
           style={{
-            maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
-            maskSize: '8px 8px',
+            maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
+            maskSize: '4px',
             maskRepeat: 'repeat',
             maskPosition: 'center',
           }}
@@ -89,7 +89,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
             className={`absolute inset-0 pointer-events-none bg-brand`}
             style={{
               maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
-              maskSize: '8px 8px',
+              maskSize: '4px',
               maskRepeat: 'repeat',
               maskPosition: 'center',
             }}

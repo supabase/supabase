@@ -20,8 +20,8 @@ export function SurveyRankedAnswersPair({
                 key={answerIndex}
                 className={`${['h-20 md:h-32', 'h-12 md:h-20', 'h-4 md:h-8'][answerIndex] || 'hidden'} w-full pointer-events-none ${['bg-brand', 'bg-brand-500', 'bg-brand-300'][answerIndex] || 'bg-brand-300'}`}
                 style={{
-                  maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
-                  maskSize: '14.5px 15px',
+                  maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
+                  maskSize: '4px',
                   maskRepeat: 'repeat',
                   maskPosition: 'top left',
                 }}

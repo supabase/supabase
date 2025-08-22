@@ -45,8 +45,8 @@ export function DecorativeProgressBar({
           <div
             className={`${bar.height} w-full ${bar.bgColor}`}
             style={{
-              maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
-              maskSize: '15px 15px',
+              maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
+              maskSize: '4px',
               maskRepeat: 'repeat',
               maskPosition: 'center',
             }}
@@ -56,8 +56,8 @@ export function DecorativeProgressBar({
           <div
             className={`absolute inset-0 ${bar.height} w-full ${bar.fgColor}`}
             style={{
-              maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
-              maskSize: '14.5px 15px',
+              maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
+              maskSize: '4px',
               maskRepeat: 'repeat',
               maskPosition: 'top left',
               animation: `terminalLine 10s steps(8, end) ${bar.animationDelay} infinite ${reverse ? 'reverse' : ''}`,

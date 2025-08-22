@@ -7,8 +7,8 @@ export function SurveySectionBreak({ className }: { className?: string }) {
         <div
           className="h-14 md:h-18 lg:h-20 xl:h-24 bg-surface-400 dark:bg-surface-75"
           style={{
-            maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
-            maskSize: '15px 15px',
+            maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
+            maskSize: '4px', // Match maskSize in SurveyPullQuote
             maskRepeat: 'repeat',
             maskPosition: 'top left',
           }}
