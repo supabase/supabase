@@ -1,9 +1,9 @@
 import { components } from './vela-schema'
-import { Organization } from '../../types/index'
+import { Organization } from '../../types'
 import { Project } from '../projects/project-detail-query'
 
 export type VelaOrganization = components['schemas']['Organization']
-export type VelaProject = components['schemas']['Project']
+export type VelaProject = components['schemas']['ProjectPublic']
 
 export function mapOrganization(organization: VelaOrganization): Organization {
   return {

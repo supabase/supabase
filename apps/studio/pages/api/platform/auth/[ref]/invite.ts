@@ -1,40 +1,68 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { apiBuilder } from '../../../../../lib/api/apiBuilder'
+import { IS_VELA_PLATFORM } from 'lib/constants'
+import { GOTRUE_URL } from '../../../constants'
 
-import { fetchPost } from 'data/fetchers'
-import { constructHeaders } from 'lib/api/apiHelpers'
-import apiWrapper from 'lib/api/apiWrapper'
+interface InviteRequest {
+  orgSlug?: string
+  projectRef: string
+  email: string
+}
 
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
+interface InviteResponse {
+  id: string
+  invited_email: string
+  invited_at: string
+  role_id: number
+}
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+interface goTrueInviteRequest {
+  email: string
+}
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req, res)
-    default:
-      res.setHeader('Allow', ['POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
+interface goTrueInviteResponse {
+  id: string
+  email: string
+  confirmation_sent_at: string
+  created_at: string
+  updated_at: string
+  invited_at: string
 }
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const headers = constructHeaders({
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-  })
-  const url = `${process.env.SUPABASE_URL}/auth/v1/invite`
-  const payload = { email: req.body.email }
-
-  const response = await fetchPost(url, payload, { headers })
-  if (response.error) {
-    const { code, message } = response.error
-    return res.status(code).json({ message })
-  } else {
-    return res.status(200).json(response)
+  if (!IS_VELA_PLATFORM) {
+    return res
+      .status(400)
+      .json({ error: { message: 'This endpoint is only available on Vela Platform' } })
   }
+
+  const request = req.body as InviteRequest
+  const inviteRequest: goTrueInviteRequest = {
+    email: request.email,
+  }
+
+  const response = await fetch(`${GOTRUE_URL}/invite`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(inviteRequest),
+  })
+
+  if (response.status !== 200) {
+    return res.status(response.status).send(response.body)
+  }
+
+  const data = (await response.json()) as goTrueInviteResponse
+  console.log(JSON.stringify(data, null, 2))
+  return res.status(200).json({
+    id: data.id,
+    invited_at: data.invited_at,
+    invited_email: data.email,
+    role_id: 0, // FIXME don't know the role id
+  } as InviteResponse)
 }
+
+const apiHandler = apiBuilder((builder) => builder.useAuth().post(handlePost))
+
+export default apiHandler
