@@ -58,14 +58,13 @@ const nextConfig = {
     // needed to make the octokit packages work in /changelog
     esmExternals: 'loose',
   },
-
   /**
    * Exclude huge directories from being traced into serverless functions
    * to avoid the max size limit for Serverless Functions on Vercel:
    * https://vercel.com/guides/troubleshooting-function-250mb-limit
    */
   outputFileTracingExcludes: {
-    '/blog/**/*': [
+    '*': [
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
