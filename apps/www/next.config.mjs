@@ -64,33 +64,33 @@ const nextConfig = {
   outputFileTracingExcludes: {
     '*': [
       // Build-time only dependencies
-      'node_modules/@swc/**/*',
-      'node_modules/@esbuild/**/*',
-      'node_modules/rollup/**/*',
-      // 'node_modules/webpack/**/*',
-      'node_modules/terser/**/*',
-      // 'node_modules/@babel/**/*',
-      'node_modules/typescript/**/*',
-      'node_modules/@types/**/*',
-      // Next.js build artifacts
-      '.next/cache/**/*',
-      '.next/static/**/*',
-      // '.next/server/**/*.js.map',
-      '.next/trace',
-      // Static assets
-      'public/**/*',
-      // Test and story files
-      'components/**/*.stories.*',
-      'components/**/*.test.*',
-      '**/*.test.*',
-      '**/*.spec.*',
-      '**/*.stories.*',
-      // Cache directories
-      '**/node_modules/.cache/**/*',
-      // Build-time Sentry plugin only
-      '**/node_modules/@sentry/webpack-plugin/**/*',
-      // Large optional dependencies
-      '**/node_modules/framer-motion/**/*',
+      // 'node_modules/@swc/**/*',
+      // 'node_modules/@esbuild/**/*',
+      // 'node_modules/rollup/**/*',
+      // // 'node_modules/webpack/**/*',
+      // 'node_modules/terser/**/*',
+      // // 'node_modules/@babel/**/*',
+      // 'node_modules/typescript/**/*',
+      // 'node_modules/@types/**/*',
+      // // Next.js build artifacts
+      // '.next/cache/**/*',
+      // '.next/static/**/*',
+      // // '.next/server/**/*.js.map',
+      // '.next/trace',
+      // // Static assets
+      // 'public/**/*',
+      // // Test and story files
+      // 'components/**/*.stories.*',
+      // 'components/**/*.test.*',
+      // '**/*.test.*',
+      // '**/*.spec.*',
+      // '**/*.stories.*',
+      // // Cache directories
+      // '**/node_modules/.cache/**/*',
+      // // Build-time Sentry plugin only
+      // '**/node_modules/@sentry/webpack-plugin/**/*',
+      // // Large optional dependencies
+      // '**/node_modules/framer-motion/**/*',
     ],
     // More conservative exclusions for blog pages
     '/blog/**/*': ['public/**/*', '.next/static/**/*'],
