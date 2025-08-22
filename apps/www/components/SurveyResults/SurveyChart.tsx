@@ -317,7 +317,7 @@ export function SurveyChart({
     >
       <header className="px-8 py-8">
         <p className="text-foreground/30 text-sm font-mono uppercase tracking-widest">Q&A</p>
-        <h3 className="text-foreground text-xl tracking-tight">{title}</h3>
+        <h3 className="text-foreground text-xl tracking-tight text-balance">{title}</h3>
       </header>
 
       <div>
