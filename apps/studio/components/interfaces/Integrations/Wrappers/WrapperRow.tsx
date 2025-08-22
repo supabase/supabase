@@ -99,7 +99,14 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                 <Link href={`/project/${ref}/editor/${table.id}`}>
                   <Badge className="transition hover:bg-surface-300 pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem] border-l-0">
                     <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
-                    {table.schema}.{table.table_name}
+                    <Tooltip>
+                      <TooltipTrigger className="truncate max-w-28">
+                        {table.schema}.{table.table_name}
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-64 whitespace-pre-wrap break-words">
+                        {table.schema}.{table.table_name}
+                      </TooltipContent>
+                    </Tooltip>
                   </Badge>
                 </Link>
               </div>
