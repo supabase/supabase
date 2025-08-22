@@ -78,7 +78,7 @@ const nextConfig = {
       // // '.next/server/**/*.js.map',
       // '.next/trace',
       // // Static assets
-      // 'public/**/*',
+      'public/**/*',
       // // Test and story files
       // 'components/**/*.stories.*',
       // 'components/**/*.test.*',
