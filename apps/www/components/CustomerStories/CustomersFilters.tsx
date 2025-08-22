@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router'
+'use client'
+
+import { useRouter } from 'next/compat/router'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import type PostTypes from '~/types/post'
@@ -11,8 +13,9 @@ import {
   cn,
 } from 'ui'
 import { ChevronDown, X as CloseIcon } from 'lucide-react'
-import startCase from 'lodash/startCase'
+import { startCase } from 'lib/helpers'
 import { useBreakpoint } from 'common'
+import { usePathname } from 'next/navigation'
 
 interface Props {
   allCustomers: PostTypes[]
@@ -21,7 +24,7 @@ interface Props {
   products: { [key: string]: number }
 }
 
-export const useFilters = (initialIndustry: string, initialProduct: string) => {
+const useFilters = (initialIndustry: string, initialProduct: string) => {
   const router = useRouter()
   const [industry, setIndustry] = useState<string>(initialIndustry)
   const [product, setProduct] = useState<string>(initialProduct)
@@ -30,7 +33,7 @@ export const useFilters = (initialIndustry: string, initialProduct: string) => {
     const params = new URLSearchParams()
     if (industry !== 'all') params.set('industry', industry)
     if (product !== 'all') params.set('product', product)
-    router.replace({ pathname: '/customers', query: params.toString() }, undefined, {
+    router?.replace({ pathname: '/customers', query: params.toString() }, undefined, {
       shallow: true,
     })
   }
@@ -45,6 +48,7 @@ export const useFilters = (initialIndustry: string, initialProduct: string) => {
 function CustomerFilters({ allCustomers, setCustomers, industries, products }: Props) {
   const isMobile = useBreakpoint('sm')
   const router = useRouter()
+  const pathname = usePathname()
   const {
     industry: activeIndustry,
     setIndustry,
@@ -73,35 +77,37 @@ function CustomerFilters({ allCustomers, setCustomers, industries, products }: P
   }, [activeIndustry, activeProduct])
 
   const handleIndustryFilter = (selectedIndustry: string) => {
+    if (!router) return
     if (selectedIndustry === 'all') {
       setIndustry('all')
       const { industry, ...rest } = router.query
-      router.push({
-        pathname: router.pathname,
+      router?.push({
+        pathname: pathname,
         query: rest,
       })
     } else {
       setIndustry(selectedIndustry)
-      router.push({
-        pathname: router.pathname,
-        query: { ...router.query, industry: selectedIndustry },
+      router?.push({
+        pathname: pathname,
+        query: { ...router?.query, industry: selectedIndustry },
       })
     }
   }
 
   const handleProductFilter = (selectedProduct: string) => {
+    if (!router) return
     if (selectedProduct === 'all') {
       setProduct('all')
       const { product, ...rest } = router.query
-      router.push({
-        pathname: router.pathname,
+      router?.push({
+        pathname: pathname,
         query: rest,
       })
     } else {
       setProduct(selectedProduct)
-      router.push({
-        pathname: router.pathname,
-        query: { ...router.query, product: selectedProduct },
+      router?.push({
+        pathname: pathname,
+        query: { ...router?.query, product: selectedProduct },
       })
     }
   }

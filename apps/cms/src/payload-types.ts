@@ -140,11 +140,24 @@ export interface UserAuthOperations {
 export interface Author {
   id: number;
   author: string;
-  author_id?: string | null;
+  /**
+   * Unique identifier for the author
+   */
+  author_id: string;
+  /**
+   * GitHub/social username
+   */
+  username?: string | null;
   position?: string | null;
+  /**
+   * Company name (for external/guest authors)
+   */
+  company?: string | null;
+  /**
+   * Link to GitHub, Twitter, LinkedIn, etc.
+   */
   author_url?: string | null;
   author_image_url?: (number | null) | Media;
-  username?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -920,6 +933,10 @@ export interface Post {
   title: string;
   slug?: string | null;
   slugLock?: boolean | null;
+  /**
+   * Appears as subheading in the blog post preview
+   */
+  description?: string | null;
   content: {
     root: {
       type: string;
@@ -945,7 +962,6 @@ export interface Post {
   readingTime?: number | null;
   date?: string | null;
   toc_depth?: number | null;
-  description?: string | null;
   authors?: (number | Author)[] | null;
   tags?: (number | Tag)[] | null;
   meta?: {
@@ -1180,10 +1196,11 @@ export interface PayloadMigration {
 export interface AuthorsSelect<T extends boolean = true> {
   author?: T;
   author_id?: T;
+  username?: T;
   position?: T;
+  company?: T;
   author_url?: T;
   author_image_url?: T;
-  username?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1414,6 +1431,7 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   slugLock?: T;
+  description?: T;
   content?: T;
   thumb?: T;
   image?: T;
@@ -1422,7 +1440,6 @@ export interface PostsSelect<T extends boolean = true> {
   readingTime?: T;
   date?: T;
   toc_depth?: T;
-  description?: T;
   authors?: T;
   tags?: T;
   meta?:
@@ -1548,10 +1565,6 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'events';
           value: number | Event;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
         } | null);
     global?: string | null;
     user?: (number | null) | User;
@@ -1588,7 +1601,7 @@ export interface BannerBlock {
  * via the `definition` "CodeBlock".
  */
 export interface CodeBlock {
-  language?: ('typescript' | 'javascript' | 'css') | null;
+  language?: ('sql' | 'json' | 'bash' | 'js' | 'ts' | 'tsx' | 'py' | 'kotlin' | 'yaml') | null;
   code: string;
   id?: string | null;
   blockName?: string | null;

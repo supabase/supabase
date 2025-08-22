@@ -12,8 +12,6 @@ import rewrites from './lib/rewrites.js'
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
-import { withContentlayer } from 'next-contentlayer2'
-
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
@@ -60,6 +58,20 @@ const nextConfig = {
     // needed to make the octokit packages work in /changelog
     esmExternals: 'loose',
   },
+  /**
+   * Exclude huge directories from being traced into serverless functions
+   * to avoid the max size limit for Serverless Functions on Vercel:
+   * https://vercel.com/guides/troubleshooting-function-250mb-limit
+   */
+  outputFileTracingExcludes: {
+    '*': [
+      // Next.js build artifacts
+      '.next/cache/**/*',
+      '.next/static/**/*',
+      // Static assets
+      'public/**/*',
+    ],
+  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
@@ -67,8 +79,30 @@ const nextConfig = {
   },
   async headers() {
     return [
+      // Allow CMS preview iframe embedding by omitting X-Frame-Options for blog routes
       {
-        source: '/:path*',
+        source: '/blog/:slug*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+          // No X-Frame-Options header to allow iframe embedding
+        ],
+      },
+      {
+        source: '/api-v2/cms/preview',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'text/html',
+          },
+          // No X-Frame-Options header to allow iframe embedding
+        ],
+      },
+      // Default X-Frame-Options for all other paths
+      {
+        source: '/((?!blog|api-v2/cms/preview).*)',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -126,7 +160,7 @@ const nextConfig = {
 
 // next.config.js.
 const configExport = () => {
-  const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
+  const plugins = [withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 

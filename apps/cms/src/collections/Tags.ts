@@ -13,6 +13,7 @@ export const Tags: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+      index: true,
     },
   ],
   timestamps: true,

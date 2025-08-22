@@ -87,7 +87,7 @@ Here's what it looks like:
 
 ```jsx
 import { useEffect } from 'react'
-import { debounce } from 'lodash'
+import { debounce } from '~/lib/helpers'
 
 const handleScroll = () => {
   // Do stuff when scrolling
@@ -247,7 +247,7 @@ Here's the complete code:
 ```jsx
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { debounce } from 'lodash'
+import { debounce } from '~/lib/helpers'
 import { motion } from 'framer-motion'
 
 const supabase = createClient('supabase-url', 'supabase-key')

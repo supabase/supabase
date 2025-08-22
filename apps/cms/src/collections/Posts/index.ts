@@ -28,6 +28,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '../../fields/slug/index.ts'
+import { WWW_SITE_ORIGIN } from '../../utilities/constants.ts'
 
 const launchweekOptions = [
   { label: '6', value: '6' },
@@ -46,37 +47,37 @@ export const Posts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
-    livePreview: {
-      url: ({ data }) => {
-        const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-        // Always use the preview route for live preview to ensure draft mode is enabled
-        return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
-      },
-      breakpoints: [
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1920,
-          height: 1080,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-      ],
-    },
+    // livePreview: {
+    //   url: ({ data }) => {
+    //     const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
+    //     // Always use the preview route for live preview to ensure draft mode is enabled
+    //     return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
+    //   },
+    //   breakpoints: [
+    //     {
+    //       label: 'Desktop',
+    //       name: 'desktop',
+    //       width: 1920,
+    //       height: 1080,
+    //     },
+    //     {
+    //       label: 'Tablet',
+    //       name: 'tablet',
+    //       width: 768,
+    //       height: 1024,
+    //     },
+    //     {
+    //       label: 'Mobile',
+    //       name: 'mobile',
+    //       width: 375,
+    //       height: 667,
+    //     },
+    //   ],
+    // },
     preview: (data) => {
-      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+      const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
       // Always use the preview route to ensure draft mode is enabled
-      return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
+      return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
     },
   },
   access: {
@@ -99,8 +100,17 @@ export const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      index: true,
     },
     ...slugField(),
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'Description / subtitle',
+      admin: {
+        description: 'Appears as subheading in the blog post preview',
+      },
+    },
     {
       type: 'tabs',
       tabs: [
@@ -144,9 +154,6 @@ export const Posts: CollectionConfig = {
             {
               name: 'categories',
               type: 'relationship',
-              admin: {
-                position: 'sidebar',
-              },
               hasMany: true,
               relationTo: 'categories',
             },
@@ -169,39 +176,23 @@ export const Posts: CollectionConfig = {
             {
               name: 'date',
               type: 'date',
-              admin: {
-                position: 'sidebar',
-              },
             },
             {
               name: 'toc_depth',
               type: 'number',
-              defaultValue: 2,
-              admin: {
-                position: 'sidebar',
-              },
-            },
-            {
-              name: 'description',
-              type: 'textarea',
+              defaultValue: 3,
             },
             {
               name: 'authors',
               type: 'relationship',
               relationTo: 'authors',
               hasMany: true,
-              admin: {
-                position: 'sidebar',
-              },
             },
             {
               name: 'tags',
               type: 'relationship',
               relationTo: 'tags',
               hasMany: true,
-              admin: {
-                position: 'sidebar',
-              },
             },
           ],
           label: 'Metadata',
@@ -264,10 +255,10 @@ export const Posts: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 200,
-      },
-      schedulePublish: true,
+      // autosave: {
+      //   interval: 200,
+      // },
+      // schedulePublish: true,
     },
     maxPerDoc: 50,
   },

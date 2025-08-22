@@ -13,7 +13,7 @@ import { isBrowser } from 'common'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { ArrowUpRight, ChevronDown } from 'lucide-react'
-import { startCase } from 'lodash'
+import { startCase } from 'lib/helpers'
 
 const LWXStickyNav: FC = () => {
   const days = mainDays()

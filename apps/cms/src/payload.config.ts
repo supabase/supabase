@@ -9,6 +9,7 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { buildConfig, type Plugin } from 'payload'
 import { defaultLexical } from './fields/defaultLexical.ts'
 import { getServerSideURL } from './utilities/getURL.ts'
+import { WWW_SITE_ORIGIN } from './utilities/constants.ts'
 
 import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import type { Customer, Event, Post } from './payload-types'
@@ -80,28 +81,6 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    livePreview: {
-      breakpoints: [
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1440,
-          height: 900,
-        },
-      ],
-    },
   },
   collections: [Authors, Categories, Customers, Events, Media, Posts, Tags, Users],
   editor: defaultLexical,
@@ -109,13 +88,24 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  cors: [getServerSideURL()].filter(Boolean),
+  cors: [getServerSideURL(), WWW_SITE_ORIGIN].filter(Boolean),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
+      // Connection pool configuration for serverless/Vercel
+      max: 25, // Maximum number of connections in the pool (keep low for serverless)
+      min: 0, // Minimum number of connections in the pool
+      idleTimeoutMillis: 0, // Time a connection can be idle before being closed
+      connectionTimeoutMillis: 0, // Time to wait for connection creation
     },
-    // schemaName: 'cms-payload',
   }),
+  // Global configuration for better performance
+  globals: [],
+  graphQL: {
+    disable: process.env.NODE_ENV !== 'development', // Disable GraphQL in production for better performance
+  },
+  // Reduce payload init overhead
+  telemetry: false,
   sharp,
   plugins,
 })

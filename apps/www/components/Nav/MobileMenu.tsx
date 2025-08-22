@@ -1,7 +1,10 @@
+'use client'
+
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Dispatch, SetStateAction } from 'react'
+import { useEffect } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 
 import { Accordion, Button, TextLink } from 'ui'
 import { DEFAULT_EASE } from '~/lib/animations'
@@ -11,13 +14,10 @@ import { useIsLoggedIn, useIsUserLoading } from 'common'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { ChevronRight } from 'lucide-react'
-import { useKey } from 'react-use'
-import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 import ProductModulesData from '~/data/ProductModules'
+import staticContent from '.generated/staticContent/_index.json'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-
-const { jobsCount } = staticContent
 
 interface Props {
   open: boolean
@@ -29,6 +29,8 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const { jobsCount } = staticContent
+
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -41,7 +43,15 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     exit: { opacity: 0, transition: { duration: 0.05 } },
   }
 
-  useKey('Escape', () => setOpen(false))
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [setOpen])
 
   const AccordionMenuItem = ({ menuItem }: any) => (
     <>
