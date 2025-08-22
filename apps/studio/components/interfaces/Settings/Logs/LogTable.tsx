@@ -10,8 +10,9 @@ import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
+import { toast } from 'sonner'
 import { ResponseError } from 'types'
 import {
   Button,
@@ -33,7 +34,6 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
-import { toast } from 'sonner'
 
 interface Props {
   data?: LogData[]
@@ -94,10 +94,14 @@ const LogTable = ({
   const [selectionOpen, setSelectionOpen] = useState(false)
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
 
-  const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'log_sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateLogQuery } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'log_sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const firstRow = data[0]
 

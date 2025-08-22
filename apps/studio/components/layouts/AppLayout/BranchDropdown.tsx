@@ -230,7 +230,7 @@ export const BranchDropdown = () => {
                         <MessageCircle size={14} strokeWidth={1} className="text-muted mt-0.5" />
                         <div>
                           <p>Branching feedback</p>
-                          <p className="text-lighter">Join Github Discussion</p>
+                          <p className="text-lighter">Join GitHub Discussion</p>
                         </div>
                       </a>
                     </CommandItem_Shadcn_>

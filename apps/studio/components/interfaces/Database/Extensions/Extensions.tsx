@@ -7,13 +7,12 @@ import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Input } from 'ui'
-import ExtensionCard from './ExtensionCard'
-import ExtensionCardSkeleton from './ExtensionCardSkeleton'
+import { Card, Input, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import ExtensionRow from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 
 const Extensions = () => {
@@ -73,50 +72,46 @@ const Extensions = () => {
       )}
 
       {isLoading ? (
-        <div className="my-8 w-full space-y-12">
-          <div className="space-y-4">
-            <ShimmeringLoader className="h-[28px] w-40" />
-
-            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <ExtensionCardSkeleton key={index} index={index} />
-              ))}
-            </div>
-          </div>
-        </div>
+        <GenericSkeletonLoader />
       ) : (
-        <>
-          {extensions.length === 0 && (
-            <NoSearchResults
-              searchString={filterString}
-              onResetFilter={() => setFilterString('')}
-            />
-          )}
-
-          <div className="my-8 w-full space-y-12">
-            {enabledExtensions.length > 0 && (
-              <div className="space-y-4">
-                <h4 className="text-lg">Enabled extensions</h4>
-                <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {enabledExtensions.map((extension) => (
-                    <ExtensionCard key={extension.name} extension={extension} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {disabledExtensions.length > 0 && (
-              <div className="space-y-4">
-                <h4 className="text-lg">Available extensions</h4>
-                <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {disabledExtensions.map((extension) => (
-                    <ExtensionCard key={extension.name} extension={extension} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </>
+        <div className="w-full overflow-hidden overflow-x-auto">
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="version">Version</TableHead>
+                  <TableHead key="schema">Schema</TableHead>
+                  <TableHead key="description">Description</TableHead>
+                  <TableHead key="used-by">Used by</TableHead>
+                  <TableHead key="links">Links</TableHead>
+                  <TableHead
+                    key="enabled"
+                    className="w-20 bg-background-200 border-l sticky right-0"
+                  >
+                    Enabled
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...enabledExtensions, ...disabledExtensions].map((extension) => (
+                  <ExtensionRow key={extension.name} extension={extension} />
+                ))}
+                {extensions.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <NoSearchResults
+                        className="border-none !p-0 bg-transparent"
+                        searchString={filterString}
+                        onResetFilter={() => setFilterString('')}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </div>
       )}
     </>
   )
