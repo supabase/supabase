@@ -82,7 +82,7 @@ function StateOfStartupsPage() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [pageData.pageChapters])
+  }, [])
 
   // Close ToC when clicking outside
   useEffect(() => {
@@ -242,7 +242,7 @@ function StateOfStartupsPage() {
 
             <SurveySectionBreak className="hidden md:block" />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto border-x border-muted">
+            <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
               {/* Intro text */}
               <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl">
                 <p>{pageData.heroSection.subheader}</p>
@@ -348,7 +348,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
       className="flex flex-col items-center gap-4 px-4 py-32 text-center border-b border-muted"
       style={{
         background:
-          'radial-gradient(circle at center 280%, hsl(var(--brand-400)), transparent 70%)',
+          'radial-gradient(circle at center 220%, hsl(var(--brand-400)), transparent 70%)',
       }}
       ref={ref}
     >
