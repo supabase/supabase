@@ -57,8 +57,6 @@ const nextConfig = {
   experimental: {
     // needed to make the octokit packages work in /changelog
     esmExternals: 'loose',
-    // Optimize bundle sizes
-    optimizePackageImports: ['lucide-react', '@heroicons/react'],
   },
 
   /**
@@ -67,19 +65,14 @@ const nextConfig = {
    * https://vercel.com/guides/troubleshooting-function-250mb-limit
    */
   outputFileTracingExcludes: {
-    '*': [
+    '/blog/**/*': [
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
-      '.next/trace',
       // Static assets
-      'public/**/*', // assets
+      'public/**/*',
     ],
-    // More conservative exclusions for blog pages
-    '/blog/**/*': ['public/**/*', '.next/static/**/*'],
   },
-  // Additional optimizations for smaller serverless functions
-  serverExternalPackages: [],
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
