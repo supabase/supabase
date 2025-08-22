@@ -48,7 +48,7 @@ import {
   updateTable,
 } from './SidePanelEditor.utils'
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
-import TableEditor from './TableEditor/TableEditor'
+import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {

@@ -20,7 +20,7 @@ const STATIC_NODES = [
       label: 'Primary Database',
       region: 'East US (Ohio)',
       provider: 'AWS',
-      regionIcon: 'EAST_US',
+      regionIcon: 'us-east-1',
     },
     position: { x: 825, y: 0 },
   },
@@ -30,7 +30,7 @@ const STATIC_NODES = [
     data: {
       label: 'Iceberg',
       details: '3 tables',
-      regionIcon: 'WEST_US',
+      regionIcon: 'us-west-1',
     },
     position: { x: 875, y: 110 },
   },
@@ -40,7 +40,7 @@ const STATIC_NODES = [
     data: {
       label: 'BigQuery',
       details: '5 tables',
-      regionIcon: 'WEST_US',
+      regionIcon: 'us-west-1',
     },
     position: { x: 875, y: 200 },
   },
