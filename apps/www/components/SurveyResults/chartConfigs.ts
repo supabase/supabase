@@ -280,7 +280,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'industry',
-    title: "What is your startup's primary industry or target customer segment?",
+    title: 'What is your startup’s primary industry or target customer segment?',
     targetColumn: 'industry',
     filterColumns: ['person_age', 'location', 'money_raised'],
     functionName: 'get_industry_stats',
@@ -288,7 +288,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'funding_stage',
-    title: 'What stage of funding are you in?',
+    title: 'What stage of funding is your startup in?',
     targetColumn: 'funding_stage',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_funding_stage_stats',
@@ -296,7 +296,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'accelerator_participation',
-    title: 'Have you participated in an accelerator program?',
+    title: 'If your startup has participated in an accelerator, which one?',
     targetColumn: 'accelerator_participation',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_accelerator_participation_stats',
@@ -320,7 +320,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'ai_models',
-    title: 'Which AI models do you use?',
+    title: 'Which AI models do you use or plan to use?',
     targetColumn: 'ai_models',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_ai_models_stats',
@@ -328,7 +328,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'regular_social_media_use',
-    title: 'How often do you use social media?',
+    title: 'Which social media platforms do you use at least 3× per week?',
     targetColumn: 'regular_social_media_use',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_regular_social_media_use_stats',
@@ -336,7 +336,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'new_ideas',
-    title: 'Where do you get new ideas from?',
+    title: 'Where do you usually discover new dev tools or startup ideas?',
     targetColumn: 'new_ideas_source',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_new_ideas_source_stats',
@@ -344,7 +344,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'initial_paying_customers',
-    title: 'How did you get your first paying customers?',
+    title: 'Where did your startup’s initial paying customers come from?',
     targetColumn: 'initial_paying_customers',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_initial_paying_customers_stats',
@@ -352,7 +352,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'sales_tools',
-    title: 'Which sales tools do you use?',
+    title: 'What tools are you using to manage your sales process?',
     targetColumn: 'sales_tools',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_sales_tools_stats',
@@ -360,7 +360,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'world_outlook',
-    title: 'What is your outlook on the world?',
+    title: 'Given the state of the world, are you…',
     targetColumn: 'world_outlook',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_world_outlook_stats',
@@ -368,7 +368,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'biggest_challenge',
-    title: 'What is your biggest challenge?',
+    title: 'What’s the biggest business challenge your startup is facing today?',
     targetColumn: 'biggest_challenge',
     filterColumns: ['person_age', 'location', 'money_raised', 'team_size'],
     functionName: 'get_biggest_challenge_stats',
@@ -376,7 +376,7 @@ export const CHART_CONFIGS: ChartConfig[] = [
   },
   {
     id: 'location',
-    title: 'Where are you located?',
+    title: 'Where is your startup headquartered?',
     targetColumn: 'location',
     filterColumns: ['person_age', 'money_raised', 'team_size'],
     functionName: 'get_location_stats',
