@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, forwardRef } from 'react'
-
+import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
 
 import { motion } from 'framer-motion'
 import { Button, cn } from 'ui'
 
+import { useFeatureFlags } from 'common'
 import DefaultLayout from '~/components/Layouts/Default'
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
 import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
@@ -17,6 +18,15 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import pageData from '~/data/surveys/state-of-startups-2025'
 
 function StateOfStartupsPage() {
+  const router = useRouter()
+  const { configcat } = useFeatureFlags()
+
+  useEffect(() => {
+    if (configcat && configcat.stateOfStartups === false) {
+      router.push('/')
+    }
+  }, [configcat, router])
+
   const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
   const meta_description =
     pageData.metaDescription ||
