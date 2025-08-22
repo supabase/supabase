@@ -28,15 +28,17 @@ export const ExampleProject = ({
   const { data: org } = useSelectedOrganizationQuery()
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const iconImgSrc =
-    iconUrl ??
-    `${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
-      ['expo', 'nextjs'].includes(framework.toLowerCase())
-        ? resolvedTheme?.includes('dark')
-          ? '-dark'
-          : ''
-        : ''
-    }-icon.svg`
+  const iconImgSrc = iconUrl
+    ? iconUrl
+    : !!framework
+      ? `${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
+          ['expo', 'nextjs'].includes(framework.toLowerCase())
+            ? resolvedTheme?.includes('dark')
+              ? '-dark'
+              : ''
+            : ''
+        }-icon.svg`
+      : ''
 
   return (
     <Link
