@@ -7,11 +7,8 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import { InlineLink } from 'components/ui/InlineLink'
-import {
-  ProjectLogStatsVariables,
-  useProjectLogStatsQuery,
-} from 'data/analytics/project-log-stats-query'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -31,7 +28,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
 
-type ChartIntervalKey = ProjectLogStatsVariables['interval']
+type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90 }
 
@@ -96,7 +93,7 @@ const generateStatusTimeSeries = (
     const jitter = 0.85 + seededRatio(`${serviceKey}-${ts}-jitter`) * 0.4
     let effectiveTotal = total > 0 ? Math.max(1, Math.round(total * jitter)) : seededBaseline
     const spikeChance = seededRatio(`${serviceKey}-${ts}-spike`)
-    
+
     if (spikeChance > 0.98) {
       effectiveTotal = Math.round(effectiveTotal * 2.5)
     } else if (spikeChance < 0.02) {
@@ -108,11 +105,11 @@ const generateStatusTimeSeries = (
     const ratioJitter = 0.8 + seededRatio(`${serviceKey}-${ts}-rj`) * 0.4
     const warnRatio = clamp((0.05 + r1 * 0.15) * ratioJitter, 0, 0.9)
     const errRatio = clamp((0.01 + r2 * 0.09) * ratioJitter, 0, 0.5)
-    
+
     let warn = Math.round(effectiveTotal * warnRatio)
     let err = Math.round(effectiveTotal * errRatio)
     let ok = effectiveTotal - warn - err
-    
+
     if (ok < 0) {
       const deficit = -ok
       const takeFromWarn = Math.min(deficit, warn)
@@ -146,7 +143,6 @@ const ProjectUsage = () => {
 
   const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
-  const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDateLocal = dayjs().subtract(
@@ -154,66 +150,118 @@ const ProjectUsage = () => {
     selectedInterval.startUnit as dayjs.ManipulateType
   )
   const endDateLocal = dayjs()
-  const fillInterval = interval === '1hr' ? '5m' : interval === '1day' ? '30m' : '2h'
-
-  const { data: charts } = useFillTimeseriesSorted(
-    data?.result || [],
-    'timestamp',
-    ['total_auth_requests', 'total_rest_requests', 'total_storage_requests', 'total_realtime_requests'],
-    10,
-    startDateLocal.toISOString(),
-    endDateLocal.toISOString(),
-    Number.MAX_SAFE_INTEGER,
-    fillInterval
-  )
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
-  // Build per-service status series and totals (mocked breakdown based on aggregated totals)
-  const restSeries = generateStatusTimeSeries(charts, 'total_rest_requests', 'rest')
-  const restTotal = sumBy(charts || [], 'total_rest_requests')
-  const restWarn = sumStatus(restSeries, 'Warn')
-  const restErr = sumStatus(restSeries, 'Err')
+  const timestampStart = startDateLocal.toISOString()
+  const timestampEnd = endDateLocal.toISOString()
 
-  const authSeries = generateStatusTimeSeries(charts, 'total_auth_requests', 'auth')
-  const authTotal = sumBy(charts || [], 'total_auth_requests')
+  // Fetch per-service event chart data
+  const dbEdge = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.EDGE,
+    timestampStart,
+    timestampEnd,
+    filterOverride: { 'product.database': true },
+  })
+  const fnEdge = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.FN_EDGE,
+    timestampStart,
+    timestampEnd,
+  })
+  const auth = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.AUTH,
+    timestampStart,
+    timestampEnd,
+  })
+  const storage = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.EDGE,
+    timestampStart,
+    timestampEnd,
+    filterOverride: { 'product.storage': true },
+  })
+  const realtime = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.EDGE,
+    timestampStart,
+    timestampEnd,
+    filterOverride: { 'product.realtime': true },
+  })
+
+  const isLoading =
+    dbEdge.isLoading ||
+    fnEdge.isLoading ||
+    auth.isLoading ||
+    storage.isLoading ||
+    realtime.isLoading
+
+  // Transform eventChartData into stacked status series
+  type StatusTimeseriesDatum = { timestamp: string; count: number; status: UsageStatus }
+  type UsageStatus = 'Ok' | 'Warn' | 'Err'
+
+  const toStatusSeries = (rows: any[] = []): StatusTimeseriesDatum[] => {
+    const series: StatusTimeseriesDatum[] = []
+    for (const r of rows) {
+      const ts = String(r.timestamp)
+      const ok = Number(r.ok_count || 0)
+      const warn = Number(r.warning_count || 0)
+      const err = Number(r.error_count || 0)
+      series.push(
+        { timestamp: ts, count: ok, status: 'Ok' },
+        { timestamp: ts, count: warn, status: 'Warn' },
+        { timestamp: ts, count: err, status: 'Err' }
+      )
+    }
+    return series
+  }
+
+  const dbSeries = toStatusSeries(dbEdge.eventChartData)
+  const fnSeries = toStatusSeries(fnEdge.eventChartData)
+  const authSeries = toStatusSeries(auth.eventChartData)
+  const storageSeries = toStatusSeries(storage.eventChartData)
+  const realtimeSeries = toStatusSeries(realtime.eventChartData)
+
+  const sumStatus = (rows: StatusTimeseriesDatum[], status: UsageStatus) =>
+    rows.filter((r) => r.status === status).reduce((acc, r) => acc + (Number(r.count) || 0), 0)
+
+  const restTotal = sumBy(dbSeries || [], 'count')
+  const restWarn = sumStatus(dbSeries, 'Warn')
+  const restErr = sumStatus(dbSeries, 'Err')
+
+  const authTotal = sumBy(authSeries || [], 'count')
   const authWarn = sumStatus(authSeries, 'Warn')
   const authErr = sumStatus(authSeries, 'Err')
 
-  const storageSeries = generateStatusTimeSeries(charts, 'total_storage_requests', 'storage')
-  const storageTotal = sumBy(charts || [], 'total_storage_requests')
+  const storageTotal = sumBy(storageSeries || [], 'count')
   const storageWarn = sumStatus(storageSeries, 'Warn')
   const storageErr = sumStatus(storageSeries, 'Err')
 
-  const realtimeSeries = generateStatusTimeSeries(charts, 'total_realtime_requests', 'realtime')
-  const realtimeTotal = sumBy(charts || [], 'total_realtime_requests')
+  const realtimeTotal = sumBy(realtimeSeries || [], 'count')
   const realtimeWarn = sumStatus(realtimeSeries, 'Warn')
   const realtimeErr = sumStatus(realtimeSeries, 'Err')
 
-  const edgeCharts = (charts || []).map((c) => {
-    const base = Number(c.total_rest_requests || 0) * 0.12 + Number(c.total_auth_requests || 0) * 0.08 || 0
-    const ts = String(c.timestamp)
-    const jitter = 0.8 + seededRatio(`edge-${ts}-j`) * 0.6
-    const spike = seededRatio(`edge-${ts}-s`)
-    let total = Math.max(1, Math.round(base * jitter))
-    if (spike > 0.985) total = Math.round(total * 2.2)
-    if (spike < 0.015) total = Math.max(1, Math.round(total * 0.5))
-    return { ...c, total_edge_requests: total }
-  })
-  const edgeSeries = generateStatusTimeSeries(edgeCharts, 'total_edge_requests', 'edge')
-  const edgeTotal = sumBy(edgeCharts || [], 'total_edge_requests')
-  const edgeWarn = sumStatus(edgeSeries, 'Warn')
-  const edgeErr = sumStatus(edgeSeries, 'Err')
+  const edgeTotal = sumBy(fnSeries || [], 'count')
+  const edgeWarn = sumStatus(fnSeries, 'Warn')
+  const edgeErr = sumStatus(fnSeries, 'Err')
 
-  const totalRequests = (restTotal || 0) + (edgeTotal || 0) + (realtimeTotal || 0) +
-    (authEnabled ? authTotal || 0 : 0) + (storageEnabled ? storageTotal || 0 : 0)
-  const totalErrors = (restErr || 0) + (edgeErr || 0) + (realtimeErr || 0) +
-    (authEnabled ? authErr || 0 : 0) + (storageEnabled ? storageErr || 0 : 0)
+  const totalRequests =
+    (restTotal || 0) +
+    (edgeTotal || 0) +
+    (realtimeTotal || 0) +
+    (authEnabled ? authTotal || 0 : 0) +
+    (storageEnabled ? storageTotal || 0 : 0)
+  const totalErrors =
+    (restErr || 0) +
+    (edgeErr || 0) +
+    (realtimeErr || 0) +
+    (authEnabled ? authErr || 0 : 0) +
+    (storageEnabled ? storageErr || 0 : 0)
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
 
-  const trDeltaSeed = seededRatio(`tr-${projectRef}-${interval}`)
-  const erDeltaSeed = seededRatio(`er-${projectRef}-${interval}`)
-  const totalRequestsChangePct = (trDeltaSeed - 0.5) * 100
-  const errorRateChangePct = (erDeltaSeed - 0.5) * 60
+  const totalRequestsChangePct = 0
+  const errorRateChangePct = 0
   const formatDelta = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`
   const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand' : 'text-destructive'
   const errorDeltaClass = errorRateChangePct <= 0 ? 'text-brand' : 'text-destructive'
@@ -243,9 +291,7 @@ const ProjectUsage = () => {
           <DropdownMenuContent side="bottom" align="end" className="w-40">
             <DropdownMenuRadioGroup
               value={interval}
-              onValueChange={(interval) =>
-                setInterval(interval as ProjectLogStatsVariables['interval'])
-              }
+              onValueChange={(interval) => setInterval(interval as ChartIntervalKey)}
             >
               {CHART_INTERVALS.map((i) => {
                 const disabled = !i.availableIn?.includes(plan?.id || 'free')
@@ -306,7 +352,7 @@ const ProjectUsage = () => {
           <CardContent className="p-6 pt-4">
             <Loading active={isLoading}>
               <StackedBarChart
-                data={restSeries}
+                data={dbSeries}
                 xAxisKey="timestamp"
                 yAxisKey="count"
                 stackKey="status"
@@ -331,7 +377,7 @@ const ProjectUsage = () => {
           <CardContent className="p-6 pt-4">
             <Loading active={isLoading}>
               <StackedBarChart
-                data={edgeSeries}
+                data={fnSeries}
                 xAxisKey="timestamp"
                 yAxisKey="count"
                 stackKey="status"
