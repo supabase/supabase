@@ -44,18 +44,20 @@ const FeedbackDropdown = ({ className }: { className?: string }) => {
           <div className="flex flex-col gap-4 p-4">
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
-              <Button type="default" className="h-24" onClick={() => setIsOpen(false)} asChild>
+              <Button type="default" className="h-32" onClick={() => setIsOpen(false)} asChild>
                 <Link href="/support/new">
                   <span className="grid gap-1 text-center">
                     <TriangleAlert size="28" className="mx-auto text-destructive-600" />
-                    <span className="text-sm">Issue</span>
+                    <span className="text-base">Issue</span>
+                    <span className="text-xm text-foreground-lighter">with my project</span>
                   </span>
                 </Link>
               </Button>
-              <Button type="default" className="h-24" onClick={() => setStage('widget')}>
+              <Button type="default" className="h-32" onClick={() => setStage('widget')}>
                 <span className="grid gap-1 text-center">
                   <Lightbulb size="28" className="mx-auto text-warning" />
-                  <span className="text-sm">Idea</span>
+                  <span className="text-base">Idea</span>
+                  <span className="text-xm text-foreground-lighter">to improve Supabase</span>
                 </span>
               </Button>
             </div>
