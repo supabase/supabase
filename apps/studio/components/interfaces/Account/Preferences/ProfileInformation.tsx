@@ -2,6 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -17,11 +22,10 @@ import {
 } from 'ui'
 import z from 'zod'
 
-import { FormActions } from 'components/ui/Forms/FormActions'
-import Panel from 'components/ui/Panel'
 import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import { useProfile } from 'lib/profile'
+import { groupBy } from 'lodash'
 import type { FormSchema } from 'types'
 
 const FormSchema = z.object({
@@ -41,27 +45,74 @@ export const ProfileInformation = () => {
     isLoading: isIdentitiesLoading,
     isSuccess: isIdentitiesSuccess,
   } = useProfileIdentitiesQuery()
-  const identities = identityData?.identities ?? []
+  // const identities = (identityData?.identities ?? []).filter((x) => x.identity_data?.email !== null)
+  const identities = [
+    {
+      identity_id: 'd2de9d13-5716-4890-a152-cade0ece5be0',
+      id: 'account:7cfa615a5081ab3ce479dc7a87e00193e364324067e524512c1747f6ea2edf72:user:a5546c35703bad1e9b73da81984734c7a1fe731c30b7cd20cbf0752c62b96859',
+      user_id: '1e34e960-b893-43f2-903e-7c7a6f878902',
+      identity_data: {
+        email: 'joshenlimek@gmail.com',
+        email_verified: true,
+        iss: 'https://marketplace.vercel.com',
+        name: 'Joshen Lim',
+        phone_verified: false,
+        picture: 'https://vercel.com/api/www/avatar/583402f6e9a4a75e943fb9b3a23b0716d98d84ec',
+        provider_id:
+          'account:7cfa615a5081ab3ce479dc7a87e00193e364324067e524512c1747f6ea2edf72:user:a5546c35703bad1e9b73da81984734c7a1fe731c30b7cd20cbf0752c62b96859',
+        sub: 'account:7cfa615a5081ab3ce479dc7a87e00193e364324067e524512c1747f6ea2edf72:user:a5546c35703bad1e9b73da81984734c7a1fe731c30b7cd20cbf0752c62b96859',
+      },
+      provider: 'vercel_marketplace',
+      last_sign_in_at: '2024-08-23T07:27:11.703592Z',
+      created_at: '2024-08-23T07:27:11.703864Z',
+      updated_at: '2024-08-23T07:27:11.703864Z',
+      email: 'joshenlimek@gmail.com',
+    },
+    {
+      identity_id: '1122135c-f8a4-462e-bbb0-be60627f54a4',
+      id: '19742402',
+      user_id: '1e34e960-b893-43f2-903e-7c7a6f878902',
+      identity_data: {
+        avatar_url: 'https://avatars.githubusercontent.com/u/19742402?v=4',
+        email: 'joshenlimek@gmail.com',
+        email_verified: true,
+        full_name: 'Joshen Lim',
+        iss: 'https://api.github.com',
+        name: 'Joshen Lim',
+        phone_verified: false,
+        preferred_username: 'joshenlim',
+        provider_id: '19742402',
+        sub: '19742402',
+        user_name: 'joshenlim',
+      },
+      provider: 'github',
+      last_sign_in_at: '2021-12-20T07:04:05.150795Z',
+      created_at: '2021-12-20T07:04:05.150838Z',
+      updated_at: '2025-08-22T12:48:10.533516Z',
+      email: 'joshenlimek@gmail.com',
+    },
+  ]
+
+  const dedupedIdentityEmails = Object.keys(groupBy(identities, 'identity_data.email'))
+
+  const defaultValues = {
+    first_name: profile?.first_name ?? '',
+    last_name: profile?.last_name ?? '',
+    username: profile?.username ?? '',
+    primary_email: profile?.primary_email ?? '',
+  }
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      first_name: profile?.first_name ?? '',
-      last_name: profile?.last_name ?? '',
-      username: profile?.username ?? '',
-      primary_email: profile?.primary_email ?? '',
-    },
+    defaultValues,
+    values: defaultValues,
   })
 
   const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
     onSuccess: (data) => {
       toast.success('Successfully saved profile')
-      form.reset({
-        first_name: data.first_name,
-        last_name: data.last_name,
-        username: data.username,
-        primary_email: data.primary_email,
-      })
+      const { first_name, last_name, username, primary_email } = data
+      form.reset({ first_name, last_name, username, primary_email })
     },
     onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
   })
@@ -76,25 +127,11 @@ export const ProfileInformation = () => {
   }
 
   return (
-    <>
-      <Panel
-        className="mb-4 md:mb-8"
-        title={<h5>Profile Information</h5>}
-        footer={
-          <FormActions
-            form={formId}
-            isSubmitting={isLoading || isIdentitiesLoading}
-            hasChanges={form.formState.isDirty}
-            handleReset={() => form.reset()}
-          />
-        }
-      >
-        <Form_Shadcn_ {...form}>
-          <form
-            id={formId}
-            className="space-y-6 w-full p-4 md:p-8"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
+    <Form_Shadcn_ {...form}>
+      <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
+        <Card className="mb-8">
+          <CardHeader>Profile Information</CardHeader>
+          <CardContent className="flex flex-col gap-y-2">
             <FormField_Shadcn_
               control={form.control}
               name="first_name"
@@ -145,16 +182,11 @@ export const ProfileInformation = () => {
                         </SelectTrigger_Shadcn_>
                         <SelectContent_Shadcn_ className="col-span-8">
                           {isIdentitiesSuccess &&
-                            identities.map((identity) => {
-                              const email = identity.identity_data?.email
-                              if (!email) return null
-                              const providerName = identity.provider
-                              return (
-                                <SelectItem_Shadcn_ key={identity.identity_id} value={email}>
-                                  {email} ({providerName})
-                                </SelectItem_Shadcn_>
-                              )
-                            })}
+                            dedupedIdentityEmails.map((email) => (
+                              <SelectItem_Shadcn_ key={email} value={email}>
+                                {email}
+                              </SelectItem_Shadcn_>
+                            ))}
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
                       {profile?.is_sso_user && (
@@ -194,9 +226,24 @@ export const ProfileInformation = () => {
                 </FormItem_Shadcn_>
               )}
             />
-          </form>
-        </Form_Shadcn_>
-      </Panel>
-    </>
+          </CardContent>
+          <CardFooter className="justify-end space-x-2">
+            {form.formState.isDirty && (
+              <Button type="default" onClick={() => form.reset()}>
+                Cancel
+              </Button>
+            )}
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isLoading || isIdentitiesLoading}
+              disabled={!form.formState.isDirty}
+            >
+              Save
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+    </Form_Shadcn_>
   )
 }
