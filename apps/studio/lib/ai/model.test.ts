@@ -9,8 +9,8 @@ vi.mock('@ai-sdk/openai', () => ({
 
 vi.mock('./bedrock', async () => ({
   ...(await vi.importActual('./bedrock')),
-  createRoutedBedrock: vi.fn((routingKey, useOpenAI) => 
-    () => useOpenAI ? 'openai-bedrock-model' : 'bedrock-model'
+  createRoutedBedrock: vi.fn(
+    (routingKey, useOpenAI) => () => (useOpenAI ? 'openai-bedrock-model' : 'bedrock-model')
   ),
   checkAwsCredentials: vi.fn(),
 }))
