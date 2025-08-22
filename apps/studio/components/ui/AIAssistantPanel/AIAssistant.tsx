@@ -236,7 +236,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
-  console.log({ chatStatus })
 
   const updateMessage = useCallback(
     ({
