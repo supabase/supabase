@@ -427,6 +427,261 @@ const stateOfStartupsData = {
       ],
     },
   ],
+  participantsList: [
+    {
+      company: 'Wasp',
+      url: 'https://wasp.sh/',
+    },
+    {
+      company: 'Greptile',
+      url: 'https://www.greptile.com/',
+    },
+    {
+      company: 'Zaymo',
+      url: 'https://zaymo.com',
+    },
+    {
+      company: 'Jazzberry',
+      url: 'https://jazzberry.ai',
+    },
+    {
+      company: 'Shor',
+      url: 'https://tryshor.com',
+    },
+
+    {
+      company: 'Mono',
+      url: 'https://www.mono.la',
+    },
+    {
+      company: 'Affl.ai',
+      url: 'https://www.affil.ai',
+    },
+    {
+      company: 'Docsum',
+      url: 'https://www.docsum.ai/',
+    },
+    {
+      company: 'Hazel',
+      url: 'https://hazelai.com/',
+    },
+    {
+      company: 'Rivet',
+      url: 'https://rivet.gg/',
+    },
+    {
+      company: 'Trieve',
+      url: 'https://trieve.ai/',
+    },
+    {
+      company: 'Artificial Societies',
+      url: 'https://societies.io/',
+    },
+    {
+      company: 'Gauge',
+      url: 'https://withgauge.com/',
+    },
+    {
+      company: 'Stardex',
+      url: 'https://www.stardex.com/',
+    },
+    {
+      company: 'TrueClaim',
+      url: 'https://www.trytrueclaim.com/',
+    },
+    {
+      company: 'Autosana',
+      url: 'https://autosana.ai/',
+    },
+    {
+      company: 'Vespper',
+      url: 'https://vespper.com/',
+    },
+    {
+      company: 'Curo',
+      url: 'https://www.curocharging.com/',
+    },
+    {
+      company: 'Kombo',
+      url: 'https://kombo.dev/',
+    },
+    {
+      company: 'Candle',
+      url: 'https://www.trycandle.app/',
+    },
+    {
+      company: 'Trainloop',
+      url: 'http://trainloop.ai/',
+    },
+    {
+      company: 'Replit',
+      url: 'https://replit.com/',
+    },
+    {
+      company: 'Roe AI',
+      url: 'https://getroe.ai/',
+    },
+    {
+      company: 'Kestral',
+      url: 'https://kestral.team/',
+    },
+    {
+      company: 'Revyl',
+      url: 'https://www.revyl.ai/',
+    },
+    {
+      company: 'Arva AI',
+      url: 'https://www.arva.ai/',
+    },
+    {
+      company: 'Posthog',
+      url: 'https://www.posthog.com',
+    },
+    {
+      company: 'Rootly',
+      url: 'https://rootly.com/',
+    },
+    {
+      company: 'Throxy',
+      url: 'https://throxy.com/',
+    },
+    {
+      company: 'Zapi',
+      url: 'https://heyzapi.com/',
+    },
+    {
+      company: 'Leaping AI',
+      url: 'https://www.leapingai.com/',
+    },
+    {
+      company: 'WarpBuild',
+      url: 'https://www.warpbuild.com/',
+    },
+    {
+      company: 'Domu',
+      url: 'https://www.domu.ai/',
+    },
+    {
+      company: 'Bilanc',
+      url: 'https://www.bilanc.co/',
+    },
+    {
+      company: 'Miru',
+      url: 'https://www.miruml.com/',
+    },
+    {
+      company: 'Repaint',
+      url: 'https://repaint.com/',
+    },
+    {
+      company: 'Cubic',
+      url: 'https://cubic.dev/',
+    },
+    {
+      company: 'CTGT',
+      url: 'https://www.ctgt.ai/',
+    },
+    {
+      company: 'Integrated Reasoning',
+      url: 'https://integrated-reasoning.com/',
+    },
+    {
+      company: 'Datafruit',
+      url: 'https://datafruit.dev/',
+    },
+    {
+      company: 'mcp-use',
+      url: 'https://mcp-use.com/',
+    },
+    {
+      company: 'Weave',
+      url: 'http://getweave.com/',
+    },
+    {
+      company: 'Palmier',
+      url: 'https://www.palmier.io/',
+    },
+    {
+      company: 'Rainmaker',
+      url: 'http://www.rainmaker.nyc/',
+    },
+    {
+      company: 'Wasmer',
+      url: 'https://wasmer.io/',
+    },
+    {
+      company: 'Artie',
+      url: 'https://www.artie.com/',
+    },
+    {
+      company: 'Lumari',
+      url: 'https://www.lumari.io/',
+    },
+    {
+      company: 'Hitpay',
+      url: 'https://www.hitpayapp.com/',
+    },
+    {
+      company: 'Tempo',
+      url: 'https://www.tempo.new/',
+    },
+    {
+      company: 'SalesPatriot',
+      url: 'https://www.salespatriot.com/',
+    },
+    {
+      company: 'Surge',
+      url: 'https://surge.app/',
+    },
+    {
+      company: 'Linum',
+      url: 'https://www.linum.ai/',
+    },
+    {
+      company: 'Rebill',
+      url: 'https://www.rebill.com/',
+    },
+    {
+      company: 'Careswift',
+      url: 'https://www.careswift.com/',
+    },
+    {
+      company: 'Autumn',
+      url: 'https://useautumn.com/',
+    },
+    {
+      company: 'Rollstack',
+      url: 'https://www.rollstack.com/',
+    },
+    {
+      company: 'OpenNote',
+      url: 'https://opennote.com/',
+    },
+    {
+      company: 'Coverage Cat',
+      url: 'https://www.coveragecat.com/',
+    },
+    {
+      company: 'Flair Labs',
+      url: 'https://www.flairlabs.ai/',
+    },
+    {
+      company: 'Percival',
+      url: 'https://www.percivaltech.com/',
+    },
+    {
+      company: 'Morphik',
+      url: 'https://morphik.ai/',
+    },
+    {
+      company: 'DrDroid',
+      url: 'https://drdroid.io/',
+    },
+    {
+      company: 'Nautilus',
+      url: 'https://nautilus.co/',
+    },
+  ],
 }
 
 export default stateOfStartupsData
