@@ -20,6 +20,7 @@ import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -51,6 +52,9 @@ const MapView = ({
 }: MapViewProps) => {
   const { ref } = useParams()
   const dbSelectorState = useDatabaseSelectorStateSnapshot()
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
 
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
@@ -286,7 +290,9 @@ const MapView = ({
                             <Badge variant="warning">Unhealthy</Badge>
                           )}
                         </p>
-                        <p className="text-xs text-foreground-light">AWS • {database.size}</p>
+                        <p className="text-xs text-foreground-light">
+                          AWS{projectHomepageShowInstanceSize ? ` • ${database.size}` : ''}
+                        </p>
                         {database.identifier !== ref && (
                           <p className="text-xs text-foreground-light">Created on: {created}</p>
                         )}

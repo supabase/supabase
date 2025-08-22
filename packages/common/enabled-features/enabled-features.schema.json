@@ -132,7 +132,7 @@
 
     "project_connection:javascript_example": {
       "type": "boolean",
-      "description": "Show the javascript example in the project connection settings"
+      "description": "Show the javascript example in the project connection settings. If off, it'll show up as Typescript example instead (both are the same code example)"
     },
     "project_connection:dart_example": {
       "type": "boolean",
@@ -146,7 +146,7 @@
 
     "project_homepage:show_instance_size": {
       "type": "boolean",
-      "description": "Show the instance size badge in the project homepage"
+      "description": "Show the instance size badge in the project homepage and infrastructure settings"
     },
     "project_homepage:show_examples": {
       "type": "boolean",
