@@ -11,4 +11,6 @@ export type CustomContentTypes = {
     iconUrl: string
     url: string
   }[]
+
+  logsDefaultQuery: string
 }
