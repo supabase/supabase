@@ -36,6 +36,12 @@ export function UserDropdown() {
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
 
+  const { username, primary_email, first_name, last_name } = profile ?? {}
+  const displayName = username
+
+  // [Joshen] Thinking we could use first name and last name here, but pending decision if this might trip users
+  // const displayName = !!first_name || !!last_name ? `${first_name} ${last_name}`.trim() : username
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
@@ -57,18 +63,15 @@ export function UserDropdown() {
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
               {profile && (
                 <>
-                  <span
-                    title={profile.username}
-                    className="w-full text-left text-foreground truncate"
-                  >
-                    {profile.username}
+                  <span title={displayName} className="w-full text-left text-foreground truncate">
+                    {displayName}
                   </span>
-                  {profile.primary_email !== profile.username && profileShowEmailEnabled && (
+                  {primary_email !== displayName && profileShowEmailEnabled && (
                     <span
-                      title={profile.primary_email}
+                      title={primary_email}
                       className="w-full text-left text-foreground-light text-xs truncate"
                     >
-                      {profile.primary_email}
+                      {primary_email}
                     </span>
                   )}
                 </>

@@ -9,9 +9,6 @@ import {
   CardHeader,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   SelectContent_Shadcn_,
@@ -27,6 +24,7 @@ import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import { useProfile } from 'lib/profile'
 import { groupBy } from 'lodash'
 import type { FormSchema } from 'types'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
@@ -89,40 +87,29 @@ export const ProfileInformation = () => {
               control={form.control}
               name="first_name"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                    First name
-                  </FormLabel_Shadcn_>
+                <FormItemLayout label="First name" layout="horizontal">
                   <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-full" />
+                    <Input_Shadcn_ {...field} className="w-72" />
                   </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                </FormItem_Shadcn_>
+                </FormItemLayout>
               )}
             />
             <FormField_Shadcn_
               control={form.control}
               name="last_name"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                    Last name
-                  </FormLabel_Shadcn_>
+                <FormItemLayout label="Last name" layout="horizontal">
                   <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-full" />
+                    <Input_Shadcn_ {...field} className="w-72" />
                   </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                </FormItem_Shadcn_>
+                </FormItemLayout>
               )}
             />
             <FormField_Shadcn_
               control={form.control}
               name="primary_email"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                    Primary Email
-                  </FormLabel_Shadcn_>
+                <FormItemLayout label="Primary email" layout="horizontal">
                   <FormControl_Shadcn_ className="col-span-8">
                     <div className="flex flex-col gap-1">
                       <Select_Shadcn_
@@ -130,7 +117,7 @@ export const ProfileInformation = () => {
                         onValueChange={field.onChange}
                         disabled={profile?.is_sso_user}
                       >
-                        <SelectTrigger_Shadcn_ className="col-span-8">
+                        <SelectTrigger_Shadcn_ className="col-span-8 w-72">
                           <SelectValue_Shadcn_ placeholder="Select primary email" />
                         </SelectTrigger_Shadcn_>
                         <SelectContent_Shadcn_ className="col-span-8">
@@ -149,25 +136,17 @@ export const ProfileInformation = () => {
                       )}
                     </div>
                   </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                </FormItem_Shadcn_>
+                </FormItemLayout>
               )}
             />
             <FormField_Shadcn_
               control={form.control}
               name="username"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                    Username
-                  </FormLabel_Shadcn_>
+                <FormItemLayout label="Username" layout="horizontal">
                   <FormControl_Shadcn_ className="col-span-8">
                     <div className="flex flex-col gap-1">
-                      <Input_Shadcn_
-                        {...field}
-                        className="w-full"
-                        disabled={profile?.is_sso_user}
-                      />
+                      <Input_Shadcn_ {...field} className="w-72" disabled={profile?.is_sso_user} />
                       {profile?.is_sso_user && (
                         <p className="text-xs text-foreground-light">
                           Username is managed by your SSO provider and cannot be changed here.
@@ -175,8 +154,7 @@ export const ProfileInformation = () => {
                       )}
                     </div>
                   </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                </FormItem_Shadcn_>
+                </FormItemLayout>
               )}
             />
           </CardContent>
