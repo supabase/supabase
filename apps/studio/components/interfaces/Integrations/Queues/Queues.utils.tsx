@@ -38,16 +38,16 @@ const QueueTypeCell = ({ queue }: QueueCellProps) => {
 
 const QueueRLSCell = ({ queue }: QueueCellProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
-  
+
   const { data: queueTables } = useTablesQuery({
     projectRef: selectedProject?.ref,
     connectionString: selectedProject?.connectionString,
     schema: 'pgmq',
   })
-  
+
   const queueTable = queueTables?.find((x) => x.name === `q_${queue.queue_name}`)
   const isRlsEnabled = !!queueTable?.rls_enabled
-  
+
   return (
     <div className="flex items-center">
       {isRlsEnabled ? <Check size={14} className="text-brand" /> : <X size={14} />}
@@ -57,15 +57,13 @@ const QueueRLSCell = ({ queue }: QueueCellProps) => {
 
 const QueueCreatedAtCell = ({ queue }: QueueCellProps) => (
   <div className="flex items-center">
-    <span title={queue.created_at}>
-      {dayjs(queue.created_at).format(DATETIME_FORMAT)}
-    </span>
+    <span title={queue.created_at}>{dayjs(queue.created_at).format(DATETIME_FORMAT)}</span>
   </div>
 )
 
 const QueueSizeCell = ({ queue }: QueueCellProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
-  
+
   const { data: metrics, isLoading } = useQueuesMetricsQuery(
     {
       queueName: queue.queue_name,
@@ -76,7 +74,7 @@ const QueueSizeCell = ({ queue }: QueueCellProps) => {
       staleTime: 30 * 1000, // 30 seconds
     }
   )
-  
+
   return (
     <div className="flex items-center">
       {isLoading ? (
@@ -90,7 +88,6 @@ const QueueSizeCell = ({ queue }: QueueCellProps) => {
   )
 }
 
-
 export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
   return [
     {
@@ -101,11 +98,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       headerCellClass: undefined,
       renderHeaderCell: () => {
         return (
-          <div
-            className={cn(
-              'flex items-center justify-between font-normal text-xs w-full ml-8'
-            )}
-          >
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full ml-8')}>
             <p className="!text-foreground">Name</p>
           </div>
         )
@@ -122,11 +115,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       headerCellClass: undefined,
       renderHeaderCell: () => {
         return (
-          <div
-            className={cn(
-              'flex items-center justify-between font-normal text-xs w-full'
-            )}
-          >
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
             <p className="!text-foreground">Type</p>
           </div>
         )
@@ -143,11 +132,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       headerCellClass: undefined,
       renderHeaderCell: () => {
         return (
-          <div
-            className={cn(
-              'flex items-center justify-between font-normal text-xs w-full'
-            )}
-          >
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
             <p className="!text-foreground">RLS enabled</p>
           </div>
         )
@@ -164,11 +149,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       headerCellClass: undefined,
       renderHeaderCell: () => {
         return (
-          <div
-            className={cn(
-              'flex items-center justify-between font-normal text-xs w-full'
-            )}
-          >
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
             <p className="!text-foreground">Created at</p>
           </div>
         )
@@ -185,11 +166,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       headerCellClass: undefined,
       renderHeaderCell: () => {
         return (
-          <div
-            className={cn(
-              'flex items-center justify-between font-normal text-xs w-full'
-            )}
-          >
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
             <p className="!text-foreground">Size</p>
           </div>
         )
