@@ -396,10 +396,10 @@ export function SurveyChart({
                       >
                         {/* Background pattern for the entire bar */}
                         <div
-                          className="absolute inset-0 pointer-events-none bg-foreground-muted/50"
+                          className="absolute inset-0 pointer-events-none bg-foreground-muted/60"
                           style={{
-                            maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
-                            maskSize: '15px 15px',
+                            maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
+                            maskSize: '4px',
                             maskRepeat: 'repeat',
                             maskPosition: 'center',
                           }}
@@ -410,17 +410,16 @@ export function SurveyChart({
                           className={`h-full relative bg-surface-100`}
                           style={{
                             width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
-                            transform: shouldAnimateBars ? 'scaleX(1)' : 'scaleX(0)',
-                            transformOrigin: 'left',
-                            transition: `transform 0.5s steps(${Math.max(2, Math.floor((item.value / 100) * 12))}, end) ${index * 0.05}s`,
+                            clipPath: shouldAnimateBars ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
+                            transition: `clip-path 0.5s steps(${Math.max(2, Math.floor((item.value / 100) * 12))}, end) ${index * 0.05}s`,
                           }}
                         >
                           {/* Foreground pattern for the filled portion */}
                           <div
                             className={`absolute inset-0 pointer-events-none ${item.value === maxValue ? 'bg-brand' : 'bg-foreground-light'}`}
                             style={{
-                              maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
-                              maskSize: '14.5px 15px',
+                              maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
+                              maskSize: '4px',
                               maskRepeat: 'repeat',
                               maskPosition: 'top left',
                             }}

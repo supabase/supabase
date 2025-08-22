@@ -18,8 +18,8 @@ export function SurveyPullQuote({
         <div
           className="absolute inset-0 pointer-events-none bg-surface-400 dark:bg-surface-75"
           style={{
-            maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
-            maskSize: '15px 15px',
+            maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
+            maskSize: '4px', // Match maskSize in SurveySectionBreak
             maskRepeat: 'repeat',
             maskPosition: 'top left',
           }}

@@ -72,10 +72,10 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
       >
         {/* Background pattern for the entire bar */}
         <div
-          className="absolute inset-0 pointer-events-none bg-foreground-muted"
+          className="absolute inset-0 pointer-events-none bg-foreground-muted/80"
           style={{
-            maskImage: 'url("/images/state-of-startups/pattern-back.svg")',
-            maskSize: '15px 15px',
+            maskImage: 'url("/images/state-of-startups/pattern-stipple.svg")',
+            maskSize: '4px',
             maskRepeat: 'repeat',
             maskPosition: 'center',
           }}
@@ -86,17 +86,16 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
           className={`h-full relative bg-surface-100`}
           style={{
             width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
-            transform: shouldAnimateBar ? 'scaleX(1)' : 'scaleX(0)',
-            transformOrigin: 'left',
-            transition: `transform 0.5s steps(${Math.max(2, Math.floor((percent / 100) * 12))}, end)`,
+            clipPath: shouldAnimateBar ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
+            transition: `clip-path 0.5s steps(${Math.max(2, Math.floor((percent / 100) * 12))}, end)`,
           }}
         >
           {/* Foreground pattern for the filled portion */}
           <div
             className={`absolute inset-0 pointer-events-none bg-brand`}
             style={{
-              maskImage: 'url("/images/state-of-startups/pattern-front.svg")',
-              maskSize: '14.5px 15px',
+              maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
+              maskSize: '4px',
               maskRepeat: 'repeat',
               maskPosition: 'top left',
             }}
