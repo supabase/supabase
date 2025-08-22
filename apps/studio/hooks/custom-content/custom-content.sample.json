@@ -20,5 +20,20 @@
         "url": "https://supabase.com"
       }
     }
+  ],
+
+  "project_homepage:example_projects": [
+    {
+      "title": "Framework 1",
+      "description": "This is a description of Framework 1",
+      "iconUrl": "https://supabase.com/dashboard/img/supabase-logo.svg",
+      "url": "https://supabase.com"
+    },
+    {
+      "title": "Framework 2",
+      "description": "This is a description of Framework 2",
+      "iconUrl": "https://supabase.com/dashboard/img/supabase-logo.svg",
+      "url": "https://supabase.com"
+    }
   ]
 }
