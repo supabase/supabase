@@ -1,8 +1,8 @@
 import { RealtimePolicies } from 'components/interfaces/Realtime/Policies'
 import type { NextPageWithLayout } from 'types'
 
-import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
 
 const RealtimePoliciesPage: NextPageWithLayout = () => {
   return <RealtimePolicies />
