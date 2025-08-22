@@ -236,6 +236,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  console.log({ chatStatus })
 
   const updateMessage = useCallback(
     ({
@@ -285,9 +286,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           .join('') ?? ''
       setValue(textContent)
 
-      if (inputRef.current) {
-        inputRef.current.focus()
-      }
+      setTimeout(() => inputRef?.current?.focus(), 100)
     },
     [chatMessages, setValue]
   )
@@ -727,6 +726,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
               )}
               loading={isChatLoading}
+              isEditing={!!editingMessageId}
               disabled={!isApiKeySet || disablePrompts || (isChatLoading && !editingMessageId)}
               placeholder={
                 hasMessages
