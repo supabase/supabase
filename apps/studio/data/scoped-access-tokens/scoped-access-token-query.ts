@@ -5,20 +5,21 @@ import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { scopedAccessTokenKeys } from './keys'
 
-export async function getAccessTokens(signal?: AbortSignal) {
+export async function getScopedAccessTokens(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/scoped-access-tokens', { signal })
 
   if (error) handleError(error)
 
-    console.log(data)
+  console.log(data)
 
   return data
 }
 
-export type ScopedAccessTokensData = Awaited<ReturnType<typeof getAccessTokens>>
+export type ScopedAccessTokensData = Awaited<ReturnType<typeof getScopedAccessTokens>>
 export type ScopedAccessTokensError = ResponseError
 
-export type ScopedAccessToken = components['schemas']['GetScopedAccessTokensResponse']['tokens'][number]
+export type ScopedAccessToken =
+  components['schemas']['GetScopedAccessTokensResponse']['tokens'][number]
 
 export const useScopedAccessTokensQuery = <TData = ScopedAccessTokensData>({
   enabled = true,
@@ -26,6 +27,6 @@ export const useScopedAccessTokensQuery = <TData = ScopedAccessTokensData>({
 }: UseQueryOptions<ScopedAccessTokensData, ScopedAccessTokensError, TData> = {}) =>
   useQuery<ScopedAccessTokensData, ScopedAccessTokensError, TData>(
     scopedAccessTokenKeys.list(),
-    ({ signal }) => getAccessTokens(signal),
+    ({ signal }) => getScopedAccessTokens(signal),
     options
   )

@@ -21,7 +21,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus, Key, X, RotateCcw } from 'lucide-react'
 import { ACCESS_TOKEN_PERMISSIONS } from '../../AccessToken.constants'
 
-interface PermissionsFormProps {
+interface PermissionsProps {
   control: Control<any>
   setValue: UseFormSetValue<any>
   watch: UseFormWatch<any>
@@ -40,13 +40,13 @@ const createAllResources = (ACCESS_TOKEN_PERMISSIONS: any[]) => {
   )
 }
 
-export const PermissionsForm = ({
+export const Permissions = ({
   control,
   setValue,
   watch,
   resourceSearchOpen,
   setResourceSearchOpen,
-}: PermissionsFormProps) => {
+}: PermissionsProps) => {
   const permissionRows = watch('permissionRows') || []
   const ALL_RESOURCES = createAllResources(ACCESS_TOKEN_PERMISSIONS)
 
@@ -75,7 +75,7 @@ export const PermissionsForm = ({
                         value="add-all-permissions"
                         onSelect={() => {
                           const allPermissions = ALL_RESOURCES.map((resource) => ({
-                            resource: resource.value,
+                            resource: resource.resource,
                             action: resource.actions.includes('read-write')
                               ? 'read-write'
                               : resource.actions[0],
@@ -93,12 +93,37 @@ export const PermissionsForm = ({
                       </CommandItem_Shadcn_>
 
                       <CommandItem_Shadcn_
+                        value="add-all-user-permissions"
+                        onSelect={() => {
+                          const userPermissions = ALL_RESOURCES.filter(
+                            (resource) => resource.group === 'User permissions'
+                          ).map((resource) => ({
+                            resource: resource.resource,
+                            action: resource.actions.includes('read-write')
+                              ? 'read-write'
+                              : resource.actions[0],
+                          }))
+                          setValue('permissionRows', userPermissions)
+                          setResourceSearchOpen(false)
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Key size={12} />
+                          <div className="flex flex-col text-left">
+                            <span className="font-medium text-foreground">
+                              All user permissions
+                            </span>
+                          </div>
+                        </div>
+                      </CommandItem_Shadcn_>
+
+                      <CommandItem_Shadcn_
                         value="add-all-project-permissions"
                         onSelect={() => {
                           const projectPermissions = ALL_RESOURCES.filter(
                             (resource) => resource.group === 'Project permissions'
                           ).map((resource) => ({
-                            resource: resource.value,
+                            resource: resource.resource,
                             action: resource.actions.includes('read-write')
                               ? 'read-write'
                               : resource.actions[0],
@@ -123,7 +148,7 @@ export const PermissionsForm = ({
                           const orgPermissions = ALL_RESOURCES.filter(
                             (resource) => resource.group === 'Organization permissions'
                           ).map((resource) => ({
-                            resource: resource.value,
+                            resource: resource.resource,
                             action: resource.actions.includes('read-write')
                               ? 'read-write'
                               : resource.actions[0],
@@ -226,7 +251,7 @@ export const PermissionsForm = ({
                           value="add-all-permissions"
                           onSelect={() => {
                             const allPermissions = ALL_RESOURCES.map((resource) => ({
-                              resource: resource.value,
+                              resource: resource.resource,
                               action: resource.actions.includes('read-write')
                                 ? 'read-write'
                                 : resource.actions[0],
@@ -240,6 +265,31 @@ export const PermissionsForm = ({
                             <div className="flex flex-col text-left">
                               <span className="font-medium text-foreground">
                                 Add all permissions
+                              </span>
+                            </div>
+                          </div>
+                        </CommandItem_Shadcn_>
+
+                        <CommandItem_Shadcn_
+                          value="add-all-user-permissions"
+                          onSelect={() => {
+                            const userPermissions = ALL_RESOURCES.filter(
+                              (resource) => resource.group === 'User permissions'
+                            ).map((resource) => ({
+                              resource: resource.resource,
+                              action: resource.actions.includes('read-write')
+                                ? 'read-write'
+                                : resource.actions[0],
+                            }))
+                            setValue('permissionRows', userPermissions)
+                            setResourceSearchOpen(false)
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Key size={12} />
+                            <div className="flex flex-col text-left">
+                              <span className="font-medium text-foreground">
+                                Add all user permissions
                               </span>
                             </div>
                           </div>
@@ -276,7 +326,7 @@ export const PermissionsForm = ({
                             const orgPermissions = ALL_RESOURCES.filter(
                               (resource) => resource.group === 'Organization permissions'
                             ).map((resource) => ({
-                              resource: resource.value,
+                              resource: resource.resource,
                               action: resource.actions.includes('read-write')
                                 ? 'read-write'
                                 : resource.actions[0],

@@ -105,6 +105,31 @@ export const FGA_PERMISSIONS = {
 // Permission mapping function
 export const mapPermissionToFGA = (resource: string, action: string): string[] => {
   // Map based on FGA_PERMISSIONS structure
+  
+  // User permissions
+  if (resource === 'user:organizations') {
+    if (action === 'read') return [FGA_PERMISSIONS.USER.ORGANIZATIONS_READ]
+    if (action === 'read-write')
+      return [FGA_PERMISSIONS.USER.ORGANIZATIONS_READ, FGA_PERMISSIONS.USER.ORGANIZATIONS_WRITE]
+    if (action === 'no access') return []
+  }
+
+  if (resource === 'user:projects') {
+    if (action === 'read') return [FGA_PERMISSIONS.USER.PROJECTS_READ]
+    if (action === 'no access') return []
+  }
+
+  if (resource === 'user:available_regions') {
+    if (action === 'read') return [FGA_PERMISSIONS.USER.AVAILABLE_REGIONS_READ]
+    if (action === 'no access') return []
+  }
+
+  if (resource === 'user:snippets') {
+    if (action === 'read') return [FGA_PERMISSIONS.USER.SNIPPETS_READ]
+    if (action === 'no access') return []
+  }
+
+  // Organization permissions
   if (resource === 'organization:admin') {
     if (action === 'read') return [FGA_PERMISSIONS.ORGANIZATION.ADMIN_READ]
     if (action === 'read-write')
@@ -370,6 +395,31 @@ export const mapPermissionToFGA = (resource: string, action: string): string[] =
 
 // Convert FGA_PERMISSIONS to UI format
 export const PERMISSIONS_UI = [
+  {
+    name: 'User permissions',
+    resources: [
+      {
+        resource: 'user:organizations',
+        title: 'Access to organization information',
+        actions: ['read', 'read-write', 'no access'],
+      },
+      {
+        resource: 'user:projects',
+        title: 'Access to project information',
+        actions: ['read', 'no access'],
+      },
+      {
+        resource: 'user:available_regions',
+        title: 'Access to available regions information',
+        actions: ['read', 'no access'],
+      },
+      {
+        resource: 'user:snippets',
+        title: 'Access to user snippets',
+        actions: ['read', 'no access'],
+      },
+    ],
+  },
   {
     name: 'Organization permissions',
     resources: [

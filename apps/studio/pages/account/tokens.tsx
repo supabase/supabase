@@ -37,7 +37,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
             onChange={(e: any) => setSearchString(e.target.value)}
             name="search"
             id="search"
-            placeholder="Filter tokens"
+            placeholder="Filter by name"
           />
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink />}>

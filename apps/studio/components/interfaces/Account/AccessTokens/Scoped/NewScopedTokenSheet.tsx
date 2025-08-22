@@ -20,9 +20,9 @@ import {
   SheetTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { BasicInfoForm } from './Form/BasicInfo'
-import { PermissionsForm } from './Form/PermissionsForm'
-import { ResourceAccessForm } from './Form/ResourceAccessForm'
+import { BasicInfo } from './Form/BasicInfo'
+import { Permissions } from './Form/Permissions'
+import { ResourceAccess } from './Form/ResourceAccess'
 import { mapPermissionToFGA, ExpiresAtOptions } from '../AccessToken.constants'
 
 const PermissionRowSchema = z.object({
@@ -217,16 +217,16 @@ export const NewScopedTokenSheet = ({
 
             <Form_Shadcn_ {...form}>
               <div className="flex flex-col gap-0 overflow-visible">
-                <BasicInfoForm
+                <BasicInfo
                   control={form.control}
                   expirationDate={expiresAt || ''}
                   onCustomDateChange={handleCustomDateChange}
                   onCustomExpiryChange={handleCustomExpiryChange}
                 />
                 <Separator />
-                <ResourceAccessForm control={form.control} resourceAccess={resourceAccess} />
+                <ResourceAccess control={form.control} resourceAccess={resourceAccess} />
                 <Separator />
-                <PermissionsForm
+                <Permissions
                   control={form.control}
                   setValue={form.setValue}
                   watch={form.watch}

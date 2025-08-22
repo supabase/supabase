@@ -21,19 +21,19 @@ import {
   NON_EXPIRING_TOKEN_VALUE,
 } from '../../AccessToken.constants'
 
-interface BasicInfoFormProps {
+interface BasicInfoProps {
   control: Control<any>
   expirationDate: string
   onCustomDateChange?: (date: { date: string } | undefined) => void
   onCustomExpiryChange?: (isCustom: boolean) => void
 }
 
-export const BasicInfoForm = ({
+export const BasicInfo = ({
   control,
   expirationDate,
   onCustomDateChange,
   onCustomExpiryChange,
-}: BasicInfoFormProps) => {
+}: BasicInfoProps) => {
   const [customDate, setCustomDate] = useState<Date>()
   const [isCustomSelected, setIsCustomSelected] = useState(false)
 
