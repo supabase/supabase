@@ -306,38 +306,25 @@ export default StateOfStartupsPage
 // Component for the participants list
 const ParticipantsList = () => {
   const [shuffledParticipants, setShuffledParticipants] = useState(pageData.participantsList)
-  const [isShuffled, setIsShuffled] = useState(false)
 
   useEffect(() => {
-    // Shuffle the participants list after component mounts (client-side only)
-    const shuffled = [...pageData.participantsList]
-    // Fisher-Yates shuffle algorithm
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-    }
+    // Simple shuffle after mount, no animation because it's at the bottom of the page
+    const shuffled = [...pageData.participantsList].sort(() => Math.random() - 0.5)
     setShuffledParticipants(shuffled)
-    setIsShuffled(true)
   }, [])
 
   return (
-    <section className="flex flex-col items-center gap-16 md:gap-24 px-4 py-20 md:py-28 text-center border-b border-muted">
+    <section className="flex flex-col items-center gap-12 md:gap-20 px-4 py-20 md:py-28 text-center border-b border-muted">
       <div className="flex flex-col items-center gap-4 max-w-prose">
         <h2 className="text-foreground text-3xl text-balance">Thank you</h2>
         <p className="text-foreground-light text-lg text-balance max-w-prose">
           A special thanks to the following companies for participating in this year’s survey.
         </p>
       </div>
-      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 items-center gap-x-2 gap-y-4 md:gap-x-4 md:gap-y-8 w-full mx-auto px-6 lg:px-16 xl:px-20">
+
+      <ul className="flex flex-wrap items-center justify-center gap-4 gap-y-4 md:gap-8 max-w-7xl mx-auto px-4">
         {shuffledParticipants.map((participant, index) => (
-          <li
-            key={participant.company} // Use company name as stable key
-            className="transition-opacity duration-500 ease-in-out"
-            style={{
-              opacity: isShuffled ? 1 : 0,
-              transitionDelay: `${index * 50}ms`, // Stagger the fade-in
-            }}
-          >
+          <li key={participant.company} className="">
             <Link
               href={participant.url}
               target="_blank"
