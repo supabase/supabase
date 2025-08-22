@@ -175,8 +175,8 @@ export function SurveyWordCloud({
                 </div>
               </div>
             )}
-            <span className="font-mono md:text-lg text-foreground tracking-wide">
-              {scramblingTexts[index].toUpperCase() || text.toUpperCase()}
+            <span className="font-mono md:text-lg text-foreground tracking-wide uppercase">
+              {scramblingTexts[index] || text}
             </span>
           </li>
         ))}

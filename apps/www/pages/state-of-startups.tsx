@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, forwardRef } from 'react'
 import { useRouter } from 'next/router'
+
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
 
@@ -165,6 +166,7 @@ function StateOfStartupsPage() {
                   >
                     <Link
                       href={`#chapter-${chapterIndex + 1}`}
+                      target="_blank"
                       onClick={() => setIsTocOpen(false)}
                       className={cn(
                         'block px-6 py-2 text-xs transition-colors font-mono uppercase tracking-wider text-center text-foreground-light hover:text-brand-link hover:bg-brand-300/25',
@@ -293,6 +295,7 @@ function StateOfStartupsPage() {
           </SurveyChapter>
         ))}
         <CTABanner ref={ctaBannerRef} />
+        <ParticipantsList />
       </DefaultLayout>
     </>
   )
@@ -300,12 +303,62 @@ function StateOfStartupsPage() {
 
 export default StateOfStartupsPage
 
+// Component for the participants list
+const ParticipantsList = () => {
+  const [shuffledParticipants, setShuffledParticipants] = useState(pageData.participantsList)
+  const [isShuffled, setIsShuffled] = useState(false)
+
+  useEffect(() => {
+    // Shuffle the participants list after component mounts (client-side only)
+    const shuffled = [...pageData.participantsList]
+    // Fisher-Yates shuffle algorithm
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    setShuffledParticipants(shuffled)
+    setIsShuffled(true)
+  }, [])
+
+  return (
+    <section className="flex flex-col items-center gap-16 md:gap-24 px-4 py-20 md:py-28 text-center border-b border-muted">
+      <div className="flex flex-col items-center gap-4 max-w-prose">
+        <h2 className="text-foreground text-3xl text-balance">Thank you</h2>
+        <p className="text-foreground-light text-lg text-balance max-w-prose">
+          A special thanks to the following companies for participating in this year’s survey.
+        </p>
+      </div>
+      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 items-center gap-x-2 gap-y-4 md:gap-x-4 md:gap-y-8 w-full mx-auto px-6 lg:px-16 xl:px-20">
+        {shuffledParticipants.map((participant, index) => (
+          <li
+            key={participant.company} // Use company name as stable key
+            className="transition-opacity duration-500 ease-in-out"
+            style={{
+              opacity: isShuffled ? 1 : 0,
+              transitionDelay: `${index * 50}ms`, // Stagger the fade-in
+            }}
+          >
+            <Link
+              href={participant.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs md:text-sm font-mono text-center tracking-widest uppercase text-foreground-lighter hover:text-brand-link transition-colors"
+            >
+              {participant.company}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 // Component for the 'Builders choose Supabase' CTA at the bottom of the page
 const CTABanner = forwardRef<HTMLElement>((props, ref) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
   return (
     <section
-      className="flex flex-col items-center gap-4 py-32 text-center border-b border-muted"
+      className="flex flex-col items-center gap-4 px-4 py-32 text-center border-b border-muted"
       style={{
         background:
           'radial-gradient(circle at center 280%, hsl(var(--brand-400)), transparent 70%)',
