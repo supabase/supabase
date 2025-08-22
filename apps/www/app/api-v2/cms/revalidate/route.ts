@@ -13,12 +13,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    console.log(`[Revalidate API] Revalidating path: ${path}`)
-
     // This will revalidate the specific page
     await res.revalidate(String(path))
 
-    console.log(`[Revalidate API] Successfully revalidated: ${path}`)
     return res.json({ revalidated: true, path })
   } catch (error) {
     console.error('[Revalidate API] Error during revalidation:', error)

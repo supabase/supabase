@@ -25,7 +25,6 @@ type BlogPostPageProps = {
 // Note: convertRichTextToMarkdown is now imported from the shared utility
 
 export default function BlogPostClient(props: BlogPostPageProps) {
-  console.log('[BlogPostClient] Props:', props)
   const isDraftMode = props.isDraftMode
   const [previewData] = useState<ProcessedBlogData>(props.blog)
   const [processedToc, setProcessedToc] = useState<{ content: string; json: any[] } | null>(null)
@@ -53,7 +52,6 @@ export default function BlogPostClient(props: BlogPostPageProps) {
 
         generateTocFromMarkdown(markdownContent, tocDepth)
           .then((tocResult) => {
-            console.log('[BlogPostClient] Generated TOC:', tocResult)
             setProcessedToc(tocResult)
           })
           .catch((error) => {
@@ -73,13 +71,6 @@ export default function BlogPostClient(props: BlogPostPageProps) {
   const blogMetaData = useMemo(() => {
     if (isDraftMode && shouldUseLivePreview) {
       if (livePreviewData && typeof livePreviewData === 'object') {
-        console.log('[BlogPostClient] BlogMetaData Debug:', {
-          hasProcessedToc: !!processedToc,
-          processedTocItems: processedToc?.json?.length || 0,
-          originalToc: props.blog.toc,
-          livePreviewTocDepth: (livePreviewData as any).toc_depth,
-          propsTocDepth: props.blog.toc_depth,
-        })
         // Process LivePreview author data to match expected CMSAuthor structure
         const processedAuthors =
           livePreviewData.authors?.map((author: Record<string, unknown>) => {
