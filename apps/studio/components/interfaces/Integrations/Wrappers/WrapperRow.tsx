@@ -85,8 +85,8 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                   </div>
                   <Tooltip>
                     <TooltipTrigger className="truncate max-w-28">{target}</TooltipTrigger>
-                    <TooltipContent className="max-w-64">
-                      <pre className="text-xs whitespace-pre-wrap">{target}</pre>
+                    <TooltipContent className="max-w-64 whitespace-pre-wrap break-words">
+                      {target}
                     </TooltipContent>
                   </Tooltip>
                   <ChevronRight
