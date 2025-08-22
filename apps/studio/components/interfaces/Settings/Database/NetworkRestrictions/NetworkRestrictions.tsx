@@ -16,7 +16,6 @@ import {
 } from 'components/layouts/Scaffold'
 import {
   Badge,
-  Button,
   Card,
   CardHeader,
   CardContent,
@@ -28,59 +27,20 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
-import AddRestrictionModal from './AddRestrictionModal'
-import AllowAllModal from './AllowAllModal'
-import DisallowAllModal from './DisallowAllModal'
-import RemoveRestrictionModal from './RemoveRestrictionModal'
+import { AddRestrictionModal } from './AddRestrictionModal'
+import { AllowAllModal } from './AllowAllModal'
+import { DisallowAllModal } from './DisallowAllModal'
+import { RemoveRestrictionModal } from './RemoveRestrictionModal'
 
 interface AccessButtonProps {
   disabled: boolean
   onClick: (value: boolean) => void
 }
 
-const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <ButtonTooltip
-    type="default"
-    disabled={disabled}
-    onClick={() => onClick(true)}
-    tooltip={{
-      content: {
-        side: 'bottom',
-        text: disabled
-          ? 'You need additional permissions to update network restrictions'
-          : undefined,
-      },
-    }}
-  >
-    Allow all access
-  </ButtonTooltip>
-)
-
-const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <ButtonTooltip
-    type="default"
-    disabled={disabled}
-    onClick={() => onClick(true)}
-    tooltip={{
-      content: {
-        side: 'bottom',
-        text: disabled
-          ? 'You need additional permissions to update network restrictions'
-          : undefined,
-      },
-    }}
-  >
-    Restrict all access
-  </ButtonTooltip>
-)
-
 export const NetworkRestrictions = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
-  const [isAllowingAll, setIsAllowingAll] = useState(false)
-  const [isDisallowingAll, setIsDisallowingAll] = useState(false)
-  const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
   const { can: canUpdateNetworkRestrictions } = useAsyncCheckProjectPermissions(
@@ -120,48 +80,41 @@ export const NetworkRestrictions = () => {
 
           <DocsButton href="https://supabase.com/docs/guides/platform/network-restrictions" />
 
-          {!canUpdateNetworkRestrictions ? (
-            <ButtonTooltip
-              disabled
-              type="primary"
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: 'You need additional permissions to update network restrictions',
-                },
-              }}
-            >
-              Add restriction
-            </ButtonTooltip>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="primary"
-                  disabled={!canUpdateNetworkRestrictions}
-                  iconRight={<ChevronDown size={14} />}
-                >
-                  Add restriction
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="bottom" className="w-48">
-                <DropdownMenuItem
-                  key="IPv4"
-                  disabled={isLoading}
-                  onClick={() => setIsAddingAddress('IPv4')}
-                >
-                  <p className="block text-foreground">Add IPv4 restriction</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="IPv6"
-                  disabled={isLoading}
-                  onClick={() => setIsAddingAddress('IPv6')}
-                >
-                  <p className="block text-foreground">Add IPv6 restriction</p>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <ButtonTooltip
+                disabled={!canUpdateNetworkRestrictions || isLoading}
+                type="primary"
+                iconRight={<ChevronDown size={14} />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canUpdateNetworkRestrictions
+                      ? 'You need additional permissions to update network restrictions'
+                      : undefined,
+                  },
+                }}
+              >
+                Add restriction
+              </ButtonTooltip>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="bottom" className="w-48">
+              <DropdownMenuItem
+                key="IPv4"
+                disabled={isLoading}
+                onClick={() => setIsAddingAddress('IPv4')}
+              >
+                <p className="block text-foreground">Add IPv4 restriction</p>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                key="IPv6"
+                disabled={isLoading}
+                onClick={() => setIsAddingAddress('IPv6')}
+              >
+                <p className="block text-foreground">Add IPv6 restriction</p>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </ScaffoldSectionTitle>
 
         {isLoading ? (
@@ -174,14 +127,8 @@ export const NetworkRestrictions = () => {
           <Admonition type="warning" title="Your network restrictions were not applied correctly">
             <p>Please try to add your network restrictions again</p>
             <div className="flex gap-2">
-              <AllowAllAccessButton
-                disabled={!canUpdateNetworkRestrictions}
-                onClick={setIsAllowingAll}
-              />
-              <DisallowAllAccessButton
-                disabled={!canUpdateNetworkRestrictions}
-                onClick={setIsDisallowingAll}
-              />
+              <AllowAllModal />
+              <DisallowAllModal />
             </div>
           </Admonition>
         ) : isUninitialized || isAllowedAll ? (
@@ -193,10 +140,7 @@ export const NetworkRestrictions = () => {
                 label="Any IP address can access your database"
                 description="You may start limiting access to your database by adding a network restriction."
               >
-                <DisallowAllAccessButton
-                  disabled={!canUpdateNetworkRestrictions}
-                  onClick={setIsDisallowingAll}
-                />
+                <DisallowAllModal />
               </FormLayout>
             </CardContent>
           </Card>
@@ -224,10 +168,7 @@ export const NetworkRestrictions = () => {
                   </div>
                 }
               >
-                <AllowAllAccessButton
-                  disabled={!canUpdateNetworkRestrictions}
-                  onClick={setIsAllowingAll}
-                />
+                <AllowAllModal />
               </FormLayout>
             </CardContent>
           </Card>
@@ -242,9 +183,7 @@ export const NetworkRestrictions = () => {
                     <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
                     <p className="text-sm font-mono">{ip}</p>
                   </div>
-                  <Button type="default" onClick={() => setSelectedRestrictionToRemove(ip)}>
-                    Remove
-                  </Button>
+                  <RemoveRestrictionModal selectedRestriction={ip} />
                 </CardContent>
               )
             })}
@@ -255,31 +194,17 @@ export const NetworkRestrictions = () => {
               <p>Note: Restrictions only apply to your database, and not to Supabase services</p>
             </CardContent>
             <CardFooter className="justify-end">
-              <AllowAllAccessButton
-                disabled={!canUpdateNetworkRestrictions}
-                onClick={setIsAllowingAll}
-              />
-              <DisallowAllAccessButton
-                disabled={!canUpdateNetworkRestrictions}
-                onClick={setIsDisallowingAll}
-              />
+              <AllowAllModal />
+              <DisallowAllModal />
             </CardFooter>
           </Card>
         )}
       </ScaffoldSection>
 
-      <AllowAllModal visible={isAllowingAll} onClose={() => setIsAllowingAll(false)} />
-      <DisallowAllModal visible={isDisallowingAll} onClose={() => setIsDisallowingAll(false)} />
-
       <AddRestrictionModal
         type={isAddingAddress}
         hasOverachingRestriction={isAllowedAll || isDisallowedAll}
         onClose={() => setIsAddingAddress(undefined)}
-      />
-      <RemoveRestrictionModal
-        visible={selectedRestrictionToRemove !== undefined}
-        selectedRestriction={selectedRestrictionToRemove}
-        onClose={() => setSelectedRestrictionToRemove(undefined)}
       />
     </>
   )
