@@ -14,7 +14,6 @@ const AuthProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
 
   const {
-    authenticationPolicies,
     authenticationSignInProviders,
     authenticationRateLimits,
     authenticationEmails,
@@ -22,7 +21,6 @@ const AuthProductMenu = () => {
     authenticationAttackProtection,
     authenticationAdvanced,
   } = useIsFeatureEnabled([
-    'authentication:policies',
     'authentication:sign_in_providers',
     'authentication:rate_limits',
     'authentication:emails',
@@ -38,7 +36,6 @@ const AuthProductMenu = () => {
     <ProductMenu
       page={page}
       menu={generateAuthMenu(projectRef, {
-        authenticationPolicies,
         authenticationSignInProviders,
         authenticationRateLimits,
         authenticationEmails,

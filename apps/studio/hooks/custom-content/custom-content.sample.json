@@ -3,7 +3,8 @@
 
   "organization:legal_documents": [
     {
-      "name": "Framework 1",
+      "id": "doc1",
+      "name": "Document 1",
       "description": "This is a description of Document 1",
       "action": {
         "text": "Download document",

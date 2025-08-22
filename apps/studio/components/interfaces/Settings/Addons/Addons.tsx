@@ -28,6 +28,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsOrioleDbInAws,
@@ -45,12 +46,17 @@ import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
 
-const Addons = () => {
+export const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
   const isProjectActive = useIsProjectActive()
   const isOrioleDbInAws = useIsOrioleDbInAws()
+
+  const { projectSettingsCustomDomains, projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
+    'project_settings:custom_domains',
+    'project_addons:dedicated_ipv4_address',
+  ])
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
@@ -330,80 +336,83 @@ const Addons = () => {
             </ScaffoldSection>
           </ScaffoldContainer>
 
-          <ScaffoldDivider />
-
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <ScaffoldSectionDetail>
-                <div className="space-y-6">
-                  <p className="m-0">Dedicated IPv4 address</p>
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light m-0">More information</p>
-                    <div>
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/ipv4-address"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">About IPv4 deprecation</p>
-                          <ExternalLink size={16} strokeWidth={1.5} />
+          {projectAddonsDedicatedIpv4Address && (
+            <>
+              <ScaffoldDivider />
+              <ScaffoldContainer>
+                <ScaffoldSection>
+                  <ScaffoldSectionDetail>
+                    <div className="space-y-6">
+                      <p className="m-0">Dedicated IPv4 address</p>
+                      <div className="space-y-2">
+                        <p className="text-sm text-foreground-light m-0">More information</p>
+                        <div>
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/ipv4-address"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                              <p className="text-sm m-0">About IPv4 deprecation</p>
+                              <ExternalLink size={16} strokeWidth={1.5} />
+                            </div>
+                          </Link>
                         </div>
-                      </Link>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </ScaffoldSectionDetail>
-              <ScaffoldSectionContent>
-                <div className="flex space-x-6">
-                  <div>
-                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                      <img
-                        alt="IPv4"
-                        width={160}
-                        height={96}
-                        src={
-                          ipv4 !== undefined
-                            ? `${BASE_PATH}/img/ipv4-on${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg?v=2`
-                            : `${BASE_PATH}/img/ipv4-off${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg?v=2`
-                        }
-                      />
+                  </ScaffoldSectionDetail>
+                  <ScaffoldSectionContent>
+                    <div className="flex space-x-6">
+                      <div>
+                        <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                          <img
+                            alt="IPv4"
+                            width={160}
+                            height={96}
+                            src={
+                              ipv4 !== undefined
+                                ? `${BASE_PATH}/img/ipv4-on${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg?v=2`
+                                : `${BASE_PATH}/img/ipv4-off${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg?v=2`
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-foreground-light">Current option:</p>
+                        <p>
+                          {ipv4 !== undefined
+                            ? 'Dedicated IPv4 address is enabled'
+                            : 'Dedicated IPv4 address is not enabled'}
+                        </p>
+                        <ButtonTooltip
+                          type="default"
+                          className="mt-2 pointer-events-auto"
+                          onClick={() => setPanel('ipv4')}
+                          disabled={
+                            !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
+                          }
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: !(canUpdateIPv4 || ipv4)
+                                ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
+                                : undefined,
+                            },
+                          }}
+                        >
+                          Change dedicated IPv4 address
+                        </ButtonTooltip>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>
-                      {ipv4 !== undefined
-                        ? 'Dedicated IPv4 address is enabled'
-                        : 'Dedicated IPv4 address is not enabled'}
-                    </p>
-                    <ButtonTooltip
-                      type="default"
-                      className="mt-2 pointer-events-auto"
-                      onClick={() => setPanel('ipv4')}
-                      disabled={
-                        !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
-                      }
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !(canUpdateIPv4 || ipv4)
-                            ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
-                            : undefined,
-                        },
-                      }}
-                    >
-                      Change dedicated IPv4 address
-                    </ButtonTooltip>
-                  </div>
-                </div>
-              </ScaffoldSectionContent>
-            </ScaffoldSection>
-          </ScaffoldContainer>
+                  </ScaffoldSectionContent>
+                </ScaffoldSection>
+              </ScaffoldContainer>
+            </>
+          )}
 
           <ScaffoldDivider />
 
@@ -528,75 +537,78 @@ const Addons = () => {
             </ScaffoldSection>
           </ScaffoldContainer>
 
-          <ScaffoldDivider />
-
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <ScaffoldSectionDetail>
-                <div className="space-y-6">
-                  <p className="m-0">Custom domain</p>
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light m-0">More information</p>
-                    <div>
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/custom-domains"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">About custom domains</p>
-                          <ExternalLink size={16} strokeWidth={1.5} />
+          {projectSettingsCustomDomains && (
+            <>
+              <ScaffoldDivider />
+              <ScaffoldContainer>
+                <ScaffoldSection>
+                  <ScaffoldSectionDetail>
+                    <div className="space-y-6">
+                      <p className="m-0">Custom domain</p>
+                      <div className="space-y-2">
+                        <p className="text-sm text-foreground-light m-0">More information</p>
+                        <div>
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/custom-domains"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                              <p className="text-sm m-0">About custom domains</p>
+                              <ExternalLink size={16} strokeWidth={1.5} />
+                            </div>
+                          </Link>
                         </div>
-                      </Link>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </ScaffoldSectionDetail>
-              <ScaffoldSectionContent>
-                <div className="flex space-x-6">
-                  <div>
-                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                      <img
-                        alt="Custom Domain"
-                        width={160}
-                        height={96}
-                        src={
-                          customDomain !== undefined
-                            ? `${BASE_PATH}/img/custom-domain-on${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                            : `${BASE_PATH}/img/custom-domain-off${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                        }
-                      />
+                  </ScaffoldSectionDetail>
+                  <ScaffoldSectionContent>
+                    <div className="flex space-x-6">
+                      <div>
+                        <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                          <img
+                            alt="Custom Domain"
+                            width={160}
+                            height={96}
+                            src={
+                              customDomain !== undefined
+                                ? `${BASE_PATH}/img/custom-domain-on${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg`
+                                : `${BASE_PATH}/img/custom-domain-off${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg`
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-foreground-light">Current option:</p>
+                        <p>
+                          {customDomain !== undefined
+                            ? 'Custom domain is enabled'
+                            : 'Custom domain is not enabled'}
+                        </p>
+                        <ProjectUpdateDisabledTooltip
+                          projectUpdateDisabled={projectUpdateDisabled}
+                          projectNotActive={!isProjectActive}
+                        >
+                          <Button
+                            type="default"
+                            className="mt-2 pointer-events-auto"
+                            onClick={() => setPanel('customDomain')}
+                            disabled={!isProjectActive || projectUpdateDisabled}
+                          >
+                            Change custom domain
+                          </Button>
+                        </ProjectUpdateDisabledTooltip>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>
-                      {customDomain !== undefined
-                        ? 'Custom domain is enabled'
-                        : 'Custom domain is not enabled'}
-                    </p>
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => setPanel('customDomain')}
-                        disabled={!isProjectActive || projectUpdateDisabled}
-                      >
-                        Change custom domain
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
-                  </div>
-                </div>
-              </ScaffoldSectionContent>
-            </ScaffoldSection>
-          </ScaffoldContainer>
+                  </ScaffoldSectionContent>
+                </ScaffoldSection>
+              </ScaffoldContainer>
+            </>
+          )}
         </>
       )}
 
@@ -606,5 +618,3 @@ const Addons = () => {
     </>
   )
 }
-
-export default Addons

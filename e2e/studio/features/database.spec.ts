@@ -2,7 +2,7 @@ import { expect, Page } from '@playwright/test'
 import { env } from '../env.config'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
-import { waitForApiResponse } from '../utils/wait-for-response'
+import { waitForApiResponse, waitForDatabaseToLoad } from '../utils/wait-for-response'
 
 const databaseTableName = 'pw_database_table'
 const databaseTableNameNew = 'pw_database_table_new'
@@ -89,12 +89,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
 
       // Wait for schema visualizer to load
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
 
       // validates table and column exists
       await page.waitForTimeout(500)
@@ -122,12 +117,7 @@ test.describe('Database', () => {
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=auth'
-      )
+      await waitForDatabaseToLoad(page, ref, 'auth')
       await expect(page.getByText('users')).toBeVisible()
       await expect(page.getByText('sso_providers')).toBeVisible()
       await expect(page.getByText('saml_providers')).toBeVisible()
@@ -145,12 +135,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
 
       // check new table button is present in public schema
       await expect(page.getByRole('button', { name: 'New table' })).toBeVisible()
@@ -166,12 +151,7 @@ test.describe('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=auth'
-      )
+      await waitForDatabaseToLoad(page, ref, 'auth')
       await expect(page.getByText('sso_providers')).toBeVisible()
       // check new table button is not present in other schemas
       await expect(page.getByRole('button', { name: 'New table' })).not.toBeVisible()
@@ -187,12 +167,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
 
       // drop database tables if exists
       if ((await page.getByText(databaseTableNameNew, { exact: true }).count()) > 0) {
@@ -229,12 +204,7 @@ test.describe('Database', () => {
 
       // validate table creation
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-create')
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameNew, { exact: true })).toBeVisible()
 
       // edit a new table
@@ -245,12 +215,7 @@ test.describe('Database', () => {
 
       // validate table update
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-update')
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
 
       // duplicate table
@@ -262,12 +227,7 @@ test.describe('Database', () => {
 
       // validate table duplicate
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameDuplicate, { exact: true })).toBeVisible()
 
       // delete tables
@@ -302,12 +262,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
 
       // navigate to table columns
       const databaseRow = page.getByRole('row', { name: databaseTableName })
