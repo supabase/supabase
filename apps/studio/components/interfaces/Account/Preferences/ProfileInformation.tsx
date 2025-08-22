@@ -45,54 +45,7 @@ export const ProfileInformation = () => {
     isLoading: isIdentitiesLoading,
     isSuccess: isIdentitiesSuccess,
   } = useProfileIdentitiesQuery()
-  // const identities = (identityData?.identities ?? []).filter((x) => x.identity_data?.email !== null)
-  const identities = [
-    {
-      identity_id: 'd2de9d13-5716-4890-a152-cade0ece5be0',
-      id: 'account:7cfa615a5081ab3ce479dc7a87e00193e364324067e524512c1747f6ea2edf72:user:a5546c35703bad1e9b73da81984734c7a1fe731c30b7cd20cbf0752c62b96859',
-      user_id: '1e34e960-b893-43f2-903e-7c7a6f878902',
-      identity_data: {
-        email: 'joshenlimek@gmail.com',
-        email_verified: true,
-        iss: 'https://marketplace.vercel.com',
-        name: 'Joshen Lim',
-        phone_verified: false,
-        picture: 'https://vercel.com/api/www/avatar/583402f6e9a4a75e943fb9b3a23b0716d98d84ec',
-        provider_id:
-          'account:7cfa615a5081ab3ce479dc7a87e00193e364324067e524512c1747f6ea2edf72:user:a5546c35703bad1e9b73da81984734c7a1fe731c30b7cd20cbf0752c62b96859',
-        sub: 'account:7cfa615a5081ab3ce479dc7a87e00193e364324067e524512c1747f6ea2edf72:user:a5546c35703bad1e9b73da81984734c7a1fe731c30b7cd20cbf0752c62b96859',
-      },
-      provider: 'vercel_marketplace',
-      last_sign_in_at: '2024-08-23T07:27:11.703592Z',
-      created_at: '2024-08-23T07:27:11.703864Z',
-      updated_at: '2024-08-23T07:27:11.703864Z',
-      email: 'joshenlimek@gmail.com',
-    },
-    {
-      identity_id: '1122135c-f8a4-462e-bbb0-be60627f54a4',
-      id: '19742402',
-      user_id: '1e34e960-b893-43f2-903e-7c7a6f878902',
-      identity_data: {
-        avatar_url: 'https://avatars.githubusercontent.com/u/19742402?v=4',
-        email: 'joshenlimek@gmail.com',
-        email_verified: true,
-        full_name: 'Joshen Lim',
-        iss: 'https://api.github.com',
-        name: 'Joshen Lim',
-        phone_verified: false,
-        preferred_username: 'joshenlim',
-        provider_id: '19742402',
-        sub: '19742402',
-        user_name: 'joshenlim',
-      },
-      provider: 'github',
-      last_sign_in_at: '2021-12-20T07:04:05.150795Z',
-      created_at: '2021-12-20T07:04:05.150838Z',
-      updated_at: '2025-08-22T12:48:10.533516Z',
-      email: 'joshenlimek@gmail.com',
-    },
-  ]
-
+  const identities = (identityData?.identities ?? []).filter((x) => x.identity_data?.email !== null)
   const dedupedIdentityEmails = Object.keys(groupBy(identities, 'identity_data.email'))
 
   const defaultValues = {
