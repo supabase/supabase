@@ -3,20 +3,8 @@ import { SurveyWordCloud } from './SurveyWordCloud'
 import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
 import { SurveyRankedAnswersPair } from './SurveyRankedAnswersPair'
 import { SurveySectionBreak } from './SurveySectionBreak'
-import { AcceleratorParticipationChart } from './charts/AcceleratorParticipationChart'
-import { RoleChart } from './charts/RoleChart'
-import { IndustryChart } from './charts/IndustryChart'
-import { FundingStageChart } from './charts/FundingStageChart'
-import { DatabasesChart } from './charts/DatabasesChart'
-import { AIModelsChart } from './charts/AIModelsChart'
-import { LocationChart } from './charts/LocationChart'
-import { SalesToolsChart } from './charts/SalesToolsChart'
-import { AICodingToolsChart } from './charts/AICodingToolsChart'
-import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
-import { NewIdeasChart } from './charts/NewIdeasChart'
-import { InitialPayingCustomersChart } from './charts/InitialPayingCustomersChart'
-import { WorldOutlookChart } from './charts/WorldOutlookChart'
-import { BiggestChallengeChart } from './charts/BiggestChallengeChart'
+import { SurveyChart } from './SurveyChart'
+import { CHART_CONFIGS } from './chartConfigs'
 
 interface SurveyChapterSectionProps {
   title: string
@@ -46,23 +34,6 @@ export function SurveyChapterSection({
   rankedAnswersPair,
   children,
 }: SurveyChapterSectionProps) {
-  const chartComponents = {
-    RoleChart,
-    IndustryChart,
-    FundingStageChart,
-    AcceleratorParticipationChart,
-    DatabasesChart,
-    AICodingToolsChart,
-    AIModelsChart,
-    RegularSocialMediaUseChart,
-    NewIdeasChart,
-    InitialPayingCustomersChart,
-    SalesToolsChart,
-    WorldOutlookChart,
-    BiggestChallengeChart,
-    LocationChart,
-  }
-
   return (
     <div id={title.toLowerCase().replace(/\s+/g, '-')} className="">
       <div className="max-w-[60rem] mx-auto flex flex-col md:border-x border-muted">
@@ -83,9 +54,9 @@ export function SurveyChapterSection({
           </aside>
         )}
 
-        {charts?.map((chartName, index) => {
-          const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
-          return ChartComponent ? <ChartComponent key={index} /> : null
+        {charts?.map((chartId, index) => {
+          const config = CHART_CONFIGS.find((c) => c.id === chartId)
+          return config ? <SurveyChart key={chartId} {...config} /> : null
         })}
 
         {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
