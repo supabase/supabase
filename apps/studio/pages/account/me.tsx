@@ -5,7 +5,6 @@ import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/Ana
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
@@ -29,9 +28,7 @@ User.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout title="Preferences">
-          <AccountSettingsLayout>{page}</AccountSettingsLayout>
-        </AccountLayout>
+        <AccountLayout title="Account Settings">{page}</AccountLayout>
       </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>

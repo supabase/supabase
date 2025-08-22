@@ -407,7 +407,7 @@ export const RegionNode = ({ data }: any) => {
         <img
           alt="region icon"
           className="w-5 rounded-sm"
-          src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+          src={`${BASE_PATH}/img/regions/${region.region}.svg`}
         />
         <p className="text-sm">{region.name}</p>
       </div>
