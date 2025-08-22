@@ -1,22 +1,23 @@
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { TokenList } from 'components/interfaces/Account/AccessTokens/Classic/TokenList'
-import { NewTokenButton } from 'components/interfaces/Account/AccessTokens/Classic/NewTokenButton'
-import { AccessTokenNewBanner } from 'components/interfaces/Account/AccessTokens/AccessTokenNewBanner'
 import AccessTokensLayout from 'components/layouts/AccessTokens/AccessTokensLayout'
+import { NewScopedTokenButton } from 'components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenButton'
+import { AccessTokenNewBanner } from 'components/interfaces/Account/AccessTokens/AccessTokenNewBanner'
+
+import { ScopedTokenList } from 'components/interfaces/Account/AccessTokens/Scoped/ScopedTokenList'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { NewScopedAccessToken } from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-const UserAccessTokens: NextPageWithLayout = () => {
-  const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
+const ScopedTokens: NextPageWithLayout = () => {
   const [searchString, setSearchString] = useState('')
+  const [newToken, setNewToken] = useState<NewScopedAccessToken | undefined>()
 
   return (
     <AccessTokensLayout>
@@ -26,6 +27,9 @@ const UserAccessTokens: NextPageWithLayout = () => {
             token={newToken}
             onClose={() => setNewToken(undefined)}
             getTokenValue={(token) => token.token}
+            getTokenPermissions={(token) => token.permissions}
+            title="Successfully generated a new scoped token!"
+            description="Do copy this scoped access token and store it in a secure place - you will not be able to see it again."
           />
         )}
         <div className="flex items-center justify-between gap-x-2 mb-3">
@@ -37,7 +41,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
             onChange={(e: any) => setSearchString(e.target.value)}
             name="search"
             id="search"
-            placeholder="Filter tokens"
+            placeholder="Filter scoped tokens"
           />
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink />}>
@@ -58,10 +62,11 @@ const UserAccessTokens: NextPageWithLayout = () => {
                 CLI docs
               </a>
             </Button>
-            <NewTokenButton onCreateToken={setNewToken} />
+            <NewScopedTokenButton onCreateToken={setNewToken} />
           </div>
         </div>
-        <TokenList
+
+        <ScopedTokenList
           searchString={searchString}
           onDeleteSuccess={(id) => {
             if (id === newToken?.id) setNewToken(undefined)
@@ -72,7 +77,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
   )
 }
 
-UserAccessTokens.getLayout = (page) => (
+ScopedTokens.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
@@ -82,4 +87,4 @@ UserAccessTokens.getLayout = (page) => (
   </AppLayout>
 )
 
-export default UserAccessTokens
+export default ScopedTokens

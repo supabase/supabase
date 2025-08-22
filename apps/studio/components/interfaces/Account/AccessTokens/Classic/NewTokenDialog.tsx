@@ -34,7 +34,7 @@ import {
   CUSTOM_EXPIRY_VALUE,
   ExpiresAtOptions,
   NON_EXPIRING_TOKEN_VALUE,
-} from './AccessTokens.constants'
+} from '../AccessToken.constants'
 
 const formId = 'new-access-token-form'
 
@@ -53,7 +53,7 @@ export interface NewAccessTokenDialogProps {
   onCreateToken: (token: any) => void
 }
 
-export const NewAccessTokenDialog = ({
+export const NewTokenDialog = ({
   open,
   tokenScope,
   onOpenChange,
@@ -70,11 +70,9 @@ export const NewAccessTokenDialog = ({
   const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
-    // Use custom date if custom option is selected
     let expiresAt = values.expiresAt
 
     if (isCustomExpiry && customExpiryDate) {
-      // Use the date from the TokensDatePicker
       expiresAt = customExpiryDate.date
     }
 

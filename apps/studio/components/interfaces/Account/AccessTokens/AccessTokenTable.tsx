@@ -1,6 +1,4 @@
 import AlertError from 'components/ui/AlertError'
-import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
-import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import dayjs from 'dayjs'
 import { MoreVertical, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -51,16 +49,17 @@ const RowLoading = () => (
 
 const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2'
 
-const TableContainer = ({ children }: { children: React.ReactNode }) => (
+const TableContainer = ({ children, columns }: { children: React.ReactNode; columns: TableColumn<any>[] }) => (
   <Card className="w-full overflow-hidden">
     <CardContent className="p-0">
       <Table className="p-5 table-auto">
         <TableHeader>
           <TableRow className="bg-200">
-            <TableHead className={tableHeaderClass}>Name</TableHead>
-            <TableHead className={tableHeaderClass}>Token</TableHead>
-            <TableHead className={tableHeaderClass}>Last used</TableHead>
-            <TableHead className={tableHeaderClass}>Expires</TableHead>
+            {columns.map((column) => (
+              <TableHead key={column.key} className={cn(tableHeaderClass, column.className)}>
+                {column.label}
+              </TableHead>
+            ))}
             <TableHead className={cn(tableHeaderClass, '!text-right')} />
           </TableRow>
         </TableHeader>
@@ -70,29 +69,57 @@ const TableContainer = ({ children }: { children: React.ReactNode }) => (
   </Card>
 )
 
-export interface AccessTokenListProps {
-  searchString?: string
-  onDeleteSuccess: (id: number) => void
+export interface TableColumn<T> {
+  key: string
+  label: string
+  render: (token: T) => React.ReactNode
+  className?: string
 }
 
-export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenListProps) => {
+export interface AccessTokenTableProps<T> {
+  searchString?: string
+  onDeleteSuccess: (id: string | number) => void
+  tokens: T[] | undefined
+  error: any
+  isLoading: boolean
+  isError: boolean
+  deleteMutation: any
+  getTokenId: (token: T) => string | number
+  getTokenName: (token: T) => string
+  columns: TableColumn<T>[]
+  emptyMessage?: string
+  emptyDescription?: string
+}
+
+export const AccessTokenTable = <T,>({
+  searchString = '',
+  onDeleteSuccess,
+  tokens,
+  error,
+  isLoading,
+  isError,
+  deleteMutation,
+  getTokenId,
+  getTokenName,
+  columns,
+  emptyMessage = 'No access tokens found',
+  emptyDescription = 'You do not have any tokens created yet',
+}: AccessTokenTableProps<T>) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [token, setToken] = useState<AccessToken | undefined>(undefined)
+  const [token, setToken] = useState<T | undefined>(undefined)
 
-  const { data: tokens, error, isLoading, isError } = useAccessTokensQuery()
-
-  const { mutate: deleteToken } = useAccessTokenDeleteMutation({
-    onSuccess: (_, vars) => {
+  const { mutate: deleteToken } = deleteMutation({
+    onSuccess: (_: any, vars: any) => {
       onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsOpen(false)
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Failed to delete access token: ${error.message}`)
     },
   })
 
-  const onDeleteToken = async (tokenId: number) => {
+  const onDeleteToken = async (tokenId: string | number) => {
     deleteToken({ id: tokenId })
   }
 
@@ -100,17 +127,17 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     return !searchString
       ? tokens
       : tokens?.filter((token) => {
-          return token.name.toLowerCase().includes(searchString.toLowerCase())
+          return getTokenName(token).toLowerCase().includes(searchString.toLowerCase())
         })
-  }, [tokens, searchString])
+  }, [tokens, searchString, getTokenName])
 
   const empty = filteredTokens?.length === 0 && !isLoading
 
   if (isError) {
     return (
-      <TableContainer>
+      <TableContainer columns={columns}>
         <TableRow>
-          <TableCell colSpan={4} className="p-0">
+          <TableCell colSpan={columns.length + 1} className="p-0">
             <AlertError
               error={error}
               subject="Failed to retrieve access tokens"
@@ -124,7 +151,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   if (isLoading) {
     return (
-      <TableContainer>
+      <TableContainer columns={columns}>
         <RowLoading />
         <RowLoading />
       </TableContainer>
@@ -133,13 +160,11 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   if (empty) {
     return (
-      <TableContainer>
+      <TableContainer columns={columns}>
         <TableRow>
-          <TableCell colSpan={4} className="py-12">
-            <p className="text-sm text-center text-foreground">No access tokens found</p>
-            <p className="text-sm text-center text-foreground-light">
-              You do not have any tokens created yet
-            </p>
+          <TableCell colSpan={columns.length + 1} className="py-12">
+            <p className="text-sm text-center text-foreground">{emptyMessage}</p>
+            <p className="text-sm text-center text-foreground-light">{emptyDescription}</p>
           </TableCell>
         </TableRow>
       </TableContainer>
@@ -148,59 +173,18 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   return (
     <>
-      <TableContainer>
-        {filteredTokens?.map((x) => {
+      <TableContainer columns={columns}>
+        {filteredTokens?.map((token) => {
+          const tokenId = getTokenId(token)
+          const tokenName = getTokenName(token)
+
           return (
-            <TableRow key={x.token_alias}>
-              <TableCell className="w-36 max-w-36">
-                <p className="truncate" title={x.name}>
-                  {x.name}
-                </p>
-              </TableCell>
-              <TableCell className="max-w-96">
-                <p className="font-mono text-foreground-light truncate">{x.token_alias}</p>
-              </TableCell>
-              <TableCell className="min-w-32">
-                <p className="text-foreground-light">
-                  {x.last_used_at ? (
-                    <Tooltip>
-                      <TooltipTrigger>{dayjs(x.last_used_at).format('DD MMM YYYY')}</TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        Last used on {dayjs(x.last_used_at).format('DD MMM, YYYY HH:mm:ss')}
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    'Never used'
-                  )}
-                </p>
-              </TableCell>
-              <TableCell className="min-w-32">
-                {x.expires_at ? (
-                  dayjs(x.expires_at).isBefore(dayjs()) ? (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <p className="text-foreground-light">Expired</p>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        Expired on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm:ss')}
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <p className="text-foreground-light">
-                          {dayjs(x.expires_at).format('DD MMM YYYY')}
-                        </p>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        Expires on {dayjs(x.expires_at).format('DD MMM, YYYY HH:mm:ss')}
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                ) : (
-                  <p className="text-foreground-light">Never</p>
-                )}
-              </TableCell>
+            <TableRow key={tokenId}>
+              {columns.map((column) => (
+                <TableCell key={column.key} className={column.className}>
+                  {column.render(token)}
+                </TableCell>
+              ))}
               <TableCell>
                 <div className="flex items-center justify-end gap-x-2">
                   <DropdownMenu>
@@ -218,7 +202,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                       <DropdownMenuItem
                         className="gap-x-2"
                         onClick={() => {
-                          setToken(x)
+                          setToken(token)
                           setIsOpen(true)
                         }}
                       >
@@ -242,11 +226,11 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         confirmLabelLoading="Deleting"
         onCancel={() => setIsOpen(false)}
         onConfirm={() => {
-          if (token) onDeleteToken(token.id)
+          if (token) onDeleteToken(getTokenId(token))
         }}
       >
         <p className="py-4 text-sm text-foreground-light">
-          This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
+          This action cannot be undone. Are you sure you want to delete "{token ? getTokenName(token) : ''}" token?
         </p>
       </ConfirmationModal>
     </>
