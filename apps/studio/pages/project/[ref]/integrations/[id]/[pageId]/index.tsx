@@ -9,7 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
 import { useEffect, useMemo } from 'react'
 import { NextPageWithLayout } from 'types'
-import { Skeleton } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -38,16 +38,10 @@ const IntegrationPage: NextPageWithLayout = () => {
       label: 'Integrations',
       href: `/project/${ref}/integrations`,
     },
+    {
+      label: integration?.name || 'Integration not found',
+    },
   ]
-
-  // Get integration icon and subtitle
-  const integrationIcon = integration ? (
-    <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
-      {integration.icon()}
-    </div>
-  ) : null
-
-  const integrationSubtitle = integration?.description || null
 
   // Create navigation items from integration navigation
   const navigationItems: NavigationItem[] = useMemo(() => {
@@ -81,59 +75,58 @@ const IntegrationPage: NextPageWithLayout = () => {
     }
   }, [installation, isIntegrationsLoading, pageId, router])
 
-  if (!router?.isReady || isIntegrationsLoading) {
-    return (
-      <PageLayout
-        title={<Skeleton className="w-32 h-8" />}
-        size="full"
-        breadcrumbs={breadcrumbItems}
-      >
+  // Determine page title, icon, and subtitle based on state
+  const pageTitle = integration?.name || 'Integration not found'
+
+  const pageSubTitle =
+    integration?.description || 'If you think this is an error, please contact support'
+
+  // Get integration icon and subtitle
+  const pageIcon = integration ? (
+    <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
+      {integration.icon()}
+    </div>
+  ) : null
+
+  // Determine content based on state
+  const content = useMemo(() => {
+    if (!router?.isReady || isIntegrationsLoading) {
+      return (
         <ScaffoldContainer size="full">
           <ScaffoldSection isFullWidth>
             <GenericSkeletonLoader />
           </ScaffoldSection>
         </ScaffoldContainer>
-      </PageLayout>
-    )
-  }
-
-  if (!id || !integration) {
-    return (
-      <PageLayout title="Integration not found" size="full" breadcrumbs={breadcrumbItems}>
-        <ScaffoldContainer>
-          <div>Integration not found</div>
+      )
+    } else if (!Component || !id || !integration) {
+      return (
+        <ScaffoldContainer size="full">
+          <ScaffoldSection isFullWidth>
+            <Admonition type="warning" title="This integration is not currently available">
+              Please try again later or contact support if the problem persists.
+            </Admonition>
+          </ScaffoldSection>
         </ScaffoldContainer>
-      </PageLayout>
-    )
-  }
+      )
+    } else {
+      return <Component />
+    }
+  }, [router?.isReady, isIntegrationsLoading, id, integration, Component])
 
-  if (!Component) {
-    return (
-      <PageLayout
-        title={integration?.name || 'Integration'}
-        icon={integrationIcon}
-        subtitle={integrationSubtitle}
-        size="full"
-        breadcrumbs={breadcrumbItems}
-        navigationItems={navigationItems}
-      >
-        <ScaffoldContainer>
-          <div className="p-10 text-sm">Component not found</div>
-        </ScaffoldContainer>
-      </PageLayout>
-    )
+  if (!router?.isReady) {
+    return null
   }
 
   return (
     <PageLayout
-      title={integration.name}
-      icon={integrationIcon}
-      subtitle={integrationSubtitle}
+      title={pageTitle}
+      icon={pageIcon}
+      subtitle={pageSubTitle}
       size="full"
       breadcrumbs={breadcrumbItems}
       navigationItems={navigationItems}
     >
-      <Component />
+      {content}
     </PageLayout>
   )
 }

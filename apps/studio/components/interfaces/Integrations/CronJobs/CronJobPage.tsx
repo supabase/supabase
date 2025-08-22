@@ -48,7 +48,6 @@ export const CronJobPage = () => {
   const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
-  // Create breadcrumb items
   const breadcrumbItems = [
     {
       label: 'Integrations',
@@ -60,15 +59,15 @@ export const CronJobPage = () => {
         ? `/project/${ref}/integrations/${id}/${pageId}`
         : `/project/${ref}/integrations/${id}`,
     },
+    {
+      label: childId,
+    },
   ]
 
-  // No navigation items for child pages
   const navigationItems: NavigationItem[] = []
 
-  // Page title is the job name (childId) or custom label
   const pageTitle = childLabel || childId || 'Cron Job'
 
-  // Create subtitle with schedule and command
   const pageSubtitle = job ? (
     <div className="text-sm text-foreground-light">
       Running{' '}
