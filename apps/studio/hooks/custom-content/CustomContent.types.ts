@@ -1,0 +1,8 @@
+export type CustomContentTypes = {
+  organizationLegalDocuments: {
+    id: string
+    name: string
+    description: string
+    action: { text: string; url: string }
+  }[]
+}

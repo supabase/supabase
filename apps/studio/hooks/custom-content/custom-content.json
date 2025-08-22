@@ -1,0 +1,5 @@
+{
+  "$schema": "./custom-content.schema.json",
+
+  "organization:legal_documents": null
+}
