@@ -122,6 +122,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
+  const [isResubmitting, setIsResubmitting] = useState(false)
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -235,7 +236,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     onFinish: handleChatFinish,
   })
 
-  const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming' || isResubmitting
 
   const updateMessage = useCallback(
     ({
@@ -335,6 +336,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     if (editingMessageId) {
       // Handling when the user is in edit mode
       // delete the message(s) from the chat just like the delete button
+      setIsResubmitting(true)
       deleteMessageFromHere(editingMessageId)
       setEditingMessageId(null)
     }
@@ -376,6 +378,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     lastUserMessageRef.current = null
     setEditingMessageId(null)
   }
+
+  useEffect(() => {
+    // Keep "Thinking" visible while stopping and resubmitting during edit
+    // Only clear once the new response actually starts streaming (or errors)
+    if (isResubmitting && (chatStatus === 'streaming' || !!error)) {
+      setIsResubmitting(false)
+    }
+  }, [isResubmitting, chatStatus, error])
 
   // Update scroll behavior for new messages
   useEffect(() => {
