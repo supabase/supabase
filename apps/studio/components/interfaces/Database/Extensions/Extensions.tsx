@@ -11,7 +11,17 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, Input, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, ShadowScrollArea } from 'ui'
+import {
+  Card,
+  Input,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  ShadowScrollArea,
+} from 'ui'
 import ExtensionRow from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 
@@ -85,10 +95,7 @@ const Extensions = () => {
                   <TableHead key="description">Description</TableHead>
                   <TableHead key="used-by">Used by</TableHead>
                   <TableHead key="links">Links</TableHead>
-                  <TableHead
-                    key="enabled"
-                    className="w-20 !bg-200"
-                  >
+                  <TableHead key="enabled" className="w-20 !bg-200">
                     Enabled
                   </TableHead>
                 </TableRow>
