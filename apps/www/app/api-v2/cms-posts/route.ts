@@ -198,6 +198,7 @@ export async function GET(request: NextRequest) {
                 image: latestVersion.image?.url
                   ? `${baseUrl}${latestVersion.image.url}`
                   : undefined,
+                meta: latestVersion.meta || null,
                 url: `/blog/${latestVersion.slug}`,
                 path: `/blog/${latestVersion.slug}`,
                 tags: latestVersion.tags || [],
@@ -274,6 +275,7 @@ export async function GET(request: NextRequest) {
                 : [],
               thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
               image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
+              meta: post.meta || null,
               url: `/blog/${post.slug}`,
               path: `/blog/${post.slug}`,
               tags: post.tags || [],
@@ -348,6 +350,7 @@ export async function GET(request: NextRequest) {
                 : [],
               thumb: post.thumb?.url ? `${baseUrl}${post.thumb.url}` : undefined,
               image: post.image?.url ? `${baseUrl}${post.image.url}` : undefined,
+              meta: post.meta || null,
               url: `/blog/${post.slug}`,
               path: `/blog/${post.slug}`,
               tags: post.tags || [],
@@ -437,6 +440,7 @@ export async function GET(request: NextRequest) {
                   ? post.image.url
                   : `${baseUrl}${post.image.url}`
                 : undefined,
+              meta: post.meta || null,
               url: `/blog/${post.slug}`,
               path: `/blog/${post.slug}`,
               tags: post.tags || [],
@@ -663,6 +667,7 @@ export async function GET(request: NextRequest) {
           authors,
           thumb: thumbUrl || imageUrl || '',
           image: imageUrl || undefined,
+          meta: p.meta || null,
           url: `/blog/${p.slug}`,
           path: `/blog/${p.slug}`,
           tags: p.tags || [],

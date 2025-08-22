@@ -116,6 +116,7 @@ export type Blog = {
   launchweek?: number | string
   meta_title?: string
   meta_description?: string
+  meta_image?: string
   isCMS?: boolean
 }
 
@@ -150,6 +151,7 @@ export type BlogData = {
   launchweek?: number | string
   meta_title?: string
   meta_description?: string
+  meta_image?: string
   video?: string
   isCMS?: boolean
 }
