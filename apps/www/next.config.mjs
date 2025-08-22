@@ -73,7 +73,7 @@ const nextConfig = {
       // 'node_modules/typescript/**/*',
       // 'node_modules/@types/**/*',
       // // Next.js build artifacts
-      // '.next/cache/**/*',
+      '.next/cache/**/*',
       '.next/static/**/*',
       // // '.next/server/**/*.js.map',
       '.next/trace',
