@@ -128,7 +128,7 @@ export const generateSettingsMenu = (
               {
                 name: 'Authentication',
                 key: 'auth',
-                url: `/project/${ref}/auth/policies`,
+                url: `/project/${ref}/auth/providers`,
                 items: [],
                 rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
