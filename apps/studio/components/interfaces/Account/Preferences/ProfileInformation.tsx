@@ -133,6 +133,10 @@ export const ProfileInformation = () => {
                         <p className="text-xs text-foreground-light">
                           Primary email is managed by your SSO provider and cannot be changed here.
                         </p>
+                      ) || (
+                        <p className="text-xs text-foreground-light">
+                          Primary email is used for account notifications.
+                        </p>
                       )}
                     </div>
                   </FormControl_Shadcn_>
@@ -150,6 +154,10 @@ export const ProfileInformation = () => {
                       {profile?.is_sso_user && (
                         <p className="text-xs text-foreground-light">
                           Username is managed by your SSO provider and cannot be changed here.
+                        </p>
+                      ) || (
+                        <p className="text-xs text-foreground-light">
+                          Username appears as a display name throughout the dashboard.
                         </p>
                       )}
                     </div>
