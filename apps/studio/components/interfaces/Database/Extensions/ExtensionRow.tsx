@@ -145,7 +145,7 @@ const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           )}
         </TableCell>
 
-        <TableCell className="w-20 sticky bg-surface-100 border-l right-0">
+        <TableCell className="w-20 sticky bg-surface-100 right-0">
           {isDisabling ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (

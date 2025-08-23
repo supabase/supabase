@@ -1,17 +1,20 @@
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { ShadowScrollArea } from '../../ShadowScrollArea'
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
   containerProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, containerProps, ...props }, ref) => (
-    <div className={cn('w-full overflow-auto')} {...containerProps}>
-      <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
-    </div>
-  )
+  ({ className, containerProps, ...props }, ref) => {
+    return (
+      <ShadowScrollArea {...containerProps}>
+        <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+      </ShadowScrollArea>
+    )
+  }
 )
 Table.displayName = 'Table'
 
