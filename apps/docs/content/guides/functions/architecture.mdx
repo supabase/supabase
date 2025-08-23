@@ -1,0 +1,201 @@
+---
+id: 'architecture'
+title: 'Architecture'
+description: 'Understand how Edge Functions work under the hood.'
+subtitle: 'Understand how Edge Functions work under the hood.'
+---
+
+{/* supa-mdx-lint-disable Rule001HeadingCase */}
+
+Edge Functions are small TypeScript functions that run in lightweight JavaScript environments (V8 Isolates) distributed across multiple regions globally. When you deploy a function, it's automatically bundled and deployed worldwide. Functions execute close to users when invoked directly (like via HTTP requests), or close to your database when triggered by database events, ensuring optimal performance for each use case.
+
+## V8 Isolates vs Traditional Serverless
+
+A serverless function is code that's typically run in a container. Containers are isolated environments that include a complete operating system (OS), runtime, and your application code. When a Serverless Function is invoked, the entire container stack must be loaded: from booting the OS, loading the runtime (Node.js, Python, etc.), installing dependencies, to then finally running your code.
+
+A Supabase Edge Function is code that runs in a **V8 isolate**. A V8 isolate is a lightweight execution environment within an already-running JavaScript engine. Instead of booting an entire operating system and runtime for each request, an Edge Function invocation only requires creating a new isolate. Each isolate gets its own isolated memory space and execution context, while sharing the already-running underlying JavaScript engine with other functions.
+
+This architecture is what makes their startup times so fast. V8 isolates allow for near-instant function execution without the typical cold start of container-based serverless functions.
+
+---
+
+## **Deployment**
+
+Supabase lets you deploy your server-side code to the global network using the  `supabase functions deploy` command.
+
+### **Bundling your code**
+
+The process starts by bundling your code. During this step, the Supabase CLI creates an ESZIP bundle.
+
+ESZIP is a specialized format that Deno developed to bundle everything your function needs to execute. This includes your compiled TypeScript code, all imported dependencies, module resolution maps, and any static assets your function needs.
+
+In a traditional serverless environment, the startup time includes downloading all dependencies. ESZIP eliminates this by pre-bundling everything your function needs to operate: your function code, assets, _and_ your dependencies. When your function starts up, every dependency is already available.
+
+Once the bundle is generated, it is uploaded to Supabase's backend for global distribution.
+
+---
+
+## Distribution
+
+After deployment, your function receives URL. This URL is the entry point to Supabase's edge network.
+
+```bash
+https://your-project.supabase.co/functions/v1/my-function
+```
+
+When a user makes a request to this URL, it’s automatically routed through Supabase's global infrastructure to the optimal edge location for that user. Edge locations are data centers strategically placed around the world to minimize response times. Each edge location can download and cache your function bundle whenever a request comes in.
+
+When a user makes a request to your function URL, it first hits Supabase's global API gateway. The gateway analyzes the client's IP address and routes the request to the nearest edge location.
+
+---
+
+## Edge Location Processing
+
+At the edge location, the user’s request goes through some steps:
+
+1. **Validation:** CORS, rate limiting, and authentication checks. Invalid requests get rejected before reaching your code.
+2. **Function lookup:** The system extracts the function name from the URL and verifies the function exists.
+3. **Isolate management:** The system looks for a "warm" V8 isolate that's already running and ready for your function. If it finds one, it reuses it immediately. If not, it creates a fresh isolate.
+
+During a cold start (the first request or when there’s no warm isolate), the system:
+
+1. Creates a fresh V8 isolate with its own memory and execution environment
+2. Loads your ESZIP bundle into memory
+3. Configures permissions and environment variables
+4. Starts executing your code
+
+This entire process takes just a few milliseconds, making even cold starts feel nearly instant.
+
+For warm starts on subsequent requests, the system reuses the existing isolate and skips all setup steps entirely.
+
+Your function bundle gets cached locally at each edge location, and isolates stay warm between requests until they're automatically shut down when no new request have come in within a certain time period. The exact timing depends on traffic patterns and available resources.
+
+---
+
+## Resource Management
+
+Each isolate operates within controlled resource limits.
+
+### Memory Allocation
+
+Every function execution gets up to 1GB of memory, tracked in two categories:
+
+- **Heap Memory**: Standard JavaScript memory used for variables, objects, arrays, and other data structures.
+- **External Memory**: Memory allocated for binary data that must be stored contiguously in memory, e.g. uploaded files, image processing buffers, or large binary datasets.
+
+The 1GB limit covers both types combined. If your function exceeds this limit, the isolate terminates and throws an error.
+
+### CPU Time vs. Wall-Clock Time
+
+Resource limiting works differently than you might expect. The system tracks two types of time:
+
+- **CPU Time**: This measures actual CPU execution time of your code. Loops, calculations, and data processing count toward this limit.
+- **Wall-Clock Time**: This measures total elapsed time from when your function starts until it finishes.
+
+Time spent waiting for external services doesn't count toward your CPU limit. For example, if your function makes a two-second database query, those two seconds don't get deducted from your 30-second CPU limit. This means your functions can work with lots of database calls and API requests without hitting limits, while still preventing CPU-intensive operations from exceeding their allocated compute time.
+
+---
+
+## Connecting to Databases
+
+Edge Functions can connect to both your Supabase database and external APIs, but there are a few things to keep in mind.
+
+Each function invocation creates fresh connections to your Supabase database through [Supavisor](https://supabase.com/features/supavisor), Supabase's connection pooler. Instead of maintaining persistent connections, your function gets a connection from a shared pool when it needs to query the database, then returns it when it’s done.
+
+However, it can happen that your function runs close to your users, but your database lives in a specific region. Edge Functions don't automatically route to the region where your database is located. If a user in Sydney triggers a function that needs to query a database in Virginia, the function will execute in Sydney but make database calls across the Pacific.
+
+You can manually control where your function executes using the `x-region` header to run it in the same region as your database.
+
+<Admonition type="note">
+  For tasks involving heavy database work, [Database Webhooks](/guides/database/webhooks) might be a
+  better choice. These run your function in the same region as your database, reducing the
+  geographic latency of database operations.
+</Admonition>
+
+---
+
+## Security Model
+
+The security model has multiple layers of isolation.
+
+### Process-Level Security
+
+Each function executes completely separately from others. Your function runs within its own V8 isolate, with its own memory, execution context, and thread. One function cannot access another's data or interfere with its execution.
+
+### Permission-Based Security
+
+Isolates start with zero permissions and only get access to specifically granted resources. They can only access the file system, make network requests, or read environment variables when explicitly configured.
+
+The custom Deno runtime enforces these restrictions:
+
+- File system access limited to the `/tmp` directory
+- Network access restricted to HTTPS requests only
+- Subprocess execution completely disabled
+- Environment variable access limited to variables you've explicitly configured
+
+### Runtime Security Features
+
+The Edge Runtime also includes several security features designed for multi-tenant operation. Multi-tenant means that thousands of different customers run their functions on the same shared infrastructure, meaning that your function might execute on the same server as functions from completely different users and projects.
+
+This requires strict isolation features such as:
+
+- **Memory isolation** to prevent any function from accessing data belonging to other customers
+- **CPU time limits** to ensure no single function can monopolize processing power that other users need
+- **Request size limits** to prevent abuse through oversized payloads that could slow down the entire system
+- **Automatic termination** to stop long-running or resource-intensive operations before they can impact other users' performance
+
+---
+
+## Monitoring and Observability
+
+### Real-Time Logging
+
+All console output from your functions gets logged in real-time, and you can stream these logs in real-time during development. In production, they’re visible in the [Supabase Dashboard](/guides/functions/monitoring).
+
+### Performance Metrics
+
+The system automatically tracks detailed metrics for every execution:
+
+- **Traffic**: Total requests, success/error rates, response times
+- **Resource usage**: Memory consumption, CPU time, execution duration
+- **Geographic distribution**: Which edge locations handle your traffic
+- **Performance trends**: How your function performance changes over time
+
+### Error Tracking
+
+When a functions crashes or throws an error, the system automatically captures detailed diagnostic information. It provides stack traces showing exactly where the error occurred, how much memory and CPU time was being used, and the complete details of the incoming request. This gives you everything you need to track down and fix production issues quickly.
+
+---
+
+## Local Development Environment
+
+Running `supabase functions serve my-function` executes the same Edge Runtime locally. The local environment mirrors production as closely as possible:
+
+- Same security restrictions and API limitations
+- Same resource monitoring and limits
+- Same request and response handling
+- Same logging and error reporting
+
+This ensures functions behave identically in development and production, reducing the chance of environment-specific bugs. The local setup uses Kong as an API gateway, just like production, routing requests to the Edge Runtime, which manages isolates and executes your functions.
+
+---
+
+## When to Use Edge Functions
+
+Do use Edge Functions for:
+
+- ✅ Fast request/response cycles with minimal latency
+- ✅ Processing JSON, images, or other data formats
+- ✅ Calling external third-party services and processing responses
+- ✅ Custom authentication flows and token validation
+- ✅ Handling incoming webhooks from external services. For example, [processing incoming webhooks from Stripe](/docs/guides/functions/examples/stripe-webhooks).
+
+You might NOT want to use Edge Functions for:
+
+- **❌ Stateful execution.** Functions execute and terminate, they don't run continuously.
+- **❌ Long-running jobs.** Functions have a 15-minute execution limit. For longer-running operations, check out our guide on [Background Tasks](/docs/guides/functions/background-tasks).
+- **❌ Persistent storage.** There is no way to save files between function executions.
+- **❌ Heavy computation.** CPU-intensive tasks may hit time limits.
+- **❌ Large file processing.** Memory limits make this challenging.
+
+These limitations exist to keep the platform fast and secure for everyone, ensuring your functions get consistent performance while preventing any single user from impacting others
