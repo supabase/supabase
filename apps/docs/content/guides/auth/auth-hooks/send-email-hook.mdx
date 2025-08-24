@@ -19,7 +19,8 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
 
 ## Email change behavior and token hash mapping
 
-When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your Secure Email Change setting.
+When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your [Secure Email Change](/dashboard/project/_/auth/providers?provider=Email) setting.
+
 
 - Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
 - Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
@@ -606,10 +607,10 @@ Your company is expanding to France and Spain. As part of expansion efforts, the
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
 
-const projectRef = '<your-project-ref>'
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email
 const FROM_EMAIL = 'myemail@gmail.com'
+const PROJECT_REF = '<your-project-ref>'
 
 // Email Subjects
 const subjects = {
@@ -674,7 +675,7 @@ const templates = {
 }
 
 function generateConfirmationURL(email_data) {
-  const baseUrl = `https://${projectRef}.supabase.co/auth/v1/verify`
+  const baseUrl = `https://${PROJECT_REF}.supabase.co/auth/v1/verify`
   const params = new URLSearchParams({
     token: email_data.token_hash,
     type: email_data.email_action_type,

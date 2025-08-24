@@ -337,7 +337,7 @@ Return a retry-able error by attaching a appropriate status code (`429`, `503`) 
 
 <Admonition type="note">
 
-`Retry-After` We do not fully support the Retry-After header as described in RFC7231, we only check if it is a non-empty value such as `true` or `10`. Setting this to your preferred value is fine as a future update to the auth server may address this.
+`Retry-After` Supabase Auth does not fully support the `Retry-After` header as described in RFC7231, we only check if it is a non-empty value such as `true` or `10`. Setting this to your preferred value is fine as a future update may address this.
 
 </Admonition>
 
