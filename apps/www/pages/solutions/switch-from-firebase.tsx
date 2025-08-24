@@ -4,7 +4,7 @@ import { NextSeo } from 'next-seo'
 
 import Layout from 'components/Layouts/Default'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
-import content from 'data/solutions/neon'
+import content from 'data/solutions/firebase'
 import { Solutions } from 'data/Solutions'
 
 const ProductHeader = dynamic(() => import('components/Sections/ProductHeader2'))
@@ -17,7 +17,7 @@ const FeatureGrid = dynamic(() => import('components/Solutions/FeatureGrid'))
 const Security = dynamic(() => import('components/Enterprise/Security'))
 const CtaSection = dynamic(() => import('components/Solutions/CtaSection'))
 
-const Neon: NextPage = () => {
+const Firebase: NextPage = () => {
   return (
     <>
       <NextSeo
@@ -26,13 +26,13 @@ const Neon: NextPage = () => {
         openGraph={{
           title: content.metadata.metaTitle,
           description: content.metadata.metaDescription,
-          url: `https://supabase.com/solutions/switch-from-neon`,
+          url: `https://supabase.com/solutions/switch-from-firebase`,
         }}
         noindex={true}
         nofollow={true}
       />
       <Layout className="overflow-visible">
-        <SolutionsStickyNav activeItem={Solutions.neon} type="migration" />
+        <SolutionsStickyNav activeItem={Solutions.firebase} type="migration" />
         <ProductHeader {...content.heroSection} />
         <SingleQuote
           quote={{
@@ -90,4 +90,4 @@ const Neon: NextPage = () => {
   )
 }
 
-export default Neon
+export default Firebase
