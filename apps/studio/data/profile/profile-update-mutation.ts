@@ -4,7 +4,6 @@ import { toast } from 'sonner'
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
-import UserManagement from 'components/interfaces/Docs/Pages/UserManagement'
 
 export type ProfileUpdateVariables = {
   firstName: string
