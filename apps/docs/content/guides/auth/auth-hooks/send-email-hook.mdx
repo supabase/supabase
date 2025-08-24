@@ -21,7 +21,6 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
 
 When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your [Secure Email Change](/dashboard/project/_/auth/providers?provider=Email) setting.
 
-
 - Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
 - Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
 
