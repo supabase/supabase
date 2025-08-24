@@ -129,11 +129,11 @@ export const ProfileInformation = () => {
                             ))}
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                      {profile?.is_sso_user && (
+                      {(profile?.is_sso_user && (
                         <p className="text-xs text-foreground-light">
                           Primary email is managed by your SSO provider and cannot be changed here.
                         </p>
-                      ) || (
+                      )) || (
                         <p className="text-xs text-foreground-light">
                           Primary email is used for account notifications.
                         </p>
@@ -151,11 +151,11 @@ export const ProfileInformation = () => {
                   <FormControl_Shadcn_ className="col-span-8">
                     <div className="flex flex-col gap-1">
                       <Input_Shadcn_ {...field} className="w-72" disabled={profile?.is_sso_user} />
-                      {profile?.is_sso_user && (
+                      {(profile?.is_sso_user && (
                         <p className="text-xs text-foreground-light">
                           Username is managed by your SSO provider and cannot be changed here.
                         </p>
-                      ) || (
+                      )) || (
                         <p className="text-xs text-foreground-light">
                           Username appears as a display name throughout the dashboard.
                         </p>
