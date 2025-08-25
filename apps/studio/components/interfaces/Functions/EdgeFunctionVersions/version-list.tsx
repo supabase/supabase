@@ -7,6 +7,12 @@ import { RollbackModal } from './RollbackModal'
 import { useParams } from 'common'
 import { toast } from 'sonner'
 
+// Ensure newest first: sort by version desc, then created_at desc
+const sortDeployments = (items: EdgeFunctionDeployment[]) =>
+  items
+    .slice()
+    .sort((a, b) => (b.version !== a.version ? b.version - a.version : b.created_at - a.created_at))
+
 export const EdgeFunctionVersionsList = () => {
   const { ref: projectRef, slug: functionSlug } = useParams()
   const [deployments, setDeployments] = useState<EdgeFunctionDeployment[]>([])
@@ -32,7 +38,7 @@ export const EdgeFunctionVersionsList = () => {
       const slug = functionSlug || 'super-function'
 
       const data = await fetchDeployments(projectId, slug)
-      setDeployments(data)
+      setDeployments(sortDeployments(data))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load deployments')
       toast.error('Failed to load deployments')
@@ -44,6 +50,7 @@ export const EdgeFunctionVersionsList = () => {
 
   useEffect(() => {
     loadDeployments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectRef, functionSlug])
 
   const handleRollbackClick = (deployment: EdgeFunctionDeployment) => {
@@ -62,7 +69,6 @@ export const EdgeFunctionVersionsList = () => {
 
       const response = await rollbackToVersion(projectId, slug, selectedDeployment.version)
 
-      // Show success message based on response type
       if ('active_version' in response) {
         toast.success(`Successfully rolled back to version ${response.active_version}`)
       } else {
@@ -74,7 +80,6 @@ export const EdgeFunctionVersionsList = () => {
       setShowRollbackModal(false)
       setSelectedDeployment(null)
 
-      // Reload deployments to show updated state
       await loadDeployments()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Rollback failed')
