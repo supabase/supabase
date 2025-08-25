@@ -3,18 +3,32 @@ title: Migrating within Supabase
 subtitle: Learn how to migrate from one Supabase project to another
 ---
 
-If you are on a Paid Plan and have physical backups enabled, you should instead use the [Restore
-to another project feature](/docs/guides/platform/clone-project).
+<Admonition type="note" title="" className="mt-3">
+  Use the dashboard [Restore a new
+  project](https://supabase.com/dashboard/project/_/database/backups/restore-to-new-project) feature
+  if you are on a Paid plan and Physical backups. Learn more about this feature
+  [here](/docs/guides/platform/clone-project).
+</Admonition>
 
 ### Caveats
 
-- If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).
+- If you need to move your project to a different organization, see [project transfers](/docs/guides/platform/project-transfer).
 
-- **This guide only migrates the Postgres database**. Some common items to re-configure in the new project include:
-  - Auth Settings and API keys
+- What will be restored to the new project?
+
+  - Database schema (tables, views, procedures)
+  - All data and indexes
+  - Database roles, permissions and users
+  - Auth user data (user accounts, hashed passwords, and authentication records from the auth schema)
+
+- What needs manual reconfiguration?
+
+  - Storage objects & settings (See [storage object migration guide](/docs/guides/platform/migrating-within-supabase#migrate-storage) below)
   - Edge Functions
-  - Read Replicas
-  - Realtime configuration
+  - Auth settings & API keys
+  - Realtime settings
+  - Database extensions and settings
+  - Read replicas
 
 ### Before you begin
 
@@ -48,7 +62,7 @@ className="text-foreground-light mt-8 mb-6"
 >
     <div className="border-b mt-3 pb-3">
         <AccordionItem
-        header={<span className="text-foreground">Manual database dump if you do not have a backup</span>}
+        header={<span className="text-foreground">Manual database backup if needed</span>}
         id="backup-project"
         >
         <StepHikeCompact>
@@ -98,20 +112,20 @@ className="text-foreground-light mt-8 mb-6"
   </div>
 </Accordion>
 
-### Restore database backup
+### How to restore a backup to a new Supabase project
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Create and configure new Supabase project" fullWidth>
           Create a [new project](https://database.new). In the new project:
             - If Webhooks were used in the old database, enable [Database Webhooks](/dashboard/project/_/database/hooks).
-            - If any non-default extensions were used in the old database, enable the [Extensions](/dashboard/project/_/database/extensions).
+            - If any extensions were used in the old project, enable the [Extensions](/dashboard/project/_/database/extensions).
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-      <StepHikeCompact.Details title="Get the Session pooler connection string for the newly created project" fullWidth>
-      Get your Session pooler connection string from your [Connect page](https://supabase.com/dashboard/project/_?showConnect=true). Example connection string:
+      <StepHikeCompact.Details title="Get the database connection string of the new project" fullWidth>
+      Get your Session pooler (Shared Pooler) connection string from the [Connect page](https://supabase.com/dashboard/project/_?showConnect=true). Example connection string:
       ```bash
         postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[PROJECT-REGION].pooler.supabase.com:5432/postgres
       ```
@@ -119,14 +133,14 @@ className="text-foreground-light mt-8 mb-6"
 
     </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Step step={3}>
 
-    <StepHikeCompact.Details title="Get the database password for the newly created project" fullWidth>
-      Reset and copy the password in the [Database Settings](/dashboard/project/_/settings/database). Replace ```[YOUR-PASSWORD]``` in step 2 with the database password.
+    <StepHikeCompact.Details title="Get the database password for the new project" fullWidth>
+      Reset and copy the password in the [Database Settings](/dashboard/project/_/settings/database). Replace ```[YOUR-PASSWORD]``` in the database connection string from step 2.
     </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Step step={4}>
       <StepHikeCompact.Details title="Restore your database backup with psql" fullWidth>
           Replace ```[CONNECTION_STRING]``` with your connection string. Select the appropriate option and run the command:
 
@@ -161,22 +175,7 @@ className="text-foreground-light mt-8 mb-6"
 
 ### Migrate Storage
 
-The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Migrate storage objects to the new project with the local only [Supabase Storage Migrator tool](https://plyn.github.io/supabase-storage-migrator/).
-
-<Accordion
-  type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <div className="border-b mt-3 pb-3">
-        <AccordionItem
-        header={<span className="text-foreground">Alternative Storage migration options</span>}
-        id="backup-project"
-        >
-        If you have your storage objects locally (e.g. 90 day paused projects), migrate the storage objects to the new project using this [Google Colab script](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb).
+        If you have your storage objects locally (e.g. >90 day paused projects), migrate the storage objects to the new project using this [Google Colab script](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb).
 
         If the old project is still active, use this script to move storage objects from one project to another:
 
@@ -233,10 +232,6 @@ The new project has the old project's Storage buckets, but the Storage objects n
         }
         })()
         ```
-        </AccordionItem>
-
-  </div>
-</Accordion>
 
 ### Troubleshooting notes
 
