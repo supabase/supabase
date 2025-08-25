@@ -1,24 +1,47 @@
-import { useParams } from 'common'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Modal } from 'ui'
 
+import { useParams } from 'common/hooks'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface RemoveRestrictionModalProps {
-  visible: boolean
   selectedRestriction?: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-const RemoveRestrictionModal = ({
-  visible,
+export const RemoveRestrictionModal = ({
   selectedRestriction,
   onClose,
 }: RemoveRestrictionModalProps) => {
+  const [visible, setVisible] = useState(false)
   const { ref } = useParams()
-
+  const { data: project } = useSelectedProjectQuery()
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
   const { data } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: visible })
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
   // @ts-ignore [Joshen] API typing issue
@@ -27,7 +50,10 @@ const RemoveRestrictionModal = ({
 
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
     useNetworkRestrictionsApplyMutation({
-      onSuccess: () => onClose(),
+      onSuccess: () => {
+        setVisible(false)
+        onClose?.()
+      },
       onError: (error) => {
         toast.error(`Failed to remove restriction: ${error.message}`)
       },
@@ -59,21 +85,44 @@ const RemoveRestrictionModal = ({
   }
 
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      visible={visible}
-      onCancel={onClose}
-      header="Confirm to remove restriction"
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) {
+          setVisible(false)
+          onClose?.()
+        }
+      }}
     >
-      <Modal.Content className="space-y-4">
-        <p className="text-sm text-foreground-light">
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          type="default"
+          disabled={!canUpdateNetworkRestrictions}
+          onClick={() => setVisible(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateNetworkRestrictions
+                ? 'You need additional permissions to update network restrictions'
+                : undefined,
+            },
+          }}
+        >
+          Remove
+        </ButtonTooltip>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirm to remove restriction</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
           The IPv4 address <code className="text-xs">{selectedRestriction}</code> will be removed
           from your list of network restrictions
           {isRemovingOnlyRestriction
             ? '.'
             : ", and no longer have access to your project's database."}
-        </p>
+        </DialogSection>
         {isRemovingOnlyRestriction && (
           <Admonition
             type="warning"
@@ -82,17 +131,22 @@ const RemoveRestrictionModal = ({
             all IP addresses."
           />
         )}
-      </Modal.Content>
-      <Modal.Content className="flex items-center justify-end space-x-2">
-        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
-          Cancel
-        </Button>
-        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
-          Remove restriction
-        </Button>
-      </Modal.Content>
-    </Modal>
+        <DialogFooter>
+          <Button
+            type="default"
+            disabled={isApplying}
+            onClick={() => {
+              setVisible(false)
+              onClose?.()
+            }}
+          >
+            Cancel
+          </Button>
+          <Button loading={isApplying} onClick={onSubmit}>
+            Remove restriction
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default RemoveRestrictionModal

@@ -9,7 +9,7 @@ interface ConfirmDisableReadOnlyModeModalProps {
   onClose: () => void
 }
 
-const ConfirmDisableReadOnlyModeModal = ({
+export const ConfirmDisableReadOnlyModeModal = ({
   visible,
   onClose,
 }: ConfirmDisableReadOnlyModeModalProps) => {
@@ -49,5 +49,3 @@ const ConfirmDisableReadOnlyModeModal = ({
     </Modal>
   )
 }
-
-export default ConfirmDisableReadOnlyModeModal

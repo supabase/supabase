@@ -1,18 +1,46 @@
-import { Button, Modal } from 'ui'
+import { useState } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common/hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 
 interface AllowAllModalProps {
-  visible: boolean
-  onClose: () => void
+  onClose?: () => void
 }
 
-const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
+export const AllowAllModal = ({ onClose }: AllowAllModalProps) => {
+  const [visible, setVisible] = useState(false)
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
     useNetworkRestrictionsApplyMutation({
-      onSuccess: () => onClose(),
+      onSuccess: () => {
+        setVisible(false)
+        onClose?.()
+      },
     })
 
   const onSubmit = async () => {
@@ -25,29 +53,48 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   }
 
   return (
-    <Modal
-      hideFooter
-      size="small"
-      visible={visible}
-      onCancel={onClose}
-      header="Allow access from all IP addresses"
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose?.()
+        }
+      }}
     >
-      <Modal.Content className="space-y-4">
-        <p className="text-sm text-foreground-light">
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          type="default"
+          disabled={!canUpdateNetworkRestrictions}
+          onClick={() => setVisible(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateNetworkRestrictions
+                ? 'You need additional permissions to update network restrictions'
+                : undefined,
+            },
+          }}
+        >
+          Allow all access
+        </ButtonTooltip>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Allow access from all IP addresses</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
           This will allow any IP address to access your project's database. Are you sure?
-        </p>
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content className="flex items-center justify-end space-x-2">
-        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
-          Cancel
-        </Button>
-        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
-          Confirm
-        </Button>
-      </Modal.Content>
-    </Modal>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" disabled={isApplying} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button loading={isApplying} onClick={onSubmit}>
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default AllowAllModal
