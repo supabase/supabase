@@ -1,10 +1,10 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Eye, EyeOff } from 'lucide-react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
-import { boolean, number, object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -42,30 +42,32 @@ const CAPTCHA_PROVIDERS = [
   { key: 'turnstile', label: 'Turnstile by Cloudflare' },
 ]
 
-const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
-  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
-  SECURITY_CAPTCHA_ENABLED: boolean().required(),
-  SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) => schema.required('Must have a Captcha secret'),
+const schema = z.intersection(
+  z.object({
+    DISABLE_SIGNUP: z.boolean(),
+    EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
+    SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
+    SITE_URL: z.string().url('Must have a Site URL'),
+    SESSIONS_TIMEBOX: z.coerce.number().min(0, 'Must be a positive number'),
+    SESSIONS_INACTIVITY_TIMEOUT: z.coerce.number().min(0, 'Must be a positive number'),
+    SESSIONS_SINGLE_PER_USER: z.boolean(),
+    PASSWORD_MIN_LENGTH: z.coerce.number().min(6, 'Must be greater or equal to 6.'),
+    PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
+    PASSWORD_HIBP_ENABLED: z.boolean(),
   }),
-  SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) =>
-      schema
-        .oneOf(['hcaptcha', 'turnstile'])
-        .required('Captcha provider must be either hcaptcha or turnstile'),
-  }),
-  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
-  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
-  SESSIONS_SINGLE_PER_USER: boolean(),
-  PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
-  PASSWORD_REQUIRED_CHARACTERS: string(),
-  PASSWORD_HIBP_ENABLED: boolean(),
-})
+  z.discriminatedUnion(`SECURITY_CAPTCHA_ENABLED`, [
+    z.object({
+      SECURITY_CAPTCHA_ENABLED: z.literal(false),
+    }),
+    z.object({
+      SECURITY_CAPTCHA_ENABLED: z.literal(true),
+      SECURITY_CAPTCHA_SECRET: z.string({ required_error: 'Must have a Captcha secret' }),
+      SECURITY_CAPTCHA_PROVIDER: z.union([z.literal('hcaptcha'), z.literal('turnstile')], {
+        required_error: 'Captcha provider must be either hcaptcha or turnstile',
+      }),
+    }),
+  ])
+)
 
 const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -89,16 +91,14 @@ const ProtectionAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const protectionForm = useForm({
-    resolver: yupResolver(schema),
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
       SECURITY_MANUAL_LINKING_ENABLED: false,
       SITE_URL: '',
       SECURITY_CAPTCHA_ENABLED: false,
-      SECURITY_CAPTCHA_SECRET: '',
-      SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
       SESSIONS_TIMEBOX: 0,
       SESSIONS_INACTIVITY_TIMEOUT: 0,
       SESSIONS_SINGLE_PER_USER: false,
@@ -110,7 +110,8 @@ const ProtectionAuthSettingsForm = () => {
 
   useEffect(() => {
     if (authConfig && !isUpdatingConfig) {
-      protectionForm.reset({
+      // @ts-expect-error
+      form.reset({
         DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
         EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
         SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
@@ -129,15 +130,22 @@ const ProtectionAuthSettingsForm = () => {
     }
   }, [authConfig, isUpdatingConfig])
 
-  const onSubmitProtection = (values: any) => {
-    const payload = { ...values }
-    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    // The backend uses empty string to represent no required characters in the password
-    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
-      payload.PASSWORD_REQUIRED_CHARACTERS = ''
-    }
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
+    if (!projectRef) return console.error('Project ref is required')
 
-    updateAuthConfig({ projectRef: projectRef!, config: payload })
+    updateAuthConfig({
+      projectRef,
+      config: {
+        ...values,
+        DISABLE_SIGNUP: !values.DISABLE_SIGNUP,
+        // The backend uses empty string to represent no required characters in the password
+        // @ts-expect-error the expected type is narrower than `string`
+        PASSWORD_REQUIRED_CHARACTERS:
+          values.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS
+            ? ''
+            : values.PASSWORD_REQUIRED_CHARACTERS,
+      },
+    })
   }
 
   if (isError) {
@@ -158,12 +166,12 @@ const ProtectionAuthSettingsForm = () => {
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle className="mb-4">Bot and Abuse Protection</ScaffoldSectionTitle>
 
-      <Form_Shadcn_ {...protectionForm}>
-        <form onSubmit={protectionForm.handleSubmit(onSubmitProtection)} className="space-y-4">
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Card>
             <CardContent>
               <FormField_Shadcn_
-                control={protectionForm.control}
+                control={form.control}
                 name="SECURITY_CAPTCHA_ENABLED"
                 render={({ field }) => (
                   <FormItemLayout
@@ -183,11 +191,11 @@ const ProtectionAuthSettingsForm = () => {
               />
             </CardContent>
 
-            {protectionForm.watch('SECURITY_CAPTCHA_ENABLED') && (
+            {form.watch('SECURITY_CAPTCHA_ENABLED') && (
               <>
                 <CardContent>
                   <FormField_Shadcn_
-                    control={protectionForm.control}
+                    control={form.control}
                     name="SECURITY_CAPTCHA_PROVIDER"
                     render={({ field }) => {
                       const selectedProvider = CAPTCHA_PROVIDERS.find((x) => x.key === field.value)
@@ -231,7 +239,7 @@ const ProtectionAuthSettingsForm = () => {
 
                 <CardContent>
                   <FormField_Shadcn_
-                    control={protectionForm.control}
+                    control={form.control}
                     name="SECURITY_CAPTCHA_SECRET"
                     render={({ field }) => (
                       <FormItemLayout
@@ -267,15 +275,15 @@ const ProtectionAuthSettingsForm = () => {
             )}
 
             <CardFooter className="justify-end space-x-2">
-              {protectionForm.formState.isDirty && (
-                <Button type="default" onClick={() => protectionForm.reset()}>
+              {form.formState.isDirty && (
+                <Button type="default" onClick={() => form.reset()}>
                   Cancel
                 </Button>
               )}
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={!canUpdateConfig || isUpdatingConfig || !protectionForm.formState.isDirty}
+                disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
                 loading={isUpdatingConfig}
               >
                 Save changes
