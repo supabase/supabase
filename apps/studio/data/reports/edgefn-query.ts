@@ -320,14 +320,17 @@ const METRIC_FORMATTER: Record<
       const data = result
         .map((p: any) => ({
           period_start: p.timestamp,
-          avg_execution_time: p.avg_execution_time,
+          ExecutionTime: p.avg_execution_time,
         }))
         .sort(
           (a: { period_start: string }, b: { period_start: string }) =>
             new Date(a.period_start).getTime() - new Date(b.period_start).getTime()
         )
 
-      return { data, chartAttributes }
+      return {
+        data,
+        chartAttributes,
+      }
     }
   },
 }
