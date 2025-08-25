@@ -106,6 +106,9 @@ export function LogsSidebarMenuV2() {
     },
     {
       enabled: enablePgReplicate,
+      retry: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     }
   )
 
