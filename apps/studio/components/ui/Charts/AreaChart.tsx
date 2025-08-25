@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
-import { useChartSync } from './useChartSync'
+import { useChartHoverState } from './useChartHoverState'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
@@ -35,11 +35,9 @@ const AreaChart = ({
   syncId,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
-  const {
-    state: syncState,
-    updateState: updateSyncState,
-    clearState: clearSyncState,
-  } = useChartSync(syncId)
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
@@ -102,21 +100,12 @@ const AreaChart = ({
               setFocusDataIndex(e.activeTooltipIndex)
             }
 
-            if (syncId) {
-              updateSyncState({
-                activeIndex: e.activeTooltipIndex,
-                activePayload: e.activePayload,
-                activeLabel: e.activeLabel,
-                isHovering: true,
-              })
-            }
+            setHover(e.activeTooltipIndex)
           }}
           onMouseLeave={() => {
             setFocusDataIndex(null)
 
-            if (syncId) {
-              clearSyncState()
-            }
+            clearHover()
           }}
         >
           <defs>
@@ -137,16 +126,13 @@ const AreaChart = ({
           />
           <Tooltip
             content={(props) =>
-              syncId && syncState.isHovering && syncState.activeIndex !== null ? (
+              syncId && syncTooltip && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">
-                    {dayjs(data[syncState.activeIndex]?.[xAxisKey]).format(customDateFormat)}
+                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
                   </div>
                   <div>
-                    {numberFormatter(
-                      Number(data[syncState.activeIndex]?.[yAxisKey]) || 0,
-                      valuePrecision
-                    )}
+                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
                     {format}
                   </div>
                 </div>

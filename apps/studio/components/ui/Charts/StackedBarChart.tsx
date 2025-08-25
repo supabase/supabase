@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useChartSync } from './useChartSync'
+import { useChartHoverState } from './useChartHoverState'
 import ChartHeader from './ChartHeader'
 import {
   CHART_COLORS,
@@ -58,11 +58,9 @@ const StackedBarChart: React.FC<Props> = ({
   syncId,
 }) => {
   const { Container } = useChartSize(size)
-  const {
-    updateState: updateSyncState,
-    clearState: clearSyncState,
-    state: syncState,
-  } = useChartSync(syncId)
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const { dataKeys, stackedData, percentagesStackedData } = useStacked({
     data,
     xAxisKey,
@@ -125,21 +123,12 @@ const StackedBarChart: React.FC<Props> = ({
               setFocusDataIndex(e.activeTooltipIndex)
             }
 
-            if (syncId) {
-              updateSyncState({
-                activeIndex: e.activeTooltipIndex,
-                activePayload: e.activePayload,
-                activeLabel: e.activeLabel,
-                isHovering: true,
-              })
-            }
+            setHover(e.activeTooltipIndex)
           }}
           onMouseLeave={() => {
             setFocusDataIndex(null)
 
-            if (syncId) {
-              clearSyncState()
-            }
+            clearHover()
           }}
         >
           {!hideLegend && (
@@ -205,7 +194,7 @@ const StackedBarChart: React.FC<Props> = ({
               fontSize: '12px',
             }}
             wrapperClassName="bg-gray-600 rounded min-w-md"
-            active={!!syncId && syncState.isHovering}
+            active={!!syncId && syncTooltip && hoveredIndex !== null}
           />
         </BarChart>
       </Container>
