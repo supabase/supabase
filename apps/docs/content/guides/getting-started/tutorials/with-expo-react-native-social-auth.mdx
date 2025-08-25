@@ -3,12 +3,12 @@ title: 'Build a Social Auth App with Expo React Native'
 description: 'Learn how to implement social authentication in an app with Expo React Native and Supabase Database and Auth functionality.'
 ---
 
-This tutorial demonstrates how to build a product management app with social authentication. The app showcases user authentication, data management, and photo uploads using:
+This tutorial demonstrates how to build a React Native app with Expo that implements social authentication. You'll learn to create a complete authentication flow with protected navigation using:
 
 - [Supabase Database](/docs/guides/database) - a Postgres database for storing your user data with [Row Level Security](/docs/guides/auth#row-level-security) to ensure data is protected and users can only access their own information.
 - [Supabase Auth](/docs/guides/auth) - enables users to log in through social authentication providers (Apple and Google).
 
-![Supabase Social Auth example](/docs/img/supabase-expo-social-auth.png)
+![Supabase Social Auth example](/docs/img/supabase-expo-social-auth-login.png)
 
 <Admonition type="note">
 
@@ -522,11 +522,12 @@ While testing, you can disable email confirmation in your [project's email auth 
 
 ## Integrate social authentication
 
-Now integrate social authentication with Supabase Auth.
+Now let's integrate social authentication with Supabase Auth, starting from the Apple authentication.
+If you only need to implement Google authentication, you can skip to the [Google authentication](#google-authentication) section.
 
 ### Apple authentication
 
-First, add the button that you'll create inside the login screen you created previously:
+Let's start by adding the button that we are going to create inside the login screen previously made:
 
 <$CodeTabs>
 
@@ -551,10 +552,11 @@ export default function LoginScreen() {
 
 </$CodeTabs>
 
-For Apple authentication, you can choose between two options:
+For Apple authentication, you can choose between:
 
-- [Expo's AppleAuthentication library](https://docs.expo.dev/versions/latest/sdk/apple-authentication/) - iOS only
-- [Invertase's React Native Apple Authentication library](https://github.com/invertase/react-native-apple-authentication) - supports iOS, Android, and Web (using the [react-apple-signin-auth](https://react-apple-signin-auth.ahmedtokyo.com/) web library)
+- [Invertase's React Native Apple Authentication library](https://github.com/invertase/react-native-apple-authentication) - that supports iOS, Android
+- [react-apple-signin-auth](https://react-apple-signin-auth.ahmedtokyo.com/) - that supports Web, also suggested by Invertase
+- [Expo's AppleAuthentication library](https://docs.expo.dev/versions/latest/sdk/apple-authentication/) - that supports iOS only
 
 For either option, you'll need to obtain a Service ID from the [Apple Developer Console](https://supabase.com/docs/guides/auth/social-login/auth-apple?queryGroups=framework&framework=nextjs&queryGroups=platform&platform=web#configuration-web).
 
@@ -563,7 +565,7 @@ For either option, you'll need to obtain a Service ID from the [Apple Developer 
 To enable Apple sign-up on Android and Web, you'll also need to register the tunneled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained by running:
 
 ```bash
-npx expo run:web --tunnel
+npx expo start --tunnel
 ```
 
 and add it to the "Allowed Callback URLs" list in your Supabase dashboard Apple provider configuration.
@@ -604,7 +606,7 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
 
     <$CodeTabs>
 
-    ```tsx name=components/social-auth-buttons/AppleSignInButton.ios.tsx
+    ```tsx name=components/social-auth-buttons/apple/AppleSignInButton.ios.tsx
     import { supabase } from '@/lib/supabase';
     import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
     import type { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
@@ -667,7 +669,7 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
 
     <$CodeTabs>
 
-    ```tsx name=components/social-auth-buttons/AppleSignInButton.ios.tsx
+    ```tsx name=components/social-auth-buttons/apple/AppleSignInButton.ios.tsx
     ...
     const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
     ...
@@ -746,7 +748,7 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
     
     <$CodeTabs>
 
-    ```tsx name=components/social-auth-buttons/AppleSignInButton.android.tsx
+    ```tsx name=components/social-auth-buttons/apple/AppleSignInButton.android.tsx
     import { supabase } from '@/lib/supabase';
     import { appleAuthAndroid, AppleButton } from '@invertase/react-native-apple-authentication';
     import { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
@@ -824,6 +826,21 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
     npx expo run:android --no-build-cache
     ```
 
+  </TabPanel>
+
+  <TabPanel id="react-apple-signin-auth" label="Web">
+    
+    #### Prerequisites
+
+    Before proceeding, as per the mobile options you'll need an Apple Service ID. To obtain it you can follow the [Invertase Initial Setup Guide](https://github.com/invertase/react-native-apple-authentication/blob/main/docs/INITIAL_SETUP.md) and the [Invertase Android Setup Guide](https://github.com/invertase/react-native-apple-authentication/blob/main/docs/ANDROID_EXTRA.md) mentioned in the Invertase tab.
+
+    You'll also need to add two new environment variables to the `.env` file:
+
+    ```bash
+    EXPO_PUBLIC_APPLE_AUTH_SERVICE_ID="YOUR_APPLE_AUTH_SERVICE_ID"
+    EXPO_PUBLIC_APPLE_AUTH_REDIRECT_URI="YOUR_APPLE_AUTH_REDIRECT_URI"
+    ```
+
     #### Web
 
     Install the required libraries:
@@ -836,7 +853,7 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
     
     <$CodeTabs>
 
-    ```tsx name=components/social-auth-buttons/AppleSignInButton.web.tsx
+    ```tsx name=components/social-auth-buttons/apple/AppleSignInButton.web.tsx
     import { supabase } from '@/lib/supabase';
     import type { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
     import { useEffect, useState } from 'react';
@@ -954,7 +971,7 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
 
     <$CodeTabs>
 
-    ```tsx name=components/social-auth-buttons/AppleSignInButton.tsx
+    ```tsx name=components/social-auth-buttons/apple/AppleSignInButton.tsx
     import { supabase } from '@/lib/supabase';
     import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
     import type { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
@@ -1016,6 +1033,352 @@ For more information, follow the [Supabase Login with Apple](https://supabase.co
     The Expo Apple Sign In button does not support the Simulator, so you will need to test it on a physical device.
 
     </Admonition>
+
+  </TabPanel>
+</Tabs>
+
+### Google authentication
+
+Let's start by adding the button that we are going to create inside the login screen previously made:
+
+<$CodeTabs>
+
+```tsx name=app/login.tsx
+...
+import { GoogleSignInButton } from '@/components/social-auth-buttons/google/GoogleSignInButton';
+...
+export default function LoginScreen() {
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Login' }} />
+      <ThemedView style={styles.container}>
+        ...
+        <GoogleSignInButton />
+        ...
+      </ThemedView>
+    </>
+  );
+}
+...
+```
+
+</$CodeTabs>
+
+For Google authentication, you can choose between the following options:
+
+- [GN Google Sign In Premium](https://react-native-google-signin.github.io/docs/install#sponsor-only-version) - that supports iOS, Android, and Web by using the latest Google's OneTap sign-in (but [it requires a subscription](https://universal-sign-in.com/))
+- [@react-oauth/google](https://github.com/MomenSherif/react-oauth#googlelogin) - that supports Web (so it's not a good option for mobile, but it works)
+- Relying on the [signInWithOAuth](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) function of the Supabase Auth - that also supports iOS, Android and Web (__useful also to manage any other OAuth provider__)
+
+<Admonition type="note">
+
+The [GN Google Sign In Free](https://react-native-google-signin.github.io/docs/install#public-version-free) doesn't support neither iOS nor Android, as [it doesn't allow to pass a custom nonce](https://github.com/react-native-google-signin/google-signin/issues/1176) to the sign-in request.
+
+</Admonition>
+
+
+For either option, you'll need to obtain a Web Client ID from the Google Cloud Engine, as explained in the [Google Sign In](https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platform&platform=react-native#react-native) guide.
+
+In this guide we will only use the [@react-oauth/google@latest](https://github.com/MomenSherif/react-oauth#googlelogin) option for the Web, and the [signInWithOAuth](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) for the mobile platforms.
+
+Before proceeding, you'll need to add a new environment variable to the `.env` file:
+
+```bash
+EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
+```
+
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="web"
+  queryGroup="google-authentication"
+>
+  <TabPanel id="web" label="Web">
+
+    Install the `@react-oauth/google` library:
+
+    ```bash
+    npx expo install @react-oauth/google
+    ```
+
+    Enable the `expo-web-browser` plugin in `app.json`:
+
+    <$CodeTabs>
+
+    ```json name=app.json
+    {
+      "expo": {
+        ...
+        "plugins": {
+          ...
+          [
+            "expo-web-browser",
+            {
+              "experimentalLauncherActivity": false
+            }
+          ]
+          ...
+        },
+        ...
+      }
+    }
+    ```
+
+    </$CodeTabs>
+
+    Then create the iOS specific button component `GoogleSignInButton.web`:
+
+    <$CodeTabs>
+    ```tsx name=components/social-auth-buttons/google/GoogleSignInButton.web.tsx
+
+    import { supabase } from '@/lib/supabase';
+    import { CredentialResponse, GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+    import { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
+    import { useEffect, useState } from 'react';
+
+    import 'react-native-get-random-values';
+
+    export default function GoogleSignInButton() {
+
+      // Generate secure, random values for state and nonce
+      const [nonce, setNonce] = useState('');
+      const [sha256Nonce, setSha256Nonce] = useState('');
+
+      async function onGoogleButtonSuccess(authRequestResponse: CredentialResponse) {
+        console.debug('Google sign in successful:', { authRequestResponse })
+        if (authRequestResponse.clientId && authRequestResponse.credential) {
+          const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
+            provider: 'google',
+            token: authRequestResponse.credential,
+            nonce: nonce,
+          }
+
+          const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials)
+
+          if (error) {
+            console.error('Error signing in with Apple:', error)
+          }
+
+          if (data) {
+            console.log('Apple sign in successful:', data)
+          }
+        }
+      }
+
+      function onGoogleButtonFailure() {
+        console.error('Error signing in with Google')
+      }
+
+      useEffect(() => {
+        function generateNonce(): string {
+          const array = new Uint32Array(1);
+          window.crypto.getRandomValues(array);
+          return array[0].toString();
+        };
+
+        async function generateSha256Nonce(nonce: string): Promise<string> {
+          const buffer = await window.crypto.subtle.digest('sha-256', new TextEncoder().encode(nonce));
+          const array = Array.from(new Uint8Array(buffer));
+          return array.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        let nonce = generateNonce();
+        setNonce(nonce);
+
+        generateSha256Nonce(nonce)
+          .then((sha256Nonce) => { setSha256Nonce(sha256Nonce) });
+      }, []);
+
+      return (
+        <GoogleOAuthProvider
+          clientId={process.env.EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID ?? ''}
+          nonce={sha256Nonce}
+        >
+          <GoogleLogin
+            nonce={sha256Nonce}
+            onSuccess={onGoogleButtonSuccess}
+            onError={onGoogleButtonFailure}
+            useOneTap={true}
+            auto_select={true}
+          />
+        </GoogleOAuthProvider>
+      );
+    }
+
+    ```
+    </$CodeTabs>
+
+
+    Test the authentication in your browser using the tunneled HTTPS URL:
+
+    ```bash
+    npx expo start --tunnel
+    ```
+
+    <Admonition type="note">
+
+    To allow the Google Sign In to work, as we did before for Apple, you'll need to register the tunneled URL (e.g., `https://arnrer1-anonymous-8081.exp.direct`) obtained to the Authorized JavaScript origins list of your [Google Cloud Console's OAuth 2.0 Client IDs](https://console.cloud.google.com/auth/clients/) configuration.
+
+    </Admonition>
+
+
+  </TabPanel>
+
+  <TabPanel id="mobile" label="Mobile">
+
+    Then create the mobile generic button component `GoogleSignInButton.tsx`:
+
+    <$CodeTabs>
+
+    ```tsx name=components/social-auth-buttons/google/GoogleSignInButton.tsx
+    import { supabase } from '@/lib/supabase';
+    import { useEffect } from 'react';
+    import { TouchableOpacity } from 'react-native';
+
+    import { expo } from '@/app.json';
+    import { Text } from '@react-navigation/elements';
+    import { Image } from 'expo-image';
+    import * as WebBrowser from "expo-web-browser";
+
+    WebBrowser.maybeCompleteAuthSession();
+
+    export default function GoogleSignInButton() {
+
+      function extractParamsFromUrl(url: string) {
+        const parsedUrl = new URL(url);
+        const hash = parsedUrl.hash.substring(1); // Remove the leading '#'
+        const params = new URLSearchParams(hash);
+      
+        return {
+          access_token: params.get("access_token"),
+          expires_in: parseInt(params.get("expires_in") || "0"),
+          refresh_token: params.get("refresh_token"),
+          token_type: params.get("token_type"),
+          provider_token: params.get("provider_token"),
+          code: params.get("code"),
+        };
+      };
+      
+      async function onSignInButtonPress() {
+        console.debug('onSignInButtonPress - start');
+        const res = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: `${expo.scheme}://google-auth`,
+            queryParams: { prompt: "consent" },
+            skipBrowserRedirect: true,
+          },
+        });
+
+        const googleOAuthUrl = res.data.url;
+
+        if (!googleOAuthUrl) { 
+          console.error("no oauth url found!");
+          return;
+        }
+
+        const result = await WebBrowser.openAuthSessionAsync(
+          googleOAuthUrl,
+          `${expo.scheme}://google-auth`,
+          { showInRecents: true },
+        ).catch((err) => {
+          console.error('onSignInButtonPress - openAuthSessionAsync - error', { err })
+          console.log(err);
+        });
+
+        console.debug('onSignInButtonPress - openAuthSessionAsync - result', { result });
+
+        if (result && result.type === "success") {
+          console.debug('onSignInButtonPress - openAuthSessionAsync - success');
+          const params = extractParamsFromUrl(result.url);
+          console.debug('onSignInButtonPress - openAuthSessionAsync - success', { params });
+
+          if (params.access_token && params.refresh_token) {
+            console.debug('onSignInButtonPress - setSession');
+            const { data, error } = await supabase.auth.setSession({
+              access_token: params.access_token,
+              refresh_token: params.refresh_token,
+            });
+            console.debug('onSignInButtonPress - setSession - success', { data, error });
+            return;
+          } else {
+            console.error('onSignInButtonPress - setSession - failed');
+            // sign in/up failed
+          }
+        } else {
+          console.error('onSignInButtonPress - openAuthSessionAsync - failed');
+        }
+      }
+
+      // to warm up the browser
+      useEffect(() => {
+        WebBrowser.warmUpAsync();
+
+        return () => {
+          WebBrowser.coolDownAsync();
+        };
+      }, []);
+
+      return (
+        <TouchableOpacity
+          onPress={onSignInButtonPress}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#ffffff',
+            borderWidth: 1,
+            borderColor: '#dbdbdb',
+            borderRadius: 4,
+            paddingVertical: 10,
+            paddingHorizontal: 15,
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 2,
+            elevation: 2, // For Android shadow
+          }}
+          activeOpacity={0.8}
+        >
+          <Image
+            source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
+            style={{ width: 24, height: 24, marginRight: 10 }}
+          />
+          <Text
+            style={{
+              fontSize: 16,
+              color: '#757575',
+              fontFamily: 'Roboto-Regular', // Assuming Roboto is available; install via expo-google-fonts or similar if needed
+              fontWeight: '500',
+            }}
+          >
+            Sign in with Google
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    ```
+
+    </$CodeTabs>
+
+
+    Finally, update the iOS and Android projects by running the Expo prebuild command:
+
+    ```bash
+    npx expo prebuild --clean
+    ```
+
+    Now test the application on both iOS and Android:
+
+    ```bash
+    npx expo run:ios && npx expo run:android
+    ```
+
+    You should see the login screen with the Google authentication button.
+
+    ![Supabase Social Auth example](/docs/img/supabase-expo-social-auth-tabs.png)
 
   </TabPanel>
 </Tabs>

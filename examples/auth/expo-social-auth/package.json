@@ -17,8 +17,10 @@
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "@react-oauth/google": "^0.12.2",
     "@supabase/supabase-js": "^2.55.0",
     "expo": "~53.0.20",
+    "expo-apple-authentication": "~7.2.4",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
     "expo-font": "~13.3.2",
@@ -44,8 +46,7 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "uuid": "^11.1.0",
-    "expo-apple-authentication": "~7.2.4"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

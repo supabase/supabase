@@ -38,7 +38,13 @@
         }
       ],
       "expo-secure-store",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-web-browser",
+        {
+          "experimentalLauncherActivity": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

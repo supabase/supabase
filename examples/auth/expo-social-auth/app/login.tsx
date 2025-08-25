@@ -3,14 +3,18 @@ import { Platform, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+
 import AppleSignInButton from '@/components/social-auth-buttons/apple/AppleSignInButton';
 import ExpoAppleSignInButton from '@/components/social-auth-buttons/apple/ExpoAppleSignInButton';
+import GoogleSignInButton from '@/components/social-auth-buttons/google/GoogleSignInButton';
+import { Image } from 'expo-image';
 
 export default function LoginScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Login' }} />
       <ThemedView style={styles.container}>
+        <Image style={styles.image} source={require('@/assets/supabase-logo-icon.svg')} />
         <ThemedText type="title">Login</ThemedText>
         <Link href="/(tabs)/explore" style={styles.link}>
           <ThemedText type="link">Try to navigate to home screen!</ThemedText>
@@ -26,6 +30,7 @@ export default function LoginScreen() {
             </>
           )}
           {Platform.OS !== 'ios' && (<AppleSignInButton />)}
+          <GoogleSignInButton />
         </ThemedView>
       </ThemedView>
     </>
@@ -38,12 +43,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
+    gap: 20,
   },
   socialAuthButtonsContainer: {
+    display: 'flex',
     gap: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
   },
 });
