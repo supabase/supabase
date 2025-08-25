@@ -8,14 +8,17 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import {
@@ -53,10 +56,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 
 const FormSchema = z
   .object({
@@ -229,18 +229,17 @@ const CreateBucketModal = () => {
           New bucket
         </ButtonTooltip>
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create storage bucket</DialogTitle>
         </DialogHeader>
+
         <DialogSectionSeparator />
-        <DialogSection>
-          <Form_Shadcn_ {...form}>
-            <form
-              id={formId}
-              className="flex flex-col gap-4"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
+
+        <Form_Shadcn_ {...form}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection>
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -311,17 +310,20 @@ const CreateBucketModal = () => {
                   </FormItemLayout>
                 )}
               />
+            </DialogSection>
 
-              <DialogSectionSeparator />
+            <DialogSectionSeparator />
 
-              {isStandardBucket ? (
-                <>
+            {isStandardBucket ? (
+              <>
+                <DialogSection>
                   <FormField_Shadcn_
                     key="public"
                     name="public"
                     control={form.control}
                     render={({ field }) => (
                       <FormItemLayout
+                        hideMessage
                         name="public"
                         label="Public bucket"
                         description="Anyone can read any object without any authorization"
@@ -338,30 +340,36 @@ const CreateBucketModal = () => {
                       </FormItemLayout>
                     )}
                   />
-                  {isPublicBucket && (
-                    <Admonition
-                      type="warning"
-                      className="rounded-none border-x-0 border-b-0 mb-0 pb-0 px-0 [&>svg]:left-0 [&>div>p]:!leading-normal"
-                      title="Public buckets are not protected"
-                      description={
-                        <>
-                          <p className="mb-2">
-                            Users can read objects in public buckets without any authorization.
-                          </p>
-                          <p>
-                            Row level security (RLS) policies are still required for other
-                            operations such as object uploads and deletes.
-                          </p>
-                        </>
-                      }
-                    />
-                  )}
+                </DialogSection>
+
+                {isPublicBucket && (
+                  <Admonition
+                    type="warning"
+                    className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                    title="Public buckets are not protected"
+                    description={
+                      <>
+                        <p className="mb-2">
+                          Users can read objects in public buckets without any authorization.
+                        </p>
+                        <p>
+                          Row level security (RLS) policies are still required for other operations
+                          such as object uploads and deletes.
+                        </p>
+                      </>
+                    }
+                  />
+                )}
+
+                <DialogSectionSeparator />
+
+                <DialogSection>
                   <Collapsible_Shadcn_
                     open={showConfiguration}
                     onOpenChange={() => setShowConfiguration(!showConfiguration)}
                   >
                     <CollapsibleTrigger_Shadcn_ asChild>
-                      <button className="w-full cursor-pointer py-3 flex items-center justify-between border-t border-default">
+                      <button className="w-full cursor-pointer flex items-center justify-between">
                         <p className="text-sm">Additional configuration</p>
                         <ChevronDown
                           size={18}
@@ -370,7 +378,7 @@ const CreateBucketModal = () => {
                         />
                       </button>
                     </CollapsibleTrigger_Shadcn_>
-                    <CollapsibleContent_Shadcn_ className="py-4 space-y-4">
+                    <CollapsibleContent_Shadcn_ className="pt-4 space-y-4">
                       <div className="space-y-2">
                         <FormField_Shadcn_
                           key="has_file_size_limit"
@@ -480,82 +488,83 @@ const CreateBucketModal = () => {
                       />
                     </CollapsibleContent_Shadcn_>
                   </Collapsible_Shadcn_>
-                </>
-              ) : (
-                <>
-                  {icebergWrapperExtensionState === 'installed' ? (
-                    <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
-                      <p>
-                        <span>Supabase will setup a </span>
+                </DialogSection>
+              </>
+            ) : (
+              <>
+                {icebergWrapperExtensionState === 'installed' ? (
+                  <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
+                    <p>
+                      <span>Supabase will setup a </span>
+                      <a
+                        href={`${BASE_PATH}/project/${ref}/integrations/iceberg_wrapper/overview`}
+                        target="_blank"
+                        className="underline text-foreground-light"
+                      >
+                        foreign data wrapper
+                        {bucketName && <span className="text-brand"> {`${bucketName}_fdw`}</span>}
+                      </a>
+                      <span>
+                        {' '}
+                        for easier access to the data. This action will also create{' '}
                         <a
-                          href={`${BASE_PATH}/project/${ref}/integrations/iceberg_wrapper/overview`}
+                          href={`${BASE_PATH}/project/${ref}/storage/access-keys`}
                           target="_blank"
                           className="underline text-foreground-light"
                         >
-                          foreign data wrapper
-                          {bucketName && <span className="text-brand"> {`${bucketName}_fdw`}</span>}
+                          S3 Access Keys
+                          {bucketName && (
+                            <>
+                              {' '}
+                              named <span className="text-brand"> {`${bucketName}_keys`}</span>
+                            </>
+                          )}
                         </a>
-                        <span>
-                          {' '}
-                          for easier access to the data. This action will also create{' '}
-                          <a
-                            href={`${BASE_PATH}/project/${ref}/storage/access-keys`}
-                            target="_blank"
-                            className="underline text-foreground-light"
-                          >
-                            S3 Access Keys
-                            {bucketName && (
-                              <>
-                                {' '}
-                                named <span className="text-brand"> {`${bucketName}_keys`}</span>
-                              </>
-                            )}
-                          </a>
-                          <span> and </span>
-                          <a
-                            href={`${BASE_PATH}/project/${ref}/integrations/vault/secrets`}
-                            target="_blank"
-                            className="underline text-foreground-light"
-                          >
-                            four Vault Secrets
-                            {bucketName && (
-                              <>
-                                {' '}
-                                prefixed with{' '}
-                                <span className="text-brand"> {`${bucketName}_vault_`}</span>
-                              </>
-                            )}
-                          </a>
-                          .
-                        </span>
-                      </p>
+                        <span> and </span>
+                        <a
+                          href={`${BASE_PATH}/project/${ref}/integrations/vault/secrets`}
+                          target="_blank"
+                          className="underline text-foreground-light"
+                        >
+                          four Vault Secrets
+                          {bucketName && (
+                            <>
+                              {' '}
+                              prefixed with{' '}
+                              <span className="text-brand"> {`${bucketName}_vault_`}</span>
+                            </>
+                          )}
+                        </a>
+                        .
+                      </span>
+                    </p>
+                    <p>
+                      As a final step, you'll need to create an{' '}
+                      <span className="text-foreground-light">Iceberg namespace</span> before you
+                      connect the Iceberg data to your database.
+                    </p>
+                  </Label_Shadcn_>
+                ) : (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>
+                      You need to install the Iceberg wrapper extension to connect your Analytic
+                      bucket to your database.
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
                       <p>
-                        As a final step, you'll need to create an{' '}
-                        <span className="text-foreground-light">Iceberg namespace</span> before you
-                        connect the Iceberg data to your database.
+                        You need to install the <span className="text-brand">wrappers</span>{' '}
+                        extension (with the minimum version of <span>0.5.3</span>) if you want to
+                        connect your Analytics bucket to your database.
                       </p>
-                    </Label_Shadcn_>
-                  ) : (
-                    <Alert_Shadcn_ variant="warning">
-                      <WarningIcon />
-                      <AlertTitle_Shadcn_>
-                        You need to install the Iceberg wrapper extension to connect your Analytic
-                        bucket to your database.
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-                        <p>
-                          You need to install the <span className="text-brand">wrappers</span>{' '}
-                          extension (with the minimum version of <span>0.5.3</span>) if you want to
-                          connect your Analytics bucket to your database.
-                        </p>
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-                </>
-              )}
-            </form>
-          </Form_Shadcn_>
-        </DialogSection>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+              </>
+            )}
+          </form>
+        </Form_Shadcn_>
+
         <DialogFooter>
           <Button
             type="default"
