@@ -139,7 +139,11 @@ export const Message = function Message({
                         return (
                           <div
                             key={`${id}-tool-${part.toolCallId}`}
-                            className="border rounded-md border-muted heading-meta mb-2 flex items-center gap-2 text-foreground-lighter py-2 px-3"
+                            className={cn(
+                              'border rounded-md border-muted heading-meta flex items-center gap-2 text-foreground-lighter py-2 px-3 dynamic-tool-item',
+                              '[&:not(.dynamic-tool-item+.dynamic-tool-item)]:mt-4 [&.dynamic-tool-item+.dynamic-tool-item]:mt-1 first:!mt-0',
+                              '[&:not(:has(+.dynamic-tool-item))]:mb-4'
+                            )}
                           >
                             {part.state === 'input-streaming' ? (
                               <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
@@ -150,7 +154,7 @@ export const Message = function Message({
                                 className="text-foreground-muted"
                               />
                             )}
-                            {`${part.toolName}...`}
+                            {`${part.toolName}`}
                           </div>
                         )
                       }
@@ -158,7 +162,11 @@ export const Message = function Message({
                         return (
                           <Reasoning
                             key={`${message.id}-${index}}`}
-                            className="w-full mb-2"
+                            className={cn(
+                              'w-full dynamic-tool-item',
+                              '[&:not(.dynamic-tool-item+.dynamic-tool-item)]:mt-4 [&.dynamic-tool-item+.dynamic-tool-item]:mt-1 first:!mt-0',
+                              '[&:not(:has(+.dynamic-tool-item))]:mb-4'
+                            )}
                             isStreaming={part.state === 'streaming'}
                           >
                             {part.text}
@@ -262,7 +270,7 @@ export const Message = function Message({
             )}
 
             {/* Action button - only show for user messages on hover */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-2 mb-4">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 mb-2">
               {message.role === 'user' && (
                 <ButtonTooltip
                   type="text"

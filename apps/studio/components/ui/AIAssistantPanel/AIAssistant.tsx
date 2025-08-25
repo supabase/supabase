@@ -381,8 +381,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
 
-  console.log('messages:', chatMessages)
-
   return (
     <ErrorBoundary
       message="Something went wrong with the AI Assistant"
@@ -645,7 +643,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     </div>
                   </div>
                 )}
-                {isThinking && (
+                {isChatLoading && (
                   <motion.span
                     animate={{ opacity: [1, 0] }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}

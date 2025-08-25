@@ -23,7 +23,9 @@ export const Reasoning = memo(({ className, isStreaming, children, ...props }: R
     {...props}
   >
     <CollapsibleTrigger
-      className={cn('flex items-center gap-2 text-foreground-lighter heading-meta px-3 py-2')}
+      className={cn(
+        'flex items-center gap-2 text-foreground-lighter heading-meta px-3 py-2 w-full'
+      )}
     >
       {isStreaming ? (
         <>
