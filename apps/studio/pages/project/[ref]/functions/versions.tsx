@@ -1,4 +1,4 @@
-import { EdgeFunctionVersionsList } from 'components/interfaces/Functions/EdgeFunctionVersions/edge-function-version-list'
+import { EdgeFunctionVersionsList } from 'components/interfaces/Functions/EdgeFunctionVersions/version-list'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
