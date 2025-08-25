@@ -1,175 +1,251 @@
-import { Card, CardContent, CardHeader, CardTitle } from 'ui'
-import { useState } from 'react'
-import { Clock } from 'lucide-react'
-import { ListItem, type Version } from './list-item'
-
-const mockVersions: Version[] = [
-  {
-    id: '1',
-    timestamp: '2024-01-15 14:30:22',
-    commitMessage: 'Add user authentication middleware',
-    commitHash: 'a1b2c3d',
-    isActive: true,
-    content: `import { createClient } from '@supabase/supabase-js'
-
-export default async function handler(req) {
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL'),
-    Deno.env.get('SUPABASE_ANON_KEY')
-  )
-  
-  // Authentication middleware
-  const token = req.headers.get('authorization')?.replace('Bearer ', '')
-  
-  if (!token) {
-    return new Response('Unauthorized', { status: 401 })
-  }
-  
-  const { data: user, error } = await supabase.auth.getUser(token)
-  
-  if (error || !user) {
-    return new Response('Invalid token', { status: 401 })
-  }
-  
-  return new Response(JSON.stringify({ user: user.user }), {
-    headers: { 'Content-Type': 'application/json' }
-  })
-}`,
-    size: '1.2 KB',
-  },
-  {
-    id: '2',
-    timestamp: '2024-01-14 09:15:45',
-    commitMessage: 'Fix CORS headers for production',
-    commitHash: 'b2c3d4e',
-    isActive: false,
-    content: `import { createClient } from '@supabase/supabase-js'
-
-export default async function handler(req) {
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL'),
-    Deno.env.get('SUPABASE_ANON_KEY')
-  )
-  
-  // CORS headers
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  }
-  
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
-  
-  return new Response(JSON.stringify({ message: 'Hello World' }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-  })
-}`,
-    size: '0.9 KB',
-  },
-  {
-    id: '3',
-    timestamp: '2024-01-13 16:42:18',
-    commitMessage: 'Initial Edge Function setup',
-    commitHash: 'c3d4e5f',
-    isActive: false,
-    content: `export default async function handler(req) {
-  return new Response(JSON.stringify({ message: 'Hello World' }), {
-    headers: { 'Content-Type': 'application/json' }
-  })
-}`,
-    size: '0.3 KB',
-  },
-  {
-    id: '4',
-    timestamp: '2024-01-12 11:28:33',
-    commitMessage: 'Add error handling and logging',
-    commitHash: 'd4e5f6g',
-    isActive: false,
-    content: `export default async function handler(req) {
-  try {
-    console.log('Request received:', req.method, req.url)
-    
-    if (req.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 })
-    }
-    
-    const body = await req.json()
-    console.log('Request body:', body)
-    
-    return new Response(JSON.stringify({ 
-      message: 'Success',
-      data: body 
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    })
-  } catch (error) {
-    console.error('Error:', error)
-    return new Response('Internal Server Error', { status: 500 })
-  }
-}`,
-    size: '0.7 KB',
-  },
-]
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Skeleton } from 'ui'
+import { useState, useEffect } from 'react'
+import { RefreshCw, AlertCircle } from 'lucide-react'
+import { fetchDeployments, rollbackToVersion } from './mocks'
+import type { EdgeFunctionDeployment } from './types'
+import { RollbackModal } from './RollbackModal'
+import { useParams } from 'common'
+import { toast } from 'sonner'
 
 export const EdgeFunctionVersionsList = () => {
-  const [selectedVersion, setSelectedVersion] = useState<Version | null>(null)
-  const [isRestoring, setIsRestoring] = useState(false)
+  const { ref: projectRef, slug: functionSlug } = useParams()
+  const [deployments, setDeployments] = useState<EdgeFunctionDeployment[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isRollingBack, setIsRollingBack] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedDeployment, setSelectedDeployment] = useState<EdgeFunctionDeployment | null>(null)
+  const [showRollbackModal, setShowRollbackModal] = useState(false)
 
-  const handleRestore = async (version: Version) => {
-    setIsRestoring(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+  // Load deployments on mount and when dependencies change
+  const loadDeployments = async (showRefreshState = false) => {
+    try {
+      if (showRefreshState) {
+        setIsRefreshing(true)
+      } else {
+        setIsLoading(true)
+      }
+      setError(null)
 
-    // Update active status
-    mockVersions.forEach((v) => {
-      v.isActive = v.id === version.id
-    })
+      // Use hardcoded values for now if params are not available
+      const projectId = projectRef || 'demo-project'
+      const slug = functionSlug || 'super-function'
 
-    setIsRestoring(false)
-    setSelectedVersion(null)
+      const data = await fetchDeployments(projectId, slug)
+      setDeployments(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load deployments')
+      toast.error('Failed to load deployments')
+    } finally {
+      setIsLoading(false)
+      setIsRefreshing(false)
+    }
   }
 
-  const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString('en-US', {
+  useEffect(() => {
+    loadDeployments()
+  }, [projectRef, functionSlug])
+
+  const handleRollbackClick = (deployment: EdgeFunctionDeployment) => {
+    setSelectedDeployment(deployment)
+    setShowRollbackModal(true)
+  }
+
+  const handleRollbackConfirm = async () => {
+    if (!selectedDeployment) return
+
+    try {
+      setIsRollingBack(true)
+
+      const projectId = projectRef || 'demo-project'
+      const slug = functionSlug || 'super-function'
+
+      const response = await rollbackToVersion(projectId, slug, selectedDeployment.version)
+
+      // Show success message based on response type
+      if ('active_version' in response) {
+        toast.success(`Successfully rolled back to version ${response.active_version}`)
+      } else {
+        toast.success(
+          `Successfully rolled back to version ${selectedDeployment.version} (new version ${response.version} created)`
+        )
+      }
+
+      setShowRollbackModal(false)
+      setSelectedDeployment(null)
+
+      // Reload deployments to show updated state
+      await loadDeployments()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Rollback failed')
+    } finally {
+      setIsRollingBack(false)
+    }
+  }
+
+  const formatTimestamp = (epochMs: number) => {
+    const date = new Date(epochMs)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    // Relative time
+    let relative = ''
+    if (diffMins < 1) {
+      relative = 'just now'
+    } else if (diffMins < 60) {
+      relative = `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`
+    } else if (diffHours < 24) {
+      relative = `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`
+    } else if (diffDays < 30) {
+      relative = `${diffDays} day${diffDays === 1 ? '' : 's'} ago`
+    } else {
+      relative = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+      })
+    }
+
+    const absolute = date.toLocaleString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
     })
+
+    return { relative, absolute }
+  }
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Edge Function Versions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error && !deployments.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Edge Function Versions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <AlertCircle className="h-8 w-8 text-destructive" />
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <Button onClick={() => loadDeployments()}>Retry</Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!deployments.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Edge Function Versions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <p className="text-sm text-muted-foreground">No deployments yet</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Edge Function Versions</CardTitle>
+        <Button
+          type="default"
+          size="tiny"
+          icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+          onClick={() => loadDeployments(true)}
+          disabled={isRefreshing}
+        >
+          Refresh
+        </Button>
       </CardHeader>
-      <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
-        <div className="p-8">
-          <div className="flex items-center gap-2">
-            <Clock size={20} />
-            <h4 className="text-base text-foreground">Available Versions</h4>
-          </div>
-          <div className="text-sm text-foreground-light mt-1 mb-4 max-w-3xl">
-            <p>Select a version to preview its content and restore if needed.</p>
-          </div>
-
-          <div className="space-y-2">
-            {mockVersions.map((version) => (
-              <ListItem
-                key={version.id}
-                version={version}
-                isSelected={selectedVersion?.id === version.id}
-                isRestoring={isRestoring}
-                onSelect={setSelectedVersion}
-                onRestore={handleRestore}
-                formatTimestamp={formatTimestamp}
-              />
-            ))}
-          </div>
+      <CardContent>
+        <div className="relative overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left font-medium p-4">Version</th>
+                <th className="text-left font-medium p-4">Status</th>
+                <th className="text-left font-medium p-4">Deployed at</th>
+                <th className="text-left font-medium p-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {deployments.map((deployment) => {
+                const { relative, absolute } = formatTimestamp(deployment.created_at)
+                return (
+                  <tr key={deployment.id} className="border-b hover:bg-muted/50">
+                    <td className="p-4">
+                      <span className="font-mono">{deployment.version}</span>
+                    </td>
+                    <td className="p-4">
+                      {deployment.status === 'ACTIVE' ? (
+                        <Badge variant="default" className="bg-green-500">
+                          ACTIVE
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">INACTIVE</Badge>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      <div>
+                        <div className="text-foreground">{relative}</div>
+                        <div className="text-xs text-muted-foreground">{absolute}</div>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      {deployment.status !== 'ACTIVE' && (
+                        <Button
+                          type="default"
+                          size="tiny"
+                          disabled={isRollingBack}
+                          onClick={() => handleRollbackClick(deployment)}
+                        >
+                          Roll back
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       </CardContent>
+
+      <RollbackModal
+        open={showRollbackModal}
+        onOpenChange={setShowRollbackModal}
+        deployment={selectedDeployment}
+        onConfirm={handleRollbackConfirm}
+        isLoading={isRollingBack}
+      />
     </Card>
   )
 }
