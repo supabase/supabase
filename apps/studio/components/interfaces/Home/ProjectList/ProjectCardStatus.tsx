@@ -57,23 +57,26 @@ export const ProjectCardStatus = ({
       : undefined
 
   const getTitle = () => {
-    if (projectStatus === 'isPaused') return renderMode === 'badge' ? 'Paused' : 'Project is paused'
-    if (projectStatus === 'isPausing')
-      return renderMode === 'badge' ? 'Pausing' : 'Project is pausing'
-    if (projectStatus === 'isRestarting')
-      return renderMode === 'badge' ? 'Restarting' : 'Project is restarting'
-    if (projectStatus === 'isResizing')
-      return renderMode === 'badge' ? 'Resizing' : 'Project is resizing'
-    if (projectStatus === 'isComingUp')
-      return renderMode === 'badge' ? 'Starting' : 'Project is coming up'
-    if (projectStatus === 'isRestoring')
-      return renderMode === 'badge' ? 'Restoring' : 'Project is restoring'
-    if (projectStatus === 'isUpgrading')
-      return renderMode === 'badge' ? 'Upgrading' : 'Project is upgrading'
-    if (projectStatus === 'isRestoreFailed')
-      return renderMode === 'badge' ? 'Restore Failed' : 'Project restore failed'
-    if (projectStatus === 'isPauseFailed')
-      return renderMode === 'badge' ? 'Pause Failed' : 'Project pause failed'
+    switch (projectStatus) {
+      case 'isPaused':
+        return renderMode === 'badge' ? 'Paused' : 'Project is paused'
+      case 'isPausing':
+        return renderMode === 'badge' ? 'Pausing' : 'Project is pausing'
+      case 'isRestarting':
+        return renderMode === 'badge' ? 'Restarting' : 'Project is restarting'
+      case 'isResizing':
+        return renderMode === 'badge' ? 'Resizing' : 'Project is resizing'
+      case 'isComingUp':
+        return renderMode === 'badge' ? 'Starting' : 'Project is coming up'
+      case 'isRestoring':
+        return renderMode === 'badge' ? 'Restoring' : 'Project is restoring'
+      case 'isUpgrading':
+        return renderMode === 'badge' ? 'Upgrading' : 'Project is upgrading'
+      case 'isRestoreFailed':
+        return renderMode === 'badge' ? 'Restore Failed' : 'Project restore failed'
+      case 'isPauseFailed':
+        return renderMode === 'badge' ? 'Pause Failed' : 'Project pause failed'
+    }
 
     if (!resourceWarnings) {
       return renderMode === 'badge' && projectStatus === 'isHealthy' ? 'Active' : undefined
