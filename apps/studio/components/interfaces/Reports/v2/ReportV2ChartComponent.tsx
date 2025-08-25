@@ -25,7 +25,7 @@ export interface ReportV2ChartProps {
   className?: string
 }
 
-const ReportV2ChartComponent = ({
+export const ReportV2ChartComponent = ({
   report,
   projectRef,
   startDate,
@@ -54,7 +54,7 @@ const ReportV2ChartComponent = ({
   } = useQuery(
     ['report-v2', report.id, projectRef, startDate, endDate, interval, functionIds],
     async () => {
-      return await report.query(
+      return await report.fetchFunction(
         projectRef,
         startDate,
         endDate,
@@ -70,25 +70,8 @@ const ReportV2ChartComponent = ({
   )
 
   const chartData = queryResult?.data || []
-  const chartAttributes = queryResult?.attributes || []
 
-  const isTopListChart = report.id === 'top-api-routes' || report.id === 'top-rpc-functions'
-
-  const { data: filledData, isError: isFillError } = useFillTimeseriesSorted(
-    chartData,
-    'period_start',
-    chartAttributes.map((attr: MultiAttribute) => attr.attribute),
-    0,
-    startDate,
-    endDate,
-    undefined,
-    interval
-  )
-
-  const finalData =
-    chartData.length > 0 && chartData.length < 20 && !isFillError && !isTopListChart
-      ? filledData
-      : chartData
+  console.log('chartData', queryResult)
 
   const getExpDemoChartData = () =>
     new Array(20).fill(0).map((_, index) => ({
@@ -214,13 +197,14 @@ const ReportV2ChartComponent = ({
   return (
     <LogChartHandler
       {...report}
-      attributes={chartAttributes as MultiAttribute[]}
-      data={finalData}
+      attributes={report.attributes}
+      data={chartData}
       isLoading={false}
       highlightedValue={undefined}
       updateDateRange={updateDateRange}
+      startDate={startDate}
+      endDate={endDate}
+      interval={interval}
     />
   )
 }
-
-export default ReportV2ChartComponent
