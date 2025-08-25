@@ -1,4 +1,4 @@
-import { Github } from 'lucide-react'
+import { GitBranch, Github } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 
@@ -63,13 +63,18 @@ export const ProjectTableRow = ({
                   />
                 </div>
               )}
+              {isBranchingEnabled && (
+                <div className="w-fit p-1 border rounded-md flex items-center">
+                  <GitBranch size={12} strokeWidth={1.5} />
+                </div>
+              )}
               {isGithubIntegrated && (
                 <>
                   <div className="w-fit p-1 border rounded-md flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
                   {githubRepository && (
-                    <span className="text-xs text-foreground-light truncate max-w-32">
+                    <span className="text-xs text-foreground-light truncate max-w-64">
                       {githubRepository}
                     </span>
                   )}
