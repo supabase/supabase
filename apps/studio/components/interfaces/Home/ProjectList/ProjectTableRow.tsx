@@ -49,9 +49,11 @@ export const ProjectTableRow = ({
       }}
     >
       <TableCell>
-        <div className="space-y-1">
-          <p className="font-medium">{name}</p>
-          <p className="text-xs text-foreground-light">{projectRef}</p>
+        <div className="flex flex-col gap-y-1">
+          <div>
+            <p className="font-medium">{name}</p>
+            <p className="text-xs text-foreground-lighter">ID: {projectRef}</p>
+          </div>
           {(isGithubIntegrated || isVercelIntegrated || isBranchingEnabled) && (
             <div className="flex items-center gap-x-2">
               {isVercelIntegrated && (
