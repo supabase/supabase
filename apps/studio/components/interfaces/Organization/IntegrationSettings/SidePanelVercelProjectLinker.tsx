@@ -48,16 +48,16 @@ const SidePanelVercelProjectLinker = () => {
   /**
    * Supabase projects available
    */
-  const { data: supabaseProjectsData } = useProjectsQuery({
+  const { data } = useProjectsQuery({
     enabled: organizationIntegrationId !== undefined,
   })
 
   const supabaseProjects = useMemo(
     () =>
-      supabaseProjectsData
+      (data?.projects ?? [])
         ?.filter((project) => project.organization_id === selectedOrganization?.id)
         .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
-    [selectedOrganization?.id, supabaseProjectsData]
+    [selectedOrganization?.id, data]
   )
 
   const { data: vercelProjectsData } = useVercelProjectsQuery(

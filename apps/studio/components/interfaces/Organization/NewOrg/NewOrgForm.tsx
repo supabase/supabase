@@ -9,14 +9,22 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { loadStripe } from '@stripe/stripe-js'
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
+import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import { useTheme } from 'next-themes'
 import {
   Button,
   Input_Shadcn_,
@@ -32,19 +40,10 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
-import { loadStripe } from '@stripe/stripe-js'
-import { useTheme } from 'next-themes'
-import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
-import { useProfile } from 'lib/profile'
-import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
 } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
-import { components } from 'api-types'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -102,9 +101,10 @@ const newMandatoryAddressInput = true
 const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
-  const { data: organizations, isSuccess } = useOrganizationsQuery()
-  const { data: projects } = useProjectsQuery()
   const { resolvedTheme } = useTheme()
+
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
+  const { data } = useProjectsQuery()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -114,8 +114,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
   const projectsByOrg = useMemo(() => {
-    return _.groupBy(projects || [], 'organization_slug')
-  }, [projects])
+    return _.groupBy(data?.projects ?? [], 'organization_slug')
+  }, [data])
 
   const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
     useState(false)

@@ -1,3 +1,12 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
+import { cn } from '@ui/lib/utils'
+import { Boxes, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Collapsible_Shadcn_,
@@ -7,31 +16,22 @@ import {
   FormField_Shadcn_,
   Skeleton,
 } from 'ui'
-import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { cn } from '@ui/lib/utils'
-import { ActionCard } from '../../../ui/ActionCard'
-import { Boxes, ChevronRight } from 'lucide-react'
+import { z } from 'zod'
+import { useOrganizationLinkAwsMarketplaceMutation } from '../../../../data/organizations/organization-link-aws-marketplace-mutation'
+import { useProjectsQuery } from '../../../../data/projects/projects-query'
+import { Organization } from '../../../../types'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '../../../layouts/Scaffold'
+import { ActionCard } from '../../../ui/ActionCard'
 import { ButtonTooltip } from '../../../ui/ButtonTooltip'
-import { z } from 'zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo, useState } from 'react'
-import { Organization } from '../../../../types'
-import { useProjectsQuery } from '../../../../data/projects/projects-query'
-import { useOrganizationLinkAwsMarketplaceMutation } from '../../../../data/organizations/organization-link-aws-marketplace-mutation'
-import { toast } from 'sonner'
-import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
-import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
-import { useRouter } from 'next/router'
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
+import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
 import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
-import Link from 'next/link'
+import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
 
 interface Props {
   organizations?: Organization[] | undefined
@@ -92,7 +92,8 @@ const AwsMarketplaceLinkExistingOrg = ({
     return { orgsLinkable: linkable, orgsNotLinkable: notLinkable }
   }, [sortedOrganizations, onboardingInfo?.organization_linking_eligibility])
 
-  const { data: projects = [] } = useProjectsQuery()
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
 
   const [isNotLinkableOrgListOpen, setIsNotLinkableOrgListOpen] = useState(false)
   const [orgLinkedSuccessfully, setOrgLinkedSuccessfully] = useState(false)

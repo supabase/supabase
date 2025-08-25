@@ -61,7 +61,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data: projects } = useProjectsQuery()
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 

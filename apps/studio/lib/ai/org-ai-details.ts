@@ -27,7 +27,7 @@ export const getOrgAIDetails = async ({
   ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const selectedProject = projects.find(
+  const selectedProject = projects.projects.find(
     (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
   )
 

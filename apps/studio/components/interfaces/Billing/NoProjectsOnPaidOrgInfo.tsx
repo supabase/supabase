@@ -1,16 +1,17 @@
 import { useProjectsQuery } from 'data/projects/projects-query'
+import Link from 'next/link'
 import type { Organization } from 'types'
 import { Admonition } from 'ui-patterns'
-import Link from 'next/link'
 
 interface NoProjectsOnPaidOrgInfoProps {
   organization?: Organization
 }
 
 export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps) => {
-  const { data: allProjects } = useProjectsQuery({})
+  const { data } = useProjectsQuery({})
   const projectCount =
-    allProjects?.filter((project) => project.organization_id === organization?.id).length ?? 0
+    (data?.projects ?? []).filter((project) => project.organization_id === organization?.id)
+      .length ?? 0
 
   if (
     projectCount > 0 ||

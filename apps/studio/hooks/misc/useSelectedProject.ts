@@ -28,7 +28,7 @@ export function useProjectByRefQuery(ref?: string) {
   const projectsQuery = useProjectsQuery({
     enabled: isLoggedIn,
     select: (data) => {
-      return data.find((project) => project.ref === ref)
+      return data.projects.find((project) => project.ref === ref)
     },
   })
 

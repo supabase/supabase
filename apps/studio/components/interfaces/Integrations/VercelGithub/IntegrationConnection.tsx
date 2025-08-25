@@ -34,8 +34,10 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const { data: org } = useSelectedOrganizationQuery()
 
     const { type, connection } = props
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data } = useProjectsQuery()
+    const project = (data?.projects ?? []).find(
+      (project) => project.ref === connection.supabase_project_ref
+    )
     const isBranchingEnabled = project?.is_branch_enabled === true
 
     const [isOpen, setIsOpen] = useState(false)

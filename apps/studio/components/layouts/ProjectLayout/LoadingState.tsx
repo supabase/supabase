@@ -2,9 +2,10 @@ import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 
-const LoadingState = () => {
+export const LoadingState = () => {
   const { ref } = useParams()
-  const { data: allProjects, isLoading } = useProjectsQuery()
+  const { data, isLoading } = useProjectsQuery()
+  const allProjects = data?.projects ?? []
 
   const projectName =
     ref !== 'default'
@@ -36,8 +37,6 @@ const LoadingState = () => {
     </div>
   )
 }
-
-export default LoadingState
 
 export const ProjectUsageLoadingState = () => {
   return (

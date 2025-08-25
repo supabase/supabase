@@ -140,11 +140,9 @@ export const SupportFormV2 = ({
     () => organizations?.find((org) => org.slug === organizationSlug),
     [organizationSlug, organizations]
   )
-  const {
-    data: allProjects,
-    isLoading: isLoadingProjects,
-    isSuccess: isSuccessProjects,
-  } = useProjectsQuery()
+  const { data, isLoading: isLoadingProjects, isSuccess: isSuccessProjects } = useProjectsQuery()
+  const allProjects = data?.projects ?? []
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({

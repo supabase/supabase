@@ -38,7 +38,7 @@ const Usage = () => {
   )
 
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: projects, isSuccess } = useProjectsQuery()
+  const { data, isSuccess } = useProjectsQuery()
   const {
     data: subscription,
     error: subscriptionError,
@@ -47,7 +47,9 @@ const Usage = () => {
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
+  const orgProjects = (data?.projects ?? []).filter(
+    (project) => project.organization_id === organization?.id
+  )
 
   useEffect(() => {
     if (projectRef && isSuccess && orgProjects !== undefined) {

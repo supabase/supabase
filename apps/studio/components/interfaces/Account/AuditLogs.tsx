@@ -29,7 +29,8 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const { data: projects } = useProjectsQuery()
+  const { data: projectsData } = useProjectsQuery()
+  const projects = projectsData?.projects ?? []
   const { data: organizations } = useOrganizationsQuery()
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useProfileAuditLogsQuery(
