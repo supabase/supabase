@@ -4,10 +4,9 @@ import {
   analyticsIntervalToGranularity,
   REPORT_STATUS_CODE_COLORS,
 } from 'data/reports/report.utils'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
 
-export interface ReportQuery {
+export interface ReportFetchFunction {
   (
     projectRef: string,
     startDate: string,
@@ -15,12 +14,12 @@ export interface ReportQuery {
     interval: AnalyticsInterval,
     functionIds?: string[],
     edgeFnIdToName?: (id: string) => string | undefined
-  ): Promise<{ data: any; attributes: MultiAttribute[] }>
+  ): Promise<{ data: any }>
 }
 export interface Report {
   id: string
   label: string
-  query: ReportQuery
+  fetchFunction: ReportFetchFunction
   [key: string]: any
 }
 
@@ -138,7 +137,23 @@ async function runQuery(projectRef: string, sql: string, startDate: string, endD
   return data
 }
 
-export const edgeFunctionReports: Report[] = [
+export const edgeFunctionReports = ({
+  projectRef,
+  functions,
+  startDate,
+  endDate,
+  interval,
+  filters,
+}: {
+  projectRef: string
+  functions: { id: string; name: string }[]
+  startDate: string
+  endDate: string
+  interval: AnalyticsInterval
+  filters: {
+    functionIds?: string[]
+  }
+}): Report[] => [
   {
     id: 'total-invocations',
     label: 'Total Edge Function Invocations',
@@ -151,45 +166,22 @@ export const edgeFunctionReports: Report[] = [
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
-    query: async (projectRef, startDate, endDate, interval, functionIds, edgeFnIdToName) => {
-      const sql = METRIC_SQL.TotalInvocations(interval, functionIds)
-      const rawData = await runQuery(projectRef, sql, startDate, endDate)
-      if (!rawData) return { data: [], attributes: [] }
-      const result = rawData.result || []
+    fetchFunction: async () => {
+      const sql = METRIC_SQL.TotalInvocations(interval, filters.functionIds)
+      const response = await runQuery(projectRef, sql, startDate, endDate)
 
-      const functionIdsInData = Array.from(
-        new Set(result.map((p: any) => p.function_id))
-      ) as string[]
-      const chartFunctionIds =
-        functionIds && functionIds.length > 0 ? functionIds : functionIdsInData
+      if (!response?.result) return { data: [] }
 
-      if (chartFunctionIds.length === 0) {
-        return { data: [], attributes: [] }
-      }
+      // Edge function logs do not include the function name,
+      // so we have to map the function id to the function name
+      // and add it to the returned data
 
-      const attributes = chartFunctionIds.map((id: string) => ({
-        attribute: id,
-        label: edgeFnIdToName?.(id) ?? id,
-        provider: 'logs',
-        enabled: true,
+      const data = response?.result?.map((log: any) => ({
+        ...log,
+        function_name: functions.find((f) => f.id === log.function_id)?.name ?? log.function_id,
       }))
 
-      const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
-      const data = Array.from(timestamps)
-        .sort()
-        .map((timestamp) => {
-          const point: any = { period_start: timestamp }
-          attributes.forEach((attr) => {
-            point[attr.attribute] = 0
-          })
-          const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
-          matchingPoints.forEach((p: any) => {
-            point[p.function_id as string] = p.count
-          })
-          return point
-        })
-
-      return { data, attributes }
+      return { data }
     },
   },
   {
@@ -204,9 +196,19 @@ export const edgeFunctionReports: Report[] = [
     defaultChartStyle: 'bar',
     titleTooltip: 'The total number of edge function executions by status code.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
-    query: async (projectRef, startDate, endDate, interval, functionIds) => {
-      const sql = METRIC_SQL.ExecutionStatusCodes(interval, functionIds)
-      const rawData = await runQuery(projectRef, sql, startDate, endDate)
+    fetchFunction: async () => {
+      const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters.functionIds)
+      // const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      const rawData = {
+        result: [
+          {
+            count: 20,
+            status_code: 200,
+            timestamp: 1756142640000000,
+          },
+        ],
+        error: null,
+      }
       if (!rawData) return { data: [], attributes: [] }
       const result = rawData.result || []
 
@@ -253,7 +255,7 @@ export const edgeFunctionReports: Report[] = [
     showLegend: true,
     showMaxValue: false,
     hideChartType: false,
-    defaultChartStyle: 'line',
+    defaultChartStyle: 'bar',
     titleTooltip: 'Average execution time for edge functions.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     format: 'ms',
@@ -261,17 +263,26 @@ export const edgeFunctionReports: Report[] = [
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
     },
-    query: async (projectRef, startDate, endDate, interval, functionIds, edgeFnIdToName) => {
-      const sql = METRIC_SQL.ExecutionTime(interval, functionIds)
-      const rawData = await runQuery(projectRef, sql, startDate, endDate)
+    fetchFunction: async () => {
+      const sql = METRIC_SQL.ExecutionTime(interval, filters.functionIds)
+      // const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      const rawData = {
+        result: [
+          {
+            avg_execution_time: 74.7,
+            timestamp: 1756142640000000,
+          },
+        ],
+        error: null,
+      }
       if (!rawData) return { data: [], attributes: [] }
       const result = rawData.result || []
-      const hasFunctions = functionIds && functionIds.length > 0
+      const hasFunctions = functions.length > 0
 
       if (hasFunctions) {
-        const attributes = functionIds.map((id: string) => ({
-          attribute: id,
-          label: edgeFnIdToName?.(id) ?? id,
+        const attributes = functions.map((f) => ({
+          attribute: f.id,
+          label: f.name,
           provider: 'logs',
           enabled: true,
         }))
@@ -332,9 +343,19 @@ export const edgeFunctionReports: Report[] = [
     defaultChartStyle: 'bar',
     titleTooltip: 'The total number of edge function invocations by region.',
     availableIn: ['pro', 'team', 'enterprise'],
-    query: async (projectRef, startDate, endDate, interval, functionIds) => {
-      const sql = METRIC_SQL.InvocationsByRegion(interval, functionIds)
-      const rawData = await runQuery(projectRef, sql, startDate, endDate)
+    fetchFunction: async () => {
+      const sql = METRIC_SQL.InvocationsByRegion(interval, filters.functionIds)
+      // const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      const rawData = {
+        result: [
+          {
+            count: 20,
+            region: 'eu-central-1',
+            timestamp: 1756142640000000,
+          },
+        ],
+        error: null,
+      }
       if (!rawData) return { data: [], attributes: [] }
       const result = rawData.result || []
 
