@@ -645,41 +645,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     </div>
                   </div>
                 )}
-                <AnimatePresence>
-                  {isThinking && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="flex gap-4 w-auto overflow-hidden"
-                    >
-                      <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
-                        <span>Thinking</span>
-                        <div className="flex gap-1">
-                          <motion.span
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                          >
-                            .
-                          </motion.span>
-                          <motion.span
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                          >
-                            .
-                          </motion.span>
-                          <motion.span
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                          >
-                            .
-                          </motion.span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {isThinking && (
+                  <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block w-1.5 h-4 bg-foreground-lighter"
+                  />
+                )}
               </ConversationContent>
             ) : isLoadingTables && isApiKeySet ? (
               <div className="w-full h-full flex-1 flex flex-col justify-center items-center p-5">

@@ -1,5 +1,5 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { Loader2, Pencil } from 'lucide-react'
+import { CheckIcon, Loader2, Pencil } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
@@ -19,6 +19,7 @@ import {
   MarkdownPre,
   OrderedList,
 } from './MessageMarkdown'
+import { Reasoning } from './elements/Reasoning'
 
 interface MessageContextType {
   isLoading: boolean
@@ -40,6 +41,7 @@ interface MessageProps {
   message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
+  status?: 'streaming' | 'submitted' | 'completed'
   action?: ReactNode
   variant?: 'default' | 'warning'
   onResults: ({
@@ -68,6 +70,7 @@ export const Message = function Message({
   onEdit,
   isAfterEditedMessage = false,
   isBeingEdited = false,
+  status,
   onCancelEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
@@ -133,33 +136,34 @@ export const Message = function Message({
                   (part: NonNullable<VercelMessage['parts']>[number], index: number) => {
                     switch (part.type) {
                       case 'dynamic-tool': {
-                        const { state } = part
-                        if (state === 'input-streaming' || state === 'input-available') {
-                          return (
-                            <div key={`${id}-tool-${part.toolCallId}`} className="mt-4 first:mt-0">
-                              <div className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {`Calling ${part.toolName}...`}
-                              </div>
-                            </div>
-                          )
-                        }
-                        return null
+                        return (
+                          <div
+                            key={`${id}-tool-${part.toolCallId}`}
+                            className="border rounded-md border-muted heading-meta mb-2 flex items-center gap-2 text-foreground-lighter py-2 px-3"
+                          >
+                            {part.state === 'input-streaming' ? (
+                              <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
+                            ) : (
+                              <CheckIcon
+                                strokeWidth={1.5}
+                                size={12}
+                                className="text-foreground-muted"
+                              />
+                            )}
+                            {`${part.toolName}...`}
+                          </div>
+                        )
                       }
-                      case 'reasoning': {
-                        const { state } = part
-                        if (state === 'streaming') {
-                          return (
-                            <div key={`${id}-reasoning`} className="mt-4 first:mt-0">
-                              <div className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {`Thinking...`}
-                              </div>
-                            </div>
-                          )
-                        }
-                        return null
-                      }
+                      case 'reasoning':
+                        return (
+                          <Reasoning
+                            key={`${message.id}-${index}}`}
+                            className="w-full mb-2"
+                            isStreaming={status === 'streaming'}
+                          >
+                            {part.text}
+                          </Reasoning>
+                        )
                       case 'text':
                         return (
                           <ReactMarkdown
