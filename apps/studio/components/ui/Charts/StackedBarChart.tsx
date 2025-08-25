@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bar, BarChart, Cell, Legend, XAxis } from 'recharts'
+import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useChartSync } from './useChartSync'
@@ -20,7 +20,6 @@ import {
   useStacked,
 } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 dayjs.extend(utc)
 
 interface Props extends CommonChartProps<any> {
@@ -35,7 +34,6 @@ interface Props extends CommonChartProps<any> {
   hideHeader?: boolean
   stackColors?: ValidStackColor[]
   syncId?: string
-  margin?: { top: number; right: number; left: number; bottom: number }
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
@@ -58,9 +56,8 @@ const StackedBarChart: React.FC<Props> = ({
   hideHeader = false,
   stackColors = DEFAULT_STACK_COLORS,
   syncId,
-  margin,
 }) => {
-  const { minHeight } = useChartSize(size)
+  const { Container } = useChartSize(size)
   const {
     updateState: updateSyncState,
     clearState: clearSyncState,
@@ -112,17 +109,15 @@ const StackedBarChart: React.FC<Props> = ({
           attributes={[]}
         />
       )}
-      <ChartContainer config={{}} className="w-full aspect-auto" style={{ height: minHeight }}>
+      <Container>
         <BarChart
           data={variant === 'percentages' ? percentagesStackedData : stackedData}
-          margin={
-            margin ?? {
-              top: 20,
-              right: 20,
-              left: 20,
-              bottom: 5,
-            }
-          }
+          margin={{
+            top: 20,
+            right: 20,
+            left: 20,
+            bottom: 5,
+          }}
           className="cursor-pointer overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {
@@ -184,47 +179,36 @@ const StackedBarChart: React.FC<Props> = ({
               ))}
             </Bar>
           ))}
-          <ChartTooltip
-            cursor={false}
-            active={!!syncId && syncState.isHovering}
-            content={
-              <ChartTooltipContent
-                labelFormatter={
-                  xAxisFormatAsDate
-                    ? (label) =>
-                        timestampFormatter(label as string, customDateFormat, displayDateInUtc)
-                    : undefined
-                }
-                formatter={(value, name, item) => {
-                  const labelName = String(name)
-                  const suffix = format || ''
-                  if (variant === 'percentages' && percentagesStackedData) {
-                    const index = percentagesStackedData.findIndex(
-                      (pStack) => pStack === (item as any).payload
-                    )
-                    const val = stackedData[index][name as string]
-                    const percentage = precisionFormatter(Number(value as number) * 100, 1) + '%'
-                    return (
-                      <div className="flex w-full items-center justify-between">
-                        <span className="text-foreground-light">{labelName}</span>
-                        <span className="font-mono font-medium tabular-nums text-foreground">{`${percentage} (${val}${suffix})`}</span>
-                      </div>
-                    )
-                  }
-                  return (
-                    <div className="flex w-full items-center justify-between">
-                      <span className="text-foreground-light">{labelName}</span>
-                      <span className="font-mono font-medium tabular-nums text-foreground">
-                        {String(value) + suffix}
-                      </span>
-                    </div>
-                  )
-                }}
-              />
+          <Tooltip
+            labelFormatter={
+              xAxisFormatAsDate
+                ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
+                : undefined
             }
+            formatter={(value, name, props) => {
+              const suffix = format || ''
+              if (variant === 'percentages' && percentagesStackedData) {
+                const index = percentagesStackedData.findIndex(
+                  (pStack) => pStack === props.payload!
+                )
+                const val = stackedData[index][name]
+                const percentage = precisionFormatter(Number(value) * 100, 1) + '%'
+                return `${percentage} (${val}${suffix})`
+              }
+              return String(value) + suffix
+            }}
+            cursor={false}
+            labelClassName="text-white"
+            contentStyle={{
+              backgroundColor: '#444444',
+              borderColor: '#444444',
+              fontSize: '12px',
+            }}
+            wrapperClassName="bg-gray-600 rounded min-w-md"
+            active={!!syncId && syncState.isHovering}
           />
         </BarChart>
-      </ChartContainer>
+      </Container>
       {stackedData && stackedData[0] && (
         <div className="text-foreground-lighter -mt-5 flex items-center justify-between text-xs">
           <span>

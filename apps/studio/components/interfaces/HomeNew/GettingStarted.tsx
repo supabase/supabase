@@ -30,7 +30,7 @@ export function GettingStarted({ steps, className }: GettingStartedProps) {
     <section className={cn('w-full', className)}>
       <div className="flex justify-between items-center mb-6">
         <h3 className="heading-section">Getting started</h3>
-        <Button size="small" type="outline">
+        <Button size="tiny" type="outline">
           Dismiss
         </Button>
       </div>

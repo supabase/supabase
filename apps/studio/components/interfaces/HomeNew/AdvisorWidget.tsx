@@ -8,7 +8,7 @@ import { EntityTypeIcon, lintInfoMap } from 'components/interfaces/Linter/Linter
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
@@ -74,7 +74,7 @@ export const AdvisorWidget = () => {
   let titleContent: React.ReactNode
 
   if (totalErrors === 0) {
-    titleContent = <h2>No issues found</h2>
+    titleContent = <h2>Assistant found no issues</h2>
   } else {
     const issuesText = totalErrors === 1 ? 'issue' : 'issues'
     const numberDisplay = totalErrors.toString()
@@ -86,8 +86,7 @@ export const AdvisorWidget = () => {
 
     titleContent = (
       <h2>
-        {numberDisplay} {issuesText} need
-        {totalErrors === 1 ? 's' : ''} attention
+        Assistant found {numberDisplay} {issuesText}
       </h2>
     )
   }
@@ -100,7 +99,12 @@ export const AdvisorWidget = () => {
       {isLoadingLints ? (
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
-        <div className="flex justify-between items-center mb-6">{titleContent}</div>
+        <div className="flex justify-between items-center mb-6">
+          {titleContent}
+          <Button type="default" icon={<AiIconAnimation />} onClick={() => snap.toggleAssistant()}>
+            Ask Assistant
+          </Button>
+        </div>
       )}
       {isLoadingLints ? (
         <div className="flex flex-col p-4 gap-2">
@@ -112,10 +116,7 @@ export const AdvisorWidget = () => {
         <Row columns={[3, 2, 1]}>
           {combinedIssues.map((lint) => {
             console.log(lint)
-            const lintText = lint.detail ? lint.detail : lint.title
             const advisor = getAdvisorPath(lint)
-            const levelClassName = 'text-destructive'
-            const levelLabel = 'Error'
             return (
               <Card key={lint.cache_key} className="h-full flex flex-col items-stretch h-64">
                 <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">

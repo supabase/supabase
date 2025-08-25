@@ -1,15 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
-  Count,
   EventChart,
   EventChartData,
   Filters,
   LogsEndpointParams,
 } from 'components/interfaces/Settings/Logs/Logs.types'
-import { genChartQuery, genCountQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
+import { genChartQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
@@ -36,75 +35,29 @@ function useProjectUsageStats({
   timestampEnd: string
   filterOverride?: Filters
 }): ProjectUsageStatsHookResult {
-  const [latestRefresh, setLatestRefresh] = useState(new Date().toISOString())
-
+  const filterOverrideString = JSON.stringify(filterOverride)
   const mergedFilters = useMemo(
     () => ({
       ...filterOverride,
     }),
-    [JSON.stringify(filterOverride)]
+    [filterOverrideString]
   )
 
   const params: LogsEndpointParams = useMemo(() => {
     return { iso_timestamp_start: timestampStart, iso_timestamp_end: timestampEnd }
   }, [timestampStart, timestampEnd])
 
-  const countQuerySql = useMemo(() => genCountQuery(table, mergedFilters), [table, mergedFilters])
-  const countQueryKey = useMemo(
-    () => [
-      'projects',
-      projectRef,
-      'logs-count',
-      {
-        projectRef,
-        sql: countQuerySql,
-        iso_timestamp_start: latestRefresh,
-        iso_timestamp_end: timestampEnd,
-        table,
-        mergedFilters,
-      },
-    ],
-    [projectRef, countQuerySql, latestRefresh, timestampEnd, table, mergedFilters]
-  )
-
-  const { data: countData } = useQuery(
-    countQueryKey,
-    async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-        params: {
-          path: { ref: projectRef },
-          query: {
-            sql: countQuerySql,
-            iso_timestamp_start: latestRefresh,
-            iso_timestamp_end: timestampEnd,
-          },
-        },
-        signal,
-      })
-      if (error) {
-        throw error
-      }
-
-      return data as unknown as Count
-    },
-    {
-      refetchOnWindowFocus: false,
-      refetchInterval: 60000,
-      enabled: true,
-    }
-  )
-
-  const isCountReady = typeof countData !== 'undefined'
-
   const chartQuery = useMemo(
     () => genChartQuery(table, params, mergedFilters),
     [table, params, mergedFilters]
   )
+
   const chartQueryKey = useMemo(
     () => [
       'projects',
       projectRef,
       'logs-chart',
+      table,
       {
         projectRef,
         sql: chartQuery,
@@ -112,7 +65,7 @@ function useProjectUsageStats({
         iso_timestamp_end: timestampEnd,
       },
     ],
-    [projectRef, chartQuery, timestampStart, timestampEnd]
+    [projectRef, chartQuery, timestampStart, timestampEnd, table]
   )
 
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
@@ -135,13 +88,11 @@ function useProjectUsageStats({
 
       return data as unknown as EventChart
     },
-    { refetchOnWindowFocus: false, enabled: isCountReady }
+    {
+      refetchOnWindowFocus: false,
+      enabled: typeof projectRef !== 'undefined',
+    }
   )
-
-  const refresh = useCallback(async () => {
-    setLatestRefresh(new Date().toISOString())
-    refreshEventChart()
-  }, [refreshEventChart])
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
     eventChartResponse?.result ?? [],
@@ -158,12 +109,12 @@ function useProjectUsageStats({
   )
 
   return {
-    isLoading: !isCountReady && !eventChartResponse,
+    isLoading: !eventChartResponse,
     error: eventChartError,
     filters: mergedFilters,
     params,
     eventChartData,
-    refresh,
+    refresh: refreshEventChart,
   }
 }
 export default useProjectUsageStats

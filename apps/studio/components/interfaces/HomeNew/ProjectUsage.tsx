@@ -1,11 +1,11 @@
 import dayjs from 'dayjs'
-import sumBy from 'lodash/sumBy'
 import { Archive, ChevronDown, Database, Key, Zap, Code } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useState, useMemo } from 'react'
 
 import { useParams } from 'common'
-import StackedBarChart from 'components/ui/Charts/StackedBarChart'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { InlineLink } from 'components/ui/InlineLink'
 import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
@@ -27,6 +27,7 @@ import {
 } from 'ui'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
@@ -59,80 +60,8 @@ const CHART_INTERVALS: ChartIntervals[] = [
   },
 ]
 
-type UsageStatus = 'Ok' | 'Warn' | 'Err'
-
-type StatusTimeseriesDatum = {
-  timestamp: string
-  count: number
-  status: UsageStatus
-}
-
-const seededRatio = (seed: string) => {
-  let hash = 0
-  for (let i = 0; i < seed.length; i++) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i)
-    hash |= 0
-  }
-  const n = Math.abs(hash % 1000)
-  return n / 1000
-}
-
-const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
-
-const generateStatusTimeSeries = (
-  base: any[] = [],
-  totalKey: string,
-  serviceKey: string
-): StatusTimeseriesDatum[] => {
-  const rows: StatusTimeseriesDatum[] = []
-  for (const point of base) {
-    const ts = String(point.timestamp)
-    const total = Number(point?.[totalKey] || 0)
-
-    const seededBaseline = Math.round(5 + seededRatio(`${serviceKey}-${ts}-base`) * 20)
-    const jitter = 0.85 + seededRatio(`${serviceKey}-${ts}-jitter`) * 0.4
-    let effectiveTotal = total > 0 ? Math.max(1, Math.round(total * jitter)) : seededBaseline
-    const spikeChance = seededRatio(`${serviceKey}-${ts}-spike`)
-
-    if (spikeChance > 0.98) {
-      effectiveTotal = Math.round(effectiveTotal * 2.5)
-    } else if (spikeChance < 0.02) {
-      effectiveTotal = Math.max(1, Math.round(effectiveTotal * 0.6))
-    }
-
-    const r1 = seededRatio(`${serviceKey}-${ts}-a`)
-    const r2 = seededRatio(`${serviceKey}-${ts}-b`)
-    const ratioJitter = 0.8 + seededRatio(`${serviceKey}-${ts}-rj`) * 0.4
-    const warnRatio = clamp((0.05 + r1 * 0.15) * ratioJitter, 0, 0.9)
-    const errRatio = clamp((0.01 + r2 * 0.09) * ratioJitter, 0, 0.5)
-
-    let warn = Math.round(effectiveTotal * warnRatio)
-    let err = Math.round(effectiveTotal * errRatio)
-    let ok = effectiveTotal - warn - err
-
-    if (ok < 0) {
-      const deficit = -ok
-      const takeFromWarn = Math.min(deficit, warn)
-      warn -= takeFromWarn
-      const remaining = deficit - takeFromWarn
-      const takeFromErr = Math.min(remaining, err)
-      err -= takeFromErr
-      ok = effectiveTotal - warn - err
-    }
-
-    rows.push(
-      { timestamp: ts, count: ok, status: 'Ok' },
-      { timestamp: ts, count: warn, status: 'Warn' },
-      { timestamp: ts, count: err, status: 'Err' }
-    )
-  }
-  return rows
-}
-
-const sumStatus = (rows: StatusTimeseriesDatum[], status: UsageStatus) =>
-  rows.filter((r) => r.status === status).reduce((acc, r) => acc + (Number(r.count) || 0), 0)
-
 const ProjectUsage = () => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
@@ -145,119 +74,173 @@ const ProjectUsage = () => {
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
-  const startDateLocal = dayjs().subtract(
-    selectedInterval.startValue,
-    selectedInterval.startUnit as dayjs.ManipulateType
-  )
-  const endDateLocal = dayjs()
-  const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
-  const timestampStart = startDateLocal.toISOString()
-  const timestampEnd = endDateLocal.toISOString()
+  const { timestampStart, timestampEnd, datetimeFormat } = useMemo(() => {
+    const startDateLocal = dayjs().subtract(
+      selectedInterval.startValue,
+      selectedInterval.startUnit as dayjs.ManipulateType
+    )
+    const endDateLocal = dayjs()
+    const format = selectedInterval.format || 'MMM D, ha'
+
+    return {
+      timestampStart: startDateLocal.toISOString(),
+      timestampEnd: endDateLocal.toISOString(),
+      datetimeFormat: format,
+    }
+  }, [selectedInterval]) // Only recalculate when interval changes
 
   // Fetch per-service event chart data
-  const dbEdge = useProjectUsageStats({
+  const dbStats = useProjectUsageStats({
     projectRef: projectRef as string,
     table: LogsTableName.EDGE,
     timestampStart,
     timestampEnd,
-    filterOverride: { 'product.database': true },
   })
-  const fnEdge = useProjectUsageStats({
+
+  const fnEdgeStats = useProjectUsageStats({
     projectRef: projectRef as string,
     table: LogsTableName.FN_EDGE,
     timestampStart,
     timestampEnd,
   })
-  const auth = useProjectUsageStats({
+
+  const authStats = useProjectUsageStats({
     projectRef: projectRef as string,
     table: LogsTableName.AUTH,
     timestampStart,
     timestampEnd,
   })
-  const storage = useProjectUsageStats({
+
+  const storageStats = useProjectUsageStats({
     projectRef: projectRef as string,
     table: LogsTableName.EDGE,
     timestampStart,
     timestampEnd,
-    filterOverride: { 'product.storage': true },
   })
-  const realtime = useProjectUsageStats({
+
+  const realtimeStats = useProjectUsageStats({
     projectRef: projectRef as string,
-    table: LogsTableName.EDGE,
+    table: LogsTableName.REALTIME,
     timestampStart,
     timestampEnd,
-    filterOverride: { 'product.realtime': true },
   })
 
-  const isLoading =
-    dbEdge.isLoading ||
-    fnEdge.isLoading ||
-    auth.isLoading ||
-    storage.isLoading ||
-    realtime.isLoading
-
-  // Transform eventChartData into stacked status series
-  type StatusTimeseriesDatum = { timestamp: string; count: number; status: UsageStatus }
-  type UsageStatus = 'Ok' | 'Warn' | 'Err'
-
-  const toStatusSeries = (rows: any[] = []): StatusTimeseriesDatum[] => {
-    const series: StatusTimeseriesDatum[] = []
-    for (const r of rows) {
-      const ts = String(r.timestamp)
-      const ok = Number(r.ok_count || 0)
-      const warn = Number(r.warning_count || 0)
-      const err = Number(r.error_count || 0)
-      series.push(
-        { timestamp: ts, count: ok, status: 'Ok' },
-        { timestamp: ts, count: warn, status: 'Warn' },
-        { timestamp: ts, count: err, status: 'Err' }
-      )
-    }
-    return series
+  // Transform eventChartData into LogsBarChart format
+  type LogsBarChartDatum = {
+    timestamp: string
+    error_count: number
+    ok_count: number
+    warning_count: number
   }
 
-  const dbSeries = toStatusSeries(dbEdge.eventChartData)
-  const fnSeries = toStatusSeries(fnEdge.eventChartData)
-  const authSeries = toStatusSeries(auth.eventChartData)
-  const storageSeries = toStatusSeries(storage.eventChartData)
-  const realtimeSeries = toStatusSeries(realtime.eventChartData)
+  type ServiceEntry = {
+    key: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    title: string
+    icon: React.ReactNode
+    href?: string
+    route: string
+    stats: ReturnType<typeof useProjectUsageStats>
+    enabled: boolean
+  }
 
-  const sumStatus = (rows: StatusTimeseriesDatum[], status: UsageStatus) =>
-    rows.filter((r) => r.status === status).reduce((acc, r) => acc + (Number(r.count) || 0), 0)
+  type ServiceComputed = ServiceEntry & {
+    data: LogsBarChartDatum[]
+    total: number
+    warn: number
+    err: number
+  }
 
-  const restTotal = sumBy(dbSeries || [], 'count')
-  const restWarn = sumStatus(dbSeries, 'Warn')
-  const restErr = sumStatus(dbSeries, 'Err')
+  const toLogsBarChartData = (rows: any[] = []): LogsBarChartDatum[] => {
+    return rows.map((r) => ({
+      timestamp: String(r.timestamp),
+      ok_count: Number(r.ok_count || 0),
+      warning_count: Number(r.warning_count || 0),
+      error_count: Number(r.error_count || 0),
+    }))
+  }
 
-  const authTotal = sumBy(authSeries || [], 'count')
-  const authWarn = sumStatus(authSeries, 'Warn')
-  const authErr = sumStatus(authSeries, 'Err')
+  const sumTotal = (data: LogsBarChartDatum[]) =>
+    data.reduce((acc, r) => acc + r.ok_count + r.warning_count + r.error_count, 0)
+  const sumWarnings = (data: LogsBarChartDatum[]) =>
+    data.reduce((acc, r) => acc + r.warning_count, 0)
+  const sumErrors = (data: LogsBarChartDatum[]) => data.reduce((acc, r) => acc + r.error_count, 0)
 
-  const storageTotal = sumBy(storageSeries || [], 'count')
-  const storageWarn = sumStatus(storageSeries, 'Warn')
-  const storageErr = sumStatus(storageSeries, 'Err')
+  const serviceEntries: ServiceEntry[] = [
+    {
+      key: 'db',
+      title: 'Database requests',
+      icon: <Database strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+      href: `/project/${projectRef}/editor`,
+      route: '/logs/postgres-logs',
+      stats: dbStats,
+      enabled: true,
+    },
+    {
+      key: 'functions',
+      title: 'Functions requests',
+      icon: <Code strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+      route: '/logs/edge-functions-logs',
+      stats: fnEdgeStats,
+      enabled: true,
+    },
+    {
+      key: 'auth',
+      title: 'Auth requests',
+      icon: <Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+      href: `/project/${projectRef}/auth/users`,
+      route: '/logs/auth-logs',
+      stats: authStats,
+      enabled: authEnabled,
+    },
+    {
+      key: 'storage',
+      title: 'Storage requests',
+      icon: <Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+      href: `/project/${projectRef}/storage/buckets`,
+      route: '/logs/storage-logs',
+      stats: storageStats,
+      enabled: storageEnabled,
+    },
+    {
+      key: 'realtime',
+      title: 'Realtime requests',
+      icon: <Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+      route: '/logs/realtime-logs',
+      stats: realtimeStats,
+      enabled: true,
+    },
+  ]
 
-  const realtimeTotal = sumBy(realtimeSeries || [], 'count')
-  const realtimeWarn = sumStatus(realtimeSeries, 'Warn')
-  const realtimeErr = sumStatus(realtimeSeries, 'Err')
+  const services: ServiceComputed[] = serviceEntries.map((s) => {
+    const data = toLogsBarChartData(s.stats.eventChartData)
+    const total = sumTotal(data || [])
+    const warn = sumWarnings(data || [])
+    const err = sumErrors(data || [])
+    return { ...s, data, total, warn, err }
+  })
 
-  const edgeTotal = sumBy(fnSeries || [], 'count')
-  const edgeWarn = sumStatus(fnSeries, 'Warn')
-  const edgeErr = sumStatus(fnSeries, 'Err')
+  const isLoading = services.some((s) => s.stats.isLoading)
 
-  const totalRequests =
-    (restTotal || 0) +
-    (edgeTotal || 0) +
-    (realtimeTotal || 0) +
-    (authEnabled ? authTotal || 0 : 0) +
-    (storageEnabled ? storageTotal || 0 : 0)
-  const totalErrors =
-    (restErr || 0) +
-    (edgeErr || 0) +
-    (realtimeErr || 0) +
-    (authEnabled ? authErr || 0 : 0) +
-    (storageEnabled ? storageErr || 0 : 0)
+  // Handle bar click navigation to logs pages
+  const handleBarClick = (logRoute: string) => (datum: any) => {
+    if (!datum?.timestamp) return
+
+    const datumTimestamp = dayjs(datum.timestamp).toISOString()
+    const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
+    const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+
+    const queryParams = new URLSearchParams({
+      iso_timestamp_start: start,
+      iso_timestamp_end: end,
+    })
+
+    router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
+  }
+
+  const enabledServices = services.filter((s) => s.enabled)
+  const totalRequests = enabledServices.reduce((sum, s) => sum + (s.total || 0), 0)
+  const totalErrors = enabledServices.reduce((sum, s) => sum + (s.err || 0), 0)
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
 
   const totalRequestsChangePct = 0
@@ -340,138 +323,31 @@ const ProjectUsage = () => {
         </DropdownMenu>
       </div>
       <Row columns={[3, 2, 1]}>
-        <Card className="mb-0 md:mb-0">
-          <PanelHeader
-            icon={<Database strokeWidth={1.5} size={16} className="text-foreground-lighter" />}
-            title="Database requests"
-            href={`/project/${projectRef}/editor`}
-            total={restTotal}
-            warn={restWarn}
-            err={restErr}
-          />
-          <CardContent className="p-6 pt-4">
-            <Loading active={isLoading}>
-              <StackedBarChart
-                data={dbSeries}
-                xAxisKey="timestamp"
-                yAxisKey="count"
-                stackKey="status"
-                customDateFormat={datetimeFormat}
-                hideHeader
-                hideLegend
-                syncId="usage-rest"
-                stackColors={['red', 'green', 'yellow']}
-                margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-              />
-            </Loading>
-          </CardContent>
-        </Card>
-        <Card className="mb-0 md:mb-0">
-          <PanelHeader
-            icon={<Code strokeWidth={1.5} size={16} className="text-foreground-lighter" />}
-            title="Functions requests"
-            total={edgeTotal}
-            warn={edgeWarn}
-            err={edgeErr}
-          />
-          <CardContent className="p-6 pt-4">
-            <Loading active={isLoading}>
-              <StackedBarChart
-                data={fnSeries}
-                xAxisKey="timestamp"
-                yAxisKey="count"
-                stackKey="status"
-                customDateFormat={datetimeFormat}
-                hideHeader
-                hideLegend
-                syncId="usage-edge"
-                stackColors={['red', 'green', 'yellow']}
-                margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-              />
-            </Loading>
-          </CardContent>
-        </Card>
-        {authEnabled && (
-          <Card className="mb-0 md:mb-0">
+        {enabledServices.map((s) => (
+          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col">
             <PanelHeader
-              icon={<Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />}
-              title="Auth requests"
-              href={`/project/${projectRef}/auth/users`}
-              total={authTotal}
-              warn={authWarn}
-              err={authErr}
+              icon={s.icon}
+              title={s.title}
+              href={s.href}
+              total={s.total}
+              warn={s.warn}
+              err={s.err}
             />
-            <CardContent className="p-6 pt-4">
+            <CardContent className="p-6 pt-4 flex-1">
               <Loading active={isLoading}>
-                <StackedBarChart
-                  data={authSeries}
-                  xAxisKey="timestamp"
-                  yAxisKey="count"
-                  stackKey="status"
-                  customDateFormat={datetimeFormat}
-                  hideHeader
-                  hideLegend
-                  syncId="usage-auth"
-                  stackColors={['red', 'green', 'yellow']}
-                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                <LogsBarChart
+                  data={s.data}
+                  height="120px"
+                  DateTimeFormat={datetimeFormat}
+                  onBarClick={handleBarClick(s.route)}
+                  EmptyState={
+                    <NoDataPlaceholder size="small" message="No data for selected period" />
+                  }
                 />
               </Loading>
             </CardContent>
           </Card>
-        )}
-        {storageEnabled && (
-          <Card className="mb-0 md:mb-0">
-            <PanelHeader
-              icon={<Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />}
-              title="Storage requests"
-              href={`/project/${projectRef}/storage/buckets`}
-              total={storageTotal}
-              warn={storageWarn}
-              err={storageErr}
-            />
-            <CardContent className="p-6 pt-4">
-              <Loading active={isLoading}>
-                <StackedBarChart
-                  data={storageSeries}
-                  xAxisKey="timestamp"
-                  yAxisKey="count"
-                  stackKey="status"
-                  customDateFormat={datetimeFormat}
-                  hideHeader
-                  hideLegend
-                  syncId="usage-storage"
-                  stackColors={['red', 'green', 'yellow']}
-                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                />
-              </Loading>
-            </CardContent>
-          </Card>
-        )}
-        <Card className="mb-0 md:mb-0">
-          <PanelHeader
-            icon={<Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />}
-            title="Realtime requests"
-            total={realtimeTotal}
-            warn={realtimeWarn}
-            err={realtimeErr}
-          />
-          <CardContent className="p-6 pt-4">
-            <Loading active={isLoading}>
-              <StackedBarChart
-                data={realtimeSeries}
-                xAxisKey="timestamp"
-                yAxisKey="count"
-                stackKey="status"
-                customDateFormat={datetimeFormat}
-                hideHeader
-                hideLegend
-                syncId="usage-realtime"
-                stackColors={['red', 'green', 'yellow']}
-                margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-              />
-            </Loading>
-          </CardContent>
-        </Card>
+        ))}
       </Row>
     </div>
   )

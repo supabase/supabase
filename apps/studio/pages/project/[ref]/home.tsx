@@ -103,7 +103,7 @@ const Home: NextPageWithLayout = () => {
       />
 
       {!isPaused && (
-        <div className="py-16 px-8">
+        <div className="pt-16 px-8 pb-32">
           <div className="mx-auto max-w-7xl space-y-16">
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
               <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
