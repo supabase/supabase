@@ -11,7 +11,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import Head from 'next/head'
 import { useMemo, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { Alert } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
 
 const ClaimProjectPage: NextPageWithLayout = () => {
   const { auth_id, token: claimToken } = useParams()
@@ -62,20 +62,22 @@ const ClaimProjectPage: NextPageWithLayout = () => {
     return (
       <ProjectClaimLayout title="Claim a project">
         <div className="py-6">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Failed to retrieve project claim request details"
-          >
-            <p>Please retry your claim request from the requesting app</p>
-            {errorProjectClaim != undefined && (
-              <p className="mt-2">Error: {errorProjectClaim?.message}</p>
-            )}
-            {errorRequester != undefined && (
-              <p className="mt-2">Error: {errorRequester?.message}</p>
-            )}
-            <p>Please go back to the requesting app and try again.</p>
-          </Alert>
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Failed to retrieve project claim request details
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <p>Please retry your claim request from the requesting app</p>
+              {errorProjectClaim != undefined && (
+                <p className="mt-2">Error: {errorProjectClaim?.message}</p>
+              )}
+              {errorRequester != undefined && (
+                <p className="mt-2">Error: {errorRequester?.message}</p>
+              )}
+              <p>Please go back to the requesting app and try again.</p>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         </div>
       </ProjectClaimLayout>
     )
