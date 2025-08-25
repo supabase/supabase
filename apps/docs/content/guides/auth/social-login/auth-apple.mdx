@@ -229,6 +229,98 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
   </TabPanel>
 
+  <TabPanel id="capacitor" label="Capacitor">
+
+    For Capacitor apps, you can use the [@capgo/capacitor-social-login](https://github.com/Cap-go/capacitor-social-login) plugin for native Apple authentication across iOS and Android platforms.
+
+    <Admonition type="info">
+
+    For comprehensive setup instructions including Service ID configuration, see our [Capacitor Social Login guide](/docs/blog/setup-supabase-with-capacitor-social-login).
+
+    </Admonition>
+
+    ### Installation and Setup
+
+    1. Install the Capacitor Social Login plugin:
+
+    ```bash
+    npm install @capgo/capacitor-social-login
+    npx cap sync
+    ```
+
+    2. Configure the plugin with your Apple credentials:
+
+    **For iOS** (native Apple Sign-In):
+    ```typescript
+    import { SocialLogin } from '@capgo/capacitor-social-login';
+
+    await SocialLogin.initialize({
+      apple: {
+        // No additional configuration needed for iOS
+        // The plugin uses the native Apple Sign-In capability
+      }
+    });
+    ```
+
+    **For Android/Web** (requires Service ID):
+    ```typescript
+    await SocialLogin.initialize({
+      apple: {
+        clientId: 'YOUR_SERVICE_ID', // The Service ID from Apple Developer Portal
+        redirectUrl: 'https://your-project-ref.supabase.co/auth/v1/callback'
+      }
+    });
+    ```
+
+    3. Implement the authentication flow:
+
+    ```typescript
+    import { SocialLogin } from '@capgo/capacitor-social-login';
+    import { supabase } from './supabase';
+
+    async function signInWithApple() {
+      try {
+        const result = await SocialLogin.login({
+          provider: 'apple',
+          options: {
+            scopes: ['email', 'name']
+          }
+        });
+
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: result.result?.identityToken!,
+        });
+
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Apple sign-in error:', error);
+        throw error;
+      }
+    }
+    ```
+
+    ### Platform-Specific Configuration
+
+    **iOS Configuration:**
+    Add the following to your `ios/App/App/Info.plist`:
+
+    ```xml
+    <!-- Apple Sign-In capability -->
+    <key>com.apple.developer.applesignin</key>
+    <array>
+      <string>Default</string>
+    </array>
+    ```
+
+    **Android Configuration:**
+    For Android, you need to create a Service ID in the Apple Developer Portal and configure it in the plugin. The plugin uses the Broadcast Channel API for Android authentication.
+
+    For detailed platform-specific setup including Service ID creation and key generation, refer to our [comprehensive Capacitor guide](/docs/blog/setup-supabase-with-capacitor-social-login).
+
+  </TabPanel>
+
   <TabPanel id="flutter" label="Flutter">
 
     ## Apple sign in on iOS and macOS
