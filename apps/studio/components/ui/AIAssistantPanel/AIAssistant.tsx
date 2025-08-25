@@ -286,7 +286,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           .join('') ?? ''
       setValue(textContent)
 
-      setTimeout(() => inputRef?.current?.focus(), 100)
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef?.current?.focus()
+
+          // [Joshen] This is just to make the cursor go to the end of the text when focusing
+          const val = inputRef.current.value
+          inputRef.current.value = ''
+          inputRef.current.value = val
+        }
+      }, 100)
     },
     [chatMessages, setValue]
   )
