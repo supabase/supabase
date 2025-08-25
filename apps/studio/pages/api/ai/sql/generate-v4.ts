@@ -1,8 +1,15 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'ai'
+import {
+  convertToModelMessages,
+  ModelMessage,
+  stepCountIs,
+  streamText,
+  wrapLanguageModel,
+} from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
+import { traced, BraintrustMiddleware, wrapTraced } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -117,7 +124,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
+  const { model: rawModel, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
+
+  // Wrap AI SDK v5 model with Braintrust middleware for tracing
+  const model = wrapLanguageModel({
+    model: rawModel as any,
+    middleware: BraintrustMiddleware(),
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -180,10 +193,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...convertToModelMessages(messages),
     ]
 
-    const abortController = new AbortController()
-    req.on('close', () => abortController.abort())
-    req.on('aborted', () => abortController.abort())
-
     // Get tools
     const tools = await getTools({
       projectRef,
@@ -193,31 +202,94 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
-      model,
-      stopWhen: stepCountIs(5),
-      messages: coreMessages,
-      tools,
-      abortSignal: abortController.signal,
-    })
+    // Trace tool calls
+    const tracedTools = Object.fromEntries(
+      Object.entries(tools).map(([name, t]: any) => [
+        name,
+        {
+          ...t,
+          execute: wrapTraced(async (...args: any[]) => t.execute(...args), { type: 'tool', name }),
+        },
+      ])
+    ) as typeof tools
 
-    result.pipeUIMessageStreamToResponse(res, {
-      onError: (error) => {
-        if (error == null) {
-          return 'unknown error'
-        }
+    return traced(
+      async (span) => {
+        // log things scorers consume
+        span.log({
+          input: coreMessages,
+          metadata: {
+            route: '/api/ai/sql/generate-v4',
+            projectRef,
+            orgSlug,
+            chatName,
+          },
+        })
 
-        if (typeof error === 'string') {
-          return error
-        }
+        const abortController = new AbortController()
+        let abortReason: string | undefined
 
-        if (error instanceof Error) {
-          return error.message
-        }
+        req.once('aborted', () => {
+          abortReason = 'request_aborted'
+          abortController.abort()
+        })
+        req.once('close', () => {
+          abortReason = 'request_closed'
+          abortController.abort()
+        })
 
-        return JSON.stringify(error)
+        abortController.signal.addEventListener('abort', () => {
+          span.log({
+            error: 'Request aborted',
+            metadata: {
+              aborted: true,
+              abort_reason: abortReason ?? 'abort_signal',
+            },
+          })
+        })
+
+        const result = streamText({
+          model,
+          stopWhen: stepCountIs(5),
+          messages: coreMessages,
+          tools: tracedTools,
+          onFinish: ({ text }) => span.log({ output: text }),
+          abortSignal: abortController.signal,
+        })
+
+        result.pipeUIMessageStreamToResponse(res, {
+          onError: (error) => {
+            let errorMessage: string
+            if (error == null) {
+              errorMessage = 'unknown error'
+            }
+
+            if (typeof error === 'string') {
+              errorMessage = error
+            }
+
+            if (error instanceof Error) {
+              errorMessage = error.message
+            }
+
+            errorMessage = JSON.stringify(error)
+
+            // Log error to Braintrust
+            span.log({
+              error: errorMessage,
+              metadata: {
+                error_type: 'stream_error',
+                error_name: error instanceof Error ? error.name : 'unknown',
+                error_stack: error instanceof Error ? error.stack : undefined,
+              },
+            })
+
+            return errorMessage
+          },
+        })
       },
-    })
+      { name: 'AI Assistant' }
+    )
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
