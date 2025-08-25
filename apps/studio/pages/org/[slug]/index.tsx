@@ -40,7 +40,7 @@ const ProjectsPage: NextPageWithLayout = () => {
             </p>
           </Admonition>
         ) : (
-          <div>
+          <div className="flex flex-col gap-y-4">
             <HomePageActions
               search={search}
               setSearch={setSearch}

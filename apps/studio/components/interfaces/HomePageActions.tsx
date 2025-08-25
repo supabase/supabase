@@ -41,7 +41,7 @@ export const HomePageActions = ({
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   return (
-    <div className="flex items-center justify-between mb-4">
+    <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search for a project"

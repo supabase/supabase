@@ -38,7 +38,7 @@ export const ProjectTableRow = ({
 
   return (
     <TableRow
-      className="cursor-pointer hover:bg-surface-100"
+      className="cursor-pointer hover:bg-surface-200"
       onClick={(event) => {
         if (event.metaKey) {
           window.open(url, '_blank')
