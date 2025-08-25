@@ -12,7 +12,6 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer-config-update-mutation'
@@ -20,11 +19,16 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -137,80 +141,50 @@ export const ConnectionPooling = () => {
   }, [isSuccessPgbouncerConfig])
 
   return (
-    <section id="connection-pooler">
-      <Panel
-        className="!mb-0"
-        title={
-          <div className="w-full flex items-center justify-between">
-            <div className="flex items-center gap-x-2">
-              <p>Connection pooling configuration</p>
-              {disablePoolModeSelection ? (
-                <Badge>Shared Pooler</Badge>
-              ) : (
-                <Badge>Shared/Dedicated Pooler</Badge>
-              )}
-            </div>
-            <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
-          </div>
-        }
-        footer={
-          <FormActions
-            form={formId}
-            isSubmitting={isUpdatingPoolerConfig}
-            hasChanges={form.formState.isDirty}
-            handleReset={() => resetForm()}
-            helper={
-              !canUpdateConnectionPoolingConfiguration
-                ? 'You need additional permissions to update connection pooling settings'
-                : undefined
-            }
-          />
-        }
-      >
-        {isSuccessAddons && !disablePoolModeSelection && !hasIpv4Addon && (
-          <Admonition
-            className="border-x-0 border-t-0 rounded-none"
-            type="default"
-            title="Dedicated Pooler is not IPv4 compatible"
-          >
-            <p className="!m-0">
-              If your network only supports IPv4, consider purchasing the{' '}
-              <InlineLink href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
-                IPv4 add-on
-              </InlineLink>
-            </p>
-          </Admonition>
-        )}
-        <Panel.Content>
-          {isLoadingPgbouncerConfig && (
-            <div className="flex flex-col gap-y-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Fragment key={`loader-${i}`}>
-                  <div className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full">
-                    <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
-                    <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
-                  </div>
-                  <Separator />
-                </Fragment>
-              ))}
+    <ScaffoldSection id="connection-pooler" className="gap-6">
+      <ScaffoldSectionTitle className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          Connection Pooling
+          <Badge>{disablePoolModeSelection ? `Shared Pooler` : `Shared/Dedicated Pooler`}</Badge>
+        </div>
+        <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
+      </ScaffoldSectionTitle>
 
-              <ShimmeringLoader className="h-8 w-full" />
-            </div>
-          )}
-          {isErrorPgbouncerConfig && (
-            <AlertError
-              error={pgbouncerConfigError}
-              subject="Failed to retrieve connection pooler configuration"
-            />
-          )}
-          {connectionPoolingUnavailable && (
-            <Admonition
-              type="default"
-              title="Unable to retrieve pooling configuration"
-              description="Please start a new project to enable this feature"
-            />
-          )}
-          {isSuccessPgbouncerConfig && (
+      {isSuccessAddons && !disablePoolModeSelection && !hasIpv4Addon ? (
+        <Admonition type="warning" title="Dedicated Pooler is not IPv4 compatible">
+          <p className="!m-0">
+            If your network only supports IPv4, consider purchasing the{' '}
+            <InlineLink href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
+              IPv4 add-on
+            </InlineLink>
+          </p>
+        </Admonition>
+      ) : isLoadingPgbouncerConfig ? (
+        <Card>
+          <CardHeader>Connection Pooling Configuration</CardHeader>
+          <CardContent className="flex flex-col gap-y-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Fragment key={`loader-${i}`}>
+                <div className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full">
+                  <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
+                  <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
+                </div>
+                <Separator />
+              </Fragment>
+            ))}
+
+            <ShimmeringLoader className="h-8 w-full" />
+          </CardContent>
+        </Card>
+      ) : isErrorPgbouncerConfig ? (
+        <AlertError
+          error={pgbouncerConfigError}
+          subject="Failed to retrieve connection pooler configuration"
+        />
+      ) : isSuccessPgbouncerConfig && !connectionPoolingUnavailable ? (
+        <Card>
+          <CardHeader>Connection Pooling Configuration</CardHeader>
+          <CardContent>
             <Form_Shadcn_ {...form}>
               <form
                 id={formId}
@@ -224,13 +198,7 @@ export const ConnectionPooling = () => {
                     <FormItemLayout
                       layout="horizontal"
                       label="Pool Size"
-                      description={
-                        <p>
-                          The maximum number of connections made to the underlying Postgres cluster,
-                          per user+db combination. Pool size has a default of {defaultPoolSize}{' '}
-                          based on your compute size of {computeSize}.
-                        </p>
-                      }
+                      description={`The maximum number of connections made to the underlying Postgres cluster, per user+db combination. Pool size has a default of ${defaultPoolSize} based on your compute size of ${computeSize}.`}
                     >
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
@@ -271,9 +239,7 @@ export const ConnectionPooling = () => {
                       description={
                         <>
                           <p>
-                            The maximum number of concurrent client connections allowed. This value
-                            is fixed at {defaultMaxClientConn} based on your compute size of{' '}
-                            {computeSize} and cannot be changed.
+                            {`The maximum number of concurrent client connections allowed. This value is fixed at ${defaultMaxClientConn} based on your compute size of ${computeSize} and cannot be changed.`}
                           </p>
                           <p className="mt-2">
                             Please refer to our{' '}
@@ -303,9 +269,28 @@ export const ConnectionPooling = () => {
                 />
               </form>
             </Form_Shadcn_>
-          )}
-        </Panel.Content>
-      </Panel>
-    </section>
+          </CardContent>
+          <CardFooter>
+            <FormActions
+              form={formId}
+              isSubmitting={isUpdatingPoolerConfig}
+              hasChanges={form.formState.isDirty}
+              handleReset={resetForm}
+              helper={
+                !canUpdateConnectionPoolingConfiguration
+                  ? 'You need additional permissions to update connection pooling settings'
+                  : undefined
+              }
+            />
+          </CardFooter>
+        </Card>
+      ) : (
+        <Admonition
+          type="default"
+          title="Unable to retrieve pooling configuration"
+          description="Please start a new project to enable this feature"
+        />
+      )}
+    </ScaffoldSection>
   )
 }
