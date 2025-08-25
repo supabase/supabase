@@ -7,7 +7,6 @@ import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   Checkbox_Shadcn_,
-  Input,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -15,6 +14,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 interface HomePageActionsProps {
   search: string
@@ -27,7 +27,7 @@ interface HomePageActionsProps {
   setViewMode?: (value: 'grid' | 'table') => void
 }
 
-const HomePageActions = ({
+export const HomePageActions = ({
   search,
   filterStatus,
   hideNewProject = false,
@@ -45,9 +45,9 @@ const HomePageActions = ({
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search for a project"
-          icon={<Search size={16} />}
+          icon={<Search size={12} />}
           size="tiny"
-          className="w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
@@ -120,7 +120,7 @@ const HomePageActions = ({
         )}
 
         {projectCreationEnabled && !hideNewProject && (
-          <Button icon={<Plus />} asChild type="primary" size="tiny">
+          <Button asChild icon={<Plus />} type="primary" size="tiny">
             <Link href={`/new/${slug}`}>New project</Link>
           </Button>
         )}
@@ -128,4 +128,3 @@ const HomePageActions = ({
     </div>
   )
 }
-export default HomePageActions

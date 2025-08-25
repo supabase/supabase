@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import { useIsMFAEnabled } from 'common'
-import { ProjectList } from 'components/interfaces/Home/ProjectList'
-import HomePageActions from 'components/interfaces/HomePageActions'
+import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
+import { HomePageActions } from 'components/interfaces/HomePageActions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -51,14 +51,12 @@ const ProjectsPage: NextPageWithLayout = () => {
               showViewToggle={true}
             />
 
-            <div className="space-y-8">
-              <ProjectList
-                search={search}
-                filterStatus={filterStatus}
-                resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-                viewMode={viewMode}
-              />
-            </div>
+            <ProjectList
+              search={search}
+              filterStatus={filterStatus}
+              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
+              viewMode={viewMode}
+            />
           </div>
         )}
       </ScaffoldSection>

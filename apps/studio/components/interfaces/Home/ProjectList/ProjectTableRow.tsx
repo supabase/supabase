@@ -1,12 +1,12 @@
 import { Github } from 'lucide-react'
 import { useRouter } from 'next/router'
+import InlineSVG from 'react-inlinesvg'
 
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
-import InlineSVG from 'react-inlinesvg'
 import { TableCell, TableRow } from 'ui'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
@@ -19,7 +19,7 @@ export interface ProjectTableRowProps {
   resourceWarnings?: ResourceWarning
 }
 
-const ProjectTableRow = ({
+export const ProjectTableRow = ({
   project,
   rewriteHref,
   githubIntegration,
@@ -30,6 +30,7 @@ const ProjectTableRow = ({
   const { name, ref: projectRef } = project
   const projectStatus = inferProjectStatus(project)
 
+  const url = rewriteHref ?? `/project/${project.ref}`
   const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
@@ -38,8 +39,12 @@ const ProjectTableRow = ({
   return (
     <TableRow
       className="cursor-pointer hover:bg-surface-100"
-      onClick={() => {
-        rewriteHref ? router.push(rewriteHref) : router.push(`/project/${project.ref}`)
+      onClick={(event) => {
+        if (event.metaKey) {
+          window.open(url, '_blank')
+        } else {
+          router.push(url)
+        }
       }}
     >
       <TableCell>
@@ -100,5 +105,3 @@ const ProjectTableRow = ({
     </TableRow>
   )
 }
-
-export default ProjectTableRow

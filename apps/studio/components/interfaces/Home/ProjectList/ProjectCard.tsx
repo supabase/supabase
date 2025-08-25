@@ -20,7 +20,7 @@ export interface ProjectCardProps {
   resourceWarnings?: ResourceWarning
 }
 
-const ProjectCard = ({
+export const ProjectCard = ({
   project,
   rewriteHref,
   githubIntegration,
@@ -86,5 +86,3 @@ const ProjectCard = ({
     </li>
   )
 }
-
-export default ProjectCard

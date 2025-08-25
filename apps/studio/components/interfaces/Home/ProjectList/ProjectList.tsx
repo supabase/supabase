@@ -6,16 +6,17 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
-import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import type { Organization, ResponseError } from 'types'
+import type { Organization } from 'types'
 import {
   Button,
   Card,
+  cn,
   Skeleton,
   Table,
   TableBody,
@@ -23,11 +24,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  cn,
 } from 'ui'
-import ProjectCard from './ProjectCard'
-import ProjectTableRow from './ProjectTableRow'
-import ShimmeringCard from './ShimmeringCard'
+import { ProjectCard } from './ProjectCard'
+import { ProjectTableRow } from './ProjectTableRow'
+import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
@@ -38,7 +38,7 @@ export interface ProjectListProps {
   viewMode?: 'grid' | 'table'
 }
 
-const ProjectList = ({
+export const ProjectList = ({
   search = '',
   organization: organization_,
   rewriteHref,
@@ -85,6 +85,45 @@ const ProjectList = ({
     isSuccessProjects &&
     orgProjects.filter((project) => filterStatus.includes(project.status)).length === 0
 
+  const isEmpty = !orgProjects || orgProjects.length === 0
+  const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
+  const filteredProjects =
+    search.length > 0
+      ? sortedProjects.filter((project) => {
+          return (
+            project.name.toLowerCase().includes(search.toLowerCase()) ||
+            project.ref.includes(search.toLowerCase())
+          )
+        })
+      : sortedProjects
+
+  const filteredProjectsByStatus =
+    filterStatus !== undefined
+      ? filterStatus.length === 2
+        ? filteredProjects
+        : filteredProjects.filter((project) => filterStatus.includes(project.status))
+      : filteredProjects
+
+  const githubConnections = connections?.map((connection) => ({
+    id: String(connection.id),
+    added_by: {
+      id: String(connection.user?.id),
+      primary_email: connection.user?.primary_email ?? '',
+      username: connection.user?.username ?? '',
+    },
+    foreign_project_id: String(connection.repository.id),
+    supabase_project_ref: connection.project.ref,
+    organization_integration_id: 'unused',
+    inserted_at: connection.inserted_at,
+    updated_at: connection.updated_at,
+    metadata: {
+      name: connection.repository.name,
+    } as any,
+  }))
+  const vercelConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'Vercel')
+    .flatMap((integration) => integration.connections)
+
   if (isLoadingProjects || !organization) {
     if (viewMode === 'table') {
       return (
@@ -130,81 +169,11 @@ const ProjectList = ({
     )
   }
 
-  if (noResultsFromSearch) {
-    return <NoSearchResults searchString={search} />
-  }
-
-  if (noResultsFromStatusFilter) {
-    return (
-      <div
-        className={cn(
-          'bg-surface-100 border border-default px-4 md:px-6 py-4 rounded flex items-center justify-between'
-        )}
-      >
-        <div className="space-y-1">
-          {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
-          <p className="text-sm text-foreground">
-            {filterStatus.length === 0
-              ? `No projects found`
-              : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`}
-          </p>
-          <p className="text-sm text-foreground-light">
-            Your search for projects with the specified status did not return any results
-          </p>
-        </div>
-        {resetFilterStatus !== undefined && (
-          <Button type="default" onClick={() => resetFilterStatus()}>
-            Reset filter
-          </Button>
-        )}
-      </div>
-    )
-  }
-
-  const isEmpty = !orgProjects || orgProjects.length === 0
-  const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
-  const filteredProjects =
-    search.length > 0
-      ? sortedProjects.filter((project) => {
-          return (
-            project.name.toLowerCase().includes(search.toLowerCase()) ||
-            project.ref.includes(search.toLowerCase())
-          )
-        })
-      : sortedProjects
-
-  const filteredProjectsByStatus =
-    filterStatus !== undefined
-      ? filterStatus.length === 2
-        ? filteredProjects
-        : filteredProjects.filter((project) => filterStatus.includes(project.status))
-      : filteredProjects
-
-  const githubConnections = connections?.map((connection) => ({
-    id: String(connection.id),
-    added_by: {
-      id: String(connection.user?.id),
-      primary_email: connection.user?.primary_email ?? '',
-      username: connection.user?.username ?? '',
-    },
-    foreign_project_id: String(connection.repository.id),
-    supabase_project_ref: connection.project.ref,
-    organization_integration_id: 'unused',
-    inserted_at: connection.inserted_at,
-    updated_at: connection.updated_at,
-    metadata: {
-      name: connection.repository.name,
-    } as any,
-  }))
-  const vercelConnections = integrations
-    ?.filter((integration) => integration.integration.name === 'Vercel')
-    .flatMap((integration) => integration.connections)
-
-  if (
-    (search.length > 0 || (filterStatus !== undefined && filterStatus.length !== 2)) &&
-    filteredProjectsByStatus.length === 0
-  )
-    return null
+  // if (
+  //   (search.length > 0 || (filterStatus !== undefined && filterStatus.length !== 2)) &&
+  //   filteredProjectsByStatus.length === 0
+  // )
+  //   return null
 
   if (isLoadingPermissions || isLoadingProjects) {
     if (viewMode === 'table') {
@@ -306,6 +275,42 @@ const ProjectList = ({
                 )}
               />
             ))}
+            {noResultsFromSearch && (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <NoSearchResults searchString={search} className="border-0" />
+                </TableCell>
+              </TableRow>
+            )}
+            {noResultsFromStatusFilter && (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <div
+                    className={cn(
+                      'bg-surface-100 px-4 md:px-6 py-4 rounded flex items-center justify-between'
+                    )}
+                  >
+                    <div className="space-y-1">
+                      {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
+                      <p className="text-sm text-foreground">
+                        {filterStatus.length === 0
+                          ? `No projects found`
+                          : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`}
+                      </p>
+                      <p className="text-sm text-foreground-light">
+                        Your search for projects with the specified status did not return any
+                        results
+                      </p>
+                    </div>
+                    {resetFilterStatus !== undefined && (
+                      <Button type="default" onClick={() => resetFilterStatus()}>
+                        Reset filter
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>
@@ -313,26 +318,27 @@ const ProjectList = ({
   }
 
   return (
-    <div className="space-y-3" key={organization.slug}>
-      <ul className="mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-        {filteredProjectsByStatus?.map((project) => (
-          <ProjectCard
-            key={makeRandomString(5)}
-            project={project}
-            rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-            resourceWarnings={resourceWarnings?.find(
-              (resourceWarning) => resourceWarning.project === project.ref
-            )}
-            githubIntegration={githubConnections?.find(
-              (connection) => connection.supabase_project_ref === project.ref
-            )}
-            vercelIntegration={vercelConnections?.find(
-              (connection) => connection.supabase_project_ref === project.ref
-            )}
-          />
-        ))}
-      </ul>
-    </div>
+    <ul
+      key={organization.slug}
+      className="mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
+    >
+      {filteredProjectsByStatus?.map((project) => (
+        <ProjectCard
+          key={makeRandomString(5)}
+          project={project}
+          rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+          resourceWarnings={resourceWarnings?.find(
+            (resourceWarning) => resourceWarning.project === project.ref
+          )}
+          githubIntegration={githubConnections?.find(
+            (connection) => connection.supabase_project_ref === project.ref
+          )}
+          vercelIntegration={vercelConnections?.find(
+            (connection) => connection.supabase_project_ref === project.ref
+          )}
+        />
+      ))}
+    </ul>
   )
 }
 
@@ -354,5 +360,3 @@ const NoProjectsState = ({ slug }: { slug: string }) => {
     </div>
   )
 }
-
-export default ProjectList
