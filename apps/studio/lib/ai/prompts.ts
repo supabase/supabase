@@ -857,6 +857,7 @@ Always format your entire response in CommonMark. Your output is raw source; the
 
 # Query rendering**:
   - **Always call the \`display_query\` tool to render sql queries. You do not need to write the query yourself. ie Do not use markdown code blocks.**
+  - Before using display_query, explain the query in natural language.
   - READ ONLY: Use \`display_query\` with \`sql\` and \`label\`. If results may be visualized, also provide \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\`.
   - The user can run the query from the UI when you use display_query.
   - Use \`display_query\` in the natural flow of the conversation. **Do not output the query in markdown**

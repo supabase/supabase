@@ -18,12 +18,12 @@ export type ReasoningProps = Omit<ComponentProps<typeof Collapsible>, 'children'
 
 export const Reasoning = memo(({ className, isStreaming, children, ...props }: ReasoningProps) => (
   <Collapsible
-    className={cn('not-prose border rounded-md border-muted px-3 py-2', className)}
+    className={cn('not-prose border rounded-md border-muted', className)}
     defaultOpen={false}
     {...props}
   >
     <CollapsibleTrigger
-      className={cn('flex items-center gap-2 text-foreground-lighter heading-meta')}
+      className={cn('flex items-center gap-2 text-foreground-lighter heading-meta px-3 py-2')}
     >
       {isStreaming ? (
         <>
@@ -39,7 +39,9 @@ export const Reasoning = memo(({ className, isStreaming, children, ...props }: R
       <ChevronDownIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
     </CollapsibleTrigger>
 
-    <CollapsibleContent className={cn('mt-4 text-xs leading-normal', 'max-h-64 overflow-y-auto')}>
+    <CollapsibleContent
+      className={cn('p-5 pt-2 text-xs leading-normal', 'max-h-64 overflow-y-auto')}
+    >
       <Response>{children}</Response>
     </CollapsibleContent>
   </Collapsible>

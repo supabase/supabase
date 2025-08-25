@@ -159,7 +159,7 @@ export const Message = function Message({
                           <Reasoning
                             key={`${message.id}-${index}}`}
                             className="w-full mb-2"
-                            isStreaming={status === 'streaming'}
+                            isStreaming={part.state === 'streaming'}
                           >
                             {part.text}
                           </Reasoning>
@@ -262,7 +262,7 @@ export const Message = function Message({
             )}
 
             {/* Action button - only show for user messages on hover */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-2 mb-4">
               {message.role === 'user' && (
                 <ButtonTooltip
                   type="text"
