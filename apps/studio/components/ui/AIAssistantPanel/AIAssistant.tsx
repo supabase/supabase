@@ -2,7 +2,7 @@ import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, Eraser, Info, Pencil, Settings, X } from 'lucide-react'
+import { Eraser, Info, Pencil, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -35,7 +35,11 @@ import { AIOnboarding } from './AIOnboarding'
 import { AIOptInModal } from './AIOptInModal'
 import { AssistantChatForm } from './AssistantChatForm'
 import { Message } from './Message'
-import { useAutoScroll } from './hooks'
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from './elements/Conversation'
 
 const MemoizedMessage = memo(
   ({
@@ -105,7 +109,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showMetadataWarning =
@@ -360,11 +363,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     if (!isChatLoading) {
       if (inputRef.current) inputRef.current.focus()
     }
-
-    if (isSticky) {
-      setTimeout(scrollToEnd, 0)
-    }
-  }, [isChatLoading, isSticky, scrollToEnd])
+  }, [isChatLoading])
 
   useEffect(() => {
     setValue(snap.initialInput || '')
@@ -401,177 +400,101 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       ]}
     >
       <div className={cn('flex flex-col h-full', className)}>
-        <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
-          <div className="z-30 sticky top-0">
-            <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
-              <div className="text-sm flex-1 flex items-center">
-                <AiIconAnimation size={20} allowHoverEffect={false} />
-                <span className="text-border-stronger dark:text-border-strong ml-3">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    shapeRendering="geometricPrecision"
-                  >
-                    <path d="M16 3.549L7.12 20.600"></path>
-                  </svg>
-                </span>
-                <AIAssistantChatSelector disabled={isChatLoading} />
-              </div>
-              <div className="flex items-center gap-x-4">
-                <div className="flex items-center">
-                  <ButtonTooltip
-                    type="text"
-                    size="tiny"
-                    icon={<Settings strokeWidth={1.5} />}
-                    onClick={() => setIsConfirmOptInModalOpen(true)}
-                    className="h-7 w-7 p-0"
-                    disabled={isChatLoading}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: 'Permission settings',
-                      },
-                    }}
-                  />
-                  <ButtonTooltip
-                    type="text"
-                    size="tiny"
-                    icon={<Eraser strokeWidth={1.5} />}
-                    onClick={handleClearMessages}
-                    className="h-7 w-7 p-0"
-                    disabled={isChatLoading}
-                    tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                  />
-                  <ButtonTooltip
-                    type="text"
-                    className="w-7 h-7"
-                    onClick={snap.closeAssistant}
-                    icon={<X strokeWidth={1.5} />}
-                    tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
-                  />
-                </div>
-              </div>
-            </div>
-            {showMetadataWarning && (
-              <Admonition
-                type="default"
-                title={
-                  !updatedOptInSinceMCP
-                    ? 'The Assistant has just been updated to help you better!'
-                    : isHipaaProjectDisallowed
-                      ? 'Project metadata is not shared due to HIPAA'
-                      : aiOptInLevel === 'disabled'
-                        ? 'Project metadata is currently not shared'
-                        : 'Limited metadata is shared to the Assistant'
-                }
-                description={
-                  !updatedOptInSinceMCP
-                    ? 'You may now opt-in to share schema metadata and even logs for better results'
-                    : isHipaaProjectDisallowed
-                      ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
-                      : aiOptInLevel === 'disabled'
-                        ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
-                        : aiOptInLevel === 'schema'
-                          ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
-                          : ''
-                }
-                className="border-0 border-b rounded-none bg-background mb-0"
-              >
-                {!isHipaaProjectDisallowed && (
-                  <Button
-                    type="default"
-                    className="w-fit mt-4"
-                    onClick={() => setIsConfirmOptInModalOpen(true)}
-                  >
-                    Permission settings
-                  </Button>
-                )}
-              </Admonition>
-            )}
-          </div>
-          {hasMessages ? (
-            <div className="w-full px-7 py-8 mb-10">
-              {renderedMessages}
-              {error && (
-                <div className="border rounded-md px-2 py-2 flex items-center justify-between gap-x-4">
-                  <div className="flex items-start gap-2 text-foreground-light text-sm">
-                    <div>
-                      <Info size={16} className="mt-0.5" />
-                    </div>
-                    <div>
-                      <p>
-                        Sorry, I'm having trouble responding right now. If the error persists while
-                        retrying, you may try clearing the conversation's messages and try again.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-x-2">
-                    <Button
-                      type="default"
-                      size="tiny"
-                      onClick={() => regenerate()}
-                      className="text-xs"
+        {isShowingOnboarding ? (
+          <div className="flex-grow overflow-auto flex flex-col">
+            <div className="z-30 sticky top-0">
+              <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
+                <div className="text-sm flex-1 flex items-center">
+                  <AiIconAnimation size={20} allowHoverEffect={false} />
+                  <span className="text-border-stronger dark:text-border-strong ml-3">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      shapeRendering="geometricPrecision"
                     >
-                      Retry
-                    </Button>
+                      <path d="M16 3.549L7.12 20.600"></path>
+                    </svg>
+                  </span>
+                  <AIAssistantChatSelector disabled={isChatLoading} />
+                </div>
+                <div className="flex items-center gap-x-4">
+                  <div className="flex items-center">
                     <ButtonTooltip
-                      type="default"
+                      type="text"
                       size="tiny"
+                      icon={<Settings strokeWidth={1.5} />}
+                      onClick={() => setIsConfirmOptInModalOpen(true)}
+                      className="h-7 w-7 p-0"
+                      disabled={isChatLoading}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: 'Permission settings',
+                        },
+                      }}
+                    />
+                    <ButtonTooltip
+                      type="text"
+                      size="tiny"
+                      icon={<Eraser strokeWidth={1.5} />}
                       onClick={handleClearMessages}
-                      className="w-7 h-7"
-                      icon={<Eraser />}
+                      className="h-7 w-7 p-0"
+                      disabled={isChatLoading}
                       tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                    />
+                    <ButtonTooltip
+                      type="text"
+                      className="w-7 h-7"
+                      onClick={snap.closeAssistant}
+                      icon={<X strokeWidth={1.5} />}
+                      tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
                     />
                   </div>
                 </div>
+              </div>
+              {showMetadataWarning && (
+                <Admonition
+                  type="default"
+                  title={
+                    !updatedOptInSinceMCP
+                      ? 'The Assistant has just been updated to help you better!'
+                      : isHipaaProjectDisallowed
+                        ? 'Project metadata is not shared due to HIPAA'
+                        : aiOptInLevel === 'disabled'
+                          ? 'Project metadata is currently not shared'
+                          : 'Limited metadata is shared to the Assistant'
+                  }
+                  description={
+                    !updatedOptInSinceMCP
+                      ? 'You may now opt-in to share schema metadata and even logs for better results'
+                      : isHipaaProjectDisallowed
+                        ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
+                        : aiOptInLevel === 'disabled'
+                          ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
+                          : aiOptInLevel === 'schema'
+                            ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                            : ''
+                  }
+                  className="border-0 border-b rounded-none bg-background mb-0"
+                >
+                  {!isHipaaProjectDisallowed && (
+                    <Button
+                      type="default"
+                      className="w-fit mt-4"
+                      onClick={() => setIsConfirmOptInModalOpen(true)}
+                    >
+                      Permission settings
+                    </Button>
+                  )}
+                </Admonition>
               )}
-              <AnimatePresence>
-                {isChatLoading && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex gap-4 w-auto overflow-hidden"
-                  >
-                    <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
-                      <span>Thinking</span>
-                      <div className="flex gap-1">
-                        <motion.span
-                          animate={{ opacity: [0, 1, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                        >
-                          .
-                        </motion.span>
-                        <motion.span
-                          animate={{ opacity: [0, 1, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                        >
-                          .
-                        </motion.span>
-                        <motion.span
-                          animate={{ opacity: [0, 1, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                        >
-                          .
-                        </motion.span>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
-          ) : isLoadingTables && isApiKeySet ? (
-            <div className="w-full h-full flex-1 flex flex-col justify-center items-center p-5">
-              <GenericSkeletonLoader className="w-4/5 flex flex-col items-center" />
-            </div>
-          ) : isShowingOnboarding ? (
             <AIOnboarding
               onMessageSend={sendMessageToAssistant}
               value={value}
@@ -588,8 +511,182 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   | undefined
               }
             />
-          ) : null}
-        </div>
+          </div>
+        ) : (
+          <Conversation className={cn('flex-1')}>
+            <div className="z-30 sticky top-0">
+              <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
+                <div className="text-sm flex-1 flex items-center">
+                  <AiIconAnimation size={20} allowHoverEffect={false} />
+                  <span className="text-border-stronger dark:text-border-strong ml-3">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      shapeRendering="geometricPrecision"
+                    >
+                      <path d="M16 3.549L7.12 20.600"></path>
+                    </svg>
+                  </span>
+                  <AIAssistantChatSelector disabled={isChatLoading} />
+                </div>
+                <div className="flex items-center gap-x-4">
+                  <div className="flex items-center">
+                    <ButtonTooltip
+                      type="text"
+                      size="tiny"
+                      icon={<Settings strokeWidth={1.5} />}
+                      onClick={() => setIsConfirmOptInModalOpen(true)}
+                      className="h-7 w-7 p-0"
+                      disabled={isChatLoading}
+                      tooltip={{
+                        content: { side: 'bottom', text: 'Permission settings' },
+                      }}
+                    />
+                    <ButtonTooltip
+                      type="text"
+                      size="tiny"
+                      icon={<Eraser strokeWidth={1.5} />}
+                      onClick={handleClearMessages}
+                      className="h-7 w-7 p-0"
+                      disabled={isChatLoading}
+                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                    />
+                    <ButtonTooltip
+                      type="text"
+                      className="w-7 h-7"
+                      onClick={snap.closeAssistant}
+                      icon={<X strokeWidth={1.5} />}
+                      tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
+                    />
+                  </div>
+                </div>
+              </div>
+              {showMetadataWarning && (
+                <Admonition
+                  type="default"
+                  title={
+                    !updatedOptInSinceMCP
+                      ? 'The Assistant has just been updated to help you better!'
+                      : isHipaaProjectDisallowed
+                        ? 'Project metadata is not shared due to HIPAA'
+                        : aiOptInLevel === 'disabled'
+                          ? 'Project metadata is currently not shared'
+                          : 'Limited metadata is shared to the Assistant'
+                  }
+                  description={
+                    !updatedOptInSinceMCP
+                      ? 'You may now opt-in to share schema metadata and even logs for better results'
+                      : isHipaaProjectDisallowed
+                        ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
+                        : aiOptInLevel === 'disabled'
+                          ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
+                          : aiOptInLevel === 'schema'
+                            ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                            : ''
+                  }
+                  className="border-0 border-b rounded-none bg-background mb-0"
+                >
+                  {!isHipaaProjectDisallowed && (
+                    <Button
+                      type="default"
+                      className="w-fit mt-4"
+                      onClick={() => setIsConfirmOptInModalOpen(true)}
+                    >
+                      Permission settings
+                    </Button>
+                  )}
+                </Admonition>
+              )}
+            </div>
+
+            {hasMessages ? (
+              <ConversationContent className="w-full px-7 py-8 mb-10">
+                {renderedMessages}
+                {error && (
+                  <div className="border rounded-md px-2 py-2 flex items-center justify-between gap-x-4">
+                    <div className="flex items-start gap-2 text-foreground-light text-sm">
+                      <div>
+                        <Info size={16} className="mt-0.5" />
+                      </div>
+                      <div>
+                        <p>
+                          Sorry, I'm having trouble responding right now. If the error persists
+                          while retrying, you may try clearing the conversation's messages and try
+                          again.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-x-2">
+                      <Button
+                        type="default"
+                        size="tiny"
+                        onClick={() => regenerate()}
+                        className="text-xs"
+                      >
+                        Retry
+                      </Button>
+                      <ButtonTooltip
+                        type="default"
+                        size="tiny"
+                        onClick={handleClearMessages}
+                        className="w-7 h-7"
+                        icon={<Eraser />}
+                        tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                      />
+                    </div>
+                  </div>
+                )}
+                <AnimatePresence>
+                  {isChatLoading && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex gap-4 w-auto overflow-hidden"
+                    >
+                      <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                        <span>Thinking</span>
+                        <div className="flex gap-1">
+                          <motion.span
+                            animate={{ opacity: [0, 1, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                          >
+                            .
+                          </motion.span>
+                          <motion.span
+                            animate={{ opacity: [0, 1, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                          >
+                            .
+                          </motion.span>
+                          <motion.span
+                            animate={{ opacity: [0, 1, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                          >
+                            .
+                          </motion.span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </ConversationContent>
+            ) : isLoadingTables && isApiKeySet ? (
+              <div className="w-full h-full flex-1 flex flex-col justify-center items-center p-5">
+                <GenericSkeletonLoader className="w-4/5 flex flex-col items-center" />
+              </div>
+            ) : null}
+
+            <ConversationScrollButton />
+          </Conversation>
+        )}
 
         <AnimatePresence>
           {editingMessageId && (
@@ -629,39 +726,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       }}
                     />
                   </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-          {!isSticky && !editingMessageId && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-none z-10 -mt-24"
-            >
-              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
-                <motion.div
-                  className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
-                  variants={{
-                    hidden: { y: 5, opacity: 0 },
-                    show: { y: 0, opacity: 1 },
-                  }}
-                  transition={{ duration: 0.1 }}
-                  initial="hidden"
-                  animate="show"
-                  exit="hidden"
-                >
-                  <Button
-                    type="default"
-                    className="rounded-full w-8 h-8 p-1.5"
-                    onClick={() => {
-                      scrollToEnd()
-                      if (inputRef.current) inputRef.current.focus()
-                    }}
-                  >
-                    <ArrowDown size={16} />
-                  </Button>
                 </motion.div>
               </div>
             </motion.div>
@@ -711,7 +775,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               onValueChange={(e) => setValue(e.target.value)}
               onSubmit={(finalMessage) => {
                 sendMessageToAssistant(finalMessage)
-                scrollToEnd()
               }}
               onStop={() => {
                 stop()
