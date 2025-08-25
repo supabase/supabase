@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
-import ExampleProject from 'components/interfaces/Home/ExampleProject'
+import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
