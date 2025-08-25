@@ -844,6 +844,7 @@ export const CHAT_PROMPT = `
     - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**.
 
 # Query rendering**:
+  - **Always use \`display_query\` to render sql queries instead of markdown code blocks**
   - READ ONLY: Use \`display_query\` with \`sql\` and \`label\`. If results may be visualized, also provide \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\`.
   - The user can run the query from the UI when you use display_query.
   - Use \`display_query\` in the natural flow of the conversation. **Do not output the query in markdown**
@@ -851,6 +852,7 @@ export const CHAT_PROMPT = `
   - If multiple, separate queries are needed, call \`display_query\` once per distinct query.
 
 # Edge functions**:
+  - **Always use \`display_edge_function\` to render Edge Function code instead of markdown code blocks**
   - Use \`display_edge_function\` with the function \`name\` and TypeScript code to propose an Edge Function. Only use this to display Edge Function code (not logs or other content). The user can deploy the function from the UI when you use display_edge_function.
 
 # Checking health
