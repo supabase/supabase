@@ -1,10 +1,9 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
-import { createOpenAI } from '@ai-sdk/openai'
+import { LanguageModel } from 'ai'
 import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
 import { selectWeightedKey } from './util'
-import { getTokenProvider } from '@aws/bedrock-token-generator'
 
 const credentialProvider = createCredentialChain(
   // Vercel OIDC provider will be used for staging/production
@@ -43,21 +42,6 @@ export async function checkAwsCredentials() {
     return !!credentials
   } catch (error) {
     return false
-  }
-}
-
-export async function getAwsBearerToken() {
-  try {
-    const credentials = await credentialProvider()
-
-    const provideToken = getTokenProvider({
-      credentials,
-      region: 'us-west-2',
-    })
-
-    return await provideToken()
-  } catch (error) {
-    throw new Error('Failed to get AWS bearer token')
   }
 }
 
@@ -108,7 +92,9 @@ const modelRegionWeights: Record<BedrockModel, RegionWeights> = {
  * their capacities.
  */
 export function createRoutedBedrock(routingKey?: string, useOpenAI = false) {
-  return async (modelId: BedrockModel) => {
+  return async (
+    modelId: BedrockModel
+  ): Promise<{ model: LanguageModel; supportsCachePoint: boolean }> => {
     const regionWeights = modelRegionWeights[modelId]
 
     // Select the Bedrock region based on the routing key and the model
@@ -120,18 +106,6 @@ export function createRoutedBedrock(routingKey?: string, useOpenAI = false) {
         ? 'use1'
         : 'usw2'
 
-    if (useOpenAI) {
-      const bedrockTempToken = await getAwsBearerToken()
-      const region = bedrockRegionMap[bedrockRegion]
-
-      const bedrockOpenAI = createOpenAI({
-        baseURL: `https://bedrock-runtime.${region}.amazonaws.com/openai/v1`,
-        apiKey: bedrockTempToken,
-      })
-
-      return bedrockOpenAI(modelId)
-    }
-
     const bedrock = createAmazonBedrock({
       credentialProvider,
       region: bedrockRegionMap[bedrockRegion],
@@ -141,6 +115,8 @@ export function createRoutedBedrock(routingKey?: string, useOpenAI = false) {
     const activeRegions = Object.values(regionWeights).filter((weight) => weight > 0).length
     const modelName = activeRegions > 1 ? `${regionPrefixMap[bedrockRegion]}.${modelId}` : modelId
 
-    return bedrock(modelName)
+    const model = bedrock(modelName)
+    const supportsCachePoint = modelId === 'anthropic.claude-3-7-sonnet-20250219-v1:0'
+    return { model, supportsCachePoint }
   }
 }

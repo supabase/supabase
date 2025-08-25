@@ -8,11 +8,13 @@ const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {
   model: LanguageModel
+  supportsCachePoint: boolean
   error?: never
 }
 
 export type ModelError = {
   model?: never
+  supportsCachePoint?: never
   error: Error
 }
 
@@ -38,16 +40,15 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
 
   if (hasAwsBedrockRoleArn && hasAwsCredentials) {
     const bedrockModel = isThrottled || isLimited ? BEDROCK_NORMAL_MODEL : BEDROCK_PRO_MODEL
-    const useOpenAI = bedrockModel === BEDROCK_NORMAL_MODEL
-    const bedrock = createRoutedBedrock(routingKey, useOpenAI)
-    const model = await bedrock(bedrockModel)
+    const bedrock = createRoutedBedrock(routingKey)
+    const { model, supportsCachePoint } = await bedrock(bedrockModel)
 
-    return { model }
+    return { model, supportsCachePoint }
   }
 
   // [Joshen] Only for local/self-hosted, hosted should always only use bedrock
   if (hasOpenAIKey) {
-    return { model: openai(OPENAI_MODEL) }
+    return { model: openai(OPENAI_MODEL), supportsCachePoint: false }
   }
 
   return { error: new Error(ModelErrorMessage) }
