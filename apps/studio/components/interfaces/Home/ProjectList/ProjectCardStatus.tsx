@@ -142,11 +142,13 @@ export const ProjectCardStatus = ({
   if (renderMode === 'badge') {
     const badgeVariant = isCritical
       ? 'destructive'
-      : projectStatus !== 'isHealthy'
-        ? 'warning'
-        : activeWarnings.length > 0
+      : projectStatus === 'isPaused'
+        ? 'default'
+        : projectStatus !== 'isHealthy'
           ? 'warning'
-          : 'success'
+          : activeWarnings.length > 0
+            ? 'warning'
+            : 'success'
 
     return alertDescription ? (
       <Tooltip>
