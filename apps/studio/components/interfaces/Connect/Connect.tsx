@@ -9,6 +9,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -30,20 +31,31 @@ import {
 } from 'ui'
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath } from './Connect.utils'
-import ConnectDropdown from './ConnectDropdown'
-import ConnectTabContent from './ConnectTabContent'
+import { ConnectDropdown } from './ConnectDropdown'
+import { ConnectTabContent } from './ConnectTabContent'
+import { ConnectTabContentCustom } from './ConnectTabContentCustom'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
+  const { connectFrameworks } = useCustomContent(['connect:frameworks'])
+  const connectionTypes = !connectFrameworks
+    ? CONNECTION_TYPES
+    : [
+        { key: 'direct', label: 'Connection String', obj: [] },
+        connectFrameworks,
+        { key: 'orms', label: 'ORMs', obj: ORMS },
+      ]
+  const frameworks = !connectFrameworks ? FRAMEWORKS : connectFrameworks.obj
+
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false)
   )
 
-  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
+  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(frameworks)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
     connectionObject.find((item) => item.key === selectedParent)?.children[0]?.key ?? ''
@@ -53,6 +65,8 @@ export const Connect = () => {
       .find((item) => item.key === selectedParent)
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
+
+  const isFrameworkSelected = frameworks.some((x) => x.key === selectedParent)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
@@ -109,8 +123,8 @@ export const Connect = () => {
 
   function handleConnectionType(type: string) {
     if (type === 'frameworks') {
-      setConnectionObject(FRAMEWORKS)
-      handleConnectionTypeChange(FRAMEWORKS)
+      setConnectionObject(frameworks)
+      handleConnectionTypeChange(frameworks)
     }
 
     if (type === 'mobiles') {
@@ -207,14 +221,14 @@ export const Connect = () => {
 
         <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
           <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
-            {CONNECTION_TYPES.map((type) => (
+            {connectionTypes.map((type) => (
               <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
                 {type.label}
               </TabsTrigger_Shadcn_>
             ))}
           </TabsList_Shadcn_>
 
-          {CONNECTION_TYPES.map((type) => {
+          {connectionTypes.map((type) => {
             const hasChildOptions =
               (connectionObject.find((parent) => parent.key === selectedParent)?.children.length ||
                 0) > 0
@@ -290,11 +304,18 @@ export const Connect = () => {
                 <p className="text-xs text-foreground-lighter my-3">
                   Add the following files below to your application
                 </p>
-                <ConnectTabContent
-                  projectKeys={projectKeys}
-                  filePath={filePath}
-                  className="rounded-b-none"
-                />
+                {!!connectFrameworks && isFrameworkSelected ? (
+                  <ConnectTabContentCustom
+                    projectKeys={projectKeys}
+                    framework={frameworks.find((x) => x.key === selectedParent)}
+                  />
+                ) : (
+                  <ConnectTabContent
+                    projectKeys={projectKeys}
+                    filePath={filePath}
+                    className="rounded-b-none"
+                  />
+                )}
                 <Panel.Notice
                   className="border border-t-0 rounded-lg rounded-t-none"
                   title="New API keys coming 2025"

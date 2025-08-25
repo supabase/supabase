@@ -36,6 +36,7 @@ import {
 } from 'data/content/content-upsert-mutation'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
@@ -57,8 +58,6 @@ const LOCAL_PLACEHOLDER_QUERY =
 const PLATFORM_PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
 
-const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACEHOLDER_QUERY
-
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const monaco = useMonaco()
@@ -71,6 +70,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
   const [editorId] = useState<string>(uuidv4())
   const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+
+  const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
+  const PLACEHOLDER_QUERY = IS_PLATFORM
+    ? logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY
+    : LOCAL_PLACEHOLDER_QUERY
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
