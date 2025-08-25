@@ -66,7 +66,7 @@ const IntegrationSettings = () => {
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      toast.success('Successfully deleted Github connection')
+      toast.success('Successfully deleted GitHub connection')
     },
   })
 

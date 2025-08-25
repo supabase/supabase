@@ -149,6 +149,7 @@ const Pagination = () => {
         <>
           <div className="flex items-center gap-x-2">
             <Button
+              aria-label="Previous page"
               icon={<ArrowLeft />}
               type="outline"
               className="px-1.5"
@@ -179,6 +180,7 @@ const Pagination = () => {
             <p className="text-xs text-foreground-light">of {totalPages.toLocaleString()}</p>
 
             <Button
+              aria-label="Next page"
               icon={<ArrowRight />}
               type="outline"
               className="px-1.5"

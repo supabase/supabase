@@ -15,6 +15,7 @@ import {
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -44,7 +45,7 @@ interface NodeData {
   id: string
   provider: string
   region: Region
-  computeSize: string
+  computeSize?: string
   status: string
   inserted_at: string
 }
@@ -109,6 +110,10 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
   const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
 
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
   return (
     <>
       <Handle
@@ -133,8 +138,12 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
               </p>
               <p className="flex items-center gap-x-1">
                 <span className="text-sm text-foreground-light">{provider}</span>
-                <span className="text-sm text-foreground-light">•</span>
-                <span className="text-sm text-foreground-light">{computeSize}</span>
+                {projectHomepageShowInstanceSize && (
+                  <>
+                    <span className="text-sm text-foreground-light">•</span>
+                    <span className="text-sm text-foreground-light">{computeSize}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -186,6 +195,10 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     PermissionAction.CREATE,
     'projects'
   )
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
@@ -289,7 +302,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
                 <span>{provider}</span>
-                {!!computeSize && (
+                {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span>•</span>
                     <span>{computeSize}</span>
