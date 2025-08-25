@@ -96,7 +96,9 @@ export const ProjectTableRow = ({
         </div>
       </TableCell>
       <TableCell>
-        <span className="text-sm text-foreground-light">{project.region || 'N/A'}</span>
+        <span className="lowercase text-sm text-foreground-light">
+          {project.cloud_provider} | {project.region || 'N/A'}
+        </span>
       </TableCell>
       <TableCell>
         {project.inserted_at ? (
