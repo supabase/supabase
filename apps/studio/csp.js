@@ -31,6 +31,8 @@ const isDevOrStaging =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
+const NIMBUS_STAGING_PROJECTS_URL = 'https://*.supabase-nimbus-projects.com'
+const NIMBUS_STAGING_PROJECTS_URL_WS = 'wss://*.supabase-nimbus-projects.com'
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
@@ -126,6 +128,8 @@ module.exports.getCSP = function getCSP() {
       ? [
           SUPABASE_STAGING_PROJECTS_URL,
           SUPABASE_STAGING_PROJECTS_URL_WS,
+          NIMBUS_STAGING_PROJECTS_URL,
+          NIMBUS_STAGING_PROJECTS_URL_WS,
           VERCEL_LIVE_URL,
           SUPABASE_DOCS_PROJECT_URL,
           SUPABASE_CONTENT_API_URL,
@@ -140,7 +144,9 @@ module.exports.getCSP = function getCSP() {
     `blob:`,
     `data:`,
     ...IMG_SRC_URLS,
-    ...(isDevOrStaging ? [SUPABASE_STAGING_PROJECTS_URL, VERCEL_URL] : []),
+    ...(isDevOrStaging
+      ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL, VERCEL_URL]
+      : []),
   ].join(' ')
 
   const scriptSrcDirective = [
