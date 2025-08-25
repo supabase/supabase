@@ -236,6 +236,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const isThinking = chatStatus === 'submitted'
 
   const updateMessage = useCallback(
     ({
@@ -645,7 +646,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   </div>
                 )}
                 <AnimatePresence>
-                  {isChatLoading && (
+                  {isThinking && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}

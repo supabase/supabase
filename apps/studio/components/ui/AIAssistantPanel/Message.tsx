@@ -100,6 +100,8 @@ export const Message = function Message({
 
   const hasTextContent = content && content.trim().length > 0
 
+  console.log('parts:', parts)
+
   return (
     <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
@@ -124,13 +126,40 @@ export const Message = function Message({
             />
           )}
 
-          <div className="flex-1 min-w-0 [&>div:first-child]:!mt-1">
+          <div className="flex-1 min-w-0">
             {shouldUsePartsRendering ? (
               (() => {
-                const shownLoadingTools = new Set<string>()
                 return parts.map(
                   (part: NonNullable<VercelMessage['parts']>[number], index: number) => {
                     switch (part.type) {
+                      case 'dynamic-tool': {
+                        const { state } = part
+                        if (state === 'input-streaming' || state === 'input-available') {
+                          return (
+                            <div key={`${id}-tool-${part.toolCallId}`} className="mt-4 first:mt-0">
+                              <div className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {`Calling ${part.toolName}...`}
+                              </div>
+                            </div>
+                          )
+                        }
+                        return null
+                      }
+                      case 'reasoning': {
+                        const { state } = part
+                        if (state === 'streaming') {
+                          return (
+                            <div key={`${id}-reasoning`} className="mt-4 first:mt-0">
+                              <div className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {`Thinking...`}
+                              </div>
+                            </div>
+                          )
+                        }
+                        return null
+                      }
                       case 'text':
                         return (
                           <ReactMarkdown
@@ -150,10 +179,6 @@ export const Message = function Message({
                       case 'tool-display_query': {
                         const { toolCallId, state, input } = part
                         if (state === 'input-streaming' || state === 'input-available') {
-                          if (shownLoadingTools.has('display_query')) {
-                            return null
-                          }
-                          shownLoadingTools.add('display_query')
                           return (
                             <div
                               key={`${id}-tool-loading-display_query`}
@@ -183,10 +208,6 @@ export const Message = function Message({
                       case 'tool-display_edge_function': {
                         const { toolCallId, state, input } = part
                         if (state === 'input-streaming' || state === 'input-available') {
-                          if (shownLoadingTools.has('display_edge_function')) {
-                            return null
-                          }
-                          shownLoadingTools.add('display_edge_function')
                           return (
                             <div
                               key={`${id}-tool-loading-display_edge_function`}
@@ -214,7 +235,6 @@ export const Message = function Message({
                         }
                         return null
                       }
-                      case 'reasoning':
                       case 'source-url':
                       case 'source-document':
                       case 'file':
