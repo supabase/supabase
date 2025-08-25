@@ -190,6 +190,98 @@ To use Google's pre-built signin buttons:
 
   </TabPanel>
 
+  <TabPanel id="capacitor" label="Capacitor">
+
+    For Capacitor apps, you can use the [@capgo/capacitor-social-login](https://github.com/Cap-go/capacitor-social-login) plugin for native Google authentication across iOS and Android platforms.
+
+    <Admonition type="info">
+
+    For comprehensive setup instructions including OAuth configuration, see our [Capacitor Social Login guide](/docs/blog/setup-supabase-with-capacitor-social-login).
+
+    </Admonition>
+
+    ### Installation and Setup
+
+    1. Install the Capacitor Social Login plugin:
+
+    ```bash
+    npm install @capgo/capacitor-social-login
+    npx cap sync
+    ```
+
+    2. Configure the plugin with your Google credentials:
+
+    ```typescript
+    import { SocialLogin } from '@capgo/capacitor-social-login';
+
+    await SocialLogin.initialize({
+      google: {
+        webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+        // Optional: iOS Client ID for iOS-specific features
+        iOSClientId: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com',
+        // Optional: Request offline access for refresh tokens
+        mode: 'offline'
+      }
+    });
+    ```
+
+    3. Implement the authentication flow:
+
+    ```typescript
+    import { SocialLogin } from '@capgo/capacitor-social-login';
+    import { supabase } from './supabase';
+
+    async function signInWithGoogle() {
+      try {
+        const result = await SocialLogin.login({
+          provider: 'google',
+          options: {
+            scopes: ['email', 'profile']
+          }
+        });
+
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: result.result?.accessToken.token!,
+        });
+
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Google sign-in error:', error);
+        throw error;
+      }
+    }
+    ```
+
+    ### Platform-Specific Configuration
+
+    **iOS Configuration:**
+    Add the following to your `ios/App/App/Info.plist`:
+
+    ```xml
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>YOUR_REVERSED_CLIENT_ID</string>
+        </array>
+      </dict>
+    </array>
+    ```
+
+    **Android Configuration:**
+    Add to your `android/app/src/main/AndroidManifest.xml`:
+
+    ```xml
+    <uses-permission android:name="android.permission.INTERNET" />
+    ```
+
+    For detailed platform-specific setup including SHA-1 fingerprints and OAuth client configuration, refer to our [comprehensive Capacitor guide](/docs/blog/setup-supabase-with-capacitor-social-login).
+
+  </TabPanel>
+
   <TabPanel id="android" label="Android (Kotlin)">
 
     ### Using Google sign-in on Android
