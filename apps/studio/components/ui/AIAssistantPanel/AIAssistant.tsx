@@ -44,7 +44,7 @@ import {
 const MemoizedMessage = memo(
   ({
     message,
-    isLoading,
+    status,
     onResults,
     onEdit,
     isAfterEditedMessage,
@@ -52,7 +52,7 @@ const MemoizedMessage = memo(
     onCancelEdit,
   }: {
     message: MessageType
-    isLoading: boolean
+    status: string
     onResults: ({
       messageId,
       resultId,
@@ -72,7 +72,7 @@ const MemoizedMessage = memo(
         id={message.id}
         message={message}
         readOnly={message.role === 'user'}
-        isLoading={isLoading}
+        status={status}
         onResults={onResults}
         onEdit={onEdit}
         isAfterEditedMessage={isAfterEditedMessage}
@@ -293,7 +293,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <MemoizedMessage
             key={message.id}
             message={message}
-            isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
+            status={chatStatus}
             onResults={updateMessage}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
@@ -302,7 +302,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           />
         )
       }),
-    [chatMessages, isChatLoading, updateMessage, editMessage, editingMessageId, cancelEdit]
+    [chatMessages, chatStatus, updateMessage, editMessage, editingMessageId, cancelEdit]
   )
 
   const hasMessages = chatMessages.length > 0
@@ -379,6 +379,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
+
+  console.log('messages:', chatMessages)
 
   return (
     <ErrorBoundary
