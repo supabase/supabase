@@ -41,6 +41,8 @@ export interface FormProps {
   snippetsClassName?: string
   /* Additional class name for the form wrapper */
   className?: string
+  /* If currently editing an existing message */
+  isEditing?: boolean
 }
 
 const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
@@ -59,6 +61,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       snippetsClassName,
       includeSnippetsInMessage = false,
       className,
+      isEditing = false,
       ...props
     },
     ref
@@ -68,7 +71,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
 
     const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || loading) return
+      if (!value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
@@ -107,8 +110,8 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             />
           )}
           <ExpandingTextArea
+            autoFocus={!isMobile}
             ref={textAreaRef}
-            autoFocus={isMobile}
             disabled={disabled}
             className={cn(
               'text-sm pr-10 max-h-64',
