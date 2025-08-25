@@ -2,10 +2,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ChevronDown, RefreshCw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Label } from '@ui/components/shadcn/ui/label'
-import ReportV2ChartComponent from 'components/interfaces/Reports/v2/ReportV2ChartComponent'
+import { ReportV2ChartComponent } from 'components/interfaces/Reports/v2/ReportV2ChartComponent'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
@@ -46,7 +46,7 @@ const EdgeFunctionsUsage = () => {
   const { data: functions, isLoading: isLoadingFunctions } = useEdgeFunctionsQuery({
     projectRef: ref,
   })
-  const { edgeFnIdToName } = useEdgeFnIdToName({ projectRef: ref })
+  const { edgeFnIdToName } = useEdgeFnIdToName({ projectRef: ref! })
 
   const [isOpen, setIsOpen] = useState(false)
   const [functionIds, setFunctionIds] = useState<string[]>([])
@@ -72,6 +72,19 @@ const EdgeFunctionsUsage = () => {
 
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const reportConfig = useMemo(() => {
+    return edgeFunctionReports({
+      projectRef: ref!,
+      functions: functions ?? [],
+      startDate: selectedDateRange?.period_start?.date ?? '',
+      endDate: selectedDateRange?.period_end?.date ?? '',
+      interval: selectedDateRange?.interval ?? 'minute',
+      filters: {
+        functionIds,
+      },
+    })
+  }, [ref, functions, selectedDateRange, functionIds])
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
@@ -213,7 +226,7 @@ const EdgeFunctionsUsage = () => {
       >
         <div className="mt-8 flex flex-col gap-4">
           {selectedDateRange &&
-            edgeFunctionReports
+            reportConfig
               .filter((report) => !report.hide)
               .map((report, i) => (
                 <ReportV2ChartComponent
@@ -225,7 +238,6 @@ const EdgeFunctionsUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   functionIds={functionIds}
-                  edgeFnIdToName={edgeFnIdToName}
                 />
               ))}
         </div>
