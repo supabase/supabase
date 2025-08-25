@@ -8,7 +8,16 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { Badge, Sheet, SheetContent, TableCell, TableRow } from 'ui'
+import {
+  Badge,
+  Sheet,
+  SheetContent,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import DeleteWrapperModal from './DeleteWrapperModal'
 import { EditWrapperSheet } from './EditWrapperSheet'
@@ -74,7 +83,12 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                   <div className="relative w-3 h-3 flex items-center justify-center">
                     {integration.icon({ className: 'p-0' })}
                   </div>
-                  {target}{' '}
+                  <Tooltip>
+                    <TooltipTrigger className="truncate max-w-28">{target}</TooltipTrigger>
+                    <TooltipContent className="max-w-64 whitespace-pre-wrap break-words">
+                      {target}
+                    </TooltipContent>
+                  </Tooltip>
                   <ChevronRight
                     size={12}
                     strokeWidth={1.5}
@@ -85,7 +99,14 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                 <Link href={`/project/${ref}/editor/${table.id}`}>
                   <Badge className="transition hover:bg-surface-300 pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem] border-l-0">
                     <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
-                    {table.schema}.{table.table_name}
+                    <Tooltip>
+                      <TooltipTrigger className="truncate max-w-28">
+                        {table.schema}.{table.table_name}
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-64 whitespace-pre-wrap break-words">
+                        {table.schema}.{table.table_name}
+                      </TooltipContent>
+                    </Tooltip>
                   </Badge>
                 </Link>
               </div>
