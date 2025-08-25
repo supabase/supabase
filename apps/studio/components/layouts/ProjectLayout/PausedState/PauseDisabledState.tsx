@@ -164,7 +164,7 @@ export const PauseDisabledState = () => {
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore"
+            href="https://supabase.com/docs/guides/platform/migrating-within-supabase"
           >
             Restore backup to a new Supabase project guide
           </a>
