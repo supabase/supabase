@@ -26,6 +26,13 @@ const SUPABASE_CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL
   ? new URL(process.env.NEXT_PUBLIC_CONTENT_API_URL).origin
   : ''
 
+const isDevOrStaging =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+const NIMBUS_STAGING_PROJECTS_URL = 'https://*.supabase-nimbus-projects.com'
+const NIMBUS_STAGING_PROJECTS_URL_WS = 'wss://*.supabase-nimbus-projects.com'
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
@@ -58,6 +65,7 @@ const SUPABASE_ASSETS_URL =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? 'https://frontend-assets.supabase.green'
     : 'https://frontend-assets.supabase.com'
+const POSTHOG_URL = isDevOrStaging ? 'https://ph.supabase.green' : 'https://ph.supabase.com'
 
 const USERCENTRICS_URLS = 'https://*.usercentrics.eu'
 const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
@@ -65,6 +73,8 @@ const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
+
+const GOOGLE_MAPS_API_URL = 'https://maps.googleapis.com'
 
 module.exports.getCSP = function getCSP() {
   const DEFAULT_SRC_URLS = [
@@ -86,6 +96,8 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_URLS,
     STAPE_URL,
+    GOOGLE_MAPS_API_URL,
+    POSTHOG_URL,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -93,6 +105,7 @@ module.exports.getCSP = function getCSP() {
     STRIPE_JS_URL,
     SUPABASE_ASSETS_URL,
     STAPE_URL,
+    POSTHOG_URL,
   ]
   const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
   const IMG_SRC_URLS = [
@@ -108,11 +121,6 @@ module.exports.getCSP = function getCSP() {
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
 
-  const isDevOrStaging =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-
   const defaultSrcDirective = [
     `default-src 'self'`,
     ...DEFAULT_SRC_URLS,
@@ -120,6 +128,8 @@ module.exports.getCSP = function getCSP() {
       ? [
           SUPABASE_STAGING_PROJECTS_URL,
           SUPABASE_STAGING_PROJECTS_URL_WS,
+          NIMBUS_STAGING_PROJECTS_URL,
+          NIMBUS_STAGING_PROJECTS_URL_WS,
           VERCEL_LIVE_URL,
           SUPABASE_DOCS_PROJECT_URL,
           SUPABASE_CONTENT_API_URL,
@@ -134,7 +144,9 @@ module.exports.getCSP = function getCSP() {
     `blob:`,
     `data:`,
     ...IMG_SRC_URLS,
-    ...(isDevOrStaging ? [SUPABASE_STAGING_PROJECTS_URL, VERCEL_URL] : []),
+    ...(isDevOrStaging
+      ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL, VERCEL_URL]
+      : []),
   ].join(' ')
 
   const scriptSrcDirective = [
@@ -144,6 +156,7 @@ module.exports.getCSP = function getCSP() {
     ...SCRIPT_SRC_URLS,
     VERCEL_LIVE_URL,
     PUSHER_URL,
+    GOOGLE_MAPS_API_URL,
   ].join(' ')
 
   const frameSrcDirective = [`frame-src 'self'`, ...FRAME_SRC_URLS, VERCEL_LIVE_URL].join(' ')

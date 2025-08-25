@@ -69,7 +69,7 @@ export const QueryPanelScoreSection = ({
               ) : (
                 <ArrowDown size={14} className="text-brand" />
               )}
-              {before !== 0 && (
+              {typeof before === 'number' && before !== 0 && !isNaN(before) && isFinite(before) && (
                 <span
                   className={cn(
                     'font-mono tracking-tighter',

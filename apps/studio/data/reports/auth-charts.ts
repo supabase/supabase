@@ -1,4 +1,4 @@
-export const getAuthReportAttributes = (isFreePlan: boolean) => [
+export const getAuthReportAttributes = () => [
   {
     id: 'active-users',
     label: 'Active Users',

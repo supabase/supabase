@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTable } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -27,7 +27,7 @@ const Pagination = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -149,6 +149,7 @@ const Pagination = () => {
         <>
           <div className="flex items-center gap-x-2">
             <Button
+              aria-label="Previous page"
               icon={<ArrowLeft />}
               type="outline"
               className="px-1.5"
@@ -179,6 +180,7 @@ const Pagination = () => {
             <p className="text-xs text-foreground-light">of {totalPages.toLocaleString()}</p>
 
             <Button
+              aria-label="Next page"
               icon={<ArrowRight />}
               type="outline"
               className="px-1.5"

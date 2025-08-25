@@ -6,16 +6,15 @@ import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DatePicker } from 'components/ui/DatePicker'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-import { formatSelectedDateRange } from '../Organization/AuditLogs/AuditLogs.utils'
+import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 
 const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -33,12 +32,16 @@ const AuditLogs = () => {
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useProfileAuditLogsQuery({
-      iso_timestamp_start: dateRange.from,
-      iso_timestamp_end: dateRange.to,
-    })
+    useProfileAuditLogsQuery(
+      {
+        iso_timestamp_start: dateRange.from,
+        iso_timestamp_end: dateRange.to,
+      },
+      {
+        retry: false,
+      }
+    )
 
-  const retentionPeriod = data?.retention_period ?? 0
   const logs = data?.result ?? []
   const sortedLogs = logs
     ?.sort((a, b) =>
@@ -53,9 +56,6 @@ const AuditLogs = () => {
         return log
       }
     })
-
-  const minDate = dayjs().subtract(retentionPeriod, 'days')
-  const maxDate = dayjs()
 
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
@@ -88,35 +88,38 @@ const AuditLogs = () => {
               activeOptions={filters.projects}
               onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
             />
-            <DatePicker
-              hideTime
-              hideClear
-              triggerButtonType="dashed"
-              triggerButtonTitle=""
-              from={dateRange.from}
-              to={dateRange.to}
-              minDate={minDate.toDate()}
-              maxDate={maxDate.toDate()}
-              onChange={(value) => {
-                if (value.from !== null && value.to !== null) {
-                  const { from, to } = formatSelectedDateRange(value)
-                  setDateRange({ from, to })
-                }
-              }}
-              renderFooter={() => {
-                return (
-                  <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                    You have a log retention period of{' '}
-                    <span className="text-brand">
-                      {retentionPeriod} day
-                      {retentionPeriod > 1 ? 's' : ''}
-                    </span>
-                    . You may only view logs from{' '}
-                    {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                    earliest date.
-                  </Alert>
-                )
-              }}
+            <LogsDatePicker
+              hideWarnings
+              value={dateRange}
+              onSubmit={(value) => setDateRange(value)}
+              helpers={[
+                {
+                  text: 'Last 1 hour',
+                  calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+                  calcTo: () => dayjs().toISOString(),
+                },
+                {
+                  text: 'Last 3 hours',
+                  calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
+                  calcTo: () => dayjs().toISOString(),
+                },
+
+                {
+                  text: 'Last 6 hours',
+                  calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
+                  calcTo: () => dayjs().toISOString(),
+                },
+                {
+                  text: 'Last 12 hours',
+                  calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
+                  calcTo: () => dayjs().toISOString(),
+                },
+                {
+                  text: 'Last 24 hours',
+                  calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+                  calcTo: () => dayjs().toISOString(),
+                },
+              ]}
             />
             {isSuccess && (
               <>

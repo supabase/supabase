@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
@@ -38,7 +38,7 @@ const FeaturePreviewModal = () => {
     closeFeaturePreviewModal,
     isFeaturePreviewReleasedToPublic,
   } = useFeaturePreviewModal()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -129,7 +129,7 @@ const FeaturePreviewModal = () => {
           <div className="mt-1 mb-3 flex flex-col items-center gap-y-0.5">
             <p className="text-sm">No feature previews available</p>
             <p className="text-sm text-foreground-light">
-              Have an idea for the dashboard? Let us know via Github Discussions!
+              Have an idea for the dashboard? Let us know via GitHub Discussions!
             </p>
           </div>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
@@ -138,7 +138,7 @@ const FeaturePreviewModal = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Github Discussions
+              GitHub Discussions
             </Link>
           </Button>
         </div>

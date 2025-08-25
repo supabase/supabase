@@ -73,7 +73,7 @@ const RoleImpersonationPopover = ({
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
         portal={portal}
-        className="p-0 w-full overflow-hidden"
+        className="p-0 w-[592px] overflow-hidden"
         side="bottom"
         align={align}
       >

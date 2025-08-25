@@ -23,9 +23,10 @@ import NoPermission from 'components/ui/NoPermission'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
@@ -40,15 +41,18 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 const MergeRequestsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'preview_branches'
+  )
 
   const {
     data: connections,
@@ -83,6 +87,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
   const isError = isErrorConnections || isErrorBranches
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to update the branch`)
@@ -100,6 +106,20 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         {
           onSuccess: () => {
             toast.success('Merge request created')
+
+            // Track merge request creation
+            sendEvent({
+              action: 'branch_create_merge_request_button_clicked',
+              properties: {
+                branchType: branch.persistent ? 'persistent' : 'preview',
+                origin: 'merge_page',
+              },
+              groups: {
+                project: projectRef ?? 'Unknown',
+                organization: selectedOrg?.slug ?? 'Unknown',
+              },
+            })
+
             router.push(`/project/${branch.project_ref}/merge`)
           },
         }
@@ -118,6 +138,15 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         {
           onSuccess: () => {
             toast.success('Merge request closed')
+
+            // Track merge request closed
+            sendEvent({
+              action: 'branch_close_merge_request_button_clicked',
+              groups: {
+                project: projectRef ?? 'Unknown',
+                organization: selectedOrg?.slug ?? 'Unknown',
+              },
+            })
           },
         }
       )
@@ -137,7 +166,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-4">
-            {!canReadBranches ? (
+            {isPermissionsLoaded && !canReadBranches ? (
               <NoPermission resourceText="view this project's branches" />
             ) : (
               <>
@@ -281,7 +310,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
@@ -290,6 +320,8 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const { data: branches } = useBranchesQuery({ projectRef })
   const previewBranches = (branches || []).filter((b) => !b.is_default)
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -308,6 +340,20 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
         {
           onSuccess: () => {
             toast.success('Merge request created')
+
+            // Track merge request creation
+            sendEvent({
+              action: 'branch_create_merge_request_button_clicked',
+              properties: {
+                branchType: branch.persistent ? 'persistent' : 'preview',
+                origin: 'branch_selector',
+              },
+              groups: {
+                project: projectRef ?? 'Unknown',
+                organization: selectedOrg?.slug ?? 'Unknown',
+              },
+            })
+
             router.push(`/project/${branch.project_ref}/merge`)
           },
         }

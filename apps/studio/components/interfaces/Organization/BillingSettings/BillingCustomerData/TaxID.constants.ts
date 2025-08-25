@@ -1,8 +1,3 @@
-// List of available Tax IDs as reflected in Stripe's web portal
-// This was manually ported over so there may be a chance of mistakes
-// Last updated as of 29th March 2022.
-// The code may not necessarily match with the name (ref SE_VAT)
-// https://stripe.com/docs/api/customer_tax_ids/create
 export interface TaxId {
   name: string
   type: string

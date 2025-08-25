@@ -74,6 +74,14 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
               <p className="text-sm text-foreground-lighter">
                 Added {isNew ? 'now' : dayjs(secret.created_at).fromNow()} by {generatedByName}
               </p>
+              {secret.last_used_at && (
+                <p className="text-sm text-foreground-lighter">
+                  Last used {dayjs(secret.last_used_at).fromNow()}
+                </p>
+              )}
+              {!secret.last_used_at && !isNew && (
+                <p className="text-sm text-foreground-lighter">Never used</p>
+              )}
             </div>
           </div>
         </div>

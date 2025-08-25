@@ -971,8 +971,10 @@
                 }
               ],
               "type": {
-                "type": "intrinsic",
-                "name": "string"
+                "type": "reference",
+                "qualifiedName": "URL",
+                "package": "typescript",
+                "name": "URL"
               }
             },
             {
@@ -1103,8 +1105,10 @@
                 }
               ],
               "type": {
-                "type": "intrinsic",
-                "name": "string"
+                "type": "reference",
+                "qualifiedName": "URL",
+                "package": "typescript",
+                "name": "URL"
               }
             },
             {
@@ -1175,8 +1179,10 @@
                 }
               ],
               "type": {
-                "type": "intrinsic",
-                "name": "string"
+                "type": "reference",
+                "qualifiedName": "URL",
+                "package": "typescript",
+                "name": "URL"
               }
             },
             {
@@ -1254,8 +1260,10 @@
                 }
               ],
               "type": {
-                "type": "intrinsic",
-                "name": "string"
+                "type": "reference",
+                "qualifiedName": "URL",
+                "package": "typescript",
+                "name": "URL"
               }
             },
             {
@@ -1293,7 +1301,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 139,
+                  "line": 141,
                   "character": 6
                 }
               ],
@@ -1325,7 +1333,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 149,
+                  "line": 151,
                   "character": 6
                 }
               ],
@@ -1359,7 +1367,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 269,
+                  "line": 271,
                   "character": 16
                 }
               ],
@@ -1405,7 +1413,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 329,
+                  "line": 331,
                   "character": 10
                 }
               ],
@@ -1482,7 +1490,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 315,
+                  "line": 317,
                   "character": 10
                 }
               ],
@@ -1528,7 +1536,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 279,
+                  "line": 281,
                   "character": 10
                 }
               ],
@@ -1699,7 +1707,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 322,
+                  "line": 324,
                   "character": 10
                 }
               ],
@@ -1732,7 +1740,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 241,
+                  "line": 243,
                   "character": 2
                 }
               ],
@@ -1797,7 +1805,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 154,
+                  "line": 156,
                   "character": 2
                 }
               ],
@@ -2021,7 +2029,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 248,
+                  "line": 250,
                   "character": 2
                 }
               ],
@@ -2056,7 +2064,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 265,
+                  "line": 267,
                   "character": 2
                 }
               ],
@@ -2110,7 +2118,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 258,
+                  "line": 260,
                   "character": 2
                 }
               ],
@@ -2179,7 +2187,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 212,
+                  "line": 214,
                   "character": 2
                 }
               ],
@@ -2290,7 +2298,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/SupabaseClient.ts",
-                                  "line": 218,
+                                  "line": 220,
                                   "character": 6
                                 }
                               ],
@@ -2326,7 +2334,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/SupabaseClient.ts",
-                                  "line": 217,
+                                  "line": 219,
                                   "character": 6
                                 }
                               ],
@@ -2349,7 +2357,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/SupabaseClient.ts",
-                                  "line": 216,
+                                  "line": 218,
                                   "character": 6
                                 }
                               ],
@@ -2495,7 +2503,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 178,
+                  "line": 180,
                   "character": 2
                 }
               ],
@@ -5630,6 +5638,46 @@
           ]
         },
         {
+          "id": 56,
+          "name": "ensureTrailingSlash",
+          "kind": 64,
+          "kindString": "Function",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/helpers.ts",
+              "line": 12,
+              "character": 16
+            }
+          ],
+          "signatures": [
+            {
+              "id": 57,
+              "name": "ensureTrailingSlash",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 58,
+                  "name": "url",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            }
+          ]
+        },
+        {
           "id": 65,
           "name": "isBrowser",
           "kind": 64,
@@ -5652,46 +5700,6 @@
               "type": {
                 "type": "intrinsic",
                 "name": "boolean"
-              }
-            }
-          ]
-        },
-        {
-          "id": 56,
-          "name": "stripTrailingSlash",
-          "kind": 64,
-          "kindString": "Function",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/lib/helpers.ts",
-              "line": 12,
-              "character": 16
-            }
-          ],
-          "signatures": [
-            {
-              "id": 57,
-              "name": "stripTrailingSlash",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "parameters": [
-                {
-                  "id": 58,
-                  "name": "url",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "intrinsic",
-                    "name": "string"
-                  }
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
               }
             }
           ]
@@ -5728,7 +5736,7 @@
         {
           "title": "Functions",
           "kind": 64,
-          "children": [59, 65, 56, 54]
+          "children": [59, 56, 65, 54]
         }
       ],
       "sources": [
