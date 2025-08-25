@@ -1,6 +1,6 @@
 import { apiBuilder } from 'lib/api/apiBuilder'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { GOTRUE_URL } from '../../constants'
+import { VELA_PLATFORM_GOTRUE_URL } from '../../constants'
 
 interface SignupRequestUi {
   email: string
@@ -66,7 +66,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
     code_challenge: '',
   }
 
-  const response = await fetch(`${GOTRUE_URL}/signup`, {
+  const response = await fetch(`${VELA_PLATFORM_GOTRUE_URL}/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

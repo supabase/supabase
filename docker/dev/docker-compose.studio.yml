@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   studio:
     build:
@@ -7,7 +5,8 @@ services:
       dockerfile: apps/studio/Dockerfile
       target: dev
     ports:
-      - 8082:8082
+      - '8082:8082/tcp'
+
   mail:
     container_name: supabase-mail
     image: inbucket/inbucket:3.0.3
@@ -19,6 +18,9 @@ services:
     environment:
       - GOTRUE_SMTP_USER=
       - GOTRUE_SMTP_PASS=
+      - GOTRUE_JWT_ADMIN_ROLES=
+      - GOTRUE_JWT_AUD=
+      - GOTRUE_JWT_DEFAULT_GROUP_NAME=
   meta:
     ports:
       - 5555:8080

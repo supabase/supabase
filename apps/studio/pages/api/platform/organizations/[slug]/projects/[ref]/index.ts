@@ -2,13 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import {
   DEFAULT_PROJECT,
   DEFAULT_PROJECT_2,
-  IS_VELA_PLATFORM,
   PROJECT_REST_URL,
 } from 'pages/api/constants'
 import { getVelaClient } from '../../../../../../../data/vela/vela'
 import { apiBuilder } from '../../../../../../../lib/api/apiBuilder'
 import { getPlatformQueryParams } from '../../../../../../../lib/api/platformQueryParams'
 import { mapProject } from '../../../../../../../data/vela/api-mappers'
+import { IS_VELA_PLATFORM } from 'lib/constants'
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!IS_VELA_PLATFORM) {

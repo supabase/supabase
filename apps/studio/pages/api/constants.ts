@@ -1,9 +1,19 @@
+import { IS_VELA_PLATFORM } from '../../lib/constants'
+
 const PUBLIC_URL = new URL(process.env.SUPABASE_PUBLIC_URL || 'http://localhost:8000')
 
-export const IS_VELA_PLATFORM = process.env.PUBLIC_PLATFORM === 'vela'
-export const VELA_PLATFORM_URL = process.env.VELA_PLATFORM_URL
+export const VELA_PLATFORM_URL = (() => {
+  const platformUrl = process.env.VELA_PLATFORM_URL
+  if (IS_VELA_PLATFORM && typeof platformUrl === 'undefined') {
+    throw new Error('VELA_PLATFORM_URL is not set')
+  }
+  return platformUrl
+})()
 
-export const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
+export const VELA_PLATFORM_GOTRUE_URL = process.env.VELA_PLATFORM_GOTRUE_URL
+if (IS_VELA_PLATFORM && typeof VELA_PLATFORM_GOTRUE_URL === 'undefined') {
+  throw new Error('VELA_PLATFORM_GOTRUE_URL is not set')
+}
 
 // Use LOGFLARE_URL until analytics/v1/ routing is supported
 export const PROJECT_ANALYTICS_URL = `${process.env.LOGFLARE_URL}/api/`

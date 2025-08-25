@@ -49,6 +49,13 @@ services:
       # Uncomment to use Big Query backend for analytics
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
 
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_GOTRUE_URL: ${NEXT_PUBLIC_GOTRUE_URL}
+      NEXT_PUBLIC_IS_PLATFORM: ${NEXT_PUBLIC_IS_PLATFORM}
+      PUBLIC_PLATFORM: ${PUBLIC_PLATFORM}
+      VELA_PLATFORM_URL: ${VELA_PLATFORM_URL}
+      VELA_PLATFORM_GOTRUE_URL: ${VELA_PLATFORM_GOTRUE_URL}
+
   kong:
     container_name: supabase-kong
     image: kong:2.8.1
@@ -94,6 +101,8 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+    ports:
+      - '9999:9999/tcp'
     depends_on:
       db:
         # Disable this if you are using an external Postgres database

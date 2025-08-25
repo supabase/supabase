@@ -10,6 +10,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { getPathReferences } from '../../data/vela/path-references'
 
 export interface DbQueryHook<T = any> {
   isLoading: boolean
@@ -36,7 +37,7 @@ const useDbQuery = ({
   where?: string
   orderBy?: string
 }): DbQueryHook => {
-  const { slug: orgSlug } = getPathReference()
+  const { slug: orgSlug } = getPathReferences()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -86,7 +87,4 @@ const useDbQuery = ({
 }
 
 export default useDbQuery
-function getPathReference(): { slug: any } {
-    throw new Error('Function not implemented.')
-}
 

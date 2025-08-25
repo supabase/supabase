@@ -1,10 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { DEFAULT_PROJECT, DEFAULT_PROJECT_2, IS_VELA_PLATFORM } from '../../../../constants'
+import { DEFAULT_PROJECT, DEFAULT_PROJECT_2 } from '../../../../constants'
 import { getVelaClient } from '../../../../../../data/vela/vela'
 import { mapProject } from '../../../../../../data/vela/api-mappers'
 import { ProjectCreateVariables } from '../../../../../../data/projects/project-create-mutation'
 import { apiBuilder } from '../../../../../../lib/api/apiBuilder'
 import { getPlatformQueryParams } from '../../../../../../lib/api/platformQueryParams'
+import { IS_VELA_PLATFORM } from 'lib/constants'
 
 const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log(JSON.stringify(req.body))

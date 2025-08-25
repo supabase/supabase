@@ -103,7 +103,8 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "PUBLIC_PLATFORM",
-        "VELA_PLATFORM_URL"
+        "VELA_PLATFORM_URL",
+        "VELA_PLATFORM_GOTRUE_URL"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]

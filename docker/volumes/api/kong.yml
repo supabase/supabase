@@ -35,10 +35,28 @@ basicauth_credentials:
 ###
 services:
   ## Open Auth routes
-  - name: auth-v1-open
+  - name: auth-v1-open-signup
+    url: http://auth:9999/signup
+    routes:
+      - name: auth-v1-open-signup
+        strip_path: true
+        paths:
+          - /auth/v1/signup
+    plugins:
+      - name: cors
+  - name: auth-v1-open-token
+    url: http://auth:9999/token
+    routes:
+      - name: auth-v1-open-token
+        strip_path: true
+        paths:
+          - /auth/v1/token
+    plugins:
+      - name: cors
+  - name: auth-v1-open-verify
     url: http://auth:9999/verify
     routes:
-      - name: auth-v1-open
+      - name: auth-v1-open-verify
         strip_path: true
         paths:
           - /auth/v1/verify

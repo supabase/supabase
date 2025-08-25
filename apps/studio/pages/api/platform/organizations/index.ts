@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { DEFAULT_ORGANIZATION, IS_VELA_PLATFORM } from '../../constants'
+import { DEFAULT_ORGANIZATION } from '../../constants'
 import { getVelaClient } from '../../../../data/vela/vela'
 import { mapOrganization } from '../../../../data/vela/api-mappers'
 import { apiBuilder } from '../../../../lib/api/apiBuilder'
+import { IS_VELA_PLATFORM } from 'lib/constants'
 
 const handleCreate = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!IS_VELA_PLATFORM) {

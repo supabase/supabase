@@ -1,7 +1,7 @@
 import { apiBuilder } from '../../../../../../lib/api/apiBuilder'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { IS_VELA_PLATFORM } from '../../../../constants'
 import { getVelaClient } from 'data/vela/vela'
+import { IS_VELA_PLATFORM } from 'lib/constants'
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!IS_VELA_PLATFORM) {
