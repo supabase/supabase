@@ -46,6 +46,7 @@ const MemoizedMessage = memo(
     message,
     status,
     onResults,
+    onDelete,
     onEdit,
     isAfterEditedMessage,
     isBeingEdited,
@@ -62,6 +63,7 @@ const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
+    onDelete: (id: string) => void
     onEdit: (id: string) => void
     isAfterEditedMessage: boolean
     isBeingEdited: boolean
@@ -74,6 +76,7 @@ const MemoizedMessage = memo(
         readOnly={message.role === 'user'}
         status={status}
         onResults={onResults}
+        onDelete={onDelete}
         onEdit={onEdit}
         isAfterEditedMessage={isAfterEditedMessage}
         isBeingEdited={isBeingEdited}
@@ -122,6 +125,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
+  const [isResubmitting, setIsResubmitting] = useState(false)
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -253,6 +257,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     [snap]
   )
 
+  const deleteMessageFromHere = useCallback(
+    (messageId: string) => {
+      // Find the message index in current chatMessages
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      if (isChatLoading) stop()
+
+      snap.deleteMessagesAfter(messageId, { includeSelf: true })
+
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+    },
+    [snap, setMessages, chatMessages, isChatLoading, stop]
+  )
+
   const editMessage = useCallback(
     (messageId: string) => {
       const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
@@ -270,9 +290,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           .join('') ?? ''
       setValue(textContent)
 
-      if (inputRef.current) {
-        inputRef.current.focus()
-      }
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef?.current?.focus()
+
+          // [Joshen] This is just to make the cursor go to the end of the text when focusing
+          const val = inputRef.current.value
+          inputRef.current.value = ''
+          inputRef.current.value = val
+        }
+      }, 100)
     },
     [chatMessages, setValue]
   )
@@ -296,6 +323,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             status={chatStatus}
             onResults={updateMessage}
+            onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
             isBeingEdited={isBeingEdited}
@@ -303,7 +331,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           />
         )
       }),
-    [chatMessages, chatStatus, updateMessage, editMessage, editingMessageId, cancelEdit]
+    [
+      chatMessages,
+      updateMessage,
+      deleteMessageFromHere,
+      editMessage,
+      cancelEdit,
+      editingMessageId,
+      chatStatus,
+    ]
   )
 
   const hasMessages = chatMessages.length > 0
@@ -312,12 +348,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
       // Handling when the user is in edit mode
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
-      if (messageIndex === -1) return
-
-      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
-      const updatedMessages = chatMessages.slice(0, messageIndex)
-      setMessages(updatedMessages)
+      // delete the message(s) from the chat just like the delete button
+      setIsResubmitting(true)
+      deleteMessageFromHere(editingMessageId)
       setEditingMessageId(null)
     }
 
@@ -359,6 +392,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setEditingMessageId(null)
   }
 
+  useEffect(() => {
+    // Keep "Thinking" visible while stopping and resubmitting during edit
+    // Only clear once the new response actually starts streaming (or errors)
+    if (isResubmitting && (chatStatus === 'streaming' || !!error)) {
+      setIsResubmitting(false)
+    }
+  }, [isResubmitting, chatStatus, error])
+
   // Update scroll behavior for new messages
   useEffect(() => {
     if (!isChatLoading) {
@@ -380,6 +421,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
+
+  useEffect(() => {
+    if (chatMessages.length === 0 && !isSticky) setIsSticky(true)
+  }, [chatMessages, isSticky, setIsSticky])
 
   return (
     <ErrorBoundary
@@ -736,7 +781,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
               )}
               loading={isChatLoading}
-              disabled={!isApiKeySet || disablePrompts || isChatLoading}
+              isEditing={!!editingMessageId}
+              disabled={!isApiKeySet || disablePrompts || (isChatLoading && !editingMessageId)}
               placeholder={
                 hasMessages
                   ? 'Ask a follow up question...'
