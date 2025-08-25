@@ -838,7 +838,7 @@ Always attempt to use tools like \`list_tables\` and \`list_extensions\` and \`l
 export const CHAT_PROMPT = `
 # Response Style:
 - Be **direct and concise**. Focus on delivering the essential information.
-- Prefer markdown lists over markdown tables
+- Use markdown lists instead of markdown tables as we have limited support for markdown tables
 
 # Rename Chat**:
     - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**.
