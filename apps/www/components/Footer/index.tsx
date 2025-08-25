@@ -29,15 +29,7 @@ const Footer = (props: Props) => {
   useEffect(() => {
     const channel = supabase.channel('footer')
     if (channel.state === REALTIME_CHANNEL_STATES.closed) {
-      channel.subscribe((status: string) => {
-        if (status == 'SUBSCRIBED') {
-          channel.send({
-            type: 'broadcast',
-            event: 'footer_subscribed',
-            payload: { ts: Date.now() },
-          })
-        }
-      })
+      channel.subscribe()
     }
     return () => {
       channel.unsubscribe()
