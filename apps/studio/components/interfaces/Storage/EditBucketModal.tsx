@@ -379,5 +379,3 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     </Dialog>
   )
 }
-
-export default EditBucketModal
