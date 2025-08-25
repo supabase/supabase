@@ -253,7 +253,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
   const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.specific[0]?.name
+    ? availableRegionsData?.recommendations.smartGroup.name
     : _defaultRegion
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
