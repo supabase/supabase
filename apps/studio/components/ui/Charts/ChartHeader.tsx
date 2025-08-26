@@ -67,6 +67,10 @@ const ChartHeader = ({
       return value
     }
 
+    if (typeof format === 'function') {
+      return format(value)
+    }
+
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
       return formatBytes(bytesValue, valuePrecision)
@@ -169,10 +173,6 @@ const ChartHeader = ({
       className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
     >
       {localHighlightedValue !== undefined && formatHighlightedValue(localHighlightedValue)}
-      {format === 'seconds' ? ' ' : ''}
-      <span className="text-lg">
-        {typeof format === 'function' ? format(localHighlightedValue) : format}
-      </span>
     </h4>
   )
   const label = <h4 className="text-foreground-lighter text-xs">{localHighlightedLabel}</h4>
