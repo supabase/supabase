@@ -1,12 +1,14 @@
-import { Command, FlaskConical, Settings } from 'lucide-react'
+import { Command, FlaskConical, Loader2, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
+import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -29,12 +31,21 @@ import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewConte
 export function UserDropdown() {
   const router = useRouter()
   const signOut = useSignOut()
-  const { profile } = useProfile()
+  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+
+  const { username, primary_email } = profile ?? {}
+
+  const { data, isLoading: isLoadingIdentities } = useProfileIdentitiesQuery()
+  const isGitHubProfile = profile?.auth0_id.startsWith('github')
+  const gitHubUsername = isGitHubProfile
+    ? (data?.identities ?? []).find((x) => x.provider === 'github')?.identity_data?.user_name
+    : undefined
+  const profileImageUrl = isGitHubProfile ? getGitHubProfileImgUrl(gitHubUsername) : undefined
 
   return (
     <DropdownMenu>
@@ -43,11 +54,17 @@ export function UserDropdown() {
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
         >
-          <ProfileImage
-            alt={profile?.username}
-            src={profile?.profileImageUrl}
-            className="w-8 h-8 rounded-md"
-          />
+          {isLoadingProfile || isLoadingIdentities ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <Loader2 className="animate-spin text-foreground-lighter" size={16} />
+            </div>
+          ) : (
+            <ProfileImage
+              alt={profile?.username}
+              src={profileImageUrl}
+              className="w-8 h-8 rounded-md"
+            />
+          )}
         </Button>
       </DropdownMenuTrigger>
 
@@ -57,18 +74,15 @@ export function UserDropdown() {
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
               {profile && (
                 <>
-                  <span
-                    title={profile.username}
-                    className="w-full text-left text-foreground truncate"
-                  >
-                    {profile.username}
+                  <span title={username} className="w-full text-left text-foreground truncate">
+                    {username}
                   </span>
-                  {profile.primary_email !== profile.username && profileShowEmailEnabled && (
+                  {primary_email !== username && profileShowEmailEnabled && (
                     <span
-                      title={profile.primary_email}
+                      title={primary_email}
                       className="w-full text-left text-foreground-light text-xs truncate"
                     >
-                      {profile.primary_email}
+                      {primary_email}
                     </span>
                   )}
                 </>
