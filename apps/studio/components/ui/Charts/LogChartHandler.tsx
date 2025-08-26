@@ -40,6 +40,7 @@ interface LogChartHandlerProps {
   isVisible?: boolean
   titleTooltip?: string
   docsUrl?: string
+  syncId?: string
 }
 
 /**
@@ -107,6 +108,7 @@ const LogChartHandler = ({
   valuePrecision,
   titleTooltip,
   id,
+  syncId,
   ...otherProps
 }: PropsWithChildren<LogChartHandlerProps>) => {
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
@@ -158,6 +160,7 @@ const LogChartHandler = ({
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
           titleTooltip={titleTooltip}
+          syncId={syncId}
           {...otherProps}
         />
       </Panel.Content>

@@ -23,6 +23,7 @@ export interface ReportV2ChartProps {
   edgeFnIdToName?: (id: string) => string | undefined
   isLoading?: boolean
   className?: string
+  syncId?: string
 }
 
 export const ReportV2ChartComponent = ({
@@ -36,6 +37,7 @@ export const ReportV2ChartComponent = ({
   edgeFnIdToName,
   isLoading,
   className,
+  syncId,
 }: ReportV2ChartProps) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
@@ -206,6 +208,7 @@ export const ReportV2ChartComponent = ({
         startDate={startDate}
         endDate={endDate}
         interval={interval}
+        syncId={syncId}
       />
       {/* <pre className="text-xs max-h-80 overflow-y-auto">{JSON.stringify(chartData, null, 2)}</pre> */}
     </>

@@ -14,6 +14,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { useChartSync } from 'components/ui/Charts/useChartSync'
 
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { edgeFunctionReports } from 'data/reports/v2/edge-functions.config'
@@ -47,6 +48,10 @@ const EdgeFunctionsUsage = () => {
     projectRef: ref,
   })
   const { edgeFnIdToName } = useEdgeFnIdToName({ projectRef: ref! })
+
+  // Create a unique sync ID for edge functions charts
+  const chartSyncId = `edge-functions-${ref}`
+  const { state: chartSyncState, updateState: updateChartSyncState } = useChartSync(chartSyncId)
 
   const [isOpen, setIsOpen] = useState(false)
   const [functionIds, setFunctionIds] = useState<string[]>([])
@@ -238,6 +243,7 @@ const EdgeFunctionsUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   functionIds={functionIds}
+                  syncId={chartSyncId}
                 />
               ))}
         </div>
