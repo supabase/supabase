@@ -207,14 +207,18 @@ export const EdgeFunctionVersionsList = () => {
                   )}
                 </div>
                 {deployment.commit_message && (
-                  <div className="text-sm text-foreground">{deployment.commit_message}</div>
+                  <div className="text-sm text-foreground-light">{deployment.commit_message}</div>
                 )}
                 <div className="flex items-center gap-x-4 text-xs text-muted-foreground">
                   {deployment.commit_hash && (
-                    <span className="font-mono">#{deployment.commit_hash}</span>
+                    <span className="font-mono text-foreground-light">
+                      #{deployment.commit_hash}
+                    </span>
                   )}
                   {typeof deployment.size_kb === 'number' && (
-                    <span>{deployment.size_kb.toFixed(1)} KB</span>
+                    <span className="text-foreground-light">
+                      {deployment.size_kb.toFixed(1)} KB
+                    </span>
                   )}
                 </div>
               </div>
