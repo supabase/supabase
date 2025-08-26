@@ -255,63 +255,10 @@ Set up server-side hooks in `src/hooks.server.ts`. The hooks:
 - Check user authentication.
 - Guard protected pages.
 
-```ts hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
-import { createServerClient } from '@supabase/ssr'
-import type { Handle } from '@sveltejs/kit'
-
-export const handle: Handle = async ({ event, resolve }) => {
-  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-    cookies: {
-      getAll() {
-        return event.cookies.getAll()
-      },
-      setAll(cookiesToSet) {
-        /**
-         * Note: You have to add the `path` variable to the
-         * set and remove method due to sveltekit's cookie API
-         * requiring this to be set, setting the path to an empty string
-         * will replicate previous/standard behavior (https://kit.svelte.dev/docs/types#public-types-cookies)
-         */
-        cookiesToSet.forEach(({ name, value, options }) =>
-          event.cookies.set(name, value, { ...options, path: '/' })
-        )
-      },
-    },
-  })
-
-  /**
-   * Unlike `supabase.auth.getSession()`, which returns the session _without_
-   * validating the JWT, this function also calls `getUser()` to validate the
-   * JWT before returning the session.
-   */
-  event.locals.safeGetSession = async () => {
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
-    if (!session) {
-      return { session: null, user: null }
-    }
-
-    const {
-      data: { user },
-      error,
-    } = await event.locals.supabase.auth.getUser()
-    if (error) {
-      // JWT validation has failed
-      return { session: null, user: null }
-    }
-
-    return { session, user }
-  }
-
-  return resolve(event, {
-    filterSerializedResponseHeaders(name) {
-      return name === 'content-range' || name === 'x-supabase-api-version'
-    },
-  })
-}
-```
+<$CodeSample
+path="/auth/sveltekit/src/hooks.server.ts"
+language="typescript"
+/>
 
 </TabPanel>
 
@@ -319,43 +266,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 Page components can get access to the Supabase client from the `data` object due to this load function.
 
-```ts +layout.ts
-import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import type { LayoutLoad } from './$types'
-import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
-
-export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-  depends('supabase:auth')
-
-  const supabase = isBrowser()
-    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-        global: {
-          fetch,
-        },
-      })
-    : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-        global: {
-          fetch,
-        },
-        cookies: {
-          getAll() {
-            return data.cookies
-          },
-        },
-      })
-
-  /**
-   * It's fine to use `getSession` here, because on the client, `getSession` is
-   * safe, and on the server, it reads `session` from the `LayoutData`, which
-   * safely checked the session using `safeGetSession`.
-   */
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  return { supabase, session }
-}
-```
+<$CodeSample
+path="/auth/sveltekit/src/routes/+layout.ts"
+language="typescript"
+/>
 
 </TabPanel>
 
