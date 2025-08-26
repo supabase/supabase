@@ -18,14 +18,14 @@ import { Button, Card, CardContent } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
-  search: string
+  search?: string
   schema: string
   tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
   onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
-  onResetSearch: () => void
+  onResetSearch?: () => void
 }
 
 export const Policies = ({
@@ -152,7 +152,7 @@ export const Policies = ({
             </section>
           ))
         ) : hasTables ? (
-          <NoSearchResults searchString={search} onResetFilter={onResetSearch} />
+          <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
         ) : null}
       </div>
 
