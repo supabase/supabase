@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
-import { useChartSync } from './useChartSync'
+import { useChartHoverState } from './useChartHoverState'
 import { numberFormatter } from './Charts.utils'
 
 export interface ChartHeaderProps {
@@ -58,7 +58,7 @@ const ChartHeader = ({
   isNetworkChart = false,
   attributes,
 }: ChartHeaderProps) => {
-  const { state: syncState } = useChartSync(syncId)
+  const { hoveredIndex, syncHover } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
 
@@ -76,8 +76,8 @@ const ChartHeader = ({
   }
 
   useEffect(() => {
-    if (syncId && syncState.activeIndex !== null && data && xAxisKey && yAxisKey) {
-      const activeDataPoint = data[syncState.activeIndex]
+    if (syncId && hoveredIndex !== null && syncHover && data && xAxisKey && yAxisKey) {
+      const activeDataPoint = data[hoveredIndex]
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
@@ -127,7 +127,8 @@ const ChartHeader = ({
       setLocalHighlightedLabel(highlightedLabel)
     }
   }, [
-    syncState,
+    hoveredIndex,
+    syncHover,
     syncId,
     data,
     xAxisKey,
