@@ -1959,6 +1959,7 @@ export interface components {
         | 'FUNCTIONS_FAILED'
       /** Format: date-time */
       updated_at: string
+      with_data: boolean
     }
     BranchUpdateResponse: {
       /** @enum {string} */
