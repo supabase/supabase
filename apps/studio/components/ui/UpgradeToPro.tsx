@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -32,7 +32,7 @@ const UpgradeToPro = ({
   const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan?.id
 
-  const canUpdateSubscription = useCheckPermissions(
+  const canUpdateSubscription = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
