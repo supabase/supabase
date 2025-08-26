@@ -318,7 +318,11 @@ Hooks return status codes based on the nature of the response. These status code
 
 <Admonition type="note">
 
-`204` See the hook specific documentation for status code handling. Some hooks do not support `204` responses because they read the request body.
+`204` Status is not supported by the following hooks which require a response body:
+
+- [Custom Access Token](/docs/guides/auth/auth-hooks/custom-access-token-hook)
+- [MFA Verification Attempt](/docs/guides/auth/auth-hooks/mfa-verification-hook)
+- [Password Verification Attempt](/docs/guides/auth/auth-hooks/password-verification-hook)
 
 </Admonition>
 
