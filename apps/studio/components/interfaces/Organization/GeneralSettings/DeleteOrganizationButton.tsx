@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Form, Input, Modal } from 'ui'
@@ -23,7 +23,7 @@ export const DeleteOrganizationButton = () => {
     ''
   )
 
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)

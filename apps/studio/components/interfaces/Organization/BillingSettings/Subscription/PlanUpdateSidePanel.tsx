@@ -18,7 +18,7 @@ import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import type { OrgPlan } from 'data/subscriptions/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions  } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
@@ -60,7 +60,7 @@ const PlanUpdateSidePanel = () => {
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
 
-  const canUpdateSubscription = useCheckPermissions(
+  const canUpdateSubscription = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

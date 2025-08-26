@@ -16,7 +16,7 @@ import {
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
@@ -68,11 +68,11 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
   const canResendInvite =
-    useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
+    useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'user_invites', {
       resource: { role_id: roleId },
     }) && hasOrgRole
   const canRevokeInvite =
-    useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
+    useAsyncCheckProjectPermissions(PermissionAction.DELETE, 'user_invites', {
       resource: { role_id: roleId },
     }) && hasOrgRole
 

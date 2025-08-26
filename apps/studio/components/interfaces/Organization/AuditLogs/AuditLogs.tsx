@@ -23,7 +23,7 @@ import {
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions, useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -53,7 +53,7 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const canReadAuditLogs = useCheckPermissions(PermissionAction.READ, 'notifications')
+  const canReadAuditLogs = useAsyncCheckProjectPermissions(PermissionAction.READ, 'notifications')
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
@@ -67,7 +67,7 @@ const AuditLogs = () => {
         iso_timestamp_end: dateRange.to,
       },
       {
-        enabled: canReadAuditLogs,
+        enabled: canReadAuditLogs.can,
         retry: false,
       }
     )

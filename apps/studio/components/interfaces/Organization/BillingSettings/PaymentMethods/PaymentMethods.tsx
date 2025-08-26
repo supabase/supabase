@@ -20,8 +20,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import {
-  useAsyncCheckProjectPermissions,
-  useCheckPermissions,
+  useAsyncCheckProjectPermissions ,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
@@ -49,7 +48,7 @@ const PaymentMethods = () => {
 
   const { isSuccess: isPermissionsLoaded, can: canReadPaymentMethods } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.payment_methods')
-  const canUpdatePaymentMethods = useCheckPermissions(
+  const canUpdatePaymentMethods = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )
@@ -149,7 +148,7 @@ const PaymentMethods = () => {
                               <CreditCard
                                 key={paymentMethod.id}
                                 paymentMethod={paymentMethod}
-                                canUpdatePaymentMethods={canUpdatePaymentMethods}
+                                canUpdatePaymentMethods={canUpdatePaymentMethods.can}
                                 paymentMethodType={subscription?.payment_method_type}
                                 setSelectedMethodForUse={setSelectedMethodForUse}
                                 setSelectedMethodToDelete={setSelectedMethodToDelete}
