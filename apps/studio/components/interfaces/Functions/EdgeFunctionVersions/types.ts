@@ -12,6 +12,10 @@ export type EdgeFunctionDeployment = {
   verify_jwt: boolean
   created_at: number // epoch ms
   updated_at: number // epoch ms
+  // Optional metadata for display (not required by backend)
+  commit_message?: string
+  commit_hash?: string
+  size_kb?: number
 }
 
 export type RollbackResponse = {

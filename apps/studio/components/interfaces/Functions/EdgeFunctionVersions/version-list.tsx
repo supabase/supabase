@@ -108,44 +108,6 @@ export const EdgeFunctionVersionsList = () => {
     }
   }
 
-  const formatTimestamp = (epochMs: number) => {
-    const date = new Date(epochMs)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    // Relative time
-    let relative = ''
-    if (diffMins < 1) {
-      relative = 'just now'
-    } else if (diffMins < 60) {
-      relative = `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`
-    } else if (diffHours < 24) {
-      relative = `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`
-    } else if (diffDays < 30) {
-      relative = `${diffDays} day${diffDays === 1 ? '' : 's'} ago`
-    } else {
-      relative = date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-      })
-    }
-
-    const absolute = date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    })
-
-    return { relative, absolute }
-  }
-
   if (isLoading) {
     return (
       <Card>
@@ -210,65 +172,58 @@ export const EdgeFunctionVersionsList = () => {
           Refresh
         </Button>
       </CardHeader>
-      <CardContent>
-        <div className="relative overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left font-medium p-4">Version</th>
-                <th className="text-left font-medium p-4">Status</th>
-                <th className="text-left font-medium p-4">Deployed at</th>
-                <th className="text-left font-medium p-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {deployments.map((deployment) => {
-                const { relative, absolute } = formatTimestamp(deployment.created_at)
-                return (
-                  <tr key={deployment.id} className="border-b hover:bg-muted/50">
-                    <td className="p-4">
-                      <span className="font-mono">{deployment.version}</span>
-                    </td>
-                    <td className="p-4">
-                      {deployment.status === 'ACTIVE' ? (
-                        <Badge variant="default" className="bg-green-500">
-                          ACTIVE
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">INACTIVE</Badge>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      <div>
-                        <div className="text-foreground">{relative}</div>
-                        <div className="text-xs text-muted-foreground">{absolute}</div>
-                      </div>
-                    </td>
-                    <td className="p-4 space-x-2">
-                      <Button
-                        type="default"
-                        size="tiny"
-                        onClick={() => handleViewCodeClick(deployment)}
-                      >
-                        View code
-                      </Button>
-                      {deployment.status !== 'ACTIVE' && (
-                        <Button
-                          type="default"
-                          size="tiny"
-                          disabled={isRollingBack}
-                          onClick={() => handleRollbackClick(deployment)}
-                        >
-                          Roll back
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+      <CardContent className="p-0 divide-y">
+        {deployments.map((deployment) => {
+          return (
+            <div key={deployment.id} className="p-6 flex items-start justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center gap-x-3">
+                  <div className="text-foreground font-medium">
+                    {new Date(deployment.created_at).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </div>
+                  {deployment.status === 'ACTIVE' && (
+                    <Badge variant="default" className="text-xs">
+                      Active
+                    </Badge>
+                  )}
+                </div>
+                {deployment.commit_message && (
+                  <div className="text-sm text-foreground">{deployment.commit_message}</div>
+                )}
+                <div className="flex items-center gap-x-4 text-xs text-muted-foreground">
+                  {deployment.commit_hash && (
+                    <span className="font-mono">#{deployment.commit_hash}</span>
+                  )}
+                  {typeof deployment.size_kb === 'number' && (
+                    <span>{deployment.size_kb.toFixed(1)} KB</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-x-2">
+                <Button type="default" size="tiny" onClick={() => handleViewCodeClick(deployment)}>
+                  View code
+                </Button>
+                {deployment.status !== 'ACTIVE' && (
+                  <Button
+                    type="default"
+                    size="tiny"
+                    disabled={isRollingBack}
+                    onClick={() => handleRollbackClick(deployment)}
+                  >
+                    Restore
+                  </Button>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </CardContent>
 
       <RollbackModal

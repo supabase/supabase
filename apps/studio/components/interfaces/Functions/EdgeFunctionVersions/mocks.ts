@@ -21,6 +21,9 @@ let mockDeployments: EdgeFunctionDeployment[] = [
     verify_jwt: true,
     created_at: 1756400000000,
     updated_at: 1756400000000,
+    commit_message: 'Add user authentication middleware',
+    commit_hash: 'a1b2c3d',
+    size_kb: 1.2,
   },
   {
     id: '3a1c2b3d-4e5f-6789-ab01-234567890b21',
@@ -35,6 +38,9 @@ let mockDeployments: EdgeFunctionDeployment[] = [
     verify_jwt: true,
     created_at: 1756230000000,
     updated_at: 1756230000000,
+    commit_message: 'Fix CORS headers for production',
+    commit_hash: 'b2c3d4e',
+    size_kb: 0.9,
   },
   {
     id: 'c9f2a8e7-6543-210f-edcb-a9876543219de',
@@ -49,6 +55,9 @@ let mockDeployments: EdgeFunctionDeployment[] = [
     verify_jwt: true,
     created_at: 1756153042342,
     updated_at: 1756153042342,
+    commit_message: 'Initial Edge Function setup',
+    commit_hash: 'c3d4e5f',
+    size_kb: 0.3,
   },
 ]
 
