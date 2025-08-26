@@ -43,7 +43,7 @@ interface MessageProps {
   message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
-  status?: 'streaming' | 'submitted' | 'completed'
+  status?: string
   action?: ReactNode
   variant?: 'default' | 'warning'
   onResults: ({
@@ -103,8 +103,6 @@ export const Message = function Message({
   const shouldUsePartsRendering = parts && parts.length > 0
 
   const hasTextContent = content && content.trim().length > 0
-
-  console.log('parts:', parts)
 
   return (
     <MessageContext.Provider value={{ isLoading, readOnly }}>
