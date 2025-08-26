@@ -7,21 +7,21 @@ import { useDatabasePoliciesQuery } from 'data/database-policies/database-polici
 import { useTableRolesAccessQuery } from 'data/tables/table-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
-  cn,
-  Card,
-  CardHeader,
-  CardContent,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
+  Card,
+  CardContent,
+  CardHeader,
+  cn,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import PolicyTableRowHeader from './PolicyTableRowHeader'
 import PolicyRow from './PolicyRow'
+import PolicyTableRowHeader from './PolicyTableRowHeader'
 
 export interface PolicyTableRowProps {
   table: {
@@ -110,7 +110,7 @@ export const PolicyTableRow = ({
         >
           <AlertDescription_Shadcn_>
             {isPubliclyReadableWritable
-              ? "Anyone with your project's anonymous key can modify or delete your data."
+              ? "Anyone with your project's anonymous key can read, modify, or delete your data."
               : 'No data will be selectable via Supabase APIs because RLS is enabled but no policies have been created yet.'}
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>

@@ -3,15 +3,15 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useParams } from 'common'
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import Policies from 'components/interfaces/Auth/Policies/Policies'
+import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
@@ -25,8 +25,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import type { NextPageWithLayout } from 'types'
-import { Input } from 'ui'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 /**
  * Filter tables by table name and policy name
@@ -64,7 +63,6 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
   const [params, setParams] = useUrlState<{
     schema?: string
     search?: string
@@ -115,6 +113,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             size="tiny"
             placeholder="Filter tables and policies"
             className="block w-full lg:w-52"
+            containerClassName="[&>div>svg]:-mt-0.5"
             value={searchString || ''}
             onChange={(e) => {
               const str = e.target.value
@@ -125,6 +124,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           <SchemaSelector
             className="w-full lg:w-[180px]"
             size="tiny"
+            align="end"
             showError={false}
             selectedSchemaName={schema}
             onSelectSchema={(schema) => {
@@ -139,6 +139,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
         {isSuccess && (
           <Policies
+            search={searchString}
             schema={schema}
             tables={filteredTables}
             hasTables={tables.length > 0}
@@ -161,6 +162,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 setShowPolicyAiEditor(true)
               }
             }}
+            onResetSearch={() => setParams({ ...params, search: undefined })}
           />
         )}
 

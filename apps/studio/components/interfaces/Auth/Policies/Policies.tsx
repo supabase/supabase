@@ -1,7 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEmpty } from 'lodash'
-import { HelpCircle } from 'lucide-react'
-import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -11,33 +10,34 @@ import {
   PolicyTableRowProps,
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import InformationBox from 'components/ui/InformationBox'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { Button, Card, CardContent } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
+  search: string
   schema: string
   tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
   onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onResetSearch: () => void
 }
 
-const Policies = ({
+export const Policies = ({
+  search,
   schema,
   tables,
   hasTables,
   isLocked,
   onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
+  onResetSearch,
 }: PoliciesProps) => {
-  const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -126,8 +126,8 @@ const Policies = ({
             RLS Policies control per-user access to table rows. Create a table in this schema first
             before creating a policy.
           </p>
-          <Button type="default" onClick={() => router.push(`/project/${ref}/editor`)}>
-            Create a table
+          <Button asChild type="default">
+            <Link href={`/project/${ref}/editor`}>Create a table</Link>
           </Button>
         </CardContent>
       </Card>
@@ -152,7 +152,7 @@ const Policies = ({
             </section>
           ))
         ) : hasTables ? (
-          <NoSearchResults />
+          <NoSearchResults searchString={search} onResetFilter={onResetSearch} />
         ) : null}
       </div>
 
@@ -184,5 +184,3 @@ const Policies = ({
     </>
   )
 }
-
-export default Policies
