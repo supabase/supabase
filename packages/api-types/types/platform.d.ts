@@ -227,6 +227,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/cloud-marketplace/buyers/{buyer_id}/onboarding-info': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get info needed for AWS Marketplace onboarding */
+    get: operations['ClazarController_getCloudMarketplaceOnboardingInfo']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/database/{ref}/backups': {
     parameters: {
       query?: never
@@ -441,7 +458,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Send exit survey to HubSpot, Notion, and survey_responses table */
+    /** Send exit survey to HubSpot and survey_responses table */
     post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
@@ -660,7 +677,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/private-link/{organization_slug}': {
+  '/platform/integrations/private-link/{slug}': {
     parameters: {
       query?: never
       header?: never
@@ -776,6 +793,23 @@ export interface paths {
     }
     /** Gets installed vercel project connections for the given organization integration */
     get: operations['VercelConnectionsController_getVercelConnections']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/integrations/vercel/connections/project/{project_ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets all Vercel integrations (regular and marketplace) with their connections for a given project */
+    get: operations['VercelConnectionsController_getProjectVercelConnections']
     put?: never
     post?: never
     delete?: never
@@ -1124,6 +1158,23 @@ export interface paths {
     get?: never
     /** Makes an existing organization being billed by AWS Marketplace */
     put: operations['ClazarController_link']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/cloud-marketplace/redirect': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the AWS Marketplace redirect url */
+    get: operations['ClazarController_getRedirectUrl']
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -1540,7 +1591,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets all projects for the given organization */
+    /**
+     * Gets all projects for the given organization
+     * @description Returns a paginated list of projects for the specified organization.
+     *
+     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     */
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
     post?: never
@@ -1634,23 +1690,6 @@ export interface paths {
     put?: never
     /** Creates organization billed by AWS Marketplace */
     post: operations['OrganizationsController_createAwsBilledOrganization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/cloud-marketplace/check-eligibility': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Check whether given organizations are eligible for AWS billing */
-    get: operations['OrganizationsController_checkCloudMarketplaceEligibility']
-    put?: never
-    post?: never
     delete?: never
     options?: never
     head?: never
@@ -2112,23 +2151,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/profile/search': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Search profiles by username, email with the given keywords */
-    post: operations['SearchProfileController_searchProfile']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/projects': {
     parameters: {
       query?: never
@@ -2189,15 +2211,15 @@ export interface paths {
     patch: operations['ProjectsRefController_updateProject']
     trace?: never
   }
-  '/platform/projects/{ref}/analytics/endpoints/functions.inv-stats': {
+  '/platform/projects/{ref}/analytics/endpoints/functions.combined-stats': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets a project's function invocation statistics */
-    get: operations['FunctionInvocationLogsController_getStatus']
+    /** Gets a project's function combined statistics */
+    get: operations['FunctionsLogsController_getCombinedStats']
     put?: never
     post?: never
     delete?: never
@@ -2214,7 +2236,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets a project's function request statistics */
-    get: operations['FunctionRequestLogsController_getStatus']
+    get: operations['FunctionsLogsController_getRequestStats']
     put?: never
     post?: never
     delete?: never
@@ -2231,7 +2253,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets a project's function resource usage */
-    get: operations['FunctionResourceLogsController_getStatus']
+    get: operations['FunctionsLogsController_getResourceUsage']
     put?: never
     post?: never
     delete?: never
@@ -4184,75 +4206,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/vercel/projects': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the list of Vercel projects */
-    get: operations['VercelProjectsController_getVercelProjects']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/vercel/projects/{id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the Vercel project with the given ID */
-    get: operations['VercelProjectsController_getVercelProject']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/vercel/projects/envs': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the environment variables for the given project ID on behalf of the given team ID */
-    get: operations['VercelEnvironmentVariablesController_getEnvironmentVariables']
-    put?: never
-    /** Creates the environment variable for the given project ID on behalf of the given team ID */
-    post: operations['VercelEnvironmentVariablesController_createEnvironmentVariable']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/vercel/redirect/{installation_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the Vercel redirect url */
-    get: operations['VercelRedirectController_getRedirectUrl']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/workflow-runs': {
     parameters: {
       query?: never
@@ -4314,7 +4267,9 @@ export interface components {
     }
     AccessToken: {
       created_at: string
+      expires_at: string | null
       id: number
+      last_used_at: string | null
       name: string
       /** @enum {string} */
       scope?: 'V0'
@@ -4438,11 +4393,6 @@ export interface components {
     ChangeMFAEnforcementStateRequest: {
       enforced: boolean
     }
-    CheckCloudMarketplaceEligibilityResponse: {
-      is_eligible: boolean
-      reasons: string[]
-      slug: string
-    }[]
     CloneBackupsResponse: {
       backups: {
         id: number
@@ -4464,12 +4414,26 @@ export interface components {
       walg_enabled: boolean
     }
     CloneProject: {
-      /** @default 0 */
       cloneBackupId?: number
       newDbPass: string
       newProjectName: string
-      /** @default 0 */
       recoveryTimeTarget?: number
+    }
+    CloudMarketplaceOnboardingInfoResponse: {
+      aws_contract_auto_renewal: boolean
+      aws_contract_end_date: string
+      aws_contract_settings_url: string
+      aws_contract_start_date: string
+      organization_linking_eligibility: {
+        is_eligible: boolean
+        reasons: (
+          | 'ALREADY_MANAGED_BY_PARTNER'
+          | 'ALREADY_MANAGED_BY_PARTNER_AWS'
+          | 'OVERDUE_INVOICES'
+        )[]
+        slug: string
+      }[]
+      plan_name_selected_on_marketplace: string
     }
     ConfirmCreateSubscriptionChangeBody: {
       kind?: string
@@ -4488,13 +4452,17 @@ export interface components {
       path: string
     }
     CreateAccessTokenBody: {
+      /** Format: date-time */
+      expires_at?: string
       name: string
       /** @enum {string} */
       scope?: 'V0'
     }
     CreateAccessTokenResponse: {
       created_at: string
+      expires_at: string | null
       id: number
+      last_used_at: string | null
       name: string
       /** @enum {string} */
       scope?: 'V0'
@@ -4810,7 +4778,7 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
+          billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -4850,7 +4818,7 @@ export interface components {
     CreateProjectBody: {
       auth_site_url?: string
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       custom_supabase_internal_requests?: {
         ami: {
           search_tags?: {
@@ -4976,8 +4944,10 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
+          /** @description Maximum number of concurrent streams when writing */
+          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins: number
+          max_staleness_mins?: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -4993,8 +4963,10 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
+          /** @description Maximum number of concurrent streams when writing */
+          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins: number
+          max_staleness_mins?: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -5231,12 +5203,6 @@ export interface components {
       }
       organization_integration_id: string
     }
-    CreateVercelEnvironmentVariableBody: {
-      key: string
-      target: string[]
-      type: string
-      value: string
-    }
     CreateVercelIntegrationBody: {
       code: string
       configuration_id: string
@@ -5295,7 +5261,7 @@ export interface components {
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       /** @default null */
       connection_string_read_only?: string | null
       /** @default null */
@@ -5498,6 +5464,9 @@ export interface components {
       archive_empty: boolean
       file_url: string
       fileUrl: string
+    }
+    GetCloudMarketplaceRedirectUrlResponse: {
+      url: string
     }
     GetContentCountResponse: {
       count: number
@@ -5714,6 +5683,68 @@ export interface components {
       iso_timestamp_start?: string
       sql?: string
     }
+    GetProjectVercelConnectionsResponse: {
+      integrations: {
+        added_by: {
+          primary_email: string
+          username: string
+        }
+        connections: {
+          added_by: {
+            primary_email: string
+            username: string
+          }
+          env_sync_targets: string[]
+          foreign_project_id: string
+          id: string
+          inserted_at: string
+          metadata: {
+            framework?: string | null
+            name: string
+            supabaseConfig: {
+              projectEnvVars: {
+                write: boolean
+              }
+            }
+          }
+          organization_integration_id: string
+          public_env_var_prefix: string
+          supabase_project_ref: string
+          updated_at: string
+        }[]
+        id: string
+        inserted_at: string
+        metadata: {
+          account: {
+            avatar: string | null
+            name: string
+            source: string
+            team_id: string | null
+            team_slug: string | null
+            type: string
+          }
+          configuration_id: string
+        }
+        organization_slug: string
+        updated_at: string
+      }[]
+      marketplace_integrations: {
+        connections: {
+          foreign_project_id: string
+          framework: string | null
+          id: string
+          inserted_at: string
+          marketplace_installation_id: string
+          name: string
+          updated_at: string
+          vercel_owner_id: string | null
+        }[]
+        id: string
+        inserted_at: string
+        organization_slug: string
+        updated_at: string
+      }[]
+    }
     GetPublicUrlBody: {
       options?: {
         download?: boolean
@@ -5798,8 +5829,9 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
+      cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
       customer_balance: number
@@ -6078,6 +6110,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID: string
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
+      EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean
       EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
       EXTERNAL_WORKOS_ENABLED: boolean
@@ -6133,6 +6166,8 @@ export interface components {
       MFA_TOTP_VERIFY_ENABLED: boolean
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
+      NIMBUS_OAUTH_CLIENT_ID: string | null
+      NIMBUS_OAUTH_CLIENT_SECRET: string | null
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -6400,6 +6435,54 @@ export interface components {
         oauth_app_id: string
       }[]
     }
+    ListProjectsPaginatedResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page (actual number may be less) */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
+      projects: {
+        cloud_provider: string
+        disk_volume_size_gb?: number
+        id: number
+        /** @enum {string} */
+        infra_compute_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        inserted_at: string | null
+        is_branch_enabled: boolean
+        is_physical_backups_enabled: boolean | null
+        name: string
+        organization_id: number
+        organization_slug: string
+        preview_branch_refs: string[]
+        ref: string
+        region: string
+        status: string
+        subscription_id: string | null
+      }[]
+    }
     ListRepositoryBranchesResponse: {
       branches: {
         name: string
@@ -6511,6 +6594,14 @@ export interface components {
       website: string
     }
     OrganizationProjectsResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
       projects: {
         databases: {
           cloud_provider: string
@@ -6586,7 +6677,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -6625,7 +6716,7 @@ export interface components {
     }
     OrganizationSlugAvailableVersionsBody: {
       /** @enum {string} */
-      provider: 'AWS' | 'FLY' | 'AWS_K8S'
+      provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       region: string
     }
     OrganizationSlugAvailableVersionsResponse: {
@@ -6640,7 +6731,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -6709,6 +6800,7 @@ export interface components {
         /** @enum {string} */
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -7162,13 +7254,6 @@ export interface components {
         enabled: boolean
       }
     }
-    Profile: {
-      first_name: string
-      gotrue_id: string
-      id: number
-      last_name: string
-      username: string
-    }
     ProfileResponse: {
       auth0_id: string
       disabled_features: (
@@ -7193,6 +7278,7 @@ export interface components {
       gotrue_id: string
       id: number
       is_alpha_user: boolean
+      is_sso_user: boolean
       last_name: string
       mobile: string
       primary_email: string
@@ -7525,7 +7611,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'FLY' | 'AWS_K8S'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -7544,7 +7630,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'FLY' | 'AWS_K8S'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -7566,8 +7652,10 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
+          /** @description Maximum number of concurrent streams when writing */
+          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins: number
+          max_staleness_mins?: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -7589,8 +7677,10 @@ export interface components {
           big_query: {
             /** @description BigQuery dataset id */
             dataset_id: string
+            /** @description Maximum number of concurrent streams when writing */
+            max_concurrent_streams?: number
             /** @description Max staleness in minutes */
-            max_staleness_mins: number
+            max_staleness_mins?: number
             /** @description BigQuery project id */
             project_id: string
             /** @description BigQuery service account key */
@@ -7938,9 +8028,6 @@ export interface components {
       disable_statement_timeout?: boolean
       query: string
     }
-    SearchProfileBody: {
-      keywords: string
-    }
     SendDocsFeedbackBody: {
       feedback?: string
       isHelpful: boolean
@@ -8276,6 +8363,7 @@ export interface components {
         /** @enum {string} */
         usage_metric?:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -8539,6 +8627,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID?: string | null
       EXTERNAL_TWITTER_ENABLED?: boolean | null
       EXTERNAL_TWITTER_SECRET?: string | null
+      EXTERNAL_WEB3_ETHEREUM_ENABLED?: boolean | null
       EXTERNAL_WEB3_SOLANA_ENABLED?: boolean | null
       EXTERNAL_WORKOS_CLIENT_ID?: string | null
       EXTERNAL_WORKOS_ENABLED?: boolean | null
@@ -8594,6 +8683,8 @@ export interface components {
       MFA_TOTP_VERIFY_ENABLED?: boolean | null
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean | null
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
+      NIMBUS_OAUTH_CLIENT_ID?: string | null
+      NIMBUS_OAUTH_CLIENT_SECRET?: string | null
       PASSWORD_HIBP_ENABLED?: boolean | null
       PASSWORD_MIN_LENGTH?: number | null
       /** @enum {string|null} */
@@ -8821,6 +8912,9 @@ export interface components {
     UpdateProfileBody: {
       first_name?: string
       last_name?: string
+      /** Format: email */
+      primary_email?: string
+      username?: string
     }
     UpdateProjectBody: {
       name: string
@@ -8857,8 +8951,10 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
+          /** @description Maximum number of concurrent streams when writing */
+          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins: number
+          max_staleness_mins?: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -8874,8 +8970,10 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
+          /** @description Maximum number of concurrent streams when writing */
+          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins: number
+          max_staleness_mins?: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -9219,9 +9317,6 @@ export interface components {
         score: number
       }[]
     }
-    VercelRedirectResponse: {
-      url: string
-    }
     WorkflowRunResponse: {
       branch_id: string
       check_run_id: number | null
@@ -9268,6 +9363,12 @@ export interface operations {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve GoTrue config */
       500: {
         headers: {
@@ -9300,6 +9401,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GoTrueConfigResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update GoTrue config */
       500: {
@@ -9772,6 +9879,34 @@ export interface operations {
       }
     }
   }
+  ClazarController_getCloudMarketplaceOnboardingInfo: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        buyer_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CloudMarketplaceOnboardingInfoResponse']
+        }
+      }
+      /** @description Failed to get info for AWS Marketplace onboarding */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   BackupsController_getBackups: {
     parameters: {
       query?: never
@@ -9791,6 +9926,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['BackupsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get project backups */
       500: {
@@ -9825,6 +9966,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadBackupResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to download project backup */
       500: {
         headers: {
@@ -9854,6 +10001,12 @@ export interface operations {
           'application/json': components['schemas']['DownloadableBackupsResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project backups */
       500: {
         headers: {
@@ -9876,6 +10029,12 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -9912,6 +10071,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project to a previous point in time */
       500: {
         headers: {
@@ -9938,6 +10103,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -9974,6 +10145,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to restore project with physical backup */
       500: {
         headers: {
@@ -10002,6 +10179,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['CloneBackupsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to list available valid backups */
       500: {
@@ -10036,6 +10219,12 @@ export interface operations {
           'application/json': components['schemas']['ProjectClonedResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to clone the current project */
       500: {
         headers: {
@@ -10064,6 +10253,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ProjectClonedStatusResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve clone project status */
       500: {
@@ -10310,6 +10505,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetOrganizationIntegrationResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get integration with the given organization slug */
       500: {
@@ -10636,7 +10837,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        organization_slug: string
+        slug: string
       }
       cookie?: never
     }
@@ -10649,6 +10850,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PrivateLinkResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve organization's PrivateLink config */
       500: {
@@ -10664,7 +10871,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        organization_slug: string
+        slug: string
       }
       cookie?: never
     }
@@ -10681,6 +10888,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PrivateLinkResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update organization's PrivateLink configuration. */
       500: {
@@ -10879,6 +11092,34 @@ export interface operations {
         }
       }
       /** @description Failed to get installed vercel connections for the given organization integration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  VercelConnectionsController_getProjectVercelConnections: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        project_ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetProjectVercelConnectionsResponse']
+        }
+      }
+      /** @description Failed to get Vercel integrations for the given project */
       500: {
         headers: {
           [name: string]: unknown
@@ -11775,6 +12016,41 @@ export interface operations {
       }
     }
   }
+  ClazarController_getRedirectUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetCloudMarketplaceRedirectUrlResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get AWS Marketplace redirect url */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   CustomerController_getCustomer: {
     parameters: {
       query?: never
@@ -11854,6 +12130,7 @@ export interface operations {
         interval?: string
         metric:
           | 'EGRESS'
+          | 'CACHED_EGRESS'
           | 'DATABASE_SIZE'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
@@ -12100,6 +12377,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to remove organization member */
       500: {
         headers: {
@@ -12127,6 +12410,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12165,6 +12454,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to update organization member role */
       500: {
         headers: {
@@ -12189,6 +12484,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12260,6 +12561,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create organization invitation */
       500: {
         headers: {
@@ -12283,6 +12590,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12375,6 +12688,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['MfaStatusResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get organization MFA status */
       500: {
@@ -12905,7 +13224,16 @@ export interface operations {
   }
   OrganizationProjectsController_getOrganizationProjects: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Number of projects to return per page */
+        limit?: number
+        /** @description Number of projects to skip */
+        offset?: number
+        /** @description Search projects by name */
+        search?: string
+        /** @description Sort order for projects */
+        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+      }
       header?: never
       path: {
         /** @description Organization slug */
@@ -13256,36 +13584,10 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateOrganizationResponse']
+          'application/json': components['schemas']['OrganizationResponse']
         }
       }
       /** @description Failed to create organization billed by AWS Marketplace */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationsController_checkCloudMarketplaceEligibility: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CheckCloudMarketplaceEligibilityResponse']
-        }
-      }
-      /** @description Failed to check whether organizations are eligible for AWS billing */
       500: {
         headers: {
           [name: string]: unknown
@@ -14430,6 +14732,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to format sql query */
       500: {
         headers: {
@@ -14462,6 +14770,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ValidateQueryResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to validate sql query */
       500: {
@@ -15407,36 +15721,6 @@ export interface operations {
       }
     }
   }
-  SearchProfileController_searchProfile: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SearchProfileBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Profile'][]
-        }
-      }
-      /** @description Failed to search profiles with the given keywords */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ProjectsController_getProjects: {
     parameters: {
       query?: never
@@ -15593,49 +15877,11 @@ export interface operations {
       }
     }
   }
-  FunctionInvocationLogsController_getStatus: {
+  FunctionsLogsController_getCombinedStats: {
     parameters: {
       query: {
         function_id: string
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project's function invocation statistics */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  FunctionRequestLogsController_getStatus: {
-    parameters: {
-      query: {
-        function_id: string
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        interval: '15min' | '1hr' | '3hr' | '1day'
       }
       header?: never
       path: {
@@ -15669,11 +15915,49 @@ export interface operations {
       }
     }
   }
-  FunctionResourceLogsController_getStatus: {
+  FunctionsLogsController_getRequestStats: {
     parameters: {
       query: {
         function_id: string
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        interval: '15min' | '1hr' | '3hr' | '1day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's function request statistics */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  FunctionsLogsController_getResourceUsage: {
+    parameters: {
+      query: {
+        function_id: string
+        interval: '15min' | '1hr' | '3hr' | '1day'
       }
       header?: never
       path: {
@@ -15841,6 +16125,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['AnalyticsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get project's usage api requests count */
       500: {
@@ -16807,6 +17097,12 @@ export interface operations {
           'application/json': components['schemas']['PgbouncerConfigResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's pgbouncer config */
       500: {
         headers: {
@@ -16875,6 +17171,12 @@ export interface operations {
           'application/json': components['schemas']['PgbouncerStatusResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's pgbouncer status */
       500: {
         headers: {
@@ -16903,6 +17205,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PostgresConfigResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project's Postgres config */
       500: {
@@ -17144,6 +17452,12 @@ export interface operations {
           'application/json': components['schemas']['GetJwtSecretUpdateStatus']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve JWT secret update status */
       500: {
         headers: {
@@ -17246,6 +17560,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SupavisorConfigResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project's supavisor config */
       500: {
@@ -17419,7 +17739,7 @@ export interface operations {
   ContentController_deleteContents: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path: {
@@ -17576,7 +17896,7 @@ export interface operations {
   ContentFoldersController_DeleteFolder: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path?: never
@@ -17731,6 +18051,7 @@ export interface operations {
           | 'total_realtime_egress'
           | 'total_ingress'
           | 'total_egress'
+          | 'total_cached_egress'
           | 'total_requests'
           | 'total_get_requests'
           | 'total_patch_requests'
@@ -17840,6 +18161,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['DatabaseStatusResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to get statuses of databases of a project */
       500: {
@@ -18141,6 +18468,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project's usage metrics */
       500: {
         headers: {
@@ -18203,6 +18536,12 @@ export interface operations {
           'application/json': components['schemas']['LoadBalancerDetailResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   ProjectAdvisorNotificationsController_listNotificationExceptions: {
@@ -18224,6 +18563,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ListNotificationExceptionsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve advisor notification exceptions */
       500: {
@@ -18258,7 +18603,13 @@ export interface operations {
           'application/json': components['schemas']['CreateNotificationExceptionsResponse']
         }
       }
-      /** @description Failed to creare advisor notification exceptions */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create advisor notification exceptions */
       500: {
         headers: {
           [name: string]: unknown
@@ -18270,7 +18621,7 @@ export interface operations {
   ProjectAdvisorNotificationsController_deleteNotificationExceptions: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path: {
@@ -18282,6 +18633,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -18314,6 +18671,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -18411,6 +18774,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to resize database disk */
       500: {
         headers: {
@@ -18474,6 +18843,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -18758,6 +19133,12 @@ export interface operations {
           'application/json': components['schemas']['ServiceVersions']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   SettingsController_getProjectSettings: {
@@ -18779,6 +19160,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ProjectSettingsResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project's settings */
       500: {
@@ -18926,7 +19313,7 @@ export interface operations {
   ProjectsController_getRegions: {
     parameters: {
       query: {
-        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
         organization_slug: string
       }
       header?: never
@@ -20009,6 +20396,12 @@ export interface operations {
           'application/json': components['schemas']['GetArchiveResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project storage archive */
       500: {
         headers: {
@@ -20031,6 +20424,12 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -21027,154 +21426,6 @@ export interface operations {
     }
     responses: {
       200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelProjectsController_getVercelProjects: {
-    parameters: {
-      query?: {
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get projects */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelProjectsController_getVercelProject: {
-    parameters: {
-      query?: {
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path: {
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelEnvironmentVariablesController_getEnvironmentVariables: {
-    parameters: {
-      query: {
-        projectId: string
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get Vercel environment variables */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelEnvironmentVariablesController_createEnvironmentVariable: {
-    parameters: {
-      query: {
-        projectId: string
-        teamId?: string
-      }
-      header: {
-        vercel_authorization: string
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateVercelEnvironmentVariableBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create Vercel environment variables */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelRedirectController_getRedirectUrl: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        installation_id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['VercelRedirectResponse']
-        }
-      }
-      /** @description Failed to get Vercel redirect url */
-      500: {
         headers: {
           [name: string]: unknown
         }

@@ -1773,6 +1773,7 @@ export interface components {
       external_twitter_client_id: string | null
       external_twitter_enabled: boolean | null
       external_twitter_secret: string | null
+      external_web3_ethereum_enabled: boolean | null
       external_web3_solana_enabled: boolean | null
       external_workos_client_id: string | null
       external_workos_enabled: boolean | null
@@ -1827,6 +1828,8 @@ export interface components {
       mfa_totp_verify_enabled: boolean | null
       mfa_web_authn_enroll_enabled: boolean | null
       mfa_web_authn_verify_enabled: boolean | null
+      nimbus_oauth_client_id: string | null
+      nimbus_oauth_client_secret: string | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -1958,6 +1961,7 @@ export interface components {
         | 'FUNCTIONS_FAILED'
       /** Format: date-time */
       updated_at: string
+      with_data: boolean
     }
     BranchUpdateResponse: {
       /** @enum {string} */
@@ -2925,6 +2929,7 @@ export interface components {
       external_twitter_client_id?: string | null
       external_twitter_enabled?: boolean | null
       external_twitter_secret?: string | null
+      external_web3_ethereum_enabled?: boolean | null
       external_web3_solana_enabled?: boolean | null
       external_workos_client_id?: string | null
       external_workos_enabled?: boolean | null
@@ -2979,6 +2984,8 @@ export interface components {
       mfa_totp_verify_enabled?: boolean | null
       mfa_web_authn_enroll_enabled?: boolean | null
       mfa_web_authn_verify_enabled?: boolean | null
+      nimbus_oauth_client_id?: string | null
+      nimbus_oauth_client_secret?: string | null
       password_hibp_enabled?: boolean | null
       password_min_length?: number | null
       /** @enum {string|null} */
@@ -3573,7 +3580,15 @@ export interface components {
             healthy: boolean
           }
       /** @enum {string} */
-      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
+      name:
+        | 'auth'
+        | 'db'
+        | 'db_postgres_user'
+        | 'pooler'
+        | 'realtime'
+        | 'rest'
+        | 'storage'
+        | 'pg_bouncer'
       /** @enum {string} */
       status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
     }
@@ -4682,7 +4697,30 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        addon_variant: unknown
+        addon_variant:
+          | (
+              | 'ci_micro'
+              | 'ci_small'
+              | 'ci_medium'
+              | 'ci_large'
+              | 'ci_xlarge'
+              | 'ci_2xlarge'
+              | 'ci_4xlarge'
+              | 'ci_8xlarge'
+              | 'ci_12xlarge'
+              | 'ci_16xlarge'
+              | 'ci_24xlarge'
+              | 'ci_24xlarge_optimized_cpu'
+              | 'ci_24xlarge_optimized_memory'
+              | 'ci_24xlarge_high_memory'
+              | 'ci_48xlarge'
+              | 'ci_48xlarge_optimized_cpu'
+              | 'ci_48xlarge_optimized_memory'
+              | 'ci_48xlarge_high_memory'
+            )
+          | 'cd_default'
+          | ('pitr_7' | 'pitr_14' | 'pitr_28')
+          | 'ipv4_default'
         /** @description Project ref */
         ref: string
       }
@@ -5576,6 +5614,12 @@ export interface operations {
           'application/json': components['schemas']['SupavisorConfigResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's supavisor config */
       500: {
         headers: {
@@ -6072,6 +6116,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1RestorePointResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -6792,7 +6842,16 @@ export interface operations {
   'v1-get-services-health': {
     parameters: {
       query: {
-        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
+        services: (
+          | 'auth'
+          | 'db'
+          | 'db_postgres_user'
+          | 'pooler'
+          | 'realtime'
+          | 'rest'
+          | 'storage'
+          | 'pg_bouncer'
+        )[]
         timeout_ms?: number
       }
       header?: never
