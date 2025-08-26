@@ -19,17 +19,17 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  WarningIcon,
-  CheckIcon,
   Card,
   CardContent,
-  CardHeader,
   CardFooter,
+  CardHeader,
+  CheckIcon,
   Select_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  WarningIcon,
 } from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
@@ -52,6 +52,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
+  const searchParams =
+    typeof window !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams()
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
+  const pathname =
+    typeof window !== 'undefined'
+      ? basePath
+        ? location.pathname.replace(basePath, '')
+        : location.pathname
+      : ''
+  searchParams.set('returnTo', pathname)
+
   const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
@@ -63,17 +74,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       router.push('/organizations')
     },
   })
-
-  useEffect(() => {
-    if (isSuccessOrganizations && organizations.length > 0) {
-      if (organization_slug) {
-        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
-      } else {
-        setSelectedOrgSlug(organizations[0].slug)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessOrganizations])
 
   const onApproveRequest = async () => {
     if (!auth_id) {
@@ -99,31 +99,36 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     declineRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsDeclining(false) })
   }
 
+  useEffect(() => {
+    if (isSuccessOrganizations && organizations.length > 0) {
+      if (organization_slug) {
+        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
+      } else {
+        setSelectedOrgSlug(organizations[0].slug)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessOrganizations])
+
   if (isLoading) {
     return (
       <Card>
         <CardHeader>Authorize API access</CardHeader>
-        <CardContent className="space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
-        </CardContent>
-      </Card>
-    )
-  }
-
-  if (auth_id === undefined) {
-    return (
-      <Card>
-        <CardHeader>Authorization for API access</CardHeader>
         <CardContent>
-          <Alert_Shadcn_ variant="warning">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>Missing authorization ID</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Please provide a valid authorization ID in the URL
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <div className="flex gap-x-4 items-center">
+            <ShimmeringLoader className="w-12 h-12 md:w-14 md:h-14" />
+            <ShimmeringLoader className="h-6 w-64" />
+          </div>
+
+          <div className="flex flex-col gap-y-2 mt-4">
+            <ShimmeringLoader className="w-1/4" />
+            <ShimmeringLoader />
+          </div>
+
+          <div className="flex flex-col gap-y-2 mt-8">
+            <ShimmeringLoader className="w-1/2" />
+            <ShimmeringLoader />
+          </div>
         </CardContent>
       </Card>
     )
@@ -133,11 +138,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     return (
       <Card>
         <CardHeader>Authorize API access</CardHeader>
-        <CardContent>
-          <Alert_Shadcn_ variant="warning">
+        <CardContent className="p-0">
+          <Alert_Shadcn_ variant="warning" className="border-0 rounded-t-none">
             <WarningIcon />
             <AlertTitle_Shadcn_>
-              Failed to fetch details for API authorization request"
+              Failed to fetch details for API authorization request
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               <p>Please retry your authorization request from the requesting app</p>
@@ -157,15 +162,23 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     return (
       <Card>
         <CardHeader>Authorize API access for {requester?.name}</CardHeader>
-        <CardContent>
-          <Alert_Shadcn_>
+        <CardContent className="p-0">
+          <Alert_Shadcn_ className="border-0 rounded-t-none">
             <CheckIcon />
             <AlertTitle_Shadcn_>This authorization request has been approved</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               <p>
-                {requester.name} has read and write access to the organization "
-                {approvedOrganization?.name ?? 'Unknown'}" and all of its projects
+                {requester.name} has been approved access to the organization "
+                {approvedOrganization?.name ?? 'Unknown'}" and all of its projects for the following
+                scopes:
               </p>
+              <AuthorizeRequesterDetails
+                showOnlyScopes
+                icon={requester.icon}
+                name={requester.name}
+                domain={requester.domain}
+                scopes={requester.scopes}
+              />
               <p className="mt-2">
                 Approved on: {dayjs(requester.approved_at).format('DD MMM YYYY HH:mm:ss (ZZ)')}
               </p>
@@ -176,20 +189,10 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
-  const searchParams = new URLSearchParams(location.search)
-  let pathname = location.pathname
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
-  if (basePath) {
-    pathname = pathname.replace(basePath, '')
-  }
-
-  searchParams.set('returnTo', pathname)
-
   return (
     <Card>
       <CardHeader>Authorize API access for {requester?.name}</CardHeader>
       <CardContent className="space-y-8">
-        {/* API Authorization requester details */}
         <AuthorizeRequesterDetails
           icon={requester.icon}
           name={requester.name}
@@ -197,7 +200,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           scopes={requester.scopes}
         />
 
-        {/* Expiry warning */}
         {isExpired && (
           <Alert_Shadcn_ variant="warning">
             <WarningIcon />
@@ -208,7 +210,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           </Alert_Shadcn_>
         )}
 
-        {/* Organization selection */}
         {isLoadingOrganizations ? (
           <div className="py-4 space-y-2">
             <ShimmeringLoader />
@@ -252,8 +253,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
               onValueChange={setSelectedOrgSlug}
             >
               <SelectTrigger_Shadcn_ size="small">
-                <SelectValue_Shadcn_ asChild>
-                  <>{selectedOrgSlug}</>
+                <SelectValue_Shadcn_>
+                  {organizations?.find((x) => x.slug === selectedOrgSlug)?.name}
                 </SelectValue_Shadcn_>
               </SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_>
