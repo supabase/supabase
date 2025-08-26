@@ -3,7 +3,6 @@ import { includes, noop, sortBy } from 'lodash'
 import { Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -16,6 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableRow,
+  TableCell,
 } from 'ui'
 
 interface FunctionListProps {
@@ -57,27 +58,27 @@ const FunctionList = ({
 
   if (_functions.length === 0 && filterString.length === 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+      <TableRow key={schema}>
+        <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
           <p className="text-sm text-foreground-light">
             There are no functions found in the schema "{schema}"
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
   if (_functions.length === 0 && filterString.length > 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+      <TableRow key={schema}>
+        <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
@@ -87,8 +88,8 @@ const FunctionList = ({
         const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
 
         return (
-          <Table.tr key={x.id}>
-            <Table.td className="truncate">
+          <TableRow key={x.id}>
+            <TableCell className="truncate">
               <Button
                 type="text"
                 className="text-foreground text-sm p-0 hover:bg-transparent"
@@ -96,17 +97,19 @@ const FunctionList = ({
               >
                 {x.name}
               </Button>
-            </Table.td>
-            <Table.td className="table-cell overflow-auto">
+            </TableCell>
+            <TableCell className="table-cell overflow-auto">
               <p title={x.argument_types} className="truncate">
                 {x.argument_types || '-'}
               </p>
-            </Table.td>
-            <Table.td className="table-cell">
+            </TableCell>
+            <TableCell className="table-cell">
               <p title={x.return_type}>{x.return_type}</p>
-            </Table.td>
-            <Table.td className="table-cell">{x.security_definer ? 'Definer' : 'Invoker'}</Table.td>
-            <Table.td className="text-right">
+            </TableCell>
+            <TableCell className="table-cell">
+              {x.security_definer ? 'Definer' : 'Invoker'}
+            </TableCell>
+            <TableCell className="text-right">
               {!isLocked && (
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
@@ -189,8 +192,8 @@ const FunctionList = ({
                   )}
                 </div>
               )}
-            </Table.td>
-          </Table.tr>
+            </TableCell>
+          </TableRow>
         )
       })}
     </>

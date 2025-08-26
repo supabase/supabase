@@ -20,6 +20,7 @@ import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-conn
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import {
@@ -45,6 +46,8 @@ const IntegrationSettings = () => {
   const router = useRouter()
   const { data: org } = useSelectedOrganizationQuery()
 
+  const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
+
   const canReadGithubConnection = useCheckPermissions(
     PermissionAction.READ,
     'integrations.github_connections'
@@ -63,7 +66,7 @@ const IntegrationSettings = () => {
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      toast.success('Successfully deleted Github connection')
+      toast.success('Successfully deleted GitHub connection')
     },
   })
 
@@ -179,9 +182,13 @@ The GitHub app will watch for changes in your repository such as file changes, b
         <ScaffoldTitle>Integrations</ScaffoldTitle>
       </ScaffoldContainerLegacy>
       <GitHubSection />
-      <ScaffoldDivider />
-      <VercelSection isProjectScoped={false} />
-      <SidePanelVercelProjectLinker />
+      {showVercelIntegration && (
+        <>
+          <ScaffoldDivider />
+          <VercelSection isProjectScoped={false} />
+          <SidePanelVercelProjectLinker />
+        </>
+      )}
     </>
   )
 }

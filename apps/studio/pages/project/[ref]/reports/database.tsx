@@ -23,11 +23,15 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -97,6 +101,13 @@ const DatabaseUsage = () => {
   const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
+  const { data: diskConfig } = useDiskAttributesQuery({ projectRef: project?.ref })
+  const { data: maxConnections } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
+
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -107,8 +118,20 @@ const DatabaseUsage = () => {
     }
   )
 
-  const REPORT_ATTRIBUTES = getReportAttributes(org!, project!)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)
+  const REPORT_ATTRIBUTES = getReportAttributes(
+    org!,
+    project!,
+    diskConfig,
+    maxConnections,
+    poolerConfig
+  )
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(
+    org!,
+    project!,
+    diskConfig,
+    maxConnections,
+    poolerConfig
+  )
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
@@ -195,7 +218,7 @@ const DatabaseUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-  }, [db, chart])
+  }, [db, chart, state])
 
   return (
     <>
@@ -212,6 +235,7 @@ const DatabaseUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
+            <ReportSettings chartId="database-charts" />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
@@ -255,6 +279,7 @@ const DatabaseUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  syncId="database-charts"
                   showMaxValue={
                     chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                       ? true
@@ -275,12 +300,12 @@ const DatabaseUsage = () => {
                     defaultChartStyle={
                       chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
                     }
+                    syncId="database-charts"
                     showMaxValue={
                       chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                         ? true
                         : chart.showMaxValue
                     }
-                    syncId={chart.syncId}
                   />
                 ) : (
                   <ReportChart
@@ -305,6 +330,7 @@ const DatabaseUsage = () => {
                   label="Replication lag"
                   interval={selectedDateRange.interval}
                   provider="infra-monitoring"
+                  syncId="database-charts"
                 />
               </div>
             </Panel.Content>

@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -18,7 +17,17 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Input } from 'ui'
+import {
+  AiIconAnimation,
+  Input,
+  Table,
+  TableHeader,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Card,
+} from 'ui'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -168,34 +177,34 @@ const FunctionsList = ({
           </div>
 
           {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
-
-          <Table
-            className="table-fixed overflow-x-auto"
-            head={
-              <>
-                <Table.th key="name">Name</Table.th>
-                <Table.th key="arguments" className="table-cell">
-                  Arguments
-                </Table.th>
-                <Table.th key="return_type" className="table-cell">
-                  Return type
-                </Table.th>
-                <Table.th key="security" className="table-cell w-[100px]">
-                  Security
-                </Table.th>
-                <Table.th key="buttons" className="w-1/6"></Table.th>
-              </>
-            }
-            body={
-              <FunctionList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isSchemaLocked}
-                editFunction={editFunction}
-                deleteFunction={deleteFunction}
-              />
-            }
-          />
+          <Card>
+            <Table className="table-fixed overflow-x-auto">
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="arguments" className="table-cell">
+                    Arguments
+                  </TableHead>
+                  <TableHead key="return_type" className="table-cell">
+                    Return type
+                  </TableHead>
+                  <TableHead key="security" className="table-cell w-[100px]">
+                    Security
+                  </TableHead>
+                  <TableHead key="buttons" className="w-1/6"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <FunctionList
+                  schema={selectedSchema}
+                  filterString={filterString}
+                  isLocked={isSchemaLocked}
+                  editFunction={editFunction}
+                  deleteFunction={deleteFunction}
+                />
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
     </>

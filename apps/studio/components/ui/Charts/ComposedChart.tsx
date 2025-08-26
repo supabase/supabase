@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useState } from 'react'
-import { useChartSync } from './useChartSync'
+import { useChartHoverState } from './useChartHoverState'
 import {
   Area,
   Bar,
@@ -102,11 +102,9 @@ export default function ComposedChart({
   docsUrl,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
-  const {
-    state: syncState,
-    updateState: updateSyncState,
-    clearState: clearSyncState,
-  } = useChartSync(syncId)
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -339,14 +337,7 @@ export default function ComposedChart({
               setActivePayload(e.activePayload)
             }
 
-            if (syncId) {
-              updateSyncState({
-                activeIndex: e.activeTooltipIndex,
-                activePayload: e.activePayload,
-                activeLabel: e.activeLabel,
-                isHovering: true,
-              })
-            }
+            setHover(e.activeTooltipIndex)
 
             const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
@@ -367,9 +358,7 @@ export default function ComposedChart({
             setFocusDataIndex(null)
             setActivePayload(null)
 
-            if (syncId) {
-              clearSyncState()
-            }
+            clearHover()
           }}
           onClick={(tooltipData) => {
             const datum = tooltipData?.activePayload?.[0]?.payload
@@ -404,7 +393,9 @@ export default function ComposedChart({
                   attributes={attributes}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
-                  isActiveHoveredChart={isActiveHoveredChart || (!!syncId && syncState.isHovering)}
+                  isActiveHoveredChart={
+                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
+                  }
                 />
               ) : null
             }
@@ -489,9 +480,9 @@ export default function ComposedChart({
               x1={chartHighlight?.coordinates.left}
               x2={chartHighlight?.coordinates.right}
               strokeOpacity={0.5}
-              stroke="#3ECF8E"
-              fill="#3ECF8E"
-              fillOpacity={0.3}
+              stroke={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fill={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fillOpacity={0.2}
             />
           )}
         </RechartComposedChart>

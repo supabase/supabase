@@ -50,7 +50,7 @@ In your environment variables file, set your Supabase URL and Supabase Anon Key:
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
 ```
 
 </TabPanel>
@@ -58,7 +58,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ```bash .env.local
 PUBLIC_SUPABASE_URL=your_supabase_project_url
-PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
 ```
 
 </TabPanel>
@@ -66,7 +66,7 @@ PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ```bash .env
 PUBLIC_SUPABASE_URL=your_supabase_project_url
-PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
 ```
 
 </TabPanel>
@@ -74,7 +74,7 @@ PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ```bash .env
 SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
 ```
 
 </TabPanel>
@@ -90,7 +90,7 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ```bash .env
 SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
 ```
 
 Install [dotenv](https://www.npmjs.com/package/dotenv):
@@ -134,7 +134,7 @@ pnpm add dotenv
 
 ```bash .env
 SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon keyY
 ```
 
 </TabPanel>
@@ -172,7 +172,7 @@ import { createBrowserClient } from '@supabase/ssr'
 export function createClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
   )
 }
 ```
@@ -190,7 +190,7 @@ export async function createClient() {
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -252,7 +252,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -324,12 +324,12 @@ export async function updateSession(request: NextRequest) {
 <TabPanel id="hooks" label="Hooks">
 
 ```ts hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
-  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {
         return event.cookies.getAll()
@@ -388,7 +388,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 Page components can get access to the Supabase client from the `data` object due to this load function.
 
 ```ts +layout.ts
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import type { LayoutLoad } from './$types'
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
 
@@ -396,12 +396,12 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = isBrowser()
-    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
         global: {
           fetch,
         },
       })
-    : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
         global: {
           fetch,
         },
@@ -475,7 +475,7 @@ import { createServerClient, parseCookieHeader } from "@supabase/ssr";
 
 const supabase = createServerClient(
   import.meta.env.PUBLIC_SUPABASE_URL,
-  import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+  import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   {
     cookies: {
       getAll() {
@@ -501,7 +501,7 @@ const supabase = createServerClient(
 
   const supabase = createBrowserClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+    import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY
   );
 </script>
 ```
@@ -517,7 +517,7 @@ import type { APIContext } from "astro";
 export async function GET(context: APIContext) {
   const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {
@@ -546,7 +546,7 @@ import { defineMiddleware } from 'astro:middleware'
 export const onRequest = defineMiddleware(async (context, next) => {
   const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {
@@ -587,18 +587,22 @@ import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@s
 export async function loader({ request }: LoaderFunctionArgs) {
   const headers = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    cookies: {
-      getAll() {
-        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+        },
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-        )
-      },
-    },
-  })
+    }
+  )
 
   return new Response('...', {
     headers,
@@ -617,18 +621,22 @@ import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@s
 export async function action({ request }: ActionFunctionArgs) {
   const headers = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    cookies: {
-      getAll() {
-        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+        },
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-        )
-      },
-    },
-  })
+    }
+  )
 
   return new Response('...', {
     headers,
@@ -649,7 +657,7 @@ export async function loader({}: LoaderFunctionArgs) {
   return {
     env: {
       SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+      SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
     },
   };
 }
@@ -657,7 +665,7 @@ export async function loader({}: LoaderFunctionArgs) {
 export default function Index() {
   const { env } = useLoaderData<typeof loader>();
 
-  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY);
 
   return ...
 }
@@ -782,7 +790,7 @@ export default function Index() {
 const { createServerClient, parseCookieHeader, serializeCookieHeader } = require('@supabase/ssr')
 
 exports.createClient = (context) => {
-  return createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+  return createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {
         return parseCookieHeader(context.req.headers.cookie ?? '')
@@ -853,21 +861,21 @@ export const getSupabase = (c: Context) => {
 
 type SupabaseEnv = {
   SUPABASE_URL: string
-  SUPABASE_ANON_KEY: string
+  SUPABASE_PUBLISHABLE_KEY: string
 }
 
 export const supabaseMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
     const supabaseEnv = env<SupabaseEnv>(c)
     const supabaseUrl = supabaseEnv.SUPABASE_URL
-    const supabaseAnonKey = supabaseEnv.SUPABASE_ANON_KEY
+    const supabaseAnonKey = supabaseEnv.SUPABASE_PUBLISHABLE_KEY
 
     if (!supabaseUrl) {
       throw new Error('SUPABASE_URL missing!')
     }
 
     if (!supabaseAnonKey) {
-      throw new Error('SUPABASE_ANON_KEY missing!')
+      throw new Error('SUPABASE_PUBLISHABLE_KEY missing!')
     }
 
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {

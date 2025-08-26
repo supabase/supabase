@@ -22,10 +22,10 @@ import { cn, Listbox } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
-import Bandwidth from './Bandwidth'
 import Compute from './Compute'
+import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
-import TotalUsage from './TotalUsage'
+import { TotalUsage } from './TotalUsage'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -234,7 +234,7 @@ const Usage = () => {
         />
       )}
 
-      <Bandwidth
+      <Egress
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
