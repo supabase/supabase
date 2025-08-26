@@ -422,10 +422,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
 
-  useEffect(() => {
-    if (chatMessages.length === 0 && !isSticky) setIsSticky(true)
-  }, [chatMessages, isSticky, setIsSticky])
-
   return (
     <ErrorBoundary
       message="Something went wrong with the AI Assistant"
