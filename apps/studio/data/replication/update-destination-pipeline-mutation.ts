@@ -9,7 +9,7 @@ export type BigQueryDestinationConfig = {
   projectId: string
   datasetId: string
   serviceAccountKey: string
-  maxStalenessMins: number
+  maxStalenessMins?: number
 }
 
 export type UpdateDestinationPipelineParams = {
@@ -23,9 +23,9 @@ export type UpdateDestinationPipelineParams = {
   sourceId: number
   pipelineConfig: {
     publicationName: string
-    batch: {
-      maxSize: number
-      maxFillMs: number
+    batch?: {
+      maxSize?: number
+      maxFillMs?: number
     }
   }
 }
@@ -41,7 +41,7 @@ async function updateDestinationPipeline(
     },
     pipelineConfig: {
       publicationName,
-      batch: { maxSize, maxFillMs },
+      batch,
     },
     sourceId,
   }: UpdateDestinationPipelineParams,
@@ -60,15 +60,17 @@ async function updateDestinationPipeline(
             project_id: projectId,
             dataset_id: datasetId,
             service_account_key: serviceAccountKey,
-            max_staleness_mins: maxStalenessMins,
+            ...(maxStalenessMins != null && { max_staleness_mins: maxStalenessMins }),
           },
         },
         pipeline_config: {
           publication_name: publicationName,
-          batch: {
-            max_size: maxSize,
-            max_fill_ms: maxFillMs,
-          },
+          ...(batch && {
+            batch: {
+              max_size: batch.maxSize,
+              max_fill_ms: batch.maxFillMs,
+            }
+          }),
         },
         source_id: sourceId,
       },

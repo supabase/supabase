@@ -30,10 +30,8 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Switch,
   TextArea_Shadcn_,
   WarningIcon,
-  Label_Shadcn_ as Label,
 } from 'ui'
 import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
@@ -41,7 +39,6 @@ import NewPublicationPanel from './NewPublicationPanel'
 import { useState, useMemo, useEffect } from 'react'
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
@@ -71,7 +68,6 @@ const DestinationPanel = ({
   const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline, isLoading: stoppingPipeline } = useStopPipelineMutation()
   const { mutateAsync: updateDestinationPipeline, isLoading: updatingDestinationPipeline } =
     useUpdateDestinationPipelineMutation()
   const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
@@ -90,9 +86,16 @@ const DestinationPanel = ({
   })
 
   const isCreating = creatingTenantSource || creatingDestinationPipeline || startingPipeline
-  const isUpdating = updatingDestinationPipeline || stoppingPipeline || startingPipeline
+  const isUpdating = updatingDestinationPipeline || startingPipeline
   const isSubmitting = isCreating || isUpdating
   const editMode = !!existingDestination
+  
+  // Determine button text based on context
+  const getButtonText = () => {
+    if (!editMode) return 'Create'
+    if (existingDestination?.enabled) return 'Apply and Restart'
+    return 'Apply and Start'
+  }
 
   const formId = 'destination-editor'
   const types = ['BigQuery'] as const
@@ -104,10 +107,9 @@ const DestinationPanel = ({
     datasetId: z.string().min(1, 'Dataset id is required'),
     serviceAccountKey: z.string().min(1, 'Service account key is required'),
     publicationName: z.string().min(1, 'Publication is required'),
-    maxSize: z.number().min(1, 'Max Size must be greater than 0').int(),
-    maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int(),
-    maxStalenessMins: z.number().nonnegative(),
-    enabled: z.boolean(),
+    maxSize: z.number().min(1, 'Max Size must be greater than 0').int().optional(),
+    maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
+    maxStalenessMins: z.number().nonnegative().optional(),
   })
   const defaultValues = useMemo(
     () => ({
@@ -118,12 +120,11 @@ const DestinationPanel = ({
       // For now, the password will always be set as empty for security reasons.
       serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
-      maxSize: pipelineData?.config?.batch?.max_size ?? 1000,
-      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? 10,
-      maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins ?? 5,
-      enabled: existingDestination?.enabled ?? true,
+      maxSize: pipelineData?.config?.batch?.max_size,
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
+      maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins,
     }),
-    [destinationData, pipelineData, existingDestination]
+    [destinationData, pipelineData]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -144,63 +145,92 @@ const DestinationPanel = ({
           return
         }
         // Update existing destination
+        const bigQueryConfig: any = {
+          projectId: data.projectId,
+          datasetId: data.datasetId,
+          serviceAccountKey: data.serviceAccountKey,
+        }
+        if (data.maxStalenessMins != null) {
+          bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+        }
+
+        const batchConfig: any = {}
+        if (data.maxSize != null) {
+          batchConfig.maxSize = data.maxSize
+        }
+        if (data.maxFillMs != null) {
+          batchConfig.maxFillMs = data.maxFillMs
+        }
+        const hasBothBatchFields = data.maxSize != null && data.maxFillMs != null
+
         await updateDestinationPipeline({
           destinationId: existingDestination.destinationId,
           pipelineId: existingDestination.pipelineId,
           projectRef,
           destinationName: data.name,
           destinationConfig: {
-            bigQuery: {
-              projectId: data.projectId,
-              datasetId: data.datasetId,
-              serviceAccountKey: data.serviceAccountKey,
-              maxStalenessMins: data.maxStalenessMins,
-            },
+            bigQuery: bigQueryConfig,
           },
           pipelineConfig: {
             publicationName: data.publicationName,
-            batch: { maxSize: data.maxSize, maxFillMs: data.maxFillMs },
+            ...(hasBothBatchFields && { batch: batchConfig }),
           },
           sourceId,
         })
-        if (data.enabled) {
-          await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
-        } else {
-          await stopPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
-        }
+        
+        // Always start/restart pipeline to apply changes
+        await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
 
-        toast.success('Successfully updated destination')
+        const actionText = existingDestination.enabled ? 'updated and restarted' : 'updated and started'
+        toast.success(`Successfully ${actionText} destination`)
       } else {
         // Create new destination
         if (!sourceId) {
           console.error('Source id is required')
           return
         }
+        const bigQueryConfig: any = {
+          projectId: data.projectId,
+          datasetId: data.datasetId,
+          serviceAccountKey: data.serviceAccountKey,
+        }
+        if (data.maxStalenessMins != null) {
+          bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+        }
+
+        const batchConfig: any = {}
+        if (data.maxSize != null) {
+          batchConfig.maxSize = data.maxSize
+        }
+        if (data.maxFillMs != null) {
+          batchConfig.maxFillMs = data.maxFillMs
+        }
+        const hasBothBatchFields = data.maxSize != null && data.maxFillMs != null
+
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
           destinationName: data.name,
           destinationConfig: {
-            bigQuery: {
-              projectId: data.projectId,
-              datasetId: data.datasetId,
-              serviceAccountKey: data.serviceAccountKey,
-              maxStalenessMins: data.maxStalenessMins,
-            },
+            bigQuery: bigQueryConfig,
           },
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
-            batch: { maxSize: data.maxSize, maxFillMs: data.maxFillMs },
+            ...(hasBothBatchFields && { batch: batchConfig }),
           },
         })
-        if (data.enabled) {
-          await startPipeline({ projectRef, pipelineId })
-        }
-        toast.success('Successfully created destination')
+        
+        // Always start new pipelines
+        await startPipeline({ projectRef, pipelineId })
+        
+        toast.success('Successfully created and started destination')
       }
       onClose()
     } catch (error) {
-      toast.error(`Failed to ${editMode ? 'update' : 'create'} destination`)
+      const action = editMode 
+        ? (existingDestination?.enabled ? 'update and restart' : 'update and start')
+        : 'create'
+      toast.error(`Failed to ${action} destination`)
     }
   }
   const onEnableReplication = async () => {
@@ -208,7 +238,6 @@ const DestinationPanel = ({
     await createTenantSource({ projectRef })
   }
 
-  const { enabled } = form.watch()
 
   useEffect(() => {
     if (editMode && destinationData && pipelineData) {
@@ -223,22 +252,11 @@ const DestinationPanel = ({
           <Sheet open={visible} onOpenChange={onClose}>
             <SheetContent showClose={false} size="default">
               <div className="flex flex-col h-full" tabIndex={-1}>
-                <SheetHeader className="flex justify-between items-center">
-                  <div>
-                    <SheetTitle>{editMode ? 'Edit Destination' : 'New Destination'}</SheetTitle>
-                    <SheetDescription>
-                      {editMode ? null : 'Send data to a new destination'}
-                    </SheetDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={enabled}
-                      onCheckedChange={(checked) => {
-                        form.setValue('enabled', checked)
-                      }}
-                    />
-                    <Label className="text-sm mx-2">Enable</Label>
-                  </div>
+                <SheetHeader>
+                  <SheetTitle>{editMode ? 'Edit Destination' : 'New Destination'}</SheetTitle>
+                  <SheetDescription>
+                    {editMode ? null : 'Send data to a new destination'}
+                  </SheetDescription>
                 </SheetHeader>
                 <SheetSection className="flex-grow overflow-auto">
                   <Form_Shadcn_ {...form}>
@@ -376,16 +394,18 @@ const DestinationPanel = ({
                                   className="mb-4"
                                   label="Max Size"
                                   layout="vertical"
-                                  description="The maximum size of the data to send"
+                                  description="The maximum size of the data to send. Leave empty to use default value."
                                 >
                                   <FormControl_Shadcn_>
                                     <Input_Shadcn_
                                       {...field}
                                       type="number"
-                                      {...form.register('maxSize', {
-                                        valueAsNumber: true, // Ensure the value is handled as a number
-                                      })}
-                                      placeholder="Max size"
+                                      value={field.value ?? ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value
+                                        field.onChange(val === '' ? undefined : Number(val))
+                                      }}
+                                      placeholder="Leave empty for default"
                                     />
                                   </FormControl_Shadcn_>
                                 </FormItemLayout>
@@ -397,18 +417,20 @@ const DestinationPanel = ({
                               render={({ field }) => (
                                 <FormItemLayout
                                   className="mb-4"
-                                  label="Max Fill Seconds"
+                                  label="Max Fill Milliseconds"
                                   layout="vertical"
-                                  description="The maximum amount of time to fill the data"
+                                  description="The maximum amount of time to fill the data in milliseconds. Leave empty to use default value."
                                 >
                                   <FormControl_Shadcn_>
                                     <Input_Shadcn_
                                       {...field}
                                       type="number"
-                                      {...form.register('maxFillMs', {
-                                        valueAsNumber: true, // Ensure the value is handled as a number
-                                      })}
-                                      placeholder="Max fill seconds"
+                                      value={field.value ?? ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value
+                                        field.onChange(val === '' ? undefined : Number(val))
+                                      }}
+                                      placeholder="Leave empty for default"
                                     />
                                   </FormControl_Shadcn_>
                                 </FormItemLayout>
@@ -420,18 +442,20 @@ const DestinationPanel = ({
                               render={({ field }) => (
                                 <FormItemLayout
                                   className="mb-4"
-                                  label="Max Staleness"
+                                  label="Max Staleness Minutes"
                                   layout="vertical"
-                                  description="Maximum staleness time allowed"
+                                  description="Maximum staleness time allowed in minutes. Leave empty to use default value."
                                 >
                                   <FormControl_Shadcn_>
                                     <Input_Shadcn_
                                       {...field}
                                       type="number"
-                                      {...form.register('maxStalenessMins', {
-                                        valueAsNumber: true, // Ensure the value is handled as a number
-                                      })}
-                                      placeholder="Max staleness in minutes"
+                                      value={field.value ?? ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value
+                                        field.onChange(val === '' ? undefined : Number(val))
+                                      }}
+                                      placeholder="Leave empty for default"
                                     />
                                   </FormControl_Shadcn_>
                                 </FormItemLayout>
@@ -440,19 +464,6 @@ const DestinationPanel = ({
                           </AccordionContent_Shadcn_>
                         </AccordionItem_Shadcn_>
                       </Accordion_Shadcn_>
-                      <div className="hidden">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="enabled"
-                          render={({ field }) => (
-                            <FormItemLayout className="mb-4" layout="vertical" label="Enabled">
-                              <FormControl_Shadcn_>
-                                <Switch checked={field.value} onCheckedChange={field.onChange} />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
                     </form>
                   </Form_Shadcn_>
                 </SheetSection>
@@ -466,7 +477,7 @@ const DestinationPanel = ({
                     form={formId}
                     htmlType="submit"
                   >
-                    {editMode ? 'Update' : 'Create'}
+                    {getButtonText()}
                   </Button>
                 </SheetFooter>
               </div>
