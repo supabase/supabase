@@ -1,6 +1,6 @@
 import Panel from 'components/ui/Panel'
 import { Button, cn } from 'ui'
-import { Report } from 'data/reports/v2/edge-functions.config'
+import { ReportConfig } from 'data/reports/v2/reports.types'
 import { useRef, useState } from 'react'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ export function ReportChartUpsell({
   interval,
   orgSlug,
 }: {
-  report: Report
+  report: ReportConfig
   startDate: string
   endDate: string
   interval: AnalyticsInterval
