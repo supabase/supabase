@@ -191,8 +191,8 @@ Run `pg_dump --help` for a full list of options.
 #### Set Connection and Restore
 
 ```bash
-# Set Supabase connection (Session Pooler on port 5432)
-export SUPABASE_DB_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres"
+# Set Supabase connection (Session Pooler on port 5432 or direct connection)
+export SUPABASE_DB_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # Determine restore parallelization based on your Supabase compute size:
 # Free tier: 2 cores → use -j 2
@@ -314,6 +314,9 @@ Edit PostgreSQL configuration files:
 
 #### postgresql.conf
 ```bash
+# Set Supabase connection (Session Pooler on port 5432 or direct connection)
+export SUPABASE_DB_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+
 # Set WAL level to logical
 wal_level = logical
 
@@ -398,7 +401,7 @@ pg_dump \
 
 # Restore schema to Supabase (use Session Pooler)
 pg_restore \
-  --dbname="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres" \
+  --dbname="$SUPABASE_DB_URL" \
   --format=directory \
   --schema-only \
   --no-privileges \
