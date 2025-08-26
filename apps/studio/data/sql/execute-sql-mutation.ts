@@ -42,7 +42,15 @@ export const useExecuteSqlMutation = ({
       const { granularInvalidation, contextualInvalidation, sql, projectRef } = variables
 
       if (granularInvalidation && projectRef) {
-        await invalidateDataGranularly(queryClient, sql, projectRef)
+        const invalidationActions = await invalidateDataGranularly(sql, projectRef)
+        const promises = invalidationActions.map((action) =>
+          queryClient.invalidateQueries({
+            queryKey: action.key,
+            exact: action.exact,
+            refetchType: action.refetchType,
+          })
+        )
+        await Promise.allSettled(promises)
       } else {
         // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
         const sqlLower = sql.toLowerCase()
