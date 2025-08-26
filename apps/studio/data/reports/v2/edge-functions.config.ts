@@ -5,7 +5,7 @@ import {
   REPORT_STATUS_CODE_COLORS,
 } from 'data/reports/report.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
-import { YAxisProps } from 'recharts'
+import { ReportConfig } from './reports.types'
 
 const MOCKED_RESPONSE = {
   result: [
@@ -90,45 +90,6 @@ const MOCKED_RESPONSE = {
       region: 'eu-central-1',
     },
   ],
-}
-
-type ReportDataProviderFilter = {
-  functionIds?: string[]
-}
-
-export interface ReportDataProvider {
-  (
-    projectRef: string,
-    startDate: string,
-    endDate: string,
-    interval: AnalyticsInterval,
-    functionIds?: string[],
-    edgeFnIdToName?: (id: string) => string | undefined,
-    filters?: ReportDataProviderFilter[]
-  ): Promise<{
-    data: any
-    attributes?: {
-      attribute: string
-      label: string
-      color?: { light: string; dark: string }
-    }[]
-  }> // [jordi] would be cool to have a type that forces data keys to match the attributes
-}
-export interface Report {
-  id: string
-  label: string
-  dataProvider: ReportDataProvider
-  valuePrecision: number
-  hide: boolean
-  showTooltip: boolean
-  showLegend: boolean
-  showMaxValue: boolean
-  hideChartType: boolean
-  defaultChartStyle: string
-  titleTooltip: string
-  availableIn: string[]
-  format?: (value: unknown) => string
-  YAxisProps?: YAxisProps
 }
 
 const METRIC_SQL: Record<string, (interval: AnalyticsInterval, functionIds?: string[]) => string> =
@@ -284,7 +245,7 @@ export const edgeFunctionReports = ({
   filters: {
     functionIds?: string[]
   }
-}): Report[] => [
+}): ReportConfig[] => [
   {
     id: 'total-invocations',
     label: 'Total Edge Function Invocations',
