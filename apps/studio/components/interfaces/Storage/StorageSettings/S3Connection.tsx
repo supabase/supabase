@@ -22,7 +22,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
@@ -54,8 +54,8 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const canReadS3Credentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canReadS3Credentials = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
+  const canUpdateStorageSettings = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const {
@@ -66,7 +66,7 @@ export const S3Connection = () => {
   } = useProjectStorageConfigQuery({ projectRef })
   const { data: storageCreds, isLoading: isLoadingStorageCreds } = useStorageCredentialsQuery(
     { projectRef },
-    { enabled: canReadS3Credentials }
+    { enabled: canReadS3Credentials.can }
   )
 
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
