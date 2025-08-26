@@ -1,14 +1,24 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { Info } from 'lucide-react'
 
 import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTableRolesAccessQuery } from 'data/tables/table-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  Card,
+  CardContent,
+  CardHeader,
+  cn,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import PolicyRow from './PolicyRow'
 import PolicyTableRowHeader from './PolicyTableRowHeader'
@@ -73,85 +83,86 @@ export const PolicyTableRow = ({
     .filter((policy) => policy.schema === table.schema && policy.table === table.name)
     .sort((a, b) => a.name.localeCompare(b.name))
   const rlsEnabledNoPolicies = isRLSEnabled && policies.length === 0
+  const isRealtimeSchema = table.schema === 'realtime'
+  const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
+  const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
   return (
-    <Panel
-      className="!m-0"
-      title={
+    <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
+      <CardHeader
+        className={cn(
+          'py-3 px-4',
+          (isPubliclyReadableWritable || rlsEnabledNoPolicies) && 'border-b-0'
+        )}
+      >
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}
           onSelectToggleRLS={onSelectToggleRLS}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
-      }
-    >
+      </CardHeader>
+
       {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && (
-        <div
-          className={cn(
-            'dark:bg-alternative-200 bg-surface-200 px-6 py-2 text-xs flex items-center gap-2',
-            policies.length === 0 ? '' : 'border-b'
-          )}
+        <Alert_Shadcn_
+          className="border-0 rounded-none mb-0 border-b border-t"
+          variant={isPubliclyReadableWritable ? 'warning' : 'default'}
         >
-          <div
-            className={cn(
-              'w-1.5 h-1.5 rounded-full bg-warning-600 ',
-              rlsEnabledNoPolicies && 'bg-selection'
-            )}
-          />
-          <span
-            className={cn('font-bold text-warning-600', rlsEnabledNoPolicies && 'text-foreground')}
-          >
-            {isPubliclyReadableWritable ? 'Warning' : 'Note'}:
-          </span>{' '}
-          <span className="text-foreground-light">
+          <AlertDescription_Shadcn_>
             {isPubliclyReadableWritable
-              ? 'Row Level Security is disabled. Your table is publicly readable and writable.'
-              : 'Row Level Security is enabled, but no policies exist. No data will be selectable via Supabase APIs.'}
-          </span>
-          {isPubliclyReadableWritable && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="w-3 h-3" />
-              </TooltipTrigger>
-              <TooltipContent className="w-[400px]">
-                Anyone with the project's anonymous key can modify or delete your data. Enable RLS
-                and create access policies to keep your data secure.
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
+              ? "Anyone with your project's anonymous key can read, modify, or delete your data."
+              : 'No data will be selectable via Supabase APIs because RLS is enabled but no policies have been created yet.'}
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       )}
+
       {isLoading && (
-        <div className="px-6 py-4">
+        <CardContent>
           <ShimmeringLoader />
-        </div>
+        </CardContent>
       )}
+
       {isError && (
-        <AlertError
-          className="border-0 rounded-none"
-          error={error}
-          subject="Failed to retrieve policies"
-        />
+        <CardContent>
+          <AlertError
+            className="border-0 rounded-none"
+            error={error}
+            subject="Failed to retrieve policies"
+          />
+        </CardContent>
       )}
+
       {isSuccess && (
-        <>
-          {policies.length === 0 && (
-            <div className="px-6 py-4 flex flex-col gap-y-3">
-              <p className="text-foreground-lighter text-sm">No policies created yet</p>
-            </div>
+        <CardContent className="p-0">
+          {policies.length === 0 ? (
+            <p className="text-foreground-lighter text-sm p-4">No policies created yet</p>
+          ) : (
+            <Table className="table-fixed">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Name</TableHead>
+                  <TableHead className="w-[20%]">Command</TableHead>
+                  <TableHead className="w-[30%]">Applied to</TableHead>
+                  <TableHead className="w-0 text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {policies.map((policy) => (
+                  <PolicyRow
+                    key={policy.id}
+                    policy={policy}
+                    isLocked={isTableLocked}
+                    onSelectEditPolicy={onSelectEditPolicy}
+                    onSelectDeletePolicy={onSelectDeletePolicy}
+                  />
+                ))}
+              </TableBody>
+            </Table>
           )}
-          {policies?.map((policy) => (
-            <PolicyRow
-              key={policy.id}
-              isLocked={isLocked}
-              policy={policy}
-              onSelectEditPolicy={onSelectEditPolicy}
-              onSelectDeletePolicy={onSelectDeletePolicy}
-            />
-          ))}
-        </>
+        </CardContent>
       )}
-    </Panel>
+    </Card>
   )
 }

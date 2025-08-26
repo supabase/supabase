@@ -17,6 +17,33 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
 | Disabled       | Enabled   | Email Signups Disabled                                               |
 | Disabled       | Disabled  | Email Signups Disabled                                               |
 
+## Email change behavior and token hash mapping
+
+When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your [Secure Email Change](/dashboard/project/_/auth/providers?provider=Email) setting.
+
+- Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
+- Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
+
+<Admonition type="note">
+
+Important quirk (backward compatibility):
+
+- `email_data.token_hash_new` = Hash(`user.email`, `email_data.token`)
+- `email_data.token_hash` = Hash(`user.email_new`, `email_data.token_new`)
+
+This naming is historical and kept for backward compatibility. Do not assume that the `_new` suffix refers to the new email.
+
+</Admonition>
+
+### What to send
+
+If both `token_hash` and `token_hash_new` are present, send two messages:
+
+- To the current email (`user.email`): use `token` with `token_hash_new`.
+- To the new email (`user.email_new`): use `token_new` with `token_hash`.
+
+If only one token/hash pair is present, send a single email. In non-secure mode, this is typically the new email OTP. Use `token` with `token_hash` or `token_new` with `token_hash`, depending on which fields are present in the payload.
+
 **Inputs**
 
 | Field   | Type                                              | Description                                                                        |
@@ -282,7 +309,15 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
         },
         "email_action_type": {
           "type": "string",
-          "enum": ["signup", "invite", "magiclink", "recovery", "email_change", "email"]
+          "enum": [
+            "signup",
+            "invite",
+            "magiclink",
+            "recovery",
+            "email_change",
+            "email",
+            "reauthentication"
+          ]
         },
         "site_url": {
           "type": "string",
@@ -578,6 +613,7 @@ import { readAll } from 'https://deno.land/std/io/read_all.ts'
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email
 const FROM_EMAIL = 'myemail@gmail.com'
+const PROJECT_REF = '<your-project-ref>'
 
 // Email Subjects
 const subjects = {
@@ -642,8 +678,14 @@ const templates = {
 }
 
 function generateConfirmationURL(email_data) {
-  // TODO: replace the ref with your project ref
-  return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token_hash}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+  const baseUrl = `https://${PROJECT_REF}.supabase.co/auth/v1/verify`
+  const params = new URLSearchParams({
+    token: email_data.token_hash,
+    type: email_data.email_action_type,
+    redirect_to: email_data.redirect_to,
+  })
+
+  return `${baseUrl}?${params.toString()}`
 }
 
 Deno.serve(async (req) => {
