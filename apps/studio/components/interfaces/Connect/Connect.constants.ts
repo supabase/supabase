@@ -257,20 +257,6 @@ export const MOBILES: ConnectionType[] = [
     ],
   },
   {
-    key: 'exporeactnativesocialauth',
-    label: 'Expo React Native Social Auth',
-    icon: 'expo',
-    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
-    children: [
-      {
-        key: 'supabasejs',
-        label: 'Supabase-js',
-        children: [],
-        icon: 'supabase',
-      },
-    ],
-  },
-  {
     key: 'flutter',
     label: 'Flutter',
     icon: 'flutter',
