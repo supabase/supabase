@@ -16,6 +16,12 @@ describe('parseSqlStatements', () => {
     expect(result).toEqual([])
   })
 
+  it('returns [] for ALTER statement (unsupported action)', async () => {
+    const sql = 'ALTER TABLE public.users ADD COLUMN name text;'
+    const result = await parseSqlStatements(sql, projectRef)
+    expect(result).toEqual([])
+  })
+
   it('parses CREATE TABLE with explicit schema', async () => {
     const sql = 'CREATE TABLE public.users (id int);'
     const result = await parseSqlStatements(sql, projectRef)
@@ -44,7 +50,7 @@ describe('parseSqlStatements', () => {
     ])
   })
 
-  it('parses DROP TABLE with schema-qualified name', async () => {
+  it('parses DROP TABLE with schema', async () => {
     const sql = 'DROP TABLE public.sessions;'
     const result = await parseSqlStatements(sql, projectRef)
     expect(result).toEqual([
