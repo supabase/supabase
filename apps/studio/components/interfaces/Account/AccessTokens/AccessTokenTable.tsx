@@ -1,6 +1,6 @@
 import AlertError from 'components/ui/AlertError'
 import dayjs from 'dayjs'
-import { MoreVertical, Trash } from 'lucide-react'
+import { MoreVertical, Trash, Eye, Key } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
+import { ViewTokenSheet } from './Scoped/ViewTokenSheet'
 
 const RowLoading = () => (
   <TableRow>
@@ -89,6 +90,7 @@ export interface AccessTokenTableProps<T> {
   columns: TableColumn<T>[]
   emptyMessage?: string
   emptyDescription?: string
+  showViewButton?: boolean
 }
 
 export const AccessTokenTable = <T,>({
@@ -104,9 +106,12 @@ export const AccessTokenTable = <T,>({
   columns,
   emptyMessage = 'No access tokens found',
   emptyDescription = 'You do not have any tokens created yet',
+  showViewButton = false,
 }: AccessTokenTableProps<T>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<T | undefined>(undefined)
+  const [viewToken, setViewToken] = useState<T | undefined>(undefined)
+  const [isViewSheetOpen, setIsViewSheetOpen] = useState(false)
 
   const { mutate: deleteToken } = deleteMutation({
     onSuccess: (_: any, vars: any) => {
@@ -199,6 +204,18 @@ export const AccessTokenTable = <T,>({
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-40">
+                      {showViewButton && (
+                        <DropdownMenuItem
+                          className="gap-x-2"
+                          onClick={() => {
+                            setViewToken(token)
+                            setIsViewSheetOpen(true)
+                          }}
+                        >
+                          <Key size={12} />
+                          <p>View permissions</p>
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem
                         className="gap-x-2"
                         onClick={() => {
@@ -233,6 +250,20 @@ export const AccessTokenTable = <T,>({
           This action cannot be undone. Are you sure you want to delete "{token ? getTokenName(token) : ''}" token?
         </p>
       </ConfirmationModal>
+
+      <ViewTokenSheet
+        visible={isViewSheetOpen}
+        token={viewToken as any}
+        onClose={() => {
+          setIsViewSheetOpen(false)
+          setViewToken(undefined)
+        }}
+        onDeleteToken={() => {
+          if (viewToken) onDeleteToken(getTokenId(viewToken))
+          setIsViewSheetOpen(false)
+          setViewToken(undefined)
+        }}
+      />
     </>
   )
 }

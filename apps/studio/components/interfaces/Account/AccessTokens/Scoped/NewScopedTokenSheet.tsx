@@ -79,6 +79,12 @@ export const NewScopedTokenSheet = ({
   const permissionRows = form.watch('permissionRows') || []
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
+    // Log the complete form data
+    console.log('=== FORM SUBMISSION DATA ===')
+    console.log('Raw form values:', values)
+    console.log('Custom expiry date:', customExpiryDate)
+    console.log('Is custom expiry:', isCustomExpiry)
+    
     // Validate that at least one permission is configured
     if (!permissionRows || permissionRows.length === 0) {
       toast.error('Please configure at least one permission.')
@@ -108,32 +114,84 @@ export const NewScopedTokenSheet = ({
       })
       .filter(Boolean) as any
 
+    // Validate permissions array
+    if (!permissions || permissions.length === 0) {
+      console.error('=== VALIDATION ERROR ===')
+      console.error('Permissions array is empty or invalid')
+      console.error('Permission rows:', permissionRows)
+      console.error('Mapped permissions:', permissions)
+      console.error('=== END VALIDATION ERROR ===')
+      toast.error('Please configure at least one valid permission.')
+      return
+    }
+
+    // Log the permissions for debugging
+    console.log('=== PERMISSIONS DEBUG ===')
+    console.log('Permission rows:', permissionRows)
+    console.log('Mapped permissions:', permissions)
+    console.log('=== END PERMISSIONS DEBUG ===')
+
     // Determine organization_slugs and project_refs based on resource access
     let organization_slugs: string[] | undefined
     let project_refs: string[] | undefined
 
     if (values.resourceAccess === 'selected-orgs') {
-      organization_slugs = values.selectedOrganizations || []
+      organization_slugs = values.selectedOrganizations && values.selectedOrganizations.length > 0 
+        ? values.selectedOrganizations 
+        : undefined
     } else if (values.resourceAccess === 'selected-projects') {
-      project_refs = values.selectedProjects || []
+      project_refs = values.selectedProjects && values.selectedProjects.length > 0 
+        ? values.selectedProjects 
+        : undefined
     }
 
-    createAccessToken(
-      {
-        name: values.tokenName,
-        expires_at: finalExpiresAt,
-        permissions,
-        organization_slugs,
-        project_refs,
+    // Log the final processed data that will be sent to the API
+    console.log('=== FINAL API PAYLOAD ===')
+    const finalPayload = {
+      name: values.tokenName,
+      expires_at: finalExpiresAt,
+      permissions,
+      organization_slugs,
+      project_refs,
+    }
+    console.log(finalPayload)
+    
+    // Validate the payload
+    if (!finalPayload.name || finalPayload.name.trim() === '') {
+      console.error('=== VALIDATION ERROR ===')
+      console.error('Token name is required')
+      console.error('=== END VALIDATION ERROR ===')
+      toast.error('Please enter a token name.')
+      return
+    }
+    
+    if (!finalPayload.permissions || finalPayload.permissions.length === 0) {
+      console.error('=== VALIDATION ERROR ===')
+      console.error('At least one permission is required')
+      console.error('=== END VALIDATION ERROR ===')
+      toast.error('Please configure at least one permission.')
+      return
+    }
+    
+    console.log('=== END FORM SUBMISSION ===')
+
+    createAccessToken(finalPayload, {
+      onSuccess: (data) => {
+        toast.success('Access token created successfully')
+        onCreateToken(data)
+        handleClose()
       },
-      {
-        onSuccess: (data) => {
-          toast.success('Access token created successfully')
-          onCreateToken(data)
-          handleClose()
-        },
+      onError: (error) => {
+        console.error('=== API ERROR ===')
+        console.error('Error details:', error)
+        console.error('Error message:', error.message)
+        console.error('Error code:', error.code)
+        console.error('Request ID:', error.requestId)
+        console.error('Full error object:', JSON.stringify(error, null, 2))
+        console.error('Request payload:', finalPayload)
+        console.error('=== END API ERROR ===')
       }
-    )
+    })
   }
 
   const handleClose = () => {

@@ -3,6 +3,7 @@ import { Control, useWatch, useFormContext } from 'react-hook-form'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProfile } from 'lib/profile'
 import { FormControl_Shadcn_, FormField_Shadcn_, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -20,28 +21,53 @@ interface ResourceAccessProps {
 }
 
 export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps) => {
-  const { data: organizations = [], isLoading: isLoadingOrgs } = useOrganizationsQuery()
-  const { data: projects = [], isLoading: isLoadingProjects } = useProjectsQuery()
+  const { profile } = useProfile()
+  const {
+    data: organizations = [],
+    isLoading: isLoadingOrgs,
+    isError: isErrorOrgs,
+    error: orgsError,
+  } = useOrganizationsQuery({
+    enabled: !!profile,
+  })
+  const {
+    data: projects = [],
+    isLoading: isLoadingProjects,
+    isError: isErrorProjects,
+    error: projectsError,
+  } = useProjectsQuery({
+    enabled: !!profile,
+  })
   const { setValue } = useFormContext()
 
-  // Watch the form values to transform them into the required format
   const selectedOrganizations = useWatch({ control, name: 'selectedOrganizations' })
   const selectedProjects = useWatch({ control, name: 'selectedProjects' })
 
-  // Transform the selected values into the required response format
   React.useEffect(() => {
     if (resourceAccess === 'selected-orgs' && selectedOrganizations) {
-      // Update the form with organization_slugs array
       setValue('organization_slugs', selectedOrganizations)
     } else if (resourceAccess === 'selected-projects' && selectedProjects) {
-      // Update the form with project_refs array
       setValue('project_refs', selectedProjects)
     } else if (resourceAccess === 'all-orgs') {
-      // Clear both arrays when "Everything" is selected
       setValue('organization_slugs', [])
       setValue('project_refs', [])
     }
   }, [resourceAccess, selectedOrganizations, selectedProjects, setValue])
+
+  // Debug logging for form values
+  React.useEffect(() => {
+    console.log('ResourceAccess Form Values:', {
+      resourceAccess,
+      selectedOrganizations,
+      selectedProjects,
+      organizations: organizations?.length || 0,
+      projects: projects?.length || 0,
+      isLoadingOrgs,
+      isLoadingProjects,
+      isErrorOrgs,
+      isErrorProjects
+    })
+  }, [resourceAccess, selectedOrganizations, selectedProjects, organizations, projects, isLoadingOrgs, isLoadingProjects, isErrorOrgs, isErrorProjects])
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
@@ -216,23 +242,23 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
                     badgeLimit="wrap"
                   />
                   <MultiSelectorContent className="z-50">
-                    <MultiSelectorList>
-                      {isLoadingOrgs ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">
-                          Loading organizations...
-                        </div>
-                      ) : organizations.length === 0 ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">
-                          No organizations available
-                        </div>
-                      ) : (
-                        organizations.map((org) => (
+                    {isLoadingOrgs ? (
+                      <div className="px-3 py-2 text-sm text-foreground-light">
+                        Loading organizations...
+                      </div>
+                    ) : organizations.length === 0 ? (
+                      <div className="px-3 py-2 text-sm text-foreground-light">
+                        No organizations available
+                      </div>
+                    ) : (
+                      <MultiSelectorList>
+                        {organizations.map((org) => (
                           <MultiSelectorItem key={org.slug} value={org.slug}>
                             {org.name}
                           </MultiSelectorItem>
-                        ))
-                      )}
-                    </MultiSelectorList>
+                        ))}
+                      </MultiSelectorList>
+                    )}
                   </MultiSelectorContent>
                 </MultiSelector>
               </FormControl_Shadcn_>
@@ -258,23 +284,23 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
                     badgeLimit="wrap"
                   />
                   <MultiSelectorContent className="z-50">
-                    <MultiSelectorList>
-                      {isLoadingProjects ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">
-                          Loading projects...
-                        </div>
-                      ) : projects.length === 0 ? (
-                        <div className="px-3 py-2 text-sm text-foreground-light">
-                          No projects available
-                        </div>
-                      ) : (
-                        projects.map((project) => (
+                    {isLoadingProjects ? (
+                      <div className="px-3 py-2 text-sm text-foreground-light">
+                        Loading projects...
+                      </div>
+                    ) : projects.length === 0 ? (
+                      <div className="px-3 py-2 text-sm text-foreground-light">
+                        No projects available
+                      </div>
+                    ) : (
+                      <MultiSelectorList>
+                        {projects.map((project) => (
                           <MultiSelectorItem key={project.ref} value={project.ref}>
                             {project.name}
                           </MultiSelectorItem>
-                        ))
-                      )}
-                    </MultiSelectorList>
+                        ))}
+                      </MultiSelectorList>
+                    )}
                   </MultiSelectorContent>
                 </MultiSelector>
               </FormControl_Shadcn_>

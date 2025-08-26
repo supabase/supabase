@@ -18,6 +18,8 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
   // Extract tokens from the response structure
   const tokens = tokensData?.tokens
 
+  console.log(tokensData)
+
   const columns: TableColumn<ScopedAccessToken>[] = [
     {
       key: 'name',
@@ -32,7 +34,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
     {
       key: 'token',
       label: 'Token',
-      className: 'max-w-96',
+      className: 'min-w-40 max-w-96',
       render: (token) => (
         <p className="font-mono text-foreground-light truncate">{token.token_alias}</p>
       ),
@@ -106,6 +108,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
       columns={columns}
       emptyMessage="No scoped access tokens found"
       emptyDescription="You do not have any scoped tokens created yet"
+      showViewButton={true}
     />
   )
 }

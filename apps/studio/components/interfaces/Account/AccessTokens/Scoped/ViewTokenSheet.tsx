@@ -119,9 +119,15 @@ export function ViewTokenSheet({ visible, token, onClose, onDeleteToken }: ViewT
   const getResourceAccessInfo = () => {
     const resources: Array<{ name: string; type: string; identifier: string }> = []
 
-    // Add organizations if token has organization_slugs
+    // Debug: Log token data to understand the structure
+    console.log('Token data:', token)
+    console.log('Token organization_slugs:', (token as any)?.organization_slugs)
+    console.log('Token project_refs:', (token as any)?.project_refs)
+    console.log('Token scope:', token?.scope)
+
+    // Check if this is a scoped access token with organization_slugs
     const organizationSlugs = (token as any)?.organization_slugs
-    if (organizationSlugs && organizationSlugs.length > 0) {
+    if (organizationSlugs && Array.isArray(organizationSlugs) && organizationSlugs.length > 0) {
       organizationSlugs.forEach((orgSlug: string) => {
         const org = organizations.find((o) => o.slug === orgSlug)
         resources.push({
@@ -132,9 +138,9 @@ export function ViewTokenSheet({ visible, token, onClose, onDeleteToken }: ViewT
       })
     }
 
-    // Add projects if token has project_refs
+    // Check if this is a scoped access token with project_refs
     const projectRefs = (token as any)?.project_refs
-    if (projectRefs && projectRefs.length > 0) {
+    if (projectRefs && Array.isArray(projectRefs) && projectRefs.length > 0) {
       projectRefs.forEach((projectRef: string) => {
         const project = projects.find((p) => p.ref === projectRef)
         resources.push({
@@ -144,6 +150,9 @@ export function ViewTokenSheet({ visible, token, onClose, onDeleteToken }: ViewT
         })
       })
     }
+
+    // For regular access tokens (V0 scope), show that they have access to all resources
+    // This is handled in the render logic below
 
     return resources
   }
@@ -167,21 +176,74 @@ export function ViewTokenSheet({ visible, token, onClose, onDeleteToken }: ViewT
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
             <div className="space-y-8 px-5 sm:px-6 py-6">
               {/* Token Details Section */}
-              <div className="flex items-center gap-2 text-base text-foreground-light">
-                <Info className="h-4 w-4 text-foreground-light" />
-                <span>
-                  This token was created on{' '}
-                  <span className="text-foreground">
-                    {token?.created_at
-                      ? new Date(token.created_at).toLocaleDateString('en-GB', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })
-                      : 'Unknown'}
-                  </span>{' '}
-                  and expires on <span className="text-foreground">4 Aug 2025</span>.
-                </span>
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-foreground">Token Information</h3>
+                <Card className="w-full overflow-hidden bg-surface-100">
+                  <CardContent className="p-0">
+                    <Table className="p-5 table-auto">
+                      <TableHeader>
+                        <TableRow className="bg-200">
+                          <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[60%]">
+                            Info
+                          </TableHead>
+                          <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                            Date
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>
+                            <p className="truncate text-foreground-light">Created</p>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-foreground">
+                              {token?.created_at
+                                ? new Date(token.created_at).toLocaleDateString('en-GB', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })
+                                : 'Unknown'}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <p className="truncate text-foreground-light">Last used</p>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-foreground">
+                              {token?.last_used_at
+                                ? new Date(token.last_used_at).toLocaleDateString('en-GB', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })
+                                : 'Never'}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <p className="truncate text-foreground-light">Expires</p>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-foreground">
+                              {token?.expires_at
+                                ? new Date(token.expires_at).toLocaleDateString('en-GB', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })
+                                : 'Never'}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Resource Access Section */}
@@ -205,10 +267,10 @@ export function ViewTokenSheet({ visible, token, onClose, onDeleteToken }: ViewT
                           getResourceAccessInfo().map((resource, index) => (
                             <TableRow key={`${resource.type}-${resource.identifier}-${index}`}>
                               <TableCell>
-                                <p className="truncate text-foreground">{resource.name}</p>
+                                <p className="truncate text-foreground-light">{resource.name}</p>
                               </TableCell>
                               <TableCell>
-                                <span className="text-foreground-light">{resource.type}</span>
+                                <span className="text-foreground">{resource.type}</span>
                               </TableCell>
                             </TableRow>
                           ))
@@ -216,7 +278,10 @@ export function ViewTokenSheet({ visible, token, onClose, onDeleteToken }: ViewT
                           <TableRow>
                             <TableCell colSpan={2}>
                               <p className="text-foreground-light text-center py-4">
-                                This token has access to all resources.
+                                {token?.scope === 'V0' 
+                                  ? 'This token has access to all resources (V0 scope).'
+                                  : 'No specific resources configured for this token.'
+                                }
                               </p>
                             </TableCell>
                           </TableRow>
