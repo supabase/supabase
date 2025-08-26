@@ -19,6 +19,12 @@ describe('invalidateDataGranularly', () => {
     expect(result).toEqual([])
   })
 
+  it('returns [] for ALTER statement (unsupported action)', async () => {
+    const sql = 'ALTER TABLE public.users ADD COLUMN name text;'
+    const result = await invalidateDataGranularly(sql, projectRef)
+    expect(result).toEqual([])
+  })
+
   it('plans invalidations for CREATE TABLE with explicit schema', async () => {
     const sql = 'CREATE TABLE public.users (id int);'
     const result = await invalidateDataGranularly(sql, projectRef)
