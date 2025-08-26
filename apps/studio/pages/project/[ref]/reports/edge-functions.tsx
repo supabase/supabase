@@ -14,7 +14,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import { useChartSync } from 'components/ui/Charts/useChartSync'
+import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
 
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { edgeFunctionReports } from 'data/reports/v2/edge-functions.config'
@@ -48,7 +48,7 @@ const EdgeFunctionsUsage = () => {
   })
 
   const chartSyncId = `edge-functions-${ref}`
-  const _ = useChartSync(chartSyncId)
+  const _ = useChartHoverState(chartSyncId)
 
   const [isOpen, setIsOpen] = useState(false)
   const [functionIds, setFunctionIds] = useState<string[]>([])
