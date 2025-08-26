@@ -5,7 +5,7 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
@@ -15,7 +15,7 @@ import { OrganizationDetailsForm } from './OrganizationDetailsForm'
 const GeneralSettings = () => {
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
 
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const {can: canDeleteOrganization} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
 
   return (
     <ScaffoldContainer>

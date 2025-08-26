@@ -20,7 +20,6 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import {
   useAsyncCheckProjectPermissions,
-  useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { FormMessage_Shadcn_, Input_Shadcn_ } from 'ui'
@@ -45,7 +44,7 @@ const BillingEmail = () => {
 
   const { name, billing_email } = selectedOrganization ?? {}
 
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const {can: canUpdateOrganization} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
   const { isSuccess: isPermissionsLoaded, can: canReadBillingEmail } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 

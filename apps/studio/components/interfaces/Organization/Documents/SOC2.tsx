@@ -12,7 +12,7 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -21,7 +21,7 @@ export const SOC2 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
   const { mutate: sendEvent } = useSendEventMutation()
-  const canReadSubscriptions = useCheckPermissions(
+  const {can: canReadSubscriptions} = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )

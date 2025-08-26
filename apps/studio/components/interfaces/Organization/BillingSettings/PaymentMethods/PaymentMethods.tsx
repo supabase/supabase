@@ -21,7 +21,6 @@ import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organizat
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import {
   useAsyncCheckProjectPermissions,
-  useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
@@ -49,7 +48,7 @@ const PaymentMethods = () => {
 
   const { isSuccess: isPermissionsLoaded, can: canReadPaymentMethods } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.payment_methods')
-  const canUpdatePaymentMethods = useCheckPermissions(
+  const {can: canUpdatePaymentMethods} = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )

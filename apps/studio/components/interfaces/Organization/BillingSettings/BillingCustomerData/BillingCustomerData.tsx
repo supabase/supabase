@@ -18,7 +18,6 @@ import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-i
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import {
   useAsyncCheckProjectPermissions,
-  useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
@@ -35,7 +34,7 @@ export const BillingCustomerData = () => {
 
   const { isSuccess: isPermissionsLoaded, can: canReadBillingCustomerData } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingCustomerData = useCheckPermissions(
+  const {can: canUpdateBillingCustomerData} = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )

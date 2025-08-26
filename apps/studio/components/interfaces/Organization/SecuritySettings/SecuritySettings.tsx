@@ -16,7 +16,7 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
@@ -47,8 +47,8 @@ const SecuritySettings = () => {
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
-  const canReadMfaConfig = useCheckPermissions(PermissionAction.READ, 'organizations')
-  const canUpdateMfaConfig = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const {can: canReadMfaConfig} = useAsyncCheckProjectPermissions(PermissionAction.READ, 'organizations')
+  const {can: canUpdateMfaConfig} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isPaidPlan = selectedOrganization?.plan.id !== 'free'

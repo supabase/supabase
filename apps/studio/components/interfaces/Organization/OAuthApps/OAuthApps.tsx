@@ -13,7 +13,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, cn } from 'ui'
 import { AuthorizedAppRow } from './AuthorizedAppRow'
 import { DeleteAppModal } from './DeleteAppModal'
@@ -34,8 +34,8 @@ const OAuthApps = () => {
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
 
-  const canReadOAuthApps = useCheckPermissions(PermissionAction.READ, 'approved_oauth_apps')
-  const canCreateOAuthApps = useCheckPermissions(PermissionAction.CREATE, 'approved_oauth_apps')
+  const {can: canReadOAuthApps} = useAsyncCheckProjectPermissions(PermissionAction.READ, 'approved_oauth_apps')
+  const {can: canCreateOAuthApps} = useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'approved_oauth_apps')
 
   const {
     data: publishedApps,
