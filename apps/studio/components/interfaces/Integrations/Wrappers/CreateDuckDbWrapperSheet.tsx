@@ -2,13 +2,13 @@ import { isEmpty } from 'lodash'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Form,
@@ -70,13 +70,24 @@ const requiredFields: Record<Target, { name: string; required: boolean }[]> = {
     { name: 'catalog_uri', required: true },
   ],
   iceberg: [
+    // iceberg option can use the same options as s3
+    { name: 'vault_key_id', required: false },
+    { name: 'vault_secret', required: false },
+    { name: 'region', required: false },
+    { name: 'endpoint', required: false },
+    { name: 'session_token', required: false },
+    { name: 'url_compatibility_mode', required: false },
+    { name: 'url_style', required: false },
+    { name: 'use_ssl', required: false },
+    { name: 'kms_key_id', required: false },
+
     { name: 'vault_client_id', required: false },
     { name: 'vault_client_secret', required: false },
     { name: 'vault_token', required: false },
     { name: 'oauth2_scope', required: false },
     { name: 'oauth2_server_uri', required: false },
-    { name: 'warehouse', required: true },
-    { name: 'catalog_uri', required: true },
+    { name: 'warehouse', required: false },
+    { name: 'catalog_uri', required: false },
   ],
 } as const
 
@@ -88,7 +99,7 @@ export const CreateDuckDbWrapperSheet = ({
   setIsClosing,
   onClose,
 }: CreateWrapperSheetProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -194,9 +205,9 @@ export const CreateDuckDbWrapperSheet = ({
         connectionString: project?.connectionString,
         wrapperMeta,
         formState: {
-          type: selectedTarget,
           ...values,
           server_name: `${values.wrapper_name}_server`,
+          supabase_target_schema: values.target_schema,
         },
         mode: 'schema',
         tables: [],
@@ -288,7 +299,7 @@ export const CreateDuckDbWrapperSheet = ({
                           <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                AWS S3 storage that's optimized for analytics workloads.
+                                Highly scalable object storage service.
                               </p>
                             </div>
                           </div>
@@ -302,7 +313,8 @@ export const CreateDuckDbWrapperSheet = ({
                           <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                AWS S3 storage that's optimized for analytics workloads.
+                                Managed Apache Iceberg service that’s optimized for analytic
+                                workloads.
                               </p>
                             </div>
                           </div>
@@ -316,7 +328,7 @@ export const CreateDuckDbWrapperSheet = ({
                           <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Managed Apache Iceberg built directly into your R2 bucket.
+                                Global object storage.
                               </p>
                             </div>
                           </div>
@@ -344,7 +356,7 @@ export const CreateDuckDbWrapperSheet = ({
                           <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Something about Polaris.
+                                Open-source, fully-featured catalog for Apache Iceberg.
                               </p>
                             </div>
                           </div>
@@ -358,7 +370,7 @@ export const CreateDuckDbWrapperSheet = ({
                           <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Can be used with any S3-compatible storage.
+                                Secure, fast, and user-friendly Apache Iceberg REST Catalog.
                               </p>
                             </div>
                           </div>
@@ -372,7 +384,7 @@ export const CreateDuckDbWrapperSheet = ({
                           <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Can be used with any S3-compatible storage.
+                                Can be used to connect to any Apache Iceberg-compatible catalogs.
                               </p>
                             </div>
                           </div>
@@ -402,7 +414,8 @@ export const CreateDuckDbWrapperSheet = ({
                       <FormSectionLabel>
                         <p>Foreign Schema</p>
                         <p className="text-foreground-light mt-2 w-[90%]">
-                          All wrapper tables will be created in the specified target schema.
+                          You can query your data from the foreign tables in the specified schema
+                          after the wrapper is created.
                         </p>
                       </FormSectionLabel>
                     }
@@ -426,7 +439,7 @@ export const CreateDuckDbWrapperSheet = ({
                           key="target_schema"
                           option={{
                             name: 'target_schema',
-                            label: 'Target Schema',
+                            label: 'Specify a new schema to create all wrapper tables in',
                             required: true,
                             encrypted: false,
                             secureEntry: false,
@@ -435,8 +448,8 @@ export const CreateDuckDbWrapperSheet = ({
                           error={formErrors['target_schema']}
                         />
                         <p className="text-foreground-lighter text-sm">
-                          A new schema will be created. All wrapper tables will be created in the
-                          specified target schema.
+                          A new schema will be created. For security purposes, the wrapper tables
+                          from the foreign schema cannot be created within an existing schema.
                         </p>
                       </div>
                     </FormSectionContent>
