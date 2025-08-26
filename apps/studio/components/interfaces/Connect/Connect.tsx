@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -53,6 +53,16 @@ export const Connect = () => {
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false)
+  )
+
+  const [connectTab, setConnectTab] = useQueryState(
+    'connectTab',
+    parseAsString.withDefault('direct').withOptions({ clearOnDefault: true })
+  )
+
+  const [prefFramework] = useQueryState(
+    'framework',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(frameworks)
@@ -185,6 +195,33 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
+  // Sync initial tab and framework from query params
+  useEffect(() => {
+    if (connectTab === 'frameworks') {
+      setConnectionObject(frameworks)
+      handleConnectionTypeChange(frameworks)
+      if (prefFramework) {
+        const exists = frameworks.find((f) => f.key === prefFramework)
+        if (exists) {
+          setSelectedParent(prefFramework)
+          // Reset children/grandchildren based on the new parent
+          const firstChild = exists.children?.[0]?.key ?? ''
+          setSelectedChild(firstChild)
+          const firstGrand = exists.children?.[0]?.children?.[0]?.key ?? ''
+          setSelectedGrandchild(firstGrand)
+        }
+      }
+    }
+    if (connectTab === 'mobiles') {
+      setConnectionObject(MOBILES)
+      handleConnectionTypeChange(MOBILES)
+    }
+    if (connectTab === 'orms') {
+      setConnectionObject(ORMS)
+      handleConnectionTypeChange(ORMS)
+    }
+  }, [connectTab, prefFramework])
+
   if (!isActiveHealthy) {
     return (
       <ButtonTooltip
@@ -219,7 +256,13 @@ export const Connect = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
+        <Tabs_Shadcn_
+          value={connectTab}
+          onValueChange={(value) => {
+            handleConnectionType(value)
+            setConnectTab(value)
+          }}
+        >
           <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
             {connectionTypes.map((type) => (
               <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">

@@ -9,6 +9,7 @@ export type GettingStartedAction = {
   onClick?: () => void
   variant?: React.ComponentProps<typeof Button>['type']
   icon?: React.ReactNode
+  component?: React.ReactNode
 }
 
 export type GettingStartedStep = {
@@ -17,6 +18,7 @@ export type GettingStartedStep = {
   icon?: React.ReactNode
   title: string
   description: string
+  image?: React.ReactNode
   actions: GettingStartedAction[]
 }
 
@@ -36,7 +38,7 @@ export function GettingStarted({ steps, className }: GettingStartedProps) {
       </div>
       <Row columns={[3, 2, 1]} className="items-stretch">
         {steps.map((step) => (
-          <Card key={step.key} className="overflow-hidden h-full">
+          <Card key={step.key} className="overflow-hidden h-full flex flex-col">
             <CardHeader className="flex flex-row space-y-0 justify-between items-center border-b-0">
               <div className="flex flex-row items-center gap-3">
                 {step.icon && <div>{step.icon}</div>}
@@ -49,10 +51,14 @@ export function GettingStarted({ steps, className }: GettingStartedProps) {
                 {step.status}
               </Badge>
             </CardHeader>
-            <CardContent className="space-y-3 pt-16">
+            <CardContent className="p-6 pt-16 flex-1 flex flex-col justify-end">
+              {step.image && <div className="w-full">{step.image}</div>}
               <p className="text-base text-foreground">{step.description}</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mt-4">
                 {step.actions.map((action, i) => {
+                  if (action.component) {
+                    return <span key={`${step.key}-action-${i}`}>{action.component}</span>
+                  }
                   const content = (
                     <Button
                       key={`${step.key}-action-${i}`}

@@ -154,7 +154,7 @@ export const AdvisorWidget = () => {
                     }}
                   />
                 </CardHeader>
-                <CardContent className="pt-16 flex flex-col justify-end flex-1 overflow-auto">
+                <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
                   {lint.detail ? getFirstSentence(lint.detail) : lint.title}
                 </CardContent>
               </Card>
