@@ -203,8 +203,8 @@ async function runQuery(projectRef: string, sql: string, startDate: string, endD
     },
   })
   if (error) throw error
-  return MOCKED_RESPONSE
-  // return data
+  // return MOCKED_RESPONSE
+  return data
 }
 
 function extractStatusCodesFromData(data: any[]): string[] {
