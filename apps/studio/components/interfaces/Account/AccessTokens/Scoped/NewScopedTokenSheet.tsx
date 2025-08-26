@@ -80,10 +80,7 @@ export const NewScopedTokenSheet = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
     // Log the complete form data
-    console.log('=== FORM SUBMISSION DATA ===')
-    console.log('Raw form values:', values)
-    console.log('Custom expiry date:', customExpiryDate)
-    console.log('Is custom expiry:', isCustomExpiry)
+
     
     // Validate that at least one permission is configured
     if (!permissionRows || permissionRows.length === 0) {
@@ -126,10 +123,7 @@ export const NewScopedTokenSheet = ({
     }
 
     // Log the permissions for debugging
-    console.log('=== PERMISSIONS DEBUG ===')
-    console.log('Permission rows:', permissionRows)
-    console.log('Mapped permissions:', permissions)
-    console.log('=== END PERMISSIONS DEBUG ===')
+
 
     // Determine organization_slugs and project_refs based on resource access
     let organization_slugs: string[] | undefined
@@ -146,7 +140,7 @@ export const NewScopedTokenSheet = ({
     }
 
     // Log the final processed data that will be sent to the API
-    console.log('=== FINAL API PAYLOAD ===')
+
     const finalPayload = {
       name: values.tokenName,
       expires_at: finalExpiresAt,
@@ -154,7 +148,7 @@ export const NewScopedTokenSheet = ({
       organization_slugs,
       project_refs,
     }
-    console.log(finalPayload)
+
     
     // Validate the payload
     if (!finalPayload.name || finalPayload.name.trim() === '') {
@@ -173,7 +167,7 @@ export const NewScopedTokenSheet = ({
       return
     }
     
-    console.log('=== END FORM SUBMISSION ===')
+
 
     createAccessToken(finalPayload, {
       onSuccess: (data) => {

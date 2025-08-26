@@ -1,6 +1,5 @@
 import AlertError from 'components/ui/AlertError'
-import dayjs from 'dayjs'
-import { MoreVertical, Trash, Eye, Key } from 'lucide-react'
+import { MoreVertical, Trash, Key } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -13,9 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
@@ -265,7 +261,6 @@ export const AccessTokenTable = <T,>({
           setIsViewSheetOpen(false)
           setViewToken(undefined)
         }}
-
       />
     </>
   )

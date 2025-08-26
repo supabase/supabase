@@ -41,7 +41,7 @@ const createAllResources = (ACCESS_TOKEN_PERMISSIONS: any[]) => {
 }
 
 export const Permissions = ({
-  control,
+  // control,
   setValue,
   watch,
   resourceSearchOpen,
@@ -69,7 +69,6 @@ export const Permissions = ({
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
-                    {/* Preset Options */}
                     <CommandGroup_Shadcn_ heading="Preset options" className="[&>div]:text-left">
                       <CommandItem_Shadcn_
                         value="add-all-permissions"
@@ -245,7 +244,6 @@ export const Permissions = ({
                     <CommandList_Shadcn_>
                       <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
 
-                      {/* Preset Options */}
                       <CommandGroup_Shadcn_ heading="Preset options" className="[&>div]:text-left">
                         <CommandItem_Shadcn_
                           value="add-all-permissions"

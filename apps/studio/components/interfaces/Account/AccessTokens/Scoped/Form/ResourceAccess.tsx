@@ -54,21 +54,6 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
     }
   }, [resourceAccess, selectedOrganizations, selectedProjects, setValue])
 
-  // Debug logging for form values
-  React.useEffect(() => {
-    console.log('ResourceAccess Form Values:', {
-      resourceAccess,
-      selectedOrganizations,
-      selectedProjects,
-      organizations: organizations?.length || 0,
-      projects: projects?.length || 0,
-      isLoadingOrgs,
-      isLoadingProjects,
-      isErrorOrgs,
-      isErrorProjects
-    })
-  }, [resourceAccess, selectedOrganizations, selectedProjects, organizations, projects, isLoadingOrgs, isLoadingProjects, isErrorOrgs, isErrorProjects])
-
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
       <FormField_Shadcn_

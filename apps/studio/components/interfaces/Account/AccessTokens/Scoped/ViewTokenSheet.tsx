@@ -2,10 +2,8 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
-  SheetFooter,
   ScrollArea,
   cn,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -13,13 +11,10 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { AccessToken } from 'data/access-tokens/access-tokens-query'
 import { useScopedAccessTokenQuery } from 'data/scoped-access-tokens/scoped-access-token-query'
 import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_PERMISSIONS, FGA_PERMISSIONS } from '../AccessToken.constants'
-import { useState } from 'react'
-import { Info } from 'lucide-react'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 
@@ -33,7 +28,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
   const { data: organizations = [] } = useOrganizationsQuery()
   const { data: projects = [] } = useProjectsQuery()
 
-  // Fetch the individual token data
   const {
     data: token,
     isLoading: isTokenLoading,
@@ -47,22 +41,9 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     }
   )
 
-  // Debug: Log query state
-  console.log('ViewTokenSheet Debug:', {
-    visible,
-    tokenId,
-    isTokenLoading,
-    tokenError,
-    token,
-    queryEnabled: visible && !!tokenId,
-  })
-
-  // Map real permissions to access levels
   const getRealAccess = (resource: string, tokenPermissions: string[]) => {
-    // Helper function to check if a permission exists
     const hasPermission = (permission: string) => tokenPermissions.includes(permission)
 
-    // Map resource to its corresponding permissions
     const resourcePermissionMap: Record<string, { read: string; write?: string }> = {
       'user:organizations': {
         read: FGA_PERMISSIONS.USER.ORGANIZATIONS_READ,
@@ -215,7 +196,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     }
   }
 
-  // Group resources by access level
   const groupResourcesByAccess = (resources: any[]) => {
     const grouped = {
       'Read only': [] as string[],
@@ -223,7 +203,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
       'No access': [] as string[],
     }
 
-    // Only process if we have token permissions
     if (!token?.permissions) {
       return grouped
     }
@@ -237,16 +216,9 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     return grouped
   }
 
-  // Get resource access information from token data
   const getResourceAccessInfo = () => {
     const resources: Array<{ name: string; type: string; identifier: string }> = []
 
-    // Debug: Log token data to understand the structure
-    console.log('Token data:', token)
-    console.log('Token organization_slugs:', token?.organization_slugs)
-    console.log('Token project_refs:', token?.project_refs)
-
-    // Check if this is a scoped access token with organization_slugs
     const organizationSlugs = token?.organization_slugs
     if (organizationSlugs && Array.isArray(organizationSlugs) && organizationSlugs.length > 0) {
       organizationSlugs.forEach((orgSlug: string) => {
@@ -259,7 +231,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
       })
     }
 
-    // Check if this is a scoped access token with project_refs
     const projectRefs = token?.project_refs
     if (projectRefs && Array.isArray(projectRefs) && projectRefs.length > 0) {
       projectRefs.forEach((projectRef: string) => {
@@ -271,9 +242,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         })
       })
     }
-
-    // For regular access tokens (V0 scope), show that they have access to all resources
-    // This is handled in the render logic below
 
     return resources
   }
@@ -294,7 +262,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             </p>
             <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
           </SheetHeader>
-          <ScrollArea className="flex-1 max-h-[calc(100vh-60px)]">
+          <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
             <div className="space-y-8 px-5 sm:px-6 py-6">
               {isTokenLoading && (
                 <div className="flex items-center justify-center py-8">
@@ -312,7 +280,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
               {token && (
                 <>
-                  {/* Token Details Section */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-medium text-foreground">Token Information</h3>
                     <Card className="w-full overflow-hidden bg-surface-100">
@@ -383,7 +350,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                     </Card>
                   </div>
 
-                  {/* Resource Access Section */}
                   <div className="space-y-3">
                     <h3 className="text-sm font-medium text-foreground">Resource Access</h3>
                     <Card className="w-full overflow-hidden bg-surface-100">
@@ -429,7 +395,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                     </Card>
                   </div>
 
-                  {/* Permissions Groups */}
                   {ACCESS_TOKEN_PERMISSIONS.map((permissionGroup) => {
                     const groupedResources = groupResourcesByAccess(permissionGroup.resources)
 

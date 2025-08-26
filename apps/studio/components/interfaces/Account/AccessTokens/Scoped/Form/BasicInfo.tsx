@@ -37,7 +37,6 @@ export const BasicInfo = ({
   const [customDate, setCustomDate] = useState<Date>()
   const [isCustomSelected, setIsCustomSelected] = useState(false)
 
-  // Initialize custom selection state based on current expiration date
   useEffect(() => {
     const isCustom = expirationDate === CUSTOM_EXPIRY_VALUE
     setIsCustomSelected(isCustom)
@@ -57,7 +56,6 @@ export const BasicInfo = ({
     const isCustom = value === CUSTOM_EXPIRY_VALUE
     setIsCustomSelected(isCustom)
     onCustomExpiryChange?.(isCustom)
-    // Update the form field value
     field.onChange(value)
   }
 

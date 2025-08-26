@@ -10,8 +10,6 @@ export async function getScopedAccessTokens(signal?: AbortSignal) {
 
   if (error) handleError(error)
 
-  console.log(data)
-
   return data
 }
 
