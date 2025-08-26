@@ -69,7 +69,7 @@ describe(`EmptyBucketModal`, () => {
       path: `/platform/storage/:ref/buckets/:id/empty`,
     })
     // Called by useStorageExplorerStateSnapshot but seems
-    // to be unnecessary for succesful test?
+    // to be unnecessary for successful test?
     //
     // useProjectSettingsV2Query -> ProjectSettings
     // GET /platform/projects/:ref/settings
