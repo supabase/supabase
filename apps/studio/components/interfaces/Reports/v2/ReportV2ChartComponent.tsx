@@ -73,7 +73,20 @@ export const ReportV2ChartComponent = ({
 
   const chartData = queryResult?.data || []
 
-  console.log('chartData', queryResult)
+  const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
+    chartData,
+    'timestamp',
+    (report.attributes as any[]).map((attr: any) => attr.attribute),
+    0,
+    startDate,
+    endDate,
+    undefined,
+    interval
+  )
+
+  // Use filled data if available, otherwise fall back to original data
+  const finalChartData =
+    filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
 
   const getExpDemoChartData = () =>
     new Array(20).fill(0).map((_, index) => ({
@@ -180,7 +193,7 @@ export const ReportV2ChartComponent = ({
   }
 
   // Show empty state
-  if (!chartData || chartData.length === 0) {
+  if (!finalChartData || finalChartData.length === 0) {
     return (
       <Panel
         title={<p className="text-sm">{report.label}</p>}
@@ -201,7 +214,7 @@ export const ReportV2ChartComponent = ({
       <LogChartHandler
         {...report}
         attributes={report.attributes}
-        data={chartData}
+        data={finalChartData}
         isLoading={false}
         highlightedValue={undefined}
         updateDateRange={updateDateRange}
