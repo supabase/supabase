@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { Lock, Table, Unlock } from 'lucide-react'
+import { Lock, Table } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -57,7 +57,7 @@ const PolicyTableRowHeader = ({
           className="flex items-center gap-x-3"
         >
           <Table strokeWidth={1.5} size={16} className="text-foreground-muted" />
-          <CardTitle className="m-0">{table.name}</CardTitle>
+          <CardTitle className="m-0 normal-case">{table.name}</CardTitle>
           {!table.rls_enabled && <Badge variant="warning">RLS Disabled</Badge>}
         </EditorTablePageLink>
         {isTableLocked && (
