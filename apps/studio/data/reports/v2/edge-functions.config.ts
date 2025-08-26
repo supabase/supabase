@@ -6,6 +6,91 @@ import {
 } from 'data/reports/report.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
 
+const MOCKED_RESPONSE = {
+  result: [
+    {
+      count: 99,
+      function_id: '123',
+      timestamp: new Date('2025-08-20T00:00:00.000Z').getTime(),
+      avg_execution_time: 24.7,
+      '200': 33,
+      '203': 10,
+      '500': 66,
+      region: 'eu-central-1',
+    },
+    {
+      count: 30,
+      function_id: '123',
+      timestamp: new Date('2025-08-21T00:00:00.000Z').getTime(),
+      avg_execution_time: 74.7,
+      '200': 12,
+      '203': 33,
+      '500': 55,
+      region: 'eu-central-1',
+    },
+    {
+      count: 120,
+      function_id: '123',
+      timestamp: new Date('2025-08-22T00:00:00.000Z').getTime(),
+      avg_execution_time: 66.7,
+      '200': 33,
+      '203': 44,
+      '500': 22,
+      region: 'eu-central-1',
+    },
+    {
+      count: 120,
+      function_id: '123',
+      timestamp: new Date('2025-08-23T00:00:00.000Z').getTime(),
+      avg_execution_time: 66.7,
+      '200': 33,
+      '203': 44,
+      '500': 22,
+      region: 'eu-central-1',
+    },
+    {
+      count: 120,
+      function_id: '123',
+      timestamp: new Date('2025-08-24T00:00:00.000Z').getTime(),
+      avg_execution_time: 66.7,
+      '200': 33,
+      '203': 44,
+      '500': 22,
+      region: 'eu-central-1',
+    },
+    {
+      count: 230,
+      function_id: '123',
+      timestamp: new Date('2025-08-25T00:00:00.000Z').getTime(),
+      avg_execution_time: 16.7,
+      '200': 90,
+      '203': 10,
+      '500': 20,
+      region: 'eu-central-1',
+    },
+    {
+      count: 3509,
+      function_id: '123',
+      timestamp: new Date('2025-08-26T00:00:00.000Z').getTime(),
+      avg_execution_time: 22.7,
+      '200': 454,
+      '203': 34,
+      '500': 12,
+      region: 'eu-central-1',
+    },
+    {
+      count: 3000,
+      function_id: '123',
+      timestamp: new Date('2025-08-27T00:00:00.000Z').getTime(),
+      avg_execution_time: 11.7,
+      '200': 40,
+      '203': 1,
+      '500': 4,
+      region: 'eu-central-1',
+    },
+  ],
+}
+
 export interface ReportFetchFunction {
   (
     projectRef: string,
@@ -134,7 +219,8 @@ async function runQuery(projectRef: string, sql: string, startDate: string, endD
     },
   })
   if (error) throw error
-  return data
+  return MOCKED_RESPONSE
+  // return data
 }
 
 export const edgeFunctionReports = ({
@@ -166,6 +252,12 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
+    attributes: [
+      {
+        attribute: 'count',
+        label: 'Count',
+      },
+    ],
     fetchFunction: async () => {
       const sql = METRIC_SQL.TotalInvocations(interval, filters.functionIds)
       const response = await runQuery(projectRef, sql, startDate, endDate)
@@ -193,57 +285,28 @@ export const edgeFunctionReports = ({
     showLegend: true,
     showMaxValue: false,
     hideChartType: false,
-    defaultChartStyle: 'bar',
+    defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function executions by status code.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
+    attributes: [
+      {
+        attribute: '200',
+        label: '200',
+      },
+      {
+        attribute: '203',
+        label: '203',
+      },
+      {
+        attribute: '500',
+        label: '500',
+      },
+    ],
     fetchFunction: async () => {
       const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters.functionIds)
-      // const rawData = await runQuery(projectRef, sql, startDate, endDate)
-      const rawData = {
-        result: [
-          {
-            count: 20,
-            status_code: 200,
-            timestamp: 1756142640000000,
-          },
-        ],
-        error: null,
-      }
-      if (!rawData) return { data: [], attributes: [] }
-      const result = rawData.result || []
+      const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
-      const statusCodes = Array.from(new Set(result.map((p: any) => p.status_code)))
-
-      const attributes = statusCodes.map((statusCode) => {
-        const statusCodeInfo = getHttpStatusCodeInfo(Number(statusCode))
-        const color =
-          REPORT_STATUS_CODE_COLORS[String(statusCode)] || REPORT_STATUS_CODE_COLORS.default
-
-        return {
-          attribute: `status_${statusCode}`,
-          label: `${statusCode} ${statusCodeInfo.label}`,
-          provider: 'logs',
-          enabled: true,
-          color: color,
-          statusCode: String(statusCode),
-        }
-      })
-
-      const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
-      const data = Array.from(timestamps)
-        .sort()
-        .map((timestamp) => {
-          const point: any = { period_start: timestamp }
-          attributes.forEach((attr) => {
-            point[attr.attribute] = 0
-          })
-          const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
-          matchingPoints.forEach((p: any) => {
-            point[`status_${p.status_code}`] = p.count
-          })
-          return point
-        })
-      return { data, attributes }
+      return { data: rawData.result }
     },
   },
   {
@@ -255,7 +318,7 @@ export const edgeFunctionReports = ({
     showLegend: true,
     showMaxValue: false,
     hideChartType: false,
-    defaultChartStyle: 'bar',
+    defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     format: 'ms',
@@ -263,72 +326,22 @@ export const edgeFunctionReports = ({
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
     },
+    attributes: [
+      {
+        attribute: 'avg_execution_time',
+        label: 'Avg. execution time (ms)',
+      },
+    ],
     fetchFunction: async () => {
       const sql = METRIC_SQL.ExecutionTime(interval, filters.functionIds)
-      // const rawData = await runQuery(projectRef, sql, startDate, endDate)
-      const rawData = {
-        result: [
-          {
-            avg_execution_time: 74.7,
-            timestamp: 1756142640000000,
-          },
-        ],
-        error: null,
-      }
-      if (!rawData) return { data: [], attributes: [] }
-      const result = rawData.result || []
-      const hasFunctions = functions.length > 0
+      const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
-      if (hasFunctions) {
-        const attributes = functions.map((f) => ({
-          attribute: f.id,
-          label: f.name,
-          provider: 'logs',
-          enabled: true,
-        }))
+      const data = rawData.result?.map((point: any) => ({
+        ...point,
+        function_name: functions.find((f) => f.id === point.function_id)?.name ?? point.function_id,
+      }))
 
-        if (result.length === 0) {
-          return { data: [], attributes }
-        }
-
-        const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
-        const data = Array.from(timestamps)
-          .sort()
-          .map((timestamp) => {
-            const point: any = { period_start: timestamp }
-            attributes.forEach((attr) => {
-              point[attr.attribute] = 0
-            })
-            const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
-            matchingPoints.forEach((p: any) => {
-              point[p.function_id as string] = p.avg_execution_time
-            })
-            return point
-          })
-
-        return { data, attributes }
-      } else {
-        const attributes = [
-          {
-            attribute: 'avg_execution_time',
-            label: 'Avg. execution time (ms)',
-            provider: 'logs',
-            enabled: true,
-          },
-        ]
-
-        const data = result
-          .map((p: any) => ({
-            period_start: p.timestamp,
-            avg_execution_time: p.avg_execution_time,
-          }))
-          .sort(
-            (a: { period_start: string }, b: { period_start: string }) =>
-              new Date(a.period_start).getTime() - new Date(b.period_start).getTime()
-          )
-
-        return { data, attributes }
-      }
+      return { data }
     },
   },
   {
@@ -340,55 +353,27 @@ export const edgeFunctionReports = ({
     showLegend: true,
     showMaxValue: false,
     hideChartType: false,
-    defaultChartStyle: 'bar',
+    defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
     availableIn: ['pro', 'team', 'enterprise'],
+    attributes: [
+      {
+        attribute: 'region',
+        label: 'Region',
+        provider: 'logs',
+        enabled: true,
+      },
+      {
+        attribute: 'count',
+        label: 'Count',
+        provider: 'logs',
+        enabled: true,
+      },
+    ],
     fetchFunction: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters.functionIds)
-      // const rawData = await runQuery(projectRef, sql, startDate, endDate)
-      const rawData = {
-        result: [
-          {
-            count: 20,
-            region: 'eu-central-1',
-            timestamp: 1756142640000000,
-          },
-        ],
-        error: null,
-      }
-      if (!rawData) return { data: [], attributes: [] }
-      const result = rawData.result || []
-
-      const regions = Array.from(new Set(result.map((p: any) => p.region))).filter(Boolean)
-
-      if (regions.length === 0) {
-        return { data: [], attributes: [] }
-      }
-
-      const attributes = regions.map((region) => {
-        return {
-          attribute: region,
-          label: region,
-          provider: 'logs',
-          enabled: true,
-        }
-      })
-
-      const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
-      const data = Array.from(timestamps)
-        .sort()
-        .map((timestamp) => {
-          const point: any = { period_start: timestamp }
-          attributes.forEach((attr) => {
-            point[attr.attribute as string] = 0
-          })
-          const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
-          matchingPoints.forEach((p: any) => {
-            point[p.region] = p.count
-          })
-          return point
-        })
-      return { data, attributes }
+      const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      return { data: rawData.result }
     },
   },
 ]

@@ -195,16 +195,19 @@ export const ReportV2ChartComponent = ({
 
   // Render the actual chart
   return (
-    <LogChartHandler
-      {...report}
-      attributes={report.attributes}
-      data={chartData}
-      isLoading={false}
-      highlightedValue={undefined}
-      updateDateRange={updateDateRange}
-      startDate={startDate}
-      endDate={endDate}
-      interval={interval}
-    />
+    <>
+      <LogChartHandler
+        {...report}
+        attributes={report.attributes}
+        data={chartData}
+        isLoading={false}
+        highlightedValue={undefined}
+        updateDateRange={updateDateRange}
+        startDate={startDate}
+        endDate={endDate}
+        interval={interval}
+      />
+      {/* <pre className="text-xs max-h-80 overflow-y-auto">{JSON.stringify(chartData, null, 2)}</pre> */}
+    </>
   )
 }
