@@ -79,31 +79,23 @@ export const NewScopedTokenSheet = ({
   const permissionRows = form.watch('permissionRows') || []
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
-    // Log the complete form data
-
-    
-    // Validate that at least one permission is configured
     if (!permissionRows || permissionRows.length === 0) {
       toast.error('Please configure at least one permission.')
       return
     }
 
-    // Validate that all permission rows have both resource and action
     const hasValidPermissions = permissionRows.every((row) => row.resource && row.action)
     if (!hasValidPermissions) {
       toast.error('Please ensure all permissions have both resource and action selected.')
       return
     }
 
-    // Use custom date if custom option is selected
     let finalExpiresAt = values.expiresAt
 
     if (isCustomExpiry && customExpiryDate) {
-      // Use the date from the custom date picker
       finalExpiresAt = customExpiryDate.date
     }
 
-    // Convert permission rows to the expected permissions format using FGA_PERMISSIONS mapping
     const permissions = permissionRows
       .flatMap((row) => {
         const { resource, action } = row
@@ -111,7 +103,6 @@ export const NewScopedTokenSheet = ({
       })
       .filter(Boolean) as any
 
-    // Validate permissions array
     if (!permissions || permissions.length === 0) {
       console.error('=== VALIDATION ERROR ===')
       console.error('Permissions array is empty or invalid')
@@ -122,21 +113,19 @@ export const NewScopedTokenSheet = ({
       return
     }
 
-    // Log the permissions for debugging
-
-
-    // Determine organization_slugs and project_refs based on resource access
     let organization_slugs: string[] | undefined
     let project_refs: string[] | undefined
 
     if (values.resourceAccess === 'selected-orgs') {
-      organization_slugs = values.selectedOrganizations && values.selectedOrganizations.length > 0 
-        ? values.selectedOrganizations 
-        : undefined
+      organization_slugs =
+        values.selectedOrganizations && values.selectedOrganizations.length > 0
+          ? values.selectedOrganizations
+          : undefined
     } else if (values.resourceAccess === 'selected-projects') {
-      project_refs = values.selectedProjects && values.selectedProjects.length > 0 
-        ? values.selectedProjects 
-        : undefined
+      project_refs =
+        values.selectedProjects && values.selectedProjects.length > 0
+          ? values.selectedProjects
+          : undefined
     }
 
     // Log the final processed data that will be sent to the API
@@ -149,7 +138,6 @@ export const NewScopedTokenSheet = ({
       project_refs,
     }
 
-    
     // Validate the payload
     if (!finalPayload.name || finalPayload.name.trim() === '') {
       console.error('=== VALIDATION ERROR ===')
@@ -158,7 +146,7 @@ export const NewScopedTokenSheet = ({
       toast.error('Please enter a token name.')
       return
     }
-    
+
     if (!finalPayload.permissions || finalPayload.permissions.length === 0) {
       console.error('=== VALIDATION ERROR ===')
       console.error('At least one permission is required')
@@ -166,8 +154,6 @@ export const NewScopedTokenSheet = ({
       toast.error('Please configure at least one permission.')
       return
     }
-    
-
 
     createAccessToken(finalPayload, {
       onSuccess: (data) => {
@@ -184,7 +170,7 @@ export const NewScopedTokenSheet = ({
         console.error('Full error object:', JSON.stringify(error, null, 2))
         console.error('Request payload:', finalPayload)
         console.error('=== END API ERROR ===')
-      }
+      },
     })
   }
 

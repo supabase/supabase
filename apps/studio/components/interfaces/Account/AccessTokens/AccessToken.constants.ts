@@ -30,370 +30,180 @@ export const ExpiresAtOptions: Record<string, { value: string; label: string }> 
   },
 }
 
-// TEMPORARY?
-export const FGA_PERMISSIONS = {
-  USER: {
-    ORGANIZATIONS_READ: 'organizations_read',
-    ORGANIZATIONS_WRITE: 'organizations_write',
-    PROJECTS_READ: 'projects_read',
-    AVAILABLE_REGIONS_READ: 'available_regions_read',
-    SNIPPETS_READ: 'snippets_read',
+// Simple direct mapping from resource-action to permission strings
+export const PERMISSION_MAP: Record<string, Record<string, string[]>> = {
+  'user:organizations': {
+    'read': ['organizations_read'],
+    'read-write': ['organizations_read', 'organizations_write'],
+    'no access': []
   },
-  ORGANIZATION: {
-    ADMIN_READ: 'organization_admin_read',
-    ADMIN_WRITE: 'organization_admin_write',
-    MEMBERS_READ: 'members_read',
-    MEMBERS_WRITE: 'members_write',
+  'user:projects': {
+    'read': ['projects_read'],
+    'no access': []
   },
-  PROJECT: {
-    ADMIN_READ: 'project_admin_read',
-    ADMIN_WRITE: 'project_admin_write',
-    ADVISORS_READ: 'advisors_read',
-    API_GATEWAY_KEYS_READ: 'api_gateway_keys_read',
-    API_GATEWAY_KEYS_WRITE: 'api_gateway_keys_write',
-    AUTH_CONFIG_READ: 'auth_config_read',
-    AUTH_CONFIG_WRITE: 'auth_config_write',
-    AUTH_SIGNING_KEYS_READ: 'auth_signing_keys_read',
-    AUTH_SIGNING_KEYS_WRITE: 'auth_signing_keys_write',
-    BACKUPS_READ: 'backups_read',
-    BACKUPS_WRITE: 'backups_write',
-    BRANCHING_DEVELOPMENT_READ: 'branching_development_read',
-    BRANCHING_DEVELOPMENT_WRITE: 'branching_development_write',
-    BRANCHING_PRODUCTION_READ: 'branching_production_read',
-    BRANCHING_PRODUCTION_WRITE: 'branching_production_write',
-    CUSTOM_DOMAIN_READ: 'custom_domain_read',
-    CUSTOM_DOMAIN_WRITE: 'custom_domain_write',
-    DATA_API_CONFIG_READ: 'data_api_config_read',
-    DATA_API_CONFIG_WRITE: 'data_api_config_write',
-    DATABASE_READ: 'database_read',
-    DATABASE_WRITE: 'database_write',
-    DATABASE_CONFIG_READ: 'database_config_read',
-    DATABASE_CONFIG_WRITE: 'database_config_write',
-    DATABASE_NETWORK_BANS_READ: 'database_network_bans_read',
-    DATABASE_NETWORK_BANS_WRITE: 'database_network_bans_write',
-    DATABASE_NETWORK_RESTRICTIONS_READ: 'database_network_restrictions_read',
-    DATABASE_NETWORK_RESTRICTIONS_WRITE: 'database_network_restrictions_write',
-    DATABASE_MIGRATIONS_READ: 'database_migrations_read',
-    DATABASE_MIGRATIONS_WRITE: 'database_migrations_write',
-    DATABASE_POOLING_CONFIG_READ: 'database_pooling_config_read',
-    DATABASE_POOLING_CONFIG_WRITE: 'database_pooling_config_write',
-    DATABASE_READONLY_CONFIG_READ: 'database_readonly_config_read',
-    DATABASE_READONLY_CONFIG_WRITE: 'database_readonly_config_write',
-    DATABASE_SSL_CONFIG_READ: 'database_ssl_config_read',
-    DATABASE_SSL_CONFIG_WRITE: 'database_ssl_config_write',
-    DATABASE_WEBHOOKS_CONFIG_READ: 'database_webhooks_config_read',
-    DATABASE_WEBHOOKS_CONFIG_WRITE: 'database_webhooks_config_write',
-    EDGE_FUNCTIONS_READ: 'edge_functions_read',
-    EDGE_FUNCTIONS_WRITE: 'edge_functions_write',
-    EDGE_FUNCTIONS_SECRETS_READ: 'edge_functions_secrets_read',
-    EDGE_FUNCTIONS_SECRETS_WRITE: 'edge_functions_secrets_write',
-    INFRA_ADDONS_READ: 'infra_add-ons_read',
-    INFRA_ADDONS_WRITE: 'infra_add-ons_write',
-    READ_REPLICAS_READ: 'infra_read_replicas_read',
-    READ_REPLICAS_WRITE: 'infra_read_replicas_write',
-    SNIPPETS_READ: 'project_snippets_read',
-    SNIPPETS_WRITE: 'project_snippets_write',
-    STORAGE_READ: 'storage_read',
-    STORAGE_WRITE: 'storage_write',
-    STORAGE_CONFIG_READ: 'storage_config_read',
-    STORAGE_CONFIG_WRITE: 'storage_config_write',
-    TELEMETRY_LOGS_READ: 'telemetry_logs_read',
-    TELEMETRY_USAGE_READ: 'telemetry_usage_read',
+  'user:available_regions': {
+    'read': ['available_regions_read'],
+    'no access': []
   },
-} as const
-
-// Permission mapping function
-export const mapPermissionToFGA = (resource: string, action: string): string[] => {
-  // Map based on FGA_PERMISSIONS structure
-  
-  // User permissions
-  if (resource === 'user:organizations') {
-    if (action === 'read') return [FGA_PERMISSIONS.USER.ORGANIZATIONS_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.USER.ORGANIZATIONS_READ, FGA_PERMISSIONS.USER.ORGANIZATIONS_WRITE]
-    if (action === 'no access') return []
+  'user:snippets': {
+    'read': ['snippets_read'],
+    'no access': []
+  },
+  'organization:admin': {
+    'read': ['organization_admin_read'],
+    'read-write': ['organization_admin_read', 'organization_admin_write'],
+    'no access': []
+  },
+  'organization:members': {
+    'read': ['members_read'],
+    'read-write': ['members_read', 'members_write'],
+    'no access': []
+  },
+  'project:admin': {
+    'read': ['project_admin_read'],
+    'read-write': ['project_admin_read', 'project_admin_write'],
+    'no access': []
+  },
+  'project:advisors': {
+    'read': ['advisors_read'],
+    'no access': []
+  },
+  'project:api_gateway:keys': {
+    'read': ['api_gateway_keys_read'],
+    'read-write': ['api_gateway_keys_read', 'api_gateway_keys_write'],
+    'no access': []
+  },
+  'project:auth:config': {
+    'read': ['auth_config_read'],
+    'read-write': ['auth_config_read', 'auth_config_write'],
+    'no access': []
+  },
+  'project:auth:signing_keys': {
+    'read': ['auth_signing_keys_read'],
+    'read-write': ['auth_signing_keys_read', 'auth_signing_keys_write'],
+    'no access': []
+  },
+  'project:backups': {
+    'read': ['backups_read'],
+    'read-write': ['backups_read', 'backups_write'],
+    'no access': []
+  },
+  'project:branching:development': {
+    'read': ['branching_development_read'],
+    'read-write': ['branching_development_read', 'branching_development_write'],
+    'no access': []
+  },
+  'project:branching:production': {
+    'read': ['branching_production_read'],
+    'read-write': ['branching_production_read', 'branching_production_write'],
+    'no access': []
+  },
+  'project:custom_domain': {
+    'read': ['custom_domain_read'],
+    'read-write': ['custom_domain_read', 'custom_domain_write'],
+    'no access': []
+  },
+  'project:data_api:config': {
+    'read': ['data_api_config_read'],
+    'read-write': ['data_api_config_read', 'data_api_config_write'],
+    'no access': []
+  },
+  'project:database': {
+    'read': ['database_read'],
+    'read-write': ['database_read', 'database_write'],
+    'no access': []
+  },
+  'project:database:config': {
+    'read': ['database_config_read'],
+    'read-write': ['database_config_read', 'database_config_write'],
+    'no access': []
+  },
+  'project:database:network_bans': {
+    'read': ['database_network_bans_read'],
+    'read-write': ['database_network_bans_read', 'database_network_bans_write'],
+    'no access': []
+  },
+  'project:database:network_restrictions': {
+    'read': ['database_network_restrictions_read'],
+    'read-write': ['database_network_restrictions_read', 'database_network_restrictions_write'],
+    'no access': []
+  },
+  'project:database:migrations': {
+    'read': ['database_migrations_read'],
+    'read-write': ['database_migrations_read', 'database_migrations_write'],
+    'no access': []
+  },
+  'project:database:pooling_config': {
+    'read': ['database_pooling_config_read'],
+    'read-write': ['database_pooling_config_read', 'database_pooling_config_write'],
+    'no access': []
+  },
+  'project:database:readonly_config': {
+    'read': ['database_readonly_config_read'],
+    'read-write': ['database_readonly_config_read', 'database_readonly_config_write'],
+    'no access': []
+  },
+  'project:database:ssl_config': {
+    'read': ['database_ssl_config_read'],
+    'read-write': ['database_ssl_config_read', 'database_ssl_config_write'],
+    'no access': []
+  },
+  'project:database:webhooks_config': {
+    'read': ['database_webhooks_config_read'],
+    'read-write': ['database_webhooks_config_read', 'database_webhooks_config_write'],
+    'no access': []
+  },
+  'project:edge_functions': {
+    'read': ['edge_functions_read'],
+    'read-write': ['edge_functions_read', 'edge_functions_write'],
+    'no access': []
+  },
+  'project:edge_functions:secrets': {
+    'read': ['edge_functions_secrets_read'],
+    'read-write': ['edge_functions_secrets_read', 'edge_functions_secrets_write'],
+    'no access': []
+  },
+  'project:infra:add-ons': {
+    'read': ['infra_add-ons_read'],
+    'read-write': ['infra_add-ons_read', 'infra_add-ons_write'],
+    'no access': []
+  },
+  'project:infra:read_replicas': {
+    'read': ['infra_read_replicas_read'],
+    'read-write': ['infra_read_replicas_read', 'infra_read_replicas_write'],
+    'no access': []
+  },
+  'project:snippets': {
+    'read': ['project_snippets_read'],
+    'read-write': ['project_snippets_read', 'project_snippets_write'],
+    'no access': []
+  },
+  'project:storage': {
+    'read': ['storage_read'],
+    'read-write': ['storage_read', 'storage_write'],
+    'no access': []
+  },
+  'project:storage:config': {
+    'read': ['storage_config_read'],
+    'read-write': ['storage_config_read', 'storage_config_write'],
+    'no access': []
+  },
+  'project:telemetry:logs': {
+    'read': ['telemetry_logs_read'],
+    'no access': []
+  },
+  'project:telemetry:usage': {
+    'read': ['telemetry_usage_read'],
+    'no access': []
   }
-
-  if (resource === 'user:projects') {
-    if (action === 'read') return [FGA_PERMISSIONS.USER.PROJECTS_READ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'user:available_regions') {
-    if (action === 'read') return [FGA_PERMISSIONS.USER.AVAILABLE_REGIONS_READ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'user:snippets') {
-    if (action === 'read') return [FGA_PERMISSIONS.USER.SNIPPETS_READ]
-    if (action === 'no access') return []
-  }
-
-  // Organization permissions
-  if (resource === 'organization:admin') {
-    if (action === 'read') return [FGA_PERMISSIONS.ORGANIZATION.ADMIN_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.ORGANIZATION.ADMIN_READ, FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'organization:members') {
-    if (action === 'read') return [FGA_PERMISSIONS.ORGANIZATION.MEMBERS_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.ORGANIZATION.MEMBERS_READ, FGA_PERMISSIONS.ORGANIZATION.MEMBERS_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:admin') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.ADMIN_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.PROJECT.ADMIN_READ, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:advisors') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.ADVISORS_READ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:api_gateway:keys') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-        FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:auth:config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ, FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:auth:signing_keys') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ,
-        FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:backups') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.BACKUPS_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.PROJECT.BACKUPS_READ, FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:branching:development') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ,
-        FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:branching:production') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_READ,
-        FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:custom_domain') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_READ,
-        FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:data_api:config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_READ,
-        FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.PROJECT.DATABASE_READ, FGA_PERMISSIONS.PROJECT.DATABASE_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:network_bans') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:network_restrictions') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:migrations') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:pooling_config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:readonly_config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_READONLY_CONFIG_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_READONLY_CONFIG_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_READONLY_CONFIG_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:ssl_config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:database:webhooks_config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ,
-        FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:edge_functions') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ,
-        FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:edge_functions:secrets') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_READ,
-        FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:infra:add-ons') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_READ, FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:infra:read_replicas') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.READ_REPLICAS_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.READ_REPLICAS_READ,
-        FGA_PERMISSIONS.PROJECT.READ_REPLICAS_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:snippets') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.SNIPPETS_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.PROJECT.SNIPPETS_READ, FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:storage') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.STORAGE_READ]
-    if (action === 'read-write')
-      return [FGA_PERMISSIONS.PROJECT.STORAGE_READ, FGA_PERMISSIONS.PROJECT.STORAGE_WRITE]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:storage:config') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ]
-    if (action === 'read-write')
-      return [
-        FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ,
-        FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE,
-      ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:telemetry:logs') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.TELEMETRY_LOGS_READ]
-    if (action === 'no access') return []
-  }
-
-  if (resource === 'project:telemetry:usage') {
-    if (action === 'read') return [FGA_PERMISSIONS.PROJECT.TELEMETRY_USAGE_READ]
-    if (action === 'no access') return []
-  }
-
-  // Unknown combination
-  console.warn(`Unknown permission combination: ${resource}:${action}`)
-  return []
 }
 
-// Convert FGA_PERMISSIONS to UI format
+// Simple mapping function
+export const mapPermissionToFGA = (resource: string, action: string): string[] => {
+  return PERMISSION_MAP[resource]?.[action] || []
+}
+
+// Convert PERMISSION_MAP to UI format
 export const PERMISSIONS_UI = [
   {
     name: 'User permissions',

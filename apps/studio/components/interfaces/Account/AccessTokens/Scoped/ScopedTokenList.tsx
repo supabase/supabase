@@ -34,7 +34,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
     {
       key: 'token',
       label: 'Token',
-      className: 'min-w-40 max-w-96',
+      className: 'w-96 max-w-96',
       render: (token) => (
         <p className="font-mono text-foreground-light truncate">{token.token_alias}</p>
       ),

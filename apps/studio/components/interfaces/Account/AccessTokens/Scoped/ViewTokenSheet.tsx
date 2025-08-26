@@ -14,7 +14,7 @@ import {
 import { useScopedAccessTokenQuery } from 'data/scoped-access-tokens/scoped-access-token-query'
 import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
-import { ACCESS_TOKEN_PERMISSIONS, FGA_PERMISSIONS } from '../AccessToken.constants'
+import { ACCESS_TOKEN_PERMISSIONS, PERMISSION_MAP } from '../AccessToken.constants'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 
@@ -44,135 +44,16 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
   const getRealAccess = (resource: string, tokenPermissions: string[]) => {
     const hasPermission = (permission: string) => tokenPermissions.includes(permission)
 
-    const resourcePermissionMap: Record<string, { read: string; write?: string }> = {
-      'user:organizations': {
-        read: FGA_PERMISSIONS.USER.ORGANIZATIONS_READ,
-        write: FGA_PERMISSIONS.USER.ORGANIZATIONS_WRITE,
-      },
-      'user:projects': { read: FGA_PERMISSIONS.USER.PROJECTS_READ },
-      'user:available_regions': { read: FGA_PERMISSIONS.USER.AVAILABLE_REGIONS_READ },
-      'user:snippets': { read: FGA_PERMISSIONS.USER.SNIPPETS_READ },
-      'organization:admin': {
-        read: FGA_PERMISSIONS.ORGANIZATION.ADMIN_READ,
-        write: FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE,
-      },
-      'organization:members': {
-        read: FGA_PERMISSIONS.ORGANIZATION.MEMBERS_READ,
-        write: FGA_PERMISSIONS.ORGANIZATION.MEMBERS_WRITE,
-      },
-      'project:admin': {
-        read: FGA_PERMISSIONS.PROJECT.ADMIN_READ,
-        write: FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-      },
-      'project:advisors': { read: FGA_PERMISSIONS.PROJECT.ADVISORS_READ },
-      'project:api_gateway:keys': {
-        read: FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-        write: FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_WRITE,
-      },
-      'project:auth:config': {
-        read: FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
-      },
-      'project:auth:signing_keys': {
-        read: FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ,
-        write: FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_WRITE,
-      },
-      'project:backups': {
-        read: FGA_PERMISSIONS.PROJECT.BACKUPS_READ,
-        write: FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE,
-      },
-      'project:branching:development': {
-        read: FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ,
-        write: FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE,
-      },
-      'project:branching:production': {
-        read: FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_READ,
-        write: FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE,
-      },
-      'project:custom_domain': {
-        read: FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_READ,
-        write: FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_WRITE,
-      },
-      'project:data_api:config': {
-        read: FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE,
-      },
-      'project:database': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
-      },
-      'project:database:config': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE,
-      },
-      'project:database:network_bans': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_WRITE,
-      },
-      'project:database:network_restrictions': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_WRITE,
-      },
-      'project:database:migrations': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_WRITE,
-      },
-      'project:database:pooling_config': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_WRITE,
-      },
-      'project:database:readonly_config': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_READONLY_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_READONLY_CONFIG_WRITE,
-      },
-      'project:database:ssl_config': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_WRITE,
-      },
-      'project:database:webhooks_config': {
-        read: FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_WRITE,
-      },
-      'project:edge_functions': {
-        read: FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ,
-        write: FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE,
-      },
-      'project:edge_functions:secrets': {
-        read: FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_READ,
-        write: FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE,
-      },
-      'project:infra:add-ons': {
-        read: FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_READ,
-        write: FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
-      },
-      'project:infra:read_replicas': {
-        read: FGA_PERMISSIONS.PROJECT.READ_REPLICAS_READ,
-        write: FGA_PERMISSIONS.PROJECT.READ_REPLICAS_WRITE,
-      },
-      'project:snippets': {
-        read: FGA_PERMISSIONS.PROJECT.SNIPPETS_READ,
-        write: FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
-      },
-      'project:storage': {
-        read: FGA_PERMISSIONS.PROJECT.STORAGE_READ,
-        write: FGA_PERMISSIONS.PROJECT.STORAGE_WRITE,
-      },
-      'project:storage:config': {
-        read: FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ,
-        write: FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE,
-      },
-      'project:telemetry:logs': { read: FGA_PERMISSIONS.PROJECT.TELEMETRY_LOGS_READ },
-      'project:telemetry:usage': { read: FGA_PERMISSIONS.PROJECT.TELEMETRY_USAGE_READ },
-    }
-
-    const permissions = resourcePermissionMap[resource]
-    if (!permissions) {
+    // Get the permissions for this resource from PERMISSION_MAP
+    const resourcePermissions = PERMISSION_MAP[resource]
+    if (!resourcePermissions) {
       console.warn(`Unknown resource: ${resource}`)
       return 'no access'
     }
 
-    const hasRead = hasPermission(permissions.read)
-    const hasWrite = permissions.write ? hasPermission(permissions.write) : false
+    // Check what permissions the token has for this resource
+    const hasRead = resourcePermissions['read']?.some((p) => hasPermission(p)) || false
+    const hasWrite = resourcePermissions['read-write']?.some((p) => hasPermission(p)) || false
 
     if (hasRead && hasWrite) {
       return 'read-write'
@@ -262,7 +143,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             </p>
             <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
           </SheetHeader>
-          <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
+          <ScrollArea className="flex-1 max-h-[calc(100vh-60px)]">
             <div className="space-y-8 px-5 sm:px-6 py-6">
               {isTokenLoading && (
                 <div className="flex items-center justify-center py-8">
