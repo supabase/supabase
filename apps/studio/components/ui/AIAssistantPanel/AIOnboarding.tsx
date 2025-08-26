@@ -36,8 +36,8 @@ export const AIOnboarding = ({
       <div className="px-4 mb-4">
         <h2 className="heading-section text-foreground mb-1">How can I assist you?</h2>
         <p className="text-foreground-light text-sm">
-          Use the Assistant to write SQL and edge functions, debug issues or check on your project
-          health
+          Generate SQL, RLS policies and edge functions, debug issues or check on your project
+          health.
         </p>
       </div>
       <div>
