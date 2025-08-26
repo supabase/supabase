@@ -584,7 +584,7 @@ export const SupportFormV2 = ({
                 rel="noreferrer"
                 className="flex items-center gap-x-1 underline hover:text-foreground transition"
               >
-                Github discussions
+                GitHub discussions
                 <ExternalLink size={14} strokeWidth={2} />
               </Link>
               <span> for a quick answer</span>
