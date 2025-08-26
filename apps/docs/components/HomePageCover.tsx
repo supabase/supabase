@@ -83,6 +83,11 @@ const HomePageCover = (props) => {
       icon: '/docs/img/icons/refine-icon',
       href: '/guides/getting-started/quickstarts/refine',
     },
+    {
+      tooltip: 'Angular',
+      icon: '/docs/img/icons/angular-icon',
+      href: '/guides/getting-started/quickstarts/angular',
+    }
   ]
 
   const GettingStarted = () => (
