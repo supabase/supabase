@@ -898,8 +898,8 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       libpg-query:
-        specifier: 15.2.0
-        version: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
+        specifier: ^17
+        version: 17.6.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -5331,6 +5331,9 @@ packages:
 
   '@pgsql/types@15.0.2':
     resolution: {integrity: sha512-K3gtnbqbSUuUVmPm143qx5Gy2EmKuooshV95yMD48EUQ1256sgZBriEfY61OWJnlzdREdqHTIOxQqpZAb7XdZg==}
+
+  '@pgsql/types@17.6.1':
+    resolution: {integrity: sha512-Hk51+nyOxS7Dy5oySWywyNZxo5HndX1VDXT4ZEBD+p+vvMFM2Vc+sKSuByCiI8banou4edbgdnOC251IOuq7QQ==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -12927,6 +12930,9 @@ packages:
 
   libpg-query@15.2.0:
     resolution: {integrity: sha512-fBi14tsU3/ahtfU0C+/tvmtlt0EJM6kXe0Dl4/cSbiNmJ3IwLIuk3lawwiK5ByXU4sXwyAzbkvSl26jVXzYuaA==}
+
+  libpg-query@17.6.0:
+    resolution: {integrity: sha512-r4zOTcLTGYS5PlLQAicJ6Yi/tvZFag42YUuNEO8pi8bwt/ZZ4kj514J4QV5bOx0mZzPLF6agbfNXQVxGgmHR8g==}
 
   light-my-request@5.14.0:
     resolution: {integrity: sha512-aORPWntbpH5esaYpGOOmri0OHDOe3wC5M2MQxZ9dvMLZm6DnaAn0kJlcbU9hwsQgLzmZyReKwFwwPkR+nHu5kA==}
@@ -22716,6 +22722,8 @@ snapshots:
 
   '@pgsql/types@15.0.2': {}
 
+  '@pgsql/types@17.6.1': {}
+
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -31929,6 +31937,10 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
+
+  libpg-query@17.6.0:
+    dependencies:
+      '@pgsql/types': 17.6.1
 
   light-my-request@5.14.0:
     dependencies:

@@ -39,8 +39,8 @@ export async function parseSqlStatements(
 // Parse SQL using libpg-query - handles multiple statements
 export async function parseQuery(sql: string, sqlLower: string): Promise<Event[]> {
   try {
-    const { parseQuery } = await import('libpg-query')
-    const parsed = await parseQuery(sql)
+    const { parse } = await import('libpg-query')
+    const parsed = await parse(sql)
 
     if (!parsed?.stmts?.length) return []
 
