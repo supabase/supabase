@@ -1,7 +1,7 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { CheckIcon, Loader2, Pencil, Trash2 } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+import { Response } from './elements/Response'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
@@ -83,11 +83,7 @@ export const Message = function Message({
     () => ({
       ...markdownComponents,
       ...baseMarkdownComponents,
-      pre: ({ children }) => (
-        <MarkdownPre id={id} onResults={onResults}>
-          {children}
-        </MarkdownPre>
-      ),
+      pre: (props) => <MarkdownPre id={id} onResults={onResults} {...props} />,
     }),
     [id, onResults]
   )
@@ -179,18 +175,17 @@ export const Message = function Message({
                         )
                       case 'text':
                         return (
-                          <ReactMarkdown
+                          <Response
                             key={`${id}-part-${index}`}
                             className={cn(
-                              'prose prose-sm [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+                              'max-w-none prose prose-sm [&>div]:my-4 prose-h1:text-xl prose-h2:text-lg prose-h1:mt-6 prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
                               isUser && 'text-foreground [&>p]:font-medium',
                               isBeingEdited && 'animate-pulse'
                             )}
-                            remarkPlugins={[remarkGfm]}
                             components={allMarkdownComponents}
                           >
                             {part.text}
-                          </ReactMarkdown>
+                          </Response>
                         )
 
                       case 'tool-display_query': {
@@ -263,13 +258,12 @@ export const Message = function Message({
                 )
               })()
             ) : hasTextContent ? (
-              <ReactMarkdown
+              <Response
                 className="prose prose-sm max-w-none break-words"
-                remarkPlugins={[remarkGfm]}
                 components={allMarkdownComponents}
               >
                 {content}
-              </ReactMarkdown>
+              </Response>
             ) : (
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
