@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Skeleton } from 'ui'
 import { useState, useEffect } from 'react'
 import { RefreshCw, AlertCircle } from 'lucide-react'
-import { fetchDeployments, rollbackToVersion } from './mocks'
+import { fetchDeployments, fetchVersionCode, rollbackToVersion } from './mocks'
 import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './RollbackModal'
+import { CodeModal } from './CodeModal'
 import { useParams } from 'common'
 import { toast } from 'sonner'
 
@@ -22,6 +23,9 @@ export const EdgeFunctionVersionsList = () => {
   const [error, setError] = useState<string | null>(null)
   const [selectedDeployment, setSelectedDeployment] = useState<EdgeFunctionDeployment | null>(null)
   const [showRollbackModal, setShowRollbackModal] = useState(false)
+  const [showCodeModal, setShowCodeModal] = useState(false)
+  const [codeFiles, setCodeFiles] = useState<{ path: string; content: string }[]>([])
+  const [isLoadingCode, setIsLoadingCode] = useState(false)
 
   // Load deployments on mount and when dependencies change
   const loadDeployments = async (showRefreshState = false) => {
@@ -85,6 +89,22 @@ export const EdgeFunctionVersionsList = () => {
       toast.error(err instanceof Error ? err.message : 'Rollback failed')
     } finally {
       setIsRollingBack(false)
+    }
+  }
+
+  const handleViewCodeClick = async (deployment: EdgeFunctionDeployment) => {
+    try {
+      setIsLoadingCode(true)
+      setSelectedDeployment(deployment)
+      setShowCodeModal(true)
+
+      const projectId = projectRef || 'demo-project'
+      const slug = functionSlug || 'super-function'
+
+      const resp = await fetchVersionCode(projectId, slug, deployment.version)
+      setCodeFiles(resp.files)
+    } finally {
+      setIsLoadingCode(false)
     }
   }
 
@@ -224,7 +244,14 @@ export const EdgeFunctionVersionsList = () => {
                         <div className="text-xs text-muted-foreground">{absolute}</div>
                       </div>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 space-x-2">
+                      <Button
+                        type="default"
+                        size="tiny"
+                        onClick={() => handleViewCodeClick(deployment)}
+                      >
+                        View code
+                      </Button>
                       {deployment.status !== 'ACTIVE' && (
                         <Button
                           type="default"
@@ -250,6 +277,14 @@ export const EdgeFunctionVersionsList = () => {
         deployment={selectedDeployment}
         onConfirm={handleRollbackConfirm}
         isLoading={isRollingBack}
+      />
+
+      <CodeModal
+        open={showCodeModal}
+        onOpenChange={setShowCodeModal}
+        version={selectedDeployment?.version ?? null}
+        files={codeFiles}
+        isLoading={isLoadingCode}
       />
     </Card>
   )
