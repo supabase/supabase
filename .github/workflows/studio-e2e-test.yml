@@ -1,19 +1,7 @@
 name: Studio E2E Tests
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'packages/pg-meta/**/*'
-      - 'apps/studio/**'
-      - 'e2e/studio/**'
-      - 'pnpm-lock.yaml'
   pull_request:
-    paths:
-      - 'packages/pg-meta/**/*'
-      - 'apps/studio/**'
-      - 'e2e/studio/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/studio-e2e-test.yml'
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -25,6 +13,7 @@ permissions:
 
 jobs:
   test:
+    if: contains(github.event.pull_request.labels.*.name, 'e2e')
     timeout-minutes: 60
     runs-on: ubuntu-latest
     # Make the job non-blocking
