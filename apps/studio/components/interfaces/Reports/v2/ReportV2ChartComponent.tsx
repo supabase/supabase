@@ -6,13 +6,12 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { cn } from 'ui'
 import type { AnalyticsInterval } from 'data/analytics/constants'
-import type { Report } from 'data/reports/v2/edge-functions.config'
-import { Loader2 } from 'lucide-react'
+import type { ReportConfig } from 'data/reports/v2/reports.types'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { ReportChartUpsell } from './ReportChartUpsell'
 
 export interface ReportV2ChartProps {
-  report: Report
+  report: ReportConfig
   projectRef: string
   startDate: string
   endDate: string
