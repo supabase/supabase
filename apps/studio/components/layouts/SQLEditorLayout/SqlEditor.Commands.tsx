@@ -9,7 +9,7 @@ import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/Com
 import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
 import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
 import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
@@ -103,7 +103,7 @@ function RunSnippetPage() {
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
   const { profile } = useProfile()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateSQLSnippet = useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
@@ -119,10 +119,10 @@ function RunSnippetPage() {
       {isLoading && <LoadingState />}
       {isError && <ErrorState />}
       {isSuccess && (!snippets || snippets.length === 0) && (
-        <EmptyState projectRef={ref} canCreateNew={canCreateSQLSnippet} />
+        <EmptyState projectRef={ref} canCreateNew={canCreateSQLSnippet.can} />
       )}
       {isSuccess && !!snippets && snippets.length > 0 && (
-        <SnippetSelector projectRef={ref} canCreateNew={canCreateSQLSnippet} snippets={snippets} />
+        <SnippetSelector projectRef={ref} canCreateNew={canCreateSQLSnippet.can} snippets={snippets} />
       )}
     </CommandWrapper>
   )
