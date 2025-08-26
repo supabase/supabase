@@ -114,11 +114,24 @@ export const EdgeFunctionVersionsList = () => {
         <CardHeader>
           <CardTitle>Edge Function Versions</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-0 divide-y">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-2">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-20 w-full" />
+            <div key={i} className="p-6 flex items-start justify-between">
+              <div className="space-y-2 w-full">
+                <div className="flex items-center gap-x-3">
+                  <Skeleton className="h-4 w-56" />
+                </div>
+                <Skeleton className="h-4 w-72" />
+                <div className="flex items-center gap-x-4">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-3 w-12" />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-x-2 shrink-0">
+                <Skeleton className="h-7 w-20" />
+                <Skeleton className="h-7 w-16" />
+              </div>
             </div>
           ))}
         </CardContent>
