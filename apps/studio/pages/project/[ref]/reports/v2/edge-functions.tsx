@@ -49,7 +49,6 @@ const EdgeFunctionsUsage = () => {
   })
   const { edgeFnIdToName } = useEdgeFnIdToName({ projectRef: ref! })
 
-  // Create a unique sync ID for edge functions charts
   const chartSyncId = `edge-functions-${ref}`
   const { state: chartSyncState, updateState: updateChartSyncState } = useChartSync(chartSyncId)
 
