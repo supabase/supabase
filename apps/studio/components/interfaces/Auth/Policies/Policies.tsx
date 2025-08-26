@@ -18,6 +18,7 @@ import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { Button, Card, CardContent } from 'ui'
 
 interface PoliciesProps {
   schema: string
@@ -115,40 +116,21 @@ const Policies = ({
     })
   }
 
-  if (tables.length === 0) {
+  if (!hasTables) {
     return (
-      <div className="flex-grow flex items-center justify-center">
-        <ProductEmptyState
-          size="large"
-          title="Row-Level Security (RLS) Policies"
-          ctaButtonLabel="Create a table"
-          infoButtonLabel="What is RLS?"
-          infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
-          onClickCta={() => router.push(`/project/${ref}/editor`)}
-        >
-          <div className="space-y-4">
-            <InformationBox
-              title="What are policies?"
-              icon={<HelpCircle size={14} strokeWidth={2} />}
-              description={
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    Policies restrict, on a per-user basis, which rows can be returned by normal
-                    queries, or inserted, updated, or deleted by data modification commands.
-                  </p>
-                  <p className="text-sm">
-                    This is also known as Row-Level Security (RLS). Each policy is attached to a
-                    table, and the policy is executed each time its accessed.
-                  </p>
-                </div>
-              }
-            />
-            <p className="text-sm text-foreground-light">
-              Create a table in this schema first before creating a policy.
-            </p>
-          </div>
-        </ProductEmptyState>
-      </div>
+      <Card className="w-full bg-transparent">
+        <CardContent className="flex flex-col items-center justify-center p-8">
+          <h2 className="heading-default">No tables to create policies for</h2>
+
+          <p className="text-sm text-foreground-light text-center mb-4">
+            RLS Policies control per-user access to table rows. Create a table in this schema first
+            before creating a policy.
+          </p>
+          <Button type="default" onClick={() => router.push(`/project/${ref}/editor`)}>
+            Create a table
+          </Button>
+        </CardContent>
+      </Card>
     )
   }
 
