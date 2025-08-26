@@ -1,16 +1,15 @@
-import Link from 'next/link'
-import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import LogChartHandler from 'components/ui/Charts/LogChartHandler'
 import Panel from 'components/ui/Panel'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { Report } from 'data/reports/v2/edge-functions.config'
+import { Loader2 } from 'lucide-react'
+import ComposedChart from 'components/ui/Charts/ComposedChart'
+import { ReportChartUpsell } from './ReportChartUpsell'
 
 export interface ReportV2ChartProps {
   report: Report
@@ -43,7 +42,6 @@ export const ReportV2ChartComponent = ({
   const { plan: orgPlan } = useCurrentOrgPlan()
   const orgPlanId = orgPlan?.id
 
-  const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
   const isAvailable =
     report.availableIn === undefined || (orgPlanId && report.availableIn.includes(orgPlanId))
 
@@ -56,7 +54,7 @@ export const ReportV2ChartComponent = ({
   } = useQuery(
     ['report-v2', report.id, projectRef, startDate, endDate, interval, functionIds],
     async () => {
-      return await report.fetchFunction(
+      return await report.dataProvider(
         projectRef,
         startDate,
         endDate,
@@ -72,11 +70,12 @@ export const ReportV2ChartComponent = ({
   )
 
   const chartData = queryResult?.data || []
+  const dynamicAttributes = queryResult?.attributes || []
 
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
     'timestamp',
-    (report.attributes as any[]).map((attr: any) => attr.attribute),
+    (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
     0,
     startDate,
     endDate,
@@ -84,87 +83,23 @@ export const ReportV2ChartComponent = ({
     interval
   )
 
-  // Use filled data if available, otherwise fall back to original data
   const finalChartData =
     filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
 
-  const getExpDemoChartData = () =>
-    new Array(20).fill(0).map((_, index) => ({
-      period_start: new Date(startDate).getTime() + index * 1000,
-      demo: Math.floor(Math.pow(1.25, index) * 10),
-      max_demo: 1000,
-    }))
-
-  const getDemoChartData = () =>
-    new Array(20).fill(0).map((_, index) => ({
-      period_start: new Date(startDate).getTime() + index * 1000,
-      demo: Math.floor(Math.random() * 10) + 1,
-      max_demo: 1000,
-    }))
-
-  const demoChartData = useRef(getDemoChartData())
-  const exponentialChartData = useRef(getExpDemoChartData())
-
-  const demoData = isHoveringUpgrade ? exponentialChartData.current : demoChartData.current
-
-  // Show upgrade prompt if not available
-  if (!isAvailable && !isLoading) {
+  // UPSELL STATE
+  if (!isAvailable && !isLoading && !isLoadingChart) {
     return (
-      <Panel
-        title={<p className="text-sm">{report.label}</p>}
-        className={cn('h-[260px] relative', className)}
-      >
-        <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
-          <h2>{report.label}</h2>
-          <p className="text-sm text-foreground-light">
-            This chart is available from{' '}
-            <span className="capitalize">
-              {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}
-            </span>{' '}
-            plan and above
-          </p>
-          <Button
-            asChild
-            type="primary"
-            onMouseEnter={() => setIsHoveringUpgrade(true)}
-            onMouseLeave={() => setIsHoveringUpgrade(false)}
-          >
-            <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=reports`}>
-              Upgrade to{' '}
-              <span className="capitalize">
-                {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}
-              </span>
-            </Link>
-          </Button>
-        </div>
-        <div className="absolute top-0 left-0 w-full h-full z-0">
-          <LogChartHandler
-            {...report}
-            attributes={
-              [
-                {
-                  attribute: 'demo',
-                  enabled: true,
-                  label: 'Demo',
-                  provider: 'logs',
-                },
-              ] as MultiAttribute[]
-            }
-            label={report.label}
-            startDate={startDate}
-            endDate={endDate}
-            interval={interval}
-            data={demoData as any}
-            isLoading={false}
-            highlightedValue={0}
-            updateDateRange={updateDateRange}
-          />
-        </div>
-      </Panel>
+      <ReportChartUpsell
+        report={report}
+        startDate={startDate}
+        endDate={endDate}
+        interval={interval}
+        orgSlug={org?.slug ?? ''}
+      />
     )
   }
 
-  // Show loading state
+  // LOADING STATE
   if (isLoadingChart || isLoading) {
     return (
       <Panel
@@ -178,7 +113,7 @@ export const ReportV2ChartComponent = ({
     )
   }
 
-  // Show error state
+  // ERROR STATE
   if (error) {
     return (
       <Panel
@@ -192,7 +127,7 @@ export const ReportV2ChartComponent = ({
     )
   }
 
-  // Show empty state
+  // EMPTY STATE
   if (!finalChartData || finalChartData.length === 0) {
     return (
       <Panel
@@ -208,21 +143,40 @@ export const ReportV2ChartComponent = ({
     )
   }
 
-  // Render the actual chart
   return (
     <>
-      <LogChartHandler
-        {...report}
-        attributes={report.attributes}
-        data={finalChartData}
-        isLoading={false}
-        highlightedValue={undefined}
-        updateDateRange={updateDateRange}
-        startDate={startDate}
-        endDate={endDate}
-        interval={interval}
-        syncId={syncId}
-      />
+      <Panel
+        noMargin
+        noHideOverflow
+        className={cn('relative w-full overflow-hidden scroll-mt-16', className)}
+        wrapWithLoading={false}
+        id={report.id}
+      >
+        <Panel.Content className="flex flex-col gap-4">
+          <ComposedChart
+            attributes={dynamicAttributes as any}
+            data={finalChartData as any}
+            format={report.format ?? undefined}
+            xAxisKey="period_start"
+            yAxisKey={dynamicAttributes[0].attribute}
+            highlightedValue={0}
+            title={report.label}
+            customDateFormat={undefined}
+            chartHighlight={undefined}
+            chartStyle={report.defaultChartStyle}
+            showTooltip={report.showTooltip}
+            showLegend={report.showLegend}
+            showTotal={false}
+            showMaxValue={report.showMaxValue}
+            onChartStyleChange={() => {}}
+            updateDateRange={updateDateRange}
+            valuePrecision={report.valuePrecision}
+            hideChartType={report.hideChartType}
+            titleTooltip={report.titleTooltip}
+            syncId={syncId}
+          />
+        </Panel.Content>
+      </Panel>
       {/* <pre className="text-xs max-h-80 overflow-y-auto">{JSON.stringify(chartData, null, 2)}</pre> */}
     </>
   )
