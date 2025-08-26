@@ -5,6 +5,7 @@ import {
   REPORT_STATUS_CODE_COLORS,
 } from 'data/reports/report.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
+import { YAxisProps } from 'recharts'
 
 const MOCKED_RESPONSE = {
   result: [
@@ -91,21 +92,43 @@ const MOCKED_RESPONSE = {
   ],
 }
 
-export interface ReportFetchFunction {
+type ReportDataProviderFilter = {
+  functionIds?: string[]
+}
+
+export interface ReportDataProvider {
   (
     projectRef: string,
     startDate: string,
     endDate: string,
     interval: AnalyticsInterval,
     functionIds?: string[],
-    edgeFnIdToName?: (id: string) => string | undefined
-  ): Promise<{ data: any }>
+    edgeFnIdToName?: (id: string) => string | undefined,
+    filters?: ReportDataProviderFilter[]
+  ): Promise<{
+    data: any
+    attributes?: {
+      attribute: string
+      label: string
+      color?: { light: string; dark: string }
+    }[]
+  }> // [jordi] would be cool to have a type that forces data keys to match the attributes
 }
 export interface Report {
   id: string
   label: string
-  fetchFunction: ReportFetchFunction
-  [key: string]: any
+  dataProvider: ReportDataProvider
+  valuePrecision: number
+  hide: boolean
+  showTooltip: boolean
+  showLegend: boolean
+  showMaxValue: boolean
+  hideChartType: boolean
+  defaultChartStyle: string
+  titleTooltip: string
+  availableIn: string[]
+  format?: (value: unknown) => string
+  YAxisProps?: YAxisProps
 }
 
 const METRIC_SQL: Record<string, (interval: AnalyticsInterval, functionIds?: string[]) => string> =
@@ -223,6 +246,28 @@ async function runQuery(projectRef: string, sql: string, startDate: string, endD
   // return data
 }
 
+function extractStatusCodesFromData(data: any[]): string[] {
+  const statusCodes = new Set<string>()
+
+  data.forEach((item: any) => {
+    Object.keys(item).forEach((key) => {
+      if (/^\d{3}$/.test(key)) {
+        statusCodes.add(key)
+      }
+    })
+  })
+
+  return Array.from(statusCodes).sort()
+}
+
+function generateStatusCodeAttributes(statusCodes: string[]) {
+  return statusCodes.map((code) => ({
+    attribute: code,
+    label: `${code} ${getHttpStatusCodeInfo(parseInt(code)).label}`,
+    color: REPORT_STATUS_CODE_COLORS[code] || REPORT_STATUS_CODE_COLORS.default,
+  }))
+}
+
 export const edgeFunctionReports = ({
   projectRef,
   functions,
@@ -252,28 +297,25 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
-    attributes: [
-      {
-        attribute: 'count',
-        label: 'Count',
-      },
-    ],
-    fetchFunction: async () => {
+    dataProvider: async () => {
       const sql = METRIC_SQL.TotalInvocations(interval, filters.functionIds)
       const response = await runQuery(projectRef, sql, startDate, endDate)
 
       if (!response?.result) return { data: [] }
-
-      // Edge function logs do not include the function name,
-      // so we have to map the function id to the function name
-      // and add it to the returned data
 
       const data = response?.result?.map((log: any) => ({
         ...log,
         function_name: functions.find((f) => f.id === log.function_id)?.name ?? log.function_id,
       }))
 
-      return { data }
+      const attributes = [
+        {
+          attribute: 'count',
+          label: 'Count',
+        },
+      ]
+
+      return { data, attributes }
     },
   },
   {
@@ -288,25 +330,28 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function executions by status code.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
-    attributes: [
-      {
-        attribute: '200',
-        label: '200',
-      },
-      {
-        attribute: '203',
-        label: '203',
-      },
-      {
-        attribute: '500',
-        label: '500',
-      },
-    ],
-    fetchFunction: async () => {
+    dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters.functionIds)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
-      return { data: rawData.result }
+      if (!rawData?.result) return { data: [] }
+
+      /**
+       * Generate the attributes dynamically based on the data returned
+       * Eg. if the data only has 200, 203 and 500, the attributes should be 200, 203 and 500
+       * and the label should be the status code and the description
+       * 200 OK
+       * 203 Not Modified
+       * 500 Internal Server Error
+       */
+
+      const statusCodes = extractStatusCodesFromData(rawData.result)
+      const attributes = generateStatusCodeAttributes(statusCodes)
+
+      return {
+        data: rawData.result,
+        attributes,
+      }
     },
   },
   {
@@ -321,18 +366,12 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
-    format: 'ms',
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
     },
-    attributes: [
-      {
-        attribute: 'avg_execution_time',
-        label: 'Avg. execution time (ms)',
-      },
-    ],
-    fetchFunction: async () => {
+    format: (value: unknown) => `${value}ms`,
+    dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionTime(interval, filters.functionIds)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
@@ -341,7 +380,13 @@ export const edgeFunctionReports = ({
         function_name: functions.find((f) => f.id === point.function_id)?.name ?? point.function_id,
       }))
 
-      return { data }
+      const attributes = [
+        {
+          attribute: 'avg_execution_time',
+          label: 'Avg. execution time (ms)',
+        },
+      ]
+      return { data, attributes }
     },
   },
   {
@@ -356,24 +401,26 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
     availableIn: ['pro', 'team', 'enterprise'],
-    attributes: [
-      {
-        attribute: 'region',
-        label: 'Region',
-        provider: 'logs',
-        enabled: true,
-      },
-      {
-        attribute: 'count',
-        label: 'Count',
-        provider: 'logs',
-        enabled: true,
-      },
-    ],
-    fetchFunction: async () => {
+    dataProvider: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters.functionIds)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
-      return { data: rawData.result }
+
+      const attributes = [
+        {
+          attribute: 'region',
+          label: 'Region',
+          provider: 'logs',
+          enabled: true,
+        },
+        {
+          attribute: 'count',
+          label: 'Count',
+          provider: 'logs',
+          enabled: true,
+        },
+      ]
+
+      return { data: rawData.result, attributes }
     },
   },
 ]
