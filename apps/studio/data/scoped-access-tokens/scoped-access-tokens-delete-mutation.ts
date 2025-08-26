@@ -34,7 +34,9 @@ export const useScopedAccessTokenDeleteMutation = ({
     (vars) => deleteScopedAccessToken(vars),
     {
       async onSuccess(data, variables, context) {
+        // Invalidate scoped access token queries
         await queryClient.invalidateQueries(scopedAccessTokenKeys.list())
+        await queryClient.invalidateQueries(scopedAccessTokenKeys.detail(variables.id))
 
         await onSuccess?.(data, variables, context)
       },

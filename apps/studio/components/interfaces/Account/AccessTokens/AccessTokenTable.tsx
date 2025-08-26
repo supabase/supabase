@@ -50,7 +50,13 @@ const RowLoading = () => (
 
 const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2'
 
-const TableContainer = ({ children, columns }: { children: React.ReactNode; columns: TableColumn<any>[] }) => (
+const TableContainer = ({
+  children,
+  columns,
+}: {
+  children: React.ReactNode
+  columns: TableColumn<any>[]
+}) => (
   <Card className="w-full overflow-hidden">
     <CardContent className="p-0">
       <Table className="p-5 table-auto">
@@ -247,22 +253,19 @@ export const AccessTokenTable = <T,>({
         }}
       >
         <p className="py-4 text-sm text-foreground-light">
-          This action cannot be undone. Are you sure you want to delete "{token ? getTokenName(token) : ''}" token?
+          This action cannot be undone. Are you sure you want to delete "
+          {token ? getTokenName(token) : ''}" token?
         </p>
       </ConfirmationModal>
 
       <ViewTokenSheet
         visible={isViewSheetOpen}
-        token={viewToken as any}
+        tokenId={viewToken ? String(getTokenId(viewToken)) : undefined}
         onClose={() => {
           setIsViewSheetOpen(false)
           setViewToken(undefined)
         }}
-        onDeleteToken={() => {
-          if (viewToken) onDeleteToken(getTokenId(viewToken))
-          setIsViewSheetOpen(false)
-          setViewToken(undefined)
-        }}
+
       />
     </>
   )
