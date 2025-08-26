@@ -1,13 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
+
+import { useFlag } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import { BASE_PATH } from 'lib/constants'
+import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 
 type SignInLayoutProps = {
