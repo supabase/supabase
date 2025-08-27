@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Skeleton } from 'ui'
 import { useState, useEffect } from 'react'
-import { RefreshCw, AlertCircle } from 'lucide-react'
+import { RefreshCw, AlertCircle, Eye } from 'lucide-react'
 import { fetchDeployments, fetchVersionCode, rollbackToVersion } from './mocks'
 import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './rollback-modal'
-import { CodeModal } from './code-modal'
+
 import { useParams } from 'common'
 import { toast } from 'sonner'
 
@@ -22,8 +22,8 @@ export const EdgeFunctionVersionsList = () => {
   const [isRollingBack, setIsRollingBack] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedDeployment, setSelectedDeployment] = useState<EdgeFunctionDeployment | null>(null)
-  const [showRollbackModal, setShowRollbackModal] = useState(false)
-  const [showCodeModal, setShowCodeModal] = useState(false)
+  const [showRollback, setShowRollback] = useState(false)
+
   const [codeFiles, setCodeFiles] = useState<{ path: string; content: string }[]>([])
   const [isLoadingCode, setIsLoadingCode] = useState(false)
 
@@ -42,7 +42,10 @@ export const EdgeFunctionVersionsList = () => {
       const slug = functionSlug || 'super-function'
 
       const data = await fetchDeployments(projectId, slug)
-      setDeployments(sortDeployments(data))
+      const sorted = sortDeployments(data)
+      setDeployments(sorted)
+      const defaultSelected = sorted.find((d) => d.status === 'ACTIVE') || sorted[0] || null
+      setSelectedDeployment(defaultSelected)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load deployments')
       toast.error('Failed to load deployments')
@@ -59,11 +62,12 @@ export const EdgeFunctionVersionsList = () => {
 
   const handleRollbackClick = (deployment: EdgeFunctionDeployment) => {
     setSelectedDeployment(deployment)
-    setShowRollbackModal(true)
+    setShowRollback(true)
   }
 
-  const handleRollbackConfirm = async () => {
-    if (!selectedDeployment) return
+  const handleRollbackConfirm = async (target?: EdgeFunctionDeployment) => {
+    const deployment = target ?? selectedDeployment
+    if (!deployment) return
 
     try {
       setIsRollingBack(true)
@@ -71,18 +75,18 @@ export const EdgeFunctionVersionsList = () => {
       const projectId = projectRef || 'demo-project'
       const slug = functionSlug || 'super-function'
 
-      const response = await rollbackToVersion(projectId, slug, selectedDeployment.version)
+      const response = await rollbackToVersion(projectId, slug, deployment.version)
 
       if ('active_version' in response) {
         toast.success(`Successfully rolled back to version ${response.active_version}`)
       } else {
         toast.success(
-          `Successfully rolled back to version ${selectedDeployment.version} (new version ${response.version} created)`
+          `Successfully rolled back to version ${deployment.version} (new version ${response.version} created)`
         )
       }
 
-      setShowRollbackModal(false)
       setSelectedDeployment(null)
+      setShowRollback(false)
 
       await loadDeployments()
     } catch (err) {
@@ -92,21 +96,25 @@ export const EdgeFunctionVersionsList = () => {
     }
   }
 
-  const handleViewCodeClick = async (deployment: EdgeFunctionDeployment) => {
-    try {
-      setIsLoadingCode(true)
-      setSelectedDeployment(deployment)
-      setShowCodeModal(true)
+  const handleViewCodeClick = (deployment: EdgeFunctionDeployment) => {
+    setSelectedDeployment(deployment)
+  }
 
+  useEffect(() => {
+    const load = async () => {
+      if (!selectedDeployment) return
+      setIsLoadingCode(true)
       const projectId = projectRef || 'demo-project'
       const slug = functionSlug || 'super-function'
-
-      const resp = await fetchVersionCode(projectId, slug, deployment.version)
-      setCodeFiles(resp.files)
-    } finally {
-      setIsLoadingCode(false)
+      try {
+        const resp = await fetchVersionCode(projectId, slug, selectedDeployment.version)
+        setCodeFiles(resp.files)
+      } finally {
+        setIsLoadingCode(false)
+      }
     }
-  }
+    load()
+  }, [selectedDeployment, projectRef, functionSlug])
 
   if (isLoading) {
     return (
@@ -185,14 +193,116 @@ export const EdgeFunctionVersionsList = () => {
           Refresh
         </Button>
       </CardHeader>
-      <CardContent className="p-0 divide-y">
-        {deployments.map((deployment) => {
-          return (
-            <div key={deployment.id} className="p-6 flex items-start justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-x-3">
+      <CardContent className="p-0 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
+        <div className="p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Eye className="h-4 w-4" />
+            <h4 className="text-foreground">Available Versions</h4>
+          </div>
+          <p className="text-sm text-foreground-light mb-4">
+            Select a version to preview its content and restore if needed.
+          </p>
+          <div className="space-y-3">
+            {deployments.map((deployment) => {
+              const isSelected = selectedDeployment?.id === deployment.id
+              return (
+                <div
+                  key={deployment.id}
+                  onClick={() => handleViewCodeClick(deployment)}
+                  className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                    isSelected ? 'bg-accent/50 border-primary' : 'hover:bg-accent/30 border-border'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-x-3">
+                        <div className="text-foreground font-medium">
+                          {new Date(deployment.created_at).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </div>
+                        {deployment.status === 'ACTIVE' && (
+                          <Badge variant="default" className="text-xs">
+                            Active
+                          </Badge>
+                        )}
+                      </div>
+                      {deployment.commit_message && (
+                        <div className="text-sm text-foreground-light">
+                          {deployment.commit_message}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-x-4 text-xs text-muted-foreground">
+                        {deployment.commit_hash && (
+                          <span className="font-mono text-foreground-light">
+                            #{deployment.commit_hash}
+                          </span>
+                        )}
+                        {typeof deployment.size_kb === 'number' && (
+                          <span className="text-foreground-light">
+                            {deployment.size_kb.toFixed(1)} KB
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-x-2">
+                      <Button
+                        type="default"
+                        size="tiny"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleViewCodeClick(deployment)
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {deployment.status !== 'ACTIVE' && (
+                        <Button
+                          type="default"
+                          size="tiny"
+                          disabled={isRollingBack}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRollbackClick(deployment)
+                          }}
+                        >
+                          Restore
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Eye className="h-4 w-4" />
+            <h4 className="text-foreground">Version Preview</h4>
+          </div>
+          <p className="text-sm text-foreground-light mb-4">
+            {selectedDeployment
+              ? `Preview of version from ${new Date(selectedDeployment.created_at).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+              : 'Select a version to preview'}
+          </p>
+
+          {isLoadingCode ? (
+            <div className="space-y-3">
+              <Skeleton className="h-6 w-80" />
+              <Skeleton className="h-[320px] w-full" />
+            </div>
+          ) : selectedDeployment && codeFiles.length > 0 ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-md border p-3">
+                <div>
                   <div className="text-foreground font-medium">
-                    {new Date(deployment.created_at).toLocaleString('en-US', {
+                    {new Date(selectedDeployment.created_at).toLocaleString('en-US', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
@@ -200,63 +310,56 @@ export const EdgeFunctionVersionsList = () => {
                       minute: '2-digit',
                     })}
                   </div>
-                  {deployment.status === 'ACTIVE' && (
-                    <Badge variant="default" className="text-xs">
-                      Active
-                    </Badge>
+                  {selectedDeployment.commit_message && (
+                    <div className="text-sm text-foreground-light">
+                      {selectedDeployment.commit_message}
+                    </div>
                   )}
                 </div>
-                {deployment.commit_message && (
-                  <div className="text-sm text-foreground-light">{deployment.commit_message}</div>
-                )}
-                <div className="flex items-center gap-x-4 text-xs text-muted-foreground">
-                  {deployment.commit_hash && (
-                    <span className="font-mono text-foreground-light">
-                      #{deployment.commit_hash}
-                    </span>
+                <div className="text-xs text-muted-foreground text-right">
+                  {typeof selectedDeployment.size_kb === 'number' && (
+                    <div>{selectedDeployment.size_kb.toFixed(1)} KB</div>
                   )}
-                  {typeof deployment.size_kb === 'number' && (
-                    <span className="text-foreground-light">
-                      {deployment.size_kb.toFixed(1)} KB
-                    </span>
+                  {selectedDeployment.commit_hash && (
+                    <div className="font-mono">#{selectedDeployment.commit_hash}</div>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-x-2">
-                <Button type="default" size="tiny" onClick={() => handleViewCodeClick(deployment)}>
-                  View code
-                </Button>
-                {deployment.status !== 'ACTIVE' && (
+              <pre className="max-h-[60vh] overflow-auto rounded border bg-muted p-3 text-xs">
+                <code>{codeFiles[0]?.content ?? ''}</code>
+              </pre>
+
+              {selectedDeployment.status === 'ACTIVE' ? (
+                <div className="mt-4 rounded-md bg-accent/30 border p-4 text-sm text-foreground">
+                  This is the currently active version
+                </div>
+              ) : (
+                <div className="mt-4">
                   <Button
-                    type="default"
-                    size="tiny"
+                    block
+                    type="primary"
+                    size="medium"
                     disabled={isRollingBack}
-                    onClick={() => handleRollbackClick(deployment)}
+                    onClick={() => setShowRollback(true)}
                   >
-                    Restore
+                    Restore This Version
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-          )
-        })}
+          ) : (
+            <div className="text-sm text-muted-foreground">No code available</div>
+          )}
+        </div>
       </CardContent>
 
       <RollbackModal
-        open={showRollbackModal}
-        onOpenChange={setShowRollbackModal}
+        open={showRollback}
+        onOpenChange={setShowRollback}
         deployment={selectedDeployment}
-        onConfirm={handleRollbackConfirm}
+        onConfirm={() => handleRollbackConfirm(selectedDeployment ?? undefined)}
         isLoading={isRollingBack}
-      />
-
-      <CodeModal
-        open={showCodeModal}
-        onOpenChange={setShowCodeModal}
-        version={selectedDeployment?.version ?? null}
-        files={codeFiles}
-        isLoading={isLoadingCode}
       />
     </Card>
   )

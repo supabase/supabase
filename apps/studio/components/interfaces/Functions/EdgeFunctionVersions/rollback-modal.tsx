@@ -54,6 +54,9 @@ export const RollbackModal = ({
                 <div className="text-sm text-muted-foreground">
                   Deployed: {formatDate(deployment.created_at)}
                 </div>
+                {deployment.commit_message && (
+                  <div className="text-sm text-muted-foreground">{deployment.commit_message}</div>
+                )}
               </div>
             </div>
           </AlertDialogDescription>
@@ -61,7 +64,7 @@ export const RollbackModal = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm} disabled={isLoading}>
-            {isLoading ? 'Rolling back...' : 'Confirm rollback'}
+            {isLoading ? 'Rolling back…' : 'Confirm rollback'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
