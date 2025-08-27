@@ -44,7 +44,8 @@ const RowLoading = () => (
   </TableRow>
 )
 
-const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2'
+const tableHeaderClass =
+  'text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 h-10'
 
 const TableContainer = ({
   children,
@@ -197,7 +198,7 @@ export const AccessTokenTable = <T,>({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        type="text"
+                        type="default"
                         title="More options"
                         className="px-1.5"
                         disabled={isLoading}

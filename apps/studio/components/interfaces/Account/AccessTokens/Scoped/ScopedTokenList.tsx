@@ -18,8 +18,6 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
   // Extract tokens from the response structure
   const tokens = tokensData?.tokens
 
-
-
   const columns: TableColumn<ScopedAccessToken>[] = [
     {
       key: 'name',
