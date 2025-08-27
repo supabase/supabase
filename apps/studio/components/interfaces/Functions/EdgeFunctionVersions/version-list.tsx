@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { RefreshCw, AlertCircle, Eye } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader, ScrollArea } from 'ui'
 import { fetchDeployments, fetchVersionCode, rollbackToVersion } from './mocks'
 import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './rollback-modal'
@@ -265,7 +265,7 @@ export const EdgeFunctionVersionsList = () => {
           </p>
 
           {isLoadingCode ? (
-            <div className="flex items-center justify-center h-full bg-surface-200 py-12">
+            <div className="flex items-center justify-center h-[400px] rounded border bg-surface-200">
               <LogoLoader />
             </div>
           ) : selectedDeployment && codeFiles.length > 0 ? (
@@ -297,9 +297,11 @@ export const EdgeFunctionVersionsList = () => {
                 </div>
               </div>
 
-              <pre className="max-h-[60vh] overflow-auto rounded border bg-muted p-3 text-xs">
-                <code>{codeFiles[0]?.content ?? ''}</code>
-              </pre>
+              <ScrollArea className="h-[400px] rounded border bg-muted p-3 text-xs">
+                <pre className="whitespace-pre">
+                  <code>{codeFiles[0]?.content ?? ''}</code>
+                </pre>
+              </ScrollArea>
 
               {selectedDeployment.status === 'ACTIVE' ? (
                 <div className="mt-4 rounded-md bg-accent/30 border p-4 text-sm text-foreground">
@@ -320,7 +322,9 @@ export const EdgeFunctionVersionsList = () => {
               )}
             </div>
           ) : (
-            <div className="text-sm text-muted-foreground">No code available</div>
+            <div className="text-sm text-muted-foreground h-[400px] rounded border bg-muted flex items-center justify-center">
+              No code available
+            </div>
           )}
         </div>
       </CardContent>
