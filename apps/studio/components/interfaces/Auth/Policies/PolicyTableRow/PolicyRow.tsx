@@ -10,13 +10,13 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
-  TableRow,
-  TableCell,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -30,7 +30,7 @@ interface PolicyRowProps {
   isLocked: boolean
 }
 
-const PolicyRow = ({
+export const PolicyRow = ({
   policy,
   isLocked: isLockedDefault,
   onSelectEditPolicy = noop,
@@ -169,5 +169,3 @@ const PolicyRow = ({
     </TableRow>
   )
 }
-
-export default PolicyRow

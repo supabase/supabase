@@ -1,4 +1,9 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
+import { noop } from 'lodash'
 import { Archive } from 'lucide-react'
+
+import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { Bucket } from 'data/storage/buckets-query'
 import {
   Badge,
   Button,
@@ -12,28 +17,39 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import PolicyRow from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
 
-const StoragePoliciesBucketRow = ({
+interface StoragePoliciesBucketRowProps {
+  table: string
+  label: string
+  bucket?: Bucket
+  policies: PostgresPolicy[]
+  onSelectPolicyAdd: (bucketName: string, table: string) => void
+  onSelectPolicyEdit: (policy: PostgresPolicy, bucketName: string, table: string) => void
+  onSelectPolicyDelete: (policy: PostgresPolicy) => void
+}
+
+export const StoragePoliciesBucketRow = ({
   table = '',
   label = '',
-  bucket = {},
+  bucket,
   policies = [],
-  onSelectPolicyAdd = () => {},
-  onSelectPolicyEdit = () => {},
-  onSelectPolicyDelete = () => {},
-}: any) => {
+  onSelectPolicyAdd = noop,
+  onSelectPolicyEdit = noop,
+  onSelectPolicyDelete = noop,
+}: StoragePoliciesBucketRowProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-row w-full items-center justify-between gap-0 space-y-0">
         <div className="flex items-center gap-3">
           <Archive className="text-foreground-light" size={16} strokeWidth={1.5} />
           <CardTitle>{label}</CardTitle>
-          {bucket.public && <Badge variant="warning">Public</Badge>}
+          {bucket?.public && <Badge variant="warning">Public</Badge>}
         </div>
-        <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
-          New policy
-        </Button>
+        {!!bucket && (
+          <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
+            New policy
+          </Button>
+        )}
       </CardHeader>
       {policies.length === 0 ? (
         <CardContent>
@@ -53,12 +69,12 @@ const StoragePoliciesBucketRow = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {policies.map((policy: any) => (
+              {policies.map((policy) => (
                 <PolicyRow
                   key={policy.id ?? policy.name}
                   policy={policy}
                   isLocked={false}
-                  onSelectEditPolicy={(p) => onSelectPolicyEdit(p, bucket.name, table)}
+                  onSelectEditPolicy={(p) => onSelectPolicyEdit(p, bucket?.name ?? '', table)}
                   onSelectDeletePolicy={onSelectPolicyDelete}
                 />
               ))}
@@ -69,5 +85,3 @@ const StoragePoliciesBucketRow = ({
     </Card>
   )
 }
-
-export default StoragePoliciesBucketRow
