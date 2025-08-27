@@ -421,7 +421,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       
       source: "",
-      files: ["registry/default/ai-editor-rules/create-db-functions.mdc","registry/default/ai-editor-rules/create-migration.mdc","registry/default/ai-editor-rules/create-rls-policies.mdc","registry/default/ai-editor-rules/postgres-sql-style-guide.mdc","registry/default/ai-editor-rules/writing-supabase-edge-functions.mdc"],
+      files: ["registry/default/ai-editor-rules/create-db-functions.mdc","registry/default/ai-editor-rules/create-migration.mdc","registry/default/ai-editor-rules/create-rls-policies.mdc","registry/default/ai-editor-rules/postgres-sql-style-guide.mdc","registry/default/ai-editor-rules/writing-supabase-edge-functions.mdc","registry/default/ai-editor-rules/use-realtime.mdc"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
