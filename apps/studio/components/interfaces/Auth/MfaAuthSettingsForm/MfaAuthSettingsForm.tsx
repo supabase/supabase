@@ -31,11 +31,8 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-<<<<<<< HEAD
   Select_Shadcn_,
-=======
   Switch,
->>>>>>> 92c3a1966a (feat: expose mfa setting for limiting aal1 sessions to 15 mins)
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -503,7 +500,7 @@ const MfaAuthSettingsForm = () => {
           </form>
         </Form_Shadcn_>
       </ScaffoldSection>
-<<<<<<< HEAD
+
       <ConfirmationModal
         visible={isConfirmationModalVisible}
         title="Confirm SMS MFA"
@@ -523,7 +520,6 @@ const MfaAuthSettingsForm = () => {
           customers are using SMS MFA.
         </p>
       </ConfirmationModal>
-=======
 
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Enhanced MFA Security</ScaffoldSectionTitle>
@@ -573,7 +569,6 @@ const MfaAuthSettingsForm = () => {
           </form>
         </Form_Shadcn_>
       </ScaffoldSection>
->>>>>>> 92c3a1966a (feat: expose mfa setting for limiting aal1 sessions to 15 mins)
     </>
   )
 }
