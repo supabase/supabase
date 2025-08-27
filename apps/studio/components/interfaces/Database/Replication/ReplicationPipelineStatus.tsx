@@ -112,10 +112,10 @@ export const ReplicationPipelineStatus = () => {
 
     try {
       if (statusName === 'stopped') {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested, statusName)
         await startPipeline({ projectRef, pipelineId: pipeline.id })
-      } else if (statusName === 'started') {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
+      } else if (statusName === 'started' || statusName === 'failed') {
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested, statusName)
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {

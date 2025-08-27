@@ -60,7 +60,14 @@ export const RowMenu = ({
     }
 
     try {
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
+      // Only show 'enabling' when transitioning from 'stopped'
+      if (statusName === PipelineStatusName.STOPPED) {
+        setGlobalRequestStatus(
+          pipeline.id,
+          PipelineStatusRequestStatus.EnableRequested,
+          statusName
+        )
+      }
       toast(`Enabling pipeline ${pipeline.destination_name}`)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
@@ -80,7 +87,17 @@ export const RowMenu = ({
     }
 
     try {
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
+      // Only show 'disabling' when transitioning from 'started' or 'failed'
+      if (
+        statusName === PipelineStatusName.STARTED ||
+        statusName === PipelineStatusName.FAILED
+      ) {
+        setGlobalRequestStatus(
+          pipeline.id,
+          PipelineStatusRequestStatus.DisableRequested,
+          statusName
+        )
+      }
       toast(`Disabling pipeline ${pipeline.destination_name}`)
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {

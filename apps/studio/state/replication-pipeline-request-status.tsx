@@ -9,7 +9,12 @@ export enum PipelineStatusRequestStatus {
 
 interface PipelineRequestStatusContextType {
   requestStatus: Record<number, PipelineStatusRequestStatus>
-  setRequestStatus: (pipelineId: number, status: PipelineStatusRequestStatus) => void
+  pipelineStatusSnapshot: Record<number, string>
+  setRequestStatus: (
+    pipelineId: number,
+    status: PipelineStatusRequestStatus,
+    snapshotStatus?: string
+  ) => void
   getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
   updatePipelineStatus: (pipelineId: number, backendStatus: string | undefined) => void
 }
@@ -26,12 +31,28 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
   const [requestStatus, setRequestStatusState] = useState<
     Record<number, PipelineStatusRequestStatus>
   >({})
+  const [pipelineStatusSnapshot, setPipelineStatusSnapshot] = useState<Record<number, string>>({})
 
-  const setRequestStatus = (pipelineId: number, status: PipelineStatusRequestStatus) => {
+  const setRequestStatus = (
+    pipelineId: number,
+    status: PipelineStatusRequestStatus,
+    snapshotStatus?: string
+  ) => {
     setRequestStatusState((prev) => ({
       ...prev,
       [pipelineId]: status,
     }))
+    setPipelineStatusSnapshot((prev) => {
+      if (status === PipelineStatusRequestStatus.None) {
+        const { [pipelineId]: _omit, ...rest } = prev
+        return rest
+      }
+      // Only set snapshot when provided to avoid undefined entries
+      if (typeof snapshotStatus !== 'undefined') {
+        return { ...prev, [pipelineId]: snapshotStatus }
+      }
+      return prev
+    })
   }
 
   const getRequestStatus = (pipelineId: number): PipelineStatusRequestStatus => {
@@ -41,21 +62,21 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
   const updatePipelineStatus = useCallback(
     (pipelineId: number, backendStatus: string | undefined) => {
       const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
+      if (currentRequestStatus === PipelineStatusRequestStatus.None) return
 
-      if (
-        (currentRequestStatus === PipelineStatusRequestStatus.EnableRequested && backendStatus !== 'stopped') ||
-        (currentRequestStatus === PipelineStatusRequestStatus.DisableRequested && backendStatus !== 'started')
-      ) {
+      const snapshot = pipelineStatusSnapshot[pipelineId]
+      if (typeof backendStatus !== 'undefined' && backendStatus !== snapshot) {
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
       }
     },
-    [requestStatus, setRequestStatus]
+    [requestStatus, pipelineStatusSnapshot]
   )
 
   return (
     <PipelineRequestStatusContext.Provider
       value={{
         requestStatus,
+        pipelineStatusSnapshot,
         setRequestStatus,
         getRequestStatus,
         updatePipelineStatus,

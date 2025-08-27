@@ -153,8 +153,13 @@ const DestinationPanel = ({
         }
         // Mark pipeline as updating to reflect immediate UI feedback
         if (existingDestination.pipelineId) {
-          // Initialize updating state before sending requests
-          setRequestStatus(existingDestination.pipelineId, PipelineStatusRequestStatus.UpdateRequested)
+          // Initialize updating state before sending requests, snapshot current steady state
+          const snapshot = existingDestination.enabled ? 'started' : 'stopped'
+          setRequestStatus(
+            existingDestination.pipelineId,
+            PipelineStatusRequestStatus.UpdateRequested,
+            snapshot
+          )
         }
         // Update existing destination
         const bigQueryConfig: any = {
