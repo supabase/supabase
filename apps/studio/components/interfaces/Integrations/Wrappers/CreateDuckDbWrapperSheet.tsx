@@ -205,6 +205,7 @@ export const CreateDuckDbWrapperSheet = ({
         connectionString: project?.connectionString,
         wrapperMeta,
         formState: {
+          type: selectedTarget,
           ...values,
           server_name: `${values.wrapper_name}_server`,
           supabase_target_schema: values.target_schema,
