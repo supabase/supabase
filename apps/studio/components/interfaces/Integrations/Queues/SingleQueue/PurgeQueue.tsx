@@ -10,7 +10,7 @@ interface PurgeQueueProps {
   onClose: () => void
 }
 
-const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
+export const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const { mutate: purgeDatabaseQueue, isLoading } = useDatabaseQueuePurgeMutation({
@@ -58,5 +58,3 @@ const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
     />
   )
 }
-
-export default PurgeQueue
