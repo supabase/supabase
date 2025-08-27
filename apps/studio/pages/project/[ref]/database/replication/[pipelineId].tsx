@@ -2,12 +2,12 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 
 import { FeatureFlagContext, useFlag, useParams } from 'common'
-import ReplicationProvider from 'components/interfaces/Database/Replication/ReplicationProvider'
 import { ReplicationPipelineStatus } from 'components/interfaces/Database/Replication/ReplicationPipelineStatus'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -25,7 +25,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
     <>
       {enablePgReplicate && (
-        <ReplicationProvider>
+        <PipelineRequestStatusProvider>
           <ScaffoldContainer>
             <ScaffoldSection>
               <div className="col-span-12">
@@ -34,7 +34,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               </div>
             </ScaffoldSection>
           </ScaffoldContainer>
-        </ReplicationProvider>
+        </PipelineRequestStatusProvider>
       )}
     </>
   )
