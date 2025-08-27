@@ -89,11 +89,7 @@ export const RowMenu = ({
     try {
       // Only show 'disabling' when transitioning from allowed states
       if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
-        setGlobalRequestStatus(
-          pipeline.id,
-          PipelineStatusRequestStatus.StopRequested,
-          statusName
-        )
+        setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
       }
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {

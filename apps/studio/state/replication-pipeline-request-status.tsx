@@ -17,7 +17,7 @@ export enum PipelineStatusRequestStatus {
 
 interface PipelineRequestStatusContextType {
   requestStatus: Record<number, PipelineStatusRequestStatus>
-  pipelineStatusSnapshot: Record<number, string>
+  pipelineStatusSnapshot: Record<number, string | undefined>
   setRequestStatus: (
     pipelineId: number,
     status: PipelineStatusRequestStatus,
@@ -39,7 +39,9 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
   const [requestStatus, setRequestStatusState] = useState<
     Record<number, PipelineStatusRequestStatus>
   >({})
-  const [pipelineStatusSnapshot, setPipelineStatusSnapshot] = useState<Record<number, string>>({})
+  const [pipelineStatusSnapshot, setPipelineStatusSnapshot] = useState<
+    Record<number, string | undefined>
+  >({})
   const timeoutsRef = useRef<Record<number, number>>({})
   const REQUEST_TIMEOUT_MS = 10_000
 
@@ -100,8 +102,9 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
       const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
       if (currentRequestStatus === PipelineStatusRequestStatus.None) return
 
-      const currentStatus = pipelineStatusSnapshot[pipelineId]
-      if (newStatus !== undefined && newStatus !== currentStatus) {
+      // Only remove when backend status differs from snapshot
+      const snapshotStatus = pipelineStatusSnapshot[pipelineId]
+      if (newStatus !== snapshotStatus) {
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
       }
     },

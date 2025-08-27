@@ -325,7 +325,7 @@ const DestinationPanel = ({
             },
           })
           // Set request status only right before starting, then fire and close
-          setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, 'stopped')
+          setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
           toast.success('Destination created. Starting the pipeline...')
           void startPipeline({ projectRef, pipelineId })
           onClose()
