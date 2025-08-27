@@ -3,6 +3,13 @@ import * as configcat from 'configcat-js'
 let client: configcat.IConfigCatClient
 const endpoint = '/configuration-files/configcat-proxy/frontend-v2/config_v6.json'
 
+/**
+ * To set up ConfigCat for another app
+ * - Declare `FeatureFlagProvider` at the _app level
+ * - Pass in `getFlags` as `getConfigCatFlags` into `FeatureFlagProvider`
+ * - Ensure that your app has the `NEXT_PUBLIC_CONFIGCAT_PROXY_URL` env var
+ */
+
 export const fetchHandler: typeof fetch = async (input, init) => {
   try {
     return await fetch(input, init)
@@ -40,10 +47,11 @@ async function getClient() {
 }
 
 export async function getFlags(userEmail: string = '') {
-  if (userEmail) {
-    const client = await getClient()
-    return client.getAllValuesAsync(new configcat.User(userEmail))
-  }
+  const client = await getClient()
 
-  return []
+  if (userEmail) {
+    return client.getAllValuesAsync(new configcat.User(userEmail))
+  } else {
+    return client.getAllValuesAsync()
+  }
 }

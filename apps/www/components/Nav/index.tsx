@@ -42,7 +42,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   const isLoggedIn = useIsLoggedIn()
   const isLoadingUser = useIsUserLoading()
-  console.log({ isLoadingUser, isLoggedIn })
 
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
