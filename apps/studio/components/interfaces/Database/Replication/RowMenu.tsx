@@ -60,10 +60,11 @@ export const RowMenu = ({
     }
 
     try {
-      await startPipeline({ projectRef, pipelineId: pipeline.id })
-      toast(`Enabling pipeline ${pipeline.destination_name}`)
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
+      toast(`Enabling pipeline ${pipeline.destination_name}`)
+      await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
     }
   }
@@ -79,10 +80,11 @@ export const RowMenu = ({
     }
 
     try {
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      toast(`Disabling pipeline ${pipeline.destination_name}`)
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
+      toast(`Disabling pipeline ${pipeline.destination_name}`)
+      await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
     }
   }

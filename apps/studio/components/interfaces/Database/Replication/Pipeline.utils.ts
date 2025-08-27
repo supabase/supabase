@@ -69,23 +69,26 @@ export const getPipelineStateMessages = (
   requestStatus: PipelineStatusRequestStatus | undefined,
   statusName: string | undefined
 ) => {
-  // Always prioritize request status (enabling/disabling) over pipeline status
+  // Prefer concrete backend transitional/error states as soon as they're available
+  switch (statusName) {
+    case 'starting':
+      return PIPELINE_STATE_MESSAGES.starting
+    case 'failed':
+      return PIPELINE_STATE_MESSAGES.failed
+  }
+
+  // Otherwise reflect optimistic request intent immediately after click
   if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
     return PIPELINE_STATE_MESSAGES.enabling
   }
-
   if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
     return PIPELINE_STATE_MESSAGES.disabling
   }
 
-  // Only check pipeline status if no request is in progress
+  // Fall back to steady states
   switch (statusName) {
-    case 'failed':
-      return PIPELINE_STATE_MESSAGES.failed
     case 'stopped':
       return PIPELINE_STATE_MESSAGES.stopped
-    case 'starting':
-      return PIPELINE_STATE_MESSAGES.starting
     case 'started':
       return PIPELINE_STATE_MESSAGES.running
     case 'unknown':

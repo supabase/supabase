@@ -111,11 +111,11 @@ export const ReplicationPipelineStatus = () => {
 
     try {
       if (statusName === 'stopped') {
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
+        await startPipeline({ projectRef, pipelineId: pipeline.id })
       } else if (statusName === 'started') {
-        await stopPipeline({ projectRef, pipelineId: pipeline.id })
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
+        await stopPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
