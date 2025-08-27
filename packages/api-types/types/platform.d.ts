@@ -458,7 +458,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Send exit survey to HubSpot and survey_responses table */
+    /** Send exit survey to HubSpot, Notion, and survey_responses table */
     post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
@@ -793,23 +793,6 @@ export interface paths {
     }
     /** Gets installed vercel project connections for the given organization integration */
     get: operations['VercelConnectionsController_getVercelConnections']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/vercel/connections/project/{project_ref}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets all Vercel integrations (regular and marketplace) with their connections for a given project */
-    get: operations['VercelConnectionsController_getProjectVercelConnections']
     put?: never
     post?: never
     delete?: never
@@ -2151,6 +2134,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/profile/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Search profiles by username, email with the given keywords */
+    post: operations['SearchProfileController_searchProfile']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects': {
     parameters: {
       query?: never
@@ -2211,15 +2211,15 @@ export interface paths {
     patch: operations['ProjectsRefController_updateProject']
     trace?: never
   }
-  '/platform/projects/{ref}/analytics/endpoints/functions.combined-stats': {
+  '/platform/projects/{ref}/analytics/endpoints/functions.inv-stats': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets a project's function combined statistics */
-    get: operations['FunctionsLogsController_getCombinedStats']
+    /** Gets a project's function invocation statistics */
+    get: operations['FunctionInvocationLogsController_getStatus']
     put?: never
     post?: never
     delete?: never
@@ -2236,7 +2236,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets a project's function request statistics */
-    get: operations['FunctionsLogsController_getRequestStats']
+    get: operations['FunctionRequestLogsController_getStatus']
     put?: never
     post?: never
     delete?: never
@@ -2253,7 +2253,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets a project's function resource usage */
-    get: operations['FunctionsLogsController_getResourceUsage']
+    get: operations['FunctionResourceLogsController_getStatus']
     put?: never
     post?: never
     delete?: never
@@ -4206,6 +4206,75 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/vercel/projects': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the list of Vercel projects */
+    get: operations['VercelProjectsController_getVercelProjects']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/vercel/projects/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the Vercel project with the given ID */
+    get: operations['VercelProjectsController_getVercelProject']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/vercel/projects/envs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the environment variables for the given project ID on behalf of the given team ID */
+    get: operations['VercelEnvironmentVariablesController_getEnvironmentVariables']
+    put?: never
+    /** Creates the environment variable for the given project ID on behalf of the given team ID */
+    post: operations['VercelEnvironmentVariablesController_createEnvironmentVariable']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/vercel/redirect/{installation_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the Vercel redirect url */
+    get: operations['VercelRedirectController_getRedirectUrl']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/workflow-runs': {
     parameters: {
       query?: never
@@ -4414,9 +4483,11 @@ export interface components {
       walg_enabled: boolean
     }
     CloneProject: {
+      /** @default 0 */
       cloneBackupId?: number
       newDbPass: string
       newProjectName: string
+      /** @default 0 */
       recoveryTimeTarget?: number
     }
     CloudMarketplaceOnboardingInfoResponse: {
@@ -4944,10 +5015,8 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
-          /** @description Maximum number of concurrent streams when writing */
-          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins?: number
+          max_staleness_mins: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -4963,10 +5032,8 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
-          /** @description Maximum number of concurrent streams when writing */
-          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins?: number
+          max_staleness_mins: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -5202,6 +5269,12 @@ export interface components {
         supabase_project_ref: string
       }
       organization_integration_id: string
+    }
+    CreateVercelEnvironmentVariableBody: {
+      key: string
+      target: string[]
+      type: string
+      value: string
     }
     CreateVercelIntegrationBody: {
       code: string
@@ -5683,68 +5756,6 @@ export interface components {
       iso_timestamp_start?: string
       sql?: string
     }
-    GetProjectVercelConnectionsResponse: {
-      integrations: {
-        added_by: {
-          primary_email: string
-          username: string
-        }
-        connections: {
-          added_by: {
-            primary_email: string
-            username: string
-          }
-          env_sync_targets: string[]
-          foreign_project_id: string
-          id: string
-          inserted_at: string
-          metadata: {
-            framework?: string | null
-            name: string
-            supabaseConfig: {
-              projectEnvVars: {
-                write: boolean
-              }
-            }
-          }
-          organization_integration_id: string
-          public_env_var_prefix: string
-          supabase_project_ref: string
-          updated_at: string
-        }[]
-        id: string
-        inserted_at: string
-        metadata: {
-          account: {
-            avatar: string | null
-            name: string
-            source: string
-            team_id: string | null
-            team_slug: string | null
-            type: string
-          }
-          configuration_id: string
-        }
-        organization_slug: string
-        updated_at: string
-      }[]
-      marketplace_integrations: {
-        connections: {
-          foreign_project_id: string
-          framework: string | null
-          id: string
-          inserted_at: string
-          marketplace_installation_id: string
-          name: string
-          updated_at: string
-          vercel_owner_id: string | null
-        }[]
-        id: string
-        inserted_at: string
-        organization_slug: string
-        updated_at: string
-      }[]
-    }
     GetPublicUrlBody: {
       options?: {
         download?: boolean
@@ -6166,8 +6177,6 @@ export interface components {
       MFA_TOTP_VERIFY_ENABLED: boolean
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
-      NIMBUS_OAUTH_CLIENT_ID: string | null
-      NIMBUS_OAUTH_CLIENT_SECRET: string | null
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -7254,6 +7263,13 @@ export interface components {
         enabled: boolean
       }
     }
+    Profile: {
+      first_name: string
+      gotrue_id: string
+      id: number
+      last_name: string
+      username: string
+    }
     ProfileResponse: {
       auth0_id: string
       disabled_features: (
@@ -7652,10 +7668,8 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
-          /** @description Maximum number of concurrent streams when writing */
-          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins?: number
+          max_staleness_mins: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -7677,10 +7691,8 @@ export interface components {
           big_query: {
             /** @description BigQuery dataset id */
             dataset_id: string
-            /** @description Maximum number of concurrent streams when writing */
-            max_concurrent_streams?: number
             /** @description Max staleness in minutes */
-            max_staleness_mins?: number
+            max_staleness_mins: number
             /** @description BigQuery project id */
             project_id: string
             /** @description BigQuery service account key */
@@ -8027,6 +8039,9 @@ export interface components {
       /** @default false */
       disable_statement_timeout?: boolean
       query: string
+    }
+    SearchProfileBody: {
+      keywords: string
     }
     SendDocsFeedbackBody: {
       feedback?: string
@@ -8683,8 +8698,6 @@ export interface components {
       MFA_TOTP_VERIFY_ENABLED?: boolean | null
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean | null
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
-      NIMBUS_OAUTH_CLIENT_ID?: string | null
-      NIMBUS_OAUTH_CLIENT_SECRET?: string | null
       PASSWORD_HIBP_ENABLED?: boolean | null
       PASSWORD_MIN_LENGTH?: number | null
       /** @enum {string|null} */
@@ -8951,10 +8964,8 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
-          /** @description Maximum number of concurrent streams when writing */
-          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins?: number
+          max_staleness_mins: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -8970,10 +8981,8 @@ export interface components {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
-          /** @description Maximum number of concurrent streams when writing */
-          max_concurrent_streams?: number
           /** @description Max staleness in minutes */
-          max_staleness_mins?: number
+          max_staleness_mins: number
           /** @description BigQuery project id */
           project_id: string
           /** @description BigQuery service account key */
@@ -9316,6 +9325,9 @@ export interface components {
         name: string
         score: number
       }[]
+    }
+    VercelRedirectResponse: {
+      url: string
     }
     WorkflowRunResponse: {
       branch_id: string
@@ -10180,12 +10192,6 @@ export interface operations {
           'application/json': components['schemas']['CloneBackupsResponse']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to list available valid backups */
       500: {
         headers: {
@@ -10219,12 +10225,6 @@ export interface operations {
           'application/json': components['schemas']['ProjectClonedResponse']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to clone the current project */
       500: {
         headers: {
@@ -10253,12 +10253,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ProjectClonedStatusResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to retrieve clone project status */
       500: {
@@ -11092,34 +11086,6 @@ export interface operations {
         }
       }
       /** @description Failed to get installed vercel connections for the given organization integration */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelConnectionsController_getProjectVercelConnections: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        project_ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetProjectVercelConnectionsResponse']
-        }
-      }
-      /** @description Failed to get Vercel integrations for the given project */
       500: {
         headers: {
           [name: string]: unknown
@@ -12377,12 +12343,6 @@ export interface operations {
         }
         content?: never
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to remove organization member */
       500: {
         headers: {
@@ -12410,12 +12370,6 @@ export interface operations {
     }
     responses: {
       200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12454,12 +12408,6 @@ export interface operations {
         }
         content?: never
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to update organization member role */
       500: {
         headers: {
@@ -12484,12 +12432,6 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12595,12 +12537,6 @@ export interface operations {
         }
         content?: never
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to delete organization invitation with given id */
       500: {
         headers: {
@@ -12688,12 +12624,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['MfaStatusResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to get organization MFA status */
       500: {
@@ -14732,12 +14662,6 @@ export interface operations {
         }
         content?: never
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to format sql query */
       500: {
         headers: {
@@ -14770,12 +14694,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ValidateQueryResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to validate sql query */
       500: {
@@ -15721,6 +15639,36 @@ export interface operations {
       }
     }
   }
+  SearchProfileController_searchProfile: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SearchProfileBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Profile'][]
+        }
+      }
+      /** @description Failed to search profiles with the given keywords */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ProjectsController_getProjects: {
     parameters: {
       query?: never
@@ -15877,11 +15825,49 @@ export interface operations {
       }
     }
   }
-  FunctionsLogsController_getCombinedStats: {
+  FunctionInvocationLogsController_getStatus: {
     parameters: {
       query: {
         function_id: string
-        interval: '15min' | '1hr' | '3hr' | '1day'
+        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's function invocation statistics */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  FunctionRequestLogsController_getStatus: {
+    parameters: {
+      query: {
+        function_id: string
+        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
       }
       header?: never
       path: {
@@ -15915,49 +15901,11 @@ export interface operations {
       }
     }
   }
-  FunctionsLogsController_getRequestStats: {
+  FunctionResourceLogsController_getStatus: {
     parameters: {
       query: {
         function_id: string
-        interval: '15min' | '1hr' | '3hr' | '1day'
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project's function request statistics */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  FunctionsLogsController_getResourceUsage: {
-    parameters: {
-      query: {
-        function_id: string
-        interval: '15min' | '1hr' | '3hr' | '1day'
+        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
       }
       header?: never
       path: {
@@ -16125,12 +16073,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['AnalyticsResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to get project's usage api requests count */
       500: {
@@ -17097,12 +17039,6 @@ export interface operations {
           'application/json': components['schemas']['PgbouncerConfigResponse']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to retrieve project's pgbouncer config */
       500: {
         headers: {
@@ -17171,12 +17107,6 @@ export interface operations {
           'application/json': components['schemas']['PgbouncerStatusResponse']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to retrieve project's pgbouncer status */
       500: {
         headers: {
@@ -17205,12 +17135,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PostgresConfigResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to retrieve project's Postgres config */
       500: {
@@ -17452,12 +17376,6 @@ export interface operations {
           'application/json': components['schemas']['GetJwtSecretUpdateStatus']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to retrieve JWT secret update status */
       500: {
         headers: {
@@ -17560,12 +17478,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SupavisorConfigResponse'][]
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to retrieve project's supavisor config */
       500: {
@@ -17739,7 +17651,7 @@ export interface operations {
   ContentController_deleteContents: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path: {
@@ -17896,7 +17808,7 @@ export interface operations {
   ContentFoldersController_DeleteFolder: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path?: never
@@ -18161,12 +18073,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['DatabaseStatusResponse'][]
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to get statuses of databases of a project */
       500: {
@@ -18468,12 +18374,6 @@ export interface operations {
         }
         content?: never
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to get project's usage metrics */
       500: {
         headers: {
@@ -18536,12 +18436,6 @@ export interface operations {
           'application/json': components['schemas']['LoadBalancerDetailResponse'][]
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
     }
   }
   ProjectAdvisorNotificationsController_listNotificationExceptions: {
@@ -18563,12 +18457,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ListNotificationExceptionsResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to retrieve advisor notification exceptions */
       500: {
@@ -18603,13 +18491,7 @@ export interface operations {
           'application/json': components['schemas']['CreateNotificationExceptionsResponse']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create advisor notification exceptions */
+      /** @description Failed to creare advisor notification exceptions */
       500: {
         headers: {
           [name: string]: unknown
@@ -18621,7 +18503,7 @@ export interface operations {
   ProjectAdvisorNotificationsController_deleteNotificationExceptions: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path: {
@@ -18633,12 +18515,6 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -18671,12 +18547,6 @@ export interface operations {
     }
     responses: {
       200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -18774,12 +18644,6 @@ export interface operations {
         }
         content?: never
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to resize database disk */
       500: {
         headers: {
@@ -18843,12 +18707,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -19133,12 +18991,6 @@ export interface operations {
           'application/json': components['schemas']['ServiceVersions']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
     }
   }
   SettingsController_getProjectSettings: {
@@ -19160,12 +19012,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ProjectSettingsResponse']
         }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to retrieve project's settings */
       500: {
@@ -20396,12 +20242,6 @@ export interface operations {
           'application/json': components['schemas']['GetArchiveResponse']
         }
       }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to get project storage archive */
       500: {
         headers: {
@@ -20424,12 +20264,6 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
         headers: {
           [name: string]: unknown
         }
@@ -21426,6 +21260,154 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  VercelProjectsController_getVercelProjects: {
+    parameters: {
+      query?: {
+        teamId?: string
+      }
+      header: {
+        vercel_authorization: string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get projects */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  VercelProjectsController_getVercelProject: {
+    parameters: {
+      query?: {
+        teamId?: string
+      }
+      header: {
+        vercel_authorization: string
+      }
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  VercelEnvironmentVariablesController_getEnvironmentVariables: {
+    parameters: {
+      query: {
+        projectId: string
+        teamId?: string
+      }
+      header: {
+        vercel_authorization: string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get Vercel environment variables */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  VercelEnvironmentVariablesController_createEnvironmentVariable: {
+    parameters: {
+      query: {
+        projectId: string
+        teamId?: string
+      }
+      header: {
+        vercel_authorization: string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateVercelEnvironmentVariableBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create Vercel environment variables */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  VercelRedirectController_getRedirectUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        installation_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['VercelRedirectResponse']
+        }
+      }
+      /** @description Failed to get Vercel redirect url */
+      500: {
         headers: {
           [name: string]: unknown
         }
