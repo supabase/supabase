@@ -4,7 +4,7 @@ import DefaultLayout from 'components/Layouts/Default'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 
 import { getAllCMSPosts } from 'lib/get-cms-posts'
-import { capitalize } from 'lib/helpers'
+import { capitalize } from 'lodash'
 import { getSortedPosts, getAllCategories } from 'lib/posts'
 import type PostTypes from 'types/post'
 

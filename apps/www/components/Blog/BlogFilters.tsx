@@ -17,7 +17,7 @@ import {
   Input,
   cn,
 } from 'ui'
-import { capitalize } from 'lib/helpers'
+import { capitalize } from 'lodash'
 
 interface Props {
   allPosts: PostTypes[]

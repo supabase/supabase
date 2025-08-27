@@ -13,7 +13,7 @@ import {
   cn,
 } from 'ui'
 import { ChevronDown, X as CloseIcon } from 'lucide-react'
-import { startCase } from 'lib/helpers'
+import { startCase } from 'lodash'
 import { useBreakpoint } from 'common'
 import { usePathname } from 'next/navigation'
 

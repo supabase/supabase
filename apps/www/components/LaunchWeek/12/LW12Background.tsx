@@ -1,6 +1,6 @@
 import React from 'react'
 import { cn } from 'ui'
-import { range } from 'lib/helpers'
+import { range } from 'lodash'
 
 interface Props {
   className?: string

@@ -1,6 +1,6 @@
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { startCase } from 'lib/helpers'
+import { startCase } from 'lodash'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
