@@ -26,7 +26,7 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
@@ -46,15 +46,15 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   // placeholder for isLoading state when a useAsyncCheckOrgPermissions hook is added
   // This component in used both in /org/[slug]/integrations and /project/[slug]/settings/integrations
   const isLoadingPermissions = false
-  const canReadVercelConnection = useCheckPermissions(
+  const {can: canReadVercelConnection} = useAsyncCheckProjectPermissions(
     PermissionAction.READ,
     'integrations.vercel_connections'
   )
-  const canCreateVercelConnection = useCheckPermissions(
+  const {can: canCreateVercelConnection} = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
     'integrations.vercel_connections'
   )
-  const canUpdateVercelConnection = useCheckPermissions(
+  const {can: canUpdateVercelConnection} = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )

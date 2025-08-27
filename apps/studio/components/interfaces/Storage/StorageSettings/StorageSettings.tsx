@@ -14,7 +14,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatBytes } from 'lib/helpers'
 import {
@@ -50,8 +50,8 @@ interface StorageSettingsState {
 
 const StorageSettings = () => {
   const { ref: projectRef } = useParams()
-  const canReadStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const {can: canReadStorageSettings} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
+  const {can: canUpdateStorageSettings} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const {
     data: config,
