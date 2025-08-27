@@ -48,6 +48,7 @@ export const DestinationRow = ({
 }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
 
   const {
@@ -83,14 +84,20 @@ export const DestinationRow = ({
     }
 
     try {
+      setIsDeleting(true)
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
       await deleteDestinationPipeline({
         projectRef,
         destinationId: destinationId,
         pipelineId: pipeline.id,
       })
+      // Close dialog after successful deletion
+      setShowDeleteDestinationForm(false)
+      toast.success(`Deleted destination "${destinationName}"`)
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -154,7 +161,7 @@ export const DestinationRow = ({
         visible={showDeleteDestinationForm}
         setVisible={setShowDeleteDestinationForm}
         onDelete={onDeleteClick}
-        isLoading={isPipelineStatusLoading}
+        isLoading={isDeleting}
         name={destinationName}
       />
       <DestinationPanel

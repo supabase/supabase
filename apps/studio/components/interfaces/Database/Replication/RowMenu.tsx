@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { PIPELINE_ERROR_MESSAGES, getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './PipelineStatus'
 
 interface RowMenuProps {
@@ -43,13 +43,6 @@ export const RowMenu = ({
   onDeleteClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
-
-  const getStatusName = (status: any) => {
-    if (status && typeof status === 'object' && 'name' in status) {
-      return status.name
-    }
-    return status
-  }
 
   const statusName = getStatusName(pipelineStatus)
   const pipelineEnabled = statusName !== PipelineStatusName.STOPPED

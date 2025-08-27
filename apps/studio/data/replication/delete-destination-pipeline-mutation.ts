@@ -47,8 +47,21 @@ export const useDeleteDestinationPipelineMutation = ({
     (vars) => deleteDestinationPipeline(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+        const { projectRef, destinationId, pipelineId } = variables
         await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
+        await queryClient.invalidateQueries(replicationKeys.pipelines(projectRef))
+        await queryClient.invalidateQueries(
+          replicationKeys.pipelineById(projectRef, pipelineId)
+        )
+        await queryClient.invalidateQueries(
+          replicationKeys.pipelinesStatus(projectRef, pipelineId)
+        )
+        await queryClient.invalidateQueries(
+          replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
+        )
+        await queryClient.invalidateQueries(
+          replicationKeys.destinationById(projectRef, destinationId)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

@@ -22,14 +22,21 @@ const DeleteDestination = ({
         visible={visible}
         onCancel={() => setVisible(!visible)}
         onConfirm={onDelete}
-        title="Delete this destination"
+        title={isLoading ? 'Deleting destination' : 'Delete this destination'}
         loading={isLoading}
-        confirmLabel={`Delete destination`}
+        confirmLabel={isLoading ? 'Deleting…' : `Delete destination`}
         confirmPlaceholder="Type in name of destination"
         confirmString={name ?? 'Unknown'}
         text={
           <>
-            <span>This will delete the destination</span>{' '}
+            {isLoading ? (
+              <span>
+                Deletion started. This may take a few seconds as the pipeline is
+                stopped and removed.
+              </span>
+            ) : (
+              <span>This will delete the destination</span>
+            )}{' '}
           </>
         }
         alert={{ title: 'You cannot recover this destination once deleted.' }}
