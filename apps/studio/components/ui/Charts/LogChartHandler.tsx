@@ -88,7 +88,7 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
  *
  * Provided data must be in the expected chart format.
  */
-const LogChartHandler = ({
+export const LogChartHandler = ({
   label,
   attributes,
   customDateFormat,
@@ -145,7 +145,7 @@ const LogChartHandler = ({
           data={data as any}
           format={format}
           xAxisKey="period_start"
-          yAxisKey={attributes[0].attribute}
+          yAxisKey={attributes[0]?.attribute}
           highlightedValue={highlightedValue}
           title={label}
           customDateFormat={customDateFormat}

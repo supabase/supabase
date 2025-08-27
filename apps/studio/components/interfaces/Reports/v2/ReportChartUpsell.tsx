@@ -4,6 +4,7 @@ import { ReportConfig } from 'data/reports/v2/reports.types'
 import { useRef, useState } from 'react'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import Link from 'next/link'
+import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
 
 export function ReportChartUpsell({
   report,
@@ -42,7 +43,7 @@ export function ReportChartUpsell({
   return (
     <Panel title={<p className="text-sm">{report.label}</p>} className={cn('h-[260px] relative')}>
       <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
-        <h2>{report.label}</h2>
+        <h2 className="text-sm">{report.label}</h2>
         <p className="text-sm text-foreground-light">
           This chart is available from{' '}
           <span className="capitalize">
@@ -55,6 +56,7 @@ export function ReportChartUpsell({
           type="primary"
           onMouseEnter={() => setIsHoveringUpgrade(true)}
           onMouseLeave={() => setIsHoveringUpgrade(false)}
+          className="mt-4"
         >
           <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=reports`}>
             Upgrade to{' '}
@@ -65,6 +67,26 @@ export function ReportChartUpsell({
         </Button>
       </div>
       <div className="absolute top-0 left-0 w-full h-full z-0"></div>
+      <div className="absolute top-0 left-0 w-full h-full z-0">
+        <LogChartHandler
+          attributes={[
+            {
+              attribute: 'demo',
+              enabled: true,
+              label: 'Demo',
+              provider: 'logs',
+            },
+          ]}
+          label={''}
+          startDate={startDate}
+          endDate={endDate}
+          interval={interval}
+          data={demoData as any}
+          isLoading={false}
+          highlightedValue={0}
+          updateDateRange={() => {}}
+        />
+      </div>
     </Panel>
   )
 }
