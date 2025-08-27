@@ -8,6 +8,8 @@ const endpoint = '/configuration-files/configcat-proxy/frontend-v2/config_v6.jso
  * - Declare `FeatureFlagProvider` at the _app level
  * - Pass in `getFlags` as `getConfigCatFlags` into `FeatureFlagProvider`
  * - Ensure that your app has the `NEXT_PUBLIC_CONFIGCAT_PROXY_URL` env var
+ * - Verify that your flags are now loading by console logging `flagValues` in `FeatureFlagProvider`'s useEffect
+ * - Can now use ConfigCat feature flags with the `useFlag` hook
  */
 
 export const fetchHandler: typeof fetch = async (input, init) => {
