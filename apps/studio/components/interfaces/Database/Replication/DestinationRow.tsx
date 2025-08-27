@@ -7,6 +7,7 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
@@ -14,7 +15,7 @@ import {
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import DeleteDestination from './DeleteDestination'
 import DestinationPanel from './DestinationPanel'
@@ -74,6 +75,18 @@ export const DestinationRow = ({
 
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
+
+  // Fetch table-level replication status to surface errors in list view
+  const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
+    { projectRef, pipelineId: pipeline?.id },
+    {
+      enabled: !!pipeline?.id,
+      refetchInterval: STATUS_REFRESH_FREQUENCY_MS,
+    }
+  )
+  const hasTableErrors = (replicationStatusData?.table_statuses || []).some(
+    (t: any) => t.state?.name === 'error'
+  )
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -139,9 +152,19 @@ export const DestinationRow = ({
           </Table.td>
           <Table.td>
             <div className="flex items-center justify-end gap-x-2">
-              <Button asChild type="default">
+              <Button asChild type="default" className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View status
+                  <span className="inline-flex items-center gap-2">
+                    <span>View status</span>
+                    {hasTableErrors && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex w-2 h-2 rounded-full bg-destructive-600 animate-pulse" />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">Some tables have replication errors</TooltipContent>
+                      </Tooltip>
+                    )}
+                  </span>
                 </Link>
               </Button>
               <RowMenu
