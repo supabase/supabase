@@ -201,7 +201,7 @@ export const CronjobsTab = () => {
                     {...props}
                     onClick={(e) => {
                       const { jobid, jobname } = props.row
-                      const url = `${BASE_PATH}/project/${ref}/integrations/cron/jobs/${jobid}?child-label=${encodeURIComponent(jobname || `Job #${jobid}`)}`
+                      const url = `/project/${ref}/integrations/cron/jobs/${jobid}?child-label=${encodeURIComponent(jobname || `Job #${jobid}`)}`
 
                       sendEvent({
                         action: 'cron_job_history_clicked',
@@ -212,7 +212,7 @@ export const CronjobsTab = () => {
                       })
 
                       if (e.metaKey) {
-                        window.open(url, '_blank')
+                        window.open(`${BASE_PATH}/${url}`, '_blank')
                       } else {
                         router.push(url)
                       }
