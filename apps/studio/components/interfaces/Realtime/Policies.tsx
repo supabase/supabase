@@ -1,7 +1,7 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
-import Policies from 'components/interfaces/Auth/Policies/Policies'
+import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
