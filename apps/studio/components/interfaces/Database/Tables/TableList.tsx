@@ -36,6 +36,8 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { useCopyToClipboard } from 'hooks/ui/useCopyToClipboard'
+import { getTableDefinition } from 'data/database/table-definition-query'
 import {
   Button,
   Card,
@@ -71,15 +73,11 @@ interface TableListProps {
   onDuplicateTable: (table: PostgresTable) => void
 }
 
-export const TableList = ({
-  onDuplicateTable,
-  onAddTable = noop,
-  onEditTable = noop,
-  onDeleteTable = noop,
-}: TableListProps) => {
+export const TableList = ({ onAddTable, onEditTable, onDuplicateTable, onDeleteTable }: TableListProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { copy } = useCopyToClipboard()
 
   const prefetchEditorTablePage = usePrefetchEditorTablePage()
 
@@ -210,6 +208,21 @@ export const TableList = ({
       ?.toLowerCase()
       ?.split('_')
       ?.join(' ')
+  }
+
+  const handleCopyTableDefinition = async (tableId: number) => {
+    try {
+      const tableDefinition = await getTableDefinition({
+        id: tableId,
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+      })
+      if (tableDefinition) {
+        copy(tableDefinition, { withToast: true })
+      }
+    } catch (error) {
+      console.error('Failed to get table definition:', error)
+    }
   }
 
   return (
@@ -536,6 +549,14 @@ export const TableList = ({
                                         <Copy size={12} />
                                         <span>Duplicate Table</span>
                                       </DropdownMenuItemTooltip>
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuItem
+                                        className="gap-x-2"
+                                        onClick={() => handleCopyTableDefinition(x.id!)}
+                                      >
+                                        <Copy size={12} />
+                                        <p>Copy table definition</p>
+                                      </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItemTooltip
                                         disabled={!canUpdateTables || isSchemaLocked}
