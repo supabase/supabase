@@ -350,6 +350,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-expo-react-native',
         },
         {
+          name: 'Expo React Native Social Auth',
+          url: '/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+        },
+        {
           name: 'Android Kotlin',
           url: '/guides/getting-started/tutorials/with-kotlin',
         },
