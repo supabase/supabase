@@ -211,7 +211,6 @@ export const MarkdownPre = ({
   children,
   id,
   onResults,
-  ...props
 }: {
   children: any
   id: string
@@ -224,9 +223,7 @@ export const MarkdownPre = ({
     resultId?: string
     results: any[]
   }) => void
-  [key: string]: any
 }) => {
-  console.log('children:', children, props)
   const router = useRouter()
   const { profile } = useProfile()
   const { isLoading, readOnly } = useContext(MessageContext)
@@ -249,8 +246,8 @@ export const MarkdownPre = ({
     cumulative: false,
   })
 
-  const language = children.props.className?.replace('language-', '') || 'sql'
-  const rawContent = children.props.children
+  const language = children[0].props.className?.replace('language-', '') || 'sql'
+  const rawContent = children[0].props.children[0]
   const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
   const snippetProps: AssistantSnippetProps = useMemo(() => {
