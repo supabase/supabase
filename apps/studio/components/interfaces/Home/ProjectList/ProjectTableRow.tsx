@@ -1,4 +1,4 @@
-import { GitBranch, Github } from 'lucide-react'
+import { Github } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 
@@ -63,11 +63,6 @@ export const ProjectTableRow = ({
                     title="Vercel Icon"
                     className="w-3"
                   />
-                </div>
-              )}
-              {isBranchingEnabled && (
-                <div className="w-fit p-1 border rounded-md flex items-center">
-                  <GitBranch size={12} strokeWidth={1.5} />
                 </div>
               )}
               {isGithubIntegrated && (
