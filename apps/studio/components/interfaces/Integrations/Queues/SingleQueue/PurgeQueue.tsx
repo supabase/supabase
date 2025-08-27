@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useDatabaseQueuePurgeMutation } from 'data/database-queues/database-queues-purge-mutation'
@@ -12,13 +11,11 @@ interface PurgeQueueProps {
 }
 
 const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
-  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
   const { mutate: purgeDatabaseQueue, isLoading } = useDatabaseQueuePurgeMutation({
     onSuccess: () => {
       toast.success(`Successfully purged queue ${queueName}`)
-      router.push(`/project/${project?.ref}/integrations/queues`)
       onClose()
     },
   })
