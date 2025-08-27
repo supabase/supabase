@@ -89,17 +89,14 @@ const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const isCreating = creatingTenantSource || creatingDestinationPipeline || startingPipeline
-  const isUpdating = updatingDestinationPipeline || startingPipeline
-  const isSubmitting = isCreating || isUpdating
+  const [isApplying, setIsApplying] = useState(false)
+  const [isApplyAndRun, setIsApplyAndRun] = useState(false)
   const editMode = !!existingDestination
   const { setRequestStatus } = usePipelineRequestStatus()
 
   // Determine button text based on context
   const getButtonText = () => {
-    if (!editMode) return 'Create'
-    if (existingDestination?.enabled) return 'Apply and Restart'
-    return 'Apply and Start'
+    return editMode ? 'Apply' : 'Create'
   }
 
   const formId = 'destination-editor'
@@ -140,6 +137,7 @@ const DestinationPanel = ({
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     try {
+      setIsApplying(true)
       if (editMode && existingDestination) {
         if (!sourceId) {
           console.error('Source id is required')
@@ -149,22 +147,7 @@ const DestinationPanel = ({
           console.error('Pipeline id is required')
           return
         }
-        // If we're applying changes to a running pipeline, close panel immediately and notify
-        if (existingDestination.enabled) {
-          toast('Applying settings and restarting pipeline...')
-          onClose()
-        }
-        // Mark pipeline as updating to reflect immediate UI feedback
-        if (existingDestination.pipelineId) {
-          // Initialize updating state before sending requests, snapshot current steady state
-          const snapshot = existingDestination.enabled ? 'started' : 'stopped'
-          setRequestStatus(
-            existingDestination.pipelineId,
-            PipelineStatusRequestStatus.UpdateRequested,
-            snapshot
-          )
-        }
-        // Update existing destination
+        // Apply settings only (no restart)
         const bigQueryConfig: any = {
           projectId: data.projectId,
           datasetId: data.datasetId,
@@ -197,16 +180,10 @@ const DestinationPanel = ({
           },
           sourceId,
         })
-
-        // Always start/restart pipeline to apply changes
-        await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
-
-        const actionText = existingDestination.enabled
-          ? 'updated and restarted'
-          : 'updated and started'
-        toast.success(`Successfully ${actionText} destination`)
+        toast.success('Successfully applied settings')
+        onClose()
       } else {
-        // Create new destination
+        // Create destination only (no start)
         if (!sourceId) {
           console.error('Source id is required')
           return
@@ -241,23 +218,119 @@ const DestinationPanel = ({
             ...(hasBothBatchFields && { batch: batchConfig }),
           },
         })
-
-        // Always start new pipelines
-        await startPipeline({ projectRef, pipelineId })
-
-        toast.success('Successfully created and started destination')
+        toast.success('Successfully created destination')
+        onClose()
       }
-      // Only close if panel wasn't already closed above
-      if (!existingDestination?.enabled) onClose()
     } catch (error) {
-      const action = editMode
-        ? existingDestination?.enabled
-          ? 'update and restart'
-          : 'update and start'
-        : 'create'
-      toast.error(`Failed to ${action} destination`)
+      toast.error(`Failed to ${editMode ? 'apply settings' : 'create'} destination`)
+    } finally {
+      setIsApplying(false)
     }
   }
+
+  const onApplyAndRun = () =>
+    form.handleSubmit(async (data) => {
+      if (!projectRef) return console.error('Project ref is required')
+      try {
+        setIsApplyAndRun(true)
+        if (editMode && existingDestination) {
+          if (!sourceId) {
+            console.error('Source id is required')
+            return
+          }
+          if (!existingDestination.pipelineId) {
+            console.error('Pipeline id is required')
+            return
+          }
+          const willRestart = existingDestination.enabled
+          const snapshot = existingDestination.enabled ? 'started' : 'stopped'
+          setRequestStatus(
+            existingDestination.pipelineId,
+            PipelineStatusRequestStatus.UpdateRequested,
+            snapshot
+          )
+          const bigQueryConfig: any = {
+            projectId: data.projectId,
+            datasetId: data.datasetId,
+            serviceAccountKey: data.serviceAccountKey,
+          }
+          if (data.maxStalenessMins != null) {
+            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+          }
+          const batchConfig: any = {}
+          if (data.maxSize != null) {
+            batchConfig.maxSize = data.maxSize
+          }
+          if (data.maxFillMs != null) {
+            batchConfig.maxFillMs = data.maxFillMs
+          }
+          const hasBothBatchFields = data.maxSize != null && data.maxFillMs != null
+          await updateDestinationPipeline({
+            destinationId: existingDestination.destinationId,
+            pipelineId: existingDestination.pipelineId,
+            projectRef,
+            destinationName: data.name,
+            destinationConfig: {
+              bigQuery: bigQueryConfig,
+            },
+            pipelineConfig: {
+              publicationName: data.publicationName,
+              ...(hasBothBatchFields && { batch: batchConfig }),
+            },
+            sourceId,
+          })
+          // Notify, kick off restart, and close without waiting for start to complete
+          toast.success(
+            willRestart
+              ? 'Settings applied. Restarting pipeline...'
+              : 'Settings applied. Starting pipeline...'
+          )
+          void startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
+          onClose()
+        } else {
+          if (!sourceId) {
+            console.error('Source id is required')
+            return
+          }
+          const bigQueryConfig: any = {
+            projectId: data.projectId,
+            datasetId: data.datasetId,
+            serviceAccountKey: data.serviceAccountKey,
+          }
+          if (data.maxStalenessMins != null) {
+            bigQueryConfig.maxStalenessMins = data.maxStalenessMins
+          }
+          const batchConfig: any = {}
+          if (data.maxSize != null) {
+            batchConfig.maxSize = data.maxSize
+          }
+          if (data.maxFillMs != null) {
+            batchConfig.maxFillMs = data.maxFillMs
+          }
+          const hasBothBatchFields = data.maxSize != null && data.maxFillMs != null
+          const { pipeline_id: pipelineId } = await createDestinationPipeline({
+            projectRef,
+            destinationName: data.name,
+            destinationConfig: {
+              bigQuery: bigQueryConfig,
+            },
+            sourceId,
+            pipelineConfig: {
+              publicationName: data.publicationName,
+              ...(hasBothBatchFields && { batch: batchConfig }),
+            },
+          })
+          toast.success('Destination created. Starting pipeline...')
+          void startPipeline({ projectRef, pipelineId })
+          onClose()
+        }
+      } catch (error) {
+        const action = editMode ? 'apply and run' : 'create and start'
+        toast.error(`Failed to ${action} destination`)
+      } finally {
+        setIsApplyAndRun(false)
+      }
+    })()
   const onEnableReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
     await createTenantSource({ projectRef })
@@ -492,16 +565,29 @@ const DestinationPanel = ({
                   </Form_Shadcn_>
                 </SheetSection>
                 <SheetFooter>
-                  <Button disabled={isSubmitting} type="default" onClick={onClose}>
+                  <Button disabled={isApplying || isApplyAndRun} type="default" onClick={onClose}>
                     Cancel
                   </Button>
                   <Button
-                    disabled={isSubmitting}
-                    loading={isSubmitting}
+                    type="default"
+                    disabled={isApplying || isApplyAndRun}
+                    loading={isApplying}
                     form={formId}
                     htmlType="submit"
                   >
                     {getButtonText()}
+                  </Button>
+                  <Button
+                    type="primary"
+                    disabled={isApplying || isApplyAndRun}
+                    loading={isApplyAndRun}
+                    onClick={onApplyAndRun}
+                  >
+                    {editMode
+                      ? existingDestination?.enabled
+                        ? 'Apply and Restart'
+                        : 'Apply and Start'
+                      : 'Create and Start'}
                   </Button>
                 </SheetFooter>
               </div>
@@ -539,7 +625,7 @@ const DestinationPanel = ({
                   </Alert_Shadcn_>
                 </SheetSection>
                 <SheetFooter>
-                  <Button disabled={isSubmitting} type="default" onClick={onClose}>
+                  <Button disabled={isApplying || isApplyAndRun} type="default" onClick={onClose}>
                     Cancel
                   </Button>
                 </SheetFooter>

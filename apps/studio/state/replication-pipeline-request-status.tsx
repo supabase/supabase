@@ -60,12 +60,12 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
   }
 
   const updatePipelineStatus = useCallback(
-    (pipelineId: number, backendStatus: string | undefined) => {
+    (pipelineId: number, newStatus: string | undefined) => {
       const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
       if (currentRequestStatus === PipelineStatusRequestStatus.None) return
 
-      const snapshot = pipelineStatusSnapshot[pipelineId]
-      if (backendStatus !== undefined && backendStatus !== snapshot) {
+      const currentStatus = pipelineStatusSnapshot[pipelineId]
+      if (newStatus !== undefined && newStatus !== currentStatus) {
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
       }
     },

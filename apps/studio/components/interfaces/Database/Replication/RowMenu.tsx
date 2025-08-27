@@ -69,7 +69,6 @@ export const RowMenu = ({
       if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested, statusName)
       }
-      toast(`Enabling pipeline ${pipeline.destination_name}`)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
@@ -96,7 +95,6 @@ export const RowMenu = ({
           statusName
         )
       }
-      toast(`Disabling pipeline ${pipeline.destination_name}`)
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
