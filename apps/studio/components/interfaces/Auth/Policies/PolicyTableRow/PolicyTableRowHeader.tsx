@@ -26,7 +26,7 @@ interface PolicyTableRowHeaderProps {
   onSelectCreatePolicy: () => void
 }
 
-const PolicyTableRowHeader = ({
+export const PolicyTableRowHeader = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
@@ -134,5 +134,3 @@ const PolicyTableRowHeader = ({
     </div>
   )
 }
-
-export default PolicyTableRowHeader
