@@ -76,11 +76,10 @@ export const QueryQuickGlance = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {/* {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 animate-pulse rounded-lg" />
-        ))} */}
-        Loading...
+      <div className="grid grid-cols-3 gap-4 w-full">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-[134px] bg-surface-100 animate-pulse rounded-lg" />
+        ))}
       </div>
     )
   }
@@ -94,7 +93,7 @@ export const QueryQuickGlance = () => {
       {cards.map((card, index) => (
         <Card key={index}>
           <CardContent className="flex flex-col items-start gap-2">
-            <div className="flex gap-2 items-center text-foreground-light ">
+            <div className="flex gap-2 items-center text-foreground-light pt-1">
               <span>{card.icon}</span>
               <span className="text-xs font-mono uppercase truncate max-w-[24ch]">
                 {card.title}
