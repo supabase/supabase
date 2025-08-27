@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { startCase } from 'lodash'
+import { startCase } from 'lib/helpers'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
