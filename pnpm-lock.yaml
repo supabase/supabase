@@ -717,9 +717,6 @@ importers:
       '@aws-sdk/credential-providers':
         specifier: ^3.804.0
         version: 3.823.0
-      '@aws/bedrock-token-generator':
-        specifier: ^1.1.0
-        version: 1.1.0
       '@dagrejs/dagre':
         specifier: ^1.0.4
         version: 1.0.4
@@ -2931,10 +2928,6 @@ packages:
   '@aws-sdk/xml-builder@3.821.0':
     resolution: {integrity: sha512-DIIotRnefVL6DiaHtO6/21DhJ4JZnnIwdNbpwiAhdt/AVbttcE4yw925gsjur0OGv5BTYXQXU3YnANBYnZjuQA==}
     engines: {node: '>=18.0.0'}
-
-  '@aws/bedrock-token-generator@1.1.0':
-    resolution: {integrity: sha512-i+DkWnfdA4j4sffy9dI4k3OGoOWqN8CTGdtO4IZ3c0kpKYFr6KyqzqLQmoRNrF3ACFcWj6u+J6cbBQ97j9wx5w==}
-    engines: {node: '>=16.0.0'}
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
@@ -19381,20 +19374,6 @@ snapshots:
     dependencies:
       '@smithy/types': 4.3.1
       tslib: 2.8.1
-
-  '@aws/bedrock-token-generator@1.1.0':
-    dependencies:
-      '@aws-sdk/credential-providers': 3.830.0
-      '@aws-sdk/util-format-url': 3.821.0
-      '@smithy/config-resolver': 4.1.4
-      '@smithy/hash-node': 4.0.4
-      '@smithy/invalid-dependency': 4.0.4
-      '@smithy/node-config-provider': 4.1.3
-      '@smithy/protocol-http': 5.1.2
-      '@smithy/signature-v4': 5.1.2
-      '@smithy/types': 4.3.1
-    transitivePeerDependencies:
-      - aws-crt
 
   '@babel/code-frame@7.24.7':
     dependencies:
