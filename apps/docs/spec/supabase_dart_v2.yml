@@ -743,7 +743,9 @@ functions:
                 idToken: accessToken,
               );
             } else {
-              throw Exception('Facebook login failed: ${result.status}');
+              throw const AuthException(
+                'Facebook login failed: ${result.status}',
+              );
             }
           }
           ```
