@@ -7,7 +7,9 @@ const endpoint = '/configuration-files/configcat-proxy/frontend-v2/config_v6.jso
  * To set up ConfigCat for another app
  * - Declare `FeatureFlagProvider` at the _app level
  * - Pass in `getFlags` as `getConfigCatFlags` into `FeatureFlagProvider`
+ *   - [Joshen] Wondering if this should just be baked into FeatureFlagProvider, rather than passed as a prop
  * - Ensure that your app has the `NEXT_PUBLIC_CONFIGCAT_PROXY_URL` env var
+ *   - [Joshen] Wondering if we can just set a default value for each env var, so can skip setting up env var in Vercel
  * - Verify that your flags are now loading by console logging `flagValues` in `FeatureFlagProvider`'s useEffect
  * - Can now use ConfigCat feature flags with the `useFlag` hook
  */
