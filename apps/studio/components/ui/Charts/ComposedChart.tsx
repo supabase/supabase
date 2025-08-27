@@ -64,9 +64,10 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideHighlightedValue?: boolean
   syncId?: string
   docsUrl?: string
+  sql?: string
 }
 
-export default function ComposedChart({
+export function ComposedChart({
   data,
   attributes,
   yAxisKey,
@@ -100,6 +101,7 @@ export default function ComposedChart({
   hideHighlightedValue,
   syncId,
   docsUrl,
+  sql,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -325,6 +327,7 @@ export default function ComposedChart({
         shouldFormatBytes={shouldFormatBytes}
         isNetworkChart={isNetworkChart}
         attributes={attributes}
+        sql={sql}
       />
       <Container className="relative z-10">
         <RechartComposedChart
@@ -512,3 +515,5 @@ export default function ComposedChart({
     </div>
   )
 }
+
+export default ComposedChart

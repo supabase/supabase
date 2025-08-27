@@ -153,8 +153,8 @@ export const ReportV2ChartComponent = ({
       >
         <Panel.Content className="flex flex-col gap-4">
           <ComposedChart
-            attributes={dynamicAttributes as any}
-            data={finalChartData as any}
+            attributes={dynamicAttributes}
+            data={finalChartData}
             format={report.format ?? undefined}
             xAxisKey="period_start"
             yAxisKey={dynamicAttributes[0].attribute}
@@ -173,6 +173,7 @@ export const ReportV2ChartComponent = ({
             hideChartType={report.hideChartType}
             titleTooltip={report.titleTooltip}
             syncId={syncId}
+            sql={queryResult?.query}
           />
         </Panel.Content>
       </Panel>

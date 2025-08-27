@@ -21,6 +21,7 @@ export interface ReportDataProvider {
       label: string
       color?: { light: string; dark: string }
     }[]
+    query?: string // The SQL used to fetch the data if any
   }> // [jordi] would be cool to have a type that forces data keys to match the attributes
 }
 
