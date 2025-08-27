@@ -25,72 +25,94 @@ export type GettingStartedStep = {
 export interface GettingStartedProps {
   steps: GettingStartedStep[]
   className?: string
+  headerRight?: React.ReactNode
+  emptyContent?: React.ReactNode
 }
 
-export function GettingStarted({ steps, className }: GettingStartedProps) {
+export function GettingStarted({
+  steps,
+  className,
+  headerRight,
+  emptyContent,
+}: GettingStartedProps) {
   return (
     <section className={cn('w-full', className)}>
       <div className="flex justify-between items-center mb-6">
         <h3 className="heading-section">Getting started</h3>
-        <Button size="tiny" type="outline">
-          Dismiss
-        </Button>
+        <div className="flex items-center gap-2">
+          {headerRight}
+          <Button size="tiny" type="outline">
+            Dismiss
+          </Button>
+        </div>
       </div>
-      <Row columns={[3, 2, 1]} className="items-stretch">
-        {steps.map((step) => (
-          <Card key={step.key} className="overflow-hidden h-full flex flex-col">
-            <CardHeader className="flex flex-row space-y-0 justify-between items-center border-b-0">
-              <div className="flex flex-row items-center gap-3">
-                {step.icon && <div>{step.icon}</div>}
-                <CardTitle className="text-foreground-light">{step.title}</CardTitle>
-              </div>
-              <Badge
-                variant={step.status === 'complete' ? 'success' : 'default'}
-                className="capitalize"
-              >
-                {step.status}
-              </Badge>
-            </CardHeader>
-            <CardContent className="p-6 pt-16 flex-1 flex flex-col justify-end">
-              {step.image && <div className="w-full">{step.image}</div>}
-              <p className="text-base text-foreground">{step.description}</p>
-              <div className="flex flex-wrap gap-2 mt-4">
-                {step.actions.map((action, i) => {
-                  if (action.component) {
-                    return <span key={`${step.key}-action-${i}`}>{action.component}</span>
-                  }
-                  const content = (
-                    <Button
-                      key={`${step.key}-action-${i}`}
-                      type={action.variant ?? 'default'}
-                      icon={action.icon}
-                    >
-                      {action.label}
-                    </Button>
-                  )
-                  if (action.href) {
-                    return (
+      {steps.length === 0 && emptyContent ? (
+        <div>{emptyContent}</div>
+      ) : (
+        <Row columns={[3, 2, 1]} className="items-stretch">
+          {steps.map((step, index) => (
+            <Card
+              key={step.key}
+              className={cn(
+                'group overflow-hidden h-full flex flex-col',
+                step.status === 'complete' && 'opacity-40 hover:opacity-100'
+              )}
+            >
+              <CardHeader className="flex flex-row space-y-0 justify-between items-center border-b-0">
+                <div className="flex flex-row items-center gap-3">
+                  {step.icon && <div>{step.icon}</div>}
+                  <CardTitle className="text-foreground-light">
+                    {index + 1}. {step.title}
+                  </CardTitle>
+                </div>
+                <Badge
+                  variant={step.status === 'complete' ? 'success' : 'default'}
+                  className="capitalize"
+                >
+                  {step.status}
+                </Badge>
+              </CardHeader>
+              <CardContent className="p-6 pt-16 flex-1 flex flex-col justify-end">
+                {step.image && <div className="w-full">{step.image}</div>}
+                <p className={cn('text-base text-foreground')}>{step.description}</p>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {step.actions.map((action, i) => {
+                    if (action.component) {
+                      return <span key={`${step.key}-action-${i}`}>{action.component}</span>
+                    }
+                    const content = (
                       <Button
-                        asChild
                         key={`${step.key}-action-${i}`}
                         type={action.variant ?? 'default'}
                         icon={action.icon}
                       >
-                        <Link href={action.href}>{action.label}</Link>
+                        {action.label}
                       </Button>
                     )
-                  }
-                  return (
-                    <span key={`${step.key}-action-${i}`} onClick={action.onClick}>
-                      {content}
-                    </span>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </Row>
+                    if (action.href) {
+                      return (
+                        <Button
+                          asChild
+                          key={`${step.key}-action-${i}`}
+                          type={action.variant ?? 'default'}
+                          icon={action.icon}
+                        >
+                          <Link href={action.href}>{action.label}</Link>
+                        </Button>
+                      )
+                    }
+                    return (
+                      <span key={`${step.key}-action-${i}`} onClick={action.onClick}>
+                        {content}
+                      </span>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </Row>
+      )}
     </section>
   )
 }
