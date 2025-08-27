@@ -1,4 +1,4 @@
-import { GitBranch, Github } from 'lucide-react'
+import { Github } from 'lucide-react'
 
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
@@ -60,11 +60,6 @@ export const ProjectCard = ({
                     title="Vercel Icon"
                     className="w-3"
                   />
-                </div>
-              )}
-              {isBranchingEnabled && (
-                <div className="w-fit p-1 border rounded-md flex items-center">
-                  <GitBranch size={12} strokeWidth={1.5} />
                 </div>
               )}
               {isGithubIntegrated && (

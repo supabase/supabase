@@ -31,8 +31,8 @@ const isDevOrStaging =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
-const NIMBUS_STAGING_PROJECTS_URL = 'https://*.supabase-nimbus-projects.com'
-const NIMBUS_STAGING_PROJECTS_URL_WS = 'wss://*.supabase-nimbus-projects.com'
+const NIMBUS_STAGING_PROJECTS_URL = 'https://*.nmb-proj.com'
+const NIMBUS_STAGING_PROJECTS_URL_WS = 'wss://*.nmb-proj.com'
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'

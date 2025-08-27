@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -23,11 +23,12 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
-import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
@@ -37,7 +38,6 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
@@ -217,7 +217,7 @@ const DatabaseUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-  }, [db, chart])
+  }, [db, chart, state])
 
   return (
     <>
@@ -234,6 +234,7 @@ const DatabaseUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
+            <ReportSettings chartId="database-charts" />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
@@ -277,6 +278,7 @@ const DatabaseUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  syncId="database-charts"
                   showMaxValue={
                     chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                       ? true
@@ -297,12 +299,12 @@ const DatabaseUsage = () => {
                     defaultChartStyle={
                       chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
                     }
+                    syncId="database-charts"
                     showMaxValue={
                       chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
                         ? true
                         : chart.showMaxValue
                     }
-                    syncId={chart.syncId}
                   />
                 ) : (
                   <ReportChart
@@ -327,6 +329,7 @@ const DatabaseUsage = () => {
                   label="Replication lag"
                   interval={selectedDateRange.interval}
                   provider="infra-monitoring"
+                  syncId="database-charts"
                 />
               </div>
             </Panel.Content>
