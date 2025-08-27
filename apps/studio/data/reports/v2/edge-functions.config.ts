@@ -203,8 +203,8 @@ async function runQuery(projectRef: string, sql: string, startDate: string, endD
     },
   })
   if (error) throw error
-  // return MOCKED_RESPONSE
-  return data
+  return MOCKED_RESPONSE
+  // return data
 }
 
 function extractStatusCodesFromData(data: any[]): string[] {
@@ -276,7 +276,7 @@ export const edgeFunctionReports = ({
         },
       ]
 
-      return { data, attributes }
+      return { data, attributes, query: sql }
     },
   },
   {
@@ -312,6 +312,7 @@ export const edgeFunctionReports = ({
       return {
         data: rawData.result,
         attributes,
+        query: sql,
       }
     },
   },
@@ -347,7 +348,7 @@ export const edgeFunctionReports = ({
           label: 'Avg. execution time (ms)',
         },
       ]
-      return { data, attributes }
+      return { data, attributes, query: sql }
     },
   },
   {
@@ -381,7 +382,7 @@ export const edgeFunctionReports = ({
         },
       ]
 
-      return { data: rawData.result, attributes }
+      return { data: rawData.result, attributes, query: sql }
     },
   },
 ]
