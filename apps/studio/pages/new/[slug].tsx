@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -53,7 +53,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
@@ -253,7 +252,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
   const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.specific[0]?.name
+    ? availableRegionsData?.recommendations.smartGroup.name
     : _defaultRegion
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
@@ -430,7 +429,7 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
     if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi)
+      setAllProjects(allProjectsFromApi.projects)
     }
   }, [allProjectsFromApi, allProjects, setAllProjects])
 

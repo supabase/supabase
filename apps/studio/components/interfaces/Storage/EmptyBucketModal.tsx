@@ -7,12 +7,12 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   Dialog,
-  DialogHeader,
-  DialogTitle,
   DialogContent,
+  DialogFooter,
+  DialogHeader,
   DialogSection,
   DialogSectionSeparator,
-  DialogFooter,
+  DialogTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -50,9 +50,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
     <Dialog
       open={visible}
       onOpenChange={(open) => {
-        if (!open) {
-          onClose()
-        }
+        if (!open) onClose()
       }}
     >
       <DialogContent>
@@ -60,12 +58,13 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           <DialogTitle>{`Confirm to delete all contents from ${bucket?.name}`}</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="flex flex-col gap-4">
-          <Admonition
-            type="destructive"
-            title="This action cannot be undone"
-            description="The contents of your bucket cannot be recovered once deleted."
-          />
+        <Admonition
+          type="destructive"
+          className="rounded-none border-x-0 border-t-0 mb-0"
+          title="This action cannot be undone"
+          description="The contents of your bucket cannot be recovered once deleted."
+        />
+        <DialogSection>
           <p className="text-sm">Are you sure you want to empty the bucket "{bucket?.name}"?</p>
         </DialogSection>
         <DialogFooter>
@@ -73,12 +72,10 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
             Cancel
           </Button>
           <Button type="danger" loading={isLoading} onClick={onEmptyBucket}>
-            Empty Bucket
+            Empty bucket
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
-
-export default EmptyBucketModal

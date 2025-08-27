@@ -11,11 +11,21 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, Input, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import ExtensionRow from './ExtensionRow'
+import {
+  Card,
+  Input,
+  ShadowScrollArea,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { ExtensionRow } from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 
-const Extensions = () => {
+export const Extensions = () => {
   const { filter } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
@@ -74,8 +84,8 @@ const Extensions = () => {
       {isLoading ? (
         <GenericSkeletonLoader />
       ) : (
-        <div className="w-full overflow-hidden overflow-x-auto">
-          <Card>
+        <Card>
+          <ShadowScrollArea stickyLastColumn>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -85,11 +95,16 @@ const Extensions = () => {
                   <TableHead key="description">Description</TableHead>
                   <TableHead key="used-by">Used by</TableHead>
                   <TableHead key="links">Links</TableHead>
-                  <TableHead
-                    key="enabled"
-                    className="w-20 bg-background-200 border-l sticky right-0"
-                  >
-                    Enabled
+                  {/* 
+                    [Joshen] All these classes are just to make the last column sticky 
+                    I reckon we can pull these out into the Table component where we can declare
+                    sticky columns via props, but we can do that if we start to have more tables
+                    in the dashboard with sticky columns
+                  */}
+                  <TableHead key="enabled" className="px-0">
+                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l">
+                      Enabled
+                    </div>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -110,11 +125,9 @@ const Extensions = () => {
                 )}
               </TableBody>
             </Table>
-          </Card>
-        </div>
+          </ShadowScrollArea>
+        </Card>
       )}
     </>
   )
 }
-
-export default Extensions
