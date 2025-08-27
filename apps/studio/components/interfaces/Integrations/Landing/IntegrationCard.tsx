@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { Badge, Card, CardContent, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
@@ -55,7 +56,7 @@ export const IntegrationCard = ({
             {image ? (
               <Image
                 fill
-                src={image}
+                src={`${BASE_PATH}/${image}`}
                 alt={`${name} integration`}
                 className="w-full h-full object-cover invert dark:invert-0"
                 objectFit="cover"

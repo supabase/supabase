@@ -21,9 +21,9 @@ const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
-  cron: '/img/integrations/covers/cron-cover.webp',
-  queues: '/img/integrations/covers/queues-cover.png',
-  stripe_wrapper: '/img/integrations/covers/stripe-cover.png',
+  cron: 'img/integrations/covers/cron-cover.webp',
+  queues: 'img/integrations/covers/queues-cover.png',
+  stripe_wrapper: 'img/integrations/covers/stripe-cover.png',
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {
