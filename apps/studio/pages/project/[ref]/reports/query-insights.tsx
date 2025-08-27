@@ -45,6 +45,7 @@ const QueryInsights = () => {
     <>
       <ReportHeader title="Query Insights" />
       <ReportStickyNav
+        className="pb-0"
         content={
           <>
             <ButtonTooltip
