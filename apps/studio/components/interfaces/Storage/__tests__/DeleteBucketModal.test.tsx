@@ -113,7 +113,7 @@ describe(`DeleteBucketModal`, () => {
     const input = screen.getByLabelText(/Type/)
     await userEvent.type(input, `test`)
 
-    const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
+    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
@@ -131,7 +131,7 @@ describe(`DeleteBucketModal`, () => {
     const input = screen.getByLabelText(/Type/)
     await userEvent.type(input, `invalid`)
 
-    const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
+    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
