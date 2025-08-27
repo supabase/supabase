@@ -4,6 +4,7 @@ export enum PipelineStatusRequestStatus {
   None = 'None',
   EnableRequested = 'EnableRequested',
   DisableRequested = 'DisableRequested',
+  UpdateRequested = 'UpdateRequested',
 }
 
 interface PipelineRequestStatusContextType {
@@ -42,10 +43,8 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
       const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
 
       if (
-        (currentRequestStatus === PipelineStatusRequestStatus.EnableRequested &&
-          (backendStatus === 'started' || backendStatus === 'failed')) ||
-        (currentRequestStatus === PipelineStatusRequestStatus.DisableRequested &&
-          (backendStatus === 'stopped' || backendStatus === 'failed'))
+        (currentRequestStatus === PipelineStatusRequestStatus.EnableRequested && backendStatus !== 'stopped') ||
+        (currentRequestStatus === PipelineStatusRequestStatus.DisableRequested && backendStatus !== 'started')
       ) {
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
       }

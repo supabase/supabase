@@ -41,6 +41,7 @@ import { useReplicationDestinationByIdQuery } from 'data/replication/destination
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
+import { usePipelineRequestStatus, PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 
 interface DestinationPanelProps {
@@ -89,6 +90,7 @@ const DestinationPanel = ({
   const isUpdating = updatingDestinationPipeline || startingPipeline
   const isSubmitting = isCreating || isUpdating
   const editMode = !!existingDestination
+  const { setRequestStatus } = usePipelineRequestStatus()
   
   // Determine button text based on context
   const getButtonText = () => {
@@ -143,6 +145,16 @@ const DestinationPanel = ({
         if (!existingDestination.pipelineId) {
           console.error('Pipeline id is required')
           return
+        }
+        // If we're applying changes to a running pipeline, close panel immediately and notify
+        if (existingDestination.enabled) {
+          toast('Applying settings and restarting pipeline...')
+          onClose()
+        }
+        // Mark pipeline as updating to reflect immediate UI feedback
+        if (existingDestination.pipelineId) {
+          // Initialize updating state before sending requests
+          setRequestStatus(existingDestination.pipelineId, PipelineStatusRequestStatus.UpdateRequested)
         }
         // Update existing destination
         const bigQueryConfig: any = {
@@ -225,7 +237,8 @@ const DestinationPanel = ({
         
         toast.success('Successfully created and started destination')
       }
-      onClose()
+      // Only close if panel wasn't already closed above
+      if (!existingDestination?.enabled) onClose()
     } catch (error) {
       const action = editMode 
         ? (existingDestination?.enabled ? 'update and restart' : 'update and start')

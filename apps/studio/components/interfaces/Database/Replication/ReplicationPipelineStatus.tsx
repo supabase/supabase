@@ -98,7 +98,8 @@ export const ReplicationPipelineStatus = () => {
   const hasTableData = tableStatuses.length > 0
   const isEnablingDisabling =
     requestStatus === PipelineStatusRequestStatus.EnableRequested ||
-    requestStatus === PipelineStatusRequestStatus.DisableRequested
+    requestStatus === PipelineStatusRequestStatus.DisableRequested ||
+    requestStatus === PipelineStatusRequestStatus.UpdateRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
   const onTogglePipeline = async () => {

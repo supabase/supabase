@@ -33,6 +33,11 @@ const PIPELINE_STATE_MESSAGES = {
     message: 'Stopping the pipeline. Table replication will be paused once disabled.',
     badge: 'Disabling',
   },
+  updating: {
+    title: 'Applying settings',
+    message: 'Updating pipeline configuration. The pipeline will restart shortly.',
+    badge: 'Updating',
+  },
   failed: {
     title: 'Pipeline failed',
     message: 'Replication has encountered an error.',
@@ -69,15 +74,10 @@ export const getPipelineStateMessages = (
   requestStatus: PipelineStatusRequestStatus | undefined,
   statusName: string | undefined
 ) => {
-  // Prefer concrete backend transitional/error states as soon as they're available
-  switch (statusName) {
-    case 'starting':
-      return PIPELINE_STATE_MESSAGES.starting
-    case 'failed':
-      return PIPELINE_STATE_MESSAGES.failed
+  // Reflect optimistic request intent immediately after click
+  if (requestStatus === PipelineStatusRequestStatus.UpdateRequested) {
+    return PIPELINE_STATE_MESSAGES.updating
   }
-
-  // Otherwise reflect optimistic request intent immediately after click
   if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
     return PIPELINE_STATE_MESSAGES.enabling
   }
@@ -87,6 +87,10 @@ export const getPipelineStateMessages = (
 
   // Fall back to steady states
   switch (statusName) {
+    case 'starting':
+      return PIPELINE_STATE_MESSAGES.starting
+    case 'failed':
+      return PIPELINE_STATE_MESSAGES.failed
     case 'stopped':
       return PIPELINE_STATE_MESSAGES.stopped
     case 'started':
