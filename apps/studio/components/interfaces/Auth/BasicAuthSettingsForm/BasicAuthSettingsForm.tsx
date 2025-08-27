@@ -1,11 +1,11 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import Link from 'next/link'
+import { ExternalLink } from 'lucide-react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
 import { toast } from 'sonner'
-import { boolean, object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -31,14 +31,13 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 
-const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
-  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  MAILER_AUTOCONFIRM: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
+const schema = z.object({
+  DISABLE_SIGNUP: z.boolean(),
+  EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
+  SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
+  MAILER_AUTOCONFIRM: z.boolean(),
+  SITE_URL: z.string().url('Must have a Site URL'),
 })
 
 const BasicAuthSettingsForm = () => {
@@ -63,8 +62,8 @@ const BasicAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const form = useForm({
-    resolver: yupResolver(schema),
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
@@ -87,19 +86,19 @@ const BasicAuthSettingsForm = () => {
     }
   }, [authConfig])
 
-  const onSubmit = (values: any) => {
-    const payload = { ...values }
-    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    // The backend uses empty string to represent no required characters in the password
-    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
-      payload.PASSWORD_REQUIRED_CHARACTERS = ''
-    }
-
-    // The backend uses false to represent that email confirmation is required
-    payload.MAILER_AUTOCONFIRM = !values.MAILER_AUTOCONFIRM
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (values) => {
+    if (!projectRef) return console.error('Project ref is required')
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      {
+        projectRef,
+        config: {
+          ...values,
+          DISABLE_SIGNUP: !values.DISABLE_SIGNUP,
+          // The backend uses false to represent that email confirmation is required
+          MAILER_AUTOCONFIRM: !values.MAILER_AUTOCONFIRM,
+        },
+      },
       {
         onError: (error) => {
           toast.error(`Failed to update settings: ${error?.message}`)
