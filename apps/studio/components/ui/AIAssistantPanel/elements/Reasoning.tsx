@@ -9,7 +9,7 @@ import {
 import { BrainIcon, ChevronDownIcon, Loader2 } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import { memo } from 'react'
-import { Response } from './Response'
+import ReactMarkdown from 'react-markdown'
 
 export type ReasoningProps = Omit<ComponentProps<typeof Collapsible>, 'children'> & {
   isStreaming?: boolean
@@ -44,7 +44,7 @@ export const Reasoning = memo(({ className, isStreaming, children, ...props }: R
     <CollapsibleContent
       className={cn('p-5 pt-2 text-xs leading-normal', 'max-h-64 overflow-y-auto')}
     >
-      <Response>{children}</Response>
+      <ReactMarkdown>{children}</ReactMarkdown>
     </CollapsibleContent>
   </Collapsible>
 ))
