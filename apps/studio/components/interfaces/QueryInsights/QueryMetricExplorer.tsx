@@ -11,7 +11,7 @@ import { QueryRowExplorer } from './QueryRowExplorer'
 
 export const QueryMetricExplorer = () => {
   return (
-    <div className="w-full">
+    <div className="w-full mb-4">
       <Card>
         <Tabs_Shadcn_ defaultValue="latency" className="w-full">
           <CardHeader className="h-10 py-0 pl-4 pr-2 flex flex-row items-center justify-between flex-0">
@@ -45,19 +45,19 @@ export const QueryMetricExplorer = () => {
 
           <CardContent className="!p-0 mt-0 flex-1">
             <TabsContent_Shadcn_ value="latency" className="bg-surface-100 mt-0">
-              <div className="h-96 flex items-center justify-center w-full">Latency</div>
+              <div className="h-72 flex items-center justify-center w-full">Latency</div>
             </TabsContent_Shadcn_>
 
             <TabsContent_Shadcn_ value="rows" className="bg-surface-100 mt-0">
-              <div className="h-96 flex items-center justify-center w-full">Rows</div>
+              <div className="h-72 flex items-center justify-center w-full">Rows</div>
             </TabsContent_Shadcn_>
 
             <TabsContent_Shadcn_ value="calls" className="bg-surface-100 mt-0">
-              <div className="h-96 flex items-center justify-center w-full">Calls</div>
+              <div className="h-72 flex items-center justify-center w-full">Calls</div>
             </TabsContent_Shadcn_>
 
             <TabsContent_Shadcn_ value="cache" className="bg-surface-100 mt-0">
-              <div className="h-96 flex items-center justify-center w-full">Cache hits</div>
+              <div className="h-72 flex items-center justify-center w-full">Cache hits</div>
             </TabsContent_Shadcn_>
           </CardContent>
         </Tabs_Shadcn_>
