@@ -27,8 +27,11 @@ export const fetchHandler: typeof fetch = async (input, init) => {
 }
 
 async function getClient() {
-  if (client) {
-    return client
+  if (client) return client
+  if (!process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL) {
+    console.error(
+      'Failed to get ConfigCat client: missing env var "NEXT_PUBLIC_CONFIGCAT_PROXY_URL"'
+    )
   }
 
   const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
