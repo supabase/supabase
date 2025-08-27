@@ -12,12 +12,16 @@ import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Re
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import dayjs from 'dayjs'
 import { useState } from 'react'
+import { QueryRowExplorer } from 'components/interfaces/QueryInsights/QueryRowExplorer'
+import { QueryMetricExplorer } from 'components/interfaces/QueryInsights/QueryMetricExplorer'
 
 const QueryInsightsReport: NextPageWithLayout = () => {
   return (
-    <ReportPadding>
-      <QueryInsights />
-    </ReportPadding>
+    <>
+      <ReportPadding>
+        <QueryInsights />
+      </ReportPadding>
+    </>
   )
 }
 
@@ -43,46 +47,16 @@ const QueryInsights = () => {
 
   return (
     <>
-      <ReportHeader title="Query Insights" />
-      <ReportStickyNav
-        className="pb-0"
-        content={
-          <>
-            <ButtonTooltip
-              type="default"
-              disabled={false}
-              icon={<RefreshCw className={false ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Reset time range' } }}
-              onClick={() => console.log('hey')}
-            />
-            <div className="flex items-center gap-3">
-              <LogsDatePicker
-                onSubmit={handleDatePickerChange}
-                value={datePickerValue}
-                helpers={datePickerHelpers}
-              />
-              {selectedDateRange && (
-                <div className="flex items-center gap-x-2 text-xs">
-                  <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
-                  </p>
-                  <p className="text-foreground-light">
-                    <ArrowRight size={12} />
-                  </p>
-                  <p className="text-foreground-light">
-                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
-                  </p>
-                </div>
-              )}
-            </div>
-          </>
-        }
-      />
+      <div className="flex flex-row justify-between gap-4 items-center">
+        <h1>Query Insights</h1>
+        <LogsDatePicker
+          onSubmit={handleDatePickerChange}
+          value={datePickerValue}
+          helpers={datePickerHelpers}
+        />
+      </div>
       <QueryQuickGlance />
-      <div>Tab group</div>
-      <div>Metrics explorer...</div>
-      <div>Row expolrer...</div>
+      <QueryMetricExplorer />
     </>
   )
 }
