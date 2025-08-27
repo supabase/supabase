@@ -150,9 +150,8 @@ export const PreviousRunsTab = () => {
   const {
     data,
     isLoading: isLoadingCronJobRuns,
-    fetchNextPage,
-    refetch,
     isFetching,
+    fetchNextPage,
   } = useCronJobRunsInfiniteQuery(
     {
       projectRef: project?.ref,

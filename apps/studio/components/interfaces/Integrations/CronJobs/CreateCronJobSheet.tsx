@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useWatch } from '@ui/components/shadcn/ui/form'
+import { useParams } from 'common'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -201,11 +202,13 @@ export const CreateCronJobSheet = ({
   setIsClosing,
   onClose,
 }: CreateCronJobSheetProps) => {
+  const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
 
+  const jobId = Number(childId)
   const isEditing = !!selectedCronJob?.jobname
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
 
@@ -340,6 +343,8 @@ export const CreateCronJobSheet = ({
         connectionString: project?.connectionString,
         query,
         searchTerm: searchQuery,
+        // [Joshen] Only need to invalidate a specific cron job if in the job's previous run tab
+        identifier: !!jobId ? jobId : undefined,
       },
       {
         onSuccess: () => {
