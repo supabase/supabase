@@ -333,7 +333,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
             </TabsContent_Shadcn_>
           </CardContent>
         </Tabs_Shadcn_>
-        <QueryRowExplorer />
+        <QueryRowExplorer startTime={effectiveStartTime} endTime={effectiveEndTime} />
       </Card>
     </div>
   )
