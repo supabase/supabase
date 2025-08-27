@@ -15,9 +15,9 @@ import {
   HoverCardTrigger_Shadcn_,
   HoverCard_Shadcn_,
   ScrollArea,
-  cn,
-  TableRow,
   TableCell,
+  TableRow,
+  cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { isInviteExpired } from '../Organization.utils'
@@ -35,7 +35,8 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data: projects } = useProjectsQuery()
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })

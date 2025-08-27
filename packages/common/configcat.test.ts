@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import * as configcat from 'configcat-js'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getFlags } from './configcat'
 
 vi.mock('data/fetchers', () => ({
@@ -34,7 +34,7 @@ describe('configcat', () => {
     const mockValues = { flag1: true, flag2: false }
     mockClient.getAllValuesAsync.mockResolvedValue(mockValues)
 
-    const { fetchHandler } = await import('data/fetchers')
+    const { fetchHandler } = await import('./configcat')
     const mockFetchHandler = fetchHandler as unknown as ReturnType<typeof vi.fn>
     mockFetchHandler.mockResolvedValueOnce(
       new Response(JSON.stringify({}), {

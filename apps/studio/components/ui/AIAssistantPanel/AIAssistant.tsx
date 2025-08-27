@@ -6,7 +6,7 @@ import { ArrowDown, Eraser, Info, Pencil, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
@@ -17,7 +17,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useHotKey } from 'hooks/ui/useHotKey'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
@@ -42,6 +41,7 @@ const MemoizedMessage = memo(
     message,
     isLoading,
     onResults,
+    onDelete,
     onEdit,
     isAfterEditedMessage,
     isBeingEdited,
@@ -58,6 +58,7 @@ const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
+    onDelete: (id: string) => void
     onEdit: (id: string) => void
     isAfterEditedMessage: boolean
     isBeingEdited: boolean
@@ -70,6 +71,7 @@ const MemoizedMessage = memo(
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
+        onDelete={onDelete}
         onEdit={onEdit}
         isAfterEditedMessage={isAfterEditedMessage}
         isBeingEdited={isBeingEdited}
@@ -105,7 +107,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
+  const { ref: scrollContainerRef, isSticky, scrollToEnd, setIsSticky } = useAutoScroll()
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showMetadataWarning =
@@ -119,6 +121,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
+  const [isResubmitting, setIsResubmitting] = useState(false)
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -232,7 +235,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     onFinish: handleChatFinish,
   })
 
-  const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming' || isResubmitting
 
   const updateMessage = useCallback(
     ({
@@ -247,6 +250,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       snap.updateMessage({ id: messageId, resultId, results })
     },
     [snap]
+  )
+
+  const deleteMessageFromHere = useCallback(
+    (messageId: string) => {
+      // Find the message index in current chatMessages
+      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      if (isChatLoading) stop()
+
+      snap.deleteMessagesAfter(messageId, { includeSelf: true })
+
+      const updatedMessages = chatMessages.slice(0, messageIndex)
+      setMessages(updatedMessages)
+    },
+    [snap, setMessages, chatMessages, isChatLoading, stop]
   )
 
   const editMessage = useCallback(
@@ -266,9 +285,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           .join('') ?? ''
       setValue(textContent)
 
-      if (inputRef.current) {
-        inputRef.current.focus()
-      }
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef?.current?.focus()
+
+          // [Joshen] This is just to make the cursor go to the end of the text when focusing
+          const val = inputRef.current.value
+          inputRef.current.value = ''
+          inputRef.current.value = val
+        }
+      }, 100)
     },
     [chatMessages, setValue]
   )
@@ -292,6 +318,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
             onResults={updateMessage}
+            onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
             isBeingEdited={isBeingEdited}
@@ -299,7 +326,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           />
         )
       }),
-    [chatMessages, isChatLoading, updateMessage, editMessage, editingMessageId, cancelEdit]
+    [
+      chatMessages,
+      isChatLoading,
+      updateMessage,
+      deleteMessageFromHere,
+      editMessage,
+      cancelEdit,
+      editingMessageId,
+    ]
   )
 
   const hasMessages = chatMessages.length > 0
@@ -308,12 +343,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
       // Handling when the user is in edit mode
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === editingMessageId)
-      if (messageIndex === -1) return
-
-      snap.deleteMessagesAfter(editingMessageId, { includeSelf: true })
-      const updatedMessages = chatMessages.slice(0, messageIndex)
-      setMessages(updatedMessages)
+      // delete the message(s) from the chat just like the delete button
+      setIsResubmitting(true)
+      deleteMessageFromHere(editingMessageId)
       setEditingMessageId(null)
     }
 
@@ -355,6 +387,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setEditingMessageId(null)
   }
 
+  useEffect(() => {
+    // Keep "Thinking" visible while stopping and resubmitting during edit
+    // Only clear once the new response actually starts streaming (or errors)
+    if (isResubmitting && (chatStatus === 'streaming' || !!error)) {
+      setIsResubmitting(false)
+    }
+  }, [isResubmitting, chatStatus, error])
+
   // Update scroll behavior for new messages
   useEffect(() => {
     if (!isChatLoading) {
@@ -380,6 +420,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
+
+  useEffect(() => {
+    if (chatMessages.length === 0 && !isSticky) setIsSticky(true)
+  }, [chatMessages, isSticky, setIsSticky])
 
   return (
     <ErrorBoundary
@@ -699,7 +743,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
               )}
               loading={isChatLoading}
-              disabled={!isApiKeySet || disablePrompts || isChatLoading}
+              isEditing={!!editingMessageId}
+              disabled={!isApiKeySet || disablePrompts || (isChatLoading && !editingMessageId)}
               placeholder={
                 hasMessages
                   ? 'Ask a follow up question...'

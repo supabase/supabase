@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
+import { ShimmeringCard } from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import CardButton from 'components/ui/CardButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'

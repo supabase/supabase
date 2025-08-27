@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { useFlag } from 'common'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import AlertError from 'components/ui/AlertError'

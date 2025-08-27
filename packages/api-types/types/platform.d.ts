@@ -677,7 +677,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/private-link/{organization_slug}': {
+  '/platform/integrations/private-link/{slug}': {
     parameters: {
       query?: never
       header?: never
@@ -7294,6 +7294,7 @@ export interface components {
       gotrue_id: string
       id: number
       is_alpha_user: boolean
+      is_sso_user: boolean
       last_name: string
       mobile: string
       primary_email: string
@@ -8924,6 +8925,9 @@ export interface components {
     UpdateProfileBody: {
       first_name?: string
       last_name?: string
+      /** Format: email */
+      primary_email?: string
+      username?: string
     }
     UpdateProjectBody: {
       name: string
@@ -10496,6 +10500,12 @@ export interface operations {
           'application/json': components['schemas']['GetOrganizationIntegrationResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get integration with the given organization slug */
       500: {
         headers: {
@@ -10821,7 +10831,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        organization_slug: string
+        slug: string
       }
       cookie?: never
     }
@@ -10834,6 +10844,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PrivateLinkResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve organization's PrivateLink config */
       500: {
@@ -10849,7 +10865,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        organization_slug: string
+        slug: string
       }
       cookie?: never
     }
@@ -10866,6 +10882,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PrivateLinkResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update organization's PrivateLink configuration. */
       500: {

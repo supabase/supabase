@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Clock, HistoryIcon, XIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, HistoryIcon } from 'lucide-react'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
-import { Label } from '@ui/components/shadcn/ui/label'
 import { Badge } from '@ui/components/shadcn/ui/badge'
+import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import {
   Button,
@@ -20,7 +21,6 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type DatePickerValue = {
   to: string
