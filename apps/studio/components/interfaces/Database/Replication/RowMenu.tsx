@@ -20,7 +20,12 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { PIPELINE_ERROR_MESSAGES, getStatusName } from './Pipeline.utils'
+import {
+  PIPELINE_DISABLE_ALLOWED_FROM,
+  PIPELINE_ENABLE_ALLOWED_FROM,
+  PIPELINE_ERROR_MESSAGES,
+  getStatusName,
+} from './Pipeline.utils'
 import { PipelineStatusName } from './PipelineStatus'
 
 interface RowMenuProps {
@@ -60,13 +65,9 @@ export const RowMenu = ({
     }
 
     try {
-      // Only show 'enabling' when transitioning from 'stopped'
-      if (statusName === PipelineStatusName.STOPPED) {
-        setGlobalRequestStatus(
-          pipeline.id,
-          PipelineStatusRequestStatus.EnableRequested,
-          statusName
-        )
+      // Only show 'enabling' when transitioning from allowed states
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+        setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested, statusName)
       }
       toast(`Enabling pipeline ${pipeline.destination_name}`)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
@@ -87,11 +88,8 @@ export const RowMenu = ({
     }
 
     try {
-      // Only show 'disabling' when transitioning from 'started' or 'failed'
-      if (
-        statusName === PipelineStatusName.STARTED ||
-        statusName === PipelineStatusName.FAILED
-      ) {
+      // Only show 'disabling' when transitioning from allowed states
+      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
         setGlobalRequestStatus(
           pipeline.id,
           PipelineStatusRequestStatus.DisableRequested,

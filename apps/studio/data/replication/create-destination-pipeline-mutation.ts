@@ -35,10 +35,7 @@ async function createDestinationPipeline(
     destinationConfig: {
       bigQuery: { projectId, datasetId, serviceAccountKey, maxStalenessMins },
     },
-    pipelineConfig: {
-      publicationName,
-      batch,
-    },
+    pipelineConfig: { publicationName, batch },
     sourceId,
   }: CreateDestinationPipelineParams,
   signal?: AbortSignal
@@ -63,7 +60,7 @@ async function createDestinationPipeline(
           batch: {
             max_size: batch.maxSize,
             max_fill_ms: batch.maxFillMs,
-          }
+          },
         }),
       },
       source_id: sourceId,

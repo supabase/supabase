@@ -41,7 +41,10 @@ import { useReplicationDestinationByIdQuery } from 'data/replication/destination
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
-import { usePipelineRequestStatus, PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
+import {
+  usePipelineRequestStatus,
+  PipelineStatusRequestStatus,
+} from 'state/replication-pipeline-request-status'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 
 interface DestinationPanelProps {
@@ -91,7 +94,7 @@ const DestinationPanel = ({
   const isSubmitting = isCreating || isUpdating
   const editMode = !!existingDestination
   const { setRequestStatus } = usePipelineRequestStatus()
-  
+
   // Determine button text based on context
   const getButtonText = () => {
     if (!editMode) return 'Create'
@@ -194,11 +197,13 @@ const DestinationPanel = ({
           },
           sourceId,
         })
-        
+
         // Always start/restart pipeline to apply changes
         await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
 
-        const actionText = existingDestination.enabled ? 'updated and restarted' : 'updated and started'
+        const actionText = existingDestination.enabled
+          ? 'updated and restarted'
+          : 'updated and started'
         toast.success(`Successfully ${actionText} destination`)
       } else {
         // Create new destination
@@ -236,17 +241,19 @@ const DestinationPanel = ({
             ...(hasBothBatchFields && { batch: batchConfig }),
           },
         })
-        
+
         // Always start new pipelines
         await startPipeline({ projectRef, pipelineId })
-        
+
         toast.success('Successfully created and started destination')
       }
       // Only close if panel wasn't already closed above
       if (!existingDestination?.enabled) onClose()
     } catch (error) {
-      const action = editMode 
-        ? (existingDestination?.enabled ? 'update and restart' : 'update and start')
+      const action = editMode
+        ? existingDestination?.enabled
+          ? 'update and restart'
+          : 'update and start'
         : 'create'
       toast.error(`Failed to ${action} destination`)
     }
@@ -255,7 +262,6 @@ const DestinationPanel = ({
     if (!projectRef) return console.error('Project ref is required')
     await createTenantSource({ projectRef })
   }
-
 
   useEffect(() => {
     if (editMode && destinationData && pipelineData) {

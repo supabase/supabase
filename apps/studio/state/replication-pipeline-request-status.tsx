@@ -36,7 +36,7 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
   const setRequestStatus = (
     pipelineId: number,
     status: PipelineStatusRequestStatus,
-    snapshotStatus?: string
+    pipelineStatusSnapshot?: string
   ) => {
     setRequestStatusState((prev) => ({
       ...prev,
@@ -48,8 +48,8 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
         return rest
       }
       // Only set snapshot when provided to avoid undefined entries
-      if (typeof snapshotStatus !== 'undefined') {
-        return { ...prev, [pipelineId]: snapshotStatus }
+      if (pipelineStatusSnapshot !== undefined) {
+        return { ...prev, [pipelineId]: pipelineStatusSnapshot }
       }
       return prev
     })
@@ -65,11 +65,11 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
       if (currentRequestStatus === PipelineStatusRequestStatus.None) return
 
       const snapshot = pipelineStatusSnapshot[pipelineId]
-      if (typeof backendStatus !== 'undefined' && backendStatus !== snapshot) {
+      if (backendStatus !== undefined && backendStatus !== snapshot) {
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
       }
     },
-    [requestStatus, pipelineStatusSnapshot]
+    [requestStatus, pipelineStatusSnapshot, setRequestStatus]
   )
 
   return (

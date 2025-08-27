@@ -31,8 +31,8 @@ const DeleteDestination = ({
           <>
             {isLoading ? (
               <span>
-                Deletion started. This may take a few seconds as the pipeline is
-                stopped and removed.
+                Deletion started. This may take a few seconds as the pipeline is stopped and
+                removed.
               </span>
             ) : (
               <span>This will delete the destination</span>

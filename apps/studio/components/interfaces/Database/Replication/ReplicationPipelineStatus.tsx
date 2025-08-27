@@ -24,7 +24,13 @@ import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ErroredTableDetails } from './ErroredTableDetails'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import {
+  PIPELINE_ACTIONABLE_STATES,
+  PIPELINE_DISABLE_ALLOWED_FROM,
+  PIPELINE_ENABLE_ALLOWED_FROM,
+  PIPELINE_ERROR_MESSAGES,
+  getStatusName,
+} from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { TableState } from './ReplicationPipelineStatus.types'
@@ -111,10 +117,10 @@ export const ReplicationPipelineStatus = () => {
     }
 
     try {
-      if (statusName === 'stopped') {
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested, statusName)
         await startPipeline({ projectRef, pipelineId: pipeline.id })
-      } else if (statusName === 'started' || statusName === 'failed') {
+      } else if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested, statusName)
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
       }
@@ -182,7 +188,7 @@ export const ReplicationPipelineStatus = () => {
             type={statusName === 'stopped' ? 'primary' : 'default'}
             onClick={() => onTogglePipeline()}
             loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-            disabled={!['failed', 'started', 'stopped', 'stopping'].includes(statusName ?? '')}
+            disabled={!PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)}
           >
             {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
           </Button>

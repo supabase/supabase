@@ -22,6 +22,10 @@ export const getStatusName = (
   return undefined
 }
 
+export const PIPELINE_ENABLE_ALLOWED_FROM = ['stopped'] as const
+export const PIPELINE_DISABLE_ALLOWED_FROM = ['started', 'failed'] as const
+export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as const
+
 const PIPELINE_STATE_MESSAGES = {
   enabling: {
     title: 'Pipeline enabling',
