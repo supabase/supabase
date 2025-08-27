@@ -1,12 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Skeleton } from 'ui'
 import { useState, useEffect } from 'react'
 import { RefreshCw, AlertCircle, Eye } from 'lucide-react'
+import { toast } from 'sonner'
+
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader, Skeleton } from 'ui'
 import { fetchDeployments, fetchVersionCode, rollbackToVersion } from './mocks'
 import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './rollback-modal'
-
 import { useParams } from 'common'
-import { toast } from 'sonner'
 
 // Ensure newest first: sort by version desc, then created_at desc
 const sortDeployments = (items: EdgeFunctionDeployment[]) =>
@@ -293,9 +293,8 @@ export const EdgeFunctionVersionsList = () => {
           </p>
 
           {isLoadingCode ? (
-            <div className="space-y-3">
-              <Skeleton className="h-6 w-80" />
-              <Skeleton className="h-[320px] w-full" />
+            <div className="flex items-center justify-center h-full bg-surface-200 py-12">
+              <LogoLoader />
             </div>
           ) : selectedDeployment && codeFiles.length > 0 ? (
             <div className="space-y-3">
