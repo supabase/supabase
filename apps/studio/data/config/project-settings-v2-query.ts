@@ -44,7 +44,10 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
 ) => {
   // [Joshen] Sync with API perms checking here - shouldReturnApiKeys
   // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/settings.controller.ts#L92
-  const {can: canReadAPIKeys} = useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    '*'
+  )
 
   return useQuery<ProjectSettingsData, ProjectSettingsError, TData>(
     configKeys.settingsV2(projectRef),

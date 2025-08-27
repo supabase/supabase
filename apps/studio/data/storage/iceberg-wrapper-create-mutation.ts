@@ -27,7 +27,10 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
-  const {can: canCreateCredentials} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { can: canCreateCredentials } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()

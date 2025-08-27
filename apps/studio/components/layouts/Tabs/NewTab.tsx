@@ -46,10 +46,14 @@ export function NewTab() {
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const {can: canCreateSQLSnippet} = useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const tableEditorActions = [
     {

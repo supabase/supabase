@@ -31,7 +31,10 @@ export type AIOptInFormValues = z.infer<typeof AIOptInSchema>
 export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const {can: canUpdateOrganization} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canUpdateOrganization } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const [_, setUpdatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,

@@ -50,8 +50,14 @@ interface StorageSettingsState {
 
 const StorageSettings = () => {
   const { ref: projectRef } = useParams()
-  const {can: canReadStorageSettings} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const {can: canUpdateStorageSettings} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { can: canReadStorageSettings } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_ADMIN_READ,
+    '*'
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const {
     data: config,

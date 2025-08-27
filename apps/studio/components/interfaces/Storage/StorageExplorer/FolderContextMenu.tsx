@@ -14,7 +14,10 @@ interface FolderContextMenuProps {
 const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
   const { openedFolders, downloadFolder, setSelectedItemToRename, setSelectedItemsToDelete } =
     useStorageExplorerStateSnapshot()
-  const {can: canUpdateFiles} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
 
   return (
     <Menu id={id} animation="fade">

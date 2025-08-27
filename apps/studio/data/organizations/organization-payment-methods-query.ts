@@ -44,7 +44,7 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
     ...options
   }: UseQueryOptions<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData> = {}
 ) => {
-  const {can: canReadSubscriptions} = useAsyncCheckProjectPermissions(
+  const { can: canReadSubscriptions } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )

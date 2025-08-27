@@ -15,7 +15,10 @@ import { z } from 'zod'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
 import { subscriptionKeys } from 'data/subscriptions/keys'
-import { useAsyncCheckProjectPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import {
+  useAsyncCheckProjectPermissions,
+  usePermissionsLoaded,
+} from 'hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -63,7 +66,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
   }>(null)
 
-  const {can: canTopUpCredits} = useAsyncCheckProjectPermissions(
+  const { can: canTopUpCredits } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

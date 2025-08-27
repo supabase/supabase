@@ -179,7 +179,10 @@ const FileExplorerHeader = ({
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
-  const {can: canUpdateStorage} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)

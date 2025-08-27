@@ -18,7 +18,10 @@ interface Props {
 export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { slug } = useParams()
   const [createdSecret, setCreatedSecret] = useState<CreatedSecret>()
-  const {can: canManageSecrets} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'oauth_apps')
+  const { can: canManageSecrets } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'oauth_apps'
+  )
 
   const { id: appId } = selectedApp ?? {}
 

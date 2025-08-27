@@ -12,7 +12,7 @@ export const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const {can: canUpdateSubscription} = useAsyncCheckProjectPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

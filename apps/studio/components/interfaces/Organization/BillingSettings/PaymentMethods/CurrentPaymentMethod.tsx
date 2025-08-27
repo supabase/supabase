@@ -31,7 +31,7 @@ const CurrentPaymentMethod = () => {
 
   const defaultPaymentMethod = paymentMethods?.data.find((pm) => pm.is_default)
 
-  const {can: canReadPaymentMethods} = useAsyncCheckProjectPermissions(
+  const { can: canReadPaymentMethods } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )

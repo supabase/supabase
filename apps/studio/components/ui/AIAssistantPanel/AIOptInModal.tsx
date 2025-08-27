@@ -24,7 +24,10 @@ interface AIOptInModalProps {
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
-  const {can: canUpdateOrganization} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canUpdateOrganization } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const onOpenChange = (open: boolean) => {
     if (!open) {

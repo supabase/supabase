@@ -54,8 +54,14 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const {can: canReadS3Credentials} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const {can: canUpdateStorageSettings} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { can: canReadS3Credentials } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_ADMIN_READ,
+    '*'
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const {

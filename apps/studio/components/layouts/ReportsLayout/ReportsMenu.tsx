@@ -34,10 +34,14 @@ const ReportsMenu = () => {
   const storageSupported = useIsFeatureEnabled('project_storage:all')
   const storageEnabled = storageReportEnabled && storageSupported
 
-  const {can: canCreateCustomReport} = useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateCustomReport } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'report', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   // Preserve date range query parameters when navigating
   const preservedQueryParams = useMemo(() => {

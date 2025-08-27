@@ -52,7 +52,10 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const {can: canReadAuditLogs} = useAsyncCheckProjectPermissions(PermissionAction.READ, 'notifications')
+  const { can: canReadAuditLogs } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'notifications'
+  )
 
   const { data: projectsData } = useProjectsQuery()
   const projects = projectsData?.projects ?? []

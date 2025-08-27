@@ -68,17 +68,13 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
-  const {
-    can: canResendInvitePerm,
-  } = useAsyncCheckProjectPermissions(
+  const { can: canResendInvitePerm } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
     'user_invites',
     { role_id: roleId }
   )
 
-  const {
-    can: canRevokeInvitePerm,
-  } = useAsyncCheckProjectPermissions(
+  const { can: canRevokeInvitePerm } = useAsyncCheckProjectPermissions(
     PermissionAction.DELETE,
     'user_invites',
     { role_id: roleId }

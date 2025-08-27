@@ -232,10 +232,14 @@ export const MarkdownPre = ({
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const {can: canCreateSQLSnippet} = useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   // [Joshen] Using a ref as this data doesn't need to trigger a re-render
   const chartConfig = useRef<ChartConfig>({

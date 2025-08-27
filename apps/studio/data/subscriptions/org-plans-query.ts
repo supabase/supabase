@@ -26,7 +26,7 @@ export const useOrgPlansQuery = <TData = OrgPlansData>(
   { orgSlug }: OrgPlansVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgPlansData, OrgPlansError, TData> = {}
 ) => {
-  const {can: canReadSubscriptions} = useAsyncCheckProjectPermissions(
+  const { can: canReadSubscriptions } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )

@@ -34,8 +34,14 @@ const OAuthApps = () => {
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
 
-  const {can: canReadOAuthApps} = useAsyncCheckProjectPermissions(PermissionAction.READ, 'approved_oauth_apps')
-  const {can: canCreateOAuthApps} = useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'approved_oauth_apps')
+  const { can: canReadOAuthApps } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'approved_oauth_apps'
+  )
+  const { can: canCreateOAuthApps } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'approved_oauth_apps'
+  )
 
   const {
     data: publishedApps,

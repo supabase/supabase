@@ -32,7 +32,7 @@ const Usage = () => {
   const [dateRange, setDateRange] = useState<any>()
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
 
-  const {can: canReadSubscriptions} = useAsyncCheckProjectPermissions(
+  const { can: canReadSubscriptions } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )

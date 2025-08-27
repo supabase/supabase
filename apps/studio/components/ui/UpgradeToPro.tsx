@@ -32,7 +32,7 @@ const UpgradeToPro = ({
   const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan?.id
 
-  const {can: canUpdateSubscription} = useAsyncCheckProjectPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

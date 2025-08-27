@@ -10,7 +10,10 @@ import { downloadFile } from './StorageExplorer.utils'
 
 const FileExplorerHeaderSelection = () => {
   const { ref: projectRef, bucketId } = useParams()
-  const {can: canUpdateFiles} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
 
   const {
     selectedItems,

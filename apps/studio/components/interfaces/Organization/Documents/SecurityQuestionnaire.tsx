@@ -19,7 +19,7 @@ export const SecurityQuestionnaire = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
   const { mutate: sendEvent } = useSendEventMutation()
-  const {can: canReadSubscriptions} = useAsyncCheckProjectPermissions(
+  const { can: canReadSubscriptions } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )

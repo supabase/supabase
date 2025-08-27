@@ -47,8 +47,14 @@ const SecuritySettings = () => {
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
-  const {can: canReadMfaConfig} = useAsyncCheckProjectPermissions(PermissionAction.READ, 'organizations')
-  const {can: canUpdateMfaConfig} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canReadMfaConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'organizations'
+  )
+  const { can: canUpdateMfaConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isPaidPlan = selectedOrganization?.plan.id !== 'free'

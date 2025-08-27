@@ -43,7 +43,7 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const {can: canReadCustomerProfile} = useAsyncCheckProjectPermissions(
+  const { can: canReadCustomerProfile } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.customer'
   )

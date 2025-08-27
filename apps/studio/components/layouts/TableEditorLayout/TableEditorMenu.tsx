@@ -85,7 +85,10 @@ export const TableEditorMenu = () => {
     [data?.pages]
   )
 
-  const {can: canCreateTables} = useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canCreateTables } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const { isSchemaLocked, reason } = useIsProtectedSchema({ schema: selectedSchema })
 

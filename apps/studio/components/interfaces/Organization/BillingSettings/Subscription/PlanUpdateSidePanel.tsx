@@ -60,7 +60,7 @@ const PlanUpdateSidePanel = () => {
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
 
-  const {can: canUpdateSubscription} = useAsyncCheckProjectPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

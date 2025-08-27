@@ -34,7 +34,10 @@ export const OrganizationDetailsForm = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const {can: canUpdateOrganization} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canUpdateOrganization } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const { mutate: updateOrganization, isLoading: isUpdatingDetails } =
     useOrganizationUpdateMutation()

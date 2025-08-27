@@ -36,7 +36,10 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
     ...options
   }: UseQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
 ) => {
-  const {can: canReadSubscriptions} = useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
+  const { can: canReadSubscriptions } = useAsyncCheckProjectPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.tax_ids'
+  )
   return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>(
     organizationKeys.taxId(slug),
     ({ signal }) => getOrganizationTaxId({ slug }, signal),

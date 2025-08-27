@@ -127,7 +127,10 @@ const PreviewPane = () => {
   } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
 
-  const {can: canUpdateFiles} = useAsyncCheckProjectPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
 
   if (!file) return null
 

@@ -48,15 +48,15 @@ const IntegrationSettings = () => {
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
 
-  const {can: canReadGithubConnection} = useAsyncCheckProjectPermissions(
+  const { can: canReadGithubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.READ,
     'integrations.github_connections'
   )
-  const {can: canCreateGitHubConnection} = useAsyncCheckProjectPermissions(
+  const { can: canCreateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
-  const {can: canUpdateGitHubConnection} = useAsyncCheckProjectPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )

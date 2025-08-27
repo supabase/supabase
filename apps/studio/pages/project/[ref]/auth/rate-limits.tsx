@@ -10,7 +10,10 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import {
+  useAsyncCheckProjectPermissions,
+  usePermissionsLoaded,
+} from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 
@@ -19,7 +22,10 @@ const RateLimitsPage: NextPageWithLayout = () => {
   const showRateLimits = useIsFeatureEnabled('authentication:rate_limits')
 
   const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const { can: canReadAuthSettings } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
 
   if (!showRateLimits) {
     return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />

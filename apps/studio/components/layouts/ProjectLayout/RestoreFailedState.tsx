@@ -18,9 +18,13 @@ const RestoreFailedState = () => {
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
 
-  const {can: canDeleteProject} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canDeleteProject } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: { project_id: project?.id },
+    }
+  )
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []

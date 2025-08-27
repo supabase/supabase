@@ -15,7 +15,10 @@ import { OrganizationDetailsForm } from './OrganizationDetailsForm'
 const GeneralSettings = () => {
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
 
-  const {can: canDeleteOrganization} = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canDeleteOrganization } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   return (
     <ScaffoldContainer>

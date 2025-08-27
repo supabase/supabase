@@ -94,7 +94,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     },
   })
 
-  const {can: canResumeProject} = useAsyncCheckProjectPermissions(
+  const { can: canResumeProject } = useAsyncCheckProjectPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.initialize_or_resume'
   )
