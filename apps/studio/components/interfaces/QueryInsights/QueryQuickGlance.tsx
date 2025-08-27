@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useQueryInsightsGlanceQuery } from 'data/query-insights/query-glance-query'
+import { useQueryInsightsGlance } from 'data/query-insights/query-glance-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Card, CardContent } from 'ui'
 import { Database, Clock, AlertCircle } from 'lucide-react'
@@ -29,25 +29,20 @@ export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) 
   console.log('QueryQuickGlance Debug:', {
     props: { startTime, endTime },
     effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
-    project: { ref: project?.ref, hasConnectionString: !!project?.connectionString }
+    project: { ref: project?.ref, hasConnectionString: !!project?.connectionString },
   })
 
   const {
     data: glanceData,
     isLoading,
     error,
-  } = useQueryInsightsGlanceQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    startTime: effectiveStartTime,
-    endTime: effectiveEndTime,
-  })
+  } = useQueryInsightsGlance(project?.ref, effectiveStartTime, effectiveEndTime)
 
   // Debug logging for glance results
   console.log('QueryQuickGlance Results:', {
     glanceData,
     isLoading,
-    error
+    error,
   })
 
   const cards = useMemo(() => {
@@ -110,7 +105,7 @@ export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) 
   }
 
   if (error) {
-    return <div className="text-red-500">Error loading query insights: {error.message}</div>
+    return <div className="text-red-500">Error loading query insights: {String(error)}</div>
   }
 
   return (

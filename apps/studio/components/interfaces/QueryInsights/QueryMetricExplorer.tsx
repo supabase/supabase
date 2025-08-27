@@ -9,7 +9,10 @@ import {
   CardHeader,
 } from 'ui'
 import { QueryRowExplorer } from './QueryRowExplorer'
-import { useQueryInsightsMetricsQuery } from 'data/query-insights/query-metrics-query'
+import {
+  useQueryInsightsMetrics,
+  usePreFetchQueryInsightsData,
+} from 'data/query-insights/query-metrics-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -55,6 +58,9 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     return { startTime: fallbackStartTime, endTime: fallbackEndTime }
   }, [startTime, endTime])
 
+  // Pre-fetch query data for the QueryRowExplorer
+  usePreFetchQueryInsightsData(project?.ref, effectiveStartTime, effectiveEndTime)
+
   // Debug logging
   console.log('QueryMetricExplorer Debug:', {
     props: { startTime, endTime },
@@ -67,13 +73,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     data: metricsData,
     isLoading,
     error,
-  } = useQueryInsightsMetricsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    metric: selectedMetric,
-    startTime: effectiveStartTime,
-    endTime: effectiveEndTime,
-  })
+  } = useQueryInsightsMetrics(project?.ref, selectedMetric, effectiveStartTime, effectiveEndTime)
 
   // Debug logging for query results
   console.log('QueryMetricExplorer Query Results:', {

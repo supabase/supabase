@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Search, Settings2, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -17,7 +17,18 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { useQueryInsightsQueries, type QueryInsightsQuery } from 'data/query-insights/query-metrics-query'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import {
+  useQueryInsightsQueries,
+  type QueryInsightsQuery,
+} from 'data/query-insights/query-metrics-query'
+import {
+  useSingleQueryLatency,
+  useSingleQueryCalls,
+  useSingleQueryRows,
+  useSingleQueryRowsWritten,
+} from 'data/query-insights/single-query-latency-query'
 
 interface QueryRowExplorerProps {
   startTime: string
@@ -40,7 +51,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
     queries,
     isLoading,
     error,
-    queriesLength: queries?.length
+    queriesLength: queries?.length,
   })
 
   const [sort, setSort] = useState<{ column: string; order: 'asc' | 'desc' } | undefined>({
@@ -48,7 +59,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
     order: 'desc',
   })
   const [selectedRow, setSelectedRow] = useState<number>()
-  const [view, setView] = useState<'details' | 'indexes'>('details')
+  const [view, setView] = useState<'details' | 'indexes' | 'metrics'>('details')
 
   // Define columns similar to QueryPerformance
   const columns: Column<QueryInsightsQuery>[] = [
@@ -171,9 +182,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
         return (
           <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
             <p>{formattedValue}</p>
-            {value && (
-              <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>
-            )}
+            {value && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>}
           </div>
         )
       },
@@ -205,9 +214,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
         return (
           <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
             <p>{formattedValue}</p>
-            {value && (
-              <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>
-            )}
+            {value && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>}
           </div>
         )
       },
@@ -277,28 +284,65 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
   ]
 
   // For debugging - show test data if no queries found
-  const reportData = queries?.length ? queries : [
-    {
-      query_id: 1,
-      query: 'SELECT * FROM test_table WHERE id = 1',
-      total_time: 150.5,
-      calls: 10,
-      rows_read: 1000,
-      rows_insert: 0,
-      rows_update: 0,
-      rows_delete: 0,
-      shared_blks_read: 50,
-      shared_blks_hit: 950,
-      mean_exec_time: 15.05,
-      database: 'postgres',
-      timestamp: new Date().toISOString(),
-      cmd_type_text: 'SELECT',
-      application_name: 'Test App',
-      badness_score: 25.5,
-      error_count: 0
-    } as QueryInsightsQuery
-  ]
+  const reportData = queries?.length
+    ? queries
+    : [
+        {
+          query_id: 1,
+          query: 'SELECT * FROM users WHERE id = 1',
+          total_time: 150.5,
+          calls: 10,
+          rows_read: 1000,
+          rows_insert: 0,
+          rows_update: 0,
+          rows_delete: 0,
+          shared_blks_read: 50,
+          shared_blks_hit: 950,
+          mean_exec_time: 15.05,
+          database: 'postgres',
+          timestamp: new Date().toISOString(),
+          cmd_type_text: 'SELECT',
+          application_name: 'Test App',
+          badness_score: 25.5,
+          error_count: 0,
+          startup_cost_before: 0,
+          startup_cost_after: 0,
+          total_cost_before: 0,
+          total_cost_after: 0,
+          index_statements: [],
+          errors: [],
+        } as QueryInsightsQuery,
+      ]
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow] : undefined
+
+  // Single query metrics hooks
+  const { data: singleQueryLatency } = useSingleQueryLatency(
+    ref,
+    startTime,
+    endTime,
+    selectedQuery?.query_id?.toString()
+  )
+
+  const { data: singleQueryCalls } = useSingleQueryCalls(
+    ref,
+    startTime,
+    endTime,
+    selectedQuery?.query_id?.toString()
+  )
+
+  const { data: singleQueryRows } = useSingleQueryRows(
+    ref,
+    startTime,
+    endTime,
+    selectedQuery?.query_id?.toString()
+  )
+
+  const { data: singleQueryRowsWritten } = useSingleQueryRowsWritten(
+    ref,
+    startTime,
+    endTime,
+    selectedQuery?.query_id?.toString()
+  )
 
   const onSortChange = (column: string) => {
     let updatedSort: { column: string; order: 'asc' | 'desc' } | undefined = undefined
@@ -326,9 +370,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
     if (aValue === undefined || bValue === undefined) return 0
 
     if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sort.order === 'asc' 
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue)
+      return sort.order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
     }
 
     if (typeof aValue === 'number' && typeof bValue === 'number') {
@@ -338,17 +380,39 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
     return 0
   })
 
+  // Debug logging for table data
+  console.log('QueryRowExplorer Table Debug:', {
+    queries,
+    reportData,
+    reportDataLength: reportData.length,
+    sortedDataLength: sortedData.length,
+    isLoading,
+    error,
+    firstRow: sortedData[0],
+  })
+
   useEffect(() => {
     setSelectedRow(undefined)
   }, [startTime, endTime])
 
   return (
-    <div className="border-t bg-surface-100 flex flex-col h-full">
+    <div className="border-t bg-surface-100 flex flex-col h-96 overflow-auto">
       <div className="px-4 py-2 border-b flex justify-between items-center">
-        <span>Search</span>
-        <span>Filters</span>
+        <Input
+          size="tiny"
+          placeholder="Filter by query name..."
+          icon={<Search size={14} />}
+          className="w-64"
+        />
+        <ButtonTooltip
+          type="default"
+          size="tiny"
+          icon={<Settings2 size={14} />}
+          tooltip={{ content: { side: 'bottom', text: 'Toggle columns' } }}
+          className="!px-1.5"
+        />
       </div>
-      
+
       <ResizablePanelGroup
         direction="horizontal"
         className="relative flex flex-grow bg-alternative min-h-0"
@@ -363,6 +427,9 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
             headerRowHeight={36}
             columns={columns}
             rows={sortedData}
+            onRowsChange={(newRows) => {
+              console.log('DataGrid rows changed:', newRows.length)
+            }}
             rowClass={(_, idx) => {
               const isSelected = idx === selectedRow
               return [
@@ -408,7 +475,12 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
         {selectedRow !== undefined && selectedQuery && (
           <>
             <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={30} maxSize={45} minSize={30} className="bg-studio border-t">
+            <ResizablePanel
+              defaultSize={30}
+              maxSize={45}
+              minSize={30}
+              className="bg-studio border-t"
+            >
               <Button
                 type="text"
                 className="absolute top-3 right-3 px-1"
@@ -426,6 +498,12 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
                     className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
                   >
                     Query details
+                  </TabsTrigger_Shadcn_>
+                  <TabsTrigger_Shadcn_
+                    value="metrics"
+                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                  >
+                    Metrics
                   </TabsTrigger_Shadcn_>
                   {selectedQuery.index_statements && selectedQuery.index_statements.length > 0 && (
                     <TabsTrigger_Shadcn_
@@ -447,63 +525,182 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
                         {selectedQuery.query}
                       </pre>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <h5 className="text-xs font-medium text-foreground-light mb-1">Database</h5>
                         <p className="text-sm">{selectedQuery.database}</p>
                       </div>
                       <div>
-                        <h5 className="text-xs font-medium text-foreground-light mb-1">Command Type</h5>
+                        <h5 className="text-xs font-medium text-foreground-light mb-1">
+                          Command Type
+                        </h5>
                         <p className="text-sm">{selectedQuery.cmd_type_text}</p>
                       </div>
                       <div>
-                        <h5 className="text-xs font-medium text-foreground-light mb-1">Application</h5>
+                        <h5 className="text-xs font-medium text-foreground-light mb-1">
+                          Application
+                        </h5>
                         <p className="text-sm">{selectedQuery.application_name}</p>
                       </div>
                       <div>
-                        <h5 className="text-xs font-medium text-foreground-light mb-1">Timestamp</h5>
-                        <p className="text-sm">{new Date(selectedQuery.timestamp).toLocaleString()}</p>
+                        <h5 className="text-xs font-medium text-foreground-light mb-1">
+                          Timestamp
+                        </h5>
+                        <p className="text-sm">
+                          {new Date(selectedQuery.timestamp).toLocaleString()}
+                        </p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h5 className="text-xs font-medium text-foreground-light mb-1">Performance</h5>
+                        <h5 className="text-xs font-medium text-foreground-light mb-1">
+                          Performance
+                        </h5>
                         <div className="space-y-1">
-                          <p className="text-xs">Total time: {selectedQuery.total_time?.toFixed(2)}ms</p>
-                          <p className="text-xs">Mean time: {selectedQuery.mean_exec_time?.toFixed(2)}ms</p>
+                          <p className="text-xs">
+                            Total time: {selectedQuery.total_time?.toFixed(2)}ms
+                          </p>
+                          <p className="text-xs">
+                            Mean time: {selectedQuery.mean_exec_time?.toFixed(2)}ms
+                          </p>
                           <p className="text-xs">Calls: {selectedQuery.calls?.toLocaleString()}</p>
                         </div>
                       </div>
                       <div>
                         <h5 className="text-xs font-medium text-foreground-light mb-1">Rows</h5>
                         <div className="space-y-1">
-                          <p className="text-xs">Read: {selectedQuery.rows_read?.toLocaleString()}</p>
-                          <p className="text-xs">Insert: {selectedQuery.rows_insert?.toLocaleString()}</p>
-                          <p className="text-xs">Update: {selectedQuery.rows_update?.toLocaleString()}</p>
-                          <p className="text-xs">Delete: {selectedQuery.rows_delete?.toLocaleString()}</p>
+                          <p className="text-xs">
+                            Read: {selectedQuery.rows_read?.toLocaleString()}
+                          </p>
+                          <p className="text-xs">
+                            Insert: {selectedQuery.rows_insert?.toLocaleString()}
+                          </p>
+                          <p className="text-xs">
+                            Update: {selectedQuery.rows_update?.toLocaleString()}
+                          </p>
+                          <p className="text-xs">
+                            Delete: {selectedQuery.rows_delete?.toLocaleString()}
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <h5 className="text-xs font-medium text-foreground-light mb-1">Cache Performance</h5>
+                      <h5 className="text-xs font-medium text-foreground-light mb-1">
+                        Cache Performance
+                      </h5>
                       <div className="space-y-1">
-                        <p className="text-xs">Blocks read: {selectedQuery.shared_blks_read?.toLocaleString()}</p>
-                        <p className="text-xs">Blocks hit: {selectedQuery.shared_blks_hit?.toLocaleString()}</p>
-                        <p className="text-xs">Hit ratio: {selectedQuery.shared_blks_hit && selectedQuery.shared_blks_read 
-                          ? ((selectedQuery.shared_blks_hit / (selectedQuery.shared_blks_hit + selectedQuery.shared_blks_read)) * 100).toFixed(1) + '%'
-                          : 'N/A'}</p>
+                        <p className="text-xs">
+                          Blocks read: {selectedQuery.shared_blks_read?.toLocaleString()}
+                        </p>
+                        <p className="text-xs">
+                          Blocks hit: {selectedQuery.shared_blks_hit?.toLocaleString()}
+                        </p>
+                        <p className="text-xs">
+                          Hit ratio:{' '}
+                          {selectedQuery.shared_blks_hit && selectedQuery.shared_blks_read
+                            ? (
+                                (selectedQuery.shared_blks_hit /
+                                  (selectedQuery.shared_blks_hit +
+                                    selectedQuery.shared_blks_read)) *
+                                100
+                              ).toFixed(1) + '%'
+                            : 'N/A'}
+                        </p>
                       </div>
                     </div>
 
                     {selectedQuery.error_count && selectedQuery.error_count > 0 && (
                       <div>
                         <h5 className="text-xs font-medium text-red-500 mb-1">Errors</h5>
-                        <p className="text-xs text-red-500">{selectedQuery.error_count} slow queries detected</p>
+                        <p className="text-xs text-red-500">
+                          {selectedQuery.error_count} slow queries detected
+                        </p>
                       </div>
                     )}
+                  </div>
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_
+                  value="metrics"
+                  className="mt-0 flex-grow min-h-0 overflow-y-auto"
+                >
+                  <div className="p-5 space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Query Performance Over Time</h4>
+
+                      {singleQueryLatency && singleQueryLatency.length > 0 && (
+                        <div className="mb-4">
+                          <h5 className="text-xs font-medium text-foreground-light mb-2">
+                            Latency
+                          </h5>
+                          <div className="space-y-1">
+                            {singleQueryLatency.slice(-5).map((point, index) => (
+                              <div key={index} className="flex justify-between text-xs">
+                                <span>{new Date(point.timestamp).toLocaleTimeString()}</span>
+                                <span>{point.value?.toFixed(2)}ms</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {singleQueryCalls && singleQueryCalls.length > 0 && (
+                        <div className="mb-4">
+                          <h5 className="text-xs font-medium text-foreground-light mb-2">Calls</h5>
+                          <div className="space-y-1">
+                            {singleQueryCalls.slice(-5).map((point, index) => (
+                              <div key={index} className="flex justify-between text-xs">
+                                <span>{new Date(point.timestamp).toLocaleTimeString()}</span>
+                                <span>{point.value?.toLocaleString()}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {singleQueryRows && singleQueryRows.length > 0 && (
+                        <div className="mb-4">
+                          <h5 className="text-xs font-medium text-foreground-light mb-2">
+                            Rows Read
+                          </h5>
+                          <div className="space-y-1">
+                            {singleQueryRows.slice(-5).map((point, index) => (
+                              <div key={index} className="flex justify-between text-xs">
+                                <span>{new Date(point.timestamp).toLocaleTimeString()}</span>
+                                <span>{point.value?.toLocaleString()}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {singleQueryRowsWritten && singleQueryRowsWritten.length > 0 && (
+                        <div className="mb-4">
+                          <h5 className="text-xs font-medium text-foreground-light mb-2">
+                            Rows Written
+                          </h5>
+                          <div className="space-y-1">
+                            {singleQueryRowsWritten.slice(-5).map((point, index) => (
+                              <div key={index} className="flex justify-between text-xs">
+                                <span>{new Date(point.timestamp).toLocaleTimeString()}</span>
+                                <span>{point.value?.toLocaleString()}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {(!singleQueryLatency || singleQueryLatency.length === 0) &&
+                        (!singleQueryCalls || singleQueryCalls.length === 0) &&
+                        (!singleQueryRows || singleQueryRows.length === 0) &&
+                        (!singleQueryRowsWritten || singleQueryRowsWritten.length === 0) && (
+                          <p className="text-sm text-foreground-light">
+                            No metrics data available for this query
+                          </p>
+                        )}
+                    </div>
                   </div>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_
@@ -513,28 +710,35 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
                   <div className="p-5 space-y-4">
                     <div>
                       <h4 className="text-sm font-medium mb-2">Index Recommendations</h4>
-                      {selectedQuery.index_statements && selectedQuery.index_statements.length > 0 ? (
+                      {selectedQuery.index_statements &&
+                      selectedQuery.index_statements.length > 0 ? (
                         <div className="space-y-3">
-                                                 {selectedQuery.index_statements.map((statement: string, index: number) => (
-                         <div key={index} className="bg-surface-200 p-3 rounded">
-                           <pre className="text-xs overflow-x-auto">{statement}</pre>
-                         </div>
-                       ))}
+                          {selectedQuery.index_statements.map(
+                            (statement: string, index: number) => (
+                              <div key={index} className="bg-surface-200 p-3 rounded">
+                                <pre className="text-xs overflow-x-auto">{statement}</pre>
+                              </div>
+                            )
+                          )}
                         </div>
                       ) : (
-                        <p className="text-sm text-foreground-light">No index recommendations available</p>
+                        <p className="text-sm text-foreground-light">
+                          No index recommendations available
+                        </p>
                       )}
                     </div>
 
                     {selectedQuery.errors && selectedQuery.errors.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-medium text-red-500 mb-2">Index Advisor Errors</h4>
+                        <h4 className="text-sm font-medium text-red-500 mb-2">
+                          Index Advisor Errors
+                        </h4>
                         <div className="space-y-2">
-                                                   {selectedQuery.errors.map((error: string, index: number) => (
-                           <div key={index} className="text-xs text-red-500 bg-red-50 p-2 rounded">
-                             {error}
-                           </div>
-                         ))}
+                          {selectedQuery.errors.map((error: string, index: number) => (
+                            <div key={index} className="text-xs text-red-500 bg-red-50 p-2 rounded">
+                              {error}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}

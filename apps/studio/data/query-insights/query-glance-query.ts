@@ -11,7 +11,8 @@ export type QueryInsightsGlance = {
   avg_error_rate: number
 }
 
-export const getQueriesGlanceMetrics = (startTime: string, endTime: string) => /* SQL */ `
+export const getQueriesGlanceMetrics = (startTime: string, endTime: string) =>
+  /* SQL */ `
   SELECT 
     COUNT(DISTINCT query) as unique_queries,
     SUM(calls) as total_queries,
@@ -43,7 +44,12 @@ export async function getQueryInsightsGlance(
   const sql = getQueriesGlanceMetrics(startTime, endTime)
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: queryInsightsKeys.glance(projectRef, startTime, endTime) },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: queryInsightsKeys.glance(projectRef, startTime, endTime),
+    },
     signal
   )
 
@@ -53,21 +59,29 @@ export async function getQueryInsightsGlance(
 export type QueryInsightsGlanceData = Awaited<ReturnType<typeof getQueryInsightsGlance>>
 export type QueryInsightsGlanceError = ExecuteSqlError
 
-export const useQueryInsightsGlanceQuery = <TData = QueryInsightsGlanceData>(
-  { projectRef, connectionString, startTime, endTime }: QueryInsightsGlanceVariables,
-  { enabled = true, ...options }: UseQueryOptions<QueryInsightsGlanceData, QueryInsightsGlanceError, TData> = {}
-) => {
-  return useQuery<QueryInsightsGlanceData, QueryInsightsGlanceError, TData>(
-    queryInsightsKeys.glance(projectRef, startTime, endTime),
-    ({ signal }) => getQueryInsightsGlance({ projectRef, connectionString, startTime, endTime }, signal),
-    { 
-      enabled: enabled && typeof projectRef !== 'undefined', 
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      ...options 
-    }
-  )
+export function useQueryInsightsGlance(
+  projectRef: string | undefined,
+  startTime: string,
+  endTime: string,
+  options?: UseQueryOptions<QueryInsightsGlanceData>
+) {
+  return useQuery({
+    queryKey: queryInsightsKeys.glance(projectRef, startTime, endTime),
+    queryFn: async () => {
+      if (!projectRef) throw new Error('Project ref is required')
+
+      const sql = getQueriesGlanceMetrics(startTime, endTime)
+      console.log(`[useQueryInsightsGlance] Executing SQL:`, sql)
+
+      const { result } = await executeSql({
+        projectRef,
+        sql,
+      })
+
+      console.log(`[useQueryInsightsGlance] Result:`, result)
+      return result[0] as QueryInsightsGlance
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    ...options,
+  })
 }
