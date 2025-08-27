@@ -61,13 +61,9 @@ export const CronJobPage = () => {
         ? `/project/${ref}/integrations/${id}/${pageId}`
         : `/project/${ref}/integrations/${id}`,
     },
-    ...(!isLoading
-      ? [
-          {
-            label: (job?.jobname ?? '')?.length > 0 ? job?.jobname ?? childId : childId,
-          },
-        ]
-      : []),
+    {
+      label: childLabel ?? job?.jobname ?? '',
+    },
   ]
 
   const navigationItems: NavigationItem[] = []
