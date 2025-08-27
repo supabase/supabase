@@ -40,7 +40,12 @@ const UserAccessTokens: NextPageWithLayout = () => {
             placeholder="Filter by name"
           />
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button
+              asChild
+              type="default"
+              icon={<ExternalLink />}
+              className="sm:inline-flex hidden"
+            >
               <a
                 href="https://supabase.com/docs/reference/api/introduction"
                 target="_blank"
@@ -49,7 +54,12 @@ const UserAccessTokens: NextPageWithLayout = () => {
                 API Docs
               </a>
             </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button
+              asChild
+              type="default"
+              icon={<ExternalLink />}
+              className="sm:inline-flex hidden"
+            >
               <a
                 href="https://supabase.com/docs/reference/cli/start"
                 target="_blank"

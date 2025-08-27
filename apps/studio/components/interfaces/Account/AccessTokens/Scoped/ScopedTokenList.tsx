@@ -32,9 +32,14 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
     {
       key: 'token',
       label: 'Token',
-      className: 'w-96 max-w-96',
+      className: 'max-w-36 lg:max-w-80',
       render: (token) => (
-        <p className="font-mono text-foreground-light truncate">{token.token_alias}</p>
+        <code
+          className="font-mono text-foreground-light text-xs truncate"
+          title={token.token_alias}
+        >
+          {token.token_alias}
+        </code>
       ),
     },
     {
@@ -45,13 +50,17 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
         <p className="text-foreground-light">
           {token.last_used_at ? (
             <Tooltip>
-              <TooltipTrigger>{dayjs(token.last_used_at).format('DD MMM YYYY')}</TooltipTrigger>
-              <TooltipContent side="bottom">
+              <TooltipTrigger>
+                <code className="text-foreground-light text-xs">
+                  {dayjs(token.last_used_at).format('DD MMM YYYY')}
+                </code>
+              </TooltipTrigger>
+              <TooltipContent side="top">
                 Last used on {dayjs(token.last_used_at).format('DD MMM, YYYY HH:mm:ss')}
               </TooltipContent>
             </Tooltip>
           ) : (
-            'Never used'
+            <code className="text-foreground-light text-xs">Never</code>
           )}
         </p>
       ),
@@ -66,26 +75,26 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
             dayjs(token.expires_at).isBefore(dayjs()) ? (
               <Tooltip>
                 <TooltipTrigger>
-                  <p className="text-foreground-light">Expired</p>
+                  <code className="text-foreground-light text-xs">Expired</code>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">
+                <TooltipContent side="top">
                   Expired on {dayjs(token.expires_at).format('DD MMM, YYYY HH:mm:ss')}
                 </TooltipContent>
               </Tooltip>
             ) : (
               <Tooltip>
                 <TooltipTrigger>
-                  <p className="text-foreground-light">
+                  <code className="text-foreground-light text-xs">
                     {dayjs(token.expires_at).format('DD MMM YYYY')}
-                  </p>
+                  </code>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">
+                <TooltipContent side="top">
                   Expires on {dayjs(token.expires_at).format('DD MMM, YYYY HH:mm:ss')}
                 </TooltipContent>
               </Tooltip>
             )
           ) : (
-            <p className="text-foreground-light">Never</p>
+            <code className="text-foreground-light text-xs">Never</code>
           )}
         </>
       ),
