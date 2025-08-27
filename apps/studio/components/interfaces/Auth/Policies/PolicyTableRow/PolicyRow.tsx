@@ -57,7 +57,7 @@ const PolicyRow = ({
 
   const displayedRoles = (() => {
     const rolesWithAnonymous = appliesToAnonymousUsers
-      ? [...policy.roles, 'Anonymous']
+      ? [...policy.roles, 'anonymous sign-ins']
       : policy.roles
     return rolesWithAnonymous
   })()
