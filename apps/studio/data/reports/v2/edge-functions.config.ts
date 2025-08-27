@@ -123,23 +123,22 @@ order by
 --edgefn-report-execution-status-codes
 select
   timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
-  response.status_code AS status_code,
-  COUNT(*) AS count
-FROM
+  response.status_code as status_code,
+  count(response.status_code) as count
+from
   function_edge_logs
-  CROSS JOIN UNNEST(metadata) AS m
-  CROSS JOIN UNNEST(m.response) AS response
-  CROSS JOIN UNNEST(m.request) AS request
+  cross join unnest(metadata) as m
+  cross join unnest(m.response) as response
   ${
     functionIds && functionIds.length > 0
-      ? `WHERE function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
+      ? `where function_id in (${functionIds.map((id) => `'${id}'`).join(',')})`
       : ''
   }
 group by
   timestamp,
   status_code
 order by
-  timestamp desc;
+  timestamp desc
 `
     },
     InvocationsByRegion: (interval, functionIds) => {
@@ -203,30 +202,49 @@ async function runQuery(projectRef: string, sql: string, startDate: string, endD
     },
   })
   if (error) throw error
-  return MOCKED_RESPONSE
-  // return data
+  // return MOCKED_RESPONSE
+  return data
 }
 
-function extractStatusCodesFromData(data: any[]): string[] {
+export function extractStatusCodesFromData(data: any[]): string[] {
   const statusCodes = new Set<string>()
 
   data.forEach((item: any) => {
-    Object.keys(item).forEach((key) => {
-      if (/^\d{3}$/.test(key)) {
-        statusCodes.add(key)
-      }
-    })
+    if (item.status_code) {
+      statusCodes.add(String(item.status_code))
+    }
   })
 
   return Array.from(statusCodes).sort()
 }
 
-function generateStatusCodeAttributes(statusCodes: string[]) {
+export function generateStatusCodeAttributes(statusCodes: string[]) {
   return statusCodes.map((code) => ({
     attribute: code,
     label: `${code} ${getHttpStatusCodeInfo(parseInt(code)).label}`,
     color: REPORT_STATUS_CODE_COLORS[code] || REPORT_STATUS_CODE_COLORS.default,
   }))
+}
+
+/**
+ * Converts a list of { timestamp, status_code, count }
+ * to a list of { timestamp, [status_code]: count }
+ * That we can pass to the chart for rendering
+ */
+export function transformStatusCodeData(data: any[], statusCodes: string[]) {
+  const pivotedData = data.reduce((acc: Record<string, any>, d: any) => {
+    const timestamp = new Date(d.timestamp).toISOString()
+    if (!acc[timestamp]) {
+      acc[timestamp] = { timestamp }
+      statusCodes.forEach((code) => {
+        acc[timestamp][code] = 0
+      })
+    }
+    acc[timestamp][d.status_code] = d.count
+    return acc
+  }, {})
+
+  return Object.values(pivotedData)
 }
 
 export const edgeFunctionReports = ({
@@ -291,29 +309,30 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function executions by status code.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
-    dataProvider: async () => {
-      const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters.functionIds)
+    dataProvider: async (
+      projectRef: string,
+      startDate: string,
+      endDate: string,
+      interval: AnalyticsInterval,
+      functionIds?: string[]
+    ) => {
+      const sql = METRIC_SQL.ExecutionStatusCodes(interval, functionIds)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
       if (!rawData?.result) return { data: [] }
 
       /**
-       * Generate the attributes dynamically based on the data returned
-       * Eg. if the data only has 200, 203 and 500, the attributes should be 200, 203 and 500
-       * and the label should be the status code and the description
-       * 200 OK
-       * 203 Not Modified
-       * 500 Internal Server Error
+       * The query returns { timestamp, status_code: 500, count: 10 }
+       * and we have to transform it to { timestamp, 500: 10 }
+       * to be able to render the chart.
        */
 
       const statusCodes = extractStatusCodesFromData(rawData.result)
       const attributes = generateStatusCodeAttributes(statusCodes)
 
-      return {
-        data: rawData.result,
-        attributes,
-        query: sql,
-      }
+      const data = transformStatusCodeData(rawData.result, statusCodes)
+
+      return { data, attributes, query: sql }
     },
   },
   {
@@ -332,7 +351,7 @@ export const edgeFunctionReports = ({
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
     },
-    format: (value: unknown) => `${value}ms`,
+    format: (value: unknown) => `${Number(value).toFixed(0)}ms`,
     dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionTime(interval, filters.functionIds)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
