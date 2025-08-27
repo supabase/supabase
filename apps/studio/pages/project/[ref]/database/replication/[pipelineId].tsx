@@ -8,7 +8,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useFlag } from 'hooks/ui/useFlag'
-import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -26,16 +25,14 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
     <>
       {enablePgReplicate && (
-        <PipelineRequestStatusProvider>
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <FormHeader title="Replication" />
-                <ReplicationPipelineStatus />
-              </div>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-        </PipelineRequestStatusProvider>
+        <ScaffoldContainer>
+          <ScaffoldSection>
+            <div className="col-span-12">
+              <FormHeader title="Replication" />
+              <ReplicationPipelineStatus />
+            </div>
+          </ScaffoldSection>
+        </ScaffoldContainer>
       )}
     </>
   )
