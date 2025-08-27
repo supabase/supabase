@@ -78,15 +78,18 @@
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -120,7 +123,8 @@
         },
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ],
       "dependencies": ["@supabase/supabase-js@latest"],
@@ -190,11 +194,13 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -278,11 +284,13 @@
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -334,15 +342,18 @@
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -364,7 +375,8 @@
         },
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ],
       "dependencies": ["@supabase/supabase-js@latest"],
@@ -419,11 +431,13 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -475,11 +489,13 @@
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -512,15 +528,18 @@
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -548,7 +567,8 @@
         },
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -581,11 +601,13 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -618,11 +640,13 @@
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -654,15 +678,18 @@
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -694,7 +721,8 @@
         },
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -726,11 +754,13 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -762,11 +792,13 @@
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -798,15 +830,18 @@
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -838,7 +873,8 @@
         },
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -870,11 +906,13 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -906,11 +944,13 @@
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -950,15 +990,18 @@
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -998,7 +1041,8 @@
         },
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -1038,11 +1082,13 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -1082,11 +1128,13 @@
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -1122,15 +1170,18 @@
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -1166,7 +1217,8 @@
         },
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -1202,11 +1254,13 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -1242,11 +1296,13 @@
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ],
       "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
@@ -1286,15 +1342,18 @@
       "files": [
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/middleware.ts"
         },
         {
           "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ]
     },
@@ -1314,7 +1373,8 @@
       "files": [
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         }
       ]
     },
@@ -1334,11 +1394,13 @@
       "files": [
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ]
     },
@@ -1358,11 +1420,13 @@
       "files": [
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/client.ts"
         },
         {
           "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "lib/supabase/server.ts"
         }
       ]
     },
