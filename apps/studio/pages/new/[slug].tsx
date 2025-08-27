@@ -429,7 +429,7 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
     if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi)
+      setAllProjects(allProjectsFromApi.projects)
     }
   }, [allProjectsFromApi, allProjects, setAllProjects])
 

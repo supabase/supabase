@@ -12,7 +12,8 @@ export type ProjectsVariables = {
   ref?: string
 }
 
-export type ProjectInfo = components['schemas']['ProjectInfo']
+type PaginatedProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
+export type ProjectInfo = PaginatedProjectsResponse['projects'][number]
 
 export async function getProjects({
   signal,
@@ -21,10 +22,14 @@ export async function getProjects({
   signal?: AbortSignal
   headers?: Record<string, string>
 }) {
-  const { data, error } = await get('/platform/projects', { signal, headers })
+  const { data, error } = await get('/platform/projects', {
+    signal,
+    headers: { ...headers, Version: '2' },
+  })
 
   if (error) handleError(error)
-  return data as ProjectInfo[]
+  // [Joshen] API TS issue
+  return data as unknown as PaginatedProjectsResponse
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
