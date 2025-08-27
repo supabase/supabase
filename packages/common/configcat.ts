@@ -27,12 +27,13 @@ export const fetchHandler: typeof fetch = async (input, init) => {
 }
 
 async function getClient() {
-  if (client) return client
   if (!process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL) {
     console.error(
       'Failed to get ConfigCat client: missing env var "NEXT_PUBLIC_CONFIGCAT_PROXY_URL"'
     )
   }
+
+  if (client) return client
 
   const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
   const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
