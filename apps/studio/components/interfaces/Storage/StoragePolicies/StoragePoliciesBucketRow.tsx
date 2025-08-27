@@ -1,6 +1,4 @@
-import Panel from 'components/ui/Panel'
-import { isEmpty } from 'lodash'
-import { Archive, Edit, MoreVertical, Trash } from 'lucide-react'
+import { Archive } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -8,59 +6,13 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
-
-interface PolicyRowProps {
-  policy: any
-  table: any
-  bucketName: string
-  onSelectPolicyEdit: (p: any, s: string, t: any) => void
-  onSelectPolicyDelete: (s: string) => void
-}
-
-const PolicyRow = ({
-  policy,
-  table,
-  bucketName,
-  onSelectPolicyEdit = () => {},
-  onSelectPolicyDelete = () => {},
-}: PolicyRowProps) => {
-  const { name, command } = policy
-  return (
-    <CardContent className="group flex justify-between gap-2 border-b border-overlay py-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div className="font-mono text-xs text-foreground-lighter">{command}</div>
-        <div className="flex flex-col gap-2 lg:flex-row">
-          <span className="truncate text-sm text-foreground">{name}</span>
-        </div>
-      </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end">
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
-          >
-            <Edit size={14} />
-            <p>Edit</p>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="gap-x-2" onClick={() => onSelectPolicyDelete(policy)}>
-            <Trash size={14} />
-            <p>Delete</p>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </CardContent>
-  )
-}
+import PolicyRow from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
 
 const StoragePoliciesBucketRow = ({
   table = '',
@@ -88,18 +40,31 @@ const StoragePoliciesBucketRow = ({
           <p className="text-sm text-foreground-lighter">No policies created yet</p>
         </CardContent>
       ) : (
-        <div>
-          {policies.map((policy: any) => (
-            <PolicyRow
-              key={policy.name}
-              policy={policy}
-              table={table}
-              bucketName={bucket.name}
-              onSelectPolicyEdit={onSelectPolicyEdit}
-              onSelectPolicyDelete={onSelectPolicyDelete}
-            />
-          ))}
-        </div>
+        <CardContent className="p-0">
+          <Table className="table-fixed">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[40%]">Name</TableHead>
+                <TableHead className="w-[20%]">Command</TableHead>
+                <TableHead className="w-[30%]">Applied to</TableHead>
+                <TableHead className="w-0 text-right">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {policies.map((policy: any) => (
+                <PolicyRow
+                  key={policy.id ?? policy.name}
+                  policy={policy}
+                  isLocked={false}
+                  onSelectEditPolicy={(p) => onSelectPolicyEdit(p, bucket.name, table)}
+                  onSelectDeletePolicy={onSelectPolicyDelete}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
       )}
     </Card>
   )
