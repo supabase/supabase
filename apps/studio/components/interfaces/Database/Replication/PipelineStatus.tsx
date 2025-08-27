@@ -49,22 +49,22 @@ export const PipelineStatus = ({
     if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
       return {
         label: 'Restarting...',
-        dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
-        color: 'text-brand-600',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
+        color: 'text-warning-600',
         tooltip: stateMessages.message,
       }
     }
     if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
       return {
-        label: 'Starting...',
-        dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
-        color: 'text-brand-600',
+        label: 'Starting',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
+        color: 'text-warning-600',
         tooltip: stateMessages.message,
       }
     }
     if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
       return {
-        label: 'Stopping...',
+        label: 'Stopping',
         dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
         color: 'text-warning-600',
         tooltip: stateMessages.message,
