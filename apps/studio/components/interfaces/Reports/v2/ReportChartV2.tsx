@@ -37,7 +37,7 @@ export const ReportChartV2 = ({
   isLoading,
   className,
   syncId,
-}: ReportV2ChartProps) => {
+}: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
   const orgPlanId = orgPlan?.id
