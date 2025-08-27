@@ -10,7 +10,7 @@ import { DatabaseExtension } from 'data/database-extensions/database-extensions-
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
-import { Button, Switch, Tooltip, TooltipContent, TooltipTrigger, TableRow, TableCell } from 'ui'
+import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
@@ -20,7 +20,7 @@ interface ExtensionRowProps {
   extension: DatabaseExtension
 }
 
-const ExtensionRow = ({ extension }: ExtensionRowProps) => {
+export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
   const { data: project } = useSelectedProjectQuery()
   const isOn = extension.installed_version !== null
   const isOrioleDb = useIsOrioleDb()
@@ -118,58 +118,66 @@ const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           )}
         </TableCell>
 
-        <TableCell className="flex gap-2 items-center">
-          {extensionMeta?.github_url && (
-            <Button asChild type="default" icon={<Github />} className="rounded-full">
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={extensionMeta.github_url}
-                className="font-mono tracking-tighter"
-              >
-                {extensionMeta.github_url.split('/').slice(-2).join('/')}
-              </a>
-            </Button>
-          )}
-          {docsUrl !== undefined && (
-            <Button asChild type="default" icon={<Book />} className="rounded-full">
-              <a
-                target="_blank"
-                rel="noreferrer"
-                className="font-mono tracking-tighter"
-                href={docsUrl}
-              >
-                Docs
-              </a>
-            </Button>
-          )}
+        <TableCell>
+          <div className="flex gap-2 items-center">
+            {extensionMeta?.github_url && (
+              <Button asChild type="default" icon={<Github />} className="rounded-full">
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href={extensionMeta.github_url}
+                  className="font-mono tracking-tighter"
+                >
+                  {extensionMeta.github_url.split('/').slice(-2).join('/')}
+                </a>
+              </Button>
+            )}
+            {docsUrl !== undefined && (
+              <Button asChild type="default" icon={<Book />} className="rounded-full">
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono tracking-tighter"
+                  href={docsUrl}
+                >
+                  Docs
+                </a>
+              </Button>
+            )}
+          </div>
         </TableCell>
 
-        <TableCell className="w-20 sticky bg-surface-100 border-l right-0">
-          {isDisabling ? (
-            <Loader2 className="animate-spin" size={16} />
-          ) : (
-            <Tooltip>
-              <TooltipTrigger>
-                <Switch
-                  disabled={disabled}
-                  checked={isOn}
-                  onCheckedChange={() =>
-                    isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
-                  }
-                />
-              </TooltipTrigger>
-              {disabled && (
-                <TooltipContent side="bottom">
-                  {!canUpdateExtensions
-                    ? 'You need additional permissions to toggle extensions'
-                    : orioleDbCheck
-                      ? 'Project is using OrioleDB and cannot be disabled'
-                      : null}
-                </TooltipContent>
-              )}
-            </Tooltip>
-          )}
+        {/* 
+          [Joshen] The div child here and all these classes is to properly add a left border
+          to make the sticky column more distinct 
+        */}
+        <TableCell className="w-20 sticky bg-surface-100 right-0 relative">
+          <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l">
+            {isDisabling ? (
+              <Loader2 className="animate-spin" size={16} />
+            ) : (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Switch
+                    disabled={disabled}
+                    checked={isOn}
+                    onCheckedChange={() =>
+                      isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
+                    }
+                  />
+                </TooltipTrigger>
+                {disabled && (
+                  <TooltipContent side="bottom">
+                    {!canUpdateExtensions
+                      ? 'You need additional permissions to toggle extensions'
+                      : orioleDbCheck
+                        ? 'Project is using OrioleDB and cannot be disabled'
+                        : null}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            )}
+          </div>
         </TableCell>
       </TableRow>
 
@@ -202,5 +210,3 @@ const ExtensionRow = ({ extension }: ExtensionRowProps) => {
     </>
   )
 }
-
-export default ExtensionRow

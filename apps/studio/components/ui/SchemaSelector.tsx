@@ -35,6 +35,7 @@ interface SchemaSelectorProps {
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   portal?: boolean
+  align?: 'start' | 'end'
 }
 
 const SchemaSelector = ({
@@ -48,6 +49,7 @@ const SchemaSelector = ({
   onSelectSchema,
   onSelectCreateSchema,
   portal = true,
+  align = 'start',
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
   const { can: canCreateSchemas } = useAsyncCheckProjectPermissions(
@@ -130,7 +132,7 @@ const SchemaSelector = ({
           <PopoverContent_Shadcn_
             className="p-0 min-w-[200px] pointer-events-auto"
             side="bottom"
-            align="start"
+            align={align}
             portal={portal}
             sameWidthAsTrigger
           >
