@@ -45,6 +45,10 @@ const QueryInsights = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
+  // Convert selectedDateRange to startTime and endTime for QueryMetricExplorer
+  const startTime = selectedDateRange?.period_start?.date ? dayjs(selectedDateRange.period_start.date).toISOString() : undefined
+  const endTime = selectedDateRange?.period_end?.date ? dayjs(selectedDateRange.period_end.date).toISOString() : undefined
+
   return (
     <>
       <div className="flex flex-row justify-between gap-4 items-center">
@@ -55,8 +59,8 @@ const QueryInsights = () => {
           helpers={datePickerHelpers}
         />
       </div>
-      <QueryQuickGlance />
-      <QueryMetricExplorer />
+      <QueryQuickGlance startTime={startTime} endTime={endTime} />
+      <QueryMetricExplorer startTime={startTime} endTime={endTime} />
     </>
   )
 }

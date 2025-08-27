@@ -4,16 +4,33 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Card, CardContent } from 'ui'
 import { Database, Clock, AlertCircle } from 'lucide-react'
 import { formatNumberWithCommas } from './QueryInsights.utils'
+import dayjs from 'dayjs'
 
-export const QueryQuickGlance = () => {
+interface QueryQuickGlanceProps {
+  startTime?: string
+  endTime?: string
+}
+
+export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  // TEMP - Memoize time range to prevent constant re-renders
-  const { startTime, endTime } = useMemo(() => {
-    const endTime = new Date().toISOString()
-    const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    return { startTime, endTime }
-  }, []) // Empty dependency array - only calculate once
+  // Use provided date range or fall back to default
+  const { startTime: effectiveStartTime, endTime: effectiveEndTime } = useMemo(() => {
+    if (startTime && endTime) {
+      return { startTime, endTime }
+    }
+    // Fallback to last 24 hours if no date range provided
+    const fallbackEndTime = new Date().toISOString()
+    const fallbackStartTime = dayjs().subtract(24, 'hours').toISOString()
+    return { startTime: fallbackStartTime, endTime: fallbackEndTime }
+  }, [startTime, endTime])
+
+  // Debug logging
+  console.log('QueryQuickGlance Debug:', {
+    props: { startTime, endTime },
+    effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
+    project: { ref: project?.ref, hasConnectionString: !!project?.connectionString }
+  })
 
   const {
     data: glanceData,
@@ -22,8 +39,15 @@ export const QueryQuickGlance = () => {
   } = useQueryInsightsGlanceQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    startTime,
-    endTime,
+    startTime: effectiveStartTime,
+    endTime: effectiveEndTime,
+  })
+
+  // Debug logging for glance results
+  console.log('QueryQuickGlance Results:', {
+    glanceData,
+    isLoading,
+    error
   })
 
   const cards = useMemo(() => {
