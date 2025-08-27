@@ -10,13 +10,13 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
-  TableRow,
-  TableCell,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -27,12 +27,12 @@ interface PolicyRowProps {
   policy: PostgresPolicy
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
-  isLocked: boolean
+  isLocked?: boolean
 }
 
-const PolicyRow = ({
+export const PolicyRow = ({
   policy,
-  isLocked: isLockedDefault,
+  isLocked: isLockedDefault = false,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
@@ -169,5 +169,3 @@ const PolicyRow = ({
     </TableRow>
   )
 }
-
-export default PolicyRow
