@@ -45,7 +45,7 @@ export async function getUpcomingInvoice(
   { orgSlug }: UpcomingInvoiceVariables,
   signal?: AbortSignal
 ) {
-  if (!orgSlug) throw new Error('orgSlug is required')
+  if (!orgSlug || orgSlug === 'undefined') throw new Error('orgSlug is required')
 
   const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices/upcoming`, {
     params: { path: { slug: orgSlug } },
@@ -74,7 +74,7 @@ export const useOrgUpcomingInvoiceQuery = <TData = UpcomingInvoiceData>(
     invoicesKeys.orgUpcomingPreview(orgSlug),
     ({ signal }) => getUpcomingInvoice({ orgSlug }, signal),
     {
-      enabled: enabled && typeof orgSlug !== 'undefined',
+      enabled: enabled && typeof orgSlug !== 'undefined' && orgSlug !== 'undefined',
       ...options,
     }
   )
