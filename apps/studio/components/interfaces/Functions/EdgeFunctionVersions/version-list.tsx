@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { RefreshCw, Eye } from 'lucide-react'
-import { toast } from 'sonner'
 
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader, ScrollArea } from 'ui'
-import { fetchDeployments, fetchVersionCode, rollbackToVersion } from './mocks'
 import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
 import { EdgeFunctionVersionsLoading } from './loading'
 import { EdgeFunctionVersionsError } from './error'
+import { useEdgeFunctionDeploymentsQuery } from 'data/edge-functions/edge-function-deployments-query'
+import { useEdgeFunctionDeploymentCodeQuery } from 'data/edge-functions/edge-function-deployment-code-query'
+import { useEdgeFunctionRollbackMutation } from 'data/edge-functions/edge-function-rollback-mutation'
 
 // Ensure newest first: sort by version desc, then created_at desc
 const sortDeployments = (items: EdgeFunctionDeployment[]) =>
@@ -18,49 +19,49 @@ const sortDeployments = (items: EdgeFunctionDeployment[]) =>
 
 export const EdgeFunctionVersionsList = () => {
   const { ref: projectRef, slug: functionSlug } = useParams()
-  const [deployments, setDeployments] = useState<EdgeFunctionDeployment[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [isRollingBack, setIsRollingBack] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [selectedDeployment, setSelectedDeployment] = useState<EdgeFunctionDeployment | null>(null)
   const [showRollback, setShowRollback] = useState(false)
 
-  const [codeFiles, setCodeFiles] = useState<{ path: string; content: string }[]>([])
-  const [isLoadingCode, setIsLoadingCode] = useState(false)
+  // Use hardcoded values for now if params are not available
+  const projectId = projectRef || 'demo-project'
+  const slug = functionSlug || 'super-function'
 
-  // Load deployments on mount and when dependencies change
-  const loadDeployments = async (showRefreshState = false) => {
-    try {
-      if (showRefreshState) {
-        setIsRefreshing(true)
-      } else {
-        setIsLoading(true)
-      }
-      setError(null)
+  // React Query hooks
+  const {
+    data: deployments = [],
+    isLoading,
+    error,
+    refetch,
+    isFetching: isRefreshing,
+  } = useEdgeFunctionDeploymentsQuery({ projectRef: projectId, slug })
 
-      // Use hardcoded values for now if params are not available
-      const projectId = projectRef || 'demo-project'
-      const slug = functionSlug || 'super-function'
-
-      const data = await fetchDeployments(projectId, slug)
-      const sorted = sortDeployments(data)
-      setDeployments(sorted)
-      const defaultSelected = sorted.find((d) => d.status === 'ACTIVE') || sorted[0] || null
-      setSelectedDeployment(defaultSelected)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load deployments')
-      toast.error('Failed to load deployments')
-    } finally {
-      setIsLoading(false)
-      setIsRefreshing(false)
+  const { data: codeResponse, isLoading: isLoadingCode } = useEdgeFunctionDeploymentCodeQuery(
+    {
+      projectRef: projectId,
+      slug,
+      version: selectedDeployment?.version,
+    },
+    {
+      enabled: !!selectedDeployment,
     }
-  }
+  )
 
-  useEffect(() => {
-    loadDeployments()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectRef, functionSlug])
+  const rollbackMutation = useEdgeFunctionRollbackMutation({
+    onSuccess: () => {
+      setSelectedDeployment(null)
+      setShowRollback(false)
+    },
+  })
+
+  // Sort deployments and set initial selection
+  const sortedDeployments = sortDeployments(deployments)
+
+  // Set default selected deployment when deployments load
+  if (sortedDeployments.length > 0 && !selectedDeployment) {
+    const defaultSelected =
+      sortedDeployments.find((d) => d.status === 'ACTIVE') || sortedDeployments[0]
+    setSelectedDeployment(defaultSelected)
+  }
 
   const handleRollbackClick = (deployment: EdgeFunctionDeployment) => {
     setSelectedDeployment(deployment)
@@ -71,60 +72,27 @@ export const EdgeFunctionVersionsList = () => {
     const deployment = target ?? selectedDeployment
     if (!deployment) return
 
-    try {
-      setIsRollingBack(true)
-
-      const projectId = projectRef || 'demo-project'
-      const slug = functionSlug || 'super-function'
-
-      const response = await rollbackToVersion(projectId, slug, deployment.version)
-
-      if ('active_version' in response) {
-        toast.success(`Successfully rolled back to version ${response.active_version}`)
-      } else {
-        toast.success(
-          `Successfully rolled back to version ${deployment.version} (new version ${response.version} created)`
-        )
-      }
-
-      setSelectedDeployment(null)
-      setShowRollback(false)
-
-      await loadDeployments()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Rollback failed')
-    } finally {
-      setIsRollingBack(false)
-    }
+    rollbackMutation.mutate({
+      projectRef: projectId,
+      slug,
+      target_version: deployment.version,
+    })
   }
 
   const handleViewCodeClick = (deployment: EdgeFunctionDeployment) => {
     setSelectedDeployment(deployment)
   }
 
-  useEffect(() => {
-    const load = async () => {
-      if (!selectedDeployment) return
-      setIsLoadingCode(true)
-      const projectId = projectRef || 'demo-project'
-      const slug = functionSlug || 'super-function'
-      try {
-        const resp = await fetchVersionCode(projectId, slug, selectedDeployment.version)
-        setCodeFiles(resp.files)
-      } finally {
-        setIsLoadingCode(false)
-      }
-    }
-    load()
-  }, [selectedDeployment, projectRef, functionSlug])
+  // Get code files from the response
+  const codeFiles = codeResponse?.files || []
 
   if (isLoading) return <EdgeFunctionVersionsLoading />
 
-  if (error && !deployments.length) {
-    return <EdgeFunctionVersionsError error={error} onRetry={() => loadDeployments()} />
+  if (error && !sortedDeployments.length) {
+    return <EdgeFunctionVersionsError error={error.message} onRetry={() => refetch()} />
   }
 
-  if (!deployments.length) {
+  if (!sortedDeployments.length) {
     return (
       <Card>
         <CardHeader>
@@ -147,7 +115,7 @@ export const EdgeFunctionVersionsList = () => {
           type="default"
           size="tiny"
           icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-          onClick={() => loadDeployments(true)}
+          onClick={() => refetch()}
           disabled={isRefreshing}
         >
           Refresh
@@ -163,7 +131,7 @@ export const EdgeFunctionVersionsList = () => {
             Select a version to preview its content and restore if needed.
           </p>
           <div className="space-y-3">
-            {deployments.map((deployment) => {
+            {sortedDeployments.map((deployment) => {
               const isSelected = selectedDeployment?.id === deployment.id
               return (
                 <div
@@ -224,7 +192,7 @@ export const EdgeFunctionVersionsList = () => {
                         <Button
                           type="default"
                           size="tiny"
-                          disabled={isRollingBack}
+                          disabled={rollbackMutation.isLoading}
                           onClick={(e) => {
                             e.stopPropagation()
                             handleRollbackClick(deployment)
@@ -301,7 +269,7 @@ export const EdgeFunctionVersionsList = () => {
                     block
                     type="primary"
                     size="medium"
-                    disabled={isRollingBack}
+                    disabled={rollbackMutation.isLoading}
                     onClick={() => setShowRollback(true)}
                   >
                     Restore This Version
@@ -322,7 +290,7 @@ export const EdgeFunctionVersionsList = () => {
         onOpenChange={setShowRollback}
         deployment={selectedDeployment}
         onConfirm={() => handleRollbackConfirm(selectedDeployment ?? undefined)}
-        isLoading={isRollingBack}
+        isLoading={rollbackMutation.isLoading}
       />
     </Card>
   )
