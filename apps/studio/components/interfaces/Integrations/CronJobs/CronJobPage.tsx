@@ -64,7 +64,7 @@ export const CronJobPage = () => {
     ...(!isLoading
       ? [
           {
-            label: (job?.jobname ?? '')?.length > 0 ? job?.jobname : childId,
+            label: (job?.jobname ?? '')?.length > 0 ? job?.jobname ?? childId : childId,
           },
         ]
       : []),

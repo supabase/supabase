@@ -121,6 +121,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                     <CodeEditor
                       id="message-payload"
                       language="json"
+                      autofocus={false}
                       className="!mb-0 h-32 overflow-hidden rounded border"
                       onInputChange={(e: string | undefined) => field.onChange(e)}
                       options={{ wordWrap: 'off', contextmenu: false }}
