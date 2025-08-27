@@ -9,9 +9,7 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
-  Badge,
   Button,
-  cn,
   TableRow,
   TableCell,
   DropdownMenu,
@@ -57,6 +55,13 @@ const PolicyRow = ({
     authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED &&
     (policy.roles.includes('authenticated') || policy.roles.includes('public'))
 
+  const displayedRoles = (() => {
+    const rolesWithAnonymous = appliesToAnonymousUsers
+      ? [...policy.roles, 'anonymous sign-ins']
+      : policy.roles
+    return rolesWithAnonymous
+  })()
+
   return (
     <TableRow>
       <TableCell className="w-[40%] truncate">
@@ -68,9 +73,6 @@ const PolicyRow = ({
           >
             {policy.name}
           </Button>
-          {appliesToAnonymousUsers ? (
-            <Badge color="yellow">Applies to anonymous users</Badge>
-          ) : null}
         </div>
       </TableCell>
       <TableCell className="w-[20%] truncate">
@@ -78,24 +80,25 @@ const PolicyRow = ({
       </TableCell>
       <TableCell className="w-[30%] truncate">
         <div className="flex items-center gap-x-1">
-          <div className="text-foreground-lighter text-sm">
-            {policy.roles.slice(0, 3).map((role, i) => (
+          <div className="text-foreground-lighter text-sm truncate">
+            {displayedRoles.slice(0, 2).map((role, i) => (
               <span key={`policy-${role}-${i}`}>
                 <code className="text-foreground-light text-xs">{role}</code>
-                {i < Math.min(policy.roles.length, 3) - 1 ? ', ' : ' '}
+                {i < Math.min(displayedRoles.length, 2) - 1 ? ', ' : ' '}
               </span>
             ))}
-            {policy.roles.length > 1 ? 'roles' : 'role'}
           </div>
-          {policy.roles.length > 3 && (
+          {displayedRoles.length > 2 && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <code key="policy-etc" className="text-foreground-light text-xs">
-                  + {policy.roles.length - 3} more roles
-                </code>
+                <div>
+                  <code key="policy-etc" className="text-foreground-light text-xs">
+                    + {displayedRoles.length - 2} more
+                  </code>
+                </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" align="center">
-                {policy.roles.slice(3).join(', ')}
+                {displayedRoles.join(', ')}
               </TooltipContent>
             </Tooltip>
           )}
