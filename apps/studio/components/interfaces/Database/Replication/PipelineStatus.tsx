@@ -54,7 +54,7 @@ export const PipelineStatus = ({
         tooltip: stateMessages.message,
       }
     }
-    if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
+    if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
       return {
         label: 'Starting...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
@@ -62,7 +62,7 @@ export const PipelineStatus = ({
         tooltip: stateMessages.message,
       }
     }
-    if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
+    if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
       return {
         label: 'Stopping...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,

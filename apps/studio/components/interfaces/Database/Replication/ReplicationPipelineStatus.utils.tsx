@@ -56,8 +56,8 @@ export const getDisabledStateConfig = ({
   const { title, message, badge } = getPipelineStateMessages(requestStatus, statusName)
 
   // Get icon and colors based on current state
-  const isEnabling = requestStatus === PipelineStatusRequestStatus.EnableRequested
-  const isDisabling = requestStatus === PipelineStatusRequestStatus.DisableRequested
+  const isEnabling = requestStatus === PipelineStatusRequestStatus.StartRequested
+  const isDisabling = requestStatus === PipelineStatusRequestStatus.StopRequested
   const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
   const isTransitioning = isEnabling || isDisabling || isRestarting
 

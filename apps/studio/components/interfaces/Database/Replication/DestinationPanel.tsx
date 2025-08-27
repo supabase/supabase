@@ -242,13 +242,6 @@ const DestinationPanel = ({
             console.error('Pipeline id is required')
             return
           }
-          const willRestart = existingDestination.enabled
-          const snapshot = existingDestination.enabled ? 'started' : 'stopped'
-          setRequestStatus(
-            existingDestination.pipelineId,
-            PipelineStatusRequestStatus.RestartRequested,
-            snapshot
-          )
           const bigQueryConfig: any = {
             projectId: data.projectId,
             datasetId: data.datasetId,
@@ -279,12 +272,23 @@ const DestinationPanel = ({
             },
             sourceId,
           })
-          // Notify, kick off restart, and close without waiting for start to complete
-          toast.success(
-            willRestart
-              ? 'Settings applied. Restarting the pipeline...'
-              : 'Settings applied. Starting the pipeline...'
-          )
+          // Set request status only right before starting, then fire and close
+          const snapshot = existingDestination.enabled ? 'started' : 'stopped'
+          if (existingDestination.enabled) {
+            setRequestStatus(
+              existingDestination.pipelineId,
+              PipelineStatusRequestStatus.RestartRequested,
+              snapshot
+            )
+            toast.success('Settings applied. Restarting the pipeline...')
+          } else {
+            setRequestStatus(
+              existingDestination.pipelineId,
+              PipelineStatusRequestStatus.StartRequested,
+              snapshot
+            )
+            toast.success('Settings applied. Starting the pipeline...')
+          }
           void startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
           onClose()
         } else {
@@ -320,6 +324,8 @@ const DestinationPanel = ({
               ...(hasBothBatchFields && { batch: batchConfig }),
             },
           })
+          // Set request status only right before starting, then fire and close
+          setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, 'stopped')
           toast.success('Destination created. Starting the pipeline...')
           void startPipeline({ projectRef, pipelineId })
           onClose()

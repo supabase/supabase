@@ -103,8 +103,8 @@ export const ReplicationPipelineStatus = () => {
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
   const isEnablingDisabling =
-    requestStatus === PipelineStatusRequestStatus.EnableRequested ||
-    requestStatus === PipelineStatusRequestStatus.DisableRequested ||
+    requestStatus === PipelineStatusRequestStatus.StartRequested ||
+    requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
@@ -118,10 +118,10 @@ export const ReplicationPipelineStatus = () => {
 
     try {
       if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested, statusName)
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
         await startPipeline({ projectRef, pipelineId: pipeline.id })
       } else if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested, statusName)
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {

@@ -10,8 +10,8 @@ import {
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
-  EnableRequested = 'EnableRequested',
-  DisableRequested = 'DisableRequested',
+  StartRequested = 'StartRequested',
+  StopRequested = 'StopRequested',
   RestartRequested = 'RestartRequested',
 }
 

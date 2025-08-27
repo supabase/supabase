@@ -82,10 +82,10 @@ export const getPipelineStateMessages = (
   if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
     return PIPELINE_STATE_MESSAGES.restarting
   }
-  if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
+  if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
     return PIPELINE_STATE_MESSAGES.enabling
   }
-  if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
+  if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
     return PIPELINE_STATE_MESSAGES.disabling
   }
 
