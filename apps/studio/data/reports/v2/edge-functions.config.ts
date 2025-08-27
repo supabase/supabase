@@ -7,91 +7,6 @@ import {
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
 import { ReportConfig } from './reports.types'
 
-const MOCKED_RESPONSE = {
-  result: [
-    {
-      count: 99,
-      function_id: '123',
-      timestamp: new Date('2025-08-20T00:00:00.000Z').getTime(),
-      avg_execution_time: 24.7,
-      '200': 33,
-      '203': 10,
-      '500': 66,
-      region: 'eu-central-1',
-    },
-    {
-      count: 30,
-      function_id: '123',
-      timestamp: new Date('2025-08-21T00:00:00.000Z').getTime(),
-      avg_execution_time: 74.7,
-      '200': 12,
-      '203': 33,
-      '500': 55,
-      region: 'eu-central-1',
-    },
-    {
-      count: 120,
-      function_id: '123',
-      timestamp: new Date('2025-08-22T00:00:00.000Z').getTime(),
-      avg_execution_time: 66.7,
-      '200': 33,
-      '203': 44,
-      '500': 22,
-      region: 'eu-central-1',
-    },
-    {
-      count: 120,
-      function_id: '123',
-      timestamp: new Date('2025-08-23T00:00:00.000Z').getTime(),
-      avg_execution_time: 66.7,
-      '200': 33,
-      '203': 44,
-      '500': 22,
-      region: 'eu-central-1',
-    },
-    {
-      count: 120,
-      function_id: '123',
-      timestamp: new Date('2025-08-24T00:00:00.000Z').getTime(),
-      avg_execution_time: 66.7,
-      '200': 33,
-      '203': 44,
-      '500': 22,
-      region: 'eu-central-1',
-    },
-    {
-      count: 230,
-      function_id: '123',
-      timestamp: new Date('2025-08-25T00:00:00.000Z').getTime(),
-      avg_execution_time: 16.7,
-      '200': 90,
-      '203': 10,
-      '500': 20,
-      region: 'eu-central-1',
-    },
-    {
-      count: 3509,
-      function_id: '123',
-      timestamp: new Date('2025-08-26T00:00:00.000Z').getTime(),
-      avg_execution_time: 22.7,
-      '200': 454,
-      '203': 34,
-      '500': 12,
-      region: 'eu-central-1',
-    },
-    {
-      count: 3000,
-      function_id: '123',
-      timestamp: new Date('2025-08-27T00:00:00.000Z').getTime(),
-      avg_execution_time: 11.7,
-      '200': 40,
-      '203': 1,
-      '500': 4,
-      region: 'eu-central-1',
-    },
-  ],
-}
-
 const METRIC_SQL: Record<string, (interval: AnalyticsInterval, functionIds?: string[]) => string> =
   {
     TotalInvocations: (interval, functionIds) => {
@@ -202,7 +117,6 @@ async function runQuery(projectRef: string, sql: string, startDate: string, endD
     },
   })
   if (error) throw error
-  // return MOCKED_RESPONSE
   return data
 }
 
