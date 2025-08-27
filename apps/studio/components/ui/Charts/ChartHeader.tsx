@@ -1,11 +1,19 @@
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Activity, BarChartIcon, GitCommitHorizontalIcon, InfoIcon } from 'lucide-react'
+import {
+  Activity,
+  BarChartIcon,
+  GitCommitHorizontalIcon,
+  InfoIcon,
+  SquareTerminal,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useChartHoverState } from './useChartHoverState'
 import { numberFormatter } from './Charts.utils'
+import { useRouter } from 'next/router'
+import { useParams } from 'common'
 
 export interface ChartHeaderProps {
   title?: string
@@ -31,6 +39,7 @@ export interface ChartHeaderProps {
   shouldFormatBytes?: boolean
   isNetworkChart?: boolean
   attributes?: any[]
+  sql?: string
 }
 
 const ChartHeader = ({
@@ -57,10 +66,13 @@ const ChartHeader = ({
   shouldFormatBytes = false,
   isNetworkChart = false,
   attributes,
+  sql,
 }: ChartHeaderProps) => {
   const { hoveredIndex, syncHover } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
+  const { ref } = useParams()
+  const router = useRouter()
 
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
@@ -202,6 +214,24 @@ const ChartHeader = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {sql ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="default"
+                className="px-1.5"
+                icon={<SquareTerminal />}
+                onClick={() =>
+                  router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}`)
+                }
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top" align="center">
+              Open in Log Explorer
+            </TooltipContent>
+          </Tooltip>
+        ) : null}
+
         {!hideChartType && onChartStyleChange && (
           <Tooltip>
             <TooltipTrigger asChild>
