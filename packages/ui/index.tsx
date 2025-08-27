@@ -204,6 +204,7 @@ export * from './src/components/shadcn/ui/hover-card'
 export * from './src/components/shadcn/ui/aspect-ratio'
 
 export * from './src/components/shadcn/ui/table'
+export * from './src/components/ShadowScrollArea'
 
 export {
   Collapsible as Collapsible_Shadcn_,
