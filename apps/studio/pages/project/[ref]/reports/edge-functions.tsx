@@ -5,7 +5,7 @@ import { ArrowRight, ChevronDown, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { Label } from '@ui/components/shadcn/ui/label'
-import { ReportV2ChartComponent } from 'components/interfaces/Reports/v2/ReportV2ChartComponent'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
@@ -228,7 +228,7 @@ const EdgeFunctionsUsage = () => {
             reportConfig
               .filter((report) => !report.hide)
               .map((report, i) => (
-                <ReportV2ChartComponent
+                <ReportChartV2
                   key={`${report.id}-${i}`}
                   report={report}
                   projectRef={ref!}

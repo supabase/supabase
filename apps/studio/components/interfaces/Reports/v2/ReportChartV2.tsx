@@ -11,7 +11,7 @@ import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { ReportChartUpsell } from './ReportChartUpsell'
 import { useState } from 'react'
 
-export interface ReportV2ChartProps {
+export interface ReportChartV2Props {
   report: ReportConfig
   projectRef: string
   startDate: string
@@ -25,7 +25,7 @@ export interface ReportV2ChartProps {
   syncId?: string
 }
 
-export const ReportV2ChartComponent = ({
+export const ReportChartV2 = ({
   report,
   projectRef,
   startDate,
@@ -181,7 +181,6 @@ export const ReportV2ChartComponent = ({
           />
         </Panel.Content>
       </Panel>
-      {/* <pre className="text-xs max-h-80 overflow-y-auto">{JSON.stringify(chartData, null, 2)}</pre> */}
     </>
   )
 }
