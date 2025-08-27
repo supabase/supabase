@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { RefreshCw, AlertCircle, Eye } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader, Skeleton } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader } from 'ui'
 import { fetchDeployments, fetchVersionCode, rollbackToVersion } from './mocks'
 import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
+import { EdgeFunctionVersionsLoading } from './loading'
 
 // Ensure newest first: sort by version desc, then created_at desc
 const sortDeployments = (items: EdgeFunctionDeployment[]) =>
@@ -116,36 +117,7 @@ export const EdgeFunctionVersionsList = () => {
     load()
   }, [selectedDeployment, projectRef, functionSlug])
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Edge Function Versions</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0 divide-y">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="p-6 flex items-start justify-between">
-              <div className="space-y-2 w-full">
-                <div className="flex items-center gap-x-3">
-                  <Skeleton className="h-4 w-56" />
-                </div>
-                <Skeleton className="h-4 w-72" />
-                <div className="flex items-center gap-x-4">
-                  <Skeleton className="h-3 w-24" />
-                  <Skeleton className="h-3 w-12" />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-x-2 shrink-0">
-                <Skeleton className="h-7 w-20" />
-                <Skeleton className="h-7 w-16" />
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    )
-  }
+  if (isLoading) return <EdgeFunctionVersionsLoading />
 
   if (error && !deployments.length) {
     return (
