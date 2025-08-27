@@ -84,9 +84,10 @@ export const DestinationRow = ({
       refetchInterval: STATUS_REFRESH_FREQUENCY_MS,
     }
   )
-  const hasTableErrors = (replicationStatusData?.table_statuses || []).some(
+  const errorCount = (replicationStatusData?.table_statuses || []).filter(
     (t: any) => t.state?.name === 'error'
-  )
+  ).length
+  const hasTableErrors = errorCount > 0
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -159,9 +160,15 @@ export const DestinationRow = ({
                     {hasTableErrors && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="inline-flex w-2 h-2 rounded-full bg-destructive-600 animate-pulse" />
+                          <span className="inline-flex items-center">
+                            <span className="inline-flex items-center justify-center px-1 min-w-4 h-4 rounded-full bg-destructive-600 text-white text-[10px] leading-none">
+                              {errorCount}
+                            </span>
+                          </span>
                         </TooltipTrigger>
-                        <TooltipContent side="bottom">Some tables have replication errors</TooltipContent>
+                        <TooltipContent side="bottom">
+                          {errorCount} table{errorCount === 1 ? '' : 's'} have replication errors
+                        </TooltipContent>
                       </Tooltip>
                     )}
                   </span>
