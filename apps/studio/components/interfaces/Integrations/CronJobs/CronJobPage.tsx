@@ -19,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
@@ -34,7 +35,7 @@ export const CronJobPage = () => {
 
   const jobId = Number(childId)
 
-  const { data: job } = useCronJobQuery({
+  const { data: job, isLoading } = useCronJobQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: jobId,
@@ -60,9 +61,13 @@ export const CronJobPage = () => {
         ? `/project/${ref}/integrations/${id}/${pageId}`
         : `/project/${ref}/integrations/${id}`,
     },
-    {
-      label: childId,
-    },
+    ...(!isLoading
+      ? [
+          {
+            label: job?.jobname ?? childId,
+          },
+        ]
+      : []),
   ]
 
   const navigationItems: NavigationItem[] = []
@@ -159,7 +164,7 @@ export const CronJobPage = () => {
         breadcrumbs={breadcrumbItems}
         navigationItems={navigationItems}
         secondaryActions={secondaryActions}
-        subtitle={pageSubtitle}
+        subtitle={isLoading ? <ShimmeringLoader className="py-0 h-[20px] w-96" /> : pageSubtitle}
         className="border-b-0"
       >
         <PreviousRunsTab />

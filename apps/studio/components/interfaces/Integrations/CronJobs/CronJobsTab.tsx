@@ -17,6 +17,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { isAtBottom } from 'lib/helpers'
 import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -200,7 +201,7 @@ export const CronjobsTab = () => {
                     {...props}
                     onClick={(e) => {
                       const { jobid, jobname } = props.row
-                      const url = `/project/${ref}/integrations/cron/jobs/${jobid}?child-label=${encodeURIComponent(jobname || `Job #${jobid}`)}`
+                      const url = `${BASE_PATH}/project/${ref}/integrations/cron/jobs/${jobid}?child-label=${encodeURIComponent(jobname || `Job #${jobid}`)}`
 
                       sendEvent({
                         action: 'cron_job_history_clicked',
