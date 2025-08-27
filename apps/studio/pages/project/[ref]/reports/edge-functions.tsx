@@ -24,6 +24,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
 import type { NextPageWithLayout } from 'types'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (
@@ -109,6 +110,8 @@ const EdgeFunctionsUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
+              <ReportSettings chartId="edge-functions-charts" />
+
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
