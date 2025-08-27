@@ -5,12 +5,12 @@ import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
+import AlertError from 'components/ui/AlertError'
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
+import { ResponseError } from 'types'
 import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
-import { ResponseError } from 'types'
-import AlertError from 'components/ui/AlertError'
 
 interface QueueDataGridProps {
   error?: ResponseError | null
@@ -95,7 +95,7 @@ const messagesCols = [
     description: undefined,
     minWidth: 600,
     value: (row: PostgresQueueMessage) => (
-      <div className="flex items-center">
+      <div className="flex items-center font-mono">
         <span>{JSON.stringify(row.message)}</span>
       </div>
     ),

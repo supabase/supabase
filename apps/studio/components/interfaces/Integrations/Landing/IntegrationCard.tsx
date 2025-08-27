@@ -1,11 +1,11 @@
 import { BadgeCheck } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Card, CardContent, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
-import Image from 'next/image'
 
 type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
@@ -46,8 +46,6 @@ export const IntegrationCard = ({
 }: IntegrationCardProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  console.log('name', id)
-
   if (featured) {
     return (
       <Link href={`/project/${project?.ref}/integrations/${id}/overview`} className="h-full">
@@ -56,10 +54,10 @@ export const IntegrationCard = ({
           <div className="w-full h-24 bg-surface-400 rounded-t-md flex items-center justify-center overflow-hidden relative">
             {image ? (
               <Image
+                fill
                 src={image}
                 alt={`${name} integration`}
                 className="w-full h-full object-cover invert dark:invert-0"
-                fill
                 objectFit="cover"
               />
             ) : (
@@ -68,21 +66,19 @@ export const IntegrationCard = ({
               </div>
             )}
           </div>
-          <CardContent className="p-6">
+          <CardContent className="p-6 px-4">
             <div className="flex-col justify-start items-center text-center gap-y-0.5 flex">
-              <h3 className="heading-subSection">{name}</h3>
-              <p className="text-foreground-light">{description}</p>
-              <div className="flex items-center justify-center w-full mt-4 gap-x-2">
-                <div className="flex items-center gap-x-1">
-                  {status && (
-                    <Badge variant="warning" className="capitalize">
-                      {status}
-                    </Badge>
-                  )}
-                  <Badge>
-                    <span>Official</span>
+              <h3>{name}</h3>
+              <p className="text-foreground-light text-sm">{description}</p>
+              <div className="flex items-center gap-x-1 mt-4">
+                {status && (
+                  <Badge variant="warning" className="capitalize">
+                    {status}
                   </Badge>
-                </div>
+                )}
+                <Badge>
+                  <span>Official</span>
+                </Badge>
               </div>
             </div>
           </CardContent>

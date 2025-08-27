@@ -100,7 +100,7 @@ export const QueueTab = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between gap-x-4 py-4 px-10 mb-0 bg-surface-200">
+      <div className="flex items-center justify-between gap-x-4 py-1.5 px-10 mb-0 bg-surface-200">
         <QueueFilters selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes} />
         <div className="flex gap-x-2">
           <QueueSettings />
@@ -240,6 +240,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
       </div>
 
       <LoadingLine loading={isFetching} />
+
       <QueueMessagesDataGrid
         error={error}
         messages={messages || []}

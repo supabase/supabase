@@ -2,20 +2,20 @@ import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
 
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { Input, cn } from 'ui'
 import {
   IntegrationCard,
   IntegrationLoadingCard,
 } from 'components/interfaces/Integrations/Landing/IntegrationCard'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import type { NextPageWithLayout } from 'types'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']
 
@@ -154,10 +154,11 @@ const IntegrationsPage: NextPageWithLayout = () => {
           <div className="flex-1 max-w-md mb-6">
             <Input
               value={search}
+              size="tiny"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search integrations..."
               icon={<Search size={14} />}
-              className="w-full"
+              className="w-52"
             />
           </div>
 

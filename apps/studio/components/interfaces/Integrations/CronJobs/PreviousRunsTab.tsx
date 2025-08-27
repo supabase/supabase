@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { CircleCheck, CircleX, Loader } from 'lucide-react'
 import { UIEvent, useCallback, useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
@@ -7,9 +8,8 @@ import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
-import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cn, LoadingLine, Tooltip, TooltipTrigger, TooltipContent, SimpleCodeBlock } from 'ui'
+import { cn, CodeBlock, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { calculateDuration, formatDate } from './CronJobs.utils'
@@ -19,7 +19,8 @@ const cronJobColumns = [
   {
     id: 'runid',
     name: 'RunID',
-    minWidth: 60,
+    minWidth: 30,
+    width: 30,
     value: (row: CronJobRun) => (
       <div className="flex items-center gap-1.5">
         <h3 className="text-xs">{row.runid}</h3>
@@ -38,14 +39,22 @@ const cronJobColumns = [
               {row.return_message}
             </span>
           </TooltipTrigger>
-          <TooltipContent side="bottom" align="center" className="max-w-[300px] text-wrap">
-            <SimpleCodeBlock
-              showCopy={true}
-              className="sql"
-              parentClassName="!p-0 [&>div>span]:text-xs"
-            >
-              {row.return_message}
-            </SimpleCodeBlock>
+          <TooltipContent
+            side="bottom"
+            align="start"
+            className="min-w-[200px] max-w-[300px] text-wrap p-0"
+          >
+            <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Message</p>
+            <CodeBlock
+              hideLineNumbers
+              language="sql"
+              value={row.return_message.trim()}
+              className={cn(
+                'py-0 px-3.5 max-w-full prose dark:prose-dark border-0 rounded-t-none',
+                '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11',
+                '[&>code]:text-xs'
+              )}
+            />
           </TooltipContent>
         </Tooltip>
       </div>
@@ -116,7 +125,7 @@ const columns = cronJobColumns.map((col) => {
             <TimestampInfo
               utcTimestamp={formattedValue}
               labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-              className="font-mono text-xs"
+              className="text-xs"
             />
           </div>
         )
@@ -208,7 +217,7 @@ interface StatusBadgeProps {
 function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'succeeded') {
     return (
-      <span className="text-brand-600 flex items-center gap-1">
+      <span className="text-brand-600 flex items-center gap-1 text-xs">
         <CircleCheck size={14} /> Succeeded
       </span>
     )
@@ -216,7 +225,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
 
   if (status === 'failed') {
     return (
-      <span className="text-destructive flex items-center gap-1">
+      <span className="text-destructive flex items-center gap-1 text-xs">
         <CircleX size={14} /> Failed
       </span>
     )
@@ -224,7 +233,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
 
   if (['running', 'starting', 'sending', 'connecting'].includes(status)) {
     return (
-      <span className="text-_secondary flex items-center gap-1">
+      <span className="text-_secondary flex items-center gap-1 text-xs">
         <Loader size={14} className="animate-spin" /> Running
       </span>
     )

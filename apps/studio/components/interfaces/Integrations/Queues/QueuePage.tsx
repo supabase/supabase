@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+
 import { useParams } from 'common'
-import { PageLayout, NavigationItem } from 'components/layouts/PageLayout/PageLayout'
-import { useRouter } from 'next/compat/router'
+import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DATETIME_FORMAT } from 'lib/constants'

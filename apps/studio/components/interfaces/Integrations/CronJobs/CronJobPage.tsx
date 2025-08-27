@@ -1,25 +1,26 @@
 import { toString as CronToString } from 'cronstrue'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { PageLayout, NavigationItem } from 'components/layouts/PageLayout/PageLayout'
+import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useRouter } from 'next/compat/router'
 import {
   Button,
+  cn,
+  CodeBlock,
   Sheet,
   SheetContent,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  SimpleCodeBlock,
 } from 'ui'
-import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { CreateCronJobSheet } from './CreateCronJobSheet'
+import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
 
 export const CronJobPage = () => {
@@ -79,7 +80,7 @@ export const CronJobPage = () => {
               : CronToString(job.schedule.toLowerCase())}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="bottom" align="start">
+        <TooltipContent side="bottom" align="center">
           <div className="text-xs">
             <p className="font-mono mb-1">{job.schedule.toLowerCase()}</p>
             {!isSecondsFormat(job.schedule) && (
@@ -95,15 +96,22 @@ export const CronJobPage = () => {
             {job.command}
           </code>
         </TooltipTrigger>
-        <TooltipContent side="bottom" align="center" className="max-w-[400px] text-wrap p-0">
+        <TooltipContent
+          side="bottom"
+          align="center"
+          className="min-w-[200px] max-w-[400px] text-wrap p-0"
+        >
           <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Command</p>
-          <SimpleCodeBlock
-            showCopy={false}
-            className="sql"
-            parentClassName="[&>div>span]:text-xs bg-alternative-200 !p-3"
-          >
-            {job.command}
-          </SimpleCodeBlock>
+          <CodeBlock
+            hideLineNumbers
+            language="sql"
+            value={job.command.trim()}
+            className={cn(
+              'py-0 px-3.5 max-w-full prose dark:prose-dark border-0 rounded-t-none',
+              '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11',
+              '[&>code]:text-xs'
+            )}
+          />
         </TooltipContent>
       </Tooltip>
     </div>
