@@ -1,10 +1,18 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useCallback,
+  useRef,
+  useEffect,
+} from 'react'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
   EnableRequested = 'EnableRequested',
   DisableRequested = 'DisableRequested',
-  UpdateRequested = 'UpdateRequested',
+  RestartRequested = 'RestartRequested',
 }
 
 interface PipelineRequestStatusContextType {
@@ -32,11 +40,13 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
     Record<number, PipelineStatusRequestStatus>
   >({})
   const [pipelineStatusSnapshot, setPipelineStatusSnapshot] = useState<Record<number, string>>({})
+  const timeoutsRef = useRef<Record<number, number>>({})
+  const REQUEST_TIMEOUT_MS = 10_000
 
   const setRequestStatus = (
     pipelineId: number,
     status: PipelineStatusRequestStatus,
-    pipelineStatusSnapshot?: string
+    snapshotStatus?: string
   ) => {
     setRequestStatusState((prev) => ({
       ...prev,
@@ -48,11 +58,37 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
         return rest
       }
       // Only set snapshot when provided to avoid undefined entries
-      if (pipelineStatusSnapshot !== undefined) {
-        return { ...prev, [pipelineId]: pipelineStatusSnapshot }
+      if (snapshotStatus !== undefined) {
+        return { ...prev, [pipelineId]: snapshotStatus }
       }
       return prev
     })
+
+    // Clear existing timeout for this pipeline
+    const existing = timeoutsRef.current[pipelineId]
+    if (existing !== undefined) {
+      clearTimeout(existing)
+      delete timeoutsRef.current[pipelineId]
+    }
+
+    // Start auto-reset timer for non-None states
+    if (status !== PipelineStatusRequestStatus.None) {
+      const id = window.setTimeout(() => {
+        // If still pending, clear to None to show backend state
+        setRequestStatusState((prev) => {
+          if (prev[pipelineId] && prev[pipelineId] !== PipelineStatusRequestStatus.None) {
+            return { ...prev, [pipelineId]: PipelineStatusRequestStatus.None }
+          }
+          return prev
+        })
+        setPipelineStatusSnapshot((prev) => {
+          const { [pipelineId]: _omit, ...rest } = prev
+          return rest
+        })
+        delete timeoutsRef.current[pipelineId]
+      }, REQUEST_TIMEOUT_MS)
+      timeoutsRef.current[pipelineId] = id
+    }
   }
 
   const getRequestStatus = (pipelineId: number): PipelineStatusRequestStatus => {
@@ -69,8 +105,16 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
       }
     },
-    [requestStatus, pipelineStatusSnapshot, setRequestStatus]
+    [requestStatus, pipelineStatusSnapshot]
   )
+
+  // Cleanup all timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(timeoutsRef.current).forEach((id) => clearTimeout(id))
+      timeoutsRef.current = {}
+    }
+  }, [])
 
   return (
     <PipelineRequestStatusContext.Provider

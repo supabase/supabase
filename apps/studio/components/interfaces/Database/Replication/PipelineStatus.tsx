@@ -46,9 +46,9 @@ export const PipelineStatus = ({
     const stateMessages = getPipelineStateMessages(requestStatus, statusName)
 
     // Show optimistic request state while backend still reports steady states
-    if (requestStatus === PipelineStatusRequestStatus.UpdateRequested) {
+    if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
       return {
-        label: 'Updating...',
+        label: 'Restarting...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
         color: 'text-brand-600',
         tooltip: stateMessages.message,
@@ -56,7 +56,7 @@ export const PipelineStatus = ({
     }
     if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
       return {
-        label: 'Enabling...',
+        label: 'Starting...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
         color: 'text-brand-600',
         tooltip: stateMessages.message,
@@ -64,7 +64,7 @@ export const PipelineStatus = ({
     }
     if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
       return {
-        label: 'Disabling...',
+        label: 'Stopping...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
         color: 'text-warning-600',
         tooltip: stateMessages.message,

@@ -28,19 +28,19 @@ export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as co
 
 const PIPELINE_STATE_MESSAGES = {
   enabling: {
-    title: 'Pipeline enabling',
-    message: 'Starting the pipeline. Table replication will resume once enabled.',
-    badge: 'Enabling',
+    title: 'Starting pipeline',
+    message: 'Starting the pipeline. Table replication will resume once running.',
+    badge: 'Starting',
   },
   disabling: {
-    title: 'Pipeline disabling',
-    message: 'Stopping the pipeline. Table replication will be paused once disabled.',
-    badge: 'Disabling',
+    title: 'Stopping pipeline',
+    message: 'Stopping the pipeline. Table replication will be paused once stopped.',
+    badge: 'Stopping',
   },
-  updating: {
-    title: 'Applying settings',
-    message: 'Updating pipeline configuration. The pipeline will restart shortly.',
-    badge: 'Updating',
+  restarting: {
+    title: 'Restarting pipeline',
+    message: 'Applying settings and restarting the pipeline.',
+    badge: 'Restarting',
   },
   failed: {
     title: 'Pipeline failed',
@@ -49,7 +49,7 @@ const PIPELINE_STATE_MESSAGES = {
   },
   stopped: {
     title: 'Pipeline stopped',
-    message: 'Replication is paused. Enable the pipeline to resume data synchronization.',
+    message: 'Replication is paused. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
   },
   starting: {
@@ -69,8 +69,8 @@ const PIPELINE_STATE_MESSAGES = {
   },
   notRunning: {
     title: 'Pipeline not running',
-    message: 'Replication is not active. Enable the pipeline to start data synchronization.',
-    badge: 'Disabled',
+    message: 'Replication is not active. Start the pipeline to begin data synchronization.',
+    badge: 'Stopped',
   },
 } as const
 
@@ -79,8 +79,8 @@ export const getPipelineStateMessages = (
   statusName: string | undefined
 ) => {
   // Reflect optimistic request intent immediately after click
-  if (requestStatus === PipelineStatusRequestStatus.UpdateRequested) {
-    return PIPELINE_STATE_MESSAGES.updating
+  if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
+    return PIPELINE_STATE_MESSAGES.restarting
   }
   if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
     return PIPELINE_STATE_MESSAGES.enabling

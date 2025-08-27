@@ -246,7 +246,7 @@ const DestinationPanel = ({
           const snapshot = existingDestination.enabled ? 'started' : 'stopped'
           setRequestStatus(
             existingDestination.pipelineId,
-            PipelineStatusRequestStatus.UpdateRequested,
+            PipelineStatusRequestStatus.RestartRequested,
             snapshot
           )
           const bigQueryConfig: any = {
@@ -282,8 +282,8 @@ const DestinationPanel = ({
           // Notify, kick off restart, and close without waiting for start to complete
           toast.success(
             willRestart
-              ? 'Settings applied. Restarting pipeline...'
-              : 'Settings applied. Starting pipeline...'
+              ? 'Settings applied. Restarting the pipeline...'
+              : 'Settings applied. Starting the pipeline...'
           )
           void startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
           onClose()
@@ -320,7 +320,7 @@ const DestinationPanel = ({
               ...(hasBothBatchFields && { batch: batchConfig }),
             },
           })
-          toast.success('Destination created. Starting pipeline...')
+          toast.success('Destination created. Starting the pipeline...')
           void startPipeline({ projectRef, pipelineId })
           onClose()
         }

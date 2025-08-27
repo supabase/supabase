@@ -105,7 +105,7 @@ export const ReplicationPipelineStatus = () => {
   const isEnablingDisabling =
     requestStatus === PipelineStatusRequestStatus.EnableRequested ||
     requestStatus === PipelineStatusRequestStatus.DisableRequested ||
-    requestStatus === PipelineStatusRequestStatus.UpdateRequested
+    requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
   const onTogglePipeline = async () => {
@@ -190,7 +190,7 @@ export const ReplicationPipelineStatus = () => {
             loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
             disabled={!PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)}
           >
-            {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
+            {statusName === 'stopped' ? 'Start' : 'Stop'} pipeline
           </Button>
         </div>
       </div>

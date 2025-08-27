@@ -117,12 +117,12 @@ export const RowMenu = ({
           {pipelineEnabled ? (
             <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
               <Pause size={14} />
-              <p>Disable pipeline</p>
+              <p>Stop pipeline</p>
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
               <Play size={14} />
-              <p>Enable pipeline</p>
+              <p>Start pipeline</p>
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />

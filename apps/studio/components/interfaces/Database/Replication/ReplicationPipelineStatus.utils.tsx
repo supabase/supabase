@@ -58,8 +58,8 @@ export const getDisabledStateConfig = ({
   // Get icon and colors based on current state
   const isEnabling = requestStatus === PipelineStatusRequestStatus.EnableRequested
   const isDisabling = requestStatus === PipelineStatusRequestStatus.DisableRequested
-  const isUpdating = requestStatus === PipelineStatusRequestStatus.UpdateRequested
-  const isTransitioning = isEnabling || isDisabling || isUpdating
+  const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
+  const isTransitioning = isEnabling || isDisabling || isRestarting
 
   const icon = isTransitioning ? (
     <Loader2 className="w-6 h-6 animate-spin" />
@@ -74,7 +74,7 @@ export const getDisabledStateConfig = ({
   )
 
   const colors =
-    isEnabling || isUpdating
+    isEnabling || isRestarting
       ? {
           bg: 'bg-brand-50',
           text: 'text-brand-900',
