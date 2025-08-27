@@ -14,11 +14,13 @@
   "files": [
     {
       "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
-      "type": "registry:lib"
+      "type": "registry:lib",
+      "target": "lib/supabase/client.ts"
     },
     {
       "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
-      "type": "registry:lib"
+      "type": "registry:lib",
+      "target": "lib/supabase/server.ts"
     }
   ]
 }
