@@ -9,6 +9,7 @@ import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { ReportChartUpsell } from './ReportChartUpsell'
+import { useState } from 'react'
 
 export interface ReportV2ChartProps {
   report: ReportConfig
@@ -85,6 +86,9 @@ export const ReportV2ChartComponent = ({
   const finalChartData =
     filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
 
+  // STATE
+  const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
+
   // UPSELL STATE
   if (!isAvailable && !isLoading && !isLoadingChart) {
     return (
@@ -157,17 +161,17 @@ export const ReportV2ChartComponent = ({
             data={finalChartData}
             format={report.format ?? undefined}
             xAxisKey="period_start"
-            yAxisKey={dynamicAttributes[0].attribute}
+            yAxisKey={dynamicAttributes[0]?.attribute}
             highlightedValue={0}
             title={report.label}
             customDateFormat={undefined}
             chartHighlight={undefined}
-            chartStyle={report.defaultChartStyle}
+            chartStyle={chartStyle}
             showTooltip={report.showTooltip}
             showLegend={report.showLegend}
             showTotal={false}
             showMaxValue={report.showMaxValue}
-            onChartStyleChange={() => {}}
+            onChartStyleChange={setChartStyle}
             updateDateRange={updateDateRange}
             valuePrecision={report.valuePrecision}
             hideChartType={report.hideChartType}
