@@ -4,7 +4,6 @@ import { noop } from 'lodash'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
 
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -13,6 +12,8 @@ import {
   Badge,
   Button,
   cn,
+  TableRow,
+  TableCell,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -57,58 +58,50 @@ const PolicyRow = ({
     (policy.roles.includes('authenticated') || policy.roles.includes('public'))
 
   return (
-    <Panel.Content
-      className={cn(
-        'flex border-overlay',
-        'w-full last:border-0 space-x-4 border-b py-4 lg:items-center'
-      )}
-    >
-      <div className="flex grow flex-col gap-y-1">
-        <div className="flex items-start gap-x-4">
-          <p className="font-mono text-xs text-foreground-light translate-y-[2px] min-w-12">
-            {policy.command}
-          </p>
-
-          <div className="flex flex-col gap-y-1">
-            <Button
-              type="text"
-              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent justify-start"
-              onClick={() => onSelectEditPolicy(policy)}
-            >
-              {policy.name}
-            </Button>
-            <div className="flex items-center gap-x-1">
-              <div className="text-foreground-lighter text-sm">
-                Applied to:{' '}
-                {policy.roles.slice(0, 3).map((role, i) => (
-                  <span key={`policy-${role}-${i}`}>
-                    <code className="text-foreground-light text-xs">{role}</code>
-                    {i < Math.min(policy.roles.length, 3) - 1 ? ', ' : ' '}
-                  </span>
-                ))}
-                {policy.roles.length > 1 ? 'roles' : 'role'}
-              </div>
-              {policy.roles.length > 3 && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <code key="policy-etc" className="text-foreground-light text-xs">
-                      + {policy.roles.length - 3} more roles
-                    </code>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="center">
-                    {policy.roles.slice(3).join(', ')}
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </div>
-          </div>
-
+    <TableRow>
+      <TableCell className="w-[40%] truncate">
+        <div className="flex items-center gap-x-2 min-w-0">
+          <Button
+            type="text"
+            className="text-foreground text-sm p-0 hover:bg-transparent w-full truncate justify-start"
+            onClick={() => onSelectEditPolicy(policy)}
+          >
+            {policy.name}
+          </Button>
           {appliesToAnonymousUsers ? (
             <Badge color="yellow">Applies to anonymous users</Badge>
           ) : null}
         </div>
-      </div>
-      <div>
+      </TableCell>
+      <TableCell className="w-[20%] truncate">
+        <code className="text-foreground-light text-xs">{policy.command}</code>
+      </TableCell>
+      <TableCell className="w-[30%] truncate">
+        <div className="flex items-center gap-x-1">
+          <div className="text-foreground-lighter text-sm">
+            {policy.roles.slice(0, 3).map((role, i) => (
+              <span key={`policy-${role}-${i}`}>
+                <code className="text-foreground-light text-xs">{role}</code>
+                {i < Math.min(policy.roles.length, 3) - 1 ? ', ' : ' '}
+              </span>
+            ))}
+            {policy.roles.length > 1 ? 'roles' : 'role'}
+          </div>
+          {policy.roles.length > 3 && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <code key="policy-etc" className="text-foreground-light text-xs">
+                  + {policy.roles.length - 3} more roles
+                </code>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center">
+                {policy.roles.slice(3).join(', ')}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+      </TableCell>
+      <TableCell className="w-0 text-right whitespace-nowrap">
         {!isLocked && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -127,9 +120,9 @@ const PolicyRow = ({
                     name: `Update policy ${policy.name}`,
                     open: true,
                     sqlSnippets: [sql],
-                    initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+                    initialInput: `Update the policy with name \"${policy.name}\" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
                     suggestions: {
-                      title: `I can help you make a change to the policy "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
+                      title: `I can help you make a change to the policy \"${policy.name}\" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
                       prompts: [
                         {
                           label: 'Improve Policy',
@@ -169,8 +162,8 @@ const PolicyRow = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </div>
-    </Panel.Content>
+      </TableCell>
+    </TableRow>
   )
 }
 
