@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { RefreshCw, AlertCircle, Eye } from 'lucide-react'
+import { RefreshCw, Eye } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader, ScrollArea } from 'ui'
@@ -8,6 +8,7 @@ import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
 import { EdgeFunctionVersionsLoading } from './loading'
+import { EdgeFunctionVersionsError } from './error'
 
 // Ensure newest first: sort by version desc, then created_at desc
 const sortDeployments = (items: EdgeFunctionDeployment[]) =>
@@ -120,20 +121,7 @@ export const EdgeFunctionVersionsList = () => {
   if (isLoading) return <EdgeFunctionVersionsLoading />
 
   if (error && !deployments.length) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Edge Function Versions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 space-y-4">
-            <AlertCircle className="h-8 w-8 text-destructive" />
-            <p className="text-sm text-muted-foreground">{error}</p>
-            <Button onClick={() => loadDeployments()}>Retry</Button>
-          </div>
-        </CardContent>
-      </Card>
-    )
+    return <EdgeFunctionVersionsError error={error} onRetry={() => loadDeployments()} />
   }
 
   if (!deployments.length) {
