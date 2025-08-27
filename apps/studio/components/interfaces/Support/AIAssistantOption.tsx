@@ -1,7 +1,7 @@
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { MessageSquare, X } from 'lucide-react'
+import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from 'ui'
@@ -17,9 +17,11 @@ export const AIAssistantOption = ({
   organizationSlug,
   isCondensed = false,
 }: AIAssistantOptionProps) => {
-  const [isVisible, setIsVisible] = useState(isCondensed ? true : false)
-  const { data: projects } = useProjectsQuery()
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
+
   const { mutate: sendEvent } = useSendEventMutation()
+  const [isVisible, setIsVisible] = useState(isCondensed ? true : false)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)

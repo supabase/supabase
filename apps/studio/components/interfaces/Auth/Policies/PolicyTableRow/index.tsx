@@ -20,8 +20,8 @@ import {
   TableRow,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import PolicyRow from './PolicyRow'
-import PolicyTableRowHeader from './PolicyTableRowHeader'
+import { PolicyRow } from './PolicyRow'
+import { PolicyTableRowHeader } from './PolicyTableRowHeader'
 
 export interface PolicyTableRowProps {
   table: {

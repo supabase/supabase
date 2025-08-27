@@ -132,7 +132,7 @@ export const Message = function Message({
             />
           )}
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 [&>div:first-child]:!mt-1">
             {shouldUsePartsRendering ? (
               (() => {
                 return parts.map(

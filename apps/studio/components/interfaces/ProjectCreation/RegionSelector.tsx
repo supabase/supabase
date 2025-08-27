@@ -1,9 +1,8 @@
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import type { CloudProvider } from 'shared-data'
 import {

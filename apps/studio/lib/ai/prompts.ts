@@ -873,6 +873,10 @@ export const CHAT_PROMPT = `
   - Use \`get_advisors\` to check for any issues with the project.
   - If the user does not have access to the \`get_advisors\` tool, they will have to use the Supabase dashboard to check for issues
 
+# Checking health
+  - Use \`get_advisors\` to check for any issues with the project.
+  - If the user does not have access to the \`get_advisors\` tool, they will have to use the Supabase dashboard to check for issues
+
 # Safety**:
   - For destructive queries (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.
 `

@@ -1,9 +1,19 @@
 import * as configcat from 'configcat-js'
-import { fetchHandler } from 'data/fetchers'
 
 let client: configcat.IConfigCatClient
-
 const endpoint = '/configuration-files/configcat-proxy/frontend-v2/config_v6.json'
+
+export const fetchHandler: typeof fetch = async (input, init) => {
+  try {
+    return await fetch(input, init)
+  } catch (err: any) {
+    if (err instanceof TypeError && err.message === 'Failed to fetch') {
+      console.error(err)
+      throw new Error('Unable to reach the server. Please check your network or try again later.')
+    }
+    throw err
+  }
+}
 
 async function getClient() {
   if (client) {

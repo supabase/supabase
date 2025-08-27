@@ -18,7 +18,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Loader } from 'lucide-react'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { formatPoliciesForStorage } from '../Storage.utils'
-import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
+import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 

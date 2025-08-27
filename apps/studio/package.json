@@ -76,7 +76,6 @@
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
-    "configcat-js": "^9.5.1",
     "cron-parser": "^4.9.0",
     "cronstrue": "^2.50.0",
     "dayjs": "^1.11.10",

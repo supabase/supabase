@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   getAddons,
   subscriptionHasHipaaAddon,
@@ -35,7 +35,6 @@ import {
   useProjectByRefQuery,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'

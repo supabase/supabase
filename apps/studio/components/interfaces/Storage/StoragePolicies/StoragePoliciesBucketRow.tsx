@@ -1,6 +1,9 @@
-import Panel from 'components/ui/Panel'
-import { isEmpty } from 'lodash'
-import { Archive, Edit, MoreVertical, Trash } from 'lucide-react'
+import { PostgresPolicy } from '@supabase/postgres-meta'
+import { noop } from 'lodash'
+import { Archive } from 'lucide-react'
+
+import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { Bucket } from 'data/storage/buckets-query'
 import {
   Badge,
   Button,
@@ -8,101 +11,76 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 
-interface PolicyRowProps {
-  policy: any
-  table: any
-  bucketName: string
-  onSelectPolicyEdit: (p: any, s: string, t: any) => void
-  onSelectPolicyDelete: (s: string) => void
+interface StoragePoliciesBucketRowProps {
+  table: string
+  label: string
+  bucket?: Bucket
+  policies: PostgresPolicy[]
+  onSelectPolicyAdd: (bucketName: string, table: string) => void
+  onSelectPolicyEdit: (policy: PostgresPolicy, bucketName: string, table: string) => void
+  onSelectPolicyDelete: (policy: PostgresPolicy) => void
 }
 
-const PolicyRow = ({
-  policy,
-  table,
-  bucketName,
-  onSelectPolicyEdit = () => {},
-  onSelectPolicyDelete = () => {},
-}: PolicyRowProps) => {
-  const { name, command } = policy
-  return (
-    <CardContent className="group flex justify-between gap-2 border-b border-overlay py-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div className="font-mono text-xs text-foreground-lighter">{command}</div>
-        <div className="flex flex-col gap-2 lg:flex-row">
-          <span className="truncate text-sm text-foreground">{name}</span>
-        </div>
-      </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end">
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
-          >
-            <Edit size={14} />
-            <p>Edit</p>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="gap-x-2" onClick={() => onSelectPolicyDelete(policy)}>
-            <Trash size={14} />
-            <p>Delete</p>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </CardContent>
-  )
-}
-
-const StoragePoliciesBucketRow = ({
+export const StoragePoliciesBucketRow = ({
   table = '',
   label = '',
-  bucket = {},
+  bucket,
   policies = [],
-  onSelectPolicyAdd = () => {},
-  onSelectPolicyEdit = () => {},
-  onSelectPolicyDelete = () => {},
-}: any) => {
+  onSelectPolicyAdd = noop,
+  onSelectPolicyEdit = noop,
+  onSelectPolicyDelete = noop,
+}: StoragePoliciesBucketRowProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-row w-full items-center justify-between gap-0 space-y-0">
         <div className="flex items-center gap-3">
           <Archive className="text-foreground-light" size={16} strokeWidth={1.5} />
           <CardTitle>{label}</CardTitle>
-          {bucket.public && <Badge variant="warning">Public</Badge>}
+          {bucket?.public && <Badge variant="warning">Public</Badge>}
         </div>
-        <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
-          New policy
-        </Button>
+        {!!bucket && (
+          <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
+            New policy
+          </Button>
+        )}
       </CardHeader>
       {policies.length === 0 ? (
         <CardContent>
           <p className="text-sm text-foreground-lighter">No policies created yet</p>
         </CardContent>
       ) : (
-        <div>
-          {policies.map((policy: any) => (
-            <PolicyRow
-              key={policy.name}
-              policy={policy}
-              table={table}
-              bucketName={bucket.name}
-              onSelectPolicyEdit={onSelectPolicyEdit}
-              onSelectPolicyDelete={onSelectPolicyDelete}
-            />
-          ))}
-        </div>
+        <CardContent className="p-0">
+          <Table className="table-fixed">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[40%]">Name</TableHead>
+                <TableHead className="w-[20%]">Command</TableHead>
+                <TableHead className="w-[30%]">Applied to</TableHead>
+                <TableHead className="w-0 text-right">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {policies.map((policy) => (
+                <PolicyRow
+                  key={policy.id ?? policy.name}
+                  policy={policy}
+                  onSelectEditPolicy={(p) => onSelectPolicyEdit(p, bucket?.name ?? '', table)}
+                  onSelectDeletePolicy={onSelectPolicyDelete}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
       )}
     </Card>
   )
 }
-
-export default StoragePoliciesBucketRow
