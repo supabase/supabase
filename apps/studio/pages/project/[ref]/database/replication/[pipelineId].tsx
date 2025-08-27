@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 
 import { FeatureFlagContext, useFlag, useParams } from 'common'
+import ReplicationProvider from 'components/interfaces/Database/Replication/ReplicationProvider'
 import { ReplicationPipelineStatus } from 'components/interfaces/Database/Replication/ReplicationPipelineStatus'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -24,14 +25,16 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
     <>
       {enablePgReplicate && (
-        <ScaffoldContainer>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <FormHeader title="Replication" />
-              <ReplicationPipelineStatus />
-            </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
+        <ReplicationProvider>
+          <ScaffoldContainer>
+            <ScaffoldSection>
+              <div className="col-span-12">
+                <FormHeader title="Replication" />
+                <ReplicationPipelineStatus />
+              </div>
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        </ReplicationProvider>
       )}
     </>
   )

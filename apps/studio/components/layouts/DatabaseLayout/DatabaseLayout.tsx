@@ -10,7 +10,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
 export interface DatabaseLayoutProps {
@@ -59,7 +58,7 @@ const DatabaseProductMenu = () => {
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
   return (
     <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
-      <PipelineRequestStatusProvider>{children}</PipelineRequestStatusProvider>
+      {children}
     </ProjectLayout>
   )
 }

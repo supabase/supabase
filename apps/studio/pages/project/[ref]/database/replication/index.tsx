@@ -7,6 +7,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import ReplicationProvider from 'components/interfaces/Database/Replication/ReplicationProvider'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -21,14 +22,16 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
     <>
       {enablePgReplicate ? (
-        <ScaffoldContainer>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <FormHeader title="Replication" />
-              <Destinations />
-            </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
+        <ReplicationProvider>
+          <ScaffoldContainer>
+            <ScaffoldSection>
+              <div className="col-span-12">
+                <FormHeader title="Replication" />
+                <Destinations />
+              </div>
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        </ReplicationProvider>
       ) : (
         <>
           <ScaffoldContainer>
