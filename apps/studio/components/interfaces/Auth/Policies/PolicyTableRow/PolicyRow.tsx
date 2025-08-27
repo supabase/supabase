@@ -27,12 +27,12 @@ interface PolicyRowProps {
   policy: PostgresPolicy
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
-  isLocked: boolean
+  isLocked?: boolean
 }
 
 export const PolicyRow = ({
   policy,
-  isLocked: isLockedDefault,
+  isLocked: isLockedDefault = false,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {

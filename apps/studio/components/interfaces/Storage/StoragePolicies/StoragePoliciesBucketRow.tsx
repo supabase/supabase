@@ -73,7 +73,6 @@ export const StoragePoliciesBucketRow = ({
                 <PolicyRow
                   key={policy.id ?? policy.name}
                   policy={policy}
-                  isLocked={false}
                   onSelectEditPolicy={(p) => onSelectPolicyEdit(p, bucket?.name ?? '', table)}
                   onSelectDeletePolicy={onSelectPolicyDelete}
                 />
