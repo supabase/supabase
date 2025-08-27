@@ -47,6 +47,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const accessToken = authorization?.replace('Bearer ', '')
 
     let aiOptInLevel: AiOptInLevel = 'disabled'
+    let isLimited = false
 
     if (!IS_PLATFORM) {
       aiOptInLevel = 'schema'
@@ -54,16 +55,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (IS_PLATFORM && orgSlug && authorization && projectRef) {
       // Get organizations and compute opt in level server-side
-      const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
+      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
         orgSlug,
         authorization,
         projectRef,
       })
 
       aiOptInLevel = orgAIOptInLevel
+      isLimited = orgAILimited
     }
 
-    const { model, error: modelError } = await getModel(projectRef)
+    const { model, error: modelError, supportsCachePoint } = await getModel(projectRef, isLimited)
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
@@ -109,12 +111,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        providerOptions: {
-          bedrock: {
-            // Always cache the system prompt (must not contain dynamic content)
-            cachePoint: { type: 'default' },
+        ...(supportsCachePoint && {
+          providerOptions: {
+            bedrock: {
+              // Always cache the system prompt (must not contain dynamic content)
+              cachePoint: { type: 'default' },
+            },
           },
-        },
+        }),
       },
       {
         role: 'assistant',
@@ -149,19 +153,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const { experimental_output } = await generateText({
+    const { text } = await generateText({
       model,
       stopWhen: stepCountIs(5),
-      experimental_output: Output.object({
-        schema: z.object({
-          code: z.string().describe('The modified code'),
-        }),
-      }),
       messages: coreMessages,
       tools,
     })
 
-    return res.status(200).json(experimental_output?.code)
+    return res.status(200).json(text)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({
