@@ -2,7 +2,7 @@ import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Column } from 'react-data-grid'
 
 import { Badge } from 'ui'
-import { type QueryInsightsQuery } from 'data/query-insights/query-metrics-query'
+import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
 import { ColumnConfiguration, QUERY_INSIGHTS_TABLE_COLUMNS } from './QueryInsights.constants'
 
 export const formatNumberWithCommas = (num: number | string | undefined | null): string => {
@@ -29,7 +29,7 @@ export const formatQueryInsightsColumns = ({
 
   let gridColumns = QUERY_INSIGHTS_TABLE_COLUMNS.map((col) => {
     const savedConfig = config.find((c) => c.id === col.id)
-    const res: Column<QueryInsightsQuery> = {
+    const res: Column<InsightsQuery> = {
       key: col.id,
       name: col.name,
       resizable: col.resizable ?? true,
@@ -53,8 +53,8 @@ export const formatQueryInsightsColumns = ({
         )
       },
       renderCell: (props) => {
-        const value = props.row?.[col.id as keyof QueryInsightsQuery]
-        
+        const value = props.row?.[col.id as keyof InsightsQuery]
+
         if (col.id === 'query') {
           return (
             <div className="w-full flex items-center gap-x-2">
@@ -81,7 +81,10 @@ export const formatQueryInsightsColumns = ({
           return (
             <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
               <span>
-                <Badge variant={getBadgeVariant(value as string)} className="text-xs !text-center !inline-flex">
+                <Badge
+                  variant={getBadgeVariant(value as string)}
+                  className="text-xs !text-center !inline-flex"
+                >
                   {value}
                 </Badge>
               </span>
@@ -111,7 +114,9 @@ export const formatQueryInsightsColumns = ({
           return (
             <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
               <p>{formattedValue}</p>
-              {value && <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>}
+              {value && (
+                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+              )}
             </div>
           )
         }
@@ -121,7 +126,9 @@ export const formatQueryInsightsColumns = ({
           return (
             <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
               <p>{formattedValue}</p>
-              {value && <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>}
+              {value && (
+                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+              )}
             </div>
           )
         }

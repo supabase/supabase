@@ -10,9 +10,9 @@ import {
 } from 'ui'
 import { QueryRowExplorer } from './QueryRowExplorer'
 import {
-  useQueryInsightsMetrics,
-  usePreFetchQueryInsightsData,
-} from 'data/query-insights/query-metrics-query'
+  useInsightsMetricsQuery,
+  useInsightsPrefetchQuery,
+} from 'data/query-insights/insights-metrics-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -59,7 +59,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   }, [startTime, endTime])
 
   // Pre-fetch query data for the QueryRowExplorer
-  usePreFetchQueryInsightsData(project?.ref, effectiveStartTime, effectiveEndTime)
+  useInsightsPrefetchQuery(project?.ref, effectiveStartTime, effectiveEndTime)
 
   // Debug logging
   console.log('QueryMetricExplorer Debug:', {
@@ -73,7 +73,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     data: metricsData,
     isLoading,
     error,
-  } = useQueryInsightsMetrics(project?.ref, selectedMetric, effectiveStartTime, effectiveEndTime)
+  } = useInsightsMetricsQuery(project?.ref, selectedMetric, effectiveStartTime, effectiveEndTime)
 
   // Debug logging for query results
   console.log('QueryMetricExplorer Query Results:', {

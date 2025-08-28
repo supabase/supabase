@@ -1,25 +1,26 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-query'
-import { QueryInsightsMetric } from './query-metrics-query'
+import { InsightsMetric } from './insights-metrics-query'
 
 const singleQueryLatencyKeys = {
-  base: ['single-query-latency'] as const,
+  base: ['projects', 'query-insights', 'single-query'] as const,
   latency: (
     projectRef: string | undefined,
     queryId: string | undefined,
     startTime: string,
     endTime: string
-  ) => [...singleQueryLatencyKeys.base, projectRef, queryId, startTime, endTime] as const,
+  ) =>
+    [...singleQueryLatencyKeys.base, 'latency', projectRef, queryId, startTime, endTime] as const,
 }
 
 const singleQueryCallsKeys = {
-  base: ['single-query-calls'] as const,
+  base: ['projects', 'query-insights', 'single-query-calls'] as const,
   calls: (
     projectRef: string | undefined,
     queryId: string | undefined,
     startTime: string,
     endTime: string
-  ) => [...singleQueryCallsKeys.base, projectRef, queryId, startTime, endTime] as const,
+  ) => [...singleQueryCallsKeys.base, 'calls', projectRef, queryId, startTime, endTime] as const,
 }
 
 const getSingleQueryLatencySql = (
@@ -30,42 +31,43 @@ const getSingleQueryLatencySql = (
   SELECT
     bucket_start_time as timestamp,
     mean_exec_time as value,
-    calls,
     datname as database
   FROM pg_stat_monitor
   WHERE bucket_start_time >= '${startTime}'::timestamptz
     AND bucket_start_time <= '${endTime}'::timestamptz
-    AND bucket_done = true -- Only include completed buckets
-    AND queryid = ${queryId}::bigint
+    AND bucket_done = true
+    AND queryid = ${queryId}
   ORDER BY timestamp ASC
 `
 
 const getSingleQueryRowsSql = (queryId: string, startTime: string, endTime: string) => /* SQL */ `
   SELECT
     bucket_start_time as timestamp,
-    SUM(rows) as value,
+    rows as value,
     datname as database
   FROM pg_stat_monitor
   WHERE bucket_start_time >= '${startTime}'::timestamptz
     AND bucket_start_time <= '${endTime}'::timestamptz
     AND bucket_done = true
-    AND queryid = ${queryId}::bigint
-    AND cmd_type = 1
-  GROUP BY bucket_start_time, datname
+    AND queryid = ${queryId}
   ORDER BY timestamp ASC
 `
 
-const getSingleQueryRowsWrittenSql = (queryId: string, startTime: string, endTime: string) => /* SQL */ `
+const getSingleQueryRowsWrittenSql = (
+  queryId: string,
+  startTime: string,
+  endTime: string
+) => /* SQL */ `
   SELECT
     bucket_start_time as timestamp,
-    SUM(CASE WHEN cmd_type IN (2, 3, 4) THEN rows ELSE 0 END) as value,
+    rows as value,
     datname as database
   FROM pg_stat_monitor
   WHERE bucket_start_time >= '${startTime}'::timestamptz
     AND bucket_start_time <= '${endTime}'::timestamptz
     AND bucket_done = true
-    AND queryid = ${queryId}::bigint
-  GROUP BY bucket_start_time, datname
+    AND queryid = ${queryId}
+    AND cmd_type IN (2, 3, 4) -- INSERT, UPDATE, DELETE
   ORDER BY timestamp ASC
 `
 
@@ -78,17 +80,16 @@ const getSingleQueryCallsSql = (queryId: string, startTime: string, endTime: str
   WHERE bucket_start_time >= '${startTime}'::timestamptz
     AND bucket_start_time <= '${endTime}'::timestamptz
     AND bucket_done = true
-    AND queryid = ${queryId}::bigint
-  GROUP BY bucket_start_time, calls, datname
+    AND queryid = ${queryId}
   ORDER BY timestamp ASC
 `
 
-export function useSingleQueryLatency(
+export function useInsightsSingleQueryLatency(
   projectRef: string | undefined,
   startTime: string,
   endTime: string,
   queryId: string | undefined,
-  options?: UseQueryOptions<QueryInsightsMetric[]>
+  options?: UseQueryOptions<InsightsMetric[]>
 ) {
   return useQuery({
     queryKey: singleQueryLatencyKeys.latency(projectRef, queryId, startTime, endTime),
@@ -102,19 +103,19 @@ export function useSingleQueryLatency(
       })
 
       console.log('Chart data points:', result)
-      return result as QueryInsightsMetric[]
+      return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
     ...options,
   })
 }
 
-export function useSingleQueryRows(
+export function useInsightsSingleQueryRows(
   projectRef: string | undefined,
   startTime: string,
   endTime: string,
   queryId: string | undefined,
-  options?: UseQueryOptions<QueryInsightsMetric[]>
+  options?: UseQueryOptions<InsightsMetric[]>
 ) {
   return useQuery({
     queryKey: [...singleQueryLatencyKeys.base, 'rows', projectRef, queryId, startTime, endTime],
@@ -123,56 +124,63 @@ export function useSingleQueryRows(
       if (!queryId) return []
 
       const sql = getSingleQueryRowsSql(queryId, startTime, endTime)
-      console.log('[useSingleQueryRows] Executing SQL:', sql)
+      console.log('[useInsightsSingleQueryRows] Executing SQL:', sql)
 
       const { result } = await executeSql({
         projectRef,
         sql,
       })
 
-      console.log('[useSingleQueryRows] Result:', result)
-      return result as QueryInsightsMetric[]
+      console.log('[useInsightsSingleQueryRows] Result:', result)
+      return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
     ...options,
   })
 }
 
-export function useSingleQueryRowsWritten(
+export function useInsightsSingleQueryRowsWritten(
   projectRef: string | undefined,
   startTime: string,
   endTime: string,
   queryId: string | undefined,
-  options?: UseQueryOptions<QueryInsightsMetric[]>
+  options?: UseQueryOptions<InsightsMetric[]>
 ) {
   return useQuery({
-    queryKey: [...singleQueryLatencyKeys.base, 'rows-written', projectRef, queryId, startTime, endTime],
+    queryKey: [
+      ...singleQueryLatencyKeys.base,
+      'rows-written',
+      projectRef,
+      queryId,
+      startTime,
+      endTime,
+    ],
     queryFn: async () => {
       if (!projectRef) throw new Error('Project ref is required')
       if (!queryId) return []
 
       const sql = getSingleQueryRowsWrittenSql(queryId, startTime, endTime)
-      console.log('[useSingleQueryRowsWritten] Executing SQL:', sql)
+      console.log('[useInsightsSingleQueryRowsWritten] Executing SQL:', sql)
 
       const { result } = await executeSql({
         projectRef,
         sql,
       })
 
-      console.log('[useSingleQueryRowsWritten] Result:', result)
-      return result as QueryInsightsMetric[]
+      console.log('[useInsightsSingleQueryRowsWritten] Result:', result)
+      return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
     ...options,
   })
 }
 
-export function useSingleQueryCalls(
+export function useInsightsSingleQueryCalls(
   projectRef: string | undefined,
   startTime: string,
   endTime: string,
   queryId: string | undefined,
-  options?: UseQueryOptions<QueryInsightsMetric[]>
+  options?: UseQueryOptions<InsightsMetric[]>
 ) {
   return useQuery({
     queryKey: singleQueryCallsKeys.calls(projectRef, queryId, startTime, endTime),
@@ -185,7 +193,7 @@ export function useSingleQueryCalls(
         sql: getSingleQueryCallsSql(queryId, startTime, endTime),
       })
 
-      return result as QueryInsightsMetric[]
+      return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
     ...options,

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useQueryInsightsGlance } from 'data/query-insights/query-glance-query'
+import { useInsightsGlanceQuery } from 'data/query-insights/insights-glance-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Card, CardContent } from 'ui'
 import { Database, Clock, AlertCircle } from 'lucide-react'
@@ -36,7 +36,7 @@ export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) 
     data: glanceData,
     isLoading,
     error,
-  } = useQueryInsightsGlance(project?.ref, effectiveStartTime, effectiveEndTime)
+  } = useInsightsGlanceQuery(project?.ref, effectiveStartTime, effectiveEndTime)
 
   // Debug logging for glance results
   console.log('QueryQuickGlance Results:', {

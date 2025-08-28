@@ -21,15 +21,15 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import {
-  useQueryInsightsQueries,
-  type QueryInsightsQuery,
-} from 'data/query-insights/query-metrics-query'
+  useInsightsQueriesQuery,
+  type InsightsQuery,
+} from 'data/query-insights/insights-queries-query'
 import {
-  useSingleQueryLatency,
-  useSingleQueryCalls,
-  useSingleQueryRows,
-  useSingleQueryRowsWritten,
-} from 'data/query-insights/single-query-latency-query'
+  useInsightsSingleQueryLatency,
+  useInsightsSingleQueryCalls,
+  useInsightsSingleQueryRows,
+  useInsightsSingleQueryRowsWritten,
+} from 'data/query-insights/insights-single-ql-query'
 import { ColumnConfiguration, QUERY_INSIGHTS_TABLE_COLUMNS } from './QueryInsights.constants'
 import { formatQueryInsightsColumns } from './QueryInsights.utils'
 
@@ -44,7 +44,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: queries, isLoading, error } = useQueryInsightsQueries(ref, startTime, endTime)
+  const { data: queries, isLoading, error } = useInsightsQueriesQuery(ref, startTime, endTime)
 
   // Debug logging
   console.log('QueryRowExplorer Debug:', {
@@ -128,15 +128,15 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
           total_cost_after: 0,
           index_statements: [],
           errors: [],
-        } as QueryInsightsQuery,
+        } as InsightsQuery,
       ]
 
   // Sort data based on current sort state
   const sortedData = [...reportData].sort((a, b) => {
     if (!sort) return 0
 
-    const aValue = a[sort.column as keyof QueryInsightsQuery]
-    const bValue = b[sort.column as keyof QueryInsightsQuery]
+    const aValue = a[sort.column as keyof InsightsQuery]
+    const bValue = b[sort.column as keyof InsightsQuery]
 
     if (aValue === undefined || bValue === undefined) return 0
 
@@ -159,28 +159,28 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
   const selectedQuery = selectedRow !== undefined ? filteredData[selectedRow] : undefined
 
   // Single query metrics hooks
-  const { data: singleQueryLatency } = useSingleQueryLatency(
+  const { data: singleQueryLatency } = useInsightsSingleQueryLatency(
     ref,
     startTime,
     endTime,
     selectedQuery?.query_id?.toString()
   )
 
-  const { data: singleQueryCalls } = useSingleQueryCalls(
+  const { data: singleQueryCalls } = useInsightsSingleQueryCalls(
     ref,
     startTime,
     endTime,
     selectedQuery?.query_id?.toString()
   )
 
-  const { data: singleQueryRows } = useSingleQueryRows(
+  const { data: singleQueryRows } = useInsightsSingleQueryRows(
     ref,
     startTime,
     endTime,
     selectedQuery?.query_id?.toString()
   )
 
-  const { data: singleQueryRowsWritten } = useSingleQueryRowsWritten(
+  const { data: singleQueryRowsWritten } = useInsightsSingleQueryRowsWritten(
     ref,
     startTime,
     endTime,
