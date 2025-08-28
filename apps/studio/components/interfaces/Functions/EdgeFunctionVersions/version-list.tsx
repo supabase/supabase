@@ -1,21 +1,11 @@
 import { useState } from 'react'
 import { RefreshCw, Eye } from 'lucide-react'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-  Badge,
-  LogoLoader,
-  ScrollArea,
-  CodeBlock,
-  Skeleton,
-  cn,
-} from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
-import { sortDeployments, inferLanguageFromPath, formatDateTime } from './utils'
+import { sortDeployments, formatDateTime } from './utils'
+import { VersionListItem } from './version-list-item'
+import { VersionCodePreview } from './version-code-preview'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
 import { EdgeFunctionVersionsLoading } from './loading'
@@ -142,73 +132,14 @@ export const EdgeFunctionVersionsList = () => {
               const isSelected = selectedDeployment?.id === deployment.id
 
               return (
-                <div
+                <VersionListItem
                   key={deployment.id}
-                  onClick={() => handleViewCodeClick(deployment)}
-                  className={cn(
-                    'p-4 rounded-lg border cursor-pointer transition-colors',
-                    isSelected ? 'bg-accent/50 border-primary' : 'hover:bg-accent/30 border-border'
-                  )}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-x-3">
-                        <div className="text-foreground font-medium">
-                          {formatDateTime(deployment.created_at)}
-                        </div>
-                        {deployment.status === 'ACTIVE' && (
-                          <Badge variant="default" className="text-xs">
-                            Active
-                          </Badge>
-                        )}
-                      </div>
-                      {deployment.commit_message && (
-                        <div className="text-sm text-foreground-light">
-                          {deployment.commit_message}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-x-4 text-xs text-muted-foreground">
-                        {deployment.commit_hash && (
-                          <span className="font-mono text-foreground-light">
-                            #{deployment.commit_hash}
-                          </span>
-                        )}
-                        {typeof deployment.size_kb === 'number' && (
-                          <span className="text-foreground-light">
-                            {deployment.size_kb.toFixed(1)} KB
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-x-2">
-                      <Button
-                        type="default"
-                        size="tiny"
-                        aria-label="Preview code"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleViewCodeClick(deployment)
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {deployment.status !== 'ACTIVE' && (
-                        <Button
-                          type="default"
-                          size="tiny"
-                          disabled={rollbackMutation.isLoading}
-                          aria-label={`Restore version ${deployment.version}`}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleRollbackClick(deployment)
-                          }}
-                        >
-                          Restore
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  deployment={deployment}
+                  isSelected={isSelected}
+                  isRestoring={rollbackMutation.isLoading}
+                  onPreview={handleViewCodeClick}
+                  onRestore={handleRollbackClick}
+                />
               )
             })}
           </div>
@@ -225,86 +156,13 @@ export const EdgeFunctionVersionsList = () => {
               : 'Select a version to preview'}
           </p>
 
-          {isLoadingCode ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between rounded-md border p-3">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-56" />
-                  <Skeleton className="h-3 w-72" />
-                </div>
-                <div className="text-xs text-muted-foreground text-right">
-                  <Skeleton className="h-3 w-12 mb-2" />
-                  <Skeleton className="h-3 w-20" />
-                </div>
-              </div>
-              <div className="flex items-center justify-center h-[400px] rounded border bg-surface-200">
-                <LogoLoader />
-              </div>
-            </div>
-          ) : selectedDeployment && codeFiles.length > 0 ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between rounded-md border p-3">
-                <div>
-                  <div className="text-foreground font-medium">
-                    {formatDateTime(selectedDeployment.created_at)}
-                  </div>
-                  {selectedDeployment.commit_message && (
-                    <div className="text-sm text-foreground-light">
-                      {selectedDeployment.commit_message}
-                    </div>
-                  )}
-                </div>
-                <div className="text-xs text-muted-foreground text-right">
-                  {typeof selectedDeployment.size_kb === 'number' && (
-                    <div>{selectedDeployment.size_kb.toFixed(1)} KB</div>
-                  )}
-                  {selectedDeployment.commit_hash && (
-                    <div className="font-mono">#{selectedDeployment.commit_hash}</div>
-                  )}
-                </div>
-              </div>
-
-              <ScrollArea className="h-[400px] rounded border bg-muted p-3 text-xs">
-                {(() => {
-                  const firstFile = codeFiles[0]
-                  const code = firstFile?.content ?? ''
-                  const path = firstFile?.path ?? ''
-                  const language = path ? inferLanguageFromPath(path) : 'js'
-                  return (
-                    <CodeBlock
-                      language={language}
-                      className="text-xs font-mono border-none p-0 !bg-muted !leading-3 tracking-tight"
-                    >
-                      {code}
-                    </CodeBlock>
-                  )
-                })()}
-              </ScrollArea>
-
-              {selectedDeployment.status === 'ACTIVE' ? (
-                <div className="mt-4 rounded-md bg-accent/30 border p-4 text-sm text-foreground">
-                  This is the currently active version
-                </div>
-              ) : (
-                <div className="mt-4">
-                  <Button
-                    block
-                    type="primary"
-                    size="medium"
-                    disabled={rollbackMutation.isLoading}
-                    aria-label={`Restore version ${selectedDeployment.version}`}
-                    onClick={() => setShowRollback(true)}
-                  >
-                    Restore This Version
-                  </Button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground h-[400px] rounded border bg-muted flex items-center justify-center">
-              No code available
-            </div>
-          )}
+          <VersionCodePreview
+            selectedDeployment={selectedDeployment}
+            codeFiles={codeFiles}
+            isLoading={isLoadingCode}
+            isRestoring={rollbackMutation.isLoading}
+            onOpenRollback={() => setShowRollback(true)}
+          />
         </div>
       </CardContent>
 
