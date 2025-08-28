@@ -128,7 +128,7 @@ export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) 
                   <span className="font-mono text-foreground-lighter truncate max-w-[16ch]">
                     {value.label}{' '}
                   </span>
-                  <span className="text-base">{value.value}</span>
+                  <span className="text-sm">{value.value}</span>
                 </div>
               ))}
             </div>

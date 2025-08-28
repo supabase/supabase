@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Button,
 } from 'ui'
 import { QueryRowExplorer } from './QueryRowExplorer'
 import {
@@ -18,12 +19,6 @@ import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import dayjs from 'dayjs'
 import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
-import {
-  useInsightsSingleQueryLatency,
-  useInsightsSingleQueryCalls,
-  useInsightsSingleQueryRows,
-  useInsightsSingleQueryRowsWritten,
-} from 'data/query-insights/insights-single-ql-query'
 
 interface QueryMetricExplorerProps {
   startTime?: string
@@ -454,23 +449,18 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                 QPS
               </TabsTrigger_Shadcn_>
             </TabsList_Shadcn_>
-            {selectedQuery && (
-              <div className="flex items-center gap-2 text-xs text-foreground-light">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span>Query {selectedQuery.query_id} highlighted</span>
-                <button
-                  onClick={clearSelectedQuery}
-                  className="text-foreground-light hover:text-foreground"
-                >
-                  ×
-                </button>
-              </div>
-            )}
           </CardHeader>
 
           <CardContent className="!p-0 mt-0 flex-1">
             <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-100 mt-0">
-              <div className="p-4">
+              <div className="p-4 relative">
+                {selectedQuery && (
+                  <div className="absolute top-4 right-4 z-10">
+                    <Button type="default" size="tiny" onClick={clearSelectedQuery}>
+                      Clear query
+                    </Button>
+                  </div>
+                )}
                 {isLoading ? (
                   <div className="h-full min-h-[264px] flex items-center justify-center">
                     <div className="text-sm text-foreground-lighter">Loading metrics...</div>
