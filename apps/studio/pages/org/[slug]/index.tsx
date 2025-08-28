@@ -29,8 +29,8 @@ const ProjectsPage: NextPageWithLayout = () => {
   useAutoProjectsPrefetch()
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection isFullWidth>
+    <ScaffoldContainer className="flex-grow flex">
+      <ScaffoldSection isFullWidth className="flex-grow pb-0">
         {disableAccessMfa ? (
           <Admonition type="note" title={`The organization "${org?.name}" has MFA enforced`}>
             <p className="!m-0">
@@ -40,7 +40,7 @@ const ProjectsPage: NextPageWithLayout = () => {
             </p>
           </Admonition>
         ) : (
-          <div className="flex flex-col gap-y-4">
+          <div className="flex flex-col gap-y-4 flex-grow">
             <HomePageActions
               search={search}
               setSearch={setSearch}

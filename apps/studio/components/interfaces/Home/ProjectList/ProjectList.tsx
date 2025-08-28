@@ -1,13 +1,15 @@
+import { useMemo } from 'react'
+
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { makeRandomString } from 'lib/helpers'
 import type { Organization } from 'types'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { LoadingCardView, LoadingTableView, NoFilterResults, NoProjectsState } from './EmptyStates'
@@ -16,32 +18,36 @@ import { ProjectTableRow } from './ProjectTableRow'
 
 export interface ProjectListProps {
   organization?: Organization
-  rewriteHref?: (projectRef: string) => string
   search?: string
   filterStatus?: string[]
-  resetFilterStatus?: () => void
   viewMode?: 'grid' | 'table'
+  rewriteHref?: (projectRef: string) => string
+  resetFilterStatus?: () => void
 }
 
 export const ProjectList = ({
   search = '',
   organization: organization_,
-  rewriteHref,
   filterStatus,
-  resetFilterStatus,
   viewMode = 'grid',
+  rewriteHref,
+  resetFilterStatus,
 }: ProjectListProps) => {
+  const { slug: urlSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
   const organization = organization_ ?? selectedOrganization
+  const slug = organization?.slug ?? urlSlug
 
   const {
     data,
+    error: projectsError,
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
-    error: projectsError,
-  } = useProjectsQuery()
-  const allProjects = data?.projects ?? []
+  } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   const {
     isLoading: _isLoadingPermissions,
@@ -54,7 +60,6 @@ export const ProjectList = ({
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
 
-  const orgProjects = allProjects.filter((x) => x.organization_slug === organization?.slug)
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
@@ -138,8 +143,10 @@ export const ProjectList = ({
   }
 
   if (viewMode === 'table') {
+    // [Joshen] Using calc for now, couldn't figure out max height with flex grow for
+    // this particular one somehow, to make the scrollable area take up the remaining space max
     return (
-      <Card>
+      <Card className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
         <Table>
           <TableHeader>
             <TableRow>
@@ -172,6 +179,7 @@ export const ProjectList = ({
                 <ProjectTableRow
                   key={project.ref}
                   project={project}
+                  organization={organization}
                   rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
                   resourceWarnings={resourceWarnings?.find(
                     (resourceWarning) => resourceWarning.project === project.ref
@@ -201,7 +209,7 @@ export const ProjectList = ({
         <ul className="w-full mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {filteredProjectsByStatus?.map((project) => (
             <ProjectCard
-              key={makeRandomString(5)}
+              key={project.ref}
               project={project}
               rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
               resourceWarnings={resourceWarnings?.find(

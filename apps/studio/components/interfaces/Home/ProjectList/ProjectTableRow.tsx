@@ -4,16 +4,17 @@ import InlineSVG from 'react-inlinesvg'
 
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import type { ProjectInfo } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
+import { Organization } from 'types'
 import { TableCell, TableRow } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectTableRowProps {
-  project: ProjectInfo
+  project: OrgProject
+  organization?: Organization
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
@@ -22,6 +23,7 @@ export interface ProjectTableRowProps {
 
 export const ProjectTableRow = ({
   project,
+  organization,
   rewriteHref,
   githubIntegration,
   vercelIntegration,
@@ -29,13 +31,14 @@ export const ProjectTableRow = ({
 }: ProjectTableRowProps) => {
   const router = useRouter()
   const { name, ref: projectRef } = project
-  const projectStatus = inferProjectStatus(project)
+  const projectStatus = inferProjectStatus(project.status)
 
   const url = rewriteHref ?? `/project/${project.ref}`
-  const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
+
+  const infraInformation = project.databases.find((x) => x.identifier === project.ref)
 
   return (
     <TableRow
@@ -54,7 +57,7 @@ export const ProjectTableRow = ({
             <p className="font-medium">{name}</p>
             <p className="text-xs text-foreground-lighter">ID: {projectRef}</p>
           </div>
-          {(isGithubIntegrated || isVercelIntegrated || isBranchingEnabled) && (
+          {(isGithubIntegrated || isVercelIntegrated) && (
             <div className="flex items-center gap-x-2">
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
@@ -91,7 +94,14 @@ export const ProjectTableRow = ({
       <TableCell>
         <div className="w-fit">
           {project.status !== 'INACTIVE' ? (
-            <ComputeBadgeWrapper project={project} />
+            <ComputeBadgeWrapper
+              project={{
+                ref: project.ref,
+                organization_slug: organization?.slug,
+                cloud_provider: infraInformation?.cloud_provider,
+                infra_compute_size: infraInformation?.infra_compute_size,
+              }}
+            />
           ) : (
             <span className="text-xs text-foreground-light">-</span>
           )}
@@ -99,18 +109,19 @@ export const ProjectTableRow = ({
       </TableCell>
       <TableCell>
         <span className="lowercase text-sm text-foreground-light">
-          {project.cloud_provider} | {project.region || 'N/A'}
+          {infraInformation?.cloud_provider} | {project.region || 'N/A'}
         </span>
       </TableCell>
       <TableCell>
-        {project.inserted_at ? (
+        TBD
+        {/* {project.inserted_at ? (
           <TimestampInfo
             className="text-sm text-foreground-light"
             utcTimestamp={project.inserted_at}
           />
         ) : (
           <span className="text-sm text-foreground-light">N/A</span>
-        )}
+        )} */}
       </TableCell>
     </TableRow>
   )
