@@ -1,8 +1,9 @@
+import { Eraser, Settings, X } from 'lucide-react'
+import { useState } from 'react'
+
 import { AiIconAnimation, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { Eraser, Settings, X } from 'lucide-react'
-import { useState } from 'react'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOptInModal } from './AIOptInModal'
 
@@ -16,7 +17,7 @@ interface AIAssistantHeaderProps {
   aiOptInLevel: 'disabled' | 'schema' | 'full' | string | undefined
 }
 
-export function AIAssistantHeader({
+export const AIAssistantHeader = ({
   isChatLoading,
   onClearMessages,
   onCloseAssistant,
@@ -24,7 +25,7 @@ export function AIAssistantHeader({
   updatedOptInSinceMCP,
   isHipaaProjectDisallowed,
   aiOptInLevel,
-}: AIAssistantHeaderProps) {
+}: AIAssistantHeaderProps) => {
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
   return (
     <div className="z-30 sticky top-0">
@@ -43,7 +44,7 @@ export function AIAssistantHeader({
               fill="none"
               shapeRendering="geometricPrecision"
             >
-              <path d="M16 3.549L7.12 20.600"></path>
+              <path d="M16 3.549L7.12 20.600" />
             </svg>
           </span>
           <AIAssistantChatSelector disabled={isChatLoading} />

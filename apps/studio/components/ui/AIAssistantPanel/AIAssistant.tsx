@@ -4,7 +4,7 @@ import { DefaultChatTransport } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Info, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
@@ -32,60 +32,12 @@ import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
-import { Message } from './Message'
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
 } from './elements/Conversation'
-
-const MemoizedMessage = memo(
-  ({
-    message,
-    status,
-    onResults,
-    onDelete,
-    onEdit,
-    isAfterEditedMessage,
-    isBeingEdited,
-    onCancelEdit,
-  }: {
-    message: MessageType
-    status: string
-    onResults: ({
-      messageId,
-      resultId,
-      results,
-    }: {
-      messageId: string
-      resultId?: string
-      results: any[]
-    }) => void
-    onDelete: (id: string) => void
-    onEdit: (id: string) => void
-    isAfterEditedMessage: boolean
-    isBeingEdited: boolean
-    onCancelEdit: () => void
-  }) => {
-    return (
-      <Message
-        id={message.id}
-        message={message}
-        readOnly={message.role === 'user'}
-        isLoading={status === 'submitted' || status === 'streaming'}
-        status={status}
-        onResults={onResults}
-        onDelete={onDelete}
-        onEdit={onEdit}
-        isAfterEditedMessage={isAfterEditedMessage}
-        isBeingEdited={isBeingEdited}
-        onCancelEdit={onCancelEdit}
-      />
-    )
-  }
-)
-
-MemoizedMessage.displayName = 'MemoizedMessage'
+import { MemoizedMessage } from './Message'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -132,7 +84,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const snippet = snippets[entityId ?? '']
   const snippetContent = snippet?.snippet?.content?.sql
 
-  const { data: tables, isLoading: isLoadingTables } = useTablesQuery(
+  const { data: tables } = useTablesQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

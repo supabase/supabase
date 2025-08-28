@@ -1,4 +1,7 @@
-'use client'
+import { BrainIcon, ChevronDownIcon, Loader2 } from 'lucide-react'
+import type { ComponentProps } from 'react'
+import { memo } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 import {
   cn,
@@ -6,12 +9,8 @@ import {
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
-import { BrainIcon, ChevronDownIcon, Loader2 } from 'lucide-react'
-import type { ComponentProps } from 'react'
-import { memo } from 'react'
-import ReactMarkdown from 'react-markdown'
 
-export type ReasoningProps = Omit<ComponentProps<typeof Collapsible>, 'children'> & {
+type ReasoningProps = Omit<ComponentProps<typeof Collapsible>, 'children'> & {
   isStreaming?: boolean
   children: string
 }

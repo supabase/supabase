@@ -1,6 +1,6 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { CheckIcon, Loader2, Pencil, Trash2 } from 'lucide-react'
-import { createContext, PropsWithChildren, ReactNode, useMemo, useState } from 'react'
+import { createContext, memo, PropsWithChildren, ReactNode, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
@@ -62,7 +62,7 @@ interface MessageProps {
   onCancelEdit: () => void
 }
 
-export const Message = function Message({
+const Message = function Message({
   id,
   message,
   isLoading,
@@ -323,3 +323,51 @@ export const Message = function Message({
     </MessageContext.Provider>
   )
 }
+
+export const MemoizedMessage = memo(
+  ({
+    message,
+    status,
+    onResults,
+    onDelete,
+    onEdit,
+    isAfterEditedMessage,
+    isBeingEdited,
+    onCancelEdit,
+  }: {
+    message: VercelMessage
+    status: string
+    onResults: ({
+      messageId,
+      resultId,
+      results,
+    }: {
+      messageId: string
+      resultId?: string
+      results: any[]
+    }) => void
+    onDelete: (id: string) => void
+    onEdit: (id: string) => void
+    isAfterEditedMessage: boolean
+    isBeingEdited: boolean
+    onCancelEdit: () => void
+  }) => {
+    return (
+      <Message
+        id={message.id}
+        message={message}
+        readOnly={message.role === 'user'}
+        isLoading={status === 'submitted' || status === 'streaming'}
+        status={status}
+        onResults={onResults}
+        onDelete={onDelete}
+        onEdit={onEdit}
+        isAfterEditedMessage={isAfterEditedMessage}
+        isBeingEdited={isBeingEdited}
+        onCancelEdit={onCancelEdit}
+      />
+    )
+  }
+)
+
+MemoizedMessage.displayName = 'MemoizedMessage'
