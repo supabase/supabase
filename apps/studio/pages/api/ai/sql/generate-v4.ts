@@ -117,7 +117,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const { model, error: modelError, supportsCachePoint } = await getModel(projectRef, isLimited) // use project ref as routing key
+  const {
+    model,
+    error: modelError,
+    promptProviderOptions,
+  } = await getModel({
+    provider: 'openai',
+    model: 'gpt-5-mini',
+    routingKey: projectRef,
+    isLimited,
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -165,14 +174,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(supportsCachePoint && {
-          providerOptions: {
-            bedrock: {
-              // Always cache the system prompt (must not contain dynamic content)
-              cachePoint: { type: 'default' },
-            },
-          },
-        }),
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',
