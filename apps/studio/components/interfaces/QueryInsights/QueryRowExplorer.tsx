@@ -55,7 +55,7 @@ export const QueryRowExplorer = ({
   // })
 
   const [sort, setSort] = useState<{ column: string; order: 'asc' | 'desc' } | undefined>({
-    column: 'badness_score',
+    column: 'last_run',
     order: 'desc',
   })
   const [selectedRow, setSelectedRow] = useState<number>()
