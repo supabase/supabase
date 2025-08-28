@@ -9,7 +9,7 @@ Postgres comes with built-in support for replication. If `pg_replicate` doesn't 
 
 Replication is done through _publications_. A [publication](https://www.postgresql.org/docs/current/logical-replication-publication.html) is a set of changes. You can choose which tables and change events to include in a publication.
 
-Once a publication is created, it can be listened to by a subscriber. Subscriptions are handled using Postgres [replication slots](https://www.postgresql.org/docs/current/logical-replication-subscription.html). The exact connection parameters for the replication slot depend on your downstream subscriber. See your subscriber documentation for more details.
+Once a publication is created, a subscriber can listen to it. Postgres [replication slots](https://www.postgresql.org/docs/current/logical-replication-subscription.html) handle subscriptions. The exact connection parameters for the replication slot depend on your downstream subscriber. Read your subscriber documentation for more details.
 
 ## Managing publications
 
