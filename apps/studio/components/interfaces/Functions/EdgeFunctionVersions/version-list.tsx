@@ -181,6 +181,7 @@ export const EdgeFunctionVersionsList = () => {
                       <Button
                         type="default"
                         size="tiny"
+                        aria-label="Preview code"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleViewCodeClick(deployment)
@@ -193,6 +194,7 @@ export const EdgeFunctionVersionsList = () => {
                           type="default"
                           size="tiny"
                           disabled={rollbackMutation.isLoading}
+                          aria-label={`Restore version ${deployment.version}`}
                           onClick={(e) => {
                             e.stopPropagation()
                             handleRollbackClick(deployment)
@@ -270,6 +272,7 @@ export const EdgeFunctionVersionsList = () => {
                     type="primary"
                     size="medium"
                     disabled={rollbackMutation.isLoading}
+                    aria-label={`Restore version ${selectedDeployment.version}`}
                     onClick={() => setShowRollback(true)}
                   >
                     Restore This Version
