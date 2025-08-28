@@ -15,6 +15,7 @@
     "@usercentrics/cmp-browser-sdk": "^4.42.0",
     "api-types": "workspace:*",
     "config": "workspace:*",
+    "configcat-js": "^9.5.1",
     "dat.gui": "^0.7.9",
     "flags": "^4.0.0",
     "lodash": "^4.17.21",
@@ -27,8 +28,11 @@
     "@types/lodash": "4.17.5",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "^3.0.9",
+    "@vitest/ui": "^3.0.0",
     "tsconfig": "workspace:*",
-    "typescript": "~5.5.0"
+    "typescript": "~5.5.0",
+    "vitest": "^3.0.5"
   },
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",

@@ -14,7 +14,7 @@
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --cache --write \"content/**/*.mdx\"",
     "dev": "concurrently --kill-others \"next dev --port 3001\" \"pnpm run dev:watch:troubleshooting\"",
-    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
+    "dev:secrets:pull": "AWS_PROFILE=supa-dev node ../../scripts/getSecrets.js -n local/docs",
     "dev:watch:troubleshooting": "node ./scripts/troubleshooting/watch.mjs",
     "embeddings": "tsx --conditions=react-server scripts/search/generate-embeddings.ts",
     "embeddings:refresh": "pnpm run embeddings --refresh",

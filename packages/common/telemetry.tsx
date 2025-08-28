@@ -77,29 +77,7 @@ export function handlePageTelemetry(
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  const sharedData = getSharedTelemetryData(pathname)
-  const { session_id, ...backendData } = sharedData // Remove session_id from backend payload (it's already in the cookie)
-
-  const payload =
-    telemetryDataOverride !== undefined
-      ? { feature_flags: featureFlags, ...telemetryDataOverride }
-      : {
-          ...backendData,
-          ...(slug || ref
-            ? {
-                groups: {
-                  ...(slug ? { organization: slug } : {}),
-                  ...(ref ? { project: ref } : {}),
-                },
-              }
-            : {}),
-          feature_flags: featureFlags,
-        }
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page`, payload, {
-    headers: { Version: '2' },
-  })
+  return Promise.resolve()
 }
 
 export function handlePageLeaveTelemetry(
@@ -122,22 +100,7 @@ export function handlePageLeaveTelemetry(
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    pathname,
-    page_url: isBrowser ? window.location.href : '',
-    page_title: isBrowser ? document?.title : '',
-    feature_flags: featureFlags,
-    ...(slug || ref
-      ? {
-          groups: {
-            ...(slug ? { organization: slug } : {}),
-            ...(ref ? { project: ref } : {}),
-          },
-        }
-      : {}),
-  })
+  return Promise.resolve()
 }
 
 export const PageTelemetry = ({

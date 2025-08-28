@@ -9,7 +9,10 @@ vi.mock('@ai-sdk/openai', () => ({
 
 vi.mock('./bedrock', async () => ({
   ...(await vi.importActual('./bedrock')),
-  createRoutedBedrock: vi.fn(() => () => 'bedrock-model'),
+  createRoutedBedrock: vi.fn(() => async (modelId: string) => ({
+    model: 'bedrock-model',
+    supportsCachePoint: modelId === 'anthropic.claude-3-7-sonnet-20250219-v1:0',
+  })),
   checkAwsCredentials: vi.fn(),
 }))
 
@@ -25,12 +28,25 @@ describe('getModel', () => {
     process.env = { ...originalEnv }
   })
 
-  it('should return bedrock model when AWS credentials are available', async () => {
+  it('should return bedrock model when AWS credentials are available and not throttled', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
+    vi.stubEnv('IS_THROTTLED', 'false')
 
-    const { model, error } = await getModel()
+    const { model, error, supportsCachePoint } = await getModel()
 
     expect(model).toEqual('bedrock-model')
+    expect(supportsCachePoint).toBe(true)
+    expect(error).toBeUndefined()
+  })
+
+  it('should return bedrock model when AWS credentials are available and throttled', async () => {
+    vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
+    vi.stubEnv('IS_THROTTLED', 'true')
+
+    const { model, error, supportsCachePoint } = await getModel()
+
+    expect(model).toEqual('bedrock-model')
+    expect(supportsCachePoint).toBe(false)
     expect(error).toBeUndefined()
   })
 
@@ -38,10 +54,11 @@ describe('getModel', () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(false)
     process.env.OPENAI_API_KEY = 'test-key'
 
-    const { model } = await getModel()
+    const { model, supportsCachePoint } = await getModel()
 
     expect(model).toEqual('openai-model')
     expect(openai).toHaveBeenCalledWith('gpt-4.1-2025-04-14')
+    expect(supportsCachePoint).toBe(false)
   })
 
   it('should return error when neither AWS credentials nor OPENAI_API_KEY is available', async () => {

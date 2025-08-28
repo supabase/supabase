@@ -33,7 +33,13 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { FeatureFlagProvider, TelemetryTagManager, ThemeProvider, useThemeSandbox } from 'common'
+import {
+  FeatureFlagProvider,
+  getFlags as getConfigCatFlags,
+  TelemetryTagManager,
+  ThemeProvider,
+  useThemeSandbox,
+} from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
@@ -45,7 +51,6 @@ import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
-import { getFlags as getConfigCatFlags } from 'lib/configcat'
 import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'

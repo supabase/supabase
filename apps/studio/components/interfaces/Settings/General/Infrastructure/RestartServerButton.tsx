@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useFlag } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
@@ -12,7 +13,6 @@ import { useProjectRestartServicesMutation } from 'data/projects/project-restart
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   DropdownMenu,
