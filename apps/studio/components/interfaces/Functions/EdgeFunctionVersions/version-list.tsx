@@ -13,8 +13,8 @@ import {
   CodeBlock,
   Skeleton,
 } from 'ui'
-import type { CodeBlockLang } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
+import { sortDeployments, inferLanguageFromPath } from './utils'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
 import { EdgeFunctionVersionsLoading } from './loading'
@@ -22,30 +22,6 @@ import { EdgeFunctionVersionsError } from './error'
 import { useEdgeFunctionDeploymentsQuery } from 'data/edge-functions/edge-function-deployments-query'
 import { useEdgeFunctionDeploymentCodeQuery } from 'data/edge-functions/edge-function-deployment-code-query'
 import { useEdgeFunctionRollbackMutation } from 'data/edge-functions/edge-function-rollback-mutation'
-
-// Ensure newest first: sort by version desc, then created_at desc
-const sortDeployments = (items: EdgeFunctionDeployment[]) =>
-  items
-    .slice()
-    .sort((a, b) => (b.version !== a.version ? b.version - a.version : b.created_at - a.created_at))
-
-const inferLanguageFromPath = (path: string): CodeBlockLang => {
-  const ext = path.split('.').pop()?.toLowerCase()
-  switch (ext) {
-    case 'ts':
-    case 'tsx':
-      return 'ts'
-    case 'js':
-    case 'jsx':
-    case 'mjs':
-    case 'cjs':
-      return 'js'
-    case 'json':
-      return 'json'
-    default:
-      return 'ts'
-  }
-}
 
 export const EdgeFunctionVersionsList = () => {
   const { ref: projectRef, slug: functionSlug } = useParams()
