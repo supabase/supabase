@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import {
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -17,6 +17,13 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import dayjs from 'dayjs'
+import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
+import {
+  useInsightsSingleQueryLatency,
+  useInsightsSingleQueryCalls,
+  useInsightsSingleQueryRows,
+  useInsightsSingleQueryRowsWritten,
+} from 'data/query-insights/insights-single-ql-query'
 
 interface QueryMetricExplorerProps {
   startTime?: string
@@ -28,6 +35,17 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   const [selectedMetric, setSelectedMetric] = useState<
     'rows_read' | 'query_latency' | 'queries_per_second' | 'calls' | 'cache_hits'
   >('query_latency')
+
+  // State to track selected query for chart highlighting
+  const [selectedQuery, setSelectedQuery] = useState<InsightsQuery | undefined>()
+  const [selectedQueryId, setSelectedQueryId] = useState<number | undefined>()
+
+  // Debug logging for query selection (commented out to reduce console noise)
+  // console.log('QueryMetricExplorer Query Selection:', {
+  //   selectedQuery: selectedQuery?.query_id,
+  //   selectedQueryId,
+  //   selectedQueryQuery: selectedQuery?.query?.substring(0, 50) + '...',
+  // })
 
   // State to control which percentile lines are visible for query latency
   const [visiblePercentiles, setVisiblePercentiles] = useState({
@@ -62,30 +80,58 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   // Pre-fetch query data for the QueryRowExplorer
   useInsightsPrefetchQuery(project?.ref, effectiveStartTime, effectiveEndTime)
 
-  // Debug logging
-  console.log('QueryMetricExplorer Debug:', {
-    props: { startTime, endTime },
-    effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
-    project: { ref: project?.ref, hasConnectionString: !!project?.connectionString },
-    selectedMetric,
-  })
+  // Debug logging (commented out to reduce console noise)
+  // console.log('QueryMetricExplorer Debug:', {
+  //   props: { startTime, endTime },
+  //   effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
+  //   project: { ref: project?.ref, hasConnectionString: !!project?.connectionString },
+  //   selectedMetric,
+  //   projectRefUndefined: !project?.ref,
+  // })
 
   const {
     data: metricsData,
     isLoading,
     error,
-  } = useInsightsMetricsQuery(project?.ref, selectedMetric, effectiveStartTime, effectiveEndTime)
-
-  // Debug logging for query results
-  console.log('QueryMetricExplorer Query Results:', {
-    metricsData,
-    isLoading,
-    error,
-    dataLength: metricsData?.length,
+  } = useInsightsMetricsQuery(project?.ref, selectedMetric, effectiveStartTime, effectiveEndTime, {
+    enabled: !!project?.ref,
   })
 
+  // Calculate the average value for the selected query based on the current metric
+  const selectedQueryAverage = useMemo(() => {
+    if (!selectedQuery) return undefined
+
+    switch (selectedMetric) {
+      case 'query_latency':
+        return selectedQuery.mean_exec_time
+      case 'calls':
+        return selectedQuery.calls
+      case 'rows_read':
+        return selectedQuery.rows_read || 0
+      case 'cache_hits':
+        // Calculate cache hit rate from shared_blks_hit and shared_blks_read
+        const totalBlocks =
+          (selectedQuery.shared_blks_hit || 0) + (selectedQuery.shared_blks_read || 0)
+        return totalBlocks > 0 ? ((selectedQuery.shared_blks_hit || 0) / totalBlocks) * 100 : 0
+      case 'queries_per_second':
+        // Calculate QPS from calls and total_time
+        const totalTimeSeconds = (selectedQuery.total_time || 0) / 1000
+        return totalTimeSeconds > 0 ? (selectedQuery.calls || 0) / totalTimeSeconds : 0
+      default:
+        return undefined
+    }
+  }, [selectedQuery, selectedMetric])
+
+  // Debug logging for query results (commented out to reduce console noise)
+  // console.log('QueryMetricExplorer Query Results:', {
+  //   metricsData,
+  //   isLoading,
+  //   error,
+  //   dataLength: metricsData?.length,
+  // })
+
   // Define chart attributes based on selected metric
-  const getChartAttributes = (): MultiAttribute[] => {
+  const getChartAttributes = useMemo((): MultiAttribute[] => {
     const metricConfigs = {
       rows_read: { label: 'Rows Read', format: '' },
       query_latency: { label: 'Query Latency', format: 'ms' },
@@ -154,10 +200,27 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         })
       }
 
+      // Add selected query attribute if available
+      if (selectedQuery && selectedQueryAverage !== undefined) {
+        attributes.push({
+          attribute: 'selected',
+          label: 'Selected',
+          format: 'ms',
+          provider: 'query-insights' as any,
+          color: {
+            light: '#dc2626', // Bright red color for selected query
+            dark: '#ef4444',
+          },
+          strokeDasharray: '5 5', // Dashed line
+          type: 'line',
+          strokeWidth: 4, // Even thicker line for more prominence
+        })
+      }
+
       return attributes
     }
 
-    return [
+    const attributes: MultiAttribute[] = [
       {
         attribute: selectedMetric,
         label: config.label,
@@ -165,7 +228,26 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         provider: 'query-insights' as any,
       },
     ]
-  }
+
+    // Add selected query attribute if available
+    if (selectedQuery && selectedQueryAverage !== undefined) {
+      attributes.push({
+        attribute: 'selected',
+        label: 'Selected',
+        format: config.format,
+        provider: 'query-insights' as any,
+        color: {
+          light: '#dc2626', // Bright red color for selected query
+          dark: '#ef4444',
+        },
+        strokeDasharray: '5 5', // Dashed line
+        type: 'line',
+        strokeWidth: 4, // Even thicker line for more prominence
+      })
+    }
+
+    return attributes
+  }, [selectedMetric, safeVisiblePercentiles, selectedQuery])
 
   // Calculate average P95 for query latency
   const averageP95 = useMemo(() => {
@@ -179,7 +261,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   // Transform data for the chart
   const chartData = useMemo(() => {
     if (!metricsData || metricsData.length === 0) {
-      console.log('QueryMetricExplorer: No metrics data available')
+      // console.log('QueryMetricExplorer: No metrics data available')
       return {
         data: [],
         format: '',
@@ -188,12 +270,12 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }
     }
 
-    console.log('QueryMetricExplorer: Processing metrics data:', {
-      metricsData,
-      selectedMetric,
-      dataLength: metricsData.length,
-      firstItem: metricsData[0],
-    })
+    // console.log('QueryMetricExplorer: Processing metrics data:', {
+    //   metricsData,
+    //   selectedMetric,
+    //   dataLength: metricsData.length,
+    //   firstItem: metricsData[0],
+    // })
 
     const transformed = metricsData.map((item) => {
       // Convert timestamp to ISO string format as expected by ChartData
@@ -226,6 +308,31 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }
     })
 
+    // Add selected query data if available
+    if (selectedQuery && selectedQueryAverage !== undefined) {
+      // Add the selected query average as a constant line across all data points
+      const transformedWithSelected = transformed.map((item) => ({
+        ...item,
+        selected: selectedQueryAverage,
+      }))
+      transformed.splice(0, transformed.length, ...transformedWithSelected)
+
+      // Debug: Check if selected query data was added
+      console.log('Chart Data Merge Debug:', {
+        selectedQueryId: selectedQuery?.query_id,
+        selectedQueryAverage,
+        transformedLength: transformed.length,
+        hasSelectedData: transformed.some((item) => item.selected !== undefined),
+        sampleTransformedItem: transformed[0],
+        chartAttributes: getChartAttributes.map((attr) => ({
+          attribute: attr.attribute,
+          label: attr.label,
+          type: attr.type,
+        })),
+        hasSelectedAttribute: getChartAttributes.some((attr) => attr.attribute === 'selected'),
+      })
+    }
+
     // Calculate totals for the ChartData format
     const total = transformed.reduce((sum, item) => {
       if (selectedMetric === 'query_latency') {
@@ -244,29 +351,67 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         ? { p95: total } // Use p95 as the main metric for query latency
         : { [selectedMetric]: total }
 
-    console.log('QueryMetricExplorer Chart Data:', {
-      originalData: metricsData,
-      transformedData: transformed,
-      selectedMetric,
-      dataLength: transformed.length,
-      visiblePercentiles,
-      total,
-      totalGrouped,
-    })
+    // console.log('QueryMetricExplorer Chart Data:', {
+    //   originalData: metricsData,
+    //   transformedData: transformed,
+    //   selectedMetric,
+    //   dataLength: transformed.length,
+    //   visiblePercentiles,
+    //   total,
+    //   totalGrouped,
+    //   selectedQuery: selectedQuery?.query_id,
+    //   selectedQueryDataLength: selectedQueryData.length,
+    //   selectedQueryData: selectedQueryData,
+    //   selectedQueryLatency: selectedQueryLatency,
+    //   selectedQueryCalls: selectedQueryCalls,
+    //   selectedQueryRows: selectedQueryRows,
+    // })
 
     return {
       data: transformed,
-      format: getChartAttributes()[0].format || '',
+      format: getChartAttributes[0].format || '',
       total,
       totalGrouped,
     }
-  }, [metricsData, selectedMetric, safeVisiblePercentiles])
+  }, [metricsData, selectedMetric, safeVisiblePercentiles, selectedQuery, selectedQueryAverage])
 
   // Mock updateDateRange function for LogChartHandler
   const updateDateRange = () => {
     // This is a no-op since we're not implementing date range updates in this component
     console.log('updateDateRange called - not implemented in QueryMetricExplorer')
   }
+
+  // Handle query selection from child component
+  const handleQuerySelect = useCallback(
+    (query: InsightsQuery | undefined) => {
+      // console.log('QueryMetricExplorer: handleQuerySelect called', {
+      //   newQuery: query?.query_id,
+      //   currentSelectedQuery: selectedQuery?.query_id,
+      //   currentSelectedQueryId: selectedQueryId,
+      //   willUpdate:
+      //     query?.query_id !== selectedQuery?.query_id || query?.query_id !== selectedQueryId,
+      //   timestamp: new Date().toISOString(),
+      // })
+      setSelectedQuery(query)
+      setSelectedQueryId(query?.query_id)
+    },
+    [] // No dependencies to prevent unnecessary recreations
+  )
+
+  // Clear selected query
+  const clearSelectedQuery = useCallback(() => {
+    // console.log('QueryMetricExplorer: Clearing selected query', {
+    //   currentSelectedQuery: selectedQuery?.query_id,
+    //   currentSelectedQueryId: selectedQueryId,
+    // })
+    setSelectedQuery(undefined)
+    setSelectedQueryId(undefined)
+  }, []) // No dependencies to prevent unnecessary recreations
+
+  // Reset selection when date range changes
+  useEffect(() => {
+    clearSelectedQuery()
+  }, [effectiveStartTime, effectiveEndTime])
 
   return (
     <div className="w-full mb-4">
@@ -309,6 +454,18 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                 QPS
               </TabsTrigger_Shadcn_>
             </TabsList_Shadcn_>
+            {selectedQuery && (
+              <div className="flex items-center gap-2 text-xs text-foreground-light">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span>Query {selectedQuery.query_id} highlighted</span>
+                <button
+                  onClick={clearSelectedQuery}
+                  className="text-foreground-light hover:text-foreground"
+                >
+                  ×
+                </button>
+              </div>
+            )}
           </CardHeader>
 
           <CardContent className="!p-0 mt-0 flex-1">
@@ -320,16 +477,32 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                   </div>
                 ) : chartData.data.length > 0 ? (
                   <>
+                    {(() => {
+                      console.log('Chart Data Final Debug:', {
+                        chartDataLength: chartData.data.length,
+                        firstDataPoint: chartData.data[0],
+                        attributes: getChartAttributes.map((attr) => attr.attribute),
+                        selectedQuery: selectedQuery?.query_id,
+                        // Check if selected query data is in the final chart data
+                        hasSelectedQueryData: chartData.data.some(
+                          (item) => item.selected !== undefined
+                        ),
+                        selectedQueryDataPoints: chartData.data.filter(
+                          (item) => item.selected !== undefined
+                        ).length,
+                      })
+                      return null
+                    })()}
                     <ComposedChart
                       data={chartData.data}
-                      attributes={getChartAttributes()}
-                      yAxisKey={getChartAttributes()[0].attribute}
-                      xAxisKey="timestamp"
-                      title={getChartAttributes()[0].label || ''}
+                      attributes={getChartAttributes}
+                      yAxisKey={getChartAttributes[0].attribute}
+                      xAxisKey="period_start"
+                      title={getChartAttributes[0].label || ''}
                       customDateFormat="HH:mm"
                       hideChartType={true}
                       showTooltip={true}
-                      showLegend={selectedMetric === 'query_latency'}
+                      showLegend={selectedMetric === 'query_latency' || !!selectedQuery}
                       showTotal={false}
                       showMaxValue={false}
                       updateDateRange={updateDateRange}
@@ -344,7 +517,12 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
             </TabsContent_Shadcn_>
           </CardContent>
         </Tabs_Shadcn_>
-        <QueryRowExplorer startTime={effectiveStartTime} endTime={effectiveEndTime} />
+        <QueryRowExplorer
+          startTime={effectiveStartTime}
+          endTime={effectiveEndTime}
+          onQuerySelect={handleQuerySelect}
+          selectedQueryId={selectedQueryId}
+        />
       </Card>
     </div>
   )

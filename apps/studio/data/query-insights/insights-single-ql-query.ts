@@ -102,10 +102,14 @@ export function useInsightsSingleQueryLatency(
         sql: getSingleQueryLatencySql(queryId, startTime, endTime),
       })
 
-      console.log('Chart data points:', result)
+      // console.log('Chart data points:', result)
       return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
     ...options,
   })
 }
@@ -124,17 +128,21 @@ export function useInsightsSingleQueryRows(
       if (!queryId) return []
 
       const sql = getSingleQueryRowsSql(queryId, startTime, endTime)
-      console.log('[useInsightsSingleQueryRows] Executing SQL:', sql)
+      // console.log('[useInsightsSingleQueryRows] Executing SQL:', sql)
 
       const { result } = await executeSql({
         projectRef,
         sql,
       })
 
-      console.log('[useInsightsSingleQueryRows] Result:', result)
+      // console.log('[useInsightsSingleQueryRows] Result:', result)
       return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
     ...options,
   })
 }
@@ -160,17 +168,21 @@ export function useInsightsSingleQueryRowsWritten(
       if (!queryId) return []
 
       const sql = getSingleQueryRowsWrittenSql(queryId, startTime, endTime)
-      console.log('[useInsightsSingleQueryRowsWritten] Executing SQL:', sql)
+      // console.log('[useInsightsSingleQueryRowsWritten] Executing SQL:', sql)
 
       const { result } = await executeSql({
         projectRef,
         sql,
       })
 
-      console.log('[useInsightsSingleQueryRowsWritten] Result:', result)
+      // console.log('[useInsightsSingleQueryRowsWritten] Result:', result)
       return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
     ...options,
   })
 }
@@ -196,6 +208,10 @@ export function useInsightsSingleQueryCalls(
       return result as InsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
     ...options,
   })
 }

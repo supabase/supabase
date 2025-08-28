@@ -25,25 +25,28 @@ export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) 
     return { startTime: fallbackStartTime, endTime: fallbackEndTime }
   }, [startTime, endTime])
 
-  // Debug logging
-  console.log('QueryQuickGlance Debug:', {
-    props: { startTime, endTime },
-    effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
-    project: { ref: project?.ref, hasConnectionString: !!project?.connectionString },
-  })
+  // Debug logging (commented out to reduce console noise)
+  // console.log('QueryQuickGlance Debug:', {
+  //   props: { startTime, endTime },
+  //   effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
+  //   project: { ref: project?.ref, hasConnectionString: !!project?.connectionString },
+  //   projectRefUndefined: !project?.ref,
+  // })
 
   const {
     data: glanceData,
     isLoading,
     error,
-  } = useInsightsGlanceQuery(project?.ref, effectiveStartTime, effectiveEndTime)
-
-  // Debug logging for glance results
-  console.log('QueryQuickGlance Results:', {
-    glanceData,
-    isLoading,
-    error,
+  } = useInsightsGlanceQuery(project?.ref, effectiveStartTime, effectiveEndTime, {
+    enabled: !!project?.ref,
   })
+
+  // Debug logging for glance results (commented out to reduce console noise)
+  // console.log('QueryQuickGlance Results:', {
+  //   glanceData,
+  //   isLoading,
+  //   error,
+  // })
 
   const cards = useMemo(() => {
     if (!glanceData) return []
