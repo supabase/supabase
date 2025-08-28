@@ -11,6 +11,7 @@ import {
   LogoLoader,
   ScrollArea,
   CodeBlock,
+  Skeleton,
 } from 'ui'
 import type { CodeBlockLang } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
@@ -252,8 +253,20 @@ export const EdgeFunctionVersionsList = () => {
           </p>
 
           {isLoadingCode ? (
-            <div className="flex items-center justify-center h-[400px] rounded border bg-surface-200">
-              <LogoLoader />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-md border p-3">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-56" />
+                  <Skeleton className="h-3 w-72" />
+                </div>
+                <div className="text-xs text-muted-foreground text-right">
+                  <Skeleton className="h-3 w-12 mb-2" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+              <div className="flex items-center justify-center h-[400px] rounded border bg-surface-200">
+                <LogoLoader />
+              </div>
             </div>
           ) : selectedDeployment && codeFiles.length > 0 ? (
             <div className="space-y-3">
