@@ -14,6 +14,7 @@ import {
   useInsightsMetricsQuery,
   useInsightsPrefetchQuery,
 } from 'data/query-insights/insights-metrics-query'
+import { useInsightsQueriesQuery } from 'data/query-insights/insights-queries-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -69,6 +70,26 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   } = useInsightsMetricsQuery(project?.ref, selectedMetric, effectiveStartTime, effectiveEndTime, {
     enabled: !!project?.ref,
   })
+
+  // Fetch all queries to calculate slowness ratings
+  const { data: allQueries, isLoading: isLoadingQueries } = useInsightsQueriesQuery(
+    project?.ref,
+    effectiveStartTime,
+    effectiveEndTime,
+    {
+      enabled: !!project?.ref,
+    }
+  )
+
+  // Calculate queries with slowness_rating of "NOTICEABLE" and above
+  const slowQueriesCount = useMemo(() => {
+    if (!allQueries) return 0
+
+    return allQueries.filter((query) => {
+      const rating = query.slowness_rating
+      return rating === 'NOTICEABLE' || rating === 'SLOW' || rating === 'CRITICAL'
+    }).length
+  }, [allQueries])
 
   // Calculate the average value for the selected query based on the current metric
   const selectedQueryAverage = useMemo(() => {
@@ -316,14 +337,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   // Handle query selection from child component
   const handleQuerySelect = useCallback(
     (query: InsightsQuery | undefined) => {
-      // console.log('QueryMetricExplorer: handleQuerySelect called', {
-      //   newQuery: query?.query_id,
-      //   currentSelectedQuery: selectedQuery?.query_id,
-      //   currentSelectedQueryId: selectedQueryId,
-      //   willUpdate:
-      //     query?.query_id !== selectedQuery?.query_id || query?.query_id !== selectedQueryId,
-      //   timestamp: new Date().toISOString(),
-      // })
       setSelectedQuery(query)
       setSelectedQueryId(query?.query_id)
     },
@@ -332,10 +345,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
   // Clear selected query
   const clearSelectedQuery = useCallback(() => {
-    // console.log('QueryMetricExplorer: Clearing selected query', {
-    //   currentSelectedQuery: selectedQuery?.query_id,
-    //   currentSelectedQueryId: selectedQueryId,
-    // })
     setSelectedQuery(undefined)
     setSelectedQueryId(undefined)
   }, []) // No dependencies to prevent unnecessary recreations
@@ -392,36 +401,40 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                     </Button>
                   </div>
                 )}
-                {isLoading ? (
+                {isLoading || isLoadingQueries ? (
                   <div className="h-full min-h-[264px] flex items-center justify-center">
                     <div className="text-sm text-foreground-lighter">Loading metrics...</div>
                   </div>
                 ) : chartData.data.length > 0 ? (
                   <>
-                    {(() => {
-                      console.log('Chart Data Final Debug:', {
-                        chartDataLength: chartData.data.length,
-                        firstDataPoint: chartData.data[0],
-                        attributes: getChartAttributes.map((attr) => attr.attribute),
-                        selectedQuery: selectedQuery?.query_id,
-                        // Check if selected query data is in the final chart data
-                        hasSelectedQueryData: chartData.data.some(
-                          (item) => item.selected !== undefined
-                        ),
-                        selectedQueryDataPoints: chartData.data.filter(
-                          (item) => item.selected !== undefined
-                        ).length,
-                      })
-                      return null
-                    })()}
+                    {selectedMetric === 'query_latency' && (
+                      <div className="flex flex-row gap-6 mt-2">
+                        <div className="flex flex-col gap-0.5 text-xs">
+                          <span className="font-mono text-xs text-foreground-lighter">
+                            Average p95
+                          </span>
+                          <span className="text-lg">
+                            {averageP95?.toFixed(2).toLocaleString()}ms
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-0.5 text-xs">
+                          <span className="font-mono text-xs text-foreground-lighter">
+                            Slow queries
+                          </span>
+                          <span className="text-lg">{slowQueriesCount}</span>
+                        </div>
+                      </div>
+                    )}
+
                     <ComposedChart
                       data={chartData.data}
                       attributes={getChartAttributes}
                       yAxisKey={getChartAttributes[0].attribute}
                       xAxisKey="period_start"
-                      title={getChartAttributes[0].label || ''}
+                      title={''}
                       customDateFormat="HH:mm"
                       hideChartType={true}
+                      hideHighlightedValue={true}
                       showTooltip={true}
                       showLegend={selectedMetric === 'query_latency' || !!selectedQuery}
                       showTotal={false}
