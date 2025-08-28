@@ -49,7 +49,7 @@ const EdgeFunctionsUsage = () => {
   })
 
   const chartSyncId = `edge-functions-${ref}`
-  const _ = useChartHoverState(chartSyncId)
+useChartHoverState(chartSyncId)
 
   const [isOpen, setIsOpen] = useState(false)
   const [functionIds, setFunctionIds] = useState<string[]>([])
