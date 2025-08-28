@@ -1,7 +1,7 @@
 import { NextSeo } from 'next-seo'
 import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import Link from 'next/link'
-import { startCase } from 'lodash'
+import { startCase } from 'lib/helpers'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogGridItem from '~/components/Blog/BlogGridItem'
