@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
-import { defineNuxtRouteMiddleware, getCookie, setCookie, deleteCookie } from 'h3'
+import { getCookie, setCookie, deleteCookie } from 'h3'
+import { defineNuxtRouteMiddleware, navigateTo, useRequestEvent } from 'nuxt/app'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const event = useRequestEvent()
@@ -10,9 +11,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
     {
       cookies: {
-        get: (key) => getCookie(event, key),
-        set: (key, value, options) => setCookie(event, key, value, options),
-        remove: (key, options) => deleteCookie(event, key, options),
+        get: (key) => getCookie(event!, key),
+        set: (key, value, options) => setCookie(event!, key, value, options),
+        remove: (key, options) => deleteCookie(event!, key, options),
       },
     }
   )

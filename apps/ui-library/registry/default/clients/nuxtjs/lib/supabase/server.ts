@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
-import { defineEventHandler, getCookie, setCookie } from 'h3';
+import { createError, defineEventHandler, getCookie, setCookie } from 'h3';
 
 export default defineEventHandler(async (event) => {
   // Create Supabase SSR client
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     {
       cookies: {
         get: (key) => getCookie(event, key),
-        set: (key, value, options) => setCookie(event, key, options),
+        set: (key, value, options) => setCookie(event, key, JSON.stringify(options)),
         remove: (key, options) => setCookie(event, key, '', { ...options, maxAge: -1 }),
       },
     }
