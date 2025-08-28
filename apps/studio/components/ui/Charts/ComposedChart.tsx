@@ -515,5 +515,3 @@ export function ComposedChart({
     </div>
   )
 }
-
-export default ComposedChart

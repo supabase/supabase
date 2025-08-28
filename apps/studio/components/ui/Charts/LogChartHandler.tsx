@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import ComposedChart from './ComposedChart'
+import { ComposedChart } from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'

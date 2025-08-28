@@ -6,7 +6,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { Card, CardContent, cn } from 'ui'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
-import ComposedChart from 'components/ui/Charts/ComposedChart'
+import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import { ReportChartUpsell } from './ReportChartUpsell'
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
