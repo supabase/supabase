@@ -1404,6 +1404,58 @@ function createStorageExplorerState({
       state.setSelectedItemsToMove([])
     },
 
+    // New function for drag & drop operations that doesn't interfere with the modal
+    moveFilesDragAndDrop: async (items: StorageItemWithColumn[], newPathToFile: string) => {
+      const newPaths = compact(newPathToFile.split('/'))
+      const formattedNewPathToFile = newPaths.join('/')
+      let numberOfFilesMovedFail = 0
+
+      const toastId = toast(`Moving ${items.length} file${items.length > 1 ? 's' : ''}...`, {
+        description: STORAGE_PROGRESS_INFO_TEXT,
+        duration: Infinity,
+      })
+
+      await Promise.all(
+        items.map(async (item) => {
+          const pathToFile = state.openedFolders
+            .slice(0, item.columnIndex)
+            .map((folder) => folder.name)
+            .join('/')
+
+          const fromPath = pathToFile.length > 0 ? `${pathToFile}/${item.name}` : item.name
+          const toPath =
+            newPathToFile.length > 0 ? `${formattedNewPathToFile}/${item.name}` : item.name
+
+          try {
+            await moveStorageObject({
+              projectRef: state.projectRef,
+              bucketId: state.selectedBucket.id,
+              from: fromPath,
+              to: toPath,
+            })
+          } catch (error: any) {
+            numberOfFilesMovedFail += 1
+            toast.error(error.message)
+          }
+        })
+      )
+
+      if (numberOfFilesMovedFail === items.length) {
+        toast.error('Failed to move files')
+      } else {
+        toast(
+          `Successfully moved ${
+            items.length - numberOfFilesMovedFail
+          } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
+        )
+      }
+
+      toast.dismiss(toastId)
+
+      // TODO: invalidate the file preview cache when moving files
+      await state.refetchAllOpenedFolders()
+    },
+
     deleteFiles: async ({
       files,
       isDeleteFolder = false,

@@ -220,6 +220,18 @@ const FileExplorerColumn = ({
 
       // We're over column background (not over a specific item)
       if (isInternalFileDrag) {
+        // Check if this is a drag from the same column (same location)
+        try {
+          const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
+          if (draggedItem && draggedItem.columnIndex === index) {
+            // Same column drag - don't highlight or allow drop
+            console.log('Same column drag detected, ignoring')
+            return
+          }
+        } catch (error) {
+          // Can't parse data during dragover, continue with normal logic
+        }
+
         // Internal file drag over column background - show blue ring to indicate valid drop zone
         event.preventDefault()
         if (event.type === 'dragover') {
@@ -241,21 +253,10 @@ const FileExplorerColumn = ({
           )
         }
       } else {
-        // External file drag - only show overlay for empty columns
-        const hasVisibleItems =
-          column.items.length > 0 && column.status !== STORAGE_ROW_STATUS.LOADING
-
-        if (!hasVisibleItems) {
-          // Column is empty - show overlay for external file uploads
-          event.preventDefault()
-          if (event.type === 'dragover' && !isDraggedOver) {
-            setIsDraggedOver(true)
-          }
-        } else {
-          // Column has items - don't show overlay for external files
-          if (isDraggedOver) {
-            setIsDraggedOver(false)
-          }
+        // External file drag - show overlay for file uploads (both empty and non-empty columns)
+        event.preventDefault()
+        if (event.type === 'dragover' && !isDraggedOver) {
+          setIsDraggedOver(true)
         }
       }
     }
@@ -287,6 +288,12 @@ const FileExplorerColumn = ({
           return
         }
 
+        // Check if this is a drop to the same column (same location)
+        if (draggedItem.columnIndex === index) {
+          console.log('Same column drop detected, ignoring move operation')
+          return
+        }
+
         // This is a column background drop
         // Use the pre-calculated path from drag over
         const targetDirectory = moveToPath
@@ -311,12 +318,8 @@ const FileExplorerColumn = ({
           target.closest('[data-item-type]') || target.closest('.storage-row')
         )
 
-        // Set the selected items for moving (required by moveFiles)
-        snap.setSelectedItemsToMove([draggedItem])
-
-        // Trigger the move operation directly without opening the modal
-        // moveFiles expects the directory path, not the full file path
-        snap.moveFiles(targetDirectory)
+        // Use the new drag & drop function that doesn't interfere with the modal
+        snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
 
         // Reset drag states after successful drop
         setIsDraggedOver(false)
@@ -350,7 +353,7 @@ const FileExplorerColumn = ({
         fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
         snap.view === STORAGE_VIEWS.LIST && 'h-full',
         'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto',
-        (isDraggedOver || isInternalDragOver) && 'ring-2 ring-blue-500 ring-opacity-50'
+        (isDraggedOver || isInternalDragOver) && 'bg-selection/10'
       )}
       onContextMenu={displayMenu}
       onDragOver={onDragOver}
@@ -432,6 +435,67 @@ const FileExplorerColumn = ({
         isLoadingNextPage={column.isLoadingMoreItems}
         onLoadNextPage={() => onColumnLoadMore(index, column)}
       />
+
+      {/* List View Background Drag & Drop (separate from content) */}
+      {snap.view === STORAGE_VIEWS.LIST && (
+        <div
+          className={cn(
+            'absolute inset-0 pointer-events-none',
+            isInternalDragOver && 'pointer-events-auto'
+          )}
+          onDragOver={(event) => {
+            // Handle list view background drag over for internal file moves
+            if (event.dataTransfer.types.includes('application/json')) {
+              event.preventDefault()
+              if (!isInternalDragOver) {
+                setIsInternalDragOver(true)
+                // For list view, the target is the current folder level
+                const currentPath = snap.openedFolders.map((folder) => folder.name).join('/')
+                setMoveToPath(currentPath)
+                console.log('List view background drag over - Target path:', currentPath)
+              }
+            }
+          }}
+          onDrop={(event) => {
+            // Handle list view background drop for internal file moves
+            if (event.dataTransfer.types.includes('application/json')) {
+              event.preventDefault()
+              try {
+                const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
+                if (draggedItem && draggedItem.type === STORAGE_ROW_TYPES.FILE) {
+                  // Check if this is a drop to the same location (same opened folders)
+                  const draggedItemPath = snap.openedFolders
+                    .slice(0, draggedItem.columnIndex)
+                    .map((folder) => folder.name)
+                    .join('/')
+                  const currentPath = snap.openedFolders.map((folder) => folder.name).join('/')
+
+                  if (draggedItemPath === currentPath) {
+                    console.log('Same location drop detected in list view, ignoring move operation')
+                    return
+                  }
+
+                  const targetDirectory = moveToPath
+                  console.log('List view background drop - Target directory:', targetDirectory)
+
+                  // Use the new drag & drop function that doesn't interfere with the modal
+                  snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
+
+                  // Reset drag states
+                  setIsDraggedOver(false)
+                  setIsInternalDragOver(false)
+                  setMoveToPath('')
+
+                  console.log('List view file move completed')
+                  return
+                }
+              } catch (error) {
+                console.error('Failed to parse dragged item in list view:', error)
+              }
+            }
+          }}
+        />
+      )}
 
       {/* Drag drop upload CTA for when column is empty */}
       {!(snap.isSearching && itemSearchString.length > 0) &&

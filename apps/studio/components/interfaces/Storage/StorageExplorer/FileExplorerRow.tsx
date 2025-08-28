@@ -211,13 +211,21 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
       try {
         const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
         if (draggedItem && draggedItem.type === STORAGE_ROW_TYPES.FILE) {
-          // Calculate the target directory path - need the full path to the folder
-          // The folder might be nested within other folders, so we need to construct the complete path
+          // Check if this is a drop to the same location (same opened folders)
+          const draggedItemPath = snap.openedFolders
+            .slice(0, draggedItem.columnIndex)
+            .map((folder) => folder.name)
+            .join('/')
           const targetDirectory = snap.openedFolders
             .slice(0, columnIndex)
             .map((folder) => folder.name)
             .concat(item.name)
             .join('/')
+
+          if (draggedItemPath === targetDirectory) {
+            console.log('Same location drop detected on folder, ignoring move operation')
+            return
+          }
 
           console.log(
             'Folder drop - Target directory:',
@@ -230,12 +238,8 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             snap.openedFolders.map((f) => f.name)
           )
 
-          // Set the selected items for moving (required by moveFiles)
-          snap.setSelectedItemsToMove([draggedItem])
-
-          // Trigger the move operation directly without opening the modal
-          // moveFiles expects the directory path, not the full file path
-          snap.moveFiles(targetDirectory)
+          // Use the new drag & drop function that doesn't interfere with the modal
+          snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
 
           // Reset drag over state
           setIsFolderDragOver(false)
