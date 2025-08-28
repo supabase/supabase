@@ -74,12 +74,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
 
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
-  const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
-  const noResultsFromSearch =
-    debouncedSearch.length > 0 && isSuccessProjects && orgProjects.length === 0
-  const noResultsFromStatusFilter =
-    hasFilterStatusApplied && isSuccessProjects && orgProjects.length === 0
-
   const isEmpty = debouncedSearch.length === 0 && (!orgProjects || orgProjects.length === 0)
   const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
 
@@ -87,6 +81,11 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     filterStatus.length === 0
       ? sortedProjects
       : sortedProjects.filter((project) => filterStatus.includes(project.status))
+
+  const noResultsFromSearch =
+    debouncedSearch.length > 0 && isSuccessProjects && orgProjects.length === 0
+  const noResultsFromStatusFilter =
+    filterStatus.length > 0 && isSuccessProjects && filteredProjectsByStatus.length === 0
 
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
