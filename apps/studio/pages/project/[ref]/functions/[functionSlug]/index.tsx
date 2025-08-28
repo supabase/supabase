@@ -179,7 +179,7 @@ const PageLayout: NextPageWithLayout = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 ) : (
-                  <div>
+                  <div className="space-y-8">
                     <AreaChart
                       title="Average execution time"
                       className="w-full"
@@ -267,7 +267,7 @@ const PageLayout: NextPageWithLayout = () => {
                     .flat()
 
                   return (
-                    <div>
+                    <div className="space-y-8">
                       <StackedBarChart
                         title="Invocation Requests"
                         className="w-full"
@@ -284,24 +284,22 @@ const PageLayout: NextPageWithLayout = () => {
                           )
                         }}
                       />
-                      <div className="mt-4">
-                        <StackedBarChart
-                          title="Worker Logs"
-                          className="w-full"
-                          xAxisKey="timestamp"
-                          yAxisKey="count"
-                          stackKey="status"
-                          data={logsData}
-                          highlightedValue={sumBy(logsData, 'count')}
-                          customDateFormat={selectedInterval.format}
-                          stackColors={['red', 'brand', 'yellow']}
-                          onBarClick={() => {
-                            router.push(
-                              `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
-                            )
-                          }}
-                        />
-                      </div>
+                      <StackedBarChart
+                        title="Worker Logs"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        yAxisKey="count"
+                        stackKey="status"
+                        data={logsData}
+                        highlightedValue={sumBy(logsData, 'count')}
+                        customDateFormat={selectedInterval.format}
+                        stackColors={['red', 'brand', 'yellow']}
+                        onBarClick={() => {
+                          router.push(
+                            `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
+                          )
+                        }}
+                      />
                     </div>
                   )
                 }
@@ -322,7 +320,7 @@ const PageLayout: NextPageWithLayout = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 ) : (
-                  <div>
+                  <div className="space-y-8">
                     <AreaChart
                       title="Average CPU Time"
                       className="w-full"
@@ -381,7 +379,7 @@ const PageLayout: NextPageWithLayout = () => {
                   .flat()
 
                 return (
-                  <div>
+                  <div className="space-y-8">
                     <AreaChart
                       title="Average Memory Usage"
                       className="w-full"
@@ -392,20 +390,18 @@ const PageLayout: NextPageWithLayout = () => {
                       format="MB"
                       highlightedValue={meanBy(props.data, 'avg_memory_used')}
                     />
-                    <div className="mt-4">
-                      <StackedBarChart
-                        title="Average Memory Usage by Type"
-                        className="w-full"
-                        xAxisKey="timestamp"
-                        yAxisKey="count"
-                        stackKey="type"
-                        format="MB"
-                        data={memoryData}
-                        highlightedValue={sumBy(memoryData, 'count')}
-                        customDateFormat={selectedInterval.format}
-                        stackColors={['blue', 'brand']}
-                      />
-                    </div>
+                    <StackedBarChart
+                      title="Average Memory Usage by Type"
+                      className="w-full"
+                      xAxisKey="timestamp"
+                      yAxisKey="count"
+                      stackKey="type"
+                      format="MB"
+                      data={memoryData}
+                      highlightedValue={sumBy(memoryData, 'count')}
+                      customDateFormat={selectedInterval.format}
+                      stackColors={['blue', 'brand']}
+                    />
                   </div>
                 )
               }}
