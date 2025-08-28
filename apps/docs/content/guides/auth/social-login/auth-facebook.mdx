@@ -121,6 +121,55 @@ Future<void> signInWithFacebook() async {
 }
 ```
 
+### Alternative: Using Facebook SDK with signInWithIdToken
+
+For more control over the Facebook authentication flow, you can use the Facebook SDK directly and then authenticate with Supabase using [`signInWithIdToken()`](/docs/reference/dart/auth-signinwithidtoken):
+
+First, add the Facebook SDK dependency to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter_facebook_auth: ^7.0.1
+```
+
+Then implement the Facebook authentication:
+
+```dart
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> signInWithFacebook() async {
+  try {
+    final LoginResult result = await FacebookAuth.instance.login(
+      permissions: ['public_profile', 'email'],
+    );
+
+    if (result.status == LoginStatus.success) {
+      final accessToken = result.accessToken!.tokenString;
+
+      await Supabase.instance.client.auth.signInWithIdToken(
+        provider: OAuthProvider.facebook,
+        idToken: accessToken,
+      );
+
+      // Authentication successful
+    } else {
+      // Handle login cancellation or failure
+      throw Exception('Facebook login failed: ${result.status}');
+    }
+  } catch (e) {
+    // Handle errors
+    throw Exception('Facebook authentication error: ${e.toString()}');
+  }
+}
+```
+
+<Admonition type="note">
+
+Make sure to configure your Facebook app properly and add the required permissions in the Facebook Developer Console. The `signInWithIdToken` method requires the Facebook access token to be valid and properly scoped.
+
+</Admonition>
+
 </TabPanel>
 <TabPanel id="swift" label="Swift">
 
