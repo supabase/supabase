@@ -87,7 +87,7 @@ describe(`EmptyBucketModal`, () => {
     await userEvent.click(openButton)
     await screen.findByRole(`dialog`)
 
-    const confirmButton = screen.getByRole(`button`, { name: `Empty Bucket` })
+    const confirmButton = screen.getByRole(`button`, { name: `Empty bucket` })
 
     fireEvent.click(confirmButton)
 
