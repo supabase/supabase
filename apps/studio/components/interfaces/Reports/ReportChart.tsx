@@ -84,15 +84,7 @@ const ReportChart = ({
       : chartDataArray
 
   if (!isAvailable && !isLoading) {
-    return (
-      <ReportChartUpsell
-        report={chart}
-        startDate={startDate}
-        endDate={endDate}
-        interval={interval as AnalyticsInterval}
-        orgSlug={org?.slug ?? ''}
-      />
-    )
+    return <ReportChartUpsell report={chart} orgSlug={org?.slug ?? ''} />
   }
 
   return (

@@ -2,24 +2,14 @@ import Panel from 'components/ui/Panel'
 import { Button, cn } from 'ui'
 import { ReportConfig } from 'data/reports/v2/reports.types'
 import { useRef, useState } from 'react'
-import { AnalyticsInterval } from 'data/analytics/constants'
 import Link from 'next/link'
 import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
 
-export function ReportChartUpsell({
-  report,
-  startDate,
-  endDate,
-  interval,
-  orgSlug,
-}: {
-  report: ReportConfig
-  startDate: string
-  endDate: string
-  interval: AnalyticsInterval
-  orgSlug: string
-}) {
+export function ReportChartUpsell({ report, orgSlug }: { report: ReportConfig; orgSlug: string }) {
   const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
+
+  const startDate = '2025-01-01'
+  const endDate = '2025-01-02'
 
   const getExpDemoChartData = () =>
     new Array(20).fill(0).map((_, index) => ({
@@ -79,7 +69,7 @@ export function ReportChartUpsell({
           label={''}
           startDate={startDate}
           endDate={endDate}
-          interval={interval}
+          interval={'1d'}
           data={demoData as any}
           isLoading={false}
           highlightedValue={0}

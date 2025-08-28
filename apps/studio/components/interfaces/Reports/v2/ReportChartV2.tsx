@@ -91,15 +91,7 @@ export const ReportChartV2 = ({
 
   // UPSELL STATE
   if (!isAvailable && !isLoading && !isLoadingChart) {
-    return (
-      <ReportChartUpsell
-        report={report}
-        startDate={startDate}
-        endDate={endDate}
-        interval={interval}
-        orgSlug={org?.slug ?? ''}
-      />
-    )
+    return <ReportChartUpsell report={report} orgSlug={org?.slug ?? ''} />
   }
 
   // LOADING STATE
