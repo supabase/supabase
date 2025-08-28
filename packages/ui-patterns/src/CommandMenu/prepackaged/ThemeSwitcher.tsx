@@ -1,7 +1,7 @@
 import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
-import { themes } from 'ui/src/components/ThemeProvider/themes'
+import { themes } from 'ui'
 
 import {
   PageType,

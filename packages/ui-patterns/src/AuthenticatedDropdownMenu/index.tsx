@@ -18,11 +18,11 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from 'ui'
-import { themes } from 'ui/src/components/ThemeProvider/themes'
+import { themes } from 'ui'
 
 import type { User } from '@supabase/supabase-js'
 import type { LucideIcon } from 'icons/src/createSupabaseIcon'
-import type { Theme } from 'ui/src/components/ThemeProvider/themes'
+import type { Theme } from 'ui'
 
 interface Props {
   menu: menuItem[][]

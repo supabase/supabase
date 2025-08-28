@@ -15,7 +15,7 @@ import {
   cn,
   markdownComponents,
 } from 'ui'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
+import { StatusIcon } from 'ui'
 
 import {
   Breadcrumb,
