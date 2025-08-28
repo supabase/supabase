@@ -6,7 +6,7 @@ import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
-const DEFAULT_LIMIT = 100
+const DEFAULT_LIMIT = 11
 
 interface GetOrgProjectsInfiniteVariables {
   slug?: string

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { UIEvent, useMemo } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -10,9 +10,16 @@ import { useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-que
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
+import { isAtBottom } from 'lib/helpers'
 import type { Organization } from 'types'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { LoadingCardView, LoadingTableView, NoFilterResults, NoProjectsState } from './EmptyStates'
+import {
+  LoadingCardView,
+  LoadingTableRow,
+  LoadingTableView,
+  NoFilterResults,
+  NoProjectsState,
+} from './EmptyStates'
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
 
@@ -45,6 +52,9 @@ export const ProjectList = ({
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
   } = useOrgProjectsInfiniteQuery({ slug })
   const orgProjects =
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
@@ -116,6 +126,11 @@ export const ProjectList = ({
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
 
+  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
+    if (isLoadingProjects || isFetchingNextPage || !isAtBottom(event)) return
+    fetchNextPage()
+  }
+
   if (isErrorPermissions) {
     return (
       <AlertError
@@ -146,7 +161,11 @@ export const ProjectList = ({
     // [Joshen] Using calc for now, couldn't figure out max height with flex grow for
     // this particular one somehow, to make the scrollable area take up the remaining space max
     return (
-      <Card className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+      <Card
+        className="overflow-y-auto"
+        style={{ maxHeight: 'calc(100vh - 250px)' }}
+        onScroll={handleScroll}
+      >
         <Table>
           <TableHeader>
             <TableRow>
@@ -175,23 +194,26 @@ export const ProjectList = ({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredProjectsByStatus?.map((project) => (
-                <ProjectTableRow
-                  key={project.ref}
-                  project={project}
-                  organization={organization}
-                  rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-                  resourceWarnings={resourceWarnings?.find(
-                    (resourceWarning) => resourceWarning.project === project.ref
-                  )}
-                  githubIntegration={githubConnections?.find(
-                    (connection) => connection.supabase_project_ref === project.ref
-                  )}
-                  vercelIntegration={vercelConnections?.find(
-                    (connection) => connection.supabase_project_ref === project.ref
-                  )}
-                />
-              ))
+              <>
+                {filteredProjectsByStatus?.map((project) => (
+                  <ProjectTableRow
+                    key={project.ref}
+                    project={project}
+                    organization={organization}
+                    rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                    resourceWarnings={resourceWarnings?.find(
+                      (resourceWarning) => resourceWarning.project === project.ref
+                    )}
+                    githubIntegration={githubConnections?.find(
+                      (connection) => connection.supabase_project_ref === project.ref
+                    )}
+                    vercelIntegration={vercelConnections?.find(
+                      (connection) => connection.supabase_project_ref === project.ref
+                    )}
+                  />
+                ))}
+                {hasNextPage && <LoadingTableRow />}
+              </>
             )}
           </TableBody>
         </Table>
