@@ -48,7 +48,6 @@ export const formatQueryInsightsColumns = ({
           >
             <div className="flex items-center gap-x-2">
               <p className="!text-foreground">{col.name}</p>
-              {col.id === 'total_time' && <p className="text-foreground-lighter">latency</p>}
             </div>
             {sort?.column === col.id && (
               <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
@@ -104,14 +103,6 @@ export const formatQueryInsightsColumns = ({
           )
         }
 
-        if (col.id === 'database') {
-          return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs">
-              <p>{value}</p>
-            </div>
-          )
-        }
-
         if (col.id === 'calls') {
           const formattedValue = (value as number)?.toLocaleString() || ''
           return (
@@ -154,6 +145,30 @@ export const formatQueryInsightsColumns = ({
           )
         }
 
+        if (col.id === 'avg_p90') {
+          const formattedValue = value ? `${(value as number).toFixed(0)}ms` : ''
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+              <p>{formattedValue}</p>
+              {value && (
+                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+              )}
+            </div>
+          )
+        }
+
+        if (col.id === 'avg_p95') {
+          const formattedValue = value ? `${(value as number).toFixed(0)}ms` : ''
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+              <p>{formattedValue}</p>
+              {value && (
+                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+              )}
+            </div>
+          )
+        }
+
         if (col.id === 'badness_score') {
           const formattedValue = value ? (value as number).toFixed(2) : ''
           return (
@@ -161,6 +176,81 @@ export const formatQueryInsightsColumns = ({
               <p>{formattedValue}</p>
             </div>
           )
+        }
+
+        if (col.id === 'total_cost_before') {
+          // Ensure costValue is a number, handle string conversion from jsonb
+          const costValue = typeof value === 'string' ? parseFloat(value) : (value as number)
+          const numericValue = isNaN(costValue) ? 0 : costValue
+          const formattedValue = numericValue.toFixed(2)
+
+          const getCostBadgeVariant = (cost: number) => {
+            if (cost <= 10) return 'success' // green
+            if (cost <= 1000) return 'warning' // yellow
+            return 'destructive' // red
+          }
+
+          return (
+            <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
+              <span>
+                <Badge
+                  variant={getCostBadgeVariant(numericValue)}
+                  className="text-xs !text-center !inline-flex items-center"
+                >
+                  {formattedValue}
+                </Badge>
+              </span>
+            </div>
+          )
+        }
+
+        if (col.id === 'last_run') {
+          if (!value)
+            return (
+              <div className="w-full flex flex-col justify-center font-mono text-xs text-center">
+                <p className="text-foreground-lighter">-</p>
+              </div>
+            )
+
+          const date = new Date(value as string)
+          const formattedValue = date.toLocaleString()
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+              <p>{formattedValue}</p>
+            </div>
+          )
+        }
+
+        if (col.id === 'index_advisor') {
+          const isOptimized = props.row?.is_optimized
+
+          if (isOptimized) {
+            return (
+              <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
+                <span>
+                  <Badge
+                    variant="success"
+                    className="text-xs !text-center !inline-flex items-center"
+                  >
+                    Optimized
+                  </Badge>
+                </span>
+              </div>
+            )
+          } else {
+            return (
+              <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
+                <span>
+                  <Badge
+                    variant="warning"
+                    className="text-xs !text-center !inline-flex items-center"
+                  >
+                    Not optimized
+                  </Badge>
+                </span>
+              </div>
+            )
+          }
         }
 
         return (

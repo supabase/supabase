@@ -46,8 +46,12 @@ const QueryInsights = () => {
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   // Convert selectedDateRange to startTime and endTime for QueryMetricExplorer
-  const startTime = selectedDateRange?.period_start?.date ? dayjs(selectedDateRange.period_start.date).toISOString() : undefined
-  const endTime = selectedDateRange?.period_end?.date ? dayjs(selectedDateRange.period_end.date).toISOString() : undefined
+  const startTime = selectedDateRange?.period_start?.date
+    ? dayjs(selectedDateRange.period_start.date).toISOString()
+    : dayjs().subtract(1, 'hour').toISOString()
+  const endTime = selectedDateRange?.period_end?.date
+    ? dayjs(selectedDateRange.period_end.date).toISOString()
+    : dayjs().toISOString()
 
   return (
     <>

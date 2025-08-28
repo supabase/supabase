@@ -20,6 +20,9 @@ export type InsightsQuery = {
   application_name: string
   badness_score: number
   slowness_rating: string
+  avg_p90: number
+  avg_p95: number
+  last_run: string
   // index_advisor results
   startup_cost_before?: number
   startup_cost_after?: number
@@ -27,6 +30,7 @@ export type InsightsQuery = {
   total_cost_after?: number
   index_statements?: string[]
   errors?: string[]
+  is_optimized?: boolean
   // Error tracking fields
   error_count?: number
 }
@@ -72,18 +76,47 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 1000 THEN 'NOTICEABLE'
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 5000 THEN 'SLOW'
         ELSE 'CRITICAL'
-      END AS slowness_rating
+      END AS slowness_rating,
+      MAX(bucket_start_time) AS last_run
     FROM pg_stat_monitor
     WHERE bucket_start_time >= '${startTime}'
       AND bucket_start_time <= '${endTime}'
       AND bucket_done = true
     GROUP BY queryid
+  ),
+  percentile_data AS (
+    SELECT 
+      queryid,
+      percentile_cont(0.90) WITHIN GROUP (ORDER BY mean_exec_time) AS p90_time,
+      percentile_cont(0.95) WITHIN GROUP (ORDER BY mean_exec_time) AS p95_time
+    FROM pg_stat_monitor
+    WHERE bucket_start_time >= '${startTime}'
+      AND bucket_start_time <= '${endTime}'
+      AND bucket_done = true
+      AND mean_exec_time IS NOT NULL
+    GROUP BY queryid
   )
   SELECT 
     q.*,
-    ia.*
+    COALESCE(p.p90_time, 0) AS avg_p90,
+    COALESCE(p.p95_time, 0) AS avg_p95,
+    COALESCE((ia.startup_cost_before->>0)::numeric, 0) AS startup_cost_before,
+    COALESCE((ia.startup_cost_after->>0)::numeric, 0) AS startup_cost_after,
+    COALESCE((ia.total_cost_before->>0)::numeric, 0) AS total_cost_before,
+    COALESCE((ia.total_cost_after->>0)::numeric, 0) AS total_cost_after,
+    ia.index_statements,
+    ia.errors,
+    -- Check if query is optimized: if no index statements are returned (meaning query is already optimized)
+    -- or if the cost improvement is significant (more than 10% improvement)
+    CASE 
+      WHEN ia.index_statements IS NULL OR array_length(ia.index_statements, 1) = 0 THEN true
+      WHEN ia.total_cost_after IS NOT NULL AND ia.total_cost_before IS NOT NULL 
+           AND (ia.total_cost_after->>0)::numeric < (ia.total_cost_before->>0)::numeric * 0.9 THEN true
+      ELSE false
+    END AS is_optimized
   FROM 
     base_queries q
+    LEFT JOIN percentile_data p ON q.query_id = p.queryid
     LEFT JOIN LATERAL (
       SELECT * 
       FROM index_advisor(q.query)
@@ -133,7 +166,8 @@ const getQueriesWithErrorsSql = (startTime: string, endTime: string) => /* SQL *
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 1000 THEN 'NOTICEABLE'
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 5000 THEN 'SLOW'
         ELSE 'CRITICAL'
-      END AS slowness_rating
+      END AS slowness_rating,
+      MAX(bucket_start_time) AS last_run
     FROM pg_stat_monitor
     WHERE bucket_start_time >= '${startTime}'
       AND bucket_start_time <= '${endTime}'
@@ -141,12 +175,42 @@ const getQueriesWithErrorsSql = (startTime: string, endTime: string) => /* SQL *
       AND mean_exec_time > 1000 
       AND calls > 1
     GROUP BY queryid
+  ),
+  percentile_data AS (
+    SELECT 
+      queryid,
+      percentile_cont(0.90) WITHIN GROUP (ORDER BY mean_exec_time) AS p90_time,
+      percentile_cont(0.95) WITHIN GROUP (ORDER BY mean_exec_time) AS p95_time
+    FROM pg_stat_monitor
+    WHERE bucket_start_time >= '${startTime}'
+      AND bucket_start_time <= '${endTime}'
+      AND bucket_done = true
+      AND mean_exec_time IS NOT NULL
+      AND mean_exec_time > 1000 
+      AND calls > 1
+    GROUP BY queryid
   )
   SELECT 
     q.*,
-    ia.*
+    COALESCE(p.p90_time, 0) AS avg_p90,
+    COALESCE(p.p95_time, 0) AS avg_p95,
+    COALESCE((ia.startup_cost_before->>0)::numeric, 0) AS startup_cost_before,
+    COALESCE((ia.startup_cost_after->>0)::numeric, 0) AS startup_cost_after,
+    COALESCE((ia.total_cost_before->>0)::numeric, 0) AS total_cost_before,
+    COALESCE((ia.total_cost_after->>0)::numeric, 0) AS total_cost_after,
+    ia.index_statements,
+    ia.errors,
+    -- Check if query is optimized: if no index statements are returned (meaning query is already optimized)
+    -- or if the cost improvement is significant (more than 10% improvement)
+    CASE 
+      WHEN ia.index_statements IS NULL OR array_length(ia.index_statements, 1) = 0 THEN true
+      WHEN ia.total_cost_after IS NOT NULL AND ia.total_cost_before IS NOT NULL 
+           AND (ia.total_cost_after->>0)::numeric < (ia.total_cost_before->>0)::numeric * 0.9 THEN true
+      ELSE false
+    END AS is_optimized
   FROM 
     base_queries q
+    LEFT JOIN percentile_data p ON q.query_id = p.queryid
     LEFT JOIN LATERAL (
       SELECT * 
       FROM index_advisor(q.query)
