@@ -1,12 +1,12 @@
-import { ArrowDown, ArrowUp, Search, Settings2, TextSearch, X } from 'lucide-react'
+import { Search, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import {
-  Badge,
   Button,
   ResizableHandle,
   ResizablePanel,
@@ -19,7 +19,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FilterPopover } from 'components/ui/FilterPopover'
 import {
   useQueryInsightsQueries,
   type QueryInsightsQuery,
@@ -30,6 +30,8 @@ import {
   useSingleQueryRows,
   useSingleQueryRowsWritten,
 } from 'data/query-insights/single-query-latency-query'
+import { ColumnConfiguration, QUERY_INSIGHTS_TABLE_COLUMNS } from './QueryInsights.constants'
+import { formatQueryInsightsColumns } from './QueryInsights.utils'
 
 interface QueryRowExplorerProps {
   startTime: string
@@ -62,276 +64,40 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
   const [selectedRow, setSelectedRow] = useState<number>()
   const [view, setView] = useState<'details' | 'indexes' | 'metrics'>('details')
   const [filterText, setFilterText] = useState<string>('')
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([])
 
-  // Define columns similar to QueryPerformance
-  const columns: Column<QueryInsightsQuery>[] = [
-    {
-      key: 'query',
-      name: 'Query',
-      resizable: true,
-      minWidth: 600,
-      headerCellClass: 'first:pl-6 cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('query')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Query</p>
-            </div>
-            {sort?.column === 'query' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.query
-        return (
-          <div className="w-full flex items-center gap-x-2">
-            <div className="font-mono text-xs">{value}</div>
-          </div>
-        )
-      },
-    },
-    {
-      key: 'slowness_rating',
-      name: 'Slowness Rating',
-      resizable: true,
-      minWidth: 120,
-      headerCellClass: 'cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('slowness_rating')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Slowness Rating</p>
-            </div>
-            {sort?.column === 'slowness_rating' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.slowness_rating
-        const getBadgeVariant = (rating: string) => {
-          switch (rating) {
-            case 'GREAT':
-            case 'ACCEPTABLE':
-              return 'default'
-            case 'NOTICEABLE':
-            case 'SLOW':
-              return 'warning'
-            case 'CRITICAL':
-              return 'destructive'
-            default:
-              return 'default'
-          }
-        }
-        return (
-          <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
-            <span>
-              <Badge variant={getBadgeVariant(value)} className="text-xs !text-center !inline-flex">
-                {value}
-              </Badge>
-            </span>
-          </div>
-        )
-      },
-    },
-    {
-      key: 'database',
-      name: 'Database',
-      resizable: true,
-      minWidth: 120,
-      headerCellClass: 'cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('database')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Database</p>
-            </div>
-            {sort?.column === 'database' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.database
-        return (
-          <div className="w-full flex flex-col justify-center font-mono text-xs">
-            <p>{value}</p>
-          </div>
-        )
-      },
-    },
-    {
-      key: 'calls',
-      name: 'Calls',
-      resizable: true,
-      minWidth: 100,
-      headerCellClass: 'cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('calls')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Calls</p>
-            </div>
-            {sort?.column === 'calls' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.calls
-        const formattedValue = value?.toLocaleString() || ''
-        return (
-          <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
-            <p>{formattedValue}</p>
-          </div>
-        )
-      },
-    },
-    {
-      key: 'total_time',
-      name: 'Total time',
-      resizable: true,
-      minWidth: 180,
-      headerCellClass: 'cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('total_time')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Total time</p>
-              <p className="text-foreground-lighter">latency</p>
-            </div>
-            {sort?.column === 'total_time' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.total_time
-        const formattedValue = value ? `${value.toFixed(0)}ms` : ''
-        return (
-          <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
-            <p>{formattedValue}</p>
-            {value && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>}
-          </div>
-        )
-      },
-    },
-    {
-      key: 'mean_exec_time',
-      name: 'Mean time',
-      resizable: true,
-      minWidth: 150,
-      headerCellClass: 'cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('mean_exec_time')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Mean time</p>
-            </div>
-            {sort?.column === 'mean_exec_time' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.mean_exec_time
-        const formattedValue = value ? `${value.toFixed(0)}ms` : ''
-        return (
-          <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
-            <p>{formattedValue}</p>
-            {value && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>}
-          </div>
-        )
-      },
-    },
-    {
-      key: 'rows_read',
-      name: 'Rows read',
-      resizable: true,
-      minWidth: 120,
-      headerCellClass: 'cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('rows_read')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Rows read</p>
-            </div>
-            {sort?.column === 'rows_read' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.rows_read
-        const formattedValue = value?.toLocaleString() || ''
-        return (
-          <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
-            <p>{formattedValue}</p>
-          </div>
-        )
-      },
-    },
-    {
-      key: 'badness_score',
-      name: 'Badness score',
-      resizable: true,
-      minWidth: 150,
-      headerCellClass: 'cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange('badness_score')}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">Badness score</p>
-            </div>
-            {sort?.column === 'badness_score' && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = props.row?.badness_score
-        const formattedValue = value ? value.toFixed(2) : ''
-        return (
-          <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
-            <p>{formattedValue}</p>
-          </div>
-        )
-      },
-    },
-  ]
+  const [
+    columnConfiguration,
+    setColumnConfiguration,
+    { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
+  ] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.QUERY_INSIGHTS_COLUMNS_CONFIGURATION(ref ?? ''),
+    null as ColumnConfiguration[] | null
+  )
+
+  const onSortChange = (column: string) => {
+    let updatedSort: { column: string; order: 'asc' | 'desc' } | undefined = undefined
+
+    if (sort?.column === column) {
+      if (sort.order === 'desc') {
+        updatedSort = { column, order: 'asc' as const }
+      } else {
+        updatedSort = undefined
+      }
+    } else {
+      updatedSort = { column, order: 'desc' as const }
+    }
+
+    setSort(updatedSort)
+  }
+
+  // Generate columns dynamically based on configuration
+  const columns = formatQueryInsightsColumns({
+    config: columnConfiguration ?? [],
+    visibleColumns: selectedColumns,
+    sort,
+    onSortChange,
+  })
 
   // For debugging - show test data if no queries found
   const reportData = queries?.length
@@ -423,22 +189,6 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
     selectedQuery?.query_id?.toString()
   )
 
-  const onSortChange = (column: string) => {
-    let updatedSort: { column: string; order: 'asc' | 'desc' } | undefined = undefined
-
-    if (sort?.column === column) {
-      if (sort.order === 'desc') {
-        updatedSort = { column, order: 'asc' as const }
-      } else {
-        updatedSort = undefined
-      }
-    } else {
-      updatedSort = { column, order: 'desc' as const }
-    }
-
-    setSort(updatedSort)
-  }
-
   // Debug logging for table data
   console.log('QueryRowExplorer Table Debug:', {
     queries,
@@ -456,6 +206,15 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
     setSelectedRow(undefined)
   }, [startTime, endTime])
 
+  // Initialize selected columns when column configuration changes
+  useEffect(() => {
+    if (columnConfiguration && columnConfiguration.length > 0) {
+      setSelectedColumns(columnConfiguration.map((c) => c.id))
+    } else {
+      setSelectedColumns([])
+    }
+  }, [columnConfiguration])
+
   return (
     <div className="border-t bg-surface-100 flex flex-col h-96 overflow-auto">
       <div className="px-4 py-2 border-b flex justify-between items-center">
@@ -467,12 +226,40 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
         />
-        <ButtonTooltip
-          type="default"
-          size="tiny"
-          icon={<Settings2 size={14} />}
-          tooltip={{ content: { side: 'bottom', text: 'Toggle columns' } }}
-          className="!px-1.5"
+        <FilterPopover
+          name={selectedColumns.length === 0 ? 'All columns' : 'Columns'}
+          title="Select columns to show"
+          buttonType={selectedColumns.length === 0 ? 'dashed' : 'default'}
+          options={QUERY_INSIGHTS_TABLE_COLUMNS}
+          labelKey="name"
+          valueKey="id"
+          labelClass="text-xs"
+          maxHeightClass="h-[190px]"
+          clearButtonText="Reset"
+          activeOptions={selectedColumns}
+          onSaveFilters={(value) => {
+            // When adding back hidden columns:
+            // (1) width set to default value if any
+            // (2) they will just get appended to the end
+            // (3) If "clearing", reset order of the columns to original
+
+            let updatedConfig = (columnConfiguration ?? []).slice()
+            if (value.length === 0) {
+              updatedConfig = QUERY_INSIGHTS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+            } else {
+              value.forEach((col) => {
+                const hasExisting = updatedConfig.find((c) => c.id === col)
+                if (!hasExisting)
+                  updatedConfig.push({
+                    id: col,
+                    width: QUERY_INSIGHTS_TABLE_COLUMNS.find((c) => c.id === col)?.width,
+                  })
+              })
+            }
+
+            setSelectedColumns(value)
+            setColumnConfiguration(updatedConfig)
+          }}
         />
       </div>
 
