@@ -1,10 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
-import Panel from 'components/ui/Panel'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { cn } from 'ui'
+import { Card, CardContent, cn } from 'ui'
 import type { AnalyticsInterval } from 'data/analytics/constants'
 import type { ReportConfig } from 'data/reports/v2/reports.types'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
@@ -96,14 +95,11 @@ export const ReportChartV2 = ({
 
   return (
     <>
-      <Panel
-        noMargin
-        noHideOverflow
+      <Card
         className={cn('relative w-full overflow-hidden scroll-mt-16', className)}
-        wrapWithLoading={false}
         id={report.id}
       >
-        <Panel.Content className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
+        <CardContent className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
           {isLoadingChart ? (
             <Loader2 className="size-5 animate-spin text-foreground-light" />
           ) : showEmptyState ? (
@@ -141,8 +137,8 @@ export const ReportChartV2 = ({
               />
             </div>
           )}
-        </Panel.Content>
-      </Panel>
+        </CardContent>
+      </Card>
     </>
   )
 }
