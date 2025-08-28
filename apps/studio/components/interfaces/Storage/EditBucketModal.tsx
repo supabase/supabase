@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { useParams } from 'common'
 import { useEffect, useState, useRef } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
@@ -32,7 +33,7 @@ import {
 } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
+import { updateBucket } from 'data/storage/bucket-update-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { isNonNullable } from 'lib/isNonNullable'
@@ -61,7 +62,7 @@ const formId = 'edit-storage-bucket-form'
 export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
   const { ref } = useParams()
 
-  const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation()
+  const [isUpdating, setIsUpdating] = useState(false)
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
@@ -102,8 +103,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
-    updateBucket(
-      {
+    // Clear any previous errors
+    form.clearErrors()
+    setIsUpdating(true)
+
+    try {
+      const result = await updateBucket({
         projectRef: ref,
         id: bucket.id,
         isPublic: values.public,
@@ -116,22 +121,69 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
             ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
             : null
           : null,
-      },
-      {
-        onSuccess: () => {
-          toast.success(`Successfully updated bucket "${bucket?.name}"`)
-          onClose()
-        },
+      })
+
+      if (result.error) {
+        // Handle specific error cases for inline display
+        const errorMessage = result.error.message?.toLowerCase() || ''
+
+        if (
+          errorMessage.includes('exceeded the maximum allowed size') ||
+          errorMessage.includes('maximum allowed size') ||
+          errorMessage.includes('entity too large') ||
+          errorMessage.includes('payload too large')
+        ) {
+          // Set form error for the file size limit field
+          form.setError('formatted_size_limit', {
+            type: 'manual',
+            message: (
+              <span>
+                Exceeds the{' '}
+                <Link
+                  href={`/project/${ref}/settings/storage`}
+                  className="font-bold underline text-destructive underline-destructive"
+                >
+                  global file size limit
+                </Link>{' '}
+                of ${formattedGlobalUploadLimit}.
+              </span>
+            ),
+          })
+        } else if (
+          errorMessage.includes('mime type') &&
+          (errorMessage.includes('is not supported') || errorMessage.includes('not supported'))
+        ) {
+          // Set form error for the MIME types field
+          form.setError('allowed_mime_types', {
+            type: 'manual',
+            message: 'Invalid MIME type format. Please check your input.',
+          })
+        } else {
+          // For other errors, show a toast as fallback
+          toast.error(`Failed to update bucket: ${result.error.message || 'Unknown error'}`)
+        }
+      } else {
+        // Success case
+        toast.success(`Successfully updated bucket "${bucket?.name}"`)
+        onClose()
       }
-    )
+    } catch (error) {
+      // This should not happen anymore, but keeping as fallback
+      console.error('Unexpected error:', error)
+      toast.error('An unexpected error occurred')
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
   useEffect(() => {
     if (visible && bucket) {
       const { unit } = convertFromBytes(bucket.file_size_limit ?? 0)
       setSelectedUnit(unit)
+      // Clear errors when modal opens
+      form.clearErrors()
     }
-  }, [visible, bucket])
+  }, [visible, bucket, form])
 
   // Auto-turn off file size limit toggle when value is 0
   useEffect(() => {
@@ -154,6 +206,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       onOpenChange={(open) => {
         if (!open) {
           form.reset()
+          form.clearErrors()
           onClose()
         }
       }}
@@ -279,15 +332,26 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                             <FormItemLayout
                               name="formatted_size_limit"
                               description={
-                                IS_PLATFORM ? (
+                                form.formState.errors.formatted_size_limit ? (
+                                  <span className="text-destructive">
+                                    Exceeds the{' '}
+                                    <Link
+                                      href={`/project/${ref}/settings/storage`}
+                                      className="font-bold underline text-destructive underline-destructive"
+                                    >
+                                      global file size limit
+                                    </Link>{' '}
+                                    of {formattedGlobalUploadLimit}.{' '}
+                                  </span>
+                                ) : IS_PLATFORM ? (
                                   <>
                                     This project has a{' '}
-                                    <InlineLink
+                                    <Link
                                       href={`/project/${ref}/settings/storage`}
                                       className="font-bold underline"
                                     >
                                       global file size limit
-                                    </InlineLink>{' '}
+                                    </Link>{' '}
                                     of {formattedGlobalUploadLimit}.
                                   </>
                                 ) : undefined
@@ -354,7 +418,15 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                           name="allowed_mime_types"
                           label="Allowed MIME types"
                           labelOptional="Comma separated values"
-                          description="Wildcards are allowed, e.g. image/*."
+                          description={
+                            form.formState.errors.allowed_mime_types ? (
+                              <span className="text-destructive">
+                                {form.formState.errors.allowed_mime_types.message}
+                              </span>
+                            ) : (
+                              'Wildcards are allowed, e.g. image/*.'
+                            )
+                          }
                         >
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
@@ -379,6 +451,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
             disabled={isUpdating}
             onClick={() => {
               form.reset()
+              form.clearErrors()
               onClose()
             }}
           >
