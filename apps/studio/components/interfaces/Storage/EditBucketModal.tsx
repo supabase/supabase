@@ -370,54 +370,59 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     </div>
                   )}
                 </div>
-                <div className="space-y-2">
-                  <FormItemLayout
-                    name="has_allowed_mime_types"
-                    label="Restrict MIME types"
-                    description="Allow only certain types of files to be uploaded"
-                    layout="flex"
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        id="has_allowed_mime_types"
-                        size="large"
-                        checked={hasAllowedMimeTypes}
-                        onCheckedChange={setHasAllowedMimeTypes}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                  {hasAllowedMimeTypes && (
-                    <FormField_Shadcn_
-                      key="allowed_mime_types"
-                      name="allowed_mime_types"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItemLayout
-                          name="allowed_mime_types"
-                          label="Allowed MIME types"
-                          labelOptional="Comma separated values"
-                          description={
-                            form.formState.errors.allowed_mime_types ? (
-                              <span className="text-destructive">
-                                {form.formState.errors.allowed_mime_types.message}
-                              </span>
-                            ) : (
-                              'Wildcards are allowed, e.g. image/*.'
-                            )
-                          }
-                        >
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              id="allowed_mime_types"
-                              {...field}
-                              placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
-                            />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
+              </div>
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogSection>
+              <div className="space-y-2">
+                <FormItemLayout
+                  name="has_allowed_mime_types"
+                  label="Restrict MIME types"
+                  description="Allow only certain types of files to be uploaded"
+                  layout="flex"
+                >
+                  <FormControl_Shadcn_>
+                    <Switch
+                      id="has_allowed_mime_types"
+                      size="large"
+                      checked={hasAllowedMimeTypes}
+                      onCheckedChange={setHasAllowedMimeTypes}
                     />
-                  )}
-                </div>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+                {hasAllowedMimeTypes && (
+                  <FormField_Shadcn_
+                    key="allowed_mime_types"
+                    name="allowed_mime_types"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        name="allowed_mime_types"
+                        label="Allowed MIME types"
+                        labelOptional="Comma separated values"
+                        description={
+                          form.formState.errors.allowed_mime_types ? (
+                            <span className="text-destructive">
+                              {form.formState.errors.allowed_mime_types.message}
+                            </span>
+                          ) : (
+                            'Wildcards are allowed, e.g. image/*.'
+                          )
+                        }
+                      >
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            id="allowed_mime_types"
+                            {...field}
+                            placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
               </div>
             </DialogSection>
           </form>
