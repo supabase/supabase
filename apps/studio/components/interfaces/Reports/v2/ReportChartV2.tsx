@@ -52,7 +52,7 @@ export const ReportChartV2 = ({
     isLoading: isLoadingChart,
     error,
   } = useQuery(
-    ['report-v2', report.id, projectRef, startDate, endDate, interval, functionIds],
+    ['projects', projectRef, 'report-v2', report.id, { startDate, endDate, interval, functionIds }],
     async () => {
       return await report.dataProvider(
         projectRef,
