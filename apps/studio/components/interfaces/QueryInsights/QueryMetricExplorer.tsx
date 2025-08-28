@@ -28,21 +28,12 @@ interface QueryMetricExplorerProps {
 export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [selectedMetric, setSelectedMetric] = useState<
-    'rows_read' | 'query_latency' | 'queries_per_second' | 'calls' | 'cache_hits'
+    'rows_read' | 'query_latency' | 'calls' | 'cache_hits'
   >('query_latency')
 
-  // State to track selected query for chart highlighting
   const [selectedQuery, setSelectedQuery] = useState<InsightsQuery | undefined>()
   const [selectedQueryId, setSelectedQueryId] = useState<number | undefined>()
 
-  // Debug logging for query selection (commented out to reduce console noise)
-  // console.log('QueryMetricExplorer Query Selection:', {
-  //   selectedQuery: selectedQuery?.query_id,
-  //   selectedQueryId,
-  //   selectedQueryQuery: selectedQuery?.query?.substring(0, 50) + '...',
-  // })
-
-  // State to control which percentile lines are visible for query latency
   const [visiblePercentiles, setVisiblePercentiles] = useState({
     p50: true,
     p75: true,
@@ -51,17 +42,14 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     p99_9: true,
   })
 
-  // Ensure at least one percentile is always visible
   const safeVisiblePercentiles = useMemo(() => {
     const hasVisible = Object.values(visiblePercentiles).some((v) => v)
     if (!hasVisible) {
-      // If all are hidden, show P95 by default
       return { ...visiblePercentiles, p95: true }
     }
     return visiblePercentiles
   }, [visiblePercentiles])
 
-  // Use provided date range or fall back to default
   const { startTime: effectiveStartTime, endTime: effectiveEndTime } = useMemo(() => {
     if (startTime && endTime) {
       return { startTime, endTime }
@@ -72,17 +60,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     return { startTime: fallbackStartTime, endTime: fallbackEndTime }
   }, [startTime, endTime])
 
-  // Pre-fetch query data for the QueryRowExplorer
   useInsightsPrefetchQuery(project?.ref, effectiveStartTime, effectiveEndTime)
-
-  // Debug logging (commented out to reduce console noise)
-  // console.log('QueryMetricExplorer Debug:', {
-  //   props: { startTime, endTime },
-  //   effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
-  //   project: { ref: project?.ref, hasConnectionString: !!project?.connectionString },
-  //   selectedMetric,
-  //   projectRefUndefined: !project?.ref,
-  // })
 
   const {
     data: metricsData,
@@ -104,33 +82,18 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       case 'rows_read':
         return selectedQuery.rows_read || 0
       case 'cache_hits':
-        // Calculate cache hit rate from shared_blks_hit and shared_blks_read
         const totalBlocks =
           (selectedQuery.shared_blks_hit || 0) + (selectedQuery.shared_blks_read || 0)
         return totalBlocks > 0 ? ((selectedQuery.shared_blks_hit || 0) / totalBlocks) * 100 : 0
-      case 'queries_per_second':
-        // Calculate QPS from calls and total_time
-        const totalTimeSeconds = (selectedQuery.total_time || 0) / 1000
-        return totalTimeSeconds > 0 ? (selectedQuery.calls || 0) / totalTimeSeconds : 0
       default:
         return undefined
     }
   }, [selectedQuery, selectedMetric])
 
-  // Debug logging for query results (commented out to reduce console noise)
-  // console.log('QueryMetricExplorer Query Results:', {
-  //   metricsData,
-  //   isLoading,
-  //   error,
-  //   dataLength: metricsData?.length,
-  // })
-
-  // Define chart attributes based on selected metric
   const getChartAttributes = useMemo((): MultiAttribute[] => {
     const metricConfigs = {
       rows_read: { label: 'Rows Read', format: '' },
       query_latency: { label: 'Query Latency', format: 'ms' },
-      queries_per_second: { label: 'Queries/Second', format: '/s' },
       calls: { label: 'Calls', format: '' },
       cache_hits: { label: 'Cache Hit Rate', format: '%' },
     }
@@ -256,7 +219,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   // Transform data for the chart
   const chartData = useMemo(() => {
     if (!metricsData || metricsData.length === 0) {
-      // console.log('QueryMetricExplorer: No metrics data available')
       return {
         data: [],
         format: '',
@@ -264,13 +226,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         totalGrouped: {},
       }
     }
-
-    // console.log('QueryMetricExplorer: Processing metrics data:', {
-    //   metricsData,
-    //   selectedMetric,
-    //   dataLength: metricsData.length,
-    //   firstItem: metricsData[0],
-    // })
 
     const transformed = metricsData.map((item) => {
       // Convert timestamp to ISO string format as expected by ChartData
@@ -342,25 +297,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     }, 0)
 
     const totalGrouped =
-      selectedMetric === 'query_latency'
-        ? { p95: total } // Use p95 as the main metric for query latency
-        : { [selectedMetric]: total }
-
-    // console.log('QueryMetricExplorer Chart Data:', {
-    //   originalData: metricsData,
-    //   transformedData: transformed,
-    //   selectedMetric,
-    //   dataLength: transformed.length,
-    //   visiblePercentiles,
-    //   total,
-    //   totalGrouped,
-    //   selectedQuery: selectedQuery?.query_id,
-    //   selectedQueryDataLength: selectedQueryData.length,
-    //   selectedQueryData: selectedQueryData,
-    //   selectedQueryLatency: selectedQueryLatency,
-    //   selectedQueryCalls: selectedQueryCalls,
-    //   selectedQueryRows: selectedQueryRows,
-    // })
+      selectedMetric === 'query_latency' ? { p95: total } : { [selectedMetric]: total }
 
     return {
       data: transformed,
@@ -441,12 +378,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                 className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
               >
                 Cache hits
-              </TabsTrigger_Shadcn_>
-              <TabsTrigger_Shadcn_
-                value="queries_per_second"
-                className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
-              >
-                QPS
               </TabsTrigger_Shadcn_>
             </TabsList_Shadcn_>
           </CardHeader>

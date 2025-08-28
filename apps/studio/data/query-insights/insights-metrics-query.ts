@@ -74,20 +74,6 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
         ORDER BY timestamp ASC
       `
 
-    case 'queries_per_second':
-      return /* SQL */ `
-        SELECT
-          bucket_start_time as timestamp,
-          COUNT(*) / 300.0 as value,
-          datname as database
-        FROM pg_stat_monitor
-        WHERE bucket_start_time >= '${startTime}'::timestamptz
-          AND bucket_start_time <= '${endTime}'::timestamptz
-          AND bucket_done = true
-        GROUP BY bucket_start_time, datname
-        ORDER BY timestamp ASC
-      `
-
     case 'calls':
       return /* SQL */ `
         SELECT
