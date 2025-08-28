@@ -168,20 +168,49 @@ const StorageSettings = () => {
               <CardContent className="pt-6">
                 <FormField_Shadcn_
                   control={form.control}
+                  name="imageTransformationEnabled"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Enable Image Transformation"
+                      description={
+                        <>
+                          Optimize and resize images on the fly.{' '}
+                          <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                            Learn more
+                          </InlineLink>
+                          .
+                        </>
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          size="large"
+                          disabled={isFreeTier}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
                   name="fileSizeLimit"
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Upload file size limit"
+                      label="Global file size limit"
                       description={
                         <>
-                          {storageUnit !== StorageSizeUnits.BYTES && (
-                            <>
-                              Equivalent to {convertToBytes(limit, storageUnit).toLocaleString()}{' '}
-                              bytes.{' '}
-                            </>
-                          )}
-                          Maximum upload file size is {formatBytes(maxBytes)}.
+                          Restrict the size of files uploaded across all buckets.{' '}
+                          <InlineLink href="https://supabase.com/docs/guides/storage/uploads/file-limits">
+                            Learn more
+                          </InlineLink>
+                          .
                         </>
                       }
                     >
@@ -222,37 +251,6 @@ const StorageSettings = () => {
                             )}
                           />
                         </div>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="imageTransformationEnabled"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Enable Image Transformation"
-                      description={
-                        <>
-                          Optimize and resize images on the fly.{' '}
-                          <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
-                            Learn more
-                          </InlineLink>
-                          .
-                        </>
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          size="large"
-                          disabled={isFreeTier}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -308,7 +306,7 @@ const StorageSettings = () => {
                   loading={isUpdating}
                   disabled={!canUpdateStorageSettings || isUpdating || !form.formState.isDirty}
                 >
-                  Save changes
+                  Save
                 </Button>
               </CardFooter>
             </Card>
