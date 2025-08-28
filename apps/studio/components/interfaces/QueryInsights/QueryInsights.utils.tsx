@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Column } from 'react-data-grid'
 
-import { Badge } from 'ui'
+import { Badge, CodeBlock, cn } from 'ui'
 import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
 import { ColumnConfiguration, QUERY_INSIGHTS_TABLE_COLUMNS } from './QueryInsights.constants'
 
@@ -62,7 +62,14 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'query') {
           return (
             <div className="w-full flex items-center gap-x-2">
-              <div className="font-mono text-xs">{value}</div>
+              <CodeBlock
+                language="sql"
+                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible"
+                hideLineNumbers
+                hideCopy
+                value={value as string}
+                wrapLines={false}
+              />
             </div>
           )
         }
