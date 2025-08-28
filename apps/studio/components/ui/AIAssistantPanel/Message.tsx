@@ -11,8 +11,8 @@ import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
+import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import {
   Heading3,
   Hyperlink,
@@ -128,11 +128,11 @@ export const Message = function Message({
             <ProfileImage
               alt={profile?.username}
               src={profile?.profileImageUrl}
-              className="w-5 h-5 shrink-0 rounded-full"
+              className="w-5 h-5 shrink-0 rounded-full translate-y-0.5"
             />
           )}
 
-          <div className="flex-1 min-w-0 [&>div:first-child]:!mt-1">
+          <div className="flex-1 min-w-0">
             {shouldUsePartsRendering ? (
               (() => {
                 return parts.map(
