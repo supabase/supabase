@@ -10,7 +10,6 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
@@ -19,10 +18,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  const [filterStatus, setFilterStatus] = useState<string[]>([
-    PROJECT_STATUS.ACTIVE_HEALTHY,
-    PROJECT_STATUS.INACTIVE,
-  ])
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
 
   useAutoProjectsPrefetch()
@@ -40,19 +35,9 @@ const ProjectsPage: NextPageWithLayout = () => {
           </Admonition>
         ) : (
           <div className="flex flex-col gap-y-4 flex-grow">
-            <HomePageActions
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              showViewToggle={true}
-            />
+            <HomePageActions viewMode={viewMode} setViewMode={setViewMode} showViewToggle={true} />
 
-            <ProjectList
-              filterStatus={filterStatus}
-              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-              viewMode={viewMode}
-            />
+            <ProjectList viewMode={viewMode} />
           </div>
         )}
       </ScaffoldSection>

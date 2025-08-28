@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PROJECT_STATUS } from 'lib/constants'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -18,26 +18,26 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 interface HomePageActionsProps {
-  filterStatus: string[]
   hideNewProject?: boolean
   viewMode?: 'grid' | 'table'
   showViewToggle?: boolean
-  setFilterStatus: (value: string[]) => void
   setViewMode?: (value: 'grid' | 'table') => void
 }
 
 export const HomePageActions = ({
-  filterStatus,
   hideNewProject = false,
   viewMode,
   showViewToggle = false,
-  setFilterStatus,
   setViewMode,
 }: HomePageActionsProps) => {
   const { slug } = useParams()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [filterStatus, setFilterStatus] = useQueryState(
+    'status',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
 
   return (
     <div className="flex items-center justify-between">
@@ -65,7 +65,7 @@ export const HomePageActions = ({
         <Popover_Shadcn_>
           <PopoverTrigger_Shadcn_ asChild>
             <Button
-              type={filterStatus.length !== 2 ? 'secondary' : 'dashed'}
+              type={filterStatus.length === 0 ? 'dashed' : 'secondary'}
               className="h-[26px] w-[26px]"
               icon={<Filter />}
             />
@@ -83,10 +83,12 @@ export const HomePageActions = ({
                       <Checkbox_Shadcn_
                         id={key}
                         name={key}
-                        checked={filterStatus.includes(key)}
+                        checked={filterStatus.length === 0 || filterStatus.includes(key)}
                         onCheckedChange={() => {
                           if (filterStatus.includes(key)) {
                             setFilterStatus(filterStatus.filter((y) => y !== key))
+                          } else if (filterStatus.length === 1) {
+                            setFilterStatus([])
                           } else {
                             setFilterStatus(filterStatus.concat([key]))
                           }

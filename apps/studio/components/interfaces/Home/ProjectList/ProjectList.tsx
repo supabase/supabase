@@ -12,7 +12,7 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { isAtBottom } from 'lib/helpers'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
@@ -28,24 +28,25 @@ import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
-  filterStatus?: string[]
   viewMode?: 'grid' | 'table'
   rewriteHref?: (projectRef: string) => string
-  resetFilterStatus?: () => void
 }
 
 export const ProjectList = ({
   organization: organization_,
-  filterStatus,
   viewMode = 'grid',
   rewriteHref,
-  resetFilterStatus,
 }: ProjectListProps) => {
   const { slug: urlSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const [search] = useQueryState('search', parseAsString.withDefault(''))
   const debouncedSearch = useDebounce(search, 500)
+
+  const [filterStatus, setFilterStatus] = useQueryState(
+    'status',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
 
   const organization = organization_ ?? selectedOrganization
   const slug = organization?.slug ?? urlSlug
@@ -168,7 +169,7 @@ export const ProjectList = ({
                 <TableCell colSpan={5} className="p-0">
                   <NoFilterResults
                     filterStatus={filterStatus}
-                    resetFilterStatus={resetFilterStatus}
+                    resetFilterStatus={() => setFilterStatus([])}
                     className="border-0"
                   />
                 </TableCell>
@@ -210,7 +211,10 @@ export const ProjectList = ({
   return (
     <>
       {noResultsFromStatusFilter ? (
-        <NoFilterResults filterStatus={filterStatus} resetFilterStatus={resetFilterStatus} />
+        <NoFilterResults
+          filterStatus={filterStatus}
+          resetFilterStatus={() => setFilterStatus([])}
+        />
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
