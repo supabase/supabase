@@ -218,9 +218,19 @@ export const handleCopyCell = (
   event: CellKeyboardEvent
 ) => {
   if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
-    const colKey = column.key
-    const cellValue = row[colKey] ?? ''
-    const value = formatClipboardValue(cellValue)
-    copyToClipboard(value)
+    // Check if there's a text selection
+    const selection = window.getSelection()
+    const selectedText = selection?.toString().trim()
+    
+    if (selectedText && selectedText.length > 0) {
+      // Copy only the selected text
+      copyToClipboard(selectedText)
+    } else {
+      // Fall back to copying entire cell value
+      const colKey = column.key
+      const cellValue = row[colKey] ?? ''
+      const value = formatClipboardValue(cellValue)
+      copyToClipboard(value)
+    }
   }
 }
