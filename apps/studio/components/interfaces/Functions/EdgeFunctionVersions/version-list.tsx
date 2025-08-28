@@ -12,6 +12,7 @@ import {
   ScrollArea,
   CodeBlock,
   Skeleton,
+  cn,
 } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
 import { sortDeployments, inferLanguageFromPath } from './utils'
@@ -139,13 +140,15 @@ export const EdgeFunctionVersionsList = () => {
           <div className="space-y-3">
             {sortedDeployments.map((deployment) => {
               const isSelected = selectedDeployment?.id === deployment.id
+
               return (
                 <div
                   key={deployment.id}
                   onClick={() => handleViewCodeClick(deployment)}
-                  className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                  className={cn(
+                    'p-4 rounded-lg border cursor-pointer transition-colors',
                     isSelected ? 'bg-accent/50 border-primary' : 'hover:bg-accent/30 border-border'
-                  }`}
+                  )}
                 >
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
