@@ -18,11 +18,16 @@ import { useParams } from 'common'
 import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
-import { Content, useContentQuery, useContentQuery as useReportQuery } from 'data/content/content-query'
+import {
+  Content,
+  useContentQuery,
+  useContentQuery as useReportQuery,
+} from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { Dashboards } from 'types'
+import { uuidv4 } from 'lib/helpers'
 import {
   Button,
   DropdownMenu,
@@ -44,10 +49,15 @@ export default function CustomReportSection() {
   const { ref } = useParams()
   const { profile } = useProfile()
 
-  // Load first report
-  const { data: reportsData } = useReportQuery({ projectRef: ref, type: 'report', limit: 1 })
-  const firstReport = reportsData?.content?.[0] as Content | undefined
-  const reportContent = firstReport?.content as Dashboards.Content | undefined
+  // Load the "Home" report
+  const { data: reportsData } = useReportQuery({
+    projectRef: ref,
+    type: 'report',
+    name: 'Home',
+    limit: 1,
+  })
+  const homeReport = reportsData?.content?.[0] as Content | undefined
+  const reportContent = homeReport?.content as Dashboards.Content | undefined
   const [editableReport, setEditableReport] = useState<Dashboards.Content | undefined>(
     reportContent
   )
@@ -59,17 +69,22 @@ export default function CustomReportSection() {
   const canUpdateReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
       type: 'report',
-      visibility: (firstReport as any)?.visibility,
-      owner_id: (firstReport as any)?.owner_id,
+      visibility: (homeReport as any)?.visibility,
+      owner_id: (homeReport as any)?.owner_id,
     },
+    subject: { id: profile?.id },
+  })
+
+  const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
   const { mutate: upsertContent } = useContentUpsertMutation()
 
   const persistReport = (updated: Dashboards.Content) => {
-    if (!ref || !firstReport) return
-    upsertContent({ projectRef: ref, payload: { ...firstReport, content: updated } })
+    if (!ref || !homeReport) return
+    upsertContent({ projectRef: ref, payload: { ...homeReport, content: updated } })
   }
 
   const { data: snippetsData, isLoading: isLoadingSnippets } = useContentQuery({
@@ -107,7 +122,55 @@ export default function CustomReportSection() {
   }
 
   const addSnippetToReport = (snippet: any) => {
-    if (!editableReport) return
+    // If the Home report doesn't exist yet, create it with the new block
+    if (!editableReport || !homeReport) {
+      if (!ref || !profile) return
+
+      // Initial placement for first block
+      const initialBlock: Dashboards.Chart = {
+        x: 0,
+        y: 0,
+        w: 1,
+        h: 1,
+        id: snippet.id,
+        label: snippet.name,
+        attribute: `snippet_${snippet.id}` as any,
+        provider: undefined as any,
+        chart_type: 'bar',
+        chartConfig: DEFAULT_CHART_CONFIG,
+      }
+
+      const newReport: Dashboards.Content = {
+        schema_version: 1,
+        period_start: { time_period: '7d', date: '' },
+        period_end: { time_period: 'today', date: '' },
+        interval: '1d',
+        layout: [initialBlock],
+      }
+
+      setEditableReport(newReport)
+      upsertContent(
+        {
+          projectRef: ref,
+          payload: {
+            id: uuidv4(),
+            type: 'report',
+            name: 'Home',
+            description: '',
+            visibility: 'project',
+            owner_id: profile.id,
+            content: newReport,
+          },
+        },
+        {
+          // Ensure subsequent updates can persist using the created report
+          onSuccess: () => {
+            // No-op; query invalidation will refresh homeReport
+          },
+        }
+      )
+      return
+    }
     const current = [...editableReport.layout]
     let x = 0
     let y: number | null = null
@@ -178,7 +241,7 @@ export default function CustomReportSection() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="heading-section">At a glance</h3>
-        {canUpdateReport ? (
+        {canUpdateReport || canCreateReport ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button type="default" icon={<Plus />}>
@@ -221,7 +284,7 @@ export default function CustomReportSection() {
           if (layout.length === 0) {
             return (
               <div className="flex min-h-[270px] items-center justify-center rounded border-2 border-dashed p-16 border-default">
-                {canUpdateReport ? (
+                {canUpdateReport || canCreateReport ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button type="default" iconRight={<Plus size={14} />}>
@@ -317,7 +380,9 @@ function SortableReportBlock({
     | ((args: { attributes: any; listeners: any; isDragging: boolean }) => ReactNode)
     | ReactNode
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  })
 
   const style: CSSProperties = {
     transform: transform

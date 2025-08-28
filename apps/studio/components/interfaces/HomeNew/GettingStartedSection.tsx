@@ -13,13 +13,25 @@ import {
   BarChart3,
   Shield,
   Table2,
+  GitBranch,
 } from 'lucide-react'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import FrameworkSelector from './FrameworkSelector'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
-import { AiIconAnimation, Button, ToggleGroup, ToggleGroupItem } from 'ui'
+import {
+  AiIconAnimation,
+  Button,
+  Card,
+  CardContent,
+  CodeBlock,
+  SimpleCodeBlock,
+  ToggleGroup,
+  ToggleGroupItem,
+} from 'ui'
+import { BASE_PATH } from 'lib/constants'
 
 export default function GettingStartedSection() {
   const { data: project } = useSelectedProjectQuery()
@@ -38,6 +50,12 @@ export default function GettingStartedSection() {
   })
 
   const tablesCount = Math.max(0, tablesData?.length ?? 0)
+  const { data: branchesData } = useBranchesQuery({
+    projectRef: project?.parent_project_ref ?? project?.ref,
+  })
+  const isDefaultProject = project?.parent_project_ref === undefined
+  const hasNonDefaultBranch =
+    (branchesData ?? []).some((b) => !b.is_default) || isDefaultProject === false
 
   const steps: GettingStartedStep[] =
     workflow === 'code'
@@ -50,9 +68,11 @@ export default function GettingStartedSection() {
             description: 'Install the Supabase CLI for local development, migrations, and seeding.',
             actions: [
               {
-                label: 'Install guide',
-                href: 'https://supabase.com/docs/reference/cli/getting-started',
-                variant: 'default',
+                component: (
+                  <CodeBlock className="w-full text-xs p-3 !bg" language="bash">
+                    npm install supabase --save-dev
+                  </CodeBlock>
+                ),
               },
             ],
           },
@@ -62,15 +82,15 @@ export default function GettingStartedSection() {
             title: 'Design your database',
             icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Define your schema in code with SQL migrations and manage changes declaratively.',
+              'Create your first schema file with the state you want your database to be in',
             actions: [
               {
-                label: 'Migrations docs',
-                href: 'https://supabase.com/docs/guides/local-development/overview',
+                label: 'Create schema file',
+                href: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
                 variant: 'default',
               },
               {
-                label: 'Do it for me',
+                label: 'Generate it',
                 variant: 'default',
                 icon: <AiIconAnimation size={14} />,
                 onClick: () =>
@@ -78,7 +98,7 @@ export default function GettingStartedSection() {
                     name: 'Design my database',
                     open: true,
                     initialInput:
-                      'Help me write SQL migrations to create tables and relationships for my app. Ask clarifying questions if needed.',
+                      'Help me create a schema file for my database. We will be using Supabase declarative schemas which you can learn about by searching docs for declarative schema.',
                   }),
               },
             ],
@@ -88,15 +108,16 @@ export default function GettingStartedSection() {
             status: 'incomplete',
             title: 'Add some data',
             icon: <Table strokeWidth={1} className="text-foreground-muted" size={16} />,
-            description: 'Create seed SQL and run it with the Supabase CLI.',
+            description:
+              'Create a seed file to populate your database and any branches with seed data',
             actions: [
               {
-                label: 'Seeding guide',
-                href: 'https://supabase.com/docs/guides/local-development/cli-seed',
+                label: 'Create a seed file',
+                href: 'https://supabase.com/docs/guides/local-development/seeding-your-database',
                 variant: 'default',
               },
               {
-                label: 'Do it for me',
+                label: 'Generate data',
                 variant: 'default',
                 icon: <AiIconAnimation size={14} />,
                 onClick: () =>
@@ -117,9 +138,13 @@ export default function GettingStartedSection() {
             description:
               'Enable Row Level Security and define policies to control access to your data.',
             actions: [
-              { label: 'Policies', href: `/project/${ref}/auth/policies`, variant: 'default' },
               {
-                label: 'Do it for me',
+                label: 'Create a migration file',
+                href: `/project/${ref}/auth/policies`,
+                variant: 'default',
+              },
+              {
+                label: 'Create policies for me',
                 variant: 'default',
                 icon: <AiIconAnimation size={14} />,
                 onClick: () =>
@@ -149,7 +174,7 @@ export default function GettingStartedSection() {
             title: 'Connect your app',
             icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Install a client library and connect to your Supabase project to start querying your data.',
+              'Connect your app to your Supabase project using one of our client libraries and optional, pre-built UI components',
             actions: [
               {
                 label: 'Framework selector',
@@ -215,7 +240,7 @@ export default function GettingStartedSection() {
               'Build and deploy an edge function to run server-side logic close to your users.',
             actions: [
               {
-                label: 'Create function',
+                label: 'Create a function',
                 href: `/project/${ref}/functions/new`,
                 variant: 'default',
               },
@@ -231,6 +256,21 @@ export default function GettingStartedSection() {
               'Create custom reports to track API, database, storage, and auth activity.',
             actions: [{ label: 'Reports', href: `/project/${ref}/reports`, variant: 'default' }],
           },
+          {
+            key: 'create-first-branch',
+            status: hasNonDefaultBranch ? 'complete' : 'incomplete',
+            title: 'Create your first branch',
+            icon: <GitBranch strokeWidth={1} className="text-foreground-muted" size={16} />,
+            description:
+              'Connect GitHub to automatically create and merge Supabase branches for every PR',
+            actions: [
+              {
+                label: 'Connect to GitHub',
+                href: `/project/${ref}/settings/integrations`,
+                variant: 'default',
+              },
+            ],
+          },
         ]
       : workflow === 'no-code'
         ? [
@@ -242,7 +282,7 @@ export default function GettingStartedSection() {
               description:
                 'Start building your app by creating tables with the table editor, SQL editor, or describe what you want with the assistant.',
               actions: [
-                { label: 'View tables', href: `/project/${ref}/editor`, variant: 'default' },
+                { label: 'Create a table', href: `/project/${ref}/editor`, variant: 'default' },
                 {
                   label: 'Do it for me',
                   variant: 'default',
@@ -265,7 +305,7 @@ export default function GettingStartedSection() {
               description:
                 'Use the table editor to create sample data, or ask the Assistant to generate it for you.',
               actions: [
-                { label: 'Table editor', href: `/project/${ref}/editor`, variant: 'default' },
+                { label: 'Add data', href: `/project/${ref}/editor`, variant: 'default' },
                 {
                   label: 'Do it for me',
                   variant: 'default',
@@ -288,7 +328,11 @@ export default function GettingStartedSection() {
               description:
                 'Create a migration file to enable Row Level Security and create policies on each of your tables',
               actions: [
-                { label: 'Policies', href: `/project/${ref}/auth/policies`, variant: 'default' },
+                {
+                  label: 'Create a policy',
+                  href: `/project/${ref}/auth/policies`,
+                  variant: 'default',
+                },
                 {
                   label: 'Do it for me',
                   variant: 'default',
@@ -311,7 +355,11 @@ export default function GettingStartedSection() {
               description:
                 'Configure authentication providers and manage settings for Supabase Auth.',
               actions: [
-                { label: 'Configure', href: `/project/${ref}/auth/providers`, variant: 'default' },
+                {
+                  label: 'Configure auth',
+                  href: `/project/${ref}/auth/providers`,
+                  variant: 'default',
+                },
               ],
             },
             {
@@ -320,7 +368,7 @@ export default function GettingStartedSection() {
               title: 'Connect your app',
               icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
               description:
-                'Install a client library and connect to your Supabase project to start querying your data.',
+                'Connect your app to your Supabase project using one of our client libraries and optional, pre-built React components',
               actions: [
                 {
                   label: 'Framework selector',
@@ -386,11 +434,10 @@ export default function GettingStartedSection() {
                 'Build and deploy an edge function to run server-side logic close to your users.',
               actions: [
                 {
-                  label: 'Create function',
+                  label: 'Create a function',
                   href: `/project/${ref}/functions/new`,
                   variant: 'default',
                 },
-                { label: 'View functions', href: `/project/${ref}/functions`, variant: 'default' },
               ],
             },
             {
@@ -400,7 +447,19 @@ export default function GettingStartedSection() {
               icon: <BarChart3 strokeWidth={1} className="text-foreground-muted" size={16} />,
               description:
                 'Create custom reports to track API, database, storage, and auth activity.',
-              actions: [{ label: 'Reports', href: `/project/${ref}/reports`, variant: 'default' }],
+              actions: [
+                { label: 'Create a report', href: `/project/${ref}/reports`, variant: 'default' },
+              ],
+            },
+            {
+              key: 'create-first-branch',
+              status: hasNonDefaultBranch ? 'complete' : 'incomplete',
+              title: 'Create your first branch',
+              icon: <GitBranch strokeWidth={1} className="text-foreground-muted" size={16} />,
+              description: 'Create a preview branch to safely test changes before merging.',
+              actions: [
+                { label: 'Create a branch', href: `/project/${ref}/branches`, variant: 'default' },
+              ],
             },
           ]
         : []
@@ -431,42 +490,63 @@ export default function GettingStartedSection() {
       }
       steps={steps}
       emptyContent={
-        <div className="flex flex-col items-center justify-center p-12 border rounded-lg">
-          <h2 className="heading-subSection mb-0">Preferred workflow</h2>
-          <p className="text-sm text-foreground-light mb-6">
-            Choose a preferred workflow to get started
-          </p>
-          <div className="flex items-center gap-4">
-            <Button
-              size="medium"
-              type="outline"
-              onClick={() => setWorkflow('no-code')}
-              className="block gap-2 h-auto p-8 w-64"
-            >
-              <Table2 size={20} strokeWidth={1.5} className="mx-auto" />
-              <div className="text-center mt-4">
-                <div>No-code</div>
-                <div className="text-foreground-light w-full whitespace-normal">
-                  Use the dashboard to manage your database
-                </div>
-              </div>
-            </Button>
-            <Button
-              size="medium"
-              type={workflow === 'code' ? 'default' : 'outline'}
-              onClick={() => setWorkflow('code')}
-              className="block gap-2 h-auto p-8 w-64"
-            >
-              <Code size={20} strokeWidth={1.5} className="mx-auto" />
-              <div className="text-center mt-4">
-                <div>Code</div>
-                <div className="text-foreground-light whitespace-normal">
-                  Manage your project entirely in your codebase
-                </div>
-              </div>
-            </Button>
+        <Card className="bg-background/25 border-dashed relative">
+          <div className="absolute -inset-16 z-0 opacity-50">
+            <img
+              src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
+              alt="Supabase Grafana"
+              className="w-full h-full object-cover object-right hidden dark:block"
+            />
+            <img
+              src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
+              alt="Supabase Grafana"
+              className="w-full h-full object-cover object-right dark:hidden"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
           </div>
-        </div>
+          <CardContent className="relative z-10 p-12 grid grid-cols-2 gap-16 items-center justify-center">
+            <div>
+              <h2 className="heading-subSection mb-0 heading-meta text-foreground-light mb-4">
+                Choose a preferred workflow
+              </h2>
+              <p className="text-foreground mb-6">
+                With Supabase, you have the flexibility to adopt a workflow that works for you. You
+                can do everything via the dashboard, or manage your entire project within your own
+                codebase.
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                size="medium"
+                type="outline"
+                onClick={() => setWorkflow('no-code')}
+                className="block gap-2 h-auto p-8 w-80 text-left justify-start bg-background "
+              >
+                <Table2 size={20} strokeWidth={1.5} className="text-brand" />
+                <div className="mt-4">
+                  <div>No-code</div>
+                  <div className="text-foreground-light w-full whitespace-normal">
+                    Ideal for prototyping or getting your project up and running
+                  </div>
+                </div>
+              </Button>
+              <Button
+                size="medium"
+                type="outline"
+                onClick={() => setWorkflow('code')}
+                className="bg-background block gap-2 h-auto p-8 w-80 text-left justify-start"
+              >
+                <Code size={20} strokeWidth={1.5} className="text-brand" />
+                <div className="mt-4">
+                  <div>Code</div>
+                  <div className="text-foreground-light whitespace-normal">
+                    Ideal for teams that want full control of their project
+                  </div>
+                </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       }
     />
   )

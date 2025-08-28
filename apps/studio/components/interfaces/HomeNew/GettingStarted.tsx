@@ -51,13 +51,7 @@ export function GettingStarted({
       ) : (
         <Row columns={[3, 2, 1]} className="items-stretch">
           {steps.map((step, index) => (
-            <Card
-              key={step.key}
-              className={cn(
-                'group overflow-hidden h-full flex flex-col',
-                step.status === 'complete' && 'opacity-40 hover:opacity-100'
-              )}
-            >
+            <Card key={step.key} className={cn('group overflow-hidden h-full flex flex-col')}>
               <CardHeader className="flex flex-row space-y-0 justify-between items-center border-b-0">
                 <div className="flex flex-row items-center gap-3">
                   {step.icon && <div>{step.icon}</div>}
@@ -78,17 +72,8 @@ export function GettingStarted({
                 <div className="flex flex-wrap gap-2 mt-4">
                   {step.actions.map((action, i) => {
                     if (action.component) {
-                      return <span key={`${step.key}-action-${i}`}>{action.component}</span>
+                      return <div key={`${step.key}-action-${i}`}>{action.component}</div>
                     }
-                    const content = (
-                      <Button
-                        key={`${step.key}-action-${i}`}
-                        type={action.variant ?? 'default'}
-                        icon={action.icon}
-                      >
-                        {action.label}
-                      </Button>
-                    )
                     if (action.href) {
                       return (
                         <Button
@@ -96,15 +81,22 @@ export function GettingStarted({
                           key={`${step.key}-action-${i}`}
                           type={action.variant ?? 'default'}
                           icon={action.icon}
+                          className="text-foreground-light hover:text-foreground"
                         >
                           <Link href={action.href}>{action.label}</Link>
                         </Button>
                       )
                     }
                     return (
-                      <span key={`${step.key}-action-${i}`} onClick={action.onClick}>
-                        {content}
-                      </span>
+                      <Button
+                        key={`${step.key}-action-${i}`}
+                        type={action.variant ?? 'default'}
+                        icon={action.icon}
+                        onClick={action.onClick}
+                        className="text-foreground-light hover:text-foreground"
+                      >
+                        {action.label}
+                      </Button>
                     )
                   })}
                 </div>
