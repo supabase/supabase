@@ -15,7 +15,7 @@ import {
   cn,
 } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
-import { sortDeployments, inferLanguageFromPath } from './utils'
+import { sortDeployments, inferLanguageFromPath, formatDateTime } from './utils'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
 import { EdgeFunctionVersionsLoading } from './loading'
@@ -154,13 +154,7 @@ export const EdgeFunctionVersionsList = () => {
                     <div className="space-y-2">
                       <div className="flex items-center gap-x-3">
                         <div className="text-foreground font-medium">
-                          {new Date(deployment.created_at).toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {formatDateTime(deployment.created_at)}
                         </div>
                         {deployment.status === 'ACTIVE' && (
                           <Badge variant="default" className="text-xs">
@@ -227,7 +221,7 @@ export const EdgeFunctionVersionsList = () => {
           </div>
           <p className="text-sm text-foreground-light mb-4">
             {selectedDeployment
-              ? `Preview of version from ${new Date(selectedDeployment.created_at).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+              ? `Preview of version from ${formatDateTime(selectedDeployment.created_at)}`
               : 'Select a version to preview'}
           </p>
 
@@ -252,13 +246,7 @@ export const EdgeFunctionVersionsList = () => {
               <div className="flex items-center justify-between rounded-md border p-3">
                 <div>
                   <div className="text-foreground font-medium">
-                    {new Date(selectedDeployment.created_at).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {formatDateTime(selectedDeployment.created_at)}
                   </div>
                   {selectedDeployment.commit_message && (
                     <div className="text-sm text-foreground-light">

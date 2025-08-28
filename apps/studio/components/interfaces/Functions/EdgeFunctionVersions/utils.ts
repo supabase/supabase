@@ -24,3 +24,14 @@ export const inferLanguageFromPath = (path: string): CodeBlockLang => {
       return 'ts'
   }
 }
+
+export const formatDateTime = (input: string | number | Date) => {
+  const date = new Date(input)
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
