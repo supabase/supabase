@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -255,8 +254,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       render={({ field }) => (
                         <FormItemLayout
                           name="has_file_size_limit"
-                          label="Restrict file upload size for bucket"
-                          description="Prevent uploading of file sizes greater than a specified limit"
+                          label="Restrict file size"
+                          description="Prevent uploading of files larger than a specified limit"
                           layout="flex"
                         >
                           <FormControl_Shadcn_>
@@ -280,10 +279,20 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                             render={({ field }) => (
                               <FormItemLayout
                                 name="formatted_size_limit"
-                                description={`Equivalent to ${convertToBytes(
-                                  formattedSizeLimit,
-                                  selectedUnit as StorageSizeUnits
-                                ).toLocaleString()} bytes.`}
+                                description={
+                                  IS_PLATFORM ? (
+                                    <>
+                                      This project has a{' '}
+                                      <InlineLink
+                                        href={`/project/${ref}/settings/storage`}
+                                        className="font-bold underline"
+                                      >
+                                        global file size limit
+                                      </InlineLink>{' '}
+                                      of {formattedGlobalUploadLimit}.
+                                    </>
+                                  ) : undefined
+                                }
                               >
                                 <FormControl_Shadcn_>
                                   <Input_Shadcn_
@@ -316,20 +325,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                        {IS_PLATFORM && (
-                          <div className="col-span-12 mt-2">
-                            <p className="text-foreground-light text-sm">
-                              Note: Individual bucket upload will still be capped at the{' '}
-                              <Link
-                                href={`/project/${ref}/settings/storage`}
-                                className="font-bold underline"
-                              >
-                                global upload limit
-                              </Link>{' '}
-                              of {formattedGlobalUploadLimit}
-                            </p>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
