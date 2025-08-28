@@ -14,7 +14,8 @@
   "files": [
     {
       "path": "registry/default/clients/react/lib/supabase/client.ts",
-      "type": "registry:lib"
+      "type": "registry:lib",
+      "target": "lib/supabase/client.ts"
     }
   ]
 }
