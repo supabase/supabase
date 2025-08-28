@@ -6,7 +6,7 @@ import { analyticsKeys } from './keys'
 export type FunctionsCombinedStatsVariables = {
   projectRef?: string
   functionId?: string
-  interval?: operations['FunctionCombinedLogsController_getStatus']['parameters']['query']['interval']
+  interval?: operations['FunctionsLogsController_getCombinedStats']['parameters']['query']['interval']
 }
 
 export type FunctionsCombinedStatsResponse = any
