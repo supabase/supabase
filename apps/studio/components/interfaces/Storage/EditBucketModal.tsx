@@ -1,14 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -26,7 +22,6 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Switch,
-  cn,
 } from 'ui'
 import { z } from 'zod'
 
@@ -57,7 +52,7 @@ const BucketSchema = z.object({
   formatted_size_limit: z.coerce
     .number()
     .min(0, 'File size upload limit has to be at least 0')
-    .default(0),
+    .optional(),
   allowed_mime_types: z.string().trim().default(''),
 })
 
@@ -72,7 +67,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.BYTES)
-  const [showConfiguration, setShowConfiguration] = useState(false)
   const { value: fileSizeLimit } = convertFromBytes(bucket?.file_size_limit ?? 0)
 
   const form = useForm<z.infer<typeof BucketSchema>>({
@@ -80,15 +74,15 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     defaultValues: {
       name: bucket?.name ?? '',
       public: bucket?.public,
-      has_file_size_limit: isNonNullable(bucket?.file_size_limit),
-      formatted_size_limit: fileSizeLimit ?? 0,
+      has_file_size_limit: Boolean(bucket?.file_size_limit),
+      formatted_size_limit: bucket?.file_size_limit ? fileSizeLimit ?? 0 : undefined,
       allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
     },
     values: {
       name: bucket?.name ?? '',
       public: bucket?.public,
-      has_file_size_limit: isNonNullable(bucket?.file_size_limit),
-      formatted_size_limit: fileSizeLimit ?? 0,
+      has_file_size_limit: Boolean(bucket?.file_size_limit),
+      formatted_size_limit: bucket?.file_size_limit ? fileSizeLimit ?? 0 : undefined,
       allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
     },
     mode: 'onSubmit',
@@ -97,6 +91,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const isPublicBucket = form.watch('public')
   const hasFileSizeLimit = form.watch('has_file_size_limit')
   const formattedSizeLimit = form.watch('formatted_size_limit')
+  const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(
+    isNonNullable(bucket?.allowed_mime_types?.length)
+  )
   const isChangingBucketVisibility = bucket?.public !== isPublicBucket
   const isMakingBucketPrivate = bucket?.public && !isPublicBucket
   const isMakingBucketPublic = !bucket?.public && isPublicBucket
@@ -110,13 +107,15 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         projectRef: ref,
         id: bucket.id,
         isPublic: values.public,
-        file_size_limit: values.has_file_size_limit
-          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
-          : null,
-        allowed_mime_types:
-          values.allowed_mime_types.length > 0
-            ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
+        file_size_limit:
+          values.has_file_size_limit && values.formatted_size_limit
+            ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
             : null,
+        allowed_mime_types: hasAllowedMimeTypes
+          ? values.allowed_mime_types.length > 0
+            ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
+            : null
+          : null,
       },
       {
         onSuccess: () => {
@@ -129,11 +128,25 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   useEffect(() => {
     if (visible && bucket) {
-      setShowConfiguration(false)
       const { unit } = convertFromBytes(bucket.file_size_limit ?? 0)
       setSelectedUnit(unit)
     }
   }, [visible, bucket])
+
+  // Auto-turn off file size limit toggle when value is 0
+  useEffect(() => {
+    if (formattedSizeLimit === 0 && hasFileSizeLimit) {
+      form.setValue('has_file_size_limit', false)
+    }
+  }, [formattedSizeLimit, hasFileSizeLimit, form])
+
+  // Auto-turn off MIME types toggle when field is empty
+  useEffect(() => {
+    const mimeTypesValue = form.getValues('allowed_mime_types')
+    if (!mimeTypesValue || mimeTypesValue.trim() === '') {
+      setHasAllowedMimeTypes(false)
+    }
+  }, [form.watch('allowed_mime_types')])
 
   return (
     <Dialog
@@ -231,126 +244,131 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
             <DialogSectionSeparator />
 
             <DialogSection>
-              <Collapsible_Shadcn_
-                open={showConfiguration}
-                onOpenChange={() => setShowConfiguration(!showConfiguration)}
-              >
-                <CollapsibleTrigger_Shadcn_ asChild>
-                  <button className="w-full cursor-pointer flex items-center justify-between">
-                    <p className="text-sm">Additional configuration</p>
-                    <ChevronDown
-                      size={18}
-                      strokeWidth={2}
-                      className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
-                    />
-                  </button>
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="pt-4 space-y-4">
-                  <div className="space-y-2">
-                    <FormField_Shadcn_
-                      key="has_file_size_limit"
-                      name="has_file_size_limit"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItemLayout
-                          name="has_file_size_limit"
-                          label="Restrict file size"
-                          description="Prevent uploading of files larger than a specified limit"
-                          layout="flex"
-                        >
-                          <FormControl_Shadcn_>
-                            <Switch
-                              id="has_file_size_limit"
-                              size="large"
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-                    {hasFileSizeLimit && (
-                      <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
-                        <div className="col-span-8">
-                          <FormField_Shadcn_
-                            key="formatted_size_limit"
-                            name="formatted_size_limit"
-                            control={form.control}
-                            render={({ field }) => (
-                              <FormItemLayout
-                                name="formatted_size_limit"
-                                description={
-                                  IS_PLATFORM ? (
-                                    <>
-                                      This project has a{' '}
-                                      <InlineLink
-                                        href={`/project/${ref}/settings/storage`}
-                                        className="font-bold underline"
-                                      >
-                                        global file size limit
-                                      </InlineLink>{' '}
-                                      of {formattedGlobalUploadLimit}.
-                                    </>
-                                  ) : undefined
-                                }
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_
-                                    id="formatted_size_limit"
-                                    aria-label="File size limit"
-                                    type="number"
-                                    min={0}
-                                    {...field}
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </div>
-                        <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                          <SelectTrigger_Shadcn_
-                            aria-label="File size limit unit"
-                            size="small"
-                            className="col-span-4"
-                          >
-                            <SelectValue_Shadcn_ asChild>
-                              <>{selectedUnit}</>
-                            </SelectValue_Shadcn_>
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {Object.values(StorageSizeUnits).map((unit: string) => (
-                              <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
-                                <div>{unit}</div>
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </div>
-                    )}
-                  </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
                   <FormField_Shadcn_
-                    key="allowed_mime_types"
-                    name="allowed_mime_types"
+                    key="has_file_size_limit"
+                    name="has_file_size_limit"
                     control={form.control}
                     render={({ field }) => (
                       <FormItemLayout
-                        name="allowed_mime_types"
-                        label="Allowed MIME types"
-                        labelOptional="Comma separated values"
-                        description="Wildcards are allowed, e.g. image/*. Leave blank to allow any MIME type."
+                        name="has_file_size_limit"
+                        label="Restrict file size"
+                        description="Prevent uploading of files larger than a specified limit"
+                        layout="flex"
                       >
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            id="allowed_mime_types"
-                            {...field}
-                            placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                          <Switch
+                            id="has_file_size_limit"
+                            size="large"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
+                  {hasFileSizeLimit && (
+                    <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
+                      <div className="col-span-8">
+                        <FormField_Shadcn_
+                          key="formatted_size_limit"
+                          name="formatted_size_limit"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              name="formatted_size_limit"
+                              description={
+                                IS_PLATFORM ? (
+                                  <>
+                                    This project has a{' '}
+                                    <InlineLink
+                                      href={`/project/${ref}/settings/storage`}
+                                      className="font-bold underline"
+                                    >
+                                      global file size limit
+                                    </InlineLink>{' '}
+                                    of {formattedGlobalUploadLimit}.
+                                  </>
+                                ) : undefined
+                              }
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  id="formatted_size_limit"
+                                  aria-label="File size limit"
+                                  type="number"
+                                  min={0}
+                                  placeholder="0"
+                                  {...field}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                      <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
+                        <SelectTrigger_Shadcn_
+                          aria-label="File size limit unit"
+                          size="small"
+                          className="col-span-4"
+                        >
+                          <SelectValue_Shadcn_ asChild>
+                            <>{selectedUnit}</>
+                          </SelectValue_Shadcn_>
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {Object.values(StorageSizeUnits).map((unit: string) => (
+                            <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                              <div>{unit}</div>
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <FormItemLayout
+                    name="has_allowed_mime_types"
+                    label="Restrict MIME types"
+                    description="Allow only certain types of files to be uploaded"
+                    layout="flex"
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        id="has_allowed_mime_types"
+                        size="large"
+                        checked={hasAllowedMimeTypes}
+                        onCheckedChange={setHasAllowedMimeTypes}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                  {hasAllowedMimeTypes && (
+                    <FormField_Shadcn_
+                      key="allowed_mime_types"
+                      name="allowed_mime_types"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout
+                          name="allowed_mime_types"
+                          label="Allowed MIME types"
+                          labelOptional="Comma separated values"
+                          description="Wildcards are allowed, e.g. image/*."
+                        >
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              id="allowed_mime_types"
+                              {...field}
+                              placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                  )}
+                </div>
+              </div>
             </DialogSection>
           </form>
         </Form_Shadcn_>
