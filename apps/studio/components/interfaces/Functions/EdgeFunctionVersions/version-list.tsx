@@ -292,7 +292,6 @@ export const EdgeFunctionVersionsList = () => {
                   const language = path ? inferLanguageFromPath(path) : 'js'
                   return (
                     <CodeBlock
-                      hideLineNumbers
                       language={language}
                       className="text-xs font-mono border-none p-0 !bg-muted"
                     >
