@@ -15,6 +15,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useContextMenu } from 'react-contexify'
+import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
@@ -112,7 +113,9 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   selectedItems = [],
 }) => {
   const { ref: projectRef, bucketId } = useParams()
+  const [isFolderDragOver, setIsFolderDragOver] = useState(false)
 
+  const snap = useStorageExplorerStateSnapshot()
   const {
     selectedBucket,
     selectedFilePreview,
@@ -129,7 +132,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     openFolder,
     downloadFolder,
     selectRangeItems,
-  } = useStorageExplorerStateSnapshot()
+  } = snap
   const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
 
@@ -162,6 +165,85 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
       setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
     setSelectedFilePreview(undefined)
+  }
+
+  // Drag and drop handlers
+  const onDragStart = (event: React.DragEvent) => {
+    if (item.type === STORAGE_ROW_TYPES.FILE && canUpdateFiles) {
+      event.dataTransfer.setData('application/json', JSON.stringify(itemWithColumnIndex))
+      event.dataTransfer.effectAllowed = 'move'
+    }
+  }
+
+  const onDragOver = (event: React.DragEvent) => {
+    // Always prevent default for folders to allow drops
+    if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
+      event.preventDefault()
+      event.stopPropagation()
+      event.dataTransfer.dropEffect = 'move'
+      setIsFolderDragOver(true)
+
+      // Calculate and dispatch the target path for this folder
+      const targetDirectory = snap.openedFolders
+        .slice(0, columnIndex)
+        .map((folder) => folder.name)
+        .concat(item.name)
+        .join('/')
+
+      // Dispatch custom event to communicate with parent column
+      const customEvent = new CustomEvent('folderDragOver', {
+        detail: { targetPath: targetDirectory, folderName: item.name },
+      })
+      event.currentTarget.dispatchEvent(customEvent)
+    }
+  }
+
+  const onDragLeave = (event: React.DragEvent) => {
+    if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
+      setIsFolderDragOver(false)
+    }
+  }
+
+  const onDrop = (event: React.DragEvent) => {
+    if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
+      event.preventDefault()
+      console.log('Folder drop event triggered for:', item.name)
+      try {
+        const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
+        if (draggedItem && draggedItem.type === STORAGE_ROW_TYPES.FILE) {
+          // Calculate the target directory path - need the full path to the folder
+          // The folder might be nested within other folders, so we need to construct the complete path
+          const targetDirectory = snap.openedFolders
+            .slice(0, columnIndex)
+            .map((folder) => folder.name)
+            .concat(item.name)
+            .join('/')
+
+          console.log(
+            'Folder drop - Target directory:',
+            targetDirectory,
+            'Folder:',
+            item.name,
+            'Column index:',
+            columnIndex,
+            'Opened folders:',
+            snap.openedFolders.map((f) => f.name)
+          )
+
+          // Set the selected items for moving (required by moveFiles)
+          snap.setSelectedItemsToMove([draggedItem])
+
+          // Trigger the move operation directly without opening the modal
+          // moveFiles expects the directory path, not the full file path
+          snap.moveFiles(targetDirectory)
+
+          // Reset drag over state
+          setIsFolderDragOver(false)
+        }
+      } catch (error) {
+        console.error('Failed to parse dragged item:', error)
+      }
+    }
   }
 
   const rowOptions =
@@ -305,11 +387,23 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   return (
     <div
       className="h-full border-b border-default"
+      draggable={item.type === STORAGE_ROW_TYPES.FILE && canUpdateFiles}
+      data-item-type={item.type.toLowerCase()}
+      data-item-name={item.name}
       onContextMenu={(event) => {
         event.stopPropagation()
         item.type === STORAGE_ROW_TYPES.FILE
           ? displayMenu(event, STORAGE_ROW_TYPES.FILE)
           : displayMenu(event, STORAGE_ROW_TYPES.FOLDER)
+      }}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      onDragEnter={(event) => {
+        if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
+          setIsFolderDragOver(true)
+        }
       }}
     >
       <div
@@ -318,6 +412,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
+          `${isFolderDragOver ? 'bg-blue-200 ring-2 ring-blue-500 shadow-lg' : ''}`,
           `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
         )}
         onClick={(event) => {
@@ -329,6 +424,17 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
               : onSelectFile(columnIndex, item)
           }
         }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
+              item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
+                ? openFolder(columnIndex, item)
+                : onSelectFile(columnIndex, item)
+            }
+          }
+        }}
+        tabIndex={item.status !== STORAGE_ROW_STATUS.LOADING ? 0 : -1}
       >
         <div
           className={cn(
@@ -336,7 +442,16 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
           )}
         >
-          <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
+          <div
+            className="relative w-[30px]"
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                event.stopPropagation()
+              }
+            }}
+          >
             {!isSelected && (
               <div
                 className={`absolute ${
@@ -396,6 +511,12 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
             event.stopPropagation()
           }
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+          }}
         >
           {item.status === STORAGE_ROW_STATUS.LOADING ? (
             <Loader
