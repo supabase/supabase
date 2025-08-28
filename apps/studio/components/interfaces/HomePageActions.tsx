@@ -1,9 +1,10 @@
-import { Filter, Grid, List, Plus, Search } from 'lucide-react'
+import { Filter, Grid, List, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PROJECT_STATUS } from 'lib/constants'
+import { parseAsString, useQueryState } from 'nuqs'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -17,28 +18,26 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 interface HomePageActionsProps {
-  search: string
   filterStatus: string[]
   hideNewProject?: boolean
   viewMode?: 'grid' | 'table'
   showViewToggle?: boolean
-  setSearch: (value: string) => void
   setFilterStatus: (value: string[]) => void
   setViewMode?: (value: 'grid' | 'table') => void
 }
 
 export const HomePageActions = ({
-  search,
   filterStatus,
   hideNewProject = false,
   viewMode,
   showViewToggle = false,
-  setSearch,
   setFilterStatus,
   setViewMode,
 }: HomePageActionsProps) => {
   const { slug } = useParams()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
+
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
 
   return (
     <div className="flex items-center justify-between">
@@ -50,6 +49,17 @@ export const HomePageActions = ({
           className="w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          actions={[
+            search && (
+              <Button
+                size="tiny"
+                type="text"
+                icon={<X />}
+                onClick={() => setSearch('')}
+                className="p-0 h-5 w-5"
+              />
+            ),
+          ]}
         />
 
         <Popover_Shadcn_>

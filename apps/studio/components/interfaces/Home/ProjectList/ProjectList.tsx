@@ -1,5 +1,6 @@
 import { UIEvent, useMemo } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -11,6 +12,7 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { isAtBottom } from 'lib/helpers'
+import { parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
@@ -26,7 +28,6 @@ import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
-  search?: string
   filterStatus?: string[]
   viewMode?: 'grid' | 'table'
   rewriteHref?: (projectRef: string) => string
@@ -34,7 +35,6 @@ export interface ProjectListProps {
 }
 
 export const ProjectList = ({
-  search = '',
   organization: organization_,
   filterStatus,
   viewMode = 'grid',
@@ -43,6 +43,9 @@ export const ProjectList = ({
 }: ProjectListProps) => {
   const { slug: urlSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const [search] = useQueryState('search', parseAsString.withDefault(''))
+  const debouncedSearch = useDebounce(search, 500)
 
   const organization = organization_ ?? selectedOrganization
   const slug = organization?.slug ?? urlSlug
@@ -56,7 +59,7 @@ export const ProjectList = ({
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useOrgProjectsInfiniteQuery({ slug })
+  } = useOrgProjectsInfiniteQuery({ slug, search: search.length === 0 ? search : debouncedSearch })
   const orgProjects =
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
@@ -75,37 +78,19 @@ export const ProjectList = ({
 
   const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
   const noResultsFromSearch =
-    search.length > 0 &&
-    isSuccessProjects &&
-    orgProjects.filter((project) => {
-      return (
-        project.name.toLowerCase().includes(search.toLowerCase()) ||
-        project.ref.includes(search.toLowerCase())
-      )
-    }).length === 0
+    debouncedSearch.length > 0 && isSuccessProjects && orgProjects.length === 0
   const noResultsFromStatusFilter =
-    hasFilterStatusApplied &&
-    isSuccessProjects &&
-    orgProjects.filter((project) => filterStatus.includes(project.status)).length === 0
+    hasFilterStatusApplied && isSuccessProjects && orgProjects.length === 0
 
-  const isEmpty = !orgProjects || orgProjects.length === 0
+  const isEmpty = debouncedSearch.length === 0 && (!orgProjects || orgProjects.length === 0)
   const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
-  const filteredProjects =
-    search.length > 0
-      ? sortedProjects.filter((project) => {
-          return (
-            project.name.toLowerCase().includes(search.toLowerCase()) ||
-            project.ref.includes(search.toLowerCase())
-          )
-        })
-      : sortedProjects
 
   const filteredProjectsByStatus =
     filterStatus !== undefined
       ? filterStatus.length === 2
-        ? filteredProjects
-        : filteredProjects.filter((project) => filterStatus.includes(project.status))
-      : filteredProjects
+        ? sortedProjects
+        : sortedProjects.filter((project) => filterStatus.includes(project.status))
+      : sortedProjects
 
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
@@ -159,7 +144,7 @@ export const ProjectList = ({
   }
 
   if (viewMode === 'table') {
-    // [Joshen] Using calc for now, couldn't figure out max height with flex grow for
+    // [Joshen] Using calc for now sorry, couldn't figure out max height with flex grow for
     // this particular one somehow, to make the scrollable area take up the remaining space max
     return (
       <Card
@@ -231,6 +216,8 @@ export const ProjectList = ({
       ) : (
         <ul
           onScroll={handleScroll}
+          // [Joshen] Likewise as per table view using calc for now sorry, ideally we figure out
+          // (and also make it a reusable component) a way to use flex-grow, max height, and overflow scroll
           style={{ maxHeight: 'calc(100vh - 220px)' }}
           className={cn(
             'w-full mx-auto grid grid-cols-1 gap-2 md:gap-4 overflow-y-scroll',

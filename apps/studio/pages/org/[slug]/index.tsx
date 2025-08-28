@@ -19,7 +19,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string[]>([
     PROJECT_STATUS.ACTIVE_HEALTHY,
     PROJECT_STATUS.INACTIVE,
@@ -42,8 +41,6 @@ const ProjectsPage: NextPageWithLayout = () => {
         ) : (
           <div className="flex flex-col gap-y-4 flex-grow">
             <HomePageActions
-              search={search}
-              setSearch={setSearch}
               filterStatus={filterStatus}
               setFilterStatus={setFilterStatus}
               viewMode={viewMode}
@@ -52,7 +49,6 @@ const ProjectsPage: NextPageWithLayout = () => {
             />
 
             <ProjectList
-              search={search}
               filterStatus={filterStatus}
               resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
               viewMode={viewMode}
