@@ -54,7 +54,7 @@ export const componentPages: SidebarNavGroup = {
   items: [
     {
       title: 'Client',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/client',
       items: [],
       commandItemLabel: 'Supabase Client',
@@ -142,4 +142,5 @@ export const frameworkTitles: Record<string, string> = {
   tanstack: 'TanStack Start',
   react: 'React SPA',
   vue: 'Vue',
+  nuxtjs: 'Nuxt.js',
 }
