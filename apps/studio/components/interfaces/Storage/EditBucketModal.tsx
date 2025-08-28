@@ -136,18 +136,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           // Set form error for the file size limit field
           form.setError('formatted_size_limit', {
             type: 'manual',
-            message: (
-              <span>
-                Exceeds the{' '}
-                <Link
-                  href={`/project/${ref}/settings/storage`}
-                  className="font-bold underline text-destructive underline-destructive"
-                >
-                  global file size limit
-                </Link>{' '}
-                of ${formattedGlobalUploadLimit}.
-              </span>
-            ),
+            message: `Exceeds global limit of ${formattedGlobalUploadLimit}.`,
           })
         } else if (
           errorMessage.includes('mime type') &&
@@ -332,18 +321,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                             <FormItemLayout
                               name="formatted_size_limit"
                               description={
-                                form.formState.errors.formatted_size_limit ? (
-                                  <span className="text-destructive">
-                                    Exceeds the{' '}
-                                    <Link
-                                      href={`/project/${ref}/settings/storage`}
-                                      className="font-bold underline text-destructive underline-destructive"
-                                    >
-                                      global file size limit
-                                    </Link>{' '}
-                                    of {formattedGlobalUploadLimit}.{' '}
-                                  </span>
-                                ) : IS_PLATFORM ? (
+                                IS_PLATFORM ? (
                                   <>
                                     This project has a{' '}
                                     <Link
