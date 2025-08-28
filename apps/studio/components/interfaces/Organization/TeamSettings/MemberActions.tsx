@@ -45,10 +45,11 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
-  const { data: allProjects } = useProjectsQuery()
+  const { data } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
 
+  const allProjects = data?.projects ?? []
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []

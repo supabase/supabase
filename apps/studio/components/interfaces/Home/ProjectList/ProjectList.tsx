@@ -35,12 +35,14 @@ export const ProjectList = ({
   const organization = organization_ ?? selectedOrganization
 
   const {
-    data: allProjects = [],
+    data,
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
     error: projectsError,
   } = useProjectsQuery()
+  const allProjects = data?.projects ?? []
+
   const {
     isLoading: _isLoadingPermissions,
     isError: isErrorPermissions,
