@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { useIsMFAEnabled } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from 'components/interfaces/HomePageActions'
@@ -18,8 +16,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
-
   useAutoProjectsPrefetch()
 
   return (
@@ -35,9 +31,8 @@ const ProjectsPage: NextPageWithLayout = () => {
           </Admonition>
         ) : (
           <div className="flex flex-col gap-y-4 flex-grow">
-            <HomePageActions viewMode={viewMode} setViewMode={setViewMode} showViewToggle={true} />
-
-            <ProjectList viewMode={viewMode} />
+            <HomePageActions showViewToggle={true} />
+            <ProjectList />
           </div>
         )}
       </ScaffoldSection>

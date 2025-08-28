@@ -1,7 +1,7 @@
 import { UIEvent, useMemo } from 'react'
 
 import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
@@ -9,6 +9,7 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { isAtBottom } from 'lib/helpers'
@@ -28,15 +29,10 @@ import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
-  viewMode?: 'grid' | 'table'
   rewriteHref?: (projectRef: string) => string
 }
 
-export const ProjectList = ({
-  organization: organization_,
-  viewMode = 'grid',
-  rewriteHref,
-}: ProjectListProps) => {
+export const ProjectList = ({ organization: organization_, rewriteHref }: ProjectListProps) => {
   const { slug: urlSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
@@ -47,6 +43,7 @@ export const ProjectList = ({
     'status',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [viewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
   const organization = organization_ ?? selectedOrganization
   const slug = organization?.slug ?? urlSlug
@@ -87,11 +84,9 @@ export const ProjectList = ({
   const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
 
   const filteredProjectsByStatus =
-    filterStatus !== undefined
-      ? filterStatus.length === 2
-        ? sortedProjects
-        : sortedProjects.filter((project) => filterStatus.includes(project.status))
-      : sortedProjects
+    filterStatus.length === 0
+      ? sortedProjects
+      : sortedProjects.filter((project) => filterStatus.includes(project.status))
 
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),

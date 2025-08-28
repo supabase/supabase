@@ -1,8 +1,9 @@
 import { Filter, Grid, List, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import {
@@ -19,16 +20,12 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 interface HomePageActionsProps {
   hideNewProject?: boolean
-  viewMode?: 'grid' | 'table'
   showViewToggle?: boolean
-  setViewMode?: (value: 'grid' | 'table') => void
 }
 
 export const HomePageActions = ({
   hideNewProject = false,
-  viewMode,
   showViewToggle = false,
-  setViewMode,
 }: HomePageActionsProps) => {
   const { slug } = useParams()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
@@ -38,6 +35,7 @@ export const HomePageActions = ({
     'status',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
   return (
     <div className="flex items-center justify-between">
