@@ -22,7 +22,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
@@ -270,7 +270,7 @@ const DatabaseUsage = () => {
           orgPlan?.id &&
           (showChartsV2
             ? REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
+                <LazyComposedChartHandler
                   key={chart.id}
                   {...chart}
                   attributes={chart.attributes as MultiAttribute[]}
@@ -289,7 +289,7 @@ const DatabaseUsage = () => {
               ))
             : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart, i) =>
                 chart.availableIn?.includes(orgPlan?.id) ? (
-                  <ComposedChartHandler
+                  <LazyComposedChartHandler
                     key={chart.id}
                     {...chart}
                     attributes={chart.attributes as MultiAttribute[]}
