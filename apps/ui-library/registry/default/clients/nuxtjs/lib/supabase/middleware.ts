@@ -6,8 +6,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // create Supabase SSR client directly here
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    process.env.NUXT_PUBLIC_SUPABASE_URL!,
+    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
     {
       cookies: {
         get: (key) => getCookie(event, key),

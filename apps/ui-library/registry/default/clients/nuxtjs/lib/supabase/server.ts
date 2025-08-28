@@ -4,8 +4,8 @@ import { defineEventHandler, getCookie, setCookie } from 'h3';
 export default defineEventHandler(async (event) => {
   // Create Supabase SSR client
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    process.env.NUXT_PUBLIC_SUPABASE_URL!,
+    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
     {
       cookies: {
         get: (key) => getCookie(event, key),
