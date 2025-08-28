@@ -192,7 +192,7 @@ const PageLayout: NextPageWithLayout = () => {
                     />
                     <AreaChart
                       title="Max execution time"
-                      className="w-full mt-4"
+                      className="w-full"
                       xAxisKey="timestamp"
                       customDateFormat={selectedInterval.format}
                       yAxisKey="max_execution_time"
@@ -333,7 +333,7 @@ const PageLayout: NextPageWithLayout = () => {
                     />
                     <AreaChart
                       title="Max CPU Time"
-                      className="w-full mt-4"
+                      className="w-full"
                       xAxisKey="timestamp"
                       customDateFormat={selectedInterval.format}
                       yAxisKey="max_cpu_time_used"
