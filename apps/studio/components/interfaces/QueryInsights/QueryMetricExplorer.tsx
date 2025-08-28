@@ -315,7 +315,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
             <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-100 mt-0">
               <div className="p-4">
                 {isLoading ? (
-                  <div className="h-full flex items-center justify-center">
+                  <div className="h-full min-h-[264px] flex items-center justify-center">
                     <div className="text-sm text-foreground-lighter">Loading metrics...</div>
                   </div>
                 ) : chartData.data.length > 0 ? (
