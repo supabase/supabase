@@ -6,6 +6,7 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { useParams } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
+  Badge,
   Button,
   ResizableHandle,
   ResizablePanel,
@@ -89,6 +90,54 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
         return (
           <div className="w-full flex items-center gap-x-2">
             <div className="font-mono text-xs">{value}</div>
+          </div>
+        )
+      },
+    },
+    {
+      key: 'slowness_rating',
+      name: 'Slowness Rating',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: 'cursor-pointer',
+      renderHeaderCell: () => {
+        return (
+          <div
+            className="flex items-center justify-between font-mono font-normal text-xs w-full"
+            onClick={() => onSortChange('slowness_rating')}
+          >
+            <div className="flex items-center gap-x-2">
+              <p className="!text-foreground">Slowness Rating</p>
+            </div>
+            {sort?.column === 'slowness_rating' && (
+              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
+            )}
+          </div>
+        )
+      },
+      renderCell: (props) => {
+        const value = props.row?.slowness_rating
+        const getBadgeVariant = (rating: string) => {
+          switch (rating) {
+            case 'GREAT':
+            case 'ACCEPTABLE':
+              return 'default'
+            case 'NOTICEABLE':
+            case 'SLOW':
+              return 'warning'
+            case 'CRITICAL':
+              return 'destructive'
+            default:
+              return 'default'
+          }
+        }
+        return (
+          <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
+            <span>
+              <Badge variant={getBadgeVariant(value)} className="text-xs !text-center !inline-flex">
+                {value}
+              </Badge>
+            </span>
           </div>
         )
       },
@@ -304,6 +353,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
           cmd_type_text: 'SELECT',
           application_name: 'Test App',
           badness_score: 25.5,
+          slowness_rating: 'GREAT',
           error_count: 0,
           startup_cost_before: 0,
           startup_cost_after: 0,

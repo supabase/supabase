@@ -38,6 +38,7 @@ export type QueryInsightsQuery = {
   cmd_type_text: string
   application_name: string
   badness_score: number
+  slowness_rating: string
   // index_advisor results
   startup_cost_before?: number
   startup_cost_after?: number
@@ -215,7 +216,15 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
           SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
           SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END),
         1)
-      ) AS badness_score
+      ) AS badness_score,
+      -- Slowness rating based on mean execution time
+      CASE 
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 100 THEN 'GREAT'
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 200 THEN 'ACCEPTABLE'
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 1000 THEN 'NOTICEABLE'
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 5000 THEN 'SLOW'
+        ELSE 'CRITICAL'
+      END AS slowness_rating
     FROM pg_stat_monitor
     WHERE bucket_start_time >= '${startTime}'
       AND bucket_start_time <= '${endTime}'
@@ -281,7 +290,15 @@ const getQueriesWithErrorsSql = (startTime: string, endTime: string) => /* SQL *
           SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
           SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END),
         1)
-      ) AS badness_score
+      ) AS badness_score,
+      -- Slowness rating based on mean execution time
+      CASE 
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 100 THEN 'GREAT'
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 200 THEN 'ACCEPTABLE'
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 1000 THEN 'NOTICEABLE'
+        WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 5000 THEN 'SLOW'
+        ELSE 'CRITICAL'
+      END AS slowness_rating
     FROM pg_stat_monitor
     WHERE bucket_start_time >= '${startTime}'
       AND bucket_start_time <= '${endTime}'
