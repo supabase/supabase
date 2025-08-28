@@ -1,4 +1,5 @@
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Activity,
   BarChartIcon,
@@ -215,56 +216,54 @@ const ChartHeader = ({
       </div>
       <div className="flex items-center gap-2">
         {sql ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="default"
-                className="px-1.5"
-                icon={<SquareTerminal />}
-                onClick={() =>
-                  router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}`)
-                }
-              />
-            </TooltipTrigger>
-            <TooltipContent side="top" align="center">
-              Open in Log Explorer
-            </TooltipContent>
-          </Tooltip>
+          <ButtonTooltip
+            type="default"
+            className="px-1.5"
+            asChild
+            tooltip={{
+              content: {
+                side: 'top',
+                text: 'Open in Log Explorer',
+              },
+            }}
+          >
+            <Link href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}`}>
+              <SquareTerminal className="w-4 h-4 text-foreground-lighter" />
+            </Link>
+          </ButtonTooltip>
         ) : null}
 
         {!hideChartType && onChartStyleChange && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="default"
-                className="px-1.5"
-                icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
-                onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="top" align="center">
-              View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
-            </TooltipContent>
-          </Tooltip>
+          <ButtonTooltip
+            type="default"
+            className="px-1.5"
+            icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+            onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: `View as ${chartStyle === 'bar' ? 'line chart' : 'bar chart'}`,
+              },
+            }}
+          />
         )}
         {setShowMaxValue && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type={showMaxValue ? 'default' : 'dashed'}
-                className="px-1.5"
-                icon={
-                  <GitCommitHorizontalIcon
-                    className={showMaxValue ? 'text-foreground-light' : 'text-foreground-lighter'}
-                  />
-                }
-                onClick={() => setShowMaxValue(!showMaxValue)}
+          <ButtonTooltip
+            type={showMaxValue ? 'default' : 'dashed'}
+            className="px-1.5"
+            icon={
+              <GitCommitHorizontalIcon
+                className={showMaxValue ? 'text-foreground-light' : 'text-foreground-lighter'}
               />
-            </TooltipTrigger>
-            <TooltipContent side="top" align="center">
-              {showMaxValue ? 'Hide' : 'Show'} limit
-            </TooltipContent>
-          </Tooltip>
+            }
+            onClick={() => setShowMaxValue(!showMaxValue)}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: `${showMaxValue ? 'Hide' : 'Show'} limit`,
+              },
+            }}
+          />
         )}
       </div>
     </div>
