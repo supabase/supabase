@@ -41,7 +41,14 @@ import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 
 import { PARTIALS_DIRECTORY } from '~/lib/docs'
-import { fromDocsMarkdown, getAttributeValue, getAttributeValueExpression } from './utils.server'
+import {
+  fromDocsMarkdown,
+  getAttributeValue,
+  getAttributeValueExpression,
+  getFeatureValue,
+} from './utils.server'
+
+import { isFeatureEnabled } from 'common'
 
 export function partialsRemark() {
   return async function transform(tree: Root) {
@@ -61,14 +68,21 @@ function isMdFile(path: string) {
 }
 
 function toFilePath(node: MdxJsxFlowElement) {
-  const path = getAttributeValue(node, 'path')
+  let path = getAttributeValue(node, 'path')
   if (typeof path !== 'string' || !isMdFile(path)) {
     throw new Error('Invalid $Partial path: path must end with .mdx or .md')
   }
+  // Feels Hacky, but works
+  const featureToToggle = getAttributeValue(node, 'feature')
+  const featureEnabled = isFeatureEnabled(featureToToggle)
+  console.log(featureEnabled)
+  if ((featureEnabled as any) === false) path = 'billing/pricing/pricing_blank.mdx'
+
   const filePath = join(PARTIALS_DIRECTORY, path)
   if (!filePath.startsWith(PARTIALS_DIRECTORY)) {
     throw new Error(`Invalid $Partial path: Path must be inside ${PARTIALS_DIRECTORY}`)
   }
+
   return filePath
 }
 

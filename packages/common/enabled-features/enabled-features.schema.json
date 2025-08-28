@@ -80,12 +80,14 @@
       "type": "boolean",
       "description": "Show the user type filter in the authentication users page"
     },
-
     "billing:all": {
       "type": "boolean",
       "description": "Enable the billing settings page"
     },
-
+    "build:self-hosting": {
+      "type": "boolean",
+      "description": "Enable Self-hosting in documentation"
+    },
     "database:replication": {
       "type": "boolean",
       "description": "Enable the database replication page"

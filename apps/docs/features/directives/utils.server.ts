@@ -25,6 +25,18 @@ export function getAttributeValue(
   )
 }
 
+export function getFeatureValue(
+  node: MdxJsxFlowElement | MdxJsxFlowElementHast | MdxJsxTextElement | MdxJsxTextElementHast,
+  attributeName: string
+) {
+  return (
+    node.attributes.find(
+      (attr: MdxJsxAttribute | MdxJsxExpressionAttribute) =>
+        'name' in attr && attr.name === attributeName
+    ) ?? undefined
+  )
+}
+
 export function getAttributeValueExpression(
   node: MdxJsxAttributeValueExpression | string | undefined
 ) {
