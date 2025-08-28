@@ -164,20 +164,21 @@ const ChartHeader = ({
         {title}
       </h3>
       {docsUrl && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              href={docsUrl}
-              target="_blank"
-              className="text-foreground-lighter hover:text-foreground-light"
-            >
-              <InfoIcon className="w-3 h-3" />
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent side="top" align="center">
-            Read docs
-          </TooltipContent>
-        </Tooltip>
+        <ButtonTooltip
+          type="text"
+          className="px-1"
+          asChild
+          tooltip={{
+            content: {
+              side: 'top',
+              text: 'Read docs',
+            },
+          }}
+        >
+          <Link href={docsUrl} target="_blank">
+            <InfoIcon className="w-4 h-4 text-foreground-lighter" />
+          </Link>
+        </ButtonTooltip>
       )}
     </div>
   )
