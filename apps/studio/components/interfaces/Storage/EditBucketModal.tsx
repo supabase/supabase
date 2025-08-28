@@ -174,21 +174,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     }
   }, [visible, bucket, form])
 
-  // Auto-turn off file size limit toggle when value is 0
-  useEffect(() => {
-    if (formattedSizeLimit === 0 && hasFileSizeLimit) {
-      form.setValue('has_file_size_limit', false)
-    }
-  }, [formattedSizeLimit, hasFileSizeLimit, form])
-
-  // Auto-turn off MIME types toggle when field is empty
-  useEffect(() => {
-    const mimeTypesValue = form.getValues('allowed_mime_types')
-    if (!mimeTypesValue || mimeTypesValue.trim() === '') {
-      setHasAllowedMimeTypes(false)
-    }
-  }, [form.watch('allowed_mime_types')])
-
   return (
     <Dialog
       open={visible}
