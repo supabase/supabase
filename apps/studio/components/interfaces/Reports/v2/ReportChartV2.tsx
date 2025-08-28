@@ -10,6 +10,7 @@ import type { ReportConfig } from 'data/reports/v2/reports.types'
 import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { ReportChartUpsell } from './ReportChartUpsell'
 import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 export interface ReportChartV2Props {
   report: ReportConfig
@@ -20,7 +21,6 @@ export interface ReportChartV2Props {
   updateDateRange: (from: string, to: string) => void
   functionIds?: string[]
   edgeFnIdToName?: (id: string) => string | undefined
-  isLoading?: boolean
   className?: string
   syncId?: string
 }
@@ -34,7 +34,6 @@ export const ReportChartV2 = ({
   updateDateRange,
   functionIds,
   edgeFnIdToName,
-  isLoading,
   className,
   syncId,
 }: ReportChartV2Props) => {
@@ -86,57 +85,14 @@ export const ReportChartV2 = ({
   const finalChartData =
     filledChartData && filledChartData.length > 0 && !isFillError ? filledChartData : chartData
 
-  // STATE
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
 
-  // UPSELL STATE
-  if (!isAvailable && !isLoading && !isLoadingChart) {
+  if (!isAvailable && !isLoadingChart) {
     return <ReportChartUpsell report={report} orgSlug={org?.slug ?? ''} />
   }
 
-  // LOADING STATE
-  if (isLoadingChart || isLoading) {
-    return (
-      <Panel
-        title={<p className="text-sm">{report.label}</p>}
-        className={cn('h-[260px]', className)}
-      >
-        <div className="flex items-center justify-center h-full">
-          <div className="text-sm text-foreground-light">Loading...</div>
-        </div>
-      </Panel>
-    )
-  }
-
-  // ERROR STATE
-  if (error) {
-    return (
-      <Panel
-        title={<p className="text-sm">{report.label}</p>}
-        className={cn('h-[260px]', className)}
-      >
-        <div className="flex items-center justify-center h-full">
-          <div className="text-sm text-destructive">Error loading chart data</div>
-        </div>
-      </Panel>
-    )
-  }
-
-  // EMPTY STATE
-  if (!finalChartData || finalChartData.length === 0) {
-    return (
-      <Panel
-        title={<p className="text-sm">{report.label}</p>}
-        className={cn('h-[260px]', className)}
-      >
-        <div className="flex items-center justify-center h-full">
-          <div className="text-sm text-foreground-light">
-            No data available for the selected time range
-          </div>
-        </div>
-      </Panel>
-    )
-  }
+  const isErrorState = error && !isLoadingChart
+  const showEmptyState = (!finalChartData || finalChartData.length === 0) && !isLoadingChart
 
   return (
     <>
@@ -147,30 +103,44 @@ export const ReportChartV2 = ({
         wrapWithLoading={false}
         id={report.id}
       >
-        <Panel.Content className="flex flex-col gap-4">
-          <ComposedChart
-            attributes={dynamicAttributes}
-            data={finalChartData}
-            format={report.format ?? undefined}
-            xAxisKey="period_start"
-            yAxisKey={dynamicAttributes[0]?.attribute}
-            highlightedValue={0}
-            title={report.label}
-            customDateFormat={undefined}
-            chartHighlight={undefined}
-            chartStyle={chartStyle}
-            showTooltip={report.showTooltip}
-            showLegend={report.showLegend}
-            showTotal={false}
-            showMaxValue={report.showMaxValue}
-            onChartStyleChange={setChartStyle}
-            updateDateRange={updateDateRange}
-            valuePrecision={report.valuePrecision}
-            hideChartType={report.hideChartType}
-            titleTooltip={report.titleTooltip}
-            syncId={syncId}
-            sql={queryResult?.query}
-          />
+        <Panel.Content className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
+          {isLoadingChart ? (
+            <Loader2 className="size-5 animate-spin text-foreground-light" />
+          ) : showEmptyState ? (
+            <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
+              No data available for the selected time range
+            </p>
+          ) : isErrorState ? (
+            <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
+              Error loading chart data
+            </p>
+          ) : (
+            <div className="w-full">
+              <ComposedChart
+                attributes={dynamicAttributes}
+                data={finalChartData}
+                format={report.format ?? undefined}
+                xAxisKey="period_start"
+                yAxisKey={dynamicAttributes[0]?.attribute}
+                highlightedValue={0}
+                title={report.label}
+                customDateFormat={undefined}
+                chartHighlight={undefined}
+                chartStyle={chartStyle}
+                showTooltip={report.showTooltip}
+                showLegend={report.showLegend}
+                showTotal={false}
+                showMaxValue={report.showMaxValue}
+                onChartStyleChange={setChartStyle}
+                updateDateRange={updateDateRange}
+                valuePrecision={report.valuePrecision}
+                hideChartType={report.hideChartType}
+                titleTooltip={report.titleTooltip}
+                syncId={syncId}
+                sql={queryResult?.query}
+              />
+            </div>
+          )}
         </Panel.Content>
       </Panel>
     </>
