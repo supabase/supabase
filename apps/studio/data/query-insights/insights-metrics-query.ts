@@ -39,6 +39,21 @@ export type InsightsMetrics = {
   }
 }
 
+const getAllMetricsSql = (startTime: string, endTime: string) => {
+  return /* SQL */ `
+    SELECT
+      COALESCE(SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END), 0) as total_rows_read,
+      COALESCE(SUM(calls), 0) as total_calls,
+      COALESCE(SUM(shared_blks_hit), 0) as total_cache_hits,
+      COALESCE(SUM(shared_blks_read), 0) as total_cache_misses,
+      COALESCE(SUM(shared_blks_hit + shared_blks_read), 0) as total_hits
+    FROM pg_stat_monitor
+    WHERE bucket_start_time >= '${startTime}'::timestamptz
+      AND bucket_start_time <= '${endTime}'::timestamptz
+      AND bucket_done = true
+  `
+}
+
 const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
   switch (metric) {
     case 'rows_read':
@@ -158,6 +173,46 @@ export function useInsightsMetricsQuery(
       console.log(`[useInsightsMetricsQuery] Result for ${metric}:`, result)
 
       return result as InsightsMetric[]
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    ...options,
+  })
+}
+
+export function useAllMetricsQuery(
+  projectRef: string | undefined,
+  startTime: string,
+  endTime: string,
+  options?: UseQueryOptions<{
+    total_rows_read: number
+    total_calls: number
+    total_cache_hits: number
+    total_cache_misses: number
+    total_hits: number
+  }>
+) {
+  return useQuery({
+    queryKey: queryInsightsKeys.metrics(projectRef, 'all_metrics', startTime, endTime),
+    queryFn: async () => {
+      if (!projectRef) throw new Error('Project ref is required')
+
+      const sql = getAllMetricsSql(startTime, endTime)
+      console.log(`[useAllMetricsQuery] Executing SQL:`, sql)
+
+      const { result } = await executeSql({
+        projectRef,
+        sql,
+      })
+
+      console.log(`[useAllMetricsQuery] Result:`, result)
+
+      return result[0] as {
+        total_rows_read: number
+        total_calls: number
+        total_cache_hits: number
+        total_cache_misses: number
+        total_hits: number
+      }
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     ...options,

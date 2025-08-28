@@ -10,9 +10,11 @@ import {
   Button,
 } from 'ui'
 import { QueryRowExplorer } from './QueryRowExplorer'
+import { formatNumberWithCommas } from './QueryInsights.utils'
 import {
   useInsightsMetricsQuery,
   useInsightsPrefetchQuery,
+  useAllMetricsQuery,
 } from 'data/query-insights/insights-metrics-query'
 import { useInsightsQueriesQuery } from 'data/query-insights/insights-queries-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -24,6 +26,21 @@ import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
 interface QueryMetricExplorerProps {
   startTime?: string
   endTime?: string
+}
+
+const QueryMetricBlock = ({
+  label,
+  value,
+}: {
+  label: string
+  value: string | number | undefined
+}) => {
+  return (
+    <div className="flex flex-col gap-0.5 text-xs">
+      <span className="font-mono text-xs text-foreground-lighter">{label}</span>
+      <span className="text-lg">{value}</span>
+    </div>
+  )
 }
 
 export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerProps) => {
@@ -70,6 +87,16 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   } = useInsightsMetricsQuery(project?.ref, selectedMetric, effectiveStartTime, effectiveEndTime, {
     enabled: !!project?.ref,
   })
+
+  // Fetch all metrics for the metric blocks
+  const { data: allMetricsData, isLoading: isLoadingAllMetrics } = useAllMetricsQuery(
+    project?.ref,
+    effectiveStartTime,
+    effectiveEndTime,
+    {
+      enabled: !!project?.ref,
+    }
+  )
 
   // Fetch all queries to calculate slowness ratings
   const { data: allQueries, isLoading: isLoadingQueries } = useInsightsQueriesQuery(
@@ -199,14 +226,41 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       return attributes
     }
 
-    const attributes: MultiAttribute[] = [
-      {
+    const attributes: MultiAttribute[] = []
+
+    if (selectedMetric === 'cache_hits') {
+      // For cache hits, show both hits and misses as separate lines
+      attributes.push(
+        {
+          attribute: 'cache_hit_rate',
+          label: 'Cache Hit Rate',
+          format: '%',
+          provider: 'query-insights' as any,
+          color: {
+            light: '#10b981', // Green for hits
+            dark: '#34d399',
+          },
+        },
+        {
+          attribute: 'cache_miss_rate',
+          label: 'Cache Miss Rate',
+          format: '%',
+          provider: 'query-insights' as any,
+          color: {
+            light: '#ef4444', // Red for misses
+            dark: '#f87171',
+          },
+        }
+      )
+    } else {
+      // For other metrics, use the default single attribute
+      attributes.push({
         attribute: selectedMetric,
         label: config.label,
         format: config.format,
         provider: 'query-insights' as any,
-      },
-    ]
+      })
+    }
 
     // Add selected query attribute if available
     if (selectedQuery && selectedQueryAverage !== undefined) {
@@ -236,6 +290,56 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     }
     return undefined
   }, [selectedMetric, metricsData])
+
+  // Get all metrics from the single query
+  const totalRowsRead = useMemo(() => {
+    if (allMetricsData?.total_rows_read !== undefined) {
+      return formatNumberWithCommas(allMetricsData.total_rows_read)
+    }
+    return '0'
+  }, [allMetricsData])
+
+  const totalCalls = useMemo(() => {
+    if (allMetricsData?.total_calls !== undefined) {
+      return formatNumberWithCommas(allMetricsData.total_calls)
+    }
+    return '0'
+  }, [allMetricsData])
+
+  const totalHits = useMemo(() => {
+    if (allMetricsData?.total_hits !== undefined) {
+      return formatNumberWithCommas(allMetricsData.total_hits)
+    }
+    return '0'
+  }, [allMetricsData])
+
+  const totalCacheHits = useMemo(() => {
+    if (
+      allMetricsData?.total_cache_hits !== undefined &&
+      allMetricsData?.total_hits !== undefined
+    ) {
+      const hitRate =
+        allMetricsData.total_hits > 0
+          ? (allMetricsData.total_cache_hits / allMetricsData.total_hits) * 100
+          : 0
+      return hitRate.toFixed(1) + '%'
+    }
+    return '0%'
+  }, [allMetricsData])
+
+  const totalCacheMisses = useMemo(() => {
+    if (
+      allMetricsData?.total_cache_misses !== undefined &&
+      allMetricsData?.total_hits !== undefined
+    ) {
+      const missRate =
+        allMetricsData.total_hits > 0
+          ? (allMetricsData.total_cache_misses / allMetricsData.total_hits) * 100
+          : 0
+      return missRate.toFixed(1) + '%'
+    }
+    return '0%'
+  }, [allMetricsData])
 
   // Transform data for the chart
   const chartData = useMemo(() => {
@@ -271,7 +375,24 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         return percentileData
       }
 
-      // For non-query_latency metrics, use the selectedMetric as the key
+      // Handle cache_hits metric specially to show both hit and miss rates
+      if (selectedMetric === 'cache_hits') {
+        const sharedBlksHit = item.shared_blks_hit || 0
+        const sharedBlksRead = item.shared_blks_read || 0
+        const totalBlocks = sharedBlksHit + sharedBlksRead
+
+        const hitRate = totalBlocks > 0 ? (sharedBlksHit / totalBlocks) * 100 : 0
+        const missRate = totalBlocks > 0 ? (sharedBlksRead / totalBlocks) * 100 : 0
+
+        return {
+          period_start: periodStart,
+          timestamp: timestamp,
+          cache_hit_rate: hitRate,
+          cache_miss_rate: missRate,
+        }
+      }
+
+      // For other non-query_latency metrics, use the selectedMetric as the key
       return {
         period_start: periodStart,
         timestamp: timestamp,
@@ -310,6 +431,10 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         // For query latency, sum the p95 values as the main metric
         const p95Value = (item as any).p95 || 0
         return sum + p95Value
+      } else if (selectedMetric === 'cache_hits') {
+        // For cache hits, use the hit rate as the main metric
+        const hitRate = (item as any).cache_hit_rate || 0
+        return sum + hitRate
       } else {
         // For other metrics, use the selectedMetric key
         const value = (item as any)[selectedMetric]
@@ -317,8 +442,15 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }
     }, 0)
 
-    const totalGrouped =
-      selectedMetric === 'query_latency' ? { p95: total } : { [selectedMetric]: total }
+    const totalGrouped = (() => {
+      if (selectedMetric === 'query_latency') {
+        return { p95: total }
+      } else if (selectedMetric === 'cache_hits') {
+        return { cache_hit_rate: total }
+      } else {
+        return { [selectedMetric]: total }
+      }
+    })()
 
     return {
       data: transformed,
@@ -409,20 +541,31 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                   <>
                     {selectedMetric === 'query_latency' && (
                       <div className="flex flex-row gap-6 mt-2">
-                        <div className="flex flex-col gap-0.5 text-xs">
-                          <span className="font-mono text-xs text-foreground-lighter">
-                            Average p95
-                          </span>
-                          <span className="text-lg">
-                            {averageP95?.toFixed(2).toLocaleString()}ms
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-0.5 text-xs">
-                          <span className="font-mono text-xs text-foreground-lighter">
-                            Slow queries
-                          </span>
-                          <span className="text-lg">{slowQueriesCount}</span>
-                        </div>
+                        <QueryMetricBlock
+                          label="Average p95"
+                          value={averageP95?.toFixed(2).toLocaleString() + 'ms'}
+                        />
+                        <QueryMetricBlock label="Slow queries" value={slowQueriesCount} />
+                      </div>
+                    )}
+
+                    {selectedMetric === 'rows_read' && (
+                      <div className="flex flex-row gap-6 mt-2">
+                        <QueryMetricBlock label="Total rows read" value={totalRowsRead} />
+                      </div>
+                    )}
+
+                    {selectedMetric === 'calls' && (
+                      <div className="flex flex-row gap-6 mt-2">
+                        <QueryMetricBlock label="Total calls" value={totalCalls} />
+                      </div>
+                    )}
+
+                    {selectedMetric === 'cache_hits' && (
+                      <div className="flex flex-row gap-6 mt-2">
+                        <QueryMetricBlock label="Total hits" value={totalHits} />
+                        <QueryMetricBlock label="Cache hits" value={totalCacheHits} />
+                        <QueryMetricBlock label="Cache misses" value={totalCacheMisses} />
                       </div>
                     )}
 
@@ -436,7 +579,11 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                       hideChartType={true}
                       hideHighlightedValue={true}
                       showTooltip={true}
-                      showLegend={selectedMetric === 'query_latency' || !!selectedQuery}
+                      showLegend={
+                        selectedMetric === 'query_latency' ||
+                        selectedMetric === 'cache_hits' ||
+                        !!selectedQuery
+                      }
                       showTotal={false}
                       showMaxValue={false}
                       updateDateRange={updateDateRange}

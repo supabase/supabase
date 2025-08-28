@@ -14,6 +14,10 @@ export const formatNumberWithCommas = (num: number | string | undefined | null):
   return numberValue.toLocaleString('en-US')
 }
 
+export const formatSlownessRating = (rating: string): string => {
+  return rating.charAt(0).toUpperCase() + rating.slice(1).toLowerCase()
+}
+
 export const formatQueryInsightsColumns = ({
   config,
   visibleColumns = [],
@@ -78,14 +82,15 @@ export const formatQueryInsightsColumns = ({
                 return 'default'
             }
           }
+
           return (
             <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
               <span>
                 <Badge
                   variant={getBadgeVariant(value as string)}
-                  className="text-xs !text-center !inline-flex"
+                  className="text-xs !text-center !inline-flex items-center"
                 >
-                  {value}
+                  {formatSlownessRating(value as string)}
                 </Badge>
               </span>
             </div>

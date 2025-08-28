@@ -1,4 +1,4 @@
-import { Search, TextSearch } from 'lucide-react'
+import { Search, TextSearch, LoaderCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState, useMemo } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
@@ -7,7 +7,6 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import {
@@ -96,37 +95,8 @@ export const QueryRowExplorer = ({
     onSortChange,
   })
 
-  // For debugging - show test data if no queries found
-  const reportData = queries?.length
-    ? queries
-    : [
-        {
-          query_id: 1,
-          query: 'SELECT * FROM users WHERE id = 1',
-          total_time: 150.5,
-          calls: 10,
-          rows_read: 1000,
-          rows_insert: 0,
-          rows_update: 0,
-          rows_delete: 0,
-          shared_blks_read: 50,
-          shared_blks_hit: 950,
-          mean_exec_time: 15.05,
-          database: 'postgres',
-          timestamp: new Date().toISOString(),
-          cmd_type_text: 'SELECT',
-          application_name: 'Test App',
-          badness_score: 25.5,
-          slowness_rating: 'GREAT',
-          error_count: 0,
-          startup_cost_before: 0,
-          startup_cost_after: 0,
-          total_cost_before: 0,
-          total_cost_after: 0,
-          index_statements: [],
-          errors: [],
-        } as InsightsQuery,
-      ]
+  // Use actual queries data or empty array if no queries found
+  const reportData = queries || []
 
   // Sort data based on current sort state
   const sortedData = [...reportData].sort((a, b) => {
@@ -283,8 +253,9 @@ export const QueryRowExplorer = ({
               )
             },
             noRowsFallback: isLoading ? (
-              <div className="absolute top-14 px-6 w-full">
-                <GenericSkeletonLoader />
+              <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+                <LoaderCircle className="h-6 w-6 animate-spin text-foreground-muted" />
+                <p className="text-foreground-light text-sm">Loading...</p>
               </div>
             ) : (
               <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
