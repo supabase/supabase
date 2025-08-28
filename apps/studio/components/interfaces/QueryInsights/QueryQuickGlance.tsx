@@ -54,7 +54,7 @@ export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) 
     return [
       {
         icon: <Database size={14} strokeWidth={1} />,
-        title: 'Queries',
+        title: 'Query Volume',
         values: [
           {
             label: 'Unique',
