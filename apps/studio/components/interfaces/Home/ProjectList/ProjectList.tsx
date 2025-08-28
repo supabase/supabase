@@ -12,7 +12,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { IS_PLATFORM } from 'lib/constants'
 import { isAtBottom } from 'lib/helpers'
 import type { Organization } from 'types'
-import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
   LoadingCardView,
   LoadingTableRow,
@@ -22,6 +22,7 @@ import {
 } from './EmptyStates'
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
+import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
@@ -126,7 +127,7 @@ export const ProjectList = ({
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
 
-  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
+  const handleScroll = (event: UIEvent<HTMLDivElement | HTMLUListElement>) => {
     if (isLoadingProjects || isFetchingNextPage || !isAtBottom(event)) return
     fetchNextPage()
   }
@@ -228,7 +229,14 @@ export const ProjectList = ({
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <ul className="w-full mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <ul
+          onScroll={handleScroll}
+          style={{ maxHeight: 'calc(100vh - 220px)' }}
+          className={cn(
+            'w-full mx-auto grid grid-cols-1 gap-2 md:gap-4 overflow-y-scroll',
+            'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
+          )}
+        >
           {filteredProjectsByStatus?.map((project) => (
             <ProjectCard
               key={project.ref}
@@ -245,6 +253,7 @@ export const ProjectList = ({
               )}
             />
           ))}
+          {hasNextPage && [...Array(2)].map((_, i) => <ShimmeringCard key={i} />)}
         </ul>
       )}
     </>
