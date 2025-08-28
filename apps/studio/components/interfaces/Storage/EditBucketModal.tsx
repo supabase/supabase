@@ -69,6 +69,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.BYTES)
   const { value: fileSizeLimit } = convertFromBytes(bucket?.file_size_limit ?? 0)
+  const bucketIdRef = useRef<string | null>(null)
 
   const form = useForm<z.infer<typeof BucketSchema>>({
     resolver: zodResolver(BucketSchema),
@@ -167,8 +168,13 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   useEffect(() => {
     if (visible && bucket) {
-      const { unit } = convertFromBytes(bucket.file_size_limit ?? 0)
-      setSelectedUnit(unit)
+      // Only set the selectedUnit when the bucket changes (different bucket ID)
+      // This preserves the user's unit selection when reopening the modal for the same bucket
+      if (bucketIdRef.current !== bucket.id) {
+        const { unit } = convertFromBytes(bucket.file_size_limit ?? 0)
+        setSelectedUnit(unit)
+        bucketIdRef.current = bucket.id
+      }
       // Clear errors when modal opens
       form.clearErrors()
     }
