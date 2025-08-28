@@ -293,7 +293,7 @@ export const EdgeFunctionVersionsList = () => {
                   return (
                     <CodeBlock
                       language={language}
-                      className="text-xs font-mono border-none p-0 !bg-muted"
+                      className="text-xs font-mono border-none p-0 !bg-muted !leading-3 tracking-tight"
                     >
                       {code}
                     </CodeBlock>
