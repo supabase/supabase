@@ -1,7 +1,7 @@
 import { Search, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -153,9 +153,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
 
   // Filter data based on filter text
   const filteredData = filterText.trim()
-    ? sortedData.filter((query) =>
-        query.query.toLowerCase().includes(filterText.toLowerCase())
-      )
+    ? sortedData.filter((query) => query.query.toLowerCase().includes(filterText.toLowerCase()))
     : sortedData
 
   const selectedQuery = selectedRow !== undefined ? filteredData[selectedRow] : undefined
@@ -217,7 +215,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
 
   return (
     <div className="border-t bg-surface-100 flex flex-col h-96 overflow-auto">
-      <div className="px-4 py-2 border-b flex justify-between items-center">
+      <div className="px-4 py-3 border-b flex justify-between items-center">
         <Input
           size="tiny"
           placeholder="Filter by query keywords..."
@@ -245,7 +243,10 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
 
             let updatedConfig = (columnConfiguration ?? []).slice()
             if (value.length === 0) {
-              updatedConfig = QUERY_INSIGHTS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+              updatedConfig = QUERY_INSIGHTS_TABLE_COLUMNS.map((c) => ({
+                id: c.id,
+                width: c.width,
+              }))
             } else {
               value.forEach((col) => {
                 const hasExisting = updatedConfig.find((c) => c.id === col)
