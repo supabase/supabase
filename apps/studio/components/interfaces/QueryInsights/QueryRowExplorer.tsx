@@ -61,6 +61,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
   })
   const [selectedRow, setSelectedRow] = useState<number>()
   const [view, setView] = useState<'details' | 'indexes' | 'metrics'>('details')
+  const [filterText, setFilterText] = useState<string>('')
 
   // Define columns similar to QueryPerformance
   const columns: Column<QueryInsightsQuery>[] = [
@@ -363,7 +364,35 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
           errors: [],
         } as QueryInsightsQuery,
       ]
-  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow] : undefined
+
+  // Sort data based on current sort state
+  const sortedData = [...reportData].sort((a, b) => {
+    if (!sort) return 0
+
+    const aValue = a[sort.column as keyof QueryInsightsQuery]
+    const bValue = b[sort.column as keyof QueryInsightsQuery]
+
+    if (aValue === undefined || bValue === undefined) return 0
+
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return sort.order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+    }
+
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sort.order === 'asc' ? aValue - bValue : bValue - aValue
+    }
+
+    return 0
+  })
+
+  // Filter data based on filter text
+  const filteredData = filterText.trim()
+    ? sortedData.filter((query) =>
+        query.query.toLowerCase().includes(filterText.toLowerCase())
+      )
+    : sortedData
+
+  const selectedQuery = selectedRow !== undefined ? filteredData[selectedRow] : undefined
 
   // Single query metrics hooks
   const { data: singleQueryLatency } = useSingleQueryLatency(
@@ -410,35 +439,17 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
     setSort(updatedSort)
   }
 
-  // Sort data based on current sort state
-  const sortedData = [...reportData].sort((a, b) => {
-    if (!sort) return 0
-
-    const aValue = a[sort.column as keyof QueryInsightsQuery]
-    const bValue = b[sort.column as keyof QueryInsightsQuery]
-
-    if (aValue === undefined || bValue === undefined) return 0
-
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sort.order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-    }
-
-    if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sort.order === 'asc' ? aValue - bValue : bValue - aValue
-    }
-
-    return 0
-  })
-
   // Debug logging for table data
   console.log('QueryRowExplorer Table Debug:', {
     queries,
     reportData,
     reportDataLength: reportData.length,
     sortedDataLength: sortedData.length,
+    filteredDataLength: filteredData.length,
+    filterText,
     isLoading,
     error,
-    firstRow: sortedData[0],
+    firstRow: filteredData[0],
   })
 
   useEffect(() => {
@@ -450,9 +461,11 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
       <div className="px-4 py-2 border-b flex justify-between items-center">
         <Input
           size="tiny"
-          placeholder="Filter by query name..."
+          placeholder="Filter by query keywords..."
           icon={<Search size={14} />}
           className="w-64"
+          value={filterText}
+          onChange={(e) => setFilterText(e.target.value)}
         />
         <ButtonTooltip
           type="default"
@@ -476,7 +489,7 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
             rowHeight={44}
             headerRowHeight={36}
             columns={columns}
-            rows={sortedData}
+            rows={filteredData}
             onRowsChange={(newRows) => {
               console.log('DataGrid rows changed:', newRows.length)
             }}
@@ -512,9 +525,13 @@ export const QueryRowExplorer = ({ startTime, endTime }: QueryRowExplorerProps) 
                 <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
                   <TextSearch className="text-foreground-muted" strokeWidth={1} />
                   <div className="text-center">
-                    <p className="text-foreground">No queries detected</p>
+                    <p className="text-foreground">
+                      {filterText ? 'No queries found' : 'No queries detected'}
+                    </p>
                     <p className="text-foreground-light">
-                      There are no queries that match the criteria in the selected time range
+                      {filterText
+                        ? `No queries match "${filterText}" in the selected time range`
+                        : 'There are no queries that match the criteria in the selected time range'}
                     </p>
                   </div>
                 </div>
