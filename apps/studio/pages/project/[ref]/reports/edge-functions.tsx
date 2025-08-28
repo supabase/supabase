@@ -49,7 +49,7 @@ const EdgeFunctionsUsage = () => {
   })
 
   const chartSyncId = `edge-functions-${ref}`
-useChartHoverState(chartSyncId)
+  useChartHoverState(chartSyncId)
 
   const [isOpen, setIsOpen] = useState(false)
   const [functionIds, setFunctionIds] = useState<string[]>([])
@@ -227,9 +227,9 @@ useChartHoverState(chartSyncId)
           {selectedDateRange &&
             reportConfig
               .filter((report) => !report.hide)
-              .map((report, i) => (
+              .map((report) => (
                 <ReportChartV2
-                  key={`${report.id}-${i}`}
+                  key={`${report.id}`}
                   report={report}
                   projectRef={ref!}
                   interval={selectedDateRange.interval}
