@@ -1,7 +1,18 @@
 import { useState } from 'react'
 import { RefreshCw, Eye } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge, LogoLoader, ScrollArea } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Badge,
+  LogoLoader,
+  ScrollArea,
+  CodeBlock,
+} from 'ui'
+import type { CodeBlockLang } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
@@ -16,6 +27,24 @@ const sortDeployments = (items: EdgeFunctionDeployment[]) =>
   items
     .slice()
     .sort((a, b) => (b.version !== a.version ? b.version - a.version : b.created_at - a.created_at))
+
+const inferLanguageFromPath = (path: string): CodeBlockLang => {
+  const ext = path.split('.').pop()?.toLowerCase()
+  switch (ext) {
+    case 'ts':
+    case 'tsx':
+      return 'ts'
+    case 'js':
+    case 'jsx':
+    case 'mjs':
+    case 'cjs':
+      return 'js'
+    case 'json':
+      return 'json'
+    default:
+      return 'ts'
+  }
+}
 
 export const EdgeFunctionVersionsList = () => {
   const { ref: projectRef, slug: functionSlug } = useParams()
@@ -256,9 +285,21 @@ export const EdgeFunctionVersionsList = () => {
               </div>
 
               <ScrollArea className="h-[400px] rounded border bg-muted p-3 text-xs">
-                <pre className="whitespace-pre">
-                  <code>{codeFiles[0]?.content ?? ''}</code>
-                </pre>
+                {(() => {
+                  const firstFile = codeFiles[0]
+                  const code = firstFile?.content ?? ''
+                  const path = firstFile?.path ?? ''
+                  const language = path ? inferLanguageFromPath(path) : 'js'
+                  return (
+                    <CodeBlock
+                      hideLineNumbers
+                      language={language}
+                      className="text-xs font-mono border-none p-0 !bg-muted"
+                    >
+                      {code}
+                    </CodeBlock>
+                  )
+                })()}
               </ScrollArea>
 
               {selectedDeployment.status === 'ACTIVE' ? (
