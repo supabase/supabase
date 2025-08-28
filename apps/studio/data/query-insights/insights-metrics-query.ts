@@ -16,6 +16,7 @@ export type InsightsMetric = {
   mean_exec_time?: number
   total_exec_time?: number
   p50?: number
+  p75?: number
   p95?: number
   p99?: number
   p99_9?: number
@@ -60,6 +61,7 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
         SELECT
           bucket_start_time as timestamp,
           percentile_cont(0.50) WITHIN GROUP (ORDER BY mean_exec_time) as p50,
+          percentile_cont(0.75) WITHIN GROUP (ORDER BY mean_exec_time) as p75,
           percentile_cont(0.95) WITHIN GROUP (ORDER BY mean_exec_time) as p95,
           percentile_cont(0.99) WITHIN GROUP (ORDER BY mean_exec_time) as p99,
           percentile_cont(0.999) WITHIN GROUP (ORDER BY mean_exec_time) as p99_9,

@@ -32,6 +32,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   // State to control which percentile lines are visible for query latency
   const [visiblePercentiles, setVisiblePercentiles] = useState({
     p50: true,
+    p75: true,
     p95: true,
     p99: true,
     p99_9: true,
@@ -102,6 +103,15 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         attributes.push({
           attribute: 'p50',
           label: 'P50',
+          format: 'ms',
+          provider: 'query-insights' as any,
+        })
+      }
+
+      if (safeVisiblePercentiles.p75) {
+        attributes.push({
+          attribute: 'p75',
+          label: 'P75',
           format: 'ms',
           provider: 'query-insights' as any,
         })
@@ -200,6 +210,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
         // Only include percentiles that are visible
         if (safeVisiblePercentiles.p50) percentileData.p50 = item.p50 || 0
+        if (safeVisiblePercentiles.p75) percentileData.p75 = item.p75 || 0
         if (safeVisiblePercentiles.p95) percentileData.p95 = item.p95 || 0
         if (safeVisiblePercentiles.p99) percentileData.p99 = item.p99 || 0
         if (safeVisiblePercentiles.p99_9) percentileData.p99_9 = item.p99_9 || 0
