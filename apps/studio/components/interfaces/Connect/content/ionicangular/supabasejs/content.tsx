@@ -24,7 +24,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
           {`
 export const environment = {
   supabaseUrl: '${projectKeys.apiUrl ?? 'your-project-url'}',
-  supabaseKey: '${projectKeys.anonKey ?? 'your-anon-key'}',
+  supabaseKey: '${projectKeys.publishableKey ?? '<prefer publishabke key instead of anon key for mobile apps>'}',
 };
 `}
         </SimpleCodeBlock>

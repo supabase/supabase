@@ -1,6 +1,6 @@
 'use client'
 
-import { FlagValues } from '@vercel/flags/react'
+import { FlagValues } from 'flags/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 import { components } from 'api-types'
@@ -9,8 +9,8 @@ import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
 import { ensurePlatformSuffix } from './helpers'
 
-type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBodyDto']
-export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponseDto']
+type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
+export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
 
 export async function getFeatureFlags(API_URL: string) {
   const data = await get(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags`)
@@ -140,4 +140,20 @@ export const FeatureFlagProvider = ({
 
 export const useFeatureFlags = () => {
   return useContext(FeatureFlagContext)
+}
+
+const isObjectEmpty = (obj: Object) => {
+  return Object.keys(obj).length === 0
+}
+
+export function useFlag<T = boolean>(name: string) {
+  const flagStore = useFeatureFlags()
+
+  const store = flagStore.configcat
+
+  if (!isObjectEmpty(store) && store[name] === undefined) {
+    console.error(`Flag key "${name}" does not exist in ConfigCat flag store`)
+    return false
+  }
+  return store[name] as T
 }

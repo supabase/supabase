@@ -4,21 +4,21 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import DeleteQueue from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
-import PurgeQueue from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
+import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
+import { PurgeQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
 import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
 import { QueueSettings } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
 import { SendMessageModal } from 'components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -33,7 +33,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [openRlsPopover, setOpenRlsPopover] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
@@ -91,7 +91,8 @@ export const QueueTab = () => {
     updateTable({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: queueTable.id,
+      name: queueTable.name,
       schema: 'pgmq',
       payload: payload,
     })
@@ -99,7 +100,8 @@ export const QueueTab = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-end gap-x-4 py-4 px-6 mb-0">
+      <div className="flex items-center justify-between gap-x-4 py-1.5 px-10 mb-0 bg-surface-200">
+        <QueueFilters selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes} />
         <div className="flex gap-x-2">
           <QueueSettings />
 
@@ -237,8 +239,8 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
         </div>
       </div>
 
-      <QueueFilters selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes} />
       <LoadingLine loading={isFetching} />
+
       <QueueMessagesDataGrid
         error={error}
         messages={messages || []}

@@ -16,7 +16,8 @@ permissions:
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on: [larger-runner-4cpu]
+    runs-on:
+      group: Default Larger Runners
 
     steps:
       - name: Checkout

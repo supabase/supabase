@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
@@ -16,10 +16,10 @@ import {
   ProjectUpgradeTargetVersion,
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
-import { ReleaseChannel, useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
+import { ReleaseChannel } from 'data/projects/new-project.constants'
+import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -66,7 +66,7 @@ const ProjectUpgradeAlert = () => {
   const router = useRouter()
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
@@ -186,6 +186,7 @@ const ProjectUpgradeAlert = () => {
                     [right-sized](https://supabase.com/docs/guides/platform/upgrading#disk-sizing) with the upgrade.`}
                   />
                 )}
+                {/* @ts-ignore */}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
                   <Alert_Shadcn_ variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />

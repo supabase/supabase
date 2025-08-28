@@ -51,7 +51,7 @@ At it's most basic a function has the following parts:
 
 1. `create or replace function hello_world()`: The function declaration, where `hello_world` is the name of the function. You can use either `create` when creating a new function or `replace` when replacing an existing function. Or you can use `create or replace` together to handle either.
 2. `returns text`: The type of data that the function returns. If it returns nothing, you can `returns void`.
-3. `language sql`: The language used inside the function body. This can also be a procedural language: `plpgsql`, `plv8`, `plpython`, etc.
+3. `language sql`: The language used inside the function body. This can also be a procedural language: `plpgsql`, `plpython`, etc.
 4. `as $$`: The function wrapper. Anything enclosed inside the `$$` symbols will be part of the function body.
 5. `select 'hello world';`: A simple function body. The final `select` statement inside a function body will be returned if there are no statements following it.
 6. `$$;`: The closing symbols of the function wrapper.
@@ -59,6 +59,12 @@ At it's most basic a function has the following parts:
 </details>
 
 <br />
+
+<Admonition type="caution">
+
+When naming your functions, make the name of the function unique as overloaded functions are not supported.
+
+</Admonition>
 
 After the Function is created, we have several ways of "executing" the function - either directly inside the database using SQL, or with one of the client libraries.
 

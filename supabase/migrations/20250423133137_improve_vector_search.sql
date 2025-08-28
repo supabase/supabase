@@ -1,8 +1,3 @@
-create index if not exists
-idx_page_section_embedding
-on public.page_section
-using hnsw (embedding vector_ip_ops);
-
 create or replace function match_embedding(
   embedding vector(1536),
   match_threshold float default 0.78,

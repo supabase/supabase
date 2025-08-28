@@ -9,6 +9,7 @@ import { Check, Copy } from 'lucide-react'
 import {
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -26,7 +27,7 @@ export async function copyToClipboardWithMeta(
   value: string
   // event?: Event
 ) {
-  navigator.clipboard.writeText(value)
+  copyToClipboard(value)
   if (event) {
     // trackEvent(event)
   }

@@ -6,7 +6,7 @@ import { visit } from 'unist-util-visit'
 export type UrlTransformFunction = (url: string, node: Element) => string
 
 function modify(node: Element, prop: string, fn?: UrlTransformFunction) {
-  if (hasProperty(node, prop)) {
+  if (node.properties && hasProperty(node, prop)) {
     const property = node.properties[prop]
     if (typeof property !== 'string') {
       return

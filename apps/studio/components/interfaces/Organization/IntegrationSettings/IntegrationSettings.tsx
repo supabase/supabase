@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
@@ -21,15 +20,16 @@ import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-conn
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
   GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
 } from 'lib/github'
+import { useRouter } from 'next/router'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
-import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
@@ -43,9 +43,10 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
+  const router = useRouter()
+  const { data: org } = useSelectedOrganizationQuery()
 
-  const org = useSelectedOrganization()
+  const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
 
   const canReadGithubConnection = useCheckPermissions(
     PermissionAction.READ,
@@ -65,14 +66,14 @@ const IntegrationSettings = () => {
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      toast.success('Successfully deleted Github connection')
+      toast.success('Successfully deleted GitHub connection')
     },
   })
 
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const onAddGitHubConnection = useCallback(() => {
-    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+    router.push('/project/_/settings/integrations')
   }, [sidePanelsStateSnapshot])
 
   const onDeleteGitHubConnection = useCallback(
@@ -177,16 +178,17 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
   return (
     <>
-      {newLayoutPreview && (
-        <ScaffoldContainerLegacy>
-          <ScaffoldTitle>Integrations</ScaffoldTitle>
-        </ScaffoldContainerLegacy>
-      )}
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Integrations</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
       <GitHubSection />
-      <ScaffoldDivider />
-      <VercelSection isProjectScoped={false} />
-      <SidePanelVercelProjectLinker />
-      <SidePanelGitHubRepoLinker />
+      {showVercelIntegration && (
+        <>
+          <ScaffoldDivider />
+          <VercelSection isProjectScoped={false} />
+          <SidePanelVercelProjectLinker />
+        </>
+      )}
     </>
   )
 }

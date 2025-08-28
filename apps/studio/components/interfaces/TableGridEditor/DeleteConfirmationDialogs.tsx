@@ -4,13 +4,13 @@ import { toast } from 'sonner'
 
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
 import { TableLike } from 'data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
@@ -25,7 +25,7 @@ const DeleteConfirmationDialogs = ({
   selectedTable,
   onTableDeleted,
 }: DeleteConfirmationDialogsProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { filters, onApplyFilters } = useTableFilter()
 
@@ -69,7 +69,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteRows } = useTableRowDeleteMutation({
+  const { mutate: deleteRows, isLoading: isDeletingRows } = useTableRowDeleteMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -81,7 +81,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteAllRows } = useTableRowDeleteAllMutation({
+  const { mutate: deleteAllRows, isLoading: isDeletingAllRows } = useTableRowDeleteAllMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -96,7 +96,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: truncateRows } = useTableRowTruncateMutation({
+  const { mutate: truncateRows, isLoading: isTruncatingRows } = useTableRowTruncateMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -133,11 +133,10 @@ const DeleteConfirmationDialogs = ({
     if (selectedColumnToDelete === undefined) return
 
     deleteColumn({
-      id: selectedColumnToDelete.id,
+      column: selectedColumnToDelete,
       cascade: isDeleteWithCascade,
       projectRef: project.ref,
       connectionString: project?.connectionString,
-      table: selectedTable,
     })
   }
 
@@ -150,8 +149,9 @@ const DeleteConfirmationDialogs = ({
     deleteTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      schema: selectedTableToDelete.schema,
       id: selectedTableToDelete.id,
+      name: selectedTableToDelete.name,
+      schema: selectedTableToDelete.schema,
       cascade: isDeleteWithCascade,
     })
   }
@@ -310,6 +310,7 @@ const DeleteConfirmationDialogs = ({
         confirmLabelLoading="Deleting"
         onCancel={() => snap.closeConfirmationDialog()}
         onConfirm={() => onConfirmDeleteRow()}
+        loading={isTruncatingRows || isDeletingRows || isDeletingAllRows}
       >
         <div className="space-y-4">
           <p className="text-sm text-foreground-light">

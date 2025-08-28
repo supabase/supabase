@@ -211,7 +211,7 @@ export const Index: Record<string, any> = {
         packagePath = `../../packages/ui/src/components/shadcn/ui`
       }
       if (type === 'fragment') {
-        packagePath = `../../packages/ui-patterns${item.optionalPath}`
+        packagePath = `../../packages/ui-patterns/src${item.optionalPath}`
       }
       if (type === 'example') {
         packagePath = `registry/${style.name}/${type}`

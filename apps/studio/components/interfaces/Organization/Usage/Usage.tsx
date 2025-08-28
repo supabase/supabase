@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
@@ -17,20 +16,18 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { cn, Listbox } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
-import Bandwidth from './Bandwidth'
 import Compute from './Compute'
+import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
-import TotalUsage from './TotalUsage'
+import { TotalUsage } from './TotalUsage'
 
 const Usage = () => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
@@ -40,8 +37,8 @@ const Usage = () => {
     'stripe.subscriptions'
   )
 
-  const organization = useSelectedOrganization()
-  const { data: projects, isSuccess } = useProjectsQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { data, isSuccess } = useProjectsQuery()
   const {
     data: subscription,
     error: subscriptionError,
@@ -50,7 +47,9 @@ const Usage = () => {
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
+  const orgProjects = (data?.projects ?? []).filter(
+    (project) => project.organization_id === organization?.id
+  )
 
   useEffect(() => {
     if (projectRef && isSuccess && orgProjects !== undefined) {
@@ -119,11 +118,9 @@ const Usage = () => {
 
   return (
     <>
-      {newLayoutPreview && (
-        <ScaffoldContainerLegacy>
-          <ScaffoldTitle>Usage</ScaffoldTitle>
-        </ScaffoldContainerLegacy>
-      )}
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Usage</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
       <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
         <ScaffoldContainer className="">
           <div className="py-4 flex items-center space-x-4">
@@ -200,8 +197,8 @@ const Usage = () => {
             title="Usage filtered by project"
             description={
               <div>
-                You are currently viewing usage for the "$
-                {selectedProject?.name || selectedProjectRef}" project. Supabase uses{' '}
+                You are currently viewing usage for the
+                {selectedProject?.name || selectedProjectRef} project. Supabase uses{' '}
                 <Link
                   href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
                   target="_blank"
@@ -239,7 +236,7 @@ const Usage = () => {
         />
       )}
 
-      <Bandwidth
+      <Egress
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}

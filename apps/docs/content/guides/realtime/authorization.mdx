@@ -18,6 +18,12 @@ Realtime Authorization is in Public Beta. To use Authorization for your Realtime
 
 </Admonition>
 
+<Admonition type="note">
+
+To enforce private channels you need to disable the 'Allow public access' setting in [Realtime Settings](https://supabase.com/dashboard/project/_?featurePreviewModal=supabase-ui-realtime-settings)
+
+</Admonition>
+
 ## How it works
 
 Realtime uses the `messages` table in your database's `realtime` schema to generate access policies for your clients when they connect to a Channel topic.
@@ -44,13 +50,11 @@ Increased RLS complexity can impact database performance and connection time, le
 
 </Admonition>
 
-## Helper functions
-
-You can use the following helper functions when writing RLS policies:
+## Accessing request information
 
 ### `realtime.topic`
 
-Returns the Channel topic the user is attempting to connect to.
+You can use the `realtime.topic` helper function when writing RLS policies. It returns the Channel topic the user is attempting to connect to.
 
 ```sql
 create policy "authenticated can read all messages on topic"
@@ -59,6 +63,21 @@ for select
 to authenticated
 using (
   (select realtime.topic()) = 'room-1'
+);
+```
+
+### JWT claims
+
+The user claims can be accessed using the `current_setting` function. The claims are available as a JSON object in the `request.jwt.claims` setting.
+
+```sql
+create policy "authenticated with supabase.io email can read all"
+on "realtime"."messages"
+for select
+to authenticated
+using (
+  -- Only users with the email claim ending with @supabase.io
+  (((current_setting('request.jwt.claims'))::json ->> 'email') ~~ '%@supabase.io')
 );
 ```
 

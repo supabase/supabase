@@ -11,6 +11,14 @@ export const AWS_REGIONS_DEFAULT =
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
+export const MANAGED_BY = {
+  VERCEL_MARKETPLACE: 'vercel-marketplace',
+  AWS_MARKETPLACE: 'aws-marketplace',
+  SUPABASE: 'supabase',
+}
+
+export type ManagedBy = (typeof MANAGED_BY)[keyof typeof MANAGED_BY]
+
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
   PRO: 'Pro - $25/month',
@@ -25,7 +33,11 @@ export const PRICING_TIER_PRODUCT_IDS = {
   ENTERPRISE: 'tier_enterprise',
 }
 
-export const DEFAULT_PROVIDER: CloudProvider = 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider =
+  process.env.NEXT_PUBLIC_ENVIRONMENT &&
+  ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
+    ? 'AWS_K8S'
+    : 'AWS'
 
 export const PROVIDERS = {
   FLY: {
@@ -41,8 +53,8 @@ export const PROVIDERS = {
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
   },
-  AWS_NEW: {
-    id: 'AWS_NEW',
+  AWS_K8S: {
+    id: 'AWS_K8S',
     name: 'AWS (Revamped)',
     DEFAULT_SSH_KEY: 'supabase-app-instance',
     default_region: AWS_REGIONS_DEFAULT,

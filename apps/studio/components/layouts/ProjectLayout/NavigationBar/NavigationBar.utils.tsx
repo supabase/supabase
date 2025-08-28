@@ -19,12 +19,7 @@ import {
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateToolRoutes = (
-  ref?: string,
-  project?: Project,
-  features?: { sqlEditorTabs: boolean }
-): Route[] => {
-  const { sqlEditorTabs } = features ?? {}
+export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -42,8 +37,7 @@ export const generateToolRoutes = (
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
-        : ref &&
-          (isProjectBuilding ? buildingUrl : `/project/${ref}/sql${!!sqlEditorTabs ? '' : '/new'}`),
+        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }
@@ -99,7 +93,7 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    ...(IS_PLATFORM && edgeFunctionsEnabled
+    ...(edgeFunctionsEnabled
       ? [
           {
             key: 'functions',
@@ -122,9 +116,17 @@ export const generateProductRoutes = (
   ]
 }
 
-export const generateOtherRoutes = (ref?: string, project?: Project): Route[] => {
+export const generateOtherRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: { unifiedLogs?: boolean; showReports?: boolean }
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
+
+  const { unifiedLogs, showReports } = features ?? {}
+  const unifiedLogsEnabled = unifiedLogs ?? false
+  const reportsEnabled = showReports ?? true
 
   return [
     {
@@ -133,7 +135,7 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
-    ...(IS_PLATFORM
+    ...(IS_PLATFORM && reportsEnabled
       ? [
           {
             key: 'reports',
@@ -147,7 +149,13 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       key: 'logs',
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs`),
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : unifiedLogsEnabled
+            ? `/project/${ref}/logs`
+            : `/project/${ref}/logs/explorer`),
     },
     {
       key: 'api',

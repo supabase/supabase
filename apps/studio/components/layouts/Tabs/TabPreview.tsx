@@ -1,14 +1,12 @@
 import { motion } from 'framer-motion'
-import { useSnapshot } from 'valtio'
 
 import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import { getTabsStore } from 'state/tabs'
+import { useTabsStateSnapshot } from 'state/tabs'
 
 export const TabPreview = ({ tab }: { tab: string }) => {
   const { ref } = useParams()
-  const store = getTabsStore(ref)
-  const tabs = useSnapshot(store)
+  const tabs = useTabsStateSnapshot()
 
   const tabData = tabs.tabsMap[tab]
 

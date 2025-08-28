@@ -79,7 +79,7 @@ Prisma is unable to allocate connections to pending queries fast enough to meet 
 
 - **Increase the pool timeout**: Increase the `pool_timeout` parameter in your Prisma configuration to give the pooler more time to allocate connections.
 - **Reduce the connection limit**: If you've explicitly increased the `connection_limit` parameter in your Prisma configuration, try reducing it to a more reasonable value.
-- **Increase pool size**: If you are connecting with Supavisor, try increasing the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+- **Increase pool size**: If you are connecting with Supavisor, try increasing the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/database/settings).
 - **Optimize queries**: [Improve the efficiency of your queries](https://supabase.com/docs/guides/database/query-optimization) to reduce execution time.
 - **Increase compute size**: Like the preceding option, this is a strategy to reduce query execution time.
 
@@ -118,14 +118,14 @@ Postgres or Supavisor rejected a request for more connections
 ### Possible causes:[#possible-causes-max-client-connections-reached]
 
 - **When working in transaction mode (port 6543):** The error "Max client connections reached" occurs when clients try to form more connections with the pooler than it can support.
-- **When working in session mode (port 5432):** The max amount of clients is restricted to the "Pool Size" value in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). If the "Pool Size" is set to 15, even if the pooler can handle 200 client connections, it will still be effectively capped at 15 for each unique ["database-role+database" combination](https://github.com/orgs/supabase/discussions/21566).
+- **When working in session mode (port 5432):** The max amount of clients is restricted to the "Pool Size" value in the [Database Settings](https://supabase.com/dashboard/project/_/database/settings). If the "Pool Size" is set to 15, even if the pooler can handle 200 client connections, it will still be effectively capped at 15 for each unique ["database-role+database" combination](https://github.com/orgs/supabase/discussions/21566).
 - **When working with direct connections**: Postgres is already servicing the max amount of connections
 
 ### Solutions [#solutions-causes-max-client-connections-reached]
 
 - **Transaction Mode for serverless apps**: If you are using serverless functions (Supabase Edge, Vercel, AWS Lambda), switch to transaction mode (port 6543). It handles more connections than session mode or direct connections.
 - **Reduce the number of Prisma connections**: A single client-server can establish multiple connections with a pooler. Typically, serverless setups do not need many connections. Starting with fewer, like five or three, or even just one, is often sufficient. In serverless setups, begin with `connection_limit=1`, increasing cautiously if needed to avoid maxing out connections.
-- **Increase pool size**: If you are connecting with Supavisor, try increasing the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+- **Increase pool size**: If you are connecting with Supavisor, try increasing the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/database/settings).
 - **Disconnect appropriately**: Close Prisma connections when they are no longer needed.
 - **Decrease query time**: Reduce query complexity or add [strategic indexes](https://supabase.com/docs/guides/database/postgres/indexes) to your tables to speed up queries.
 - **Increase compute size**: Sometimes the best option is to increase your compute size, which also increases your max client size and query execution speed

@@ -8,8 +8,6 @@ export type ProjectTransferPreviewVariables = {
   targetOrganizationSlug?: string
 }
 
-export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
-
 export async function previewProjectTransfer(
   { projectRef, targetOrganizationSlug }: ProjectTransferPreviewVariables,
   signal?: AbortSignal

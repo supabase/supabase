@@ -18,4 +18,8 @@ export const organizationKeys = {
   taxId: (slug: string | undefined) => ['organizations', slug, 'tax-ids'] as const,
   tokenValidation: (slug: string | undefined, token: string | undefined) =>
     ['organizations', slug, 'validate-token', token] as const,
+  projectClaim: (slug: string, token: string) =>
+    ['organizations', slug, 'project-claim', token] as const,
+  availableRegions: (slug: string | undefined, cloudProvider: string) =>
+    ['organizations', slug, 'available-regions', cloudProvider] as const,
 }

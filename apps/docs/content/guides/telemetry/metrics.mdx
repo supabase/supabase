@@ -22,10 +22,30 @@ The endpoint discussed in this article is not available on self-hosted.
 
 ## Accessing the metrics endpoint
 
-Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Access to the endpoint is secured via HTTP Basic Auth; the username is `service_role`, while the password is the service role JWT available through the Supabase dashboard.
+Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`.
+
+Access to the endpoint is secured via HTTP Basic Auth:
+
+- username: `service_role`
+- password: the service role JWT from the [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/api-keys)
+
+You can also retrieve your service role key programmatically using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get project API keys including service_role key
+curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true"
+```
+
+<ProjectConfigVariables variable="url" />
 
 ```shell
-> curl https://<project-ref>.supabase.co/customer/v1/privileged/metrics --user 'service_role:<service-role-jwt>'
+curl <project-url>/customer/v1/privileged/metrics \
+    --user 'service_role:<service-role-jwt>'
 ```
 
 ## Supabase Grafana
@@ -108,8 +128,8 @@ Click `Load` and the dashboard will load from the project specified in your Prom
 You can configure alerts from Prometheus or Grafana. The `supabase-grafana` repository has a selection of [example alerts](https://github.com/supabase/supabase-grafana/blob/main/docs/example-alerts.md) that can be configured.
 
 <Admonition type="caution">
-  Grafana Cloud has an unofficial integration for scraping Supabase metrics. See their
-  [docs](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/)
-  for instructions on how to configure it but note that it is not full-featured nor is it supported
-  by Supabase.
+
+Grafana Cloud has an unofficial integration for scraping Supabase metrics. See their [docs](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/) for instructions on how to configure it but note that it is not full-featured nor is it supported
+by Supabase.
+
 </Admonition>

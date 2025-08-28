@@ -1,3 +1,7 @@
+export function isObject(value: unknown): value is object {
+  return !!value && typeof value === 'object' && !Array.isArray(value)
+}
+
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return false

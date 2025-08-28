@@ -311,16 +311,13 @@ withTestDatabase('create, retrieve, update, and delete table', async ({ executeQ
   )
 
   // Update table
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { id: retrieveRes!.id },
-    {
-      name: 'test a',
-      rls_enabled: true,
-      rls_forced: true,
-      replica_identity: 'NOTHING',
-      comment: 'foo',
-    }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(retrieveRes!, {
+    name: 'test a',
+    rls_enabled: true,
+    rls_forced: true,
+    replica_identity: 'NOTHING',
+    comment: 'foo',
+  })
   await executeQuery(updateSql)
 
   // Retrieve the updated table
@@ -359,15 +356,11 @@ withTestDatabase('create, retrieve, update, and delete table', async ({ executeQ
   )
 
   // Remove table
-  const { sql: removeSql } = await pgMeta.tables.remove({
-    id: updateRes!.id,
-  })
+  const { sql: removeSql } = await pgMeta.tables.remove(updateRes!)
   await executeQuery(removeSql)
 
   // Verify table is deleted
-  const { sql: verifyDeleteSql } = await pgMeta.tables.retrieve({
-    id: updateRes!.id,
-  })
+  const { sql: verifyDeleteSql } = await pgMeta.tables.retrieve(updateRes!)
   const verifyDeleteRes = await executeQuery(verifyDeleteSql)
   expect(verifyDeleteRes).toHaveLength(0)
 })
@@ -385,7 +378,7 @@ withTestDatabase('update with name unchanged', async ({ executeQuery }) => {
   const table = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update table with same name
-  const { sql: updateSql } = await pgMeta.tables.update({ id: table!.id }, { name: 't' })
+  const { sql: updateSql } = await pgMeta.tables.update(table!, { name: 't' })
   await executeQuery(updateSql)
 
   // Verify update
@@ -486,10 +479,9 @@ withTestDatabase('primary keys', async ({ executeQuery }) => {
   const table = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update table with primary keys
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { id: table!.id },
-    { primary_keys: [{ name: 'c' }, { name: 'cc' }] }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(table!, {
+    primary_keys: [{ name: 'c' }, { name: 'cc' }],
+  })
   await executeQuery(updateSql)
 
   // Verify update
@@ -948,10 +940,10 @@ withTestDatabase('remove table by id', async ({ executeQuery }) => {
   // Get the table's id
   const { sql: listSql, zod: listZod } = await pgMeta.tables.list()
   const tables = listZod.parse(await executeQuery(listSql))
-  const tableId = tables.find((t) => t.name === 'test_remove_table')!.id
+  const tableId = tables.find((t) => t.name === 'test_remove_table')!
 
   // Remove the table
-  const { sql } = await pgMeta.tables.remove({ id: tableId })
+  const { sql } = await pgMeta.tables.remove(tableId)
   await executeQuery(sql)
 
   // Verify the table is gone
@@ -989,22 +981,15 @@ withTestDatabase('remove throws error for non-existent table', async ({ executeQ
 
   // With schema and name
   await expect(executeQuery(sql)).rejects.toThrow(
-    `Failed to execute query: Cannot find table with: name = 'non_existent_table' and schema = 'public'`
+    `Failed to execute query: table "non_existent_table" does not exist`
   )
-  await expect(
-    executeQuery(
-      pgMeta.tables.remove({
-        id: 999999,
-      }).sql
-    )
-  ).rejects.toThrow(`Failed to execute query: Cannot find table with: id = 999999`)
 })
 
 withTestDatabase('remove throws error with missing identifiers', async ({}) => {
   await expect(async () => {
     //@ts-expect-error use with missing params
     await pgMeta.tables.remove({ name: 'some_table' })
-  }).rejects.toThrow('Must provide either id or name and schema')
+  }).rejects.toThrow('SQL identifier cannot be null or undefined')
 })
 
 withTestDatabase('update table - rename', async ({ executeQuery }) => {
@@ -1014,7 +999,7 @@ withTestDatabase('update table - rename', async ({ executeQuery }) => {
 
   // Update table name
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_rename', schema: 'public' },
+    { id: 0, name: 'test_rename', schema: 'public' },
     { name: 'test_renamed' }
   )
   await executeQuery(updateSql)
@@ -1036,7 +1021,7 @@ withTestDatabase('update table - change schema', async ({ executeQuery }) => {
 
   // Move table to new schema
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_schema_move', schema: 'public' },
+    { id: 0, name: 'test_schema_move', schema: 'public' },
     { schema: 'test_schema' }
   )
   await executeQuery(updateSql)
@@ -1057,7 +1042,7 @@ withTestDatabase('update table - row level security', async ({ executeQuery }) =
 
   // Enable RLS
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_rls', schema: 'public' },
+    { id: 0, name: 'test_rls', schema: 'public' },
     { rls_enabled: true, rls_forced: true }
   )
   await executeQuery(updateSql)
@@ -1079,7 +1064,7 @@ withTestDatabase('update table - replica identity', async ({ executeQuery }) => 
 
   // Change replica identity
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_replica', schema: 'public' },
+    { id: 0, name: 'test_replica', schema: 'public' },
     { replica_identity: 'NOTHING' }
   )
   await executeQuery(updateSql)
@@ -1101,7 +1086,7 @@ withTestDatabase('update table - primary keys', async ({ executeQuery }) => {
 
   // Add primary key
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_pk', schema: 'public' },
+    { id: 0, name: 'test_pk', schema: 'public' },
     { primary_keys: [{ name: 'id' }] }
   )
   await executeQuery(updateSql)
@@ -1122,11 +1107,14 @@ withTestDatabase('update table - remove primary keys', async ({ executeQuery }) 
   await executeQuery(createSql)
   await executeQuery('ALTER TABLE test_pk_remove ADD COLUMN id INT PRIMARY KEY')
 
+  const { sql: tableSql, zod: tableZod } = await pgMeta.tables.retrieve({
+    name: 'test_pk_remove',
+    schema: 'public',
+  })
+  const table = tableZod.parse((await executeQuery(tableSql))[0])
+
   // Remove primary key
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_pk_remove', schema: 'public' },
-    { primary_keys: [] }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(table!, { primary_keys: [] })
   await executeQuery(updateSql)
 
   // Verify update
@@ -1145,7 +1133,7 @@ withTestDatabase('update table - comment', async ({ executeQuery }) => {
 
   // Add comment
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_comment', schema: 'public' },
+    { id: 0, name: 'test_comment', schema: 'public' },
     { comment: 'Test comment' }
   )
   await executeQuery(updateSql)
@@ -1167,7 +1155,7 @@ withTestDatabase('update table - multiple changes', async ({ executeQuery }) => 
 
   // Make multiple changes
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_multiple', schema: 'public' },
+    { id: 0, name: 'test_multiple', schema: 'public' },
     {
       name: 'test_multiple_updated',
       comment: 'Updated table',
@@ -1206,10 +1194,7 @@ withTestDatabase('update table - by id', async ({ executeQuery }) => {
   const table = zod.parse((await executeQuery(retrieveSql))[0])
 
   // Update by id
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { id: table!.id },
-    { name: 'test_by_id_updated' }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(table!, { name: 'test_by_id_updated' })
   await executeQuery(updateSql)
 
   // Verify update
@@ -1223,7 +1208,7 @@ withTestDatabase('update table - by id', async ({ executeQuery }) => {
 
 withTestDatabase('update table - error on non-existent table', async ({ executeQuery }) => {
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'non_existent', schema: 'public' },
+    { id: 0, name: 'non_existent', schema: 'public' },
     { name: 'new_name' }
   )
 
@@ -1238,7 +1223,7 @@ withTestDatabase('update table - rename with schema change', async ({ executeQue
 
   // Update both name and schema
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_rename_schema', schema: 'public' },
+    { id: 0, name: 'test_rename_schema', schema: 'public' },
     {
       name: 'test_renamed_schema',
       schema: 'test_schema',

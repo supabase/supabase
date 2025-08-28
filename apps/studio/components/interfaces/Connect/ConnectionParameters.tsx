@@ -1,13 +1,13 @@
 import { Check, ChevronRight, Copy } from 'lucide-react'
 import { useState } from 'react'
 
-import { copyToClipboard } from 'lib/helpers'
 import {
   Button,
   cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  copyToClipboard,
   Separator,
 } from 'ui'
 

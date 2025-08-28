@@ -26,7 +26,8 @@ permissions:
 jobs:
   test:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on: [larger-runner-4cpu]
+    runs-on:
+      group: Default Larger Runners
     strategy:
       matrix:
         test_number: [1]

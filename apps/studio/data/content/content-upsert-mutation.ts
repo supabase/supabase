@@ -7,10 +7,7 @@ import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type UpsertContentPayload = Omit<
-  components['schemas']['UpsertContentBodyDto'],
-  'content'
-> & {
+export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Partial<Content['content']>
 }
 
@@ -55,7 +52,10 @@ export const useContentUpsertMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
+          await Promise.all([
+            queryClient.invalidateQueries(contentKeys.allContentLists(projectRef)),
+            queryClient.invalidateQueries(contentKeys.infiniteList(projectRef)),
+          ])
         }
         await onSuccess?.(data, variables, context)
       },

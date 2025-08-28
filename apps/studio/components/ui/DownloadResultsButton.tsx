@@ -5,9 +5,9 @@ import Papa from 'papaparse'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { copyToClipboard } from 'lib/helpers'
 import {
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,

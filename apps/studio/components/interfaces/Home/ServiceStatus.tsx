@@ -3,14 +3,16 @@ import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
   ProjectServiceStatus,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   InfoIcon,
@@ -18,27 +20,27 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
 const StatusMessage = ({
   status,
   isLoading,
-  isSuccess,
+  isHealthy,
   isProjectNew,
 }: {
   isLoading: boolean
-  isSuccess: boolean
+  isHealthy: boolean
   isProjectNew: boolean
   status?: ProjectServiceStatus
 }) => {
+  if (isHealthy) return 'Healthy'
   if (isLoading) return 'Checking status'
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
   if (isProjectNew) return 'Coming up...'
-  if (isSuccess) return 'Healthy'
+  if (status) return status
   return 'Unable to connect'
 }
 
@@ -52,27 +54,27 @@ const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
 
 const StatusIcon = ({
   isLoading,
-  isSuccess,
+  isHealthy,
   isProjectNew,
   projectStatus,
 }: {
   isLoading: boolean
-  isSuccess: boolean
+  isHealthy: boolean
   isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
+  if (isHealthy) return <CheckIcon />
   if (isLoading) return <LoaderIcon />
   if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
   if (isProjectNew) return <LoaderIcon />
-  if (isSuccess) return <CheckIcon />
   return <AlertIcon />
 }
 
-const ServiceStatus = () => {
+export const ServiceStatus = () => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
 
   const {
@@ -88,6 +90,27 @@ const ServiceStatus = () => {
   ])
 
   const isBranch = project?.parentRef !== project?.ref
+
+  // Get branches data when on a branch
+  const { data: branches, isLoading: isBranchesLoading } = useBranchesQuery(
+    { projectRef: isBranch ? project?.parentRef : undefined },
+    {
+      enabled: isBranch,
+      refetchInterval: (data) => {
+        if (!data) return false
+        const currentBranch = data.find((branch) => branch.project_ref === ref)
+        return ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
+          currentBranch?.status || ''
+        )
+          ? false
+          : 5000
+      },
+    }
+  )
+
+  const currentBranch = isBranch
+    ? branches?.find((branch) => branch.project_ref === ref)
+    : undefined
 
   // [Joshen] Need pooler service check eventually
   const {
@@ -124,17 +147,17 @@ const ServiceStatus = () => {
     error?: string
     docsUrl?: string
     isLoading: boolean
-    isSuccess?: boolean
+    isHealthy: boolean
+    status: ProjectServiceStatus
     logsUrl: string
-    status?: ProjectServiceStatus
   }[] = [
     {
       name: 'Database',
       error: undefined,
       docsUrl: undefined,
       isLoading: isLoading,
-      isSuccess: dbStatus?.healthy,
-      status: dbStatus?.status,
+      isHealthy: !!dbStatus?.healthy,
+      status: dbStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgres-logs',
     },
     {
@@ -142,8 +165,8 @@ const ServiceStatus = () => {
       error: restStatus?.error,
       docsUrl: undefined,
       isLoading,
-      isSuccess: restStatus?.healthy,
-      status: restStatus?.status,
+      isHealthy: !!restStatus?.healthy,
+      status: restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -153,8 +176,8 @@ const ServiceStatus = () => {
             error: authStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: authStatus?.healthy,
-            status: authStatus?.status,
+            isHealthy: !!authStatus?.healthy,
+            status: authStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/auth-logs',
           },
         ]
@@ -166,8 +189,8 @@ const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: realtimeStatus?.healthy,
-            status: realtimeStatus?.status,
+            isHealthy: !!realtimeStatus?.healthy,
+            status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/realtime-logs',
           },
         ]
@@ -179,8 +202,8 @@ const ServiceStatus = () => {
             error: storageStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: storageStatus?.healthy,
-            status: storageStatus?.status,
+            isHealthy: !!storageStatus?.healthy,
+            status: storageStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/storage-logs',
           },
         ]
@@ -192,15 +215,42 @@ const ServiceStatus = () => {
             error: undefined,
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
-            isSuccess: edgeFunctionsStatus?.healthy,
+            isHealthy: !!edgeFunctionsStatus?.healthy,
+            status: edgeFunctionsStatus?.healthy
+              ? 'ACTIVE_HEALTHY'
+              : isLoading
+                ? 'COMING_UP'
+                : ('UNHEALTHY' as ProjectServiceStatus),
             logsUrl: '/logs/edge-functions-logs',
+          },
+        ]
+      : []),
+    ...(isBranch
+      ? [
+          {
+            name: 'Migrations',
+            error: undefined,
+            docsUrl: undefined,
+            isLoading: isBranchesLoading,
+            isHealthy: currentBranch?.status === 'FUNCTIONS_DEPLOYED',
+            status: (currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+              ? 'ACTIVE_HEALTHY'
+              : currentBranch?.status === 'FUNCTIONS_FAILED' ||
+                  currentBranch?.status === 'MIGRATIONS_FAILED'
+                ? 'UNHEALTHY'
+                : 'COMING_UP') as ProjectServiceStatus,
+            logsUrl: '/branches',
           },
         ]
       : []),
   ]
 
+  const isMigrationLoading =
+    isBranchesLoading ||
+    currentBranch?.status === 'CREATING_PROJECT' ||
+    currentBranch?.status === 'RUNNING_MIGRATIONS'
   const isLoadingChecks = services.some((service) => service.isLoading)
-  const allServicesOperational = services.every((service) => service.isSuccess)
+  const allServicesOperational = services.every((service) => service.isHealthy)
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
   const isProjectNew =
@@ -234,7 +284,7 @@ const ServiceStatus = () => {
         <Button
           type="default"
           icon={
-            isLoadingChecks || isProjectNew ? (
+            isLoadingChecks || (!allServicesOperational && isProjectNew && isMigrationLoading) ? (
               <LoaderIcon />
             ) : (
               <div
@@ -245,10 +295,10 @@ const ServiceStatus = () => {
             )
           }
         >
-          {isBranch ? 'Preview Branch' : 'Project'} Status
+          {isBranch ? 'Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -258,7 +308,7 @@ const ServiceStatus = () => {
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
-                isSuccess={!!service.isSuccess}
+                isHealthy={!!service.isHealthy}
                 isProjectNew={isProjectNew}
                 projectStatus={service.status}
               />
@@ -267,7 +317,7 @@ const ServiceStatus = () => {
                 <p className="text-foreground-light flex items-center gap-1">
                   <StatusMessage
                     isLoading={service.isLoading}
-                    isSuccess={!!service.isSuccess}
+                    isHealthy={!!service.isHealthy}
                     isProjectNew={isProjectNew}
                     status={service.status}
                   />
@@ -295,5 +345,3 @@ const ServiceStatus = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default ServiceStatus

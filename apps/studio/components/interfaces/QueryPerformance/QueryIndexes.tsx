@@ -2,12 +2,12 @@ import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
-import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import AlertError from 'components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -39,7 +39,7 @@ interface QueryIndexesProps {
 export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [showStartupCosts, setShowStartupCosts] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
 
@@ -60,7 +60,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     connectionString: project?.connectionString,
   })
 
-  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const {
     data: indexAdvisorResult,
@@ -75,7 +75,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       connectionString: project?.connectionString,
       query: selectedRow?.['query'],
     },
-    { enabled: isAdvisorAvailable }
+    { enabled: isIndexAdvisorEnabled }
   )
 
   const {
@@ -175,7 +175,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           <p className="text-sm">New index recommendations</p>
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
-          ) : !isAdvisorAvailable ? (
+          ) : !isIndexAdvisorEnabled ? (
             <IndexAdvisorDisabledState />
           ) : (
             <>
@@ -246,7 +246,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
             </>
           )}
         </div>
-        {isAdvisorAvailable && hasIndexRecommendation && (
+        {isIndexAdvisorEnabled && hasIndexRecommendation && (
           <>
             <div className="flex flex-col gap-y-2">
               <p className="text-sm">Query costs</p>
@@ -311,7 +311,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         )}
       </QueryPanelSection>
 
-      {isAdvisorAvailable && hasIndexRecommendation && (
+      {isIndexAdvisorEnabled && hasIndexRecommendation && (
         <div className="bg-studio sticky bottom-0 border-t py-3 flex items-center justify-between px-5">
           <div className="flex flex-col gap-y-1 text-sm">
             <span>Apply index to database</span>

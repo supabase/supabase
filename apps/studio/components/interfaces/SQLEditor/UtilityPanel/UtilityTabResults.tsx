@@ -6,8 +6,9 @@ import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import CopyButton from 'components/ui/CopyButton'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -25,7 +26,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
   ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
-    const organization = useSelectedOrganization()
+    const { data: organization } = useSelectedOrganizationQuery()
     const snapV2 = useSqlEditorV2StateSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -33,7 +34,8 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
     // Customers on HIPAA plans should not have access to Supabase AI
-    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
@@ -151,11 +153,11 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
               )}
               {!hasHipaaAddon && (
                 <Button
-                  icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugging} />}
+                  icon={<AiIconAnimation size={16} loading={isDebugging} />}
                   disabled={!!isDisabled || isDebugging}
                   onClick={onDebug}
                 >
-                  Debug with Supabase AI
+                  Debug with Assistant
                 </Button>
               )}
             </div>

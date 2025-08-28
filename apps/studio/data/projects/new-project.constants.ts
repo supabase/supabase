@@ -31,7 +31,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.01344,
     priceMonthly: 10,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id, PROVIDERS.FLY.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
   },
   small: {
     label: 'Small',
@@ -39,7 +39,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.0206,
     priceMonthly: 15,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id, PROVIDERS.FLY.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
   },
   medium: {
     label: 'Medium',
@@ -47,7 +47,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.0822,
     priceMonthly: 60,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id, PROVIDERS.FLY.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
   },
   large: {
     label: 'Large',
@@ -55,7 +55,7 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.1517,
     priceMonthly: 110,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id, PROVIDERS.FLY.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
   },
   xlarge: {
     label: 'XL',
@@ -63,7 +63,7 @@ export const instanceSizeSpecs: Record<
     cpu: '4-core',
     priceHourly: 0.2877,
     priceMonthly: 210,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id, PROVIDERS.FLY.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
   },
   '2xlarge': {
     label: '2XL',
@@ -71,7 +71,7 @@ export const instanceSizeSpecs: Record<
     cpu: '8-core',
     priceHourly: 0.562,
     priceMonthly: 410,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id, PROVIDERS.FLY.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
   },
   '4xlarge': {
     label: '4XL',
@@ -79,7 +79,7 @@ export const instanceSizeSpecs: Record<
     cpu: '16-core',
     priceHourly: 1.32,
     priceMonthly: 960,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id, PROVIDERS.FLY.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
   },
   '8xlarge': {
     label: '8XL',
@@ -87,7 +87,7 @@ export const instanceSizeSpecs: Record<
     cpu: '32-core',
     priceHourly: 2.562,
     priceMonthly: 1870,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '12xlarge': {
     label: '12XL',
@@ -95,7 +95,7 @@ export const instanceSizeSpecs: Record<
     cpu: '48-core',
     priceHourly: 3.836,
     priceMonthly: 2800,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '16xlarge': {
     label: '16XL',
@@ -103,7 +103,7 @@ export const instanceSizeSpecs: Record<
     cpu: '64-core',
     priceHourly: 5.12,
     priceMonthly: 3730,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '24xlarge': {
     label: '24XL',
@@ -111,7 +111,7 @@ export const instanceSizeSpecs: Record<
     cpu: '96-core',
     priceHourly: 9.73,
     priceMonthly: 7100,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '24xlarge_optimized_cpu': {
     label: '24XL - Optimized CPU',
@@ -119,7 +119,7 @@ export const instanceSizeSpecs: Record<
     cpu: '96-core',
     priceHourly: 8.9,
     priceMonthly: 6500,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '24xlarge_optimized_memory': {
     label: '24XL - Optimized Memory',
@@ -127,7 +127,7 @@ export const instanceSizeSpecs: Record<
     cpu: '96-core',
     priceHourly: 13.84,
     priceMonthly: 10100,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '24xlarge_high_memory': {
     label: '24XL - High Memory',
@@ -135,7 +135,7 @@ export const instanceSizeSpecs: Record<
     cpu: '96-core',
     priceHourly: 21.91,
     priceMonthly: 16000,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '48xlarge': {
     label: '48XL',
@@ -143,7 +143,7 @@ export const instanceSizeSpecs: Record<
     cpu: '192-core',
     priceHourly: 19.47,
     priceMonthly: 14200,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '48xlarge_optimized_cpu': {
     label: '48XL - Optimized CPU',
@@ -151,7 +151,7 @@ export const instanceSizeSpecs: Record<
     cpu: '192-core',
     priceHourly: 17.8,
     priceMonthly: 13000,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '48xlarge_optimized_memory': {
     label: '48XL - Optimized Memory',
@@ -159,7 +159,7 @@ export const instanceSizeSpecs: Record<
     cpu: '192-core',
     priceHourly: 27.68,
     priceMonthly: 20200,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
   '48xlarge_high_memory': {
     label: '48XL - High Memory',
@@ -167,6 +167,6 @@ export const instanceSizeSpecs: Record<
     cpu: '192-core',
     priceHourly: 43.84,
     priceMonthly: 32000,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_NEW.id],
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id],
   },
 }

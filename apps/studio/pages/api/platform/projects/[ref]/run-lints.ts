@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { paths } from 'api-types'
+import { fetchPost } from 'data/fetchers'
 import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
-import { post } from 'lib/common/fetch'
 import { PG_META_URL } from 'lib/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
@@ -25,7 +25,11 @@ type ResponseData =
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   const headers = constructHeaders(req.headers)
-  const response = await post(`${PG_META_URL}/query`, { query: enrichQuery(LINT_SQL) }, { headers })
+  const response = await fetchPost(
+    `${PG_META_URL}/query`,
+    { query: enrichQuery(LINT_SQL) },
+    { headers }
+  )
   if (response.error) {
     return res.status(400).json(response.error)
   } else {

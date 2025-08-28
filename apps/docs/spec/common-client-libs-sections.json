@@ -491,6 +491,13 @@
         "type": "function"
       },
       {
+        "id": "get-claims",
+        "title": "Get user claims from verified JWT",
+        "slug": "auth-getclaims",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-out",
         "title": "Sign out a user",
         "slug": "auth-signout",
@@ -792,6 +799,12 @@
     "title": "Realtime",
     "items": [
       {
+        "id": "realtime-api",
+        "title": "Overview",
+        "slug": "realtime-api",
+        "type": "function"
+      },
+      {
         "id": "stream",
         "title": "Listen to database changes",
         "slug": "stream",
@@ -995,6 +1008,7 @@
       "reference_dart_v1",
       "reference_dart_v2",
       "reference_javascript_v1",
+      "reference_javascript_v2",
       "reference_kotlin_v1",
       "reference_kotlin_v2",
       "reference_python_v2",

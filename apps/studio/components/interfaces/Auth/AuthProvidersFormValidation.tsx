@@ -19,11 +19,6 @@ const PROVIDER_EMAIL = {
       description: 'This will enable Email based signup and login for your application',
       type: 'boolean',
     },
-    MAILER_AUTOCONFIRM: {
-      title: 'Confirm email',
-      description: `Users will need to confirm their email address before signing in for the first time.`,
-      type: 'boolean',
-    },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
       title: 'Secure email change',
       description: `Users will be required to confirm any email change on both the old email address and new email address.
@@ -1386,10 +1381,32 @@ const PROVIDER_SAML = {
   },
 }
 
+const PROVIDER_WEB3 = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Web3 Wallet (Solana)',
+  link: 'https://supabase.com/docs/guides/auth/auth-web3',
+  properties: {
+    EXTERNAL_WEB3_SOLANA_ENABLED: {
+      title: 'Enable Sign in with Solana',
+      description:
+        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_WEB3_SOLANA_ENABLED: boolean().required(),
+  }),
+  misc: {
+    iconKey: 'web3-icon',
+  },
+}
+
 export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
   PROVIDER_PHONE,
   PROVIDER_SAML,
+  PROVIDER_WEB3,
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,

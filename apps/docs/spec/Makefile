@@ -118,7 +118,7 @@ combine-raw.tsdoc.v2:
 generate: generate.sections.api.v1
 
 generate.sections.api.v1:
-	node $(REPO_DIR)/sections/generateMgmtApiSections.ts $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/common-api-sections.json
+	npx tsx $(REPO_DIR)/sections/generateMgmtApiSections.cts $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/common-api-sections.json
 
 ###############################################################################
 # Validate OpenAPI 3.0
@@ -131,4 +131,4 @@ validate.analytics.v0:
 # Format everything - easier for git to track changes.
 ###############################################################################
 format:
-	npx prettier --write .
+	npx prettier --cache --write .

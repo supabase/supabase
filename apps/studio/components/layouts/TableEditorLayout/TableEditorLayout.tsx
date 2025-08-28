@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PropsWithChildren } from 'react'
+
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { PropsWithChildren } from 'react'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
@@ -16,7 +17,7 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  return <>{children}</>
+  return children
 }
 
 export default TableEditorLayout

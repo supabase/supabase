@@ -67,6 +67,51 @@ export async function executeWithRetry<T>(
   throw new Error('Max retries reached without success')
 }
 
+export const getAllTableRowsSql = ({
+  table,
+  filters = [],
+  sorts = [],
+}: {
+  table: SupaTable
+  filters?: Filter[]
+  sorts?: Sort[]
+}) => {
+  const query = new Query()
+
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
+
+  let queryChains = query
+    .from(table.name, table.schema ?? undefined)
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
+
+  filters
+    .filter((filter) => filter.value && filter.value !== '')
+    .forEach((filter) => {
+      const value = formatFilterValue(table, filter)
+      queryChains = queryChains.filter(filter.column, filter.operator, value)
+    })
+
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+    const primaryKeys = getDefaultOrderByColumns(table)
+    if (primaryKeys.length > 0) {
+      primaryKeys.forEach((col) => {
+        queryChains = queryChains.order(table.name, col)
+      })
+    }
+  } else {
+    sorts.forEach((sort) => {
+      queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
+    })
+  }
+
+  return queryChains
+}
+
 // TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
 // this is not suitable and will cause crashes on the pg-meta side given big tables
 // (either when the number of rows exceeds Blob size or if the columns in the rows are too large).
@@ -96,38 +141,7 @@ export const fetchAllTableRows = async ({
   }
 
   const rows: any[] = []
-  const query = new Query()
-
-  const arrayBasedColumns = table.columns
-    .filter(
-      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
-    )
-    .map((column) => `"${column.name}"::text[]`)
-
-  let queryChains = query
-    .from(table.name, table.schema ?? undefined)
-    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
-
-  filters
-    .filter((filter) => filter.value && filter.value !== '')
-    .forEach((filter) => {
-      const value = formatFilterValue(table, filter)
-      queryChains = queryChains.filter(filter.column, filter.operator, value)
-    })
-
-  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
-  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
-    const primaryKeys = getDefaultOrderByColumns(table)
-    if (primaryKeys.length > 0) {
-      primaryKeys.forEach((col) => {
-        queryChains = queryChains.order(table.name, col, true, true)
-      })
-    }
-  } else {
-    sorts.forEach((sort) => {
-      queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
-    })
-  }
+  const queryChains = getAllTableRowsSql({ table, sorts, filters })
 
   const rowsPerPage = 500
   const THROTTLE_DELAY = 500

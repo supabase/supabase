@@ -259,7 +259,7 @@ response = supabase.storage.from_('bucket').download(
 
 When using the image transformation API, Storage will automatically find the best format supported by the client and return that to the client, without any code change. For instance, if you use Chrome when viewing a JPEG image and using transformation options, you'll see that images are automatically optimized as `webp` images.
 
-As a result, this will lower the bandwidth that you send to your users and your application will load much faster.
+As a result, this will lower the egress that you send to your users and your application will load much faster.
 
 <Admonition type="note">
 
@@ -377,7 +377,7 @@ export default function supabaseLoader({ src, width, quality }) {
 }
 ```
 
-In your `nextjs.config.js` file add the following configuration to instruct Next.js to use our custom loader
+In your `next.config.js` file add the following configuration to instruct Next.js to use our custom loader
 
 ```js
 module.exports = {

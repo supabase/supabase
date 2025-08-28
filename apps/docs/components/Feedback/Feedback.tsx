@@ -96,6 +96,8 @@ function Feedback({ className }: { className?: string }) {
   const showNo = unanswered || isNo
 
   async function sendFeedbackVote(response: Response) {
+    if (!supabase) return
+
     const { error } = await supabase.from('feedback').insert({
       vote: response,
       page: pathname,

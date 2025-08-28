@@ -1,11 +1,9 @@
 import dayjs from 'dayjs'
 import { Clipboard, Trash, UserIcon } from 'lucide-react'
-import { UIEvent } from 'react'
 import { Column, useRowSelection } from 'react-data-grid'
 
 import { User } from 'data/auth/users-infinite-query'
 import { BASE_PATH } from 'lib/constants'
-import { copyToClipboard } from 'lib/helpers'
 import {
   Checkbox_Shadcn_,
   cn,
@@ -14,17 +12,14 @@ import {
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
 } from 'ui'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
-import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
-
-export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
-  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
-}
 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {

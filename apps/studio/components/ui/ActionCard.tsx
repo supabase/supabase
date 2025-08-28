@@ -1,10 +1,11 @@
+import { JSX, ReactNode } from 'react'
 import { Badge, Card, cn } from 'ui'
 
 export const ActionCard = (card: {
   icon: JSX.Element
   title: string
   bgColor?: string
-  description?: string
+  description?: string | ReactNode
   isBeta?: boolean
   className?: string
   onClick?: () => void
@@ -28,9 +29,13 @@ export const ActionCard = (card: {
         >
           {card.icon}
         </div>
-        <div className="flex flex-col gap-0">
+        <div className="flex flex-col gap-0 w-full">
           <h3 className="text-sm text-foreground mb-0">{card.title}</h3>
-          <pre className="text-xs text-foreground-light font-sans">{card.description}</pre>
+          {typeof card.description === 'string' ? (
+            <pre className="text-xs text-foreground-light font-sans">{card.description}</pre>
+          ) : (
+            card.description
+          )}
         </div>
       </div>
     </Card>

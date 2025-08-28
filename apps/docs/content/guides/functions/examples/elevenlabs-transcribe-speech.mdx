@@ -11,8 +11,9 @@ In this tutorial you will learn how to build a Telegram bot that transcribes aud
 To check out what the end result will look like, you can test out the [t.me/ElevenLabsScribeBot](https://t.me/ElevenLabsScribeBot)
 
 <Admonition type="tip">
-  Find the [example project on
-  GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/speech-to-text/telegram-transcription-bot).
+
+Find the [example project on GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/speech-to-text/telegram-transcription-bot).
+
 </Admonition>
 
 ## Requirements
@@ -108,7 +109,7 @@ In your newly created `scribe-bot/index.ts` file, add the following code:
 ```ts supabase/functions/scribe-bot/index.ts
 import { Bot, webhookCallback } from 'https://deno.land/x/grammy@v1.34.0/mod.ts'
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 import { ElevenLabsClient } from 'npm:elevenlabs@1.50.5'
 
 console.log(`Function "elevenlabs-scribe-bot" up and running!`)

@@ -1,4 +1,4 @@
-import { GitBranch, Github } from 'lucide-react'
+import { Github } from 'lucide-react'
 
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
@@ -6,6 +6,7 @@ import type { IntegrationProjectConnection } from 'data/integrations/integration
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
@@ -19,7 +20,7 @@ export interface ProjectCardProps {
   resourceWarnings?: ResourceWarning
 }
 
-const ProjectCard = ({
+export const ProjectCard = ({
   project,
   rewriteHref,
   githubIntegration,
@@ -28,6 +29,10 @@ const ProjectCard = ({
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
+
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
 
   const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
@@ -45,7 +50,9 @@ const ProjectCard = ({
             <p className="flex-shrink truncate text-sm pr-4">{name}</p>
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center gap-x-1.5">
-              {project.status !== 'INACTIVE' && <ComputeBadgeWrapper project={project} />}
+              {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
+                <ComputeBadgeWrapper project={project} />
+              )}
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
                   <InlineSVG
@@ -55,17 +62,12 @@ const ProjectCard = ({
                   />
                 </div>
               )}
-              {isBranchingEnabled && (
-                <div className="w-fit p-1 border rounded-md flex items-center">
-                  <GitBranch size={12} strokeWidth={1.5} />
-                </div>
-              )}
               {isGithubIntegrated && (
                 <>
                   <div className="w-fit p-1 border rounded-md flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs !ml-2 text-foreground-light">{githubRepository}</p>
+                  <p className="text-xs !ml-2 text-foreground-light truncate">{githubRepository}</p>
                 </>
               )}
             </div>
@@ -79,5 +81,3 @@ const ProjectCard = ({
     </li>
   )
 }
-
-export default ProjectCard

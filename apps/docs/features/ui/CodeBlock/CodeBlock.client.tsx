@@ -4,7 +4,7 @@ import { Check, Copy } from 'lucide-react'
 import { type MouseEvent, useCallback, useEffect, useState } from 'react'
 import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export function AnnotatedSpan({
   token,
@@ -89,13 +89,10 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(content)
+    copyToClipboard(content, () => {
       setCopied(true)
       setTimeout(() => setCopied(false), 1000)
-    } catch (error) {
-      console.error('Failed to copy text: ', error)
-    }
+    })
   }
 
   return (

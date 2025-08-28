@@ -20,6 +20,28 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Kayhan Space saw 8x improvement in developer speed when moving to Supabase',
+    description:
+      'The Kayhan Space team migrated to Supabase from Amazon RDS and Auth0 to simplify infrastructure and unlock developer velocity.',
+    organization: 'Kayhan Space',
+    imgUrl: 'images/customers/logos/kayhanspace.png',
+    logo: '/images/customers/logos/kayhanspace.png',
+    logo_inverse: '/images/customers/logos/light/kayhanspace.png',
+    url: '/customers/kayhanspace',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Udio hits the right notes with Supabase',
+    description:
+      'Udio built a scalable, AI-driven music platform on a Supabase backend from day one.',
+    organization: 'Udio',
+    imgUrl: 'images/customers/logos/udio.png',
+    logo: '/images/customers/logos/udio.png',
+    logo_inverse: '/images/customers/logos/light/udio.png',
+    url: '/customers/udio',
+  },
+  {
+    type: 'Customer Story',
     title: 'Euka used Supabase to unlock faster growth',
     description:
       'Supabase helped Euka accelerate development, simplify AI feature rollout, and scale creator marketing faster than ever.',

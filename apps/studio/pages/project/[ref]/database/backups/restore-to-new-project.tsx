@@ -13,10 +13,8 @@ import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement
 import { Markdown } from 'components/interfaces/Markdown'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
@@ -25,9 +23,13 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
@@ -59,10 +61,11 @@ RestoreToNewProjectPage.getLayout = (page) => (
 )
 
 const RestoreToNewProject = () => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan?.id === 'free'
   const isOrioleDb = useIsOrioleDb()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
@@ -77,12 +80,11 @@ const RestoreToNewProject = () => {
     isError,
   } = useCloneBackupsQuery({ projectRef: project?.ref }, { enabled: !isFreePlan })
 
-  const plan = organization?.plan?.id
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
-  const canTriggerPhysicalBackups = useCheckPermissions(
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.READ, 'physical_backups')
+  const { can: canTriggerPhysicalBackups } = useAsyncCheckProjectPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
@@ -188,6 +190,16 @@ const RestoreToNewProject = () => {
     }
   }
 
+  if (organization?.managed_by === 'vercel-marketplace') {
+    return (
+      <Admonition
+        type="default"
+        title="Restore to new project is not available for Vercel Marketplace organizations"
+        description="Restoring project backups to a new project created via Vercel Marketplace is not supported yet."
+      />
+    )
+  }
+
   if (isFreePlan) {
     return (
       <UpgradeToPro
@@ -205,9 +217,16 @@ const RestoreToNewProject = () => {
         type="default"
         title="Restoring to new projects are not available for OrioleDB"
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
-      >
-        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
-      </Admonition>
+      />
+    )
+  }
+
+  if (isAwsK8s) {
+    return (
+      <Admonition
+        type="default"
+        title="Restoring to new projects is temporarily not available for AWS (Revamped) projects"
+      />
     )
   }
 

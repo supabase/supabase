@@ -1,26 +1,27 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SqlEditor } from 'icons'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useAppStateSnapshot } from 'state/app-state'
-import { Button } from 'ui'
+import { KeyboardShortcut } from 'ui'
 
-const InlineEditorButton = () => {
-  const { closeAssistant } = useAiAssistantStateSnapshot()
-  const { setEditorPanel, editorPanel } = useAppStateSnapshot()
-
+export const InlineEditorButton = ({ onClick }: { onClick: () => void }) => {
   return (
-    <Button
+    <ButtonTooltip
       type="text"
       size="tiny"
       id="editor-trigger"
-      className="w-[24px] h-[24px] flex items-center justify-center p-0"
-      onClick={() => {
-        closeAssistant()
-        setEditorPanel({ open: !editorPanel.open })
+      className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
+      onClick={onClick}
+      tooltip={{
+        content: {
+          text: (
+            <div className="flex items-center gap-4">
+              <span>SQL Editor</span>
+              <KeyboardShortcut keys={['Meta', 'e']} />
+            </div>
+          ),
+        },
       }}
     >
-      <SqlEditor size={20} strokeWidth={1.5} />
-    </Button>
+      <SqlEditor size={18} strokeWidth={1.5} />
+    </ButtonTooltip>
   )
 }
-
-export default InlineEditorButton

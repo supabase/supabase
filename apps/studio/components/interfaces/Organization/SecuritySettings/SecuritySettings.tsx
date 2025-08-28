@@ -15,8 +15,9 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
   Alert_Shadcn_,
@@ -44,10 +45,11 @@ const schema = z.object({
 const SecuritySettings = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const canReadMfaConfig = useCheckPermissions(PermissionAction.READ, 'organizations')
   const canUpdateMfaConfig = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const isPaidPlan = selectedOrganization?.plan.id !== 'free'
 
@@ -66,6 +68,15 @@ const SecuritySettings = () => {
     },
     onSuccess: (data) => {
       toast.success('Successfully updated organization MFA settings')
+      sendEvent({
+        action: 'organization_mfa_enforcement_updated',
+        properties: {
+          mfaEnforced: data.enforced,
+        },
+        groups: {
+          organization: slug ?? 'Unknown',
+        },
+      })
     },
   })
 

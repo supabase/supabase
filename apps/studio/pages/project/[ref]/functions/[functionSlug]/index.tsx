@@ -22,7 +22,7 @@ import {
 } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -34,18 +34,11 @@ import {
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
-    key: '5min',
-    label: '5 min',
-    startValue: 5,
-    startUnit: 'minute',
-    format: 'MMM D, h:mm:ssa',
-  },
-  {
     key: '15min',
     label: '15 min',
     startValue: 15,
     startUnit: 'minute',
-    format: 'MMM D, h:mma',
+    format: 'MMM D, h:mm:ssa',
   },
   {
     key: '1hr',
@@ -61,13 +54,13 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
-  {
-    key: '7day',
-    label: '7 days',
-    startValue: 7,
-    startUnit: 'day',
-    format: 'MMM D',
-  },
+  // {
+  //   key: '7day',
+  //   label: '7 days',
+  //   startValue: 7,
+  //   startUnit: 'day',
+  //   format: 'MMM D',
+  // },
 ]
 
 const PageLayout: NextPageWithLayout = () => {
@@ -149,11 +142,11 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const canReadFunction = useCheckPermissions(
+  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckProjectPermissions(
     PermissionAction.FUNCTIONS_READ,
     functionSlug as string
   )
-  if (!canReadFunction) {
+  if (!canReadFunction && !permissionsLoading) {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
 

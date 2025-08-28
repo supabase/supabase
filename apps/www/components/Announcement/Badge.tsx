@@ -61,7 +61,7 @@ const AnnouncementBadge = ({
         <ArrowNarrowRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
-        className="absolute inset-0 -z-10 bg-gradient-to-br
+        className="announcement-overlay absolute inset-0 -z-10 bg-gradient-to-br
             opacity-70
             group-hover/announcement:opacity-100
             transition-opacity
