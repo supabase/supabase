@@ -57,7 +57,7 @@ const data = {
         avatar:
           'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
         author: 'Sarah Chen',
-        authorTitle: 'SupaSquad Helper – L2',
+        authorTitle: 'SupaSquad Helper',
         quote: (
           <>
             Being a Helper in SupaSquad has been incredibly rewarding. There's nothing like that
@@ -71,7 +71,7 @@ const data = {
         avatar:
           'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
         author: 'Marcus Torres',
-        authorTitle: 'SupaSquad Advocate – L3',
+        authorTitle: 'SupaSquad Advocate',
         quote: (
           <>
             As an Advocate, I get to share my genuine excitement about Supabase with the broader
@@ -84,18 +84,18 @@ const data = {
         ),
       },
       {
-        avatar: 'https://pbs.twimg.com/profile_images/1952929230439772161/B1ZRkVvE_bigger.jpg',
-        author: 'Tomás Pozo',
-        authorTitle: 'Community Support at Supabase',
+        avatar:
+          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+        author: 'Alex Kim',
+        authorTitle: 'SupaSquad Maintainer',
         quote: (
           <>
-            A year ago I was a Supabase fan <span className="text-foreground">hosting meetups</span>{' '}
-            and <span className="text-foreground">helping people on Discord</span>. A few months
-            later, I joined the program and{' '}
+            Contributing as a Maintainer has accelerated my growth as a developer more than any
+            course could.
             <span className="text-foreground">
-              now work full-time on the Community Support team
+              Working directly with the core team on real production code
             </span>{' '}
-            at Supabase. Taking chances contributing to the community shaped my career.
+            has given me insights I never would have gained otherwise.
           </>
         ),
       },
