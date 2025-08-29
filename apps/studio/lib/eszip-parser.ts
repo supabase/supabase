@@ -64,7 +64,11 @@ export async function parseEszip(bytes: Uint8Array) {
     }
 
     // Extract version
-    const version = parseInt(await parser.getModuleSource('---SUPABASE-ESZIP-VERSION-ESZIP---'))
+    let version = parseInt(await parser.getModuleSource('---SUPABASE-ESZIP-VERSION-ESZIP---'))
+    if (isNaN(version)) {
+      version = 0
+    }
+
     // Extract files from the eszip
     const files = await extractEszip(parser, specifiers, version >= 2)
 
@@ -79,7 +83,10 @@ export async function parseEszip(bytes: Uint8Array) {
       })
     )
 
-    return responseFiles
+    return {
+      version,
+      files: responseFiles,
+    }
   } catch (error) {
     console.error('Error in parseEszip:', error)
     throw error
