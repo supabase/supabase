@@ -270,7 +270,13 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
 
   // Apply drag and drop refs
   if (canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET) {
-    drag(drop(ref))
+    // Always apply drag ref
+    drag(ref)
+
+    // Only apply drop ref for folders
+    if (item.type === STORAGE_ROW_TYPES.FOLDER) {
+      drop(ref)
+    }
   }
 
   const onSelectFile = async (columnIndex: number, file: StorageItem) => {
