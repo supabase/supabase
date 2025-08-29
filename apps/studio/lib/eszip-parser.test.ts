@@ -45,7 +45,7 @@ describe('eszip-parser', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(Parser.createInstance as any).mockResolvedValue(mockParser)
+      ; (Parser.createInstance as any).mockResolvedValue(mockParser)
   })
 
   afterEach(() => {
@@ -62,6 +62,7 @@ describe('eszip-parser', () => {
       mockParser.parseBytes.mockResolvedValue(mockSpecifiers)
       mockParser.load.mockResolvedValue(undefined)
       mockParser.getModuleSource
+        .mockResolvedValueOnce(null)
         .mockResolvedValueOnce(mockModuleSource1)
         .mockResolvedValueOnce(mockModuleSource2)
 
@@ -71,6 +72,7 @@ describe('eszip-parser', () => {
       expect(mockParser.parseBytes).toHaveBeenCalledWith(mockBytes)
       expect(mockParser.load).toHaveBeenCalled()
       expect(result).toHaveLength(2)
+      console.log(result)
       expect(result[0]).toEqual({
         name: 'file1.ts',
         content: mockModuleSource1,
