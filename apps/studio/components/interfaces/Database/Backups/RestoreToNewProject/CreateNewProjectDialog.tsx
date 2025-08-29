@@ -162,7 +162,7 @@ export const CreateNewProjectDialog = ({
                     <FormControl_Shadcn_>
                       <Input
                         id="db-password"
-                        label="Database Password"
+                        label="Database password"
                         type="password"
                         placeholder="Type in a strong password"
                         value={field.value}

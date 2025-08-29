@@ -61,7 +61,7 @@ export const PostgresVersionSelector = ({
   form,
   type = 'create',
   layout = 'horizontal',
-  label = 'Postgres Version',
+  label = 'Postgres version',
 }: PostgresVersionSelectorProps) => {
   const { data: project } = useSelectedProjectQuery()
 
