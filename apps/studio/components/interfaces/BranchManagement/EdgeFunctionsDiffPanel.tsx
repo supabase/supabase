@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
   version: 0,
-  files: EMPTY_ARR
+  files: EMPTY_ARR,
 }
 
 interface EdgeFunctionsDiffPanelProps {
@@ -87,10 +87,10 @@ const FunctionDiff = ({
   }, [allFileKeys, activeFileKey])
 
   const currentFile = currentBody.files.find(
-    (f: EdgeFunctionBodyData["files"][number]) => fileKey(f.name) === activeFileKey
+    (f: EdgeFunctionBodyData['files'][number]) => fileKey(f.name) === activeFileKey
   )
   const mainFile = mainBody.files.find(
-    (f: EdgeFunctionBodyData["files"][number]) => fileKey(f.name) === activeFileKey
+    (f: EdgeFunctionBodyData['files'][number]) => fileKey(f.name) === activeFileKey
   )
 
   const language = useMemo(() => {
