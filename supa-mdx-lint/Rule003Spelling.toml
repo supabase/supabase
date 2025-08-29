@@ -336,6 +336,7 @@ allow_list = [
     "psql",
     "scrypt",
     "sessionStorage",
+    "signInWithIdToken",
     "stdin",
     "stdout",
     "[Ss]ubnet(s)?",

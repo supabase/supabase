@@ -1,6 +1,6 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { Loader2, Pencil, Trash2 } from 'lucide-react'
-import { createContext, PropsWithChildren, ReactNode, useMemo, useState } from 'react'
+import { CheckIcon, Loader2, Pencil, Trash2 } from 'lucide-react'
+import { createContext, memo, PropsWithChildren, ReactNode, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
@@ -11,8 +11,8 @@ import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
+import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import {
   Heading3,
   Hyperlink,
@@ -21,6 +21,7 @@ import {
   MarkdownPre,
   OrderedList,
 } from './MessageMarkdown'
+import { Reasoning } from './elements/Reasoning'
 
 interface MessageContextType {
   isLoading: boolean
@@ -42,6 +43,7 @@ interface MessageProps {
   message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
+  status?: string
   action?: ReactNode
   variant?: 'default' | 'warning'
   onResults: ({
@@ -60,7 +62,7 @@ interface MessageProps {
   onCancelEdit: () => void
 }
 
-export const Message = function Message({
+const Message = function Message({
   id,
   message,
   isLoading,
@@ -72,6 +74,7 @@ export const Message = function Message({
   onEdit,
   isAfterEditedMessage = false,
   isBeingEdited = false,
+  status,
   onCancelEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
@@ -125,23 +128,59 @@ export const Message = function Message({
             <ProfileImage
               alt={profile?.username}
               src={profile?.profileImageUrl}
-              className="w-5 h-5 shrink-0 rounded-full"
+              className="w-5 h-5 shrink-0 rounded-full translate-y-0.5"
             />
           )}
 
-          <div className="flex-1 min-w-0 [&>div:first-child]:!mt-1">
+          <div className="flex-1 min-w-0">
             {shouldUsePartsRendering ? (
               (() => {
-                const shownLoadingTools = new Set<string>()
                 return parts.map(
                   (part: NonNullable<VercelMessage['parts']>[number], index: number) => {
                     switch (part.type) {
+                      case 'dynamic-tool': {
+                        return (
+                          <div
+                            key={`${id}-tool-${part.toolCallId}`}
+                            className={cn(
+                              'border rounded-md border-muted heading-meta flex items-center gap-2 text-foreground-lighter py-2 px-3 dynamic-tool-item',
+                              '[&:not(.dynamic-tool-item+.dynamic-tool-item)]:mt-4 [&.dynamic-tool-item+.dynamic-tool-item]:mt-1 first:!mt-0',
+                              '[&:not(:has(+.dynamic-tool-item))]:mb-4'
+                            )}
+                          >
+                            {part.state === 'input-streaming' ? (
+                              <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
+                            ) : (
+                              <CheckIcon
+                                strokeWidth={1.5}
+                                size={12}
+                                className="text-foreground-muted"
+                              />
+                            )}
+                            {`${part.toolName}`}
+                          </div>
+                        )
+                      }
+                      case 'reasoning':
+                        return (
+                          <Reasoning
+                            key={`${message.id}-${index}}`}
+                            className={cn(
+                              'w-full dynamic-tool-item',
+                              '[&:not(.dynamic-tool-item+.dynamic-tool-item)]:mt-4 [&.dynamic-tool-item+.dynamic-tool-item]:mt-1 first:!mt-0',
+                              '[&:not(:has(+.dynamic-tool-item))]:mb-4'
+                            )}
+                            isStreaming={part.state === 'streaming'}
+                          >
+                            {part.text}
+                          </Reasoning>
+                        )
                       case 'text':
                         return (
                           <ReactMarkdown
                             key={`${id}-part-${index}`}
                             className={cn(
-                              'prose prose-sm [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+                              'max-w-none prose prose-sm [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
                               isUser && 'text-foreground [&>p]:font-medium',
                               isBeingEdited && 'animate-pulse'
                             )}
@@ -155,10 +194,6 @@ export const Message = function Message({
                       case 'tool-display_query': {
                         const { toolCallId, state, input } = part
                         if (state === 'input-streaming' || state === 'input-available') {
-                          if (shownLoadingTools.has('display_query')) {
-                            return null
-                          }
-                          shownLoadingTools.add('display_query')
                           return (
                             <div
                               key={`${id}-tool-loading-display_query`}
@@ -188,10 +223,6 @@ export const Message = function Message({
                       case 'tool-display_edge_function': {
                         const { toolCallId, state, input } = part
                         if (state === 'input-streaming' || state === 'input-available') {
-                          if (shownLoadingTools.has('display_edge_function')) {
-                            return null
-                          }
-                          shownLoadingTools.add('display_edge_function')
                           return (
                             <div
                               key={`${id}-tool-loading-display_edge_function`}
@@ -206,7 +237,7 @@ export const Message = function Message({
                           return (
                             <div
                               key={`${id}-tool-${toolCallId}`}
-                              className="w-auto overflow-x-hidden"
+                              className="w-auto overflow-x-hidden my-4"
                             >
                               <EdgeFunctionBlock
                                 label={(input as any).name || 'Edge Function'}
@@ -219,7 +250,6 @@ export const Message = function Message({
                         }
                         return null
                       }
-                      case 'reasoning':
                       case 'source-url':
                       case 'source-document':
                       case 'file':
@@ -242,8 +272,8 @@ export const Message = function Message({
               <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
 
-            {/* Action buttons - only show for user messages on hover */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+            {/* Action button - only show for user messages on hover */}
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 mb-2">
               {message.role === 'user' && (
                 <>
                   <ButtonTooltip
@@ -293,3 +323,51 @@ export const Message = function Message({
     </MessageContext.Provider>
   )
 }
+
+export const MemoizedMessage = memo(
+  ({
+    message,
+    status,
+    onResults,
+    onDelete,
+    onEdit,
+    isAfterEditedMessage,
+    isBeingEdited,
+    onCancelEdit,
+  }: {
+    message: VercelMessage
+    status: string
+    onResults: ({
+      messageId,
+      resultId,
+      results,
+    }: {
+      messageId: string
+      resultId?: string
+      results: any[]
+    }) => void
+    onDelete: (id: string) => void
+    onEdit: (id: string) => void
+    isAfterEditedMessage: boolean
+    isBeingEdited: boolean
+    onCancelEdit: () => void
+  }) => {
+    return (
+      <Message
+        id={message.id}
+        message={message}
+        readOnly={message.role === 'user'}
+        isLoading={status === 'submitted' || status === 'streaming'}
+        status={status}
+        onResults={onResults}
+        onDelete={onDelete}
+        onEdit={onEdit}
+        isAfterEditedMessage={isAfterEditedMessage}
+        isBeingEdited={isBeingEdited}
+        onCancelEdit={onCancelEdit}
+      />
+    )
+  }
+)
+
+MemoizedMessage.displayName = 'MemoizedMessage'
