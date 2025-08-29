@@ -85,7 +85,7 @@ export function ActivityStats() {
             ) : isDefaultProject ? (
               <div className="flex items-center gap-2">
                 <GitBranch size={16} strokeWidth={1.5} className="text-foreground-muted" />
-                {latestNonDefaultBranch?.name ?? 'No branches'}
+                {latestNonDefaultBranch?.name ?? '+ Create your first branch'}
               </div>
             ) : currentBranch?.created_at ? (
               dayjs(currentBranch.created_at).fromNow()

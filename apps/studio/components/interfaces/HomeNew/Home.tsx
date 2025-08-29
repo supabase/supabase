@@ -11,12 +11,9 @@ import {
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import type { NextPageWithLayout } from 'types'
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import TopSection from 'components/interfaces/HomeNew/TopSection'
 import GettingStartedSection from 'components/interfaces/HomeNew/GettingStartedSection'
 import AdvisorSection from 'components/interfaces/HomeNew/AdvisorSection'
@@ -25,7 +22,7 @@ import SortableSection from 'components/interfaces/HomeNew/SortableSection'
 import { ProjectUsageSection } from 'components/interfaces/HomeNew/ProjectUsageSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
-const Home: NextPageWithLayout = () => {
+const Home = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
@@ -150,11 +147,5 @@ const Home: NextPageWithLayout = () => {
     </div>
   )
 }
-
-Home.getLayout = (page) => (
-  <DefaultLayout>
-    <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
-  </DefaultLayout>
-)
 
 export default Home

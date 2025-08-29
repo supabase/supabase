@@ -1,11 +1,10 @@
 import { useParams } from 'common'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import GettingStarted, { GettingStartedStep } from './GettingStarted'
+import GettingStarted from './GettingStarted'
 import {
   Code,
   Database,
-  File,
   Table,
   User,
   Upload,
@@ -27,11 +26,29 @@ import {
   Card,
   CardContent,
   CodeBlock,
-  SimpleCodeBlock,
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
 import { BASE_PATH } from 'lib/constants'
+
+export type GettingStartedAction = {
+  label: string
+  href?: string
+  onClick?: () => void
+  variant?: React.ComponentProps<typeof Button>['type']
+  icon?: React.ReactNode
+  component?: React.ReactNode
+}
+
+export type GettingStartedStep = {
+  key: string
+  status: 'complete' | 'incomplete'
+  icon?: React.ReactNode
+  title: string
+  description: string
+  image?: React.ReactNode
+  actions: GettingStartedAction[]
+}
 
 type GettingStartedState = 'empty' | 'code' | 'no-code' | 'hidden'
 
@@ -71,9 +88,10 @@ export default function GettingStartedSection({
           {
             key: 'install-cli',
             status: 'incomplete',
-            title: 'Install CLI',
+            title: 'Install the Supabase CLI',
             icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
-            description: 'Install the Supabase CLI for local development, migrations, and seeding.',
+            description:
+              'To get started, install the Supabase CLI to manage your project locally, handle migrations, and seed data.',
             actions: [
               {
                 label: 'Install via npm',
@@ -88,10 +106,9 @@ export default function GettingStartedSection({
           {
             key: 'design-db',
             status: tablesCount > 0 ? 'complete' : 'incomplete',
-            title: 'Design your database',
+            title: 'Design your database schema',
             icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
-            description:
-              'Create your first schema file with the state you want your database to be in',
+            description: 'Next, create a schema file that defines the structure of your database.',
             actions: [
               {
                 label: 'Create schema file',
@@ -115,10 +132,9 @@ export default function GettingStartedSection({
           {
             key: 'add-data',
             status: 'incomplete',
-            title: 'Add some data',
+            title: 'Seed your database with data',
             icon: <Table strokeWidth={1} className="text-foreground-muted" size={16} />,
-            description:
-              'Create a seed file to populate your database and any branches with seed data',
+            description: 'Now, create a seed file to populate your database with initial data.',
             actions: [
               {
                 label: 'Create a seed file',
@@ -142,10 +158,10 @@ export default function GettingStartedSection({
           {
             key: 'add-rls-policies',
             status: 'incomplete',
-            title: 'Add RLS policies',
+            title: 'Secure your data with RLS policies',
             icon: <Shield strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Enable Row Level Security and define policies to control access to your data.',
+              "Let's secure your data by enabling Row Level Security and defining access policies in a migration file.",
             actions: [
               {
                 label: 'Create a migration file',
@@ -169,10 +185,10 @@ export default function GettingStartedSection({
           {
             key: 'setup-auth',
             status: 'incomplete',
-            title: 'Set up authentication',
+            title: 'Configure authentication',
             icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Configure authentication providers and manage settings for Supabase Auth.',
+              "It's time to configure your authentication providers and settings for Supabase Auth.",
             actions: [
               { label: 'Configure', href: `/project/${ref}/auth/providers`, variant: 'default' },
             ],
@@ -180,10 +196,10 @@ export default function GettingStartedSection({
           {
             key: 'connect-app',
             status: 'incomplete',
-            title: 'Connect your app',
+            title: 'Connect your application',
             icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Connect your app to your Supabase project using one of our client libraries and optional, pre-built UI components',
+              'Your project is ready. Connect your app using one of our client libraries.',
             actions: [
               {
                 label: 'Framework selector',
@@ -221,7 +237,7 @@ export default function GettingStartedSection({
             status: 'incomplete',
             title: 'Sign up your first user',
             icon: <UserPlus strokeWidth={1} className="text-foreground-muted" size={16} />,
-            description: 'Create your first user account to test authentication flows.',
+            description: 'Test your authentication setup by creating the first user account.',
             actions: [
               {
                 label: 'Read docs',
@@ -235,7 +251,7 @@ export default function GettingStartedSection({
             status: 'incomplete',
             title: 'Upload a file',
             icon: <Upload strokeWidth={1} className="text-foreground-muted" size={16} />,
-            description: 'Create a bucket and upload your first file with Supabase Storage.',
+            description: 'Integrate file storage by creating a bucket and uploading a file.',
             actions: [
               { label: 'Buckets', href: `/project/${ref}/storage/buckets`, variant: 'default' },
             ],
@@ -243,10 +259,10 @@ export default function GettingStartedSection({
           {
             key: 'create-edge-function',
             status: 'incomplete',
-            title: 'Create your first edge function',
+            title: 'Deploy an Edge Function',
             icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Build and deploy an edge function to run server-side logic close to your users.',
+              'Add server-side logic by creating and deploying your first Edge Function.',
             actions: [
               {
                 label: 'Create a function',
@@ -259,19 +275,19 @@ export default function GettingStartedSection({
           {
             key: 'monitor-progress',
             status: 'incomplete',
-            title: 'Monitor your progress',
+            title: "Monitor your project's usage",
             icon: <BarChart3 strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Create custom reports to track API, database, storage, and auth activity.',
+              "Track your project's activity by creating custom reports for API, database, and auth events.",
             actions: [{ label: 'Reports', href: `/project/${ref}/reports`, variant: 'default' }],
           },
           {
             key: 'create-first-branch',
             status: hasNonDefaultBranch ? 'complete' : 'incomplete',
-            title: 'Create your first branch',
+            title: 'Connect to GitHub',
             icon: <GitBranch strokeWidth={1} className="text-foreground-muted" size={16} />,
             description:
-              'Connect GitHub to automatically create and merge Supabase branches for every PR',
+              'Streamline your development workflow by connecting your project to GitHub to automatically manage branches.',
             actions: [
               {
                 label: 'Connect to GitHub',
@@ -286,10 +302,10 @@ export default function GettingStartedSection({
             {
               key: 'design-db',
               status: tablesCount > 0 ? 'complete' : 'incomplete',
-              title: 'Design your database',
+              title: 'Create your first table',
               icon: <Database strokeWidth={1} className="text-foreground-muted" size={16} />,
               description:
-                'Start building your app by creating tables with the table editor, SQL editor, or describe what you want with the assistant.',
+                "To kick off your new project, let's start by creating your very first database table using either the table editor or AI Assistant.",
               actions: [
                 { label: 'Create a table', href: `/project/${ref}/editor`, variant: 'default' },
                 {
@@ -309,10 +325,10 @@ export default function GettingStartedSection({
             {
               key: 'add-data',
               status: 'incomplete',
-              title: 'Add some data',
+              title: 'Add sample data',
               icon: <Table strokeWidth={1} className="text-foreground-muted" size={16} />,
               description:
-                'Use the table editor to create sample data, or ask the Assistant to generate it for you.',
+                "Next, let's add some sample data that you can play with once you connect your app.",
               actions: [
                 { label: 'Add data', href: `/project/${ref}/editor`, variant: 'default' },
                 {
@@ -332,10 +348,10 @@ export default function GettingStartedSection({
             {
               key: 'add-rls-policies',
               status: 'incomplete',
-              title: 'Add RLS policies',
+              title: 'Secure your data with Row Level Security',
               icon: <Shield strokeWidth={1} className="text-foreground-muted" size={16} />,
               description:
-                'Create a migration file to enable Row Level Security and create policies on each of your tables',
+                "Now that you have some data, let's secure it by enabling Row Level Security and creating policies.",
               actions: [
                 {
                   label: 'Create a policy',
@@ -361,8 +377,7 @@ export default function GettingStartedSection({
               status: 'incomplete',
               title: 'Set up authentication',
               icon: <User strokeWidth={1} className="text-foreground-muted" size={16} />,
-              description:
-                'Configure authentication providers and manage settings for Supabase Auth.',
+              description: "It's time to set up authentication so you can start signing up users.",
               actions: [
                 {
                   label: 'Configure auth',
@@ -374,10 +389,9 @@ export default function GettingStartedSection({
             {
               key: 'connect-app',
               status: 'incomplete',
-              title: 'Connect your app',
+              title: 'Connect your application',
               icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
-              description:
-                'Connect your app to your Supabase project using one of our client libraries and optional, pre-built React components',
+              description: "Your project is ready. Let's connect your application to Supabase.",
               actions: [
                 {
                   label: 'Framework selector',
@@ -415,7 +429,7 @@ export default function GettingStartedSection({
               status: 'incomplete',
               title: 'Sign up your first user',
               icon: <UserPlus strokeWidth={1} className="text-foreground-muted" size={16} />,
-              description: 'Create your first user account to test authentication flows.',
+              description: 'Test your authentication by signing up your first user.',
               actions: [
                 {
                   label: 'Read docs',
@@ -429,7 +443,8 @@ export default function GettingStartedSection({
               status: 'incomplete',
               title: 'Upload a file',
               icon: <Upload strokeWidth={1} className="text-foreground-muted" size={16} />,
-              description: 'Create a bucket and upload your first file with Supabase Storage.',
+              description:
+                "Let's add file storage to your app by creating a bucket and uploading your first file.",
               actions: [
                 { label: 'Buckets', href: `/project/${ref}/storage/buckets`, variant: 'default' },
               ],
@@ -437,10 +452,10 @@ export default function GettingStartedSection({
             {
               key: 'create-edge-function',
               status: 'incomplete',
-              title: 'Create your first edge function',
+              title: 'Add server-side logic',
               icon: <Code strokeWidth={1} className="text-foreground-muted" size={16} />,
               description:
-                'Build and deploy an edge function to run server-side logic close to your users.',
+                "Extend your app's functionality by creating an Edge Function for server-side logic.",
               actions: [
                 {
                   label: 'Create a function',
@@ -452,10 +467,10 @@ export default function GettingStartedSection({
             {
               key: 'monitor-progress',
               status: 'incomplete',
-              title: 'Monitor your progress',
+              title: "Monitor your project's health",
               icon: <BarChart3 strokeWidth={1} className="text-foreground-muted" size={16} />,
               description:
-                'Create custom reports to track API, database, storage, and auth activity.',
+                "Keep an eye on your project's performance and usage by setting up custom reports.",
               actions: [
                 { label: 'Create a report', href: `/project/${ref}/reports`, variant: 'default' },
               ],
@@ -463,9 +478,10 @@ export default function GettingStartedSection({
             {
               key: 'create-first-branch',
               status: hasNonDefaultBranch ? 'complete' : 'incomplete',
-              title: 'Create your first branch',
+              title: 'Create a branch to test changes',
               icon: <GitBranch strokeWidth={1} className="text-foreground-muted" size={16} />,
-              description: 'Create a preview branch to safely test changes before merging.',
+              description:
+                'Safely test changes by creating a preview branch before deploying to production.',
               actions: [
                 { label: 'Create a branch', href: `/project/${ref}/branches`, variant: 'default' },
               ],
@@ -474,32 +490,37 @@ export default function GettingStartedSection({
         : []
 
   return (
-    <GettingStarted
-      onDismiss={() => onChange('hidden')}
-      headerRight={
-        <ToggleGroup
-          type="single"
-          value={workflow ?? undefined}
-          onValueChange={(v) => v && onChange(v as 'no-code' | 'code')}
-        >
-          <ToggleGroupItem
-            value="no-code"
-            aria-label="No-code workflow"
-            className="w-[26px] h-[26px] p-0"
+    <section className="w-full">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="heading-section">Getting started</h3>
+        <div className="flex items-center gap-2">
+          <ToggleGroup
+            type="single"
+            value={workflow ?? undefined}
+            onValueChange={(v) => v && onChange(v as 'no-code' | 'code')}
           >
-            <Table2 size={16} strokeWidth={1.5} className="text-foreground" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="code"
-            aria-label="Code workflow"
-            className="w-[26px] h-[26px] p-0"
-          >
-            <Code size={16} strokeWidth={1.5} className="text-foreground" />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      }
-      steps={steps}
-      emptyContent={
+            <ToggleGroupItem
+              value="no-code"
+              aria-label="No-code workflow"
+              className="w-[26px] h-[26px] p-0"
+            >
+              <Table2 size={16} strokeWidth={1.5} className="text-foreground" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="code"
+              aria-label="Code workflow"
+              className="w-[26px] h-[26px] p-0"
+            >
+              <Code size={16} strokeWidth={1.5} className="text-foreground" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+          <Button size="tiny" type="outline" onClick={() => onChange('hidden')}>
+            Dismiss
+          </Button>
+        </div>
+      </div>
+
+      {steps.length === 0 ? (
         <Card className="bg-background/25 border-dashed relative">
           <div className="absolute -inset-16 z-0 opacity-50">
             <img
@@ -557,7 +578,9 @@ export default function GettingStartedSection({
             </div>
           </CardContent>
         </Card>
-      }
-    />
+      ) : (
+        <GettingStarted steps={steps} />
+      )}
+    </section>
   )
 }

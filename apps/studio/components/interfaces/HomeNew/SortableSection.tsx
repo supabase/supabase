@@ -8,7 +8,9 @@ type SortableSectionProps = {
 }
 
 export function SortableSection({ id, children }: SortableSectionProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  })
 
   const style: CSSProperties = {
     transform: transform

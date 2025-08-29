@@ -19,7 +19,7 @@ const LintDetail = ({ lint, projectRef }: LintDetailProps) => {
   return (
     <div>
       <h3 className="text-sm mb-2">Entity</h3>
-      <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg text-sm mb-6">
+      <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg text-sm mb-6 w-fit">
         <EntityTypeIcon type={lint.metadata?.type} />
         <LintEntity metadata={lint.metadata} />
       </div>

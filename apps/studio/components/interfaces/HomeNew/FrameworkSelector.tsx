@@ -20,7 +20,6 @@ interface FrameworkSelectorProps {
   value: string
   onChange: (value: string) => void
   items: ConnectionType[]
-  label?: string
   className?: string
 }
 
@@ -28,7 +27,6 @@ export const FrameworkSelector = ({
   value,
   onChange,
   items,
-  label = 'Framework',
   className,
 }: FrameworkSelectorProps) => {
   const [open, setOpen] = useState(false)
