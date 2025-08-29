@@ -1058,6 +1058,32 @@ functions:
           let session = try await supabase.auth.refreshSession(refreshToken: "custom-refresh-token")
           ```
 
+  - id: start-auto-refresh
+    title: 'startAutoRefresh()'
+    description: |
+      Starts the automatic session refresh process.
+    examples:
+      - id: start-auto-refresh
+        name: Start automatic session refresh
+        isSpotlight: true
+        code: |
+          ```swift
+          supabase.auth.startAutoRefresh()
+          ```
+
+  - id: stop-auto-refresh
+    title: 'stopAutoRefresh()'
+    description: |
+      Stops the automatic session refresh process.
+    examples:
+      - id: stop-auto-refresh
+        name: Stop automatic session refresh
+        isSpotlight: true
+        code: |
+          ```swift
+          supabase.auth.stopAutoRefresh()
+          ```
+
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
     notes: |
@@ -1237,6 +1263,102 @@ functions:
             id: "715ed5db-f090-4b8c-a067-640ecee36aa0"
           )
           ```
+
+  - id: get-user-by-id
+    title: 'getUserById()'
+    description: |
+      Get user by ID.
+    notes: |
+      - The `getUserById()` method requires a user's ID.
+    examples:
+      - id: get-user-by-id
+        name: Get user by ID
+        isSpotlight: true
+        code: |
+          ```swift
+          let user = try await supabase.auth.admin.getUserById(
+            "715ed5db-f090-4b8c-a067-640ecee36aa0"
+          )
+          ```
+
+  - id: list-users
+    title: 'listUsers()'
+    description: |
+      List all users in the system.
+    examples:
+      - id: list-users
+        name: List users
+        isSpotlight: true
+        code: |
+          ```swift
+          let users = try await supabase.auth.admin.listUsers()
+          ```
+      - id: list-users-with-pagination
+        name: List users with pagination
+        code: |
+          ```swift
+          let users = try await supabase.auth.admin.listUsers(
+            params: PageParams(
+              page: 2,
+              perPage: 10
+            )
+          )
+          ```
+
+  - id: create-user
+    title: 'createUser()'
+    description: |
+      Create a new user.
+    examples:
+      - id: create-user
+        name: Create user
+        isSpotlight: true
+        code: |
+          ```swift
+          let user = try await supabase.auth.admin.createUser(
+            attributes: AdminUserAttributes(
+              email: "user@email.com",
+              password: "password",
+              emailConfirm: true
+            )
+          )
+          ```
+
+  - id: update-user-by-id
+    title: 'updateUserById()'
+    description: |
+      Update user by ID.
+    examples:
+      - id: update-user-by-id
+        name: Update user by ID
+        isSpotlight: true
+        code: |
+          ```swift
+          let user = try await supabase.auth.admin.updateUserById(
+            "715ed5db-f090-4b8c-a067-640ecee36aa0",
+            attributes: AdminUserAttributes(
+              email: "newemail@email.com"
+            )
+          )
+          ```
+
+  - id: invite-user-by-email
+    title: 'inviteUserByEmail()'
+    description: |
+      Send an invite link to the user's email address.
+    examples:
+      - id: invite-user-by-email
+        name: Invite user by email
+        isSpotlight: true
+        code: |
+          ```swift
+          let user = try await supabase.auth.admin.inviteUserByEmail(
+            "user@email.com",
+            data: ["role": "admin"],
+            redirectTo: URL(string: "https://example.com/welcome")
+          )
+          ```
+
   - id: select
     title: 'Fetch data: select()'
     notes: |
@@ -2951,6 +3073,305 @@ functions:
           }
           ```
         hideCodeBlock: true
+
+  - id: eq
+    title: eq()
+    description: |
+      Match only rows where `column` is equal to `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .eq("name", value: "The shire")
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "The shire",
+                "country_id": 554
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+
+  - id: neq
+    title: neq()
+    description: |
+      Match only rows where `column` is not equal to `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .neq("name", value: "Paris")
+          ```
+
+  - id: gt
+    title: gt()
+    description: |
+      Match only rows where `column` is greater than `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .gt("country_id", value: 250)
+          ```
+
+  - id: gte
+    title: gte()
+    description: |
+      Match only rows where `column` is greater than or equal to `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .gte("country_id", value: 250)
+          ```
+
+  - id: lt
+    title: lt()
+    description: |
+      Match only rows where `column` is less than `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .lt("country_id", value: 250)
+          ```
+
+  - id: lte
+    title: lte()
+    description: |
+      Match only rows where `column` is less than or equal to `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .lte("country_id", value: 250)
+          ```
+
+  - id: like
+    title: like()
+    description: |
+      Match only rows where `column` matches `pattern` case-sensitively.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .like("name", pattern: "%la%")
+          ```
+
+  - id: ilike
+    title: ilike()
+    description: |
+      Match only rows where `column` matches `pattern` case-insensitively.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .ilike("name", pattern: "%la%")
+          ```
+
+  - id: is
+    title: is()
+    description: |
+      Match only rows where `column` IS `value`. For non-null values, this is equivalent to the `eq` filter. For null values, use this instead of `eq`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .is("name", value: nil)
+          ```
+
+  - id: in
+    title: in()
+    description: |
+      Match only rows where `column` is included in the `values` array.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .in("name", values: ["Rio de Janeiro", "San Francisco"])
+          ```
+
+  - id: contains
+    title: contains()
+    description: |
+      Match only rows where `column` contains every element appearing in `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, main_exports")
+            .contains("main_exports", value: ["oil"])
+          ```
+
+  - id: containedBy
+    title: containedBy()
+    description: |
+      Match only rows where every element in `column` appears in `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, main_exports")
+            .containedBy("main_exports", value: ["cars", "food", "machine"])
+          ```
+
+  - id: overlaps
+    title: overlaps()
+    description: |
+      Match only rows where `column` and `value` have an element in common.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, main_exports")
+            .overlaps("main_exports", value: ["exports", "tourism"])
+          ```
+
+  - id: rangeLt
+    title: rangeLt()
+    description: |
+      Match only rows where every element in `column` is less than any element in `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("reservations")
+            .select()
+            .rangeLt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+          ```
+
+  - id: rangeGt
+    title: rangeGt()
+    description: |
+      Match only rows where every element in `column` is greater than any element in `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("reservations")
+            .select()
+            .rangeGt("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+          ```
+
+  - id: rangeGte
+    title: rangeGte()
+    description: |
+      Match only rows where every element in `column` is either contained in `value` or greater than any element in `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("reservations")
+            .select()
+            .rangeGte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+          ```
+
+  - id: rangeLte
+    title: rangeLte()
+    description: |
+      Match only rows where every element in `column` is either contained in `value` or less than any element in `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("reservations")
+            .select()
+            .rangeLte("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+          ```
+
+  - id: rangeAdjacent
+    title: rangeAdjacent()
+    description: |
+      Match only rows where `column` is adjacent to the `value` range.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("reservations")
+            .select()
+            .rangeAdjacent("during", value: "[2000-01-02 08:30, 2000-01-02 09:30)")
+          ```
+
+  - id: textSearch
+    title: textSearch()
+    description: |
+      Match only rows where `column` matches the query string in `query`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("quotes")
+            .select("catchphrase")
+            .textSearch("catchphrase", query: "'fat' & 'cat'", config: "english")
+          ```
+
   - id: using-modifiers
     title: Using Modifiers
     description: |
@@ -4387,6 +4808,82 @@ functions:
             .storage
             .from("avatars")
             .createSignedURLs(paths: ["folder/avatar1.png", "folder/avatar2.png"], expiresIn: 60)
+          ```
+
+  - id: from-create-signed-upload-url
+    title: from.createSignedUploadURL()
+    description: |
+      Create a signed upload URL that can be used to upload files to a bucket.
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: create-signed-upload-url
+        name: Create signed upload URL
+        isSpotlight: true
+        code: |
+          ```swift
+          let signedUploadUrl = try await supabase.storage
+            .from("avatars")
+            .createSignedUploadURL(path: "folder/avatar1.png")
+          ```
+      - id: create-signed-upload-url-with-options
+        name: Create signed upload URL with options
+        code: |
+          ```swift
+          let signedUploadUrl = try await supabase.storage
+            .from("avatars")
+            .createSignedUploadURL(
+              path: "folder/avatar1.png",
+              options: CreateSignedUploadURLOptions(
+                upsert: true
+              )
+            )
+          ```
+
+  - id: from-upload-to-signed-url
+    title: from.uploadToSignedUrl()
+    description: |
+      Upload a file to a bucket using a signed URL.
+    notes: |
+      - Use this method to upload files using a signed upload URL created with `createSignedUploadURL()`.
+    examples:
+      - id: upload-to-signed-url
+        name: Upload to signed URL
+        isSpotlight: true
+        code: |
+          ```swift
+          let fileData = "Hello World".data(using: .utf8)!
+          
+          try await supabase.storage
+            .from("avatars")
+            .uploadToSignedURL(
+              "folder/avatar1.png",
+              token: "your-signed-token",
+              data: fileData,
+              options: FileOptions(
+                contentType: "text/plain"
+              )
+            )
+          ```
+      - id: upload-file-to-signed-url
+        name: Upload file from URL to signed URL
+        code: |
+          ```swift
+          let fileURL = URL(fileURLWithPath: "/path/to/file.txt")
+          
+          try await supabase.storage
+            .from("avatars")
+            .uploadToSignedURL(
+              "folder/avatar1.png",
+              token: "your-signed-token",
+              fileURL: fileURL,
+              options: FileOptions(
+                contentType: "text/plain"
+              )
+            )
           ```
 
   - id: from-get-public-url

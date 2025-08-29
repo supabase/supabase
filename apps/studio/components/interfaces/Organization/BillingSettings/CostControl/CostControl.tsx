@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -17,15 +17,14 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
+import PartnerIcon from 'components/ui/PartnerIcon'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
-import PartnerIcon from 'components/ui/PartnerIcon'
 
 export interface CostControlProps {}
 
