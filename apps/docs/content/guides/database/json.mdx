@@ -184,6 +184,7 @@ const { data, error } = await supabase.from('books').insert([
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 await supabase.from('books').insert([
@@ -238,6 +239,7 @@ await supabase.from('books').insert([
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 Supabase Swift provides a convenience `AnyJSON` type.
 
@@ -302,6 +304,7 @@ try await supabase.from("books")
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 @Serializable
@@ -331,6 +334,7 @@ val data = supabase.from("books").insert(listOf(
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 supabase.from_('books').insert([
@@ -426,6 +430,7 @@ const { data, error } = await supabase.from('books').select(`
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase
@@ -444,6 +449,7 @@ try await supabase
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select(Columns.raw("""
@@ -457,6 +463,7 @@ val data = supabase.from("books").select(Columns.raw("""
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = supabase.from_('books').select("""

@@ -34,6 +34,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 
   </TabPanel>
   <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
     ```dart
     import 'package:supabase_flutter/supabase_flutter.dart';
@@ -51,6 +52,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 
   </TabPanel>
   <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
     ```swift
     import Supabase
@@ -63,6 +65,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 
   </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
     ```kotlin
     val supabaseUrl = "https://<project>.supabase.co"
@@ -74,6 +77,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 
   </TabPanel>
   <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
     ```python
     import asyncio
@@ -130,6 +134,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
 
   </TabPanel>
   <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
     {/* prettier-ignore */}
     ```dart
@@ -151,6 +156,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
 
   </TabPanel>
   <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
     ```swift
     let myChannel = await supabase.channel("test-channel")
@@ -167,6 +173,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
 
   </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
     {/* prettier-ignore */}
     ```kotlin
@@ -183,6 +190,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
 
   </TabPanel>
   <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
     <Admonition type="note">
 
     In the following Realtime examples, certain methods are awaited. These should be enclosed within an `async` function.
@@ -261,6 +269,7 @@ You can use the Supabase client libraries to send Broadcast messages.
   </TabPanel>
 
   <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
     {/* prettier-ignore */}
     ```dart
@@ -288,6 +297,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
   </TabPanel>
   <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
     {/* prettier-ignore */}
     ```swift
@@ -308,6 +318,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
   </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
     ```kotlin
     val myChannel = supabase.channel("test-channel") {
       broadcast {
@@ -331,6 +342,7 @@ You can use the Supabase client libraries to send Broadcast messages.
   </TabPanel>
 
   <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
     <Admonition type="note">
 
@@ -485,6 +497,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `self` parameter to `true`.
 
@@ -513,6 +526,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
 
@@ -535,6 +549,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
 
@@ -563,6 +578,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
     <Admonition type="note">
 
@@ -637,6 +653,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
     ```dart
     final myChannel = supabase.channel('room-3',opts: const RealtimeChannelConfig(
@@ -660,6 +677,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
     You can confirm that Realtime received your message by setting Broadcast's `acknowledgeBroadcasts` config to `true`.
 
@@ -675,6 +693,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `acknowledgeBroadcasts` parameter to `true`.
 
@@ -692,6 +711,7 @@ You can pass configuration options while initializing the Supabase Client.
 
   </TabPanel>
   <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
   Unsupported in Python yet.
   </TabPanel>
 </Tabs>
@@ -737,6 +757,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
   </TabPanel>
   <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
     ```dart
     // No need to subscribe to channel
 
@@ -752,6 +773,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
   </TabPanel>
   <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
     ```swift
     let myChannel = await supabase.channel("room-2") {
       $0.broadcast.acknowledgeBroadcasts = true
@@ -764,6 +786,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
   </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
     ```kotlin
     val myChannel = supabase.channel("room-2") {
         broadcast {
@@ -780,6 +803,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
   </TabPanel>
   <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
   Unsupported in Python yet.
   </TabPanel>
 </Tabs>

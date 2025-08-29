@@ -58,6 +58,7 @@ const { data, error } = await supabase.auth.signInWithOtp({
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase.auth.signInWithOTP(
@@ -67,6 +68,7 @@ try await supabase.auth.signInWithOTP(
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 supabase.auth.signInWith(OTP) {
@@ -76,6 +78,7 @@ supabase.auth.signInWith(OTP) {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = supabase.auth.sign_in_with_otp({
@@ -132,6 +135,7 @@ const {
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
 
@@ -145,6 +149,7 @@ try await supabase.auth.verifyOTP(
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyPhoneOtp`:
 
@@ -158,6 +163,7 @@ supabase.auth.verifyPhoneOtp(
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verify_otp`:
 
@@ -224,6 +230,7 @@ const { data, error } = await supabase.auth.updateUser({
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase.auth.updateUser(
@@ -235,6 +242,7 @@ try await supabase.auth.updateUser(
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 supabase.auth.updateUser {
@@ -244,6 +252,7 @@ supabase.auth.updateUser {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = supabase.auth.update_user({

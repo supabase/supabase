@@ -65,6 +65,7 @@ const { data, error } = await supabase.auth.signInAnonymously()
 
 </TabPanel>
 <TabPanel id="dart" label="Flutter">
+<$Partial path="not_all_sdks_warning.md" />
 
 Call the [`signInAnonymously()`](/docs/reference/dart/auth-signinanonymously) method:
 
@@ -74,6 +75,7 @@ await supabase.auth.signInAnonymously();
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 Call the [`signInAnonymously()`](/docs/reference/swift/auth-signinanonymously) method:
 
@@ -83,6 +85,7 @@ let session = try await supabase.auth.signInAnonymously()
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
 
@@ -92,6 +95,7 @@ supabase.auth.signInAnonymously()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 Call the [`sign_in_anonymously()`](/docs/reference/python/auth-signinanonymously) method:
 
@@ -139,6 +143,7 @@ const { data: updatePasswordData, error: updatePasswordError } = await supabase.
 
 </TabPanel>
 <TabPanel id="dart" label="Flutter">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
@@ -148,6 +153,7 @@ await supabase.auth.updateUser(UserAttributes(email: 'valid.email@supabase.io'))
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
@@ -159,6 +165,7 @@ try await supabase.auth.updateUser(
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`updateUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
@@ -170,6 +177,7 @@ supabase.auth.updateUser {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`update_user()`](/docs/reference/python/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
@@ -213,6 +221,7 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 
 </TabPanel>
 <TabPanel id="dart" label="Flutter">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
@@ -222,6 +231,7 @@ await supabase.auth.linkIdentity(OAuthProvider.google);
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
@@ -231,6 +241,7 @@ try await supabase.auth.linkIdentity(provider: .google)
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
@@ -240,6 +251,7 @@ supabase.auth.linkIdentity(Google)
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 

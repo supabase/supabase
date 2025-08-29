@@ -73,6 +73,7 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() async {
@@ -88,6 +89,7 @@ void main() async {
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase.storage.createBucket("avatars")
@@ -97,6 +99,7 @@ try await supabase.storage.createBucket("avatars")
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = supabase.storage.create_bucket('avatars')
@@ -139,6 +142,7 @@ const { data, error } = await supabase.storage
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() async {
@@ -190,6 +194,7 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() async {
@@ -206,6 +211,7 @@ void main() async {
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase.storage.from("avatars").download(path: "public/avatar1.png")
@@ -215,6 +221,7 @@ let response = try await supabase.storage.from("avatars").download(path: "public
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = supabase.storage.from_('avatars').download('public/avatar1.png')

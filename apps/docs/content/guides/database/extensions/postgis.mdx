@@ -129,6 +129,7 @@ const { error } = await supabase.from('restaurants').insert([
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 await supabase.from('restaurants').insert([
@@ -149,6 +150,7 @@ await supabase.from('restaurants').insert([
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 struct Restaurant: Codable {
@@ -169,6 +171,7 @@ try await supabase.from("restaurants")
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 @Serializable
@@ -242,6 +245,7 @@ const { data, error } = await supabase.rpc('nearby_restaurants', {
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final data = await supabase.rpc('nearby_restaurants',params: {
@@ -252,6 +256,7 @@ final data = await supabase.rpc('nearby_restaurants',params: {
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 struct Response: Codable {
@@ -280,6 +285,7 @@ let response: Response = try await supabase.rpc(
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.postgrest.rpc(
@@ -368,6 +374,7 @@ const { data, error } = await supabase.rpc('restaurants_in_view', {
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final data = await supabase.rpc('restaurants_in_view', params: {
@@ -380,6 +387,7 @@ final data = await supabase.rpc('restaurants_in_view', params: {
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 struct Response: Codable {
@@ -404,6 +412,7 @@ let response: Response = try await supabase.rpc(
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.postgrest.rpc(

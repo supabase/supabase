@@ -130,6 +130,7 @@ const { data, error } = await supabase.from('books').select().eq('title', 'Harry
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -140,6 +141,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase.from("books")
@@ -150,6 +152,7 @@ let response = try await supabase.from("books")
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -161,6 +164,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = supabase.from_('books').select().eq('title', 'Harry').execute()
@@ -196,6 +200,7 @@ const { data, error } = await supabase.from('books').select().textSearch('title'
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -206,6 +211,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase.from("books")
@@ -215,6 +221,7 @@ let response = try await supabase.from("books")
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -261,6 +268,7 @@ const { data, error } = await supabase.from('books').select().textSearch('descri
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -271,6 +279,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = await client.from("books")
@@ -281,6 +290,7 @@ let response = await client.from("books")
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -292,6 +302,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = supabase.from_('books').select().text_search('description', "'big'").execute()
@@ -356,6 +367,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```sql
 create function title_description(books) returns text as $$
@@ -372,6 +384,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```sql
 create function title_description(books) returns text as $$
@@ -389,6 +402,7 @@ let response = try await client
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```sql
 create function title_description(books) returns text as $$
@@ -406,6 +420,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```sql
 create function title_description(books) returns text as $$
@@ -467,6 +482,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -477,6 +493,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await client
@@ -488,6 +505,7 @@ let response = try await client
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -499,6 +517,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = supabase.from_('books').select().text_search('description', "'little' & 'big'").execute()
@@ -553,6 +572,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -563,6 +583,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await client
@@ -574,6 +595,7 @@ let response = try await client
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -585,6 +607,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = client.from_('books').select().text_search('description', "'little' | 'big'").execute()
@@ -653,6 +676,7 @@ const { data, error } = await supabase.rpc('search_books_by_title_prefix', { pre
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final data = await supabase.rpc('search_books_by_title_prefix', params: { 'prefix': 'Lit' });
@@ -660,6 +684,7 @@ final data = await supabase.rpc('search_books_by_title_prefix', params: { 'prefi
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase.rpc(
@@ -671,6 +696,7 @@ let response = try await supabase.rpc(
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val rpcParams = mapOf("prefix" to "Lit")
@@ -679,6 +705,7 @@ val result = supabase.postgrest.rpc("search_books_by_title_prefix", rpcParams)
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = client.rpc('search_books_by_title_prefix', { 'prefix': 'Lit' }).execute()
@@ -778,6 +805,7 @@ const { data, error } = await supabase.from('books').select().textSearch('fts', 
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -788,6 +816,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await client
@@ -799,6 +828,7 @@ let response = try await client
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -810,6 +840,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = client.from_('books').select().text_search('fts', "'little' & 'big'").execute()
@@ -869,6 +900,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -879,6 +911,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await client
@@ -890,6 +923,7 @@ let response = try await client
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -901,6 +935,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = client.from_('books').select().text_search('description', "'big' <-> 'dreams'").execute()
@@ -941,6 +976,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -951,6 +987,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase
@@ -962,6 +999,7 @@ let response = try await supabase
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -973,6 +1011,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = client.from_('books').select().text_search('description', "'year' <2> 'school'").execute()
@@ -1016,6 +1055,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final result = await client
@@ -1026,6 +1066,7 @@ final result = await client
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await client
@@ -1037,6 +1078,7 @@ let response = try await client
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.from("books").select {
@@ -1048,6 +1090,7 @@ val data = supabase.from("books").select {
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = client.from_('books').select().text_search('description', "'big' & !'little'").execute()

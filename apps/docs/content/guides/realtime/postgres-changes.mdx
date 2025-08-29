@@ -239,6 +239,7 @@ const changes = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -253,6 +254,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("schema-db-changes")
@@ -273,6 +275,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("schema-db-changes")
@@ -294,6 +297,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('schema-db-changes').on_postgres_changes(
@@ -338,6 +342,7 @@ const changes = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final changes = supabase
@@ -351,6 +356,7 @@ final changes = supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 Use `InsertAction.self` as type to listen only to database `INSERT`s:
 
@@ -368,6 +374,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 Use `PostgresAction.Insert` as type to listen only to database `INSERT`s:
 
@@ -387,6 +394,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('schema-db-changes').on_postgres_changes(
@@ -431,6 +439,7 @@ const changes = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -444,6 +453,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 Use `UpdateAction.self` as type to listen only to database `UPDATE`s:
 
@@ -461,6 +471,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
 
@@ -480,6 +491,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('schema-db-changes').on_postgres_changes(
@@ -524,6 +536,7 @@ const changes = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -537,6 +550,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 Use `DeleteAction.self` as type to listen only to database `DELETE`s:
 
@@ -554,6 +568,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 Use `PostgresAction.Delete` as type to listen only to database `DELETE`s:
 
@@ -573,6 +588,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('schema-db-changes').on_postgres_changes(
@@ -618,6 +634,7 @@ const changes = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -632,6 +649,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -652,6 +670,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -671,6 +690,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -726,6 +746,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -745,6 +766,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -757,6 +779,7 @@ await myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -771,6 +794,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -820,6 +844,7 @@ const changes = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
   supabase
@@ -839,6 +864,7 @@ const changes = supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -859,6 +885,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -879,6 +906,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -929,6 +957,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -948,6 +977,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -968,6 +998,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -988,6 +1019,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -1036,6 +1068,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -1055,6 +1088,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -1075,6 +1109,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.realtime.createChannel("db-changes")
@@ -1096,6 +1131,7 @@ myChannel.join()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -1144,6 +1180,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -1163,6 +1200,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -1183,6 +1221,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -1203,6 +1242,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -1251,6 +1291,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -1270,6 +1311,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -1290,6 +1332,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -1310,6 +1353,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -1358,6 +1402,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -1377,6 +1422,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -1397,6 +1443,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -1417,6 +1464,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -1465,6 +1513,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -1484,6 +1533,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -1504,6 +1554,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -1524,6 +1575,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -1572,6 +1624,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase
@@ -1591,6 +1644,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let myChannel = await supabase.channel("db-changes")
@@ -1611,6 +1665,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -1631,6 +1686,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 changes = supabase.channel('db-changes').on_postgres_changes(
@@ -1725,6 +1781,7 @@ const channel = supabase
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase.realtime.setAuth('your-custom-jwt');
@@ -1747,6 +1804,7 @@ supabase
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 await supabase.realtime.setAuth("your-custom-jwt")
@@ -1769,6 +1827,7 @@ for await change in changes {
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
@@ -1794,6 +1853,7 @@ myChannel.subscribe()
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 supabase.realtime.set_auth('your-custom-jwt')
@@ -1834,6 +1894,7 @@ supabase.realtime.setAuth('fresh-token')
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 supabase.realtime.setAuth('fresh-token');
@@ -1841,6 +1902,7 @@ supabase.realtime.setAuth('fresh-token');
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 await supabase.realtime.setAuth("fresh-token")
@@ -1848,6 +1910,7 @@ await supabase.realtime.setAuth("fresh-token")
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+<$Partial path="not_all_sdks_warning.md" />
 
 In Kotlin, you have to update the token manually per channel:
 
@@ -1857,6 +1920,7 @@ myChannel.updateAuth("fresh-token")
 
 </TabPanel>
 <TabPanel id="python" label="Python">
+<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 supabase.realtime.set_auth('fresh-token')
