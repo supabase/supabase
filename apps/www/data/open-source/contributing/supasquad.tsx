@@ -106,8 +106,8 @@ const data = {
     label: '',
     heading: (
       <>
-        Every skill has <span className="text-foreground">a place in building the future</span> of
-        open source
+        Contribute in the way that best fits you{' '}
+        <span className="text-foreground">unique skills</span>
       </>
     ),
     subheading:
@@ -125,7 +125,7 @@ const data = {
         icon: LifeBuoy,
         heading: 'Helper',
         subheading:
-          "Share your expertise by answering questions on GitHub Discussions, Discord, and community platforms. Help improve docs and guides that make everyone's journey smoother.",
+          "Share your expertise by answering questions on Discord, GitHub Discussions, and other community platforms. Help improve docs and guides that make everyone's journey smoother.",
       },
       {
         id: 'maintainer',
@@ -147,7 +147,7 @@ const data = {
     id: 'results',
     heading: <>The Perfect Time to Join</>,
     subheading:
-      "Supabase's explosive growth means more builders need help, more opportunities to contribute, and more ways to make your mark. Join SupaSquad and help us support this thriving ecosystem of builders and innovators.",
+      "Supabase's explosive growth means more builders need help. There are more opportunities to contribute, and more ways to make your mark. Join SupaSquad and help us support this thriving ecosystem of builders.",
     highlights: [
       {
         heading: 'databases managed',
@@ -175,7 +175,8 @@ const data = {
         heading: 'Community Recognition',
         subheading: (
           <>
-            Badge on Discord and flair on Reddit showcasing your SupaSquad status in the community.
+            Get a Badge on Discord and flair on Reddit showcasing your SupaSquad status in the
+            community.
           </>
         ),
         icon: Award,
@@ -204,8 +205,8 @@ const data = {
         heading: 'Paid Contributions',
         subheading: (
           <>
-            Earn while you contribute with stipends that recognize the value of your time and
-            expertise.
+            We invite top contributors to get paid for their efforts. Earn while you contribute with
+            a stipend that recognizes the value of your time and expertise.
           </>
         ),
         icon: DollarSign,
