@@ -37,7 +37,7 @@ const QueryMetricBlock = ({
 }) => {
   return (
     <div className="flex flex-col gap-0.5 text-xs">
-      <span className="font-mono text-xs text-foreground-lighter">{label}</span>
+      <span className="font-mono text-xs text-foreground-light uppercase">{label}</span>
       <span className="text-lg">{value}</span>
     </div>
   )
