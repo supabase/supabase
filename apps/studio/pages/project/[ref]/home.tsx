@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useParams } from 'common'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -12,14 +12,7 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import {
-  DndContext,
-  DragEndEvent,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -30,6 +23,7 @@ import AdvisorSection from 'components/interfaces/HomeNew/AdvisorSection'
 import CustomReportSection from 'components/interfaces/HomeNew/CustomReportSection'
 import SortableSection from 'components/interfaces/HomeNew/SortableSection'
 import { ProjectUsageSection } from 'components/interfaces/HomeNew/ProjectUsageSection'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const Home: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -70,12 +64,11 @@ const Home: NextPageWithLayout = () => {
     ['getting-started', 'usage', 'advisor', 'custom-report']
   )
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
-  const [activeId, setActiveId] = useState<string | null>(null)
+  const [gettingStartedState, setGettingStartedState] = useLocalStorage<
+    'empty' | 'code' | 'no-code' | 'hidden'
+  >(`home-getting-started-${project?.ref || 'default'}`, 'empty')
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(String(event.active.id))
-  }
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -86,32 +79,43 @@ const Home: NextPageWithLayout = () => {
       if (oldIndex === -1 || newIndex === -1) return items
       return arrayMove(items, oldIndex, newIndex)
     })
-    setActiveId(null)
   }
 
   return (
     <div className="w-full">
-      <TopSection
-        projectName={projectName}
-        isMainBranch={isMainBranch}
-        parentProject={parentProject}
-        isOrioleDb={!!isOrioleDb}
-        project={project}
-        organization={organization}
-        projectRef={ref}
-        isPaused={isPaused}
-      />
+      <ScaffoldContainer size="large">
+        <ScaffoldSection isFullWidth className="pt-16 pb-0">
+          <TopSection
+            projectName={projectName}
+            isMainBranch={isMainBranch}
+            parentProject={parentProject}
+            isOrioleDb={!!isOrioleDb}
+            project={project}
+            organization={organization}
+            projectRef={ref}
+            isPaused={isPaused}
+          />
+        </ScaffoldSection>
+      </ScaffoldContainer>
 
       {!isPaused && (
-        <div className="px-8 pb-32">
-          <div className="mx-auto max-w-7xl space-y-16">
-            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-              <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
+        <ScaffoldContainer size="large">
+          <ScaffoldSection isFullWidth className="gap-16 pb-32">
+            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+              <SortableContext
+                items={sectionOrder.filter(
+                  (id) => id !== 'getting-started' || gettingStartedState !== 'hidden'
+                )}
+                strategy={verticalListSortingStrategy}
+              >
                 {sectionOrder.map((id) => {
                   if (id === 'getting-started') {
-                    return (
+                    return gettingStartedState === 'hidden' ? null : (
                       <SortableSection key={id} id={id}>
-                        <GettingStartedSection />
+                        <GettingStartedSection
+                          value={gettingStartedState}
+                          onChange={setGettingStartedState}
+                        />
                       </SortableSection>
                     )
                   }
@@ -140,8 +144,8 @@ const Home: NextPageWithLayout = () => {
                 })}
               </SortableContext>
             </DndContext>
-          </div>
-        </div>
+          </ScaffoldSection>
+        </ScaffoldContainer>
       )}
     </div>
   )

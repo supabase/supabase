@@ -33,7 +33,15 @@ import {
 } from 'ui'
 import { BASE_PATH } from 'lib/constants'
 
-export default function GettingStartedSection() {
+type GettingStartedState = 'empty' | 'code' | 'no-code' | 'hidden'
+
+export default function GettingStartedSection({
+  value,
+  onChange,
+}: {
+  value: GettingStartedState
+  onChange: (v: GettingStartedState) => void
+}) {
   const { data: project } = useSelectedProjectQuery()
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -41,7 +49,7 @@ export default function GettingStartedSection() {
 
   // Local state for framework selector preview
   const [selectedFramework, setSelectedFramework] = useState<string>(FRAMEWORKS[0]?.key ?? 'nextjs')
-  const [workflow, setWorkflow] = useState<'no-code' | 'code' | null>(null)
+  const workflow: 'no-code' | 'code' | null = value === 'code' || value === 'no-code' ? value : null
 
   const { data: tablesData } = useTablesQuery({
     projectRef: project?.ref,
@@ -68,6 +76,7 @@ export default function GettingStartedSection() {
             description: 'Install the Supabase CLI for local development, migrations, and seeding.',
             actions: [
               {
+                label: 'Install via npm',
                 component: (
                   <CodeBlock className="w-full text-xs p-3 !bg" language="bash">
                     npm install supabase --save-dev
@@ -466,11 +475,12 @@ export default function GettingStartedSection() {
 
   return (
     <GettingStarted
+      onDismiss={() => onChange('hidden')}
       headerRight={
         <ToggleGroup
           type="single"
           value={workflow ?? undefined}
-          onValueChange={(v) => setWorkflow((v as 'no-code' | 'code') ?? null)}
+          onValueChange={(v) => v && onChange(v as 'no-code' | 'code')}
         >
           <ToggleGroupItem
             value="no-code"
@@ -504,23 +514,23 @@ export default function GettingStartedSection() {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
           </div>
-          <CardContent className="relative z-10 p-12 grid grid-cols-2 gap-16 items-center justify-center">
+          <CardContent className="relative z-10 p-8 md:p-12 grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="heading-subSection mb-0 heading-meta text-foreground-light mb-4">
                 Choose a preferred workflow
               </h2>
-              <p className="text-foreground mb-6">
+              <p className="text-foreground">
                 With Supabase, you have the flexibility to adopt a workflow that works for you. You
                 can do everything via the dashboard, or manage your entire project within your own
                 codebase.
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-stretch gap-4">
               <Button
                 size="medium"
                 type="outline"
-                onClick={() => setWorkflow('no-code')}
-                className="block gap-2 h-auto p-8 w-80 text-left justify-start bg-background "
+                onClick={() => onChange('no-code')}
+                className="block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start bg-background "
               >
                 <Table2 size={20} strokeWidth={1.5} className="text-brand" />
                 <div className="mt-4">
@@ -533,8 +543,8 @@ export default function GettingStartedSection() {
               <Button
                 size="medium"
                 type="outline"
-                onClick={() => setWorkflow('code')}
-                className="bg-background block gap-2 h-auto p-8 w-80 text-left justify-start"
+                onClick={() => onChange('code')}
+                className="bg-background block gap-2 h-auto p-4 md:p-8 max-w-80 text-left justify-start"
               >
                 <Code size={20} strokeWidth={1.5} className="text-brand" />
                 <div className="mt-4">

@@ -27,6 +27,7 @@ export interface GettingStartedProps {
   className?: string
   headerRight?: React.ReactNode
   emptyContent?: React.ReactNode
+  onDismiss?: () => void
 }
 
 export function GettingStarted({
@@ -34,6 +35,7 @@ export function GettingStarted({
   className,
   headerRight,
   emptyContent,
+  onDismiss,
 }: GettingStartedProps) {
   return (
     <section className={cn('w-full', className)}>
@@ -41,7 +43,7 @@ export function GettingStarted({
         <h3 className="heading-section">Getting started</h3>
         <div className="flex items-center gap-2">
           {headerRight}
-          <Button size="tiny" type="outline">
+          <Button size="tiny" type="outline" onClick={onDismiss}>
             Dismiss
           </Button>
         </div>

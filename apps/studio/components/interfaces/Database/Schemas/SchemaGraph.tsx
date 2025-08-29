@@ -2,7 +2,7 @@ import type { PostgresSchema } from '@supabase/postgres-meta'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Clipboard, Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
@@ -30,12 +30,7 @@ import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.u
 import { TableNode } from './SchemaTableNode'
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
-interface SchemaGraphProps {
-  hideUI?: boolean
-  onLoad?: () => void
-}
-
-export const SchemaGraph = ({ hideUI = false, onLoad }: SchemaGraphProps) => {
+export const SchemaGraph = () => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
@@ -92,8 +87,6 @@ export const SchemaGraph = ({ hideUI = false, onLoad }: SchemaGraphProps) => {
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
   )
-
-  const hasFiredOnLoadRef = useRef(false)
 
   const resetLayout = () => {
     const nodes = reactFlowInstance.getNodes()
@@ -186,110 +179,94 @@ export const SchemaGraph = ({ hideUI = false, onLoad }: SchemaGraphProps) => {
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
-        setTimeout(() => {
-          reactFlowInstance.fitView({}) // it needs to happen during next event tick
-          if (!hasFiredOnLoadRef.current) {
-            hasFiredOnLoadRef.current = true
-            onLoad?.()
-          }
-        })
+        setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
       })
     }
   }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
 
-  // Fire onLoad even if there are no tables (successful load but empty state)
-  useEffect(() => {
-    if (isSuccessTables && isSuccessSchemas && tables.length === 0 && !hasFiredOnLoadRef.current) {
-      hasFiredOnLoadRef.current = true
-      onLoad?.()
-    }
-  }, [isSuccessTables, isSuccessSchemas, tables])
-
   return (
     <>
-      {!hideUI && (
-        <div className="flex items-center justify-between p-4 border-b border-muted">
-          {isLoadingSchemas && (
-            <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
-          )}
+      <div className="flex items-center justify-between p-4 border-b border-muted">
+        {isLoadingSchemas && (
+          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
+        )}
 
-          {isErrorSchemas && (
-            <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
-          )}
+        {isErrorSchemas && (
+          <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
+        )}
 
-          {isSuccessSchemas && (
-            <>
-              <SchemaSelector
-                className="w-[180px]"
-                size="tiny"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
-              />
-              <div className="flex items-center gap-x-2">
-                <ButtonTooltip
-                  type="outline"
-                  icon={copied ? <Check /> : <Clipboard />}
-                  onClick={() => {
-                    if (tables) {
-                      copyToClipboard(tablesToSQL(tables))
-                      setCopied(true)
-                    }
-                  }}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: (
-                        <div className="max-w-[180px] space-y-2 text-foreground-light">
-                          <p className="text-foreground">Note</p>
-                          <p>
-                            This schema is for context or debugging only. Table order and
-                            constraints may be invalid. Not meant to be run as-is.
-                          </p>
-                        </div>
-                      ),
-                    },
-                  }}
-                >
-                  Copy as SQL
-                </ButtonTooltip>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <ButtonTooltip
-                      aria-label="Download Schema"
-                      type="default"
-                      loading={isDownloading}
-                      className="px-1.5"
-                      icon={<Download />}
-                      tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-32">
-                    <DropdownMenuItem onClick={() => downloadImage('png')}>
-                      Download as PNG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => downloadImage('svg')}>
-                      Download as SVG
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <ButtonTooltip
-                  type="default"
-                  onClick={resetLayout}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: 'Automatically arrange the layout of all nodes',
-                    },
-                  }}
-                >
-                  Auto layout
-                </ButtonTooltip>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+        {isSuccessSchemas && (
+          <>
+            <SchemaSelector
+              className="w-[180px]"
+              size="tiny"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+            />
+            <div className="flex items-center gap-x-2">
+              <ButtonTooltip
+                type="outline"
+                icon={copied ? <Check /> : <Clipboard />}
+                onClick={() => {
+                  if (tables) {
+                    copyToClipboard(tablesToSQL(tables))
+                    setCopied(true)
+                  }
+                }}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: (
+                      <div className="max-w-[180px] space-y-2 text-foreground-light">
+                        <p className="text-foreground">Note</p>
+                        <p>
+                          This schema is for context or debugging only. Table order and constraints
+                          may be invalid. Not meant to be run as-is.
+                        </p>
+                      </div>
+                    ),
+                  },
+                }}
+              >
+                Copy as SQL
+              </ButtonTooltip>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <ButtonTooltip
+                    aria-label="Download Schema"
+                    type="default"
+                    loading={isDownloading}
+                    className="px-1.5"
+                    icon={<Download />}
+                    tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-32">
+                  <DropdownMenuItem onClick={() => downloadImage('png')}>
+                    Download as PNG
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => downloadImage('svg')}>
+                    Download as SVG
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ButtonTooltip
+                type="default"
+                onClick={resetLayout}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'Automatically arrange the layout of all nodes',
+                  },
+                }}
+              >
+                Auto layout
+              </ButtonTooltip>
+            </div>
+          </>
+        )}
+      </div>
       {isLoadingTables && (
         <div className="w-full h-full flex items-center justify-center gap-x-2">
           <Loader2 className="animate-spin text-foreground-light" size={16} />
@@ -303,7 +280,7 @@ export const SchemaGraph = ({ hideUI = false, onLoad }: SchemaGraphProps) => {
       )}
       {isSuccessTables && (
         <>
-          {tables.length === 0 && !hideUI ? (
+          {tables.length === 0 ? (
             <div className="h-full flex items-center justify-center">
               <ProductEmptyState
                 title="No tables created yet"
@@ -331,9 +308,6 @@ export const SchemaGraph = ({ hideUI = false, onLoad }: SchemaGraphProps) => {
                 }}
                 nodeTypes={nodeTypes}
                 fitView
-                fitViewOptions={{
-                  padding: hideUI ? 48 : 0,
-                }}
                 minZoom={0.8}
                 maxZoom={1.8}
                 proOptions={{ hideAttribution: true }}
@@ -341,22 +315,18 @@ export const SchemaGraph = ({ hideUI = false, onLoad }: SchemaGraphProps) => {
               >
                 <Background
                   gap={16}
-                  className="[&>*]:stroke-foreground-muted opacity-[50%]"
+                  className="[&>*]:stroke-foreground-muted opacity-[25%]"
                   variant={BackgroundVariant.Dots}
                   color={'inherit'}
                 />
-                {!hideUI && (
-                  <>
-                    <MiniMap
-                      pannable
-                      zoomable
-                      nodeColor={miniMapNodeColor}
-                      maskColor={miniMapMaskColor}
-                      className="border rounded-md shadow-sm"
-                    />
-                    <SchemaGraphLegend />
-                  </>
-                )}
+                <MiniMap
+                  pannable
+                  zoomable
+                  nodeColor={miniMapNodeColor}
+                  maskColor={miniMapMaskColor}
+                  className="border rounded-md shadow-sm"
+                />
+                <SchemaGraphLegend />
               </ReactFlow>
             </div>
           )}

@@ -1,16 +1,28 @@
 import { BarChart, Shield } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { EntityTypeIcon, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { LintCategoryBadge, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import {
+  AiIconAnimation,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+} from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import LintDetail from 'components/interfaces/Linter/LintDetail'
 
 // Returns the first sentence of the provided text. Uses Intl.Segmenter when available
 // and falls back to a regex that avoids splitting on intra-word dots (e.g. `public.messages`).
@@ -44,6 +56,8 @@ export const AdvisorWidget = () => {
   const { ref: projectRef } = useParams()
   const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const snap = useAiAssistantStateSnapshot()
+
+  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -113,54 +127,77 @@ export const AdvisorWidget = () => {
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : combinedIssues.length > 0 ? (
-        <Row columns={[3, 2, 1]}>
-          {combinedIssues.map((lint) => {
-            console.log(lint)
-            const advisor = getAdvisorPath(lint)
-            return (
-              <Card key={lint.cache_key} className="h-full flex flex-col items-stretch h-64">
-                <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">
-                  <Link
-                    href={`/project/${projectRef}/advisors/${advisor}?id=${lint.cache_key}&preset=${lint.level}`}
-                    className="flex flex-row items-center gap-3"
-                  >
-                    {lint.categories[0] === 'SECURITY' ? (
-                      <Shield size={16} strokeWidth={1.5} className="text-foreground-muted" />
-                    ) : (
-                      <BarChart size={16} strokeWidth={1.5} className="text-foreground-muted" />
-                    )}
-                    <CardTitle className="text-foreground-light">{lint.categories[0]}</CardTitle>
-                  </Link>
-                  <ButtonTooltip
-                    type="text"
-                    className="w-7 h-7"
-                    icon={<AiIconAnimation size={16} />}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      snap.newChat({
-                        name: 'Summarize lint',
-                        open: true,
-                        initialInput: `Summarize the issue and suggest fixes for the following lint item:
+        <>
+          <Row columns={[3, 2, 1]}>
+            {combinedIssues.map((lint) => {
+              const advisor = getAdvisorPath(lint)
+              return (
+                <Card
+                  key={lint.cache_key}
+                  className="h-full flex flex-col items-stretch h-64 cursor-pointer"
+                  onClick={() => {
+                    setSelectedLint(lint)
+                  }}
+                >
+                  <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">
+                    <div className="flex flex-row items-center gap-3">
+                      {lint.categories[0] === 'SECURITY' ? (
+                        <Shield size={16} strokeWidth={1.5} className="text-foreground-muted" />
+                      ) : (
+                        <BarChart size={16} strokeWidth={1.5} className="text-foreground-muted" />
+                      )}
+                      <CardTitle className="text-foreground-light">{lint.categories[0]}</CardTitle>
+                    </div>
+                    <ButtonTooltip
+                      type="text"
+                      className="w-7 h-7"
+                      icon={<AiIconAnimation size={16} />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        snap.newChat({
+                          name: 'Summarize lint',
+                          open: true,
+                          initialInput: `Summarize the issue and suggest fixes for the following lint item:
   Title: ${lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title}
   Entity: ${(lint.metadata && (lint.metadata.entity || (lint.metadata.schema && lint.metadata.name && `${lint.metadata.schema}.${lint.metadata.name}`))) ?? 'N/A'}
   Schema: ${lint.metadata?.schema ?? 'N/A'}
   Issue Details: ${lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'}
   Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`,
-                      })
-                    }}
-                    tooltip={{
-                      content: { side: 'bottom', text: 'Help me fix this issue' },
-                    }}
-                  />
-                </CardHeader>
-                <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
-                  {lint.detail ? getFirstSentence(lint.detail) : lint.title}
-                </CardContent>
-              </Card>
-            )
-          })}
-        </Row>
+                        })
+                      }}
+                      tooltip={{
+                        content: { side: 'bottom', text: 'Help me fix this issue' },
+                      }}
+                    />
+                  </CardHeader>
+                  <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
+                    {lint.detail ? getFirstSentence(lint.detail) : lint.title}
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </Row>
+          {selectedLint && (
+            <Sheet open={selectedLint !== null} onOpenChange={() => setSelectedLint(null)}>
+              <SheetContent>
+                <SheetHeader>
+                  <div className="flex items-center gap-4">
+                    <SheetTitle>
+                      {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
+                    </SheetTitle>
+                    <LintCategoryBadge category={selectedLint.categories[0]} />
+                  </div>
+                </SheetHeader>
+                <SheetSection>
+                  {selectedLint && projectRef && (
+                    <LintDetail lint={selectedLint} projectRef={projectRef!} />
+                  )}
+                </SheetSection>
+              </SheetContent>
+            </Sheet>
+          )}
+        </>
       ) : (
         <Card className="bg-transparent">
           <CardContent className="flex flex-col items-center justify-center gap-2 p-16">

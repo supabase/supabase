@@ -90,6 +90,16 @@ const ProjectUsage = () => {
     }
   }, [selectedInterval]) // Only recalculate when interval changes
 
+  // Compute the previous period range for deltas
+  const { previousStart, previousEnd } = useMemo(() => {
+    const currentStart = dayjs(timestampStart)
+    const currentEnd = dayjs(timestampEnd)
+    const durationMs = currentEnd.diff(currentStart)
+    const prevEnd = currentStart
+    const prevStart = currentStart.subtract(durationMs, 'millisecond')
+    return { previousStart: prevStart.toISOString(), previousEnd: prevEnd.toISOString() }
+  }, [timestampStart, timestampEnd])
+
   // Fetch per-service event chart data
   const dbStats = useProjectUsageStats({
     projectRef: projectRef as string,
@@ -124,6 +134,42 @@ const ProjectUsage = () => {
     table: LogsTableName.REALTIME,
     timestampStart,
     timestampEnd,
+  })
+
+  // Fetch previous period data for deltas
+  const dbStatsPrev = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.EDGE,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const fnEdgeStatsPrev = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.FN_EDGE,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const authStatsPrev = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.AUTH,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const storageStatsPrev = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.EDGE,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const realtimeStatsPrev = useProjectUsageStats({
+    projectRef: projectRef as string,
+    table: LogsTableName.REALTIME,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
   })
 
   // Transform eventChartData into LogsBarChart format
@@ -243,8 +289,39 @@ const ProjectUsage = () => {
   const totalErrors = enabledServices.reduce((sum, s) => sum + (s.err || 0), 0)
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
 
-  const totalRequestsChangePct = 0
-  const errorRateChangePct = 0
+  // Compute previous totals for enabled services
+  const prevServiceTotals = [
+    { enabled: true, stats: dbStatsPrev },
+    { enabled: true, stats: fnEdgeStatsPrev },
+    { enabled: authEnabled, stats: authStatsPrev },
+    { enabled: storageEnabled, stats: storageStatsPrev },
+    { enabled: true, stats: realtimeStatsPrev },
+  ].map((entry) => {
+    const data = toLogsBarChartData(entry.stats.eventChartData)
+    return {
+      enabled: entry.enabled,
+      total: sumTotal(data || []),
+      err: sumErrors(data || []),
+    }
+  })
+
+  const enabledPrev = prevServiceTotals.filter((s) => s.enabled)
+  const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
+  const prevTotalErrors = enabledPrev.reduce((sum, s) => sum + (s.err || 0), 0)
+  const prevErrorRate = prevTotalRequests > 0 ? (prevTotalErrors / prevTotalRequests) * 100 : 0
+
+  const totalRequestsChangePct =
+    prevTotalRequests === 0
+      ? totalRequests > 0
+        ? 100
+        : 0
+      : ((totalRequests - prevTotalRequests) / prevTotalRequests) * 100
+  const errorRateChangePct =
+    prevErrorRate === 0
+      ? errorRate > 0
+        ? 100
+        : 0
+      : ((errorRate - prevErrorRate) / prevErrorRate) * 100
   const formatDelta = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`
   const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand' : 'text-destructive'
   const errorDeltaClass = errorRateChangePct <= 0 ? 'text-brand' : 'text-destructive'
@@ -325,14 +402,34 @@ const ProjectUsage = () => {
       <Row columns={[3, 2, 1]}>
         {enabledServices.map((s) => (
           <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col">
-            <PanelHeader
-              icon={s.icon}
-              title={s.title}
-              href={s.href}
-              total={s.total}
-              warn={s.warn}
-              err={s.err}
-            />
+            <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-foreground-light">
+                      {s.href ? <Link href={s.href}>{s.title}</Link> : s.title}
+                    </CardTitle>
+                  </div>
+                  <span className="text-foreground text-xl">{(s.total || 0).toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="flex items-end gap-4 text-foreground-light">
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-warning rounded-full" />
+                    <span className="heading-meta">Warn</span>
+                  </div>
+                  <span className="text-foreground text-xl">{(s.warn || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
+                    <span className="heading-meta">Err</span>
+                  </div>
+                  <span className="text-foreground text-xl">{(s.err || 0).toLocaleString()}</span>
+                </div>
+              </div>
+            </CardHeader>
             <CardContent className="p-6 pt-4 flex-1">
               <Loading active={isLoading}>
                 <LogsBarChart
@@ -353,48 +450,3 @@ const ProjectUsage = () => {
   )
 }
 export default ProjectUsage
-
-const PanelHeader = ({
-  icon,
-  title,
-  href,
-  total,
-  warn,
-  err,
-}: {
-  icon?: React.ReactNode
-  title: string
-  href?: string
-  total?: number
-  warn?: number
-  err?: number
-}) => (
-  <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
-    <div className="flex items-center gap-2">
-      <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-foreground-light">
-            {href ? <Link href={href}>{title}</Link> : title}
-          </CardTitle>
-        </div>
-        <span className="text-foreground text-xl">{(total || 0).toLocaleString()}</span>
-      </div>
-    </div>
-    <div className="flex items-end gap-4 text-foreground-light">
-      <div className="flex flex-col items-end">
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 bg-warning rounded-full" />
-          <span className="heading-meta">Warn</span>
-        </div>
-        <span className="text-foreground text-xl">{(warn || 0).toLocaleString()}</span>
-      </div>
-      <div className="flex flex-col items-end">
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-          <span className="heading-meta">Err</span>
-        </div>
-        <span className="text-foreground text-xl">{(err || 0).toLocaleString()}</span>
-      </div>
-    </div>
-  </CardHeader>
-)
