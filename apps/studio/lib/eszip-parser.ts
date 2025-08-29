@@ -64,11 +64,9 @@ export async function parseEszip(bytes: Uint8Array) {
     }
 
     // Extract version
-    const version = parseInt(
-      await parser.getModuleSource("---SUPABASE-ESZIP-VERSION-ESZIP---"),
-    );
+    const version = parseInt(await parser.getModuleSource('---SUPABASE-ESZIP-VERSION-ESZIP---'))
     // Extract files from the eszip
-    const files = await extractEszip(parser, specifiers, version >= 2);
+    const files = await extractEszip(parser, specifiers, version >= 2)
 
     // Convert files to the expected format
     const responseFiles = await Promise.all(
@@ -118,11 +116,11 @@ async function extractEszip(parser: any, specifiers: string[], isDeno2: boolean)
     try {
       // Try to get the module source
       const moduleSource = await parser.getModuleSource(specifier)
-      let qualifiedSpecifier = specifier;
+      let qualifiedSpecifier = specifier
 
       // Get the file path
-      if (isDeno2 && !specifier.startsWith("file://")) {
-        qualifiedSpecifier = `file://${specifier}`;
+      if (isDeno2 && !specifier.startsWith('file://')) {
+        qualifiedSpecifier = `file://${specifier}`
       }
       const filePath = url2path(qualifiedSpecifier)
 
