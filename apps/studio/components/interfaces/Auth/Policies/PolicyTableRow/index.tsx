@@ -143,7 +143,7 @@ export const PolicyTableRow = ({
                   <TableHead className="w-[40%]">Name</TableHead>
                   <TableHead className="w-[20%]">Command</TableHead>
                   <TableHead className="w-[30%]">Applied to</TableHead>
-                  <TableHead className="w-0 text-right">
+                  <TableHead className="text-right">
                     <span className="sr-only">Actions</span>
                   </TableHead>
                 </TableRow>

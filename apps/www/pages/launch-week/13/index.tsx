@@ -68,7 +68,7 @@ export default function LaunchWeekIndex() {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW_URL,
+          url: `${LW_URL}/13`,
           images: [
             {
               url: OG_IMAGE,
