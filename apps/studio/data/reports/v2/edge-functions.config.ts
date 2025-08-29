@@ -5,7 +5,15 @@ import {
   REPORT_STATUS_CODE_COLORS,
 } from 'data/reports/report.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
 import { ReportConfig } from './reports.types'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 const METRIC_SQL: Record<string, (interval: AnalyticsInterval, functionIds?: string[]) => string> =
   {
@@ -147,7 +155,9 @@ export function generateStatusCodeAttributes(statusCodes: string[]) {
  */
 export function transformStatusCodeData(data: any[], statusCodes: string[]) {
   const pivotedData = data.reduce((acc: Record<string, any>, d: any) => {
-    const timestamp = new Date(d.timestamp).toISOString()
+    const timestamp = isUnixMicro(d.timestamp)
+      ? unixMicroToIsoTimestamp(d.timestamp)
+      : dayjs.utc(d.timestamp).toISOString()
     if (!acc[timestamp]) {
       acc[timestamp] = { timestamp }
       statusCodes.forEach((code) => {
