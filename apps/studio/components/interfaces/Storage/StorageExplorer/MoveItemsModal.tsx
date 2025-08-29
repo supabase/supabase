@@ -1,90 +1,127 @@
-import { noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import { Button, Input, Modal } from 'ui'
-import { StorageItemWithColumn } from '../Storage.types'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+} from 'ui'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-interface MoveItemsModalProps {
-  bucketName: string
-  visible: boolean
-  selectedItemsToMove: StorageItemWithColumn[]
-  onSelectCancel: () => void
-  onSelectMove: (path: string) => void
+export interface MoveItemsModalProps {
+  onClose?: () => void
 }
 
-const MoveItemsModal = ({
-  bucketName = '',
-  visible = false,
-  selectedItemsToMove = [],
-  onSelectCancel = noop,
-  onSelectMove = noop,
-}: MoveItemsModalProps) => {
-  const [moving, setMoving] = useState(false)
-  const [newPath, setNewPath] = useState('')
+const PathSchema = z.object({
+  path: z.string().min(0, 'Please provide a valid path name'),
+})
 
-  useEffect(() => {
-    setMoving(false)
-    setNewPath('')
-  }, [visible])
+const formId = `move_items_form`
+
+export const MoveItemsModal = ({ onClose }: MoveItemsModalProps) => {
+  const { selectedItemsToMove, selectedBucket, moveFiles, setSelectedItemsToMove } =
+    useStorageExplorerStateSnapshot()
+  const form = useForm<z.infer<typeof PathSchema>>({
+    resolver: zodResolver(PathSchema),
+    defaultValues: { path: '' },
+    mode: 'onSubmit',
+  })
+
+  const isMoving = form.formState.isSubmitting
 
   const multipleFiles = selectedItemsToMove.length > 1
 
   const title = multipleFiles
-    ? `Moving ${selectedItemsToMove.length} items within ${bucketName}`
+    ? `Moving ${selectedItemsToMove.length} items within ${selectedBucket.name}`
     : selectedItemsToMove.length === 1
-      ? `Moving ${selectedItemsToMove[0]?.name} within ${bucketName}`
+      ? `Moving ${selectedItemsToMove[0]?.name} within ${selectedBucket.name}`
       : ``
 
   const description = `Enter the path to where you'd like to move the file${
     multipleFiles ? 's' : ''
   } to.`
 
-  const onConfirmMove = (event: any) => {
-    if (event) {
-      event.preventDefault()
-    }
-    setMoving(true)
-    const formattedPath = newPath[0] === '/' ? newPath.slice(1) : newPath
-    onSelectMove(formattedPath)
+  const handleClose = () => {
+    setSelectedItemsToMove([])
+    form.reset()
+    onClose?.()
+  }
+
+  const onSubmit: SubmitHandler<z.infer<typeof PathSchema>> = async (values) => {
+    const formattedPath = values.path[0] === '/' ? values.path.slice(1) : values.path
+    await moveFiles(formattedPath)
+    handleClose()
   }
 
   return (
-    <Modal
-      visible={visible}
-      header={title}
-      description={description}
-      size="medium"
-      onCancel={onSelectCancel}
-      customFooter={
-        <div className="flex items-center gap-2">
-          <Button type="default" onClick={onSelectCancel}>
+    <Dialog
+      open={selectedItemsToMove.length > 0}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleClose()
+        }
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField_Shadcn_
+                key="path"
+                name="path"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    name="path"
+                    label={`Path to new directory in ${selectedBucket.name}`}
+                    description="Leave blank to move items to the root of the bucket"
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        id="path"
+                        {...field}
+                        autoFocus
+                        autoComplete="off"
+                        placeholder="e.g folder1/subfolder2"
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form_Shadcn_>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" loading={isMoving} onClick={handleClose}>
             Cancel
           </Button>
-          <Button type="primary" loading={moving} onClick={onConfirmMove}>
-            {moving ? 'Moving files' : 'Move files'}
+          <Button form={formId} type="primary" htmlType="submit" loading={isMoving}>
+            {isMoving ? 'Moving files' : 'Move files'}
           </Button>
-        </div>
-      }
-    >
-      <Modal.Content>
-        <form>
-          <div className="relative flex items-center">
-            <Input
-              autoFocus
-              label={`Path to new directory in ${bucketName}`}
-              type="text"
-              className="w-full"
-              placeholder="e.g folder1/subfolder2"
-              value={newPath}
-              descriptionText="Leave blank to move items to the root of the bucket"
-              onChange={(event) => setNewPath(event.target.value)}
-            />
-          </div>
-
-          <button className="hidden" type="submit" onClick={onConfirmMove} />
-        </form>
-      </Modal.Content>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
