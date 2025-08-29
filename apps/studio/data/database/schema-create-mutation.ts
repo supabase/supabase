@@ -8,13 +8,15 @@ import { invalidateSchemasQuery } from './schemas-query'
 
 export type SchemaCreateVariables = {
   name: string
+  orgSlug?: string
   projectRef?: string
   connectionString?: string | null
 }
 
-export async function createSchema({ name, projectRef, connectionString }: SchemaCreateVariables) {
+export async function createSchema({ name, orgSlug, projectRef, connectionString }: SchemaCreateVariables) {
   const sql = pgMeta.schemas.create({ name, owner: 'postgres' }).sql
   const { result } = await executeSql({
+    orgSlug,
     projectRef,
     connectionString,
     sql,
@@ -38,8 +40,8 @@ export const useSchemaCreateMutation = ({
     (vars) => createSchema(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await invalidateSchemasQuery(queryClient, projectRef)
+        const { orgSlug, projectRef } = variables
+        await invalidateSchemasQuery(queryClient, orgSlug, projectRef)
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

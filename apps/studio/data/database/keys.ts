@@ -1,5 +1,5 @@
 export const databaseKeys = {
-  schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
+  schemas: (orgSlug: string | undefined, projectRef: string | undefined) => ['projects', orgSlug, projectRef, 'schemas'] as const,
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
   tableColumns: (
@@ -35,6 +35,6 @@ export const databaseKeys = {
     ['projects', projectRef, 'max-connections'] as const,
   pgbouncerStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'pgbouncer', 'status'] as const,
-  pgbouncerConfig: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'pgbouncer', 'config'] as const,
+  pgbouncerConfig: (orgSlug: string| undefined, projectRef: string | undefined) =>
+    ['projects', orgSlug, projectRef, 'pgbouncer', 'config'] as const,
 }

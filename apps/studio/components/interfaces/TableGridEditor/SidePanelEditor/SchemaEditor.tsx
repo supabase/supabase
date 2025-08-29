@@ -4,6 +4,7 @@ import { Input, SidePanel } from 'ui'
 
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 interface SchemaEditorProps {
   visible: boolean
@@ -13,6 +14,7 @@ interface SchemaEditorProps {
 
 const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })
   const [name, setName] = useState('')
@@ -36,6 +38,7 @@ const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => 
     if (project === undefined) return console.error('Project is required')
     try {
       await createSchema({
+        orgSlug,
         projectRef: project.ref,
         connectionString: project.connectionString,
         name,

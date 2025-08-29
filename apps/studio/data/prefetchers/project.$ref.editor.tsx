@@ -29,6 +29,7 @@ export function usePrefetchEditorIndexPage() {
 
     // Prefetch data
     prefetchSchemas(queryClient, {
+      orgSlug: slug,
       projectRef: project.ref,
       connectionString: project.connectionString,
     }).catch(() => {

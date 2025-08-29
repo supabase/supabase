@@ -30,6 +30,7 @@ import {
 } from 'ui'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
+import { getPathReferences } from '../../../../../data/vela/path-references'
 
 interface FunctionsListProps {
   createFunction: () => void
@@ -47,6 +48,7 @@ const FunctionsList = ({
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const { slug: orgSlug } = getPathReferences()
 
   const filterString = search ?? ''
 
@@ -69,6 +71,7 @@ const FunctionsList = ({
 
   // [Joshen] This is to preload the data for the Schema Selector
   useSchemasQuery({
+    orgSlug: orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

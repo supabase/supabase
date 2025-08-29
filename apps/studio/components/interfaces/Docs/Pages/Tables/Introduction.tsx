@@ -13,7 +13,7 @@ interface IntroductionProps {
 const Introduction = ({ selectedLang }: IntroductionProps) => {
   const { slug, ref: projectRef } = useParams()
 
-  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ orgSlug: slug, projectRef })
 
   const isPublicSchemaEnabled = config?.db_schema
     .split(',')

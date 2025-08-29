@@ -19,6 +19,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { getPathReferences } from '../../data/vela/path-references'
 
 interface SchemaComboBoxProps {
   className?: string
@@ -45,6 +46,7 @@ export const SchemaComboBox = ({
   const [open, setOpen] = useState(false)
 
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
   const {
     data,
     isLoading: isSchemasLoading,
@@ -53,6 +55,7 @@ export const SchemaComboBox = ({
     error: schemasError,
     refetch: refetchSchemas,
   } = useSchemasQuery({
+    orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

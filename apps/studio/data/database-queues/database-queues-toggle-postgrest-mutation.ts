@@ -8,6 +8,7 @@ import { databaseQueuesKeys } from './keys'
 import { databaseKeys } from 'data/database/keys'
 
 export type DatabaseQueueExposePostgrestVariables = {
+  orgSlug: string
   projectRef: string
   connectionString?: string | null
   enable: boolean
@@ -256,10 +257,10 @@ export const useDatabaseQueueToggleExposeMutation = ({
     DatabaseQueueExposePostgrestVariables
   >((vars) => toggleQueuesExposurePostgrest(vars), {
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
+      const { orgSlug, projectRef } = variables
       await queryClient.invalidateQueries(databaseQueuesKeys.exposePostgrestStatus(projectRef))
       // [Joshen] Schemas can be invalidated without waiting
-      queryClient.invalidateQueries(databaseKeys.schemas(projectRef))
+      queryClient.invalidateQueries(databaseKeys.schemas(orgSlug, projectRef))
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

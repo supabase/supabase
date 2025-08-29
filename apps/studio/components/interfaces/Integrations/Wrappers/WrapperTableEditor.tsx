@@ -28,6 +28,7 @@ import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -217,11 +218,13 @@ const TableForm = ({
   initialData: any
 }) => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
   const {
     data: schemas,
     isLoading,
     isSuccess,
   } = useSchemasQuery({
+    orgSlug: orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

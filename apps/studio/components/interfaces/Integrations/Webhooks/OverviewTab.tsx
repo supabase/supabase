@@ -13,7 +13,7 @@ import { Admonition } from 'ui-patterns'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 
 export const WebhooksOverviewTab = () => {
-  const { ref: projectRef } = useParams()
+  const { slug: orgSlug, ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const {
@@ -21,6 +21,7 @@ export const WebhooksOverviewTab = () => {
     isSuccess: isSchemasLoaded,
     refetch,
   } = useSchemasQuery({
+    orgSlug: orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -39,8 +40,9 @@ export const WebhooksOverviewTab = () => {
   })
 
   const enableHooksForProject = async () => {
+    if (!orgSlug) return console.error('Organization slug is required')
     if (!projectRef) return console.error('Project ref is required')
-    enableHooks({ ref: projectRef })
+    enableHooks({ slug: orgSlug, ref: projectRef })
   }
 
   if (!isSchemasLoaded || isLoadingPermissions) {

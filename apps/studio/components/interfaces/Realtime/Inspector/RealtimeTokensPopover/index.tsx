@@ -31,7 +31,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const { anonKey, publishableKey } = getKeys(apiKeys)
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
-    { projectRef: config.projectRef },
+    { orgSlug, projectRef: config.projectRef },
     { enabled: IS_PLATFORM }
   )
 

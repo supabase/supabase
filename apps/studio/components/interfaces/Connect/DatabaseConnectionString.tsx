@@ -78,7 +78,7 @@ export const DatabaseConnectionString = () => {
     isLoading: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgBouncerConfig,
-  } = usePgbouncerConfigQuery({ projectRef })
+  } = usePgbouncerConfigQuery({ orgSlug: slug, projectRef })
   const {
     data: supavisorConfig,
     error: supavisorConfigError,

@@ -12,6 +12,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import PolicyRow from './PolicyRow'
 import PolicyTableRowHeader from './PolicyTableRowHeader'
+import { getPathReferences } from '../../../../../data/vela/path-references'
 
 export interface PolicyTableRowProps {
   table: {
@@ -41,6 +42,7 @@ export const PolicyTableRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
 
   // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
   // The following scenarios are technically okay if the table has RLS disabled, in which it won't be publicly readable / writable
@@ -50,7 +52,7 @@ export const PolicyTableRow = ({
   // - They only consider the public schema
   // - They do not consider roles
   // Eventually if the security lints are able to cover those, we can look to using them as the source of truth instead then
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
+  const { data: config } = useProjectPostgrestConfigQuery({ orgSlug, projectRef: project?.ref })
   const exposedSchemas = config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : []
   const isRLSEnabled = table.rls_enabled
   const isTableExposedThroughAPI = exposedSchemas.includes(table.schema)

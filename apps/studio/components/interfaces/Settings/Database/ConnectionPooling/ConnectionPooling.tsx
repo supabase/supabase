@@ -63,7 +63,7 @@ export const ConnectionPooling = () => {
     isLoading: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
-  } = usePgbouncerConfigQuery({ projectRef })
+  } = usePgbouncerConfigQuery({ orgSlug: slug, projectRef })
 
   const disablePoolModeSelection = useMemo(() => {
     return org?.plan?.id === 'free'
@@ -104,10 +104,12 @@ export const ConnectionPooling = () => {
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
     const { default_pool_size } = data
 
+    if (!slug) return console.error('Organization slug is required')
     if (!projectRef) return console.error('Project ref is required')
 
     updatePoolerConfig(
       {
+        slug: slug,
         ref: projectRef,
         default_pool_size: default_pool_size === null ? undefined : default_pool_size,
         ignore_startup_parameters: ignoreStartupParameters ?? '',

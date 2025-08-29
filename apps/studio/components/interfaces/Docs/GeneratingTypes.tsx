@@ -18,7 +18,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
   const { slug, ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: ref })
+  const { data: config } = useProjectPostgrestConfigQuery({ orgSlug: slug, projectRef: ref })
 
   const onClickGenerateTypes = async () => {
     try {

@@ -26,6 +26,7 @@ import {
   DialogTitle,
   WarningIcon,
 } from 'ui'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 interface HardenAPIModalProps {
   visible: boolean
@@ -34,12 +35,14 @@ interface HardenAPIModalProps {
 
 export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
 
   const { data: schemas } = useSchemasQuery({
+    orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
+  const { data: config } = useProjectPostgrestConfigQuery({ orgSlug, projectRef: project?.ref })
 
   const hasAPISchema = (schemas ?? []).find((schema) => schema.name === 'api')
   const exposedSchemas = config?.db_schema.split(',').map((x) => x.trim()) ?? []
@@ -64,6 +67,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
     if (project === undefined) return console.error('Project is required')
     if (config === undefined) return console.error('Postgrest config is required')
     createAndExposeAPISchema({
+      orgSlug: orgSlug!,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       existingPostgrestConfig: {
@@ -90,6 +94,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
       .filter((x) => x !== 'public')
       .join(', ')
     updatePostgrestConfig({
+      orgSlug: orgSlug!,
       projectRef: project.ref,
       maxRows: config.max_rows,
       dbPool: config.db_pool,

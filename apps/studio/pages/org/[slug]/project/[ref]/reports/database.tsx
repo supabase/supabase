@@ -105,7 +105,7 @@ const DatabaseUsage = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
+  const { data: poolerConfig } = usePgbouncerConfigQuery({ orgSlug: org?.slug, projectRef: project?.ref })
 
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,

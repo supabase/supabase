@@ -78,13 +78,14 @@ export const CreateWrapperSheet = ({
       setNewTables([])
 
       const hasNewSchema = newTables.some((table) => table.is_new_schema)
-      if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
+      if (hasNewSchema) invalidateSchemasQuery(queryClient, org?.slug, project?.ref)
 
       onClose()
     },
   })
 
   const { data: schemas } = useSchemasQuery({
+    orgSlug: org?.slug,
     projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })
@@ -149,6 +150,7 @@ export const CreateWrapperSheet = ({
     try {
       if (selectedMode === 'schema') {
         await createSchema({
+          orgSlug: org?.slug,
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           name: values.target_schema,

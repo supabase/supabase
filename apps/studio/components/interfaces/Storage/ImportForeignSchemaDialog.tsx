@@ -35,7 +35,7 @@ export const ImportForeignSchemaDialog = ({
   onClose,
 }: ImportForeignSchemaDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { ref } = useParams()
+  const { slug, ref } = useParams()
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
@@ -47,7 +47,7 @@ export const ImportForeignSchemaDialog = ({
     },
   })
 
-  const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
+  const { data: schemas } = useSchemasQuery({ orgSlug: slug, projectRef: project?.ref! })
 
   const FormSchema = z.object({
     bucketName: z.string().trim(),
@@ -85,6 +85,7 @@ export const ImportForeignSchemaDialog = ({
 
     try {
       await createSchema({
+        orgSlug: slug,
         projectRef: ref,
         connectionString: project?.connectionString,
         name: values.targetSchema,

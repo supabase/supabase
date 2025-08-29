@@ -26,11 +26,6 @@ const GeneralSettings = () => {
         <OrganizationDetailsForm />
       </ScaffoldSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Data Privacy</ScaffoldSectionTitle>
-        <DataPrivacyForm />
-      </ScaffoldSection>
-
       {organizationDeletionEnabled && canDeleteOrganization && <OrganizationDeletePanel />}
     </ScaffoldContainer>
   )

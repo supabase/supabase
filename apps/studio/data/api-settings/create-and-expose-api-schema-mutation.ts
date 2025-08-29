@@ -8,6 +8,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
 export type CreateAndExposeAPISchemaVariables = {
+  orgSlug: string
   projectRef: string
   connectionString?: string | null
   existingPostgrestConfig: {
@@ -19,6 +20,7 @@ export type CreateAndExposeAPISchemaVariables = {
 }
 
 export async function createAndExposeApiSchema({
+  orgSlug,
   projectRef,
   connectionString,
   existingPostgrestConfig,
@@ -28,11 +30,11 @@ create schema if not exists api;
 grant usage on schema api to anon, authenticated;
   `.trim()
 
-  await executeSql({ projectRef, connectionString, sql })
+  await executeSql({ orgSlug, projectRef, connectionString, sql })
 
   const { db_extra_search_path, db_pool, db_schema, max_rows } = existingPostgrestConfig
-  const { error } = await patch('/platform/projects/{ref}/config/postgrest', {
-    params: { path: { ref: projectRef } },
+  const { error } = await patch('/platform/organizations/{slug}/projects/{ref}/config/postgrest', {
+    params: { path: { slug: orgSlug, ref: projectRef } },
     body: {
       db_pool,
       max_rows,
@@ -67,10 +69,10 @@ export const useCreateAndExposeAPISchemaMutation = ({
     CreateAndExposeAPISchemaVariables
   >((vars) => createAndExposeApiSchema(vars), {
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
+      const { orgSlug, projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(databaseKeys.schemas(projectRef)),
-        queryClient.invalidateQueries(configKeys.postgrest(projectRef)),
+        queryClient.invalidateQueries(databaseKeys.schemas(orgSlug, projectRef)),
+        queryClient.invalidateQueries(configKeys.postgrest(orgSlug, projectRef)),
       ])
       await onSuccess?.(data, variables, context)
     },

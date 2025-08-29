@@ -34,7 +34,7 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
 
     const { data: settings } = useProjectSettingsV2Query({ orgSlug, projectRef })
-    const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
+    const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ orgSlug, projectRef })
     const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
     const { data: addons } = useProjectAddonsQuery({ projectRef })
     const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])

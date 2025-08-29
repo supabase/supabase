@@ -86,7 +86,7 @@ const JWTSettings = () => {
   )
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
-  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isError } = useProjectPostgrestConfigQuery({ orgSlug, projectRef })
   const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 

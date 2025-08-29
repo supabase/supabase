@@ -6,6 +6,7 @@ import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
+  orgSlug?: string
   projectRef?: string
   connectionString?: string | null
 }
@@ -18,11 +19,12 @@ export type SchemasData = z.infer<typeof pgMetaSchemasList.zod>
 export type SchemasError = ExecuteSqlError
 
 export async function getSchemas(
-  { projectRef, connectionString }: SchemasVariables,
+  { orgSlug, projectRef, connectionString }: SchemasVariables,
   signal?: AbortSignal
 ) {
   const { result } = await executeSql(
     {
+      orgSlug,
       projectRef,
       connectionString,
       sql: pgMetaSchemasList.sql,
@@ -35,27 +37,27 @@ export async function getSchemas(
 }
 
 export const useSchemasQuery = <TData = SchemasData>(
-  { projectRef, connectionString }: SchemasVariables,
+  { orgSlug, projectRef, connectionString }: SchemasVariables,
   { enabled = true, ...options }: UseQueryOptions<SchemasData, SchemasError, TData> = {}
 ) =>
   useQuery<SchemasData, SchemasError, TData>(
-    databaseKeys.schemas(projectRef),
-    ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
+    databaseKeys.schemas(orgSlug, projectRef),
+    ({ signal }) => getSchemas({ orgSlug, projectRef, connectionString }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
 
-export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseKeys.schemas(projectRef))
+export function invalidateSchemasQuery(client: QueryClient, orgSlug: string | undefined, projectRef: string | undefined) {
+  return client.invalidateQueries(databaseKeys.schemas(orgSlug, projectRef))
 }
 
 export function prefetchSchemas(
   client: QueryClient,
-  { projectRef, connectionString }: SchemasVariables
+  { orgSlug, projectRef, connectionString }: SchemasVariables
 ) {
-  return client.fetchQuery(databaseKeys.schemas(projectRef), ({ signal }) =>
+  return client.fetchQuery(databaseKeys.schemas(orgSlug, projectRef), ({ signal }) =>
     getSchemas({ projectRef, connectionString }, signal)
   )
 }

@@ -21,6 +21,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
@@ -32,12 +33,14 @@ interface EnableExtensionModalProps {
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
   const isOrioleDb = useIsOrioleDb()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
   const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
     {
+      orgSlug: orgSlug,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },

@@ -1,23 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-
-import apiWrapper from 'lib/api/apiWrapper'
+import { apiBuilder } from 'lib/api/apiBuilder'
 import { DEFAULT_PROJECT, DEFAULT_PROJECT_2 } from '../../constants'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   const response = {
     id: 1,
@@ -31,9 +16,41 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
         slug: 'default-org-slug',
         billing_email: 'billing@supabase.co',
-        projects: [{ ...DEFAULT_PROJECT, connectionString: '' }, { ...DEFAULT_PROJECT_2, connectionString: '' }],
+        projects: [
+          { ...DEFAULT_PROJECT, connectionString: '' },
+          { ...DEFAULT_PROJECT_2, connectionString: '' },
+        ],
       },
     ],
   }
   return res.status(200).json(response)
 }
+
+const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
+  return res.status(200).json({
+    id: '',
+    primary_email: '',
+    username: '',
+    first_name: '',
+    last_name: '',
+    organizations: [],
+    ...req.body,
+  })
+}
+
+const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
+  return res.status(200).json({
+    id: '',
+    primary_email: '',
+    username: '',
+    first_name: '',
+    last_name: '',
+    organizations: [],
+  })
+}
+
+const apiHandler = apiBuilder((builder) => {
+  builder.useAuth().get(handleGet).post(handlePost).put(handlePut)
+})
+
+export default apiHandler

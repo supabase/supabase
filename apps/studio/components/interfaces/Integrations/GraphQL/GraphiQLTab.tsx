@@ -24,7 +24,7 @@ export const GraphiQLTab = () => {
   const { data: apiKeys, isFetched } = useAPIKeysQuery({ orgSlug, projectRef, reveal: true })
   const { serviceKey, secretKey } = getKeys(apiKeys)
 
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config } = useProjectPostgrestConfigQuery({ orgSlug, projectRef })
   const jwtSecret = config?.jwt_secret
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()

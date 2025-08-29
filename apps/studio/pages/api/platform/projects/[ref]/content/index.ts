@@ -2,26 +2,7 @@ import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type { UserContent } from 'types'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    case 'POST':
-      return handlePost(req, res)
-    case 'PATCH':
-      return handlePatch(req, res)
-    case 'PUT':
-      return handlePut(req, res)
-    default:
-      res.setHeader('Allow', ['GET', 'POST', 'PATCH', 'PUT'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
+import { apiBuilder } from '../../../../../../lib/api/apiBuilder'
 
 type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
@@ -43,9 +24,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
       visibility: 'user' as const,
       content: {
         content_id: '1.0',
-        sql: `select * from
-  (select version()) as version,
-  (select current_setting('server_version_num')) as version_number;`,
+        sql: `select *
+              from (select version()) as version,
+                   (select current_setting('server_version_num')) as version_number;`,
         schema_version: '1',
         favorite: false,
       } as any,
@@ -81,3 +62,19 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
   const snippet: UserContent = req.body
   return res.status(200).json({ data: snippet })
 }
+
+const handleDelete = (req: NextApiRequest, res: NextApiResponse) => {
+  return res.status(200).json({})
+}
+
+const apiHandler = apiBuilder((builder) =>
+  builder
+    .useAuth()
+    .get(handleGetAll)
+    .post(handlePost)
+    .patch(handlePatch)
+    .put(handlePut)
+    .delete(handleDelete)
+)
+
+export default apiHandler

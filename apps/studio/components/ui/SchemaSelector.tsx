@@ -23,6 +23,7 @@ import {
   ScrollArea,
   Skeleton,
 } from 'ui'
+import { getPathReferences } from '../../data/vela/path-references'
 
 interface SchemaSelectorProps {
   className?: string
@@ -56,6 +57,7 @@ const SchemaSelector = ({
   )
 
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
   const {
     data,
     isLoading: isSchemasLoading,
@@ -64,6 +66,7 @@ const SchemaSelector = ({
     error: schemasError,
     refetch: refetchSchemas,
   } = useSchemasQuery({
+    orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

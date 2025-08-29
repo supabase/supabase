@@ -8,7 +8,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   return res.status(200).json([{
     actions: [PermissionAction.CREATE, PermissionAction.TENANT_SQL_ADMIN_WRITE],
     condition: true,
-    organization_slug: 'foobar23213qweewqe1w',
+    organization_slug: 'foo-org',
     resources: ['projects'],
     project_refs: []
   }])

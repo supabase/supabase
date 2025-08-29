@@ -1037,7 +1037,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/projects/{ref}/functions': {
+  '/platform/organizations/{slug}/projects/{ref}/functions': {
     parameters: {
       query?: never
       header?: never
@@ -6477,6 +6477,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -6512,6 +6513,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -6561,6 +6563,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }

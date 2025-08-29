@@ -14,7 +14,11 @@ export async function getOrgSSOConfig({ orgSlug }: OrgSSOConfigVariables, signal
   if (!orgSlug) throw new Error('Organization slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/sso', {
-    params: { path: { slug: orgSlug } },
+    params: {
+      path: {
+        slug: orgSlug,
+      },
+    },
     signal,
   })
 

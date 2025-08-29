@@ -25,6 +25,7 @@ import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import type { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
+import { getPathReferences } from '../../../../../data/vela/path-references'
 
 const EMPTY_STATE: ForeignKey = {
   id: undefined,
@@ -57,6 +58,7 @@ export const ForeignKeySelector = ({
   onSaveRelation,
 }: ForeignKeySelectorProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
   const { selectedSchema } = useQuerySchemaState()
 
   const [fk, setFk] = useState(EMPTY_STATE)
@@ -65,6 +67,7 @@ export const ForeignKeySelector = ({
   const hasTypeNotices = (errors?.typeNotice ?? []).filter((x: any) => x !== undefined).length > 0
 
   const { data: schemas } = useSchemasQuery({
+    orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

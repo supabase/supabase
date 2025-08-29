@@ -12,6 +12,7 @@ import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
 
 export type ExecuteSqlVariables = {
+  orgSlug?: string
   projectRef?: string
   connectionString?: string | null
   sql: string
@@ -25,6 +26,7 @@ export type ExecuteSqlVariables = {
 
 export async function executeSql<T = any>(
   {
+    orgSlug,
     projectRef,
     connectionString,
     sql,
@@ -34,6 +36,7 @@ export async function executeSql<T = any>(
     isStatementTimeoutDisabled = false,
   }: Pick<
     ExecuteSqlVariables,
+    | 'orgSlug'
     | 'projectRef'
     | 'connectionString'
     | 'sql'
@@ -49,6 +52,7 @@ export async function executeSql<T = any>(
     headers?: HeadersInit
   ) => Promise<{ data: T } | { error: ResponseError }>
 ): Promise<{ result: T }> {
+  // FIXME: Add orgSlug support
   if (!projectRef) throw new Error('projectRef is required')
 
   const sqlSize = new Blob([sql]).size

@@ -15,7 +15,7 @@ export default function Introduction({ selectedLang }: Props) {
   const { slug, ref: projectRef } = useParams()
 
   const { data: settings } = useProjectSettingsV2Query({ orgSlug: slug, projectRef })
-  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ orgSlug: slug, projectRef })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const hostEndpoint = settings?.app_config?.endpoint

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import apiWrapper from 'lib/api/apiWrapper'
+import apiWrapper from '../../../../../../../../lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

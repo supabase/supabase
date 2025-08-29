@@ -7,9 +7,11 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from 'lib/void'
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
 
   const {
     data,
@@ -39,6 +41,7 @@ export const useInstalledIntegrations = () => {
     isLoading: isSchemasLoading,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
+    orgSlug: orgSlug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

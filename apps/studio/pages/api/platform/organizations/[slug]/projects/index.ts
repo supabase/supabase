@@ -92,6 +92,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(response.response.status).send(response.error)
   }
 
+  console.log(JSON.stringify(response.data))
   return res.status(200).json(response.data.map(mapProject))
 }
 

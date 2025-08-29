@@ -6,6 +6,7 @@ import type { ResponseError } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
 
 export type HooksEnableVariables = {
+  slug: string
   ref: string
 }
 
@@ -32,9 +33,9 @@ export const useHooksEnableMutation = ({
     (vars) => enableDatabaseWebhooks(vars),
     {
       async onSuccess(data, variables, context) {
-        const { ref } = variables
+        const { slug, ref } = variables
         await onSuccess?.(data, variables, context)
-        await invalidateSchemasQuery(queryClient, ref)
+        await invalidateSchemasQuery(queryClient, slug, ref)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {

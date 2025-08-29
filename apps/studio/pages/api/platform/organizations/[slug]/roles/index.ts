@@ -1,18 +1,19 @@
 import { apiBuilder } from '../../../../../../lib/api/apiBuilder'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getVelaClient } from 'data/vela/vela'
-import { IS_VELA_PLATFORM } from 'lib/constants'
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!IS_VELA_PLATFORM) {
-    return res.status(200).json([])
-  }
-
-  const { slug } = req.query
-
-  const client = getVelaClient(req)
-
-  return res.status(200).json([])
+  return res.status(200).json({
+    org_scoped_roles: [
+      {
+        base_role_id: 0,
+        description: 'Test Role',
+        id: 0,
+        name: 'Test',
+        project_ids: [1, 2],
+      },
+    ],
+    project_scoped_roles: []
+  })
 }
 
 const apiHandler = apiBuilder((builder) => builder.useAuth().get(handleGet))

@@ -1,20 +1,7 @@
 import { components } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
+import apiWrapper from '../../../../../../../../lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
+import { apiBuilder } from '../../../../../../../../lib/api/apiBuilder'
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const responseObj: components['schemas']['GetPostgrestConfigResponse'] = {
@@ -29,3 +16,13 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
 
   return res.status(200).json(responseObj)
 }
+
+const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
+  return res.status(200).json({})
+}
+
+const apiHandler = apiBuilder((builder) => {
+  builder.useAuth().get(handleGet).patch(handlePatch)
+})
+
+export default apiHandler

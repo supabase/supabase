@@ -2612,7 +2612,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/config/pgbouncer': {
+  '/platform/organizations/{slug}/projects/{ref}/config/pgbouncer': {
     parameters: {
       query?: never
       header?: never
@@ -2630,7 +2630,7 @@ export interface paths {
     patch: operations['PgbouncerConfigController_updatePgbouncerConfig']
     trace?: never
   }
-  '/platform/projects/{ref}/config/pgbouncer/status': {
+  '/platform/organizations/{slug}/projects/{ref}/config/pgbouncer/status': {
     parameters: {
       query?: never
       header?: never
@@ -2665,7 +2665,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/config/postgrest': {
+  '/platform/organizations/{slug}/projects/{ref}/config/postgrest': {
     parameters: {
       query?: never
       header?: never
@@ -2735,7 +2735,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/config/storage': {
+  '/platform/organizations/{slug}/projects/{ref}/config/storage': {
     parameters: {
       query?: never
       header?: never
@@ -17011,6 +17011,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -17040,6 +17041,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -17079,6 +17081,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -17176,6 +17179,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -17211,6 +17215,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -17377,6 +17382,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }
@@ -17412,6 +17418,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        slug: string
       }
       cookie?: never
     }

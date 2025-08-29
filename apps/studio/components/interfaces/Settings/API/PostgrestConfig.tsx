@@ -83,12 +83,13 @@ export const PostgrestConfig = () => {
 
   const [showModal, setShowModal] = useState(false)
 
-  const { data: config, isError, isLoading } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isError, isLoading } = useProjectPostgrestConfigQuery({ orgSlug: slug, projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const { data: schemas, isLoading: isLoadingSchemas } = useSchemasQuery({
+    orgSlug: slug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -145,6 +146,7 @@ export const PostgrestConfig = () => {
     if (!projectRef) return console.error('Project ref is required') // is this needed ?
 
     updatePostgrestConfig({
+      orgSlug: slug!,
       projectRef,
       dbSchema: values.dbSchema.join(', '),
       maxRows: values.maxRows,

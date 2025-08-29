@@ -90,7 +90,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const projects = projectsRef.current ?? []
       const isValidProject = projects.some((project) => project.ref === ref)
       const isValidBranch = IS_PLATFORM
-        ? projects.some((project) => project.preview_branch_refs.includes(ref))
+        ? projects.some((project) => !!project.preview_branch_refs && project.preview_branch_refs.includes(ref))
         : true
 
       if (!isValidProject && !isValidBranch) {

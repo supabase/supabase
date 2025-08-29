@@ -404,12 +404,6 @@ const OrganizationLinks = () => {
       icon: <HardDrive size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
-      label: 'Support',
-      href: `/org/${slug}/usage`,
-      key: 'support',
-      icon: <MessageCircleQuestionIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
-    {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
       key: 'settings',

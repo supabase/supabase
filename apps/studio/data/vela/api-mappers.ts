@@ -32,7 +32,7 @@ export function mapProject(project: VelaProject): Project {
     id: project.id!,
     name: project.name!,
     ref: project.name!,
-    organization_id: project.organization_id!,
+    organization_id: 1,
     cloud_provider: 'vela',
     status: 'ACTIVE_HEALTHY',
     region: 'local',

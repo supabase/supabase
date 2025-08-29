@@ -13,9 +13,11 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { getPathReferences } from '../../../data/vela/path-references'
 
 export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
   const { data: project } = useSelectedProjectQuery()
+  const { slug: orgSlug } = getPathReferences()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -39,6 +41,7 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
   )
   const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery(
     {
+      orgSlug,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },

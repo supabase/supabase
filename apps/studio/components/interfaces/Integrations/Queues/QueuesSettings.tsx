@@ -34,10 +34,12 @@ import {
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { getPathReferences } from '../../../../data/vela/path-references'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
 export const QueuesSettings = () => {
+  const { slug: orgSlug } = getPathReferences()
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdatePostgrestConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
@@ -65,6 +67,7 @@ export const QueuesSettings = () => {
     queueTables?.filter((x) => x.name.startsWith('q_') && !x.rls_enabled) ?? []
 
   const { data: config, error: configError } = useProjectPostgrestConfigQuery({
+    orgSlug,
     projectRef: project?.ref,
   })
 
@@ -104,6 +107,7 @@ export const QueuesSettings = () => {
         if (values.enable) {
           const updatedSchemas = schemas.concat([QUEUES_SCHEMA])
           updatePostgrestConfig({
+            orgSlug: orgSlug!,
             projectRef: project?.ref,
             dbSchema: updatedSchemas.join(', '),
             maxRows: config.max_rows,
@@ -113,6 +117,7 @@ export const QueuesSettings = () => {
         } else {
           const updatedSchemas = schemas.filter((x) => x !== QUEUES_SCHEMA)
           updatePostgrestConfig({
+            orgSlug: orgSlug!,
             projectRef: project?.ref,
             dbSchema: updatedSchemas.join(', '),
             maxRows: config.max_rows,
@@ -156,6 +161,7 @@ export const QueuesSettings = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project) return console.error('Project is required')
+    if (!orgSlug) return console.error('Organization context is required')
     if (configError) {
       return toast.error(
         `Failed to toggle queue exposure via PostgREST: Unable to retrieve PostgREST configuration (${configError.message})`
@@ -164,6 +170,7 @@ export const QueuesSettings = () => {
 
     setIsToggling(true)
     toggleExposeQueuePostgrest({
+      orgSlug: orgSlug,
       projectRef: project.ref,
       connectionString: project.connectionString,
       enable: values.enable,

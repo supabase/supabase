@@ -98,6 +98,7 @@ export const CreateIcebergWrapperSheet = ({
   }, [wrapperMetaOriginal, selectedTarget])
 
   const { data: schemas } = useSchemasQuery({
+    orgSlug: org?.slug,
     projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })
@@ -140,6 +141,7 @@ export const CreateIcebergWrapperSheet = ({
 
     try {
       await createSchema({
+        orgSlug: org?.slug,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         name: values.target_schema,

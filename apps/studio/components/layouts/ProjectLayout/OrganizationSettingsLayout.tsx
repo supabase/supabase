@@ -36,11 +36,6 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       href: `/org/${slug}/security`,
     },
     {
-      label: 'OAuth Apps',
-      href: `/org/${slug}/apps`,
-    },
-
-    {
       label: 'SSO',
       href: `/org/${slug}/sso`,
     },
@@ -48,11 +43,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     {
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
-    },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-    },
+    }
   ]
 
   return (

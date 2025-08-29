@@ -63,6 +63,26 @@ const handleUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-const apiHandler = apiBuilder((builder) => builder.useAuth().get(handleGet))
+// FIXME: Implementation missing
+const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { slug } = req.query
+
+  if (!slug) {
+    return res.status(400).json({
+      error: { message: 'Organization slug is required' },
+    })
+  }
+
+  return res.status(200).json({
+    id: '',
+    slug: String(slug),
+    name: '',
+    deleted_at: '',
+  })
+}
+
+const apiHandler = apiBuilder((builder) =>
+  builder.useAuth().get(handleGet).patch(handleUpdate).delete(handleDelete)
+)
 
 export default apiHandler

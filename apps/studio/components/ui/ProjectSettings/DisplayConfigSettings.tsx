@@ -18,7 +18,7 @@ const DisplayConfigSettings = () => {
   } = useProjectSettingsV2Query({
     orgSlug, projectRef,
   })
-  const { data: config, isError: isPostgrestError } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isError: isPostgrestError } = useProjectPostgrestConfigQuery({ orgSlug, projectRef })
 
   const {
     data,

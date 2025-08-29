@@ -1,25 +1,43 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { apiBuilder } from 'lib/api/apiBuilder'
 
-import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
+// FIXME: Implementation missing
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  return res.status(200).json({
+    id: '',
+    installation_id: '',
+    organization_id: '',
+    metadata: {
+      repositories: [],
+      repository_selection: 'all',
+    },
+    status: 'success',
+  })
+}
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { code } = req.body
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+  if (!code) {
+    return res.status(400).json({
+      error: {
+        message: 'Missing required parameter: code',
+      },
+    })
   }
+
+  return res.status(200).json({
+    id: '',
+    installation_id: '',
+    organization_id: '',
+    metadata: {
+      repositories: [],
+      repository_selection: 'all',
+    },
+    status: 'success',
+  })
 }
 
-type ResponseData =
-  paths['/platform/integrations/github/authorization']['get']['responses']['200']['content']['application/json']
+const apiHandler = apiBuilder((builder) => builder.useAuth().get(handleGet).post(handlePost))
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
-  return res.status(200).json(null as any)
-}
+export default apiHandler

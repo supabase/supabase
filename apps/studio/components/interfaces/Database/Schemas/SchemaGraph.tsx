@@ -65,6 +65,7 @@ export const SchemaGraph = () => {
     isLoading: isLoadingSchemas,
     isError: isErrorSchemas,
   } = useSchemasQuery({
+    orgSlug: slug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

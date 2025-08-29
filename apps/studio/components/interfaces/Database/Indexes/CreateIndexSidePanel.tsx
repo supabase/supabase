@@ -58,6 +58,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const [searchTerm, setSearchTerm] = useState('')
 
   const { data: schemas } = useSchemasQuery({
+    orgSlug: slug,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

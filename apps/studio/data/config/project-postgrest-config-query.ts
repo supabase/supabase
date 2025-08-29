@@ -6,6 +6,7 @@ import { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigVariables = {
+  orgSlug?: string
   projectRef?: string
 }
 
@@ -14,13 +15,14 @@ type PostgrestConfigResponse = components['schemas']['GetPostgrestConfigResponse
 }
 
 export async function getProjectPostgrestConfig(
-  { projectRef }: ProjectPostgrestConfigVariables,
+  { orgSlug, projectRef }: ProjectPostgrestConfigVariables,
   signal?: AbortSignal
 ) {
+  if (!orgSlug) throw new Error('orgSlug is required')
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get('/platform/projects/{ref}/config/postgrest', {
-    params: { path: { ref: projectRef } },
+  const { data, error } = await get('/platform/organizations/{slug}/projects/{ref}/config/postgrest', {
+    params: { path: { slug: orgSlug, ref: projectRef } },
     signal,
   })
   if (error) handleError(error)
@@ -33,17 +35,17 @@ export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPos
 export type ProjectPostgrestConfigError = ResponseError
 
 export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigData>(
-  { projectRef }: ProjectPostgrestConfigVariables,
+  { orgSlug, projectRef }: ProjectPostgrestConfigVariables,
   {
     enabled = true,
     ...options
   }: UseQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
 ) =>
   useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>(
-    configKeys.postgrest(projectRef),
-    ({ signal }) => getProjectPostgrestConfig({ projectRef }, signal),
+    configKeys.postgrest(orgSlug, projectRef),
+    ({ signal }) => getProjectPostgrestConfig({ orgSlug, projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof orgSlug !== 'undefined',
       ...options,
     }
   )

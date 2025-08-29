@@ -5,18 +5,24 @@ import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
-export type EdgeFunctionsVariables = { projectRef?: string }
+export type EdgeFunctionsVariables = { orgSlug?: string; projectRef?: string }
 
 export type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
 
 export async function getEdgeFunctions(
-  { projectRef }: EdgeFunctionsVariables,
+  { orgSlug, projectRef }: EdgeFunctionsVariables,
   signal?: AbortSignal
 ) {
+  if (!orgSlug) throw new Error('orgSlug is required')
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get(`/v1/projects/{ref}/functions`, {
-    params: { path: { ref: projectRef } },
+  const { data, error } = await get(`/platform/organizations/{slug}/projects/{ref}/functions`, {
+    params: {
+      path: {
+        slug: orgSlug,
+        ref: projectRef,
+      },
+    },
     signal,
   })
 
