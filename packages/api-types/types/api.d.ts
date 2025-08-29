@@ -337,6 +337,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/analytics/endpoints/functions.combined-stats': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a project's function combined statistics */
+    get: operations['v1-get-project-function-combined-stats']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/analytics/endpoints/logs.all': {
     parameters: {
       query?: never
@@ -946,7 +963,11 @@ export interface paths {
      * @description Modifies the roles that can be assumed and for how long
      */
     put: operations['v1-update-jit-access']
-    post?: never
+    /**
+     * Authorize user-id to role mappings for JIT access
+     * @description Authorizes the request to assume a role in the project database
+     */
+    post: operations['v1-authorize-jit-access']
     delete?: never
     options?: never
     head?: never
@@ -1828,6 +1849,8 @@ export interface components {
       mfa_totp_verify_enabled: boolean | null
       mfa_web_authn_enroll_enabled: boolean | null
       mfa_web_authn_verify_enabled: boolean | null
+      nimbus_oauth_client_id: string | null
+      nimbus_oauth_client_secret: string | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -1893,6 +1916,10 @@ export interface components {
       smtp_sender_name: string | null
       smtp_user: string | null
       uri_allow_list: string | null
+    }
+    AuthorizeJitAccessBody: {
+      rhost: string
+      role: string
     }
     BranchActionBody: {
       migration_version?: string
@@ -2337,16 +2364,48 @@ export interface components {
       /** Format: uuid */
       user_id: string
       user_roles: {
-        expires_at?: string
+        allowed_networks?: {
+          allowed_cidrs?: {
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            cidr: string
+          }[]
+        }
+        expires_at?: number
         role: string
       }[]
+    }
+    JitAuthorizeAccessResponse: {
+      /** Format: uuid */
+      user_id: string
+      user_role: {
+        allowed_networks?: {
+          allowed_cidrs?: {
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            cidr: string
+          }[]
+        }
+        expires_at?: number
+        role: string
+      }
     }
     JitListAccessResponse: {
       items: {
         /** Format: uuid */
         user_id: string
         user_roles: {
-          expires_at?: string
+          allowed_networks?: {
+            allowed_cidrs?: {
+              cidr: string
+            }[]
+            allowed_cidrs_v6?: {
+              cidr: string
+            }[]
+          }
+          expires_at?: number
           role: string
         }[]
       }[]
@@ -2982,6 +3041,8 @@ export interface components {
       mfa_totp_verify_enabled?: boolean | null
       mfa_web_authn_enroll_enabled?: boolean | null
       mfa_web_authn_verify_enabled?: boolean | null
+      nimbus_oauth_client_id?: string | null
+      nimbus_oauth_client_secret?: string | null
       password_hibp_enabled?: boolean | null
       password_min_length?: number | null
       /** @enum {string|null} */
@@ -3108,7 +3169,15 @@ export interface components {
     }
     UpdateJitAccessBody: {
       roles: {
-        expires_at?: string
+        allowed_networks?: {
+          allowed_cidrs?: {
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            cidr: string
+          }[]
+        }
+        expires_at?: number
         role: string
       }[]
       /** Format: uuid */
@@ -4277,6 +4346,44 @@ export interface operations {
         }
       }
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-project-function-combined-stats': {
+    parameters: {
+      query: {
+        function_id: string
+        interval: '15min' | '1hr' | '3hr' | '1day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's function combined statistics */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -6245,6 +6352,45 @@ export interface operations {
         content?: never
       }
       /** @description Failed to upsert database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-authorize-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AuthorizeJitAccessBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAuthorizeAccessResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to authorize database jit access */
       500: {
         headers: {
           [name: string]: unknown
