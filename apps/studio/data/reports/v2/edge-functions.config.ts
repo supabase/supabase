@@ -171,6 +171,40 @@ export function transformStatusCodeData(data: any[], statusCodes: string[]) {
   return Object.values(pivotedData)
 }
 
+/**
+ * Transforms raw invocation data by normalizing timestamps and adding function names
+ * @param data - Raw data from the database
+ * @param functions - Array of function objects with id and name
+ * @returns Transformed data with normalized timestamps and function names
+ */
+export function transformInvocationData(data: any[], functions: { id: string; name: string }[]) {
+  return data.map((log: any) => ({
+    ...log,
+    timestamp: isUnixMicro(log.timestamp)
+      ? unixMicroToIsoTimestamp(log.timestamp)
+      : dayjs.utc(log.timestamp).toISOString(),
+    function_name: functions.find((f) => f.id === log.function_id)?.name ?? log.function_id,
+  }))
+}
+
+/**
+ * Aggregates invocation data by timestamp, summing counts for each timestamp
+ * @param data - Transformed invocation data
+ * @returns Aggregated data with one entry per timestamp
+ */
+export function aggregateInvocationsByTimestamp(data: any[]) {
+  const aggregatedData = data.reduce((acc: Record<string, any>, item: any) => {
+    const timestamp = item.timestamp
+    if (!acc[timestamp]) {
+      acc[timestamp] = { timestamp, count: 0 }
+    }
+    acc[timestamp].count += item.count
+    return acc
+  }, {})
+
+  return Object.values(aggregatedData)
+}
+
 export const edgeFunctionReports = ({
   projectRef,
   functions,
@@ -206,26 +240,9 @@ export const edgeFunctionReports = ({
 
       if (!response?.result) return { data: [] }
 
-      // Transform the raw data to aggregate counts per timestamp
-      const rawData = response?.result?.map((log: any) => ({
-        ...log,
-        timestamp: isUnixMicro(log.timestamp)
-          ? unixMicroToIsoTimestamp(log.timestamp)
-          : dayjs.utc(log.timestamp).toISOString(),
-        function_name: functions.find((f) => f.id === log.function_id)?.name ?? log.function_id,
-      }))
-
-      // Aggregate counts by timestamp to ensure one data point per timestamp
-      const aggregatedData = rawData.reduce((acc: Record<string, any>, item: any) => {
-        const timestamp = item.timestamp
-        if (!acc[timestamp]) {
-          acc[timestamp] = { timestamp, count: 0 }
-        }
-        acc[timestamp].count += item.count
-        return acc
-      }, {})
-
-      const data = Object.values(aggregatedData)
+      // Transform and aggregate the data using extracted functions
+      const transformedData = transformInvocationData(response.result, functions)
+      const data = aggregateInvocationsByTimestamp(transformedData)
 
       const attributes = [
         {

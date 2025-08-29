@@ -3,6 +3,8 @@ import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
   transformStatusCodeData,
+  transformInvocationData,
+  aggregateInvocationsByTimestamp,
 } from './edge-functions.config'
 
 describe('extractStatusCodesFromData', () => {
@@ -87,5 +89,163 @@ describe('transformStatusCodeData', () => {
     const data = [{ timestamp: '2023-01-01T00:00:00Z', status_code: 200, count: 10 }]
     const result = transformStatusCodeData(data, ['200', '404'])
     expect(result).toEqual([{ timestamp: '2023-01-01T00:00:00.000Z', '200': 10, '404': 0 }])
+  })
+})
+
+describe('transformInvocationData', () => {
+  const mockFunctions = [
+    { id: 'func1', name: 'Function One' },
+    { id: 'func2', name: 'Function Two' },
+  ]
+
+  it('should transform raw invocation data with function names', () => {
+    const rawData = [
+      {
+        timestamp: '2023-01-01T00:00:00Z',
+        function_id: 'func1',
+        count: 10,
+      },
+      {
+        timestamp: '2023-01-01T01:00:00Z',
+        function_id: 'func2',
+        count: 5,
+      },
+    ]
+
+    const result = transformInvocationData(rawData, mockFunctions)
+    expect(result).toEqual([
+      {
+        timestamp: '2023-01-01T00:00:00.000Z',
+        function_id: 'func1',
+        count: 10,
+        function_name: 'Function One',
+      },
+      {
+        timestamp: '2023-01-01T01:00:00.000Z',
+        function_id: 'func2',
+        count: 5,
+        function_name: 'Function Two',
+      },
+    ])
+  })
+
+  it('should use function_id as fallback when function name not found', () => {
+    const rawData = [
+      {
+        timestamp: '2023-01-01T00:00:00Z',
+        function_id: 'unknown_func',
+        count: 10,
+      },
+    ]
+
+    const result = transformInvocationData(rawData, mockFunctions)
+    expect(result).toEqual([
+      {
+        timestamp: '2023-01-01T00:00:00.000Z',
+        function_id: 'unknown_func',
+        count: 10,
+        function_name: 'unknown_func',
+      },
+    ])
+  })
+
+  it('should handle unix micro timestamps', () => {
+    const rawData = [
+      {
+        timestamp: 1672531200000000, // Unix micro timestamp for 2023-01-01T00:00:00Z
+        function_id: 'func1',
+        count: 10,
+      },
+    ]
+
+    const result = transformInvocationData(rawData, mockFunctions)
+    expect(result[0].timestamp).toBe('2023-01-01T00:00:00.000Z')
+    expect(result[0].function_name).toBe('Function One')
+  })
+
+  it('should handle empty data array', () => {
+    const result = transformInvocationData([], mockFunctions)
+    expect(result).toEqual([])
+  })
+
+  it('should handle empty functions array', () => {
+    const rawData = [
+      {
+        timestamp: '2023-01-01T00:00:00Z',
+        function_id: 'func1',
+        count: 10,
+      },
+    ]
+
+    const result = transformInvocationData(rawData, [])
+    expect(result).toEqual([
+      {
+        timestamp: '2023-01-01T00:00:00.000Z',
+        function_id: 'func1',
+        count: 10,
+        function_name: 'func1',
+      },
+    ])
+  })
+})
+
+describe('aggregateInvocationsByTimestamp', () => {
+  it('should aggregate counts by timestamp', () => {
+    const data = [
+      { timestamp: '2023-01-01T00:00:00.000Z', function_id: 'func1', count: 10 },
+      { timestamp: '2023-01-01T00:00:00.000Z', function_id: 'func2', count: 5 },
+      { timestamp: '2023-01-01T01:00:00.000Z', function_id: 'func1', count: 20 },
+    ]
+
+    const result = aggregateInvocationsByTimestamp(data)
+    expect(result).toEqual([
+      { timestamp: '2023-01-01T00:00:00.000Z', count: 15 },
+      { timestamp: '2023-01-01T01:00:00.000Z', count: 20 },
+    ])
+  })
+
+  it('should handle single entry per timestamp', () => {
+    const data = [
+      { timestamp: '2023-01-01T00:00:00.000Z', function_id: 'func1', count: 10 },
+      { timestamp: '2023-01-01T01:00:00.000Z', function_id: 'func2', count: 5 },
+    ]
+
+    const result = aggregateInvocationsByTimestamp(data)
+    expect(result).toEqual([
+      { timestamp: '2023-01-01T00:00:00.000Z', count: 10 },
+      { timestamp: '2023-01-01T01:00:00.000Z', count: 5 },
+    ])
+  })
+
+  it('should handle empty data array', () => {
+    const result = aggregateInvocationsByTimestamp([])
+    expect(result).toEqual([])
+  })
+
+  it('should handle multiple entries with same timestamp and different counts', () => {
+    const data = [
+      { timestamp: '2023-01-01T00:00:00.000Z', function_id: 'func1', count: 1 },
+      { timestamp: '2023-01-01T00:00:00.000Z', function_id: 'func2', count: 2 },
+      { timestamp: '2023-01-01T00:00:00.000Z', function_id: 'func3', count: 3 },
+    ]
+
+    const result = aggregateInvocationsByTimestamp(data)
+    expect(result).toEqual([{ timestamp: '2023-01-01T00:00:00.000Z', count: 6 }])
+  })
+
+  it('should preserve timestamp order from reduce operation', () => {
+    const data = [
+      { timestamp: '2023-01-01T02:00:00.000Z', function_id: 'func1', count: 30 },
+      { timestamp: '2023-01-01T00:00:00.000Z', function_id: 'func1', count: 10 },
+      { timestamp: '2023-01-01T01:00:00.000Z', function_id: 'func1', count: 20 },
+    ]
+
+    const result = aggregateInvocationsByTimestamp(data)
+    expect(result).toHaveLength(3)
+    expect(result.map((item) => item.timestamp)).toEqual([
+      '2023-01-01T02:00:00.000Z',
+      '2023-01-01T00:00:00.000Z',
+      '2023-01-01T01:00:00.000Z',
+    ])
   })
 })
