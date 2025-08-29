@@ -108,6 +108,47 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     form.clearErrors()
     setIsUpdating(true)
 
+    // Client-side validation: Check if bucket limit exceeds global limit
+    if (
+      values.has_file_size_limit &&
+      values.formatted_size_limit !== undefined &&
+      data?.fileSizeLimit
+    ) {
+      const bucketLimitInBytes = convertToBytes(
+        values.formatted_size_limit,
+        selectedUnit as StorageSizeUnits
+      )
+
+      if (bucketLimitInBytes > data.fileSizeLimit) {
+        form.setError('formatted_size_limit', {
+          type: 'manual',
+          message: `Exceeds global limit of ${formattedGlobalUploadLimit}. Increase the global limit in Storage Settings first.`,
+        })
+        setIsUpdating(false)
+        return
+      }
+    }
+
+    // Additional server-side validation: Double-check the global limit constraint
+    if (
+      values.has_file_size_limit &&
+      values.formatted_size_limit !== undefined &&
+      data?.fileSizeLimit
+    ) {
+      const bucketLimitInBytes = convertToBytes(
+        values.formatted_size_limit,
+        selectedUnit as StorageSizeUnits
+      )
+
+      if (bucketLimitInBytes > data.fileSizeLimit) {
+        toast.error(
+          `Cannot set bucket limit higher than global limit of ${formattedGlobalUploadLimit}. Increase the global limit in Storage Settings first.`
+        )
+        setIsUpdating(false)
+        return
+      }
+    }
+
     try {
       const result = await updateBucket({
         projectRef: ref,
@@ -393,15 +434,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                         name="allowed_mime_types"
                         label="Allowed MIME types"
                         labelOptional="Comma separated values"
-                        description={
-                          form.formState.errors.allowed_mime_types ? (
-                            <span className="text-destructive">
-                              {form.formState.errors.allowed_mime_types.message}
-                            </span>
-                          ) : (
-                            'Wildcards are allowed, e.g. image/*.'
-                          )
-                        }
+                        description="Wildcards are allowed, e.g. image/*."
                       >
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
