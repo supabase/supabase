@@ -45,10 +45,9 @@ import {
   fromDocsMarkdown,
   getAttributeValue,
   getAttributeValueExpression,
-  getFeatureValue,
 } from './utils.server'
 
-import { Feature, isFeatureEnabled } from 'common'
+import { isFeatureEnabled } from 'common'
 
 export function partialsRemark() {
   return async function transform(tree: Root) {
@@ -75,7 +74,7 @@ function toFilePath(node: MdxJsxFlowElement) {
   // Feels Hacky, but works
   const featureToToggle = getAttributeValue(node, 'feature')
   const featureEnabled = isFeatureEnabled(featureToToggle as Feature)
-  console.log(featureEnabled)
+
   if ((featureEnabled as any) === false) path = 'billing/pricing/pricing_blank.mdx'
 
   const filePath = join(PARTIALS_DIRECTORY, path)
