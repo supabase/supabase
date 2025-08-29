@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { useMemo } from 'react'
 import { useParams } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -17,28 +18,38 @@ export function ActivityStats() {
     projectRef: project?.parent_project_ref ?? project?.ref,
   })
   const isDefaultProject = project?.parent_project_ref === undefined
-  const currentBranch = (branchesData ?? []).find((b) => b.project_ref === ref)
-  const latestNonDefaultBranch = (branchesData ?? [])
-    .filter((b) => !b.is_default)
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.created_at ?? b.updated_at).valueOf() -
-        new Date(a.created_at ?? a.updated_at).valueOf()
-    )[0]
+  const currentBranch = useMemo(
+    () => (branchesData ?? []).find((b) => b.project_ref === ref),
+    [branchesData, ref]
+  )
+  const latestNonDefaultBranch = useMemo(() => {
+    const list = (branchesData ?? []).filter((b) => !b.is_default)
+    if (list.length === 0) return undefined
+    return list
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(b.created_at ?? b.updated_at).valueOf() -
+          new Date(a.created_at ?? a.updated_at).valueOf()
+      )[0]
+  }, [branchesData])
 
   const { data: migrationsData, isLoading: isLoadingMigrations } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const latestMigration = (migrationsData ?? [])[0]
+  const latestMigration = useMemo(() => (migrationsData ?? [])[0], [migrationsData])
 
   const { data: backupsData, isLoading: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
   })
-  const latestBackup = (backupsData?.backups ?? [])
-    .slice()
-    .sort((a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf())[0]
+  const latestBackup = useMemo(() => {
+    const list = backupsData?.backups ?? []
+    if (list.length === 0) return undefined
+    return list
+      .slice()
+      .sort((a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf())[0]
+  }, [backupsData])
 
   return (
     <div className="@container">

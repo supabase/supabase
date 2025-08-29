@@ -1,5 +1,5 @@
 import { BarChart, Shield } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
@@ -68,45 +68,60 @@ export const AdvisorWidget = () => {
     [lints]
   )
 
-  const securityErrorCount = securityLints.filter(
-    (lint: Lint) => lint.level === LINTER_LEVELS.ERROR
-  ).length
-  const performanceErrorCount = performanceLints.filter(
-    (lint: Lint) => lint.level === LINTER_LEVELS.ERROR
-  ).length
+  const securityErrorCount = useMemo(
+    () => securityLints.filter((lint: Lint) => lint.level === LINTER_LEVELS.ERROR).length,
+    [securityLints]
+  )
+  const performanceErrorCount = useMemo(
+    () => performanceLints.filter((lint: Lint) => lint.level === LINTER_LEVELS.ERROR).length,
+    [performanceLints]
+  )
 
   const combinedIssues: Lint[] = useMemo(() => {
     const combined = [...securityLints, ...performanceLints]
-    return combined
-      .filter((lint) => lint.level === LINTER_LEVELS.ERROR)
-      .sort((a, b) => (a.level === LINTER_LEVELS.ERROR ? -1 : 1))
+    return combined.filter((lint) => lint.level === LINTER_LEVELS.ERROR)
   }, [securityLints, performanceLints])
 
   const totalErrors = securityErrorCount + performanceErrorCount
-  const hasErrors = securityErrorCount > 0 || performanceErrorCount > 0
 
-  let titleContent: React.ReactNode
-
-  if (totalErrors === 0) {
-    titleContent = <h2>Assistant found no issues</h2>
-  } else {
+  const titleContent = useMemo(() => {
+    if (totalErrors === 0) return <h2>Assistant found no issues</h2>
     const issuesText = totalErrors === 1 ? 'issue' : 'issues'
     const numberDisplay = totalErrors.toString()
-
-    let attentionClassName = ''
-    if (hasErrors) {
-      attentionClassName = 'text-destructive'
-    }
-
-    titleContent = (
+    return (
       <h2>
         Assistant found {numberDisplay} {issuesText}
       </h2>
     )
-  }
+  }, [totalErrors])
 
-  const getAdvisorPath = (lint: Lint) =>
-    lint.categories.includes('SECURITY') ? 'security' : 'performance'
+  const createLintSummaryPrompt = useCallback((lint: Lint) => {
+    const title = lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title
+    const entity =
+      (lint.metadata &&
+        (lint.metadata.entity ||
+          (lint.metadata.schema &&
+            lint.metadata.name &&
+            `${lint.metadata.schema}.${lint.metadata.name}`))) ||
+      'N/A'
+    const schema = lint.metadata?.schema ?? 'N/A'
+    const issue = lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'
+    const description = lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'
+    return `Summarize the issue and suggest fixes for the following lint item:
+  Title: ${title}
+  Entity: ${entity}
+  Schema: ${schema}
+  Issue Details: ${issue}
+  Description: ${description}`
+  }, [])
+
+  const handleAskAssistant = useCallback(() => {
+    snap.toggleAssistant()
+  }, [snap])
+
+  const handleCardClick = useCallback((lint: Lint) => {
+    setSelectedLint(lint)
+  }, [])
 
   return (
     <div>
@@ -115,7 +130,7 @@ export const AdvisorWidget = () => {
       ) : (
         <div className="flex justify-between items-center mb-6">
           {titleContent}
-          <Button type="default" icon={<AiIconAnimation />} onClick={() => snap.toggleAssistant()}>
+          <Button type="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
             Ask Assistant
           </Button>
         </div>
@@ -130,13 +145,12 @@ export const AdvisorWidget = () => {
         <>
           <Row columns={[3, 2, 1]}>
             {combinedIssues.map((lint) => {
-              const advisor = getAdvisorPath(lint)
               return (
                 <Card
                   key={lint.cache_key}
                   className="h-full flex flex-col items-stretch h-64 cursor-pointer"
                   onClick={() => {
-                    setSelectedLint(lint)
+                    handleCardClick(lint)
                   }}
                 >
                   <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">
@@ -158,12 +172,7 @@ export const AdvisorWidget = () => {
                         snap.newChat({
                           name: 'Summarize lint',
                           open: true,
-                          initialInput: `Summarize the issue and suggest fixes for the following lint item:
-  Title: ${lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title}
-  Entity: ${(lint.metadata && (lint.metadata.entity || (lint.metadata.schema && lint.metadata.name && `${lint.metadata.schema}.${lint.metadata.name}`))) ?? 'N/A'}
-  Schema: ${lint.metadata?.schema ?? 'N/A'}
-  Issue Details: ${lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'}
-  Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`,
+                          initialInput: createLintSummaryPrompt(lint),
                         })
                       }}
                       tooltip={{
