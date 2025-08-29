@@ -1,18 +1,16 @@
 import { useState } from 'react'
-import { RefreshCw, Eye } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
-import { sortDeployments, formatDateTime } from './utils'
-import { VersionListItem } from './version-list-item'
-import { VersionCodePreview } from './version-code-preview'
+import { sortDeployments } from './utils'
 import { RollbackModal } from './rollback-modal'
 import { useParams } from 'common'
 import { EdgeFunctionVersionsLoading } from './loading'
 import { EdgeFunctionVersionsError } from './error'
 import { useEdgeFunctionDeploymentsQuery } from 'data/edge-functions/edge-function-deployments-query'
-import { useEdgeFunctionDeploymentCodeQuery } from 'data/edge-functions/edge-function-deployment-code-query'
 import { useEdgeFunctionRollbackMutation } from 'data/edge-functions/edge-function-rollback-mutation'
+import { DeployListItem } from './deploy-list-item'
 
 export const EdgeFunctionVersionsList = () => {
   const { ref: projectRef, slug: functionSlug } = useParams()
@@ -32,17 +30,6 @@ export const EdgeFunctionVersionsList = () => {
     isFetching: isRefreshing,
   } = useEdgeFunctionDeploymentsQuery({ projectRef: projectId, slug })
 
-  const { data: codeResponse, isLoading: isLoadingCode } = useEdgeFunctionDeploymentCodeQuery(
-    {
-      projectRef: projectId,
-      slug,
-      version: selectedDeployment?.version,
-    },
-    {
-      enabled: !!selectedDeployment,
-    }
-  )
-
   const rollbackMutation = useEdgeFunctionRollbackMutation({
     onSuccess: () => {
       setSelectedDeployment(null)
@@ -53,12 +40,8 @@ export const EdgeFunctionVersionsList = () => {
   // Sort deployments and set initial selection
   const sortedDeployments = sortDeployments(deployments)
 
-  // Set default selected deployment when deployments load
-  if (sortedDeployments.length > 0 && !selectedDeployment) {
-    const defaultSelected =
-      sortedDeployments.find((d) => d.status === 'ACTIVE') || sortedDeployments[0]
-    setSelectedDeployment(defaultSelected)
-  }
+  // Only show up to the latest 10 deployments (newest first)
+  const limitedDeployments = sortedDeployments.slice(0, 10)
 
   const handleRollbackClick = (deployment: EdgeFunctionDeployment) => {
     setSelectedDeployment(deployment)
@@ -76,13 +59,6 @@ export const EdgeFunctionVersionsList = () => {
     })
   }
 
-  const handleViewCodeClick = (deployment: EdgeFunctionDeployment) => {
-    setSelectedDeployment(deployment)
-  }
-
-  // Get code files from the response
-  const codeFiles = codeResponse?.files || []
-
   if (isLoading) return <EdgeFunctionVersionsLoading />
 
   if (error && !sortedDeployments.length) {
@@ -93,7 +69,7 @@ export const EdgeFunctionVersionsList = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Edge Function Versions</CardTitle>
+          <CardTitle>Deployments</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 space-y-4">
@@ -107,7 +83,7 @@ export const EdgeFunctionVersionsList = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Edge Function Versions</CardTitle>
+        <CardTitle>Deployments</CardTitle>
         <Button
           type="default"
           size="tiny"
@@ -118,51 +94,35 @@ export const EdgeFunctionVersionsList = () => {
           Refresh
         </Button>
       </CardHeader>
-      <CardContent className="p-0 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
+      <CardContent className="p-0">
         <div className="p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Eye className="h-4 w-4" />
-            <h4 className="text-foreground">Available Versions</h4>
-          </div>
           <p className="text-sm text-foreground-light mb-4">
-            Select a version to preview its content and restore if needed.
+            Showing up to the latest 10 deployments.
           </p>
-          <div className="space-y-3">
-            {sortedDeployments.map((deployment) => {
-              const isSelected = selectedDeployment?.id === deployment.id
-
-              return (
-                <VersionListItem
-                  key={deployment.id}
-                  deployment={deployment}
-                  isSelected={isSelected}
-                  isRestoring={rollbackMutation.isLoading}
-                  onPreview={handleViewCodeClick}
-                  onRestore={handleRollbackClick}
-                />
-              )
-            })}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-muted-foreground border-b">
+                  <th className="text-left py-2 pr-2">Deployed at</th>
+                  <th className="text-left py-2 pr-2">Status</th>
+                  <th className="text-left py-2 pr-2">Commit message</th>
+                  <th className="text-left py-2 pr-2">Hash</th>
+                  <th className="text-left py-2 pr-2">Size</th>
+                  <th className="text-right py-2 pl-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {limitedDeployments.map((deployment) => (
+                  <DeployListItem
+                    key={deployment.id}
+                    deployment={deployment}
+                    isRestoring={rollbackMutation.isLoading}
+                    onRestore={handleRollbackClick}
+                  />
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Eye className="h-4 w-4" />
-            <h4 className="text-foreground">Version Preview</h4>
-          </div>
-          <p className="text-sm text-foreground-light mb-4">
-            {selectedDeployment
-              ? `Preview of version from ${formatDateTime(selectedDeployment.created_at)}`
-              : 'Select a version to preview'}
-          </p>
-
-          <VersionCodePreview
-            selectedDeployment={selectedDeployment}
-            codeFiles={codeFiles}
-            isLoading={isLoadingCode}
-            isRestoring={rollbackMutation.isLoading}
-            onOpenRollback={() => setShowRollback(true)}
-          />
         </div>
       </CardContent>
 
