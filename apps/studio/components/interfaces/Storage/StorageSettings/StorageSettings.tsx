@@ -339,33 +339,30 @@ const StorageSettings = () => {
                   )}
                 />
               </CardContent>
-
               {isFreeTier && (
-                <CardContent className="pt-0">
-                  <UpgradeToPro
-                    primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                    secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
-                      STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                    )} and unlock image transformations.`}
-                    source="storageSizeLimit"
-                  />
-                </CardContent>
+                <UpgradeToPro
+                  fullWidth
+                  primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                  secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
+                    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                  )} and unlock image transformations.`}
+                  source="storageSizeLimit"
+                />
               )}
               {isSpendCapOn && (
-                <CardContent className="pt-0">
-                  <UpgradeToPro
-                    buttonText="Disable Spend Cap"
-                    primaryText="Reduced max upload file size limit due to Spend Cap"
-                    secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
-                      STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                    )}.`}
-                    source="storageSizeLimit"
-                  />
-                </CardContent>
+                <UpgradeToPro
+                  fullWidth
+                  buttonText="Disable Spend Cap"
+                  primaryText="Reduced max upload file size limit due to Spend Cap"
+                  secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
+                    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                  )}.`}
+                  source="storageSizeLimit"
+                />
               )}
 
               {!canUpdateStorageSettings && (
-                <CardContent className="pt-0">
+                <CardContent>
                   <p className="text-sm text-foreground-light">
                     You need additional permissions to update storage settings
                   </p>
