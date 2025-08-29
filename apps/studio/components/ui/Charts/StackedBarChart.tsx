@@ -58,7 +58,7 @@ const StackedBarChart: React.FC<Props> = ({
   syncId,
 }) => {
   const { Container } = useChartSize(size)
-  const { hoveredValue, syncTooltip, setHover, clearHover } = useChartHoverState(
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
   )
   const { dataKeys, stackedData, percentagesStackedData } = useStacked({
@@ -194,7 +194,7 @@ const StackedBarChart: React.FC<Props> = ({
               fontSize: '12px',
             }}
             wrapperClassName="bg-gray-600 rounded min-w-md"
-            active={!!syncId && syncTooltip && hoveredValue !== null}
+            active={!!syncId && syncTooltip && hoveredIndex !== null}
           />
         </BarChart>
       </Container>

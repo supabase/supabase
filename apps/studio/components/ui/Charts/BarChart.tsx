@@ -57,9 +57,9 @@ const BarChart = ({
   showGrid = false,
   syncId,
 }: BarChartProps) => {
-  const { hoveredValue, isHovered, isCurrentChart, setHover, clearHover } =
+  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } =
     useChartHoverState('default')
-  const { Container, width, height } = useChartSize(size)
+  const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // Transform data to ensure yAxisKey values are numbers
@@ -176,13 +176,13 @@ const BarChart = ({
           />
           <Tooltip
             content={(props) =>
-              syncId && isHovered && isCurrentChart ? (
+              syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">
-                    {dayjs(data[hoveredValue]?.[xAxisKey]).format(customDateFormat)}
+                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
                   </div>
                   <div>
-                    {numberFormatter(Number(data[hoveredValue]?.[yAxisKey]) || 0, valuePrecision)}
+                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
                     {typeof format === 'string' ? format : ''}
                   </div>
                 </div>

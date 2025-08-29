@@ -104,7 +104,7 @@ export function ComposedChart({
   sql,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
-  const { hoveredValue, syncTooltip, setHover, clearHover } = useChartHoverState(
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
   )
   const [_activePayload, setActivePayload] = useState<any>(null)
@@ -397,7 +397,7 @@ export function ComposedChart({
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
                   isActiveHoveredChart={
-                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredValue !== null)
+                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
                   }
                 />
               ) : null

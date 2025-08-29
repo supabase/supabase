@@ -206,13 +206,26 @@ export const edgeFunctionReports = ({
 
       if (!response?.result) return { data: [] }
 
-      const data = response?.result?.map((log: any) => ({
+      // Transform the raw data to aggregate counts per timestamp
+      const rawData = response?.result?.map((log: any) => ({
         ...log,
         timestamp: isUnixMicro(log.timestamp)
           ? unixMicroToIsoTimestamp(log.timestamp)
           : dayjs.utc(log.timestamp).toISOString(),
         function_name: functions.find((f) => f.id === log.function_id)?.name ?? log.function_id,
       }))
+
+      // Aggregate counts by timestamp to ensure one data point per timestamp
+      const aggregatedData = rawData.reduce((acc: Record<string, any>, item: any) => {
+        const timestamp = item.timestamp
+        if (!acc[timestamp]) {
+          acc[timestamp] = { timestamp, count: 0 }
+        }
+        acc[timestamp].count += item.count
+        return acc
+      }, {})
+
+      const data = Object.values(aggregatedData)
 
       const attributes = [
         {
@@ -283,13 +296,37 @@ export const edgeFunctionReports = ({
       const sql = METRIC_SQL.ExecutionTime(interval, filters.functionIds)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
-      const data = rawData.result?.map((point: any) => ({
+      if (!rawData?.result) return { data: [] }
+
+      // Transform the raw data to ensure one data point per timestamp
+      const transformedData = rawData.result?.map((point: any) => ({
         ...point,
         timestamp: isUnixMicro(point.timestamp)
           ? unixMicroToIsoTimestamp(point.timestamp)
           : dayjs.utc(point.timestamp).toISOString(),
         function_name: functions.find((f) => f.id === point.function_id)?.name ?? point.function_id,
       }))
+
+      // If we have multiple function IDs, we need to aggregate the execution times per timestamp
+      const aggregatedData = transformedData.reduce((acc: Record<string, any>, item: any) => {
+        const timestamp = item.timestamp
+        if (!acc[timestamp]) {
+          acc[timestamp] = {
+            timestamp,
+            avg_execution_time: item.avg_execution_time,
+            count: 1,
+          }
+        } else {
+          // Calculate weighted average for multiple functions at the same timestamp
+          const totalTime =
+            acc[timestamp].avg_execution_time * acc[timestamp].count + item.avg_execution_time
+          acc[timestamp].count += 1
+          acc[timestamp].avg_execution_time = totalTime / acc[timestamp].count
+        }
+        return acc
+      }, {})
+
+      const data = Object.values(aggregatedData).map(({ count, ...item }) => item)
 
       const attributes = [
         {

@@ -35,7 +35,7 @@ const AreaChart = ({
   syncId,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
-  const { hoveredValue, syncTooltip, setHover, clearHover } = useChartHoverState(
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
   )
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -126,13 +126,13 @@ const AreaChart = ({
           />
           <Tooltip
             content={(props) =>
-              syncId && syncTooltip && hoveredValue !== null ? (
+              syncId && syncTooltip && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">
-                    {dayjs(data[hoveredValue]?.[xAxisKey]).format(customDateFormat)}
+                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
                   </div>
                   <div>
-                    {numberFormatter(Number(data[hoveredValue]?.[yAxisKey]) || 0, valuePrecision)}
+                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
                     {format}
                   </div>
                 </div>
