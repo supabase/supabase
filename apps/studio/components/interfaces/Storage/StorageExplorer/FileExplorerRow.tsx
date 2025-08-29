@@ -167,6 +167,12 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     setSelectedFilePreview(undefined)
   }
 
+  const onDoubleClickName = () => {
+    if (canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET) {
+      setSelectedItemToRename(itemWithColumnIndex)
+    }
+  }
+
   // Drag and drop handlers
   const onDragStart = (event: React.DragEvent) => {
     if (item.type === STORAGE_ROW_TYPES.FILE && canUpdateFiles) {
@@ -483,7 +489,19 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
               }}
             />
           </div>
-          <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
+          <p
+            title={item.name}
+            className="truncate text-sm cursor-pointer hover:text-foreground"
+            style={{ width: nameWidth }}
+            onDoubleClick={onDoubleClickName}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onDoubleClickName()
+              }
+            }}
+            tabIndex={canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET ? 0 : -1}
+          >
             {item.name}
           </p>
           {item.isCorrupted && (
