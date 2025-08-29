@@ -14,7 +14,6 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatBytes } from 'lib/helpers'
@@ -66,17 +65,6 @@ const StorageSettings = () => {
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
-
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
-
-  // Calculate the minimum file size limit from existing buckets
-  const minBucketFileSizeLimit = useMemo(() => {
-    const bucketLimits = buckets
-      .filter((bucket: any) => bucket.file_size_limit && bucket.file_size_limit > 0)
-      .map((bucket: any) => bucket.file_size_limit!)
-
-    return bucketLimits.length > 0 ? Math.min(...bucketLimits) : 0
-  }, [buckets])
 
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
@@ -132,42 +120,6 @@ const StorageSettings = () => {
           path: ['fileSizeLimit'],
         })
       }
-
-      // Validate that global limit is not smaller than any bucket's limit
-      if (minBucketFileSizeLimit > 0 && !isLoadingBuckets && buckets.length > 0) {
-        const { value: formattedMinBucketLimit } = convertFromBytes(minBucketFileSizeLimit, unit)
-
-        if (fileSizeLimit < formattedMinBucketLimit) {
-          // Get buckets that would be affected by this too-small global limit
-          const affectedBuckets = buckets
-            .filter((bucket: any) => bucket.file_size_limit && bucket.file_size_limit > 0)
-            .map((bucket: any) => ({
-              name: bucket.name,
-              limit: bucket.file_size_limit!,
-              formattedLimit: convertFromBytes(bucket.file_size_limit!, unit).value,
-            }))
-            .filter((bucket) => bucket.formattedLimit > fileSizeLimit)
-            .sort((a, b) => b.formattedLimit - a.formattedLimit) // Sort by limit descending
-
-          if (affectedBuckets.length > 0) {
-            const primaryBucket = affectedBuckets[0]
-            const otherBucketsCount = affectedBuckets.length - 1
-
-            let errorMessage = `Cannot set global limit lower than that of individual buckets. Remove or decrease the limit on ${primaryBucket.name} (${formatBytes(primaryBucket.limit)})`
-
-            if (otherBucketsCount > 0) {
-              errorMessage += ` +${otherBucketsCount} other bucket${otherBucketsCount === 1 ? '' : 's'}`
-            }
-            errorMessage += ` first.`
-
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: errorMessage,
-              path: ['fileSizeLimit'],
-            })
-          }
-        }
-      }
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -186,35 +138,6 @@ const StorageSettings = () => {
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!config) return console.error('Storage config is required')
-
-    // Server-side validation: Check if global limit would be smaller than any bucket's limit
-    if (!isLoadingBuckets && buckets.length > 0) {
-      const newGlobalLimitInBytes = convertToBytes(data.fileSizeLimit, data.unit)
-
-      const bucketsWithLimits = buckets.filter(
-        (bucket: any) => bucket.file_size_limit && bucket.file_size_limit > 0
-      )
-
-      const conflictingBuckets = bucketsWithLimits.filter(
-        (bucket: any) => bucket.file_size_limit! > newGlobalLimitInBytes
-      )
-
-      if (conflictingBuckets.length > 0) {
-        const primaryBucket = conflictingBuckets[0]
-        const otherBucketsCount = conflictingBuckets.length - 1
-
-        let errorMessage = `Cannot set global limit lower than the limit set on ${primaryBucket.name} (${formatBytes(primaryBucket.file_size_limit!)})`
-
-        if (otherBucketsCount > 0) {
-          errorMessage += ` +${otherBucketsCount} other bucket${otherBucketsCount === 1 ? '' : 's'}`
-        }
-
-        errorMessage += '. Remove or decrease those limits first.'
-
-        toast.error(errorMessage)
-        return
-      }
-    }
 
     updateStorageConfig({
       projectRef,
@@ -245,55 +168,20 @@ const StorageSettings = () => {
               <CardContent className="pt-6">
                 <FormField_Shadcn_
                   control={form.control}
-                  name="imageTransformationEnabled"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Enable Image Transformation"
-                      description={
-                        <>
-                          Optimize and resize images on the fly.{' '}
-                          <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
-                            Learn more
-                          </InlineLink>
-                          .
-                        </>
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          size="large"
-                          disabled={isFreeTier}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
                   name="fileSizeLimit"
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Global file size limit"
+                      label="Upload file size limit"
                       description={
                         <>
-                          Restrict the size of files uploaded across all buckets.{' '}
-                          {isLoadingBuckets && (
-                            <span className="text-foreground-light">
-                              {' '}
-                              Loading bucket information...
-                            </span>
-                          )}{' '}
-                          <InlineLink href="https://supabase.com/docs/guides/storage/uploads/file-limits">
-                            Learn more
-                          </InlineLink>
-                          .
+                          {storageUnit !== StorageSizeUnits.BYTES && (
+                            <>
+                              Equivalent to {convertToBytes(limit, storageUnit).toLocaleString()}{' '}
+                              bytes.{' '}
+                            </>
+                          )}
+                          Maximum upload file size is {formatBytes(maxBytes)}.
                         </>
                       }
                     >
@@ -339,30 +227,64 @@ const StorageSettings = () => {
                   )}
                 />
               </CardContent>
-              {isFreeTier && (
-                <UpgradeToPro
-                  fullWidth
-                  primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                  secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
-                    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                  )} and unlock image transformations.`}
-                  source="storageSizeLimit"
+
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="imageTransformationEnabled"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Enable Image Transformation"
+                      description={
+                        <>
+                          Optimize and resize images on the fly.{' '}
+                          <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                            Learn more
+                          </InlineLink>
+                          .
+                        </>
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          size="large"
+                          disabled={isFreeTier}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
                 />
+              </CardContent>
+
+              {isFreeTier && (
+                <CardContent className="pt-0">
+                  <UpgradeToPro
+                    primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                    secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
+                      STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                    )} and unlock image transformations.`}
+                    source="storageSizeLimit"
+                  />
+                </CardContent>
               )}
               {isSpendCapOn && (
-                <UpgradeToPro
-                  fullWidth
-                  buttonText="Disable Spend Cap"
-                  primaryText="Reduced max upload file size limit due to Spend Cap"
-                  secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
-                    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                  )}.`}
-                  source="storageSizeLimit"
-                />
+                <CardContent className="pt-0">
+                  <UpgradeToPro
+                    buttonText="Disable Spend Cap"
+                    primaryText="Reduced max upload file size limit due to Spend Cap"
+                    secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
+                      STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                    )}.`}
+                    source="storageSizeLimit"
+                  />
+                </CardContent>
               )}
 
               {!canUpdateStorageSettings && (
-                <CardContent>
+                <CardContent className="pt-0">
                   <p className="text-sm text-foreground-light">
                     You need additional permissions to update storage settings
                   </p>
@@ -386,7 +308,7 @@ const StorageSettings = () => {
                   loading={isUpdating}
                   disabled={!canUpdateStorageSettings || isUpdating || !form.formState.isDirty}
                 >
-                  Save
+                  Save changes
                 </Button>
               </CardFooter>
             </Card>

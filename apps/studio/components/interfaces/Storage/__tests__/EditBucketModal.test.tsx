@@ -82,13 +82,18 @@ describe(`EditBucketModal`, () => {
     await userEvent.click(publicToggle)
     expect(publicToggle).toBeChecked()
 
-    const sizeLimitToggle = screen.getByLabelText(`Restrict file size`)
+    const detailsTrigger = screen.getByRole(`button`, { name: `Additional configuration` })
+    expect(detailsTrigger).toHaveAttribute(`data-state`, `closed`)
+    await userEvent.click(detailsTrigger)
+    expect(detailsTrigger).toHaveAttribute(`data-state`, `open`)
+
+    const sizeLimitToggle = screen.getByLabelText(`Restrict file upload size for bucket`)
     expect(sizeLimitToggle).not.toBeChecked()
     await userEvent.click(sizeLimitToggle)
     expect(sizeLimitToggle).toBeChecked()
 
     const sizeLimitInput = screen.getByLabelText(`File size limit`)
-    expect(sizeLimitInput).toHaveValue(null)
+    expect(sizeLimitInput).toHaveValue(0)
     await userEvent.type(sizeLimitInput, `25`)
 
     const sizeLimitUnitSelect = screen.getByLabelText(`File size limit unit`)
@@ -97,11 +102,6 @@ describe(`EditBucketModal`, () => {
     const mbOption = screen.getByRole(`option`, { name: `MB` })
     await userEvent.click(mbOption)
     expect(sizeLimitUnitSelect).toHaveTextContent(`MB`)
-
-    const mimeTypeToggle = screen.getByLabelText(`Restrict MIME types`)
-    expect(mimeTypeToggle).not.toBeChecked()
-    await userEvent.click(mimeTypeToggle)
-    expect(mimeTypeToggle).toBeChecked()
 
     const mimeTypeInput = screen.getByLabelText(`Allowed MIME types`)
     expect(mimeTypeInput).toHaveValue(``)
