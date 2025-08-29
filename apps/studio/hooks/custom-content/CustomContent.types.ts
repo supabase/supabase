@@ -1,4 +1,5 @@
 import { ConnectionType } from 'components/interfaces/Connect/Connect.constants'
+import type { CloudProvider } from 'shared-data'
 
 export type CustomContentTypes = {
   organizationLegalDocuments: {
@@ -30,4 +31,6 @@ export type CustomContentTypes = {
     label: string
     obj: ConnectionType[]
   }
+
+  infraCloudProviders: CloudProvider[]
 }

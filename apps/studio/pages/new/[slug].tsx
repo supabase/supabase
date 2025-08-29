@@ -48,6 +48,7 @@ import {
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -57,11 +58,11 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  DEFAULT_PROVIDER,
   FLY_REGIONS_DEFAULT,
   MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
+  useDefaultProvider,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
@@ -140,6 +141,8 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -221,9 +224,11 @@ const Wizard: NextPageWithLayout = () => {
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
 
+  const defaultProvider = useDefaultProvider()
+
   const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      cloudProvider: PROVIDERS[defaultProvider].id,
     },
     {
       enabled: !smartRegionEnabled,
@@ -239,7 +244,7 @@ const Wizard: NextPageWithLayout = () => {
     useOrganizationAvailableRegionsQuery(
       {
         slug: slug,
-        cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+        cloudProvider: PROVIDERS[defaultProvider].id,
       },
       {
         enabled: smartRegionEnabled,
@@ -304,7 +309,7 @@ const Wizard: NextPageWithLayout = () => {
       organization: slug,
       projectName: projectName || '',
       postgresVersion: '',
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
       dbRegion: defaultRegion || undefined,
@@ -455,7 +460,7 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (regionError) {
-      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
+      form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
   }, [regionError])
 
@@ -707,15 +712,20 @@ const Wizard: NextPageWithLayout = () => {
                                 </FormControl_Shadcn_>
                                 <SelectContent_Shadcn_>
                                   <SelectGroup_Shadcn_>
-                                    {Object.values(PROVIDERS).map((providerObj) => {
-                                      const label = providerObj['name']
-                                      const value = providerObj['id']
-                                      return (
-                                        <SelectItem_Shadcn_ key={value} value={value}>
-                                          {label}
-                                        </SelectItem_Shadcn_>
+                                    {Object.values(PROVIDERS)
+                                      .filter(
+                                        (provider) =>
+                                          validCloudProviders?.includes(provider.id) ?? true
                                       )
-                                    })}
+                                      .map((providerObj) => {
+                                        const label = providerObj['name']
+                                        const value = providerObj['id']
+                                        return (
+                                          <SelectItem_Shadcn_ key={value} value={value}>
+                                            {label}
+                                          </SelectItem_Shadcn_>
+                                        )
+                                      })}
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
