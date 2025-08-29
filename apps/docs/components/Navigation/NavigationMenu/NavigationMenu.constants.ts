@@ -935,8 +935,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/replication',
           items: [
             {
-              name: 'pg_replicate',
-              url: '/guides/database/replication/pg_replicate',
+              name: 'ETL',
+              url: '/guides/database/replication/etl',
             },
             {
               name: 'Manual replication',
