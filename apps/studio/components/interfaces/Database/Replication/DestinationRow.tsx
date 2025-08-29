@@ -10,12 +10,13 @@ import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/p
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { AlertCircle } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
-import { Button, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationPanel } from './DestinationPanel'
@@ -79,14 +80,10 @@ export const DestinationRow = ({
   // Fetch table-level replication status to surface errors in list view
   const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
-    {
-      enabled: !!pipeline?.id,
-      refetchInterval: STATUS_REFRESH_FREQUENCY_MS,
-    }
+    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
-  const errorCount = (replicationStatusData?.table_statuses || []).filter(
-    (t: any) => t.state?.name === 'error'
-  ).length
+  const tableStatuses = replicationStatusData?.table_statuses ?? []
+  const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const hasTableErrors = errorCount > 0
 
   const onDeleteClick = async () => {
@@ -159,8 +156,8 @@ export const DestinationRow = ({
                     <span>View status</span>
                     {hasTableErrors && (
                       <Tooltip>
-                        <TooltipTrigger asChild>
-                          <WarningIcon />
+                        <TooltipTrigger>
+                          <AlertCircle size={14} />
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
                           {errorCount} table{errorCount === 1 ? '' : 's'} have replication errors

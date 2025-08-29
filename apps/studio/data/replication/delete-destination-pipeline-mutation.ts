@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, del } from 'data/fetchers'
 
 export type DeleteDestinationPipelineParams = {
   projectRef: string
@@ -48,16 +48,18 @@ export const useDeleteDestinationPipelineMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, destinationId, pipelineId } = variables
-        await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
-        await queryClient.invalidateQueries(replicationKeys.pipelines(projectRef))
-        await queryClient.invalidateQueries(replicationKeys.pipelineById(projectRef, pipelineId))
-        await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
-        await queryClient.invalidateQueries(
-          replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
-        )
-        await queryClient.invalidateQueries(
-          replicationKeys.destinationById(projectRef, destinationId)
-        )
+
+        await Promise.all([
+          queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
+          queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+          queryClient.invalidateQueries(replicationKeys.pipelineById(projectRef, pipelineId)),
+          queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId)),
+          queryClient.invalidateQueries(
+            replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
+          ),
+          queryClient.invalidateQueries(replicationKeys.destinationById(projectRef, destinationId)),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

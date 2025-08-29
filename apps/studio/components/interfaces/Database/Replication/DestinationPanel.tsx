@@ -350,7 +350,7 @@ export const DestinationPanel = ({
                 {editMode ? null : 'Send data to a new destination'}
               </SheetDescription>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-auto px-0">
+            <SheetSection className="flex-grow overflow-auto px-0 pb-0">
               <Form_Shadcn_ {...form}>
                 <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
                   <div className="px-5 pb-4">

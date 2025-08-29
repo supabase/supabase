@@ -48,7 +48,7 @@ export const PipelineStatus = ({
     // Show optimistic request state while backend still reports steady states
     if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
       return {
-        label: 'Restarting...',
+        label: 'Restarting',
         dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
         color: 'text-warning-600',
         tooltip: stateMessages.message,

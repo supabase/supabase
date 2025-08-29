@@ -35,8 +35,8 @@ export const DeleteDestination = ({
                 removed.
               </span>
             ) : (
-              <span>This will delete the destination</span>
-            )}{' '}
+              <span>This will delete the destination "{name}"</span>
+            )}
           </>
         }
         alert={{ title: 'You cannot recover this destination once deleted.' }}

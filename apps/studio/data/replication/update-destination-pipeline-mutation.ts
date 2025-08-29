@@ -98,8 +98,12 @@ export const useUpdateDestinationPipelineMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
-        await queryClient.invalidateQueries(replicationKeys.pipelines(projectRef))
+
+        await Promise.all([
+          queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
+          queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
