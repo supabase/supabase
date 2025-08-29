@@ -106,7 +106,7 @@ const data = {
     label: '',
     heading: (
       <>
-        Contribute in the way that best fits you{' '}
+        Contribute in the way that best fits your{' '}
         <span className="text-foreground">unique skills</span>
       </>
     ),
