@@ -165,7 +165,32 @@ supabase --experimental \
 postgres-config delete --config shared_buffers,work_mem
 ```
 
-By default, changing the configuration, whether by updating or deleting, causes the database and all associated read replicas to restart. You can use the `--no-restart` flag to prevent this behavior, and attempt to reload the updated configuration without a restart. Refer to the Postgres documentation to determine if a given parameter can be reloaded without a restart.
+By default, CLI v2 (≥ 2.0.0) checks the parameter’s context and requests the correct action (reload or restart):
+
+- If the setting can be reloaded (`pg_settings.context = 'sighup'`), then the Management API will detect this and apply the change with a configuration reload.
+- If the setting requires a restart (`pg_settings.context = 'postmaster'`), then both the primary and any read replicas will restart to apply the change.
+
+To check whether a parameter can be reloaded without a restart, see the [Postgres docs](https://www.postgresql.org/docs/current/runtime-config.html).
+
+You can verify whether changes have been applied with the following checks:
+
+```bash
+supabase --version;
+```
+
+```sql
+-- Check whether the parameters were updated (and if a restart is pending):
+select name, setting, context, pending_restart
+from pg_settings
+where name in ('max_slot_wal_keep_size', 'shared_buffers', 'max_connections');
+```
+
+```sql
+-- If the timestamp hasn’t changed, no restart occurred
+select pg_postmaster_start_time();
+```
+
+You can also pass the `--no-restart` flag to attempt a reload-only apply. If the parameter cannot be reloaded, the change stays pending until the next restart.
 
 <Admonition type="note" label="Read Replicas and Custom Config">
 
