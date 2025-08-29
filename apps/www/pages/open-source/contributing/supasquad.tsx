@@ -1,0 +1,53 @@
+import { NextPage } from 'next'
+import dynamic from 'next/dynamic'
+import { NextSeo } from 'next-seo'
+
+import Layout from 'components/Layouts/Default'
+import ProductHeader from 'components/Sections/ProductHeader2'
+
+import content from 'data/open-source/contributing/supasquad'
+
+const Quotes = dynamic(() => import('components/Solutions/Quotes'))
+const WhySupaSquad = dynamic(() => import('components/Solutions/FeaturesSection'))
+const Benefits = dynamic(() => import('components/Solutions/FeaturesSection'))
+const PerfectTiming = dynamic(() => import('components/Solutions/ResultsSection'))
+const CtaSection = dynamic(() => import('components/Solutions/CtaSection'))
+
+const BeginnersPage: NextPage = () => {
+  return (
+    <>
+      <NextSeo
+        title={content.metadata.metaTitle}
+        description={content.metadata.metaDescription}
+        openGraph={{
+          title: content.metadata.metaTitle,
+          description: content.metadata.metaDescription,
+          url: `https://supabase.com/solutions/beginners`,
+        }}
+      />
+      <Layout className="overflow-visible">
+        <ProductHeader
+          {...content.heroSection}
+          className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
+          sectionContainerClassName="lg:gap-4"
+        />
+        <Quotes {...content.quotes} />
+        <WhySupaSquad {...content.why} />
+        <PerfectTiming
+          id={content.timing.id}
+          heading={content.timing.heading}
+          subheading={content.timing.subheading}
+          highlights={content.timing.highlights}
+        />
+        <Benefits {...content.benefits} />
+        <CtaSection
+          id={content.ctaSection.id}
+          title={content.ctaSection.title}
+          primaryCta={content.ctaSection.primaryCta}
+        />
+      </Layout>
+    </>
+  )
+}
+
+export default BeginnersPage
