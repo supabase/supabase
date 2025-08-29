@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import ComposedChart from './ComposedChart'
+import { ComposedChart } from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
@@ -40,6 +40,7 @@ interface LogChartHandlerProps {
   isVisible?: boolean
   titleTooltip?: string
   docsUrl?: string
+  syncId?: string
 }
 
 /**
@@ -87,7 +88,7 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
  *
  * Provided data must be in the expected chart format.
  */
-const LogChartHandler = ({
+export const LogChartHandler = ({
   label,
   attributes,
   customDateFormat,
@@ -107,6 +108,7 @@ const LogChartHandler = ({
   valuePrecision,
   titleTooltip,
   id,
+  syncId,
   ...otherProps
 }: PropsWithChildren<LogChartHandlerProps>) => {
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
@@ -143,7 +145,7 @@ const LogChartHandler = ({
           data={data as any}
           format={format}
           xAxisKey="period_start"
-          yAxisKey={attributes[0].attribute}
+          yAxisKey={attributes[0]?.attribute}
           highlightedValue={highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
@@ -158,6 +160,7 @@ const LogChartHandler = ({
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
           titleTooltip={titleTooltip}
+          syncId={syncId}
           {...otherProps}
         />
       </Panel.Content>

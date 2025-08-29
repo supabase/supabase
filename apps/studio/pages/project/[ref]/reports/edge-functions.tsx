@@ -2,10 +2,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ChevronDown, RefreshCw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Label } from '@ui/components/shadcn/ui/label'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
@@ -14,17 +14,19 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
 
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
+import { edgeFunctionReports } from 'data/reports/v2/edge-functions.config'
 
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
 import type { NextPageWithLayout } from 'types'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 
-const EdgeFunctionsReport: NextPageWithLayout = () => {
+const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <EdgeFunctionsUsage />
@@ -32,20 +34,23 @@ const EdgeFunctionsReport: NextPageWithLayout = () => {
   )
 }
 
-EdgeFunctionsReport.getLayout = (page) => (
+EdgeFunctionsReportV2.getLayout = (page) => (
   <DefaultLayout>
     <ReportsLayout title="Edge Functions">{page}</ReportsLayout>
   </DefaultLayout>
 )
 
-export type UpdateDateRange = (from: string, to: string) => void
-export default EdgeFunctionsReport
+export default EdgeFunctionsReportV2
 
 const EdgeFunctionsUsage = () => {
   const { ref } = useParams()
   const { data: functions, isLoading: isLoadingFunctions } = useEdgeFunctionsQuery({
     projectRef: ref,
   })
+
+  const chartSyncId = `edge-functions-${ref}`
+  useChartHoverState(chartSyncId)
+
   const [isOpen, setIsOpen] = useState(false)
   const [functionIds, setFunctionIds] = useState<string[]>([])
   const [tempFunctionIds, setTempFunctionIds] = useState<string[]>(functionIds)
@@ -61,8 +66,6 @@ const EdgeFunctionsUsage = () => {
     updateDateRange,
     datePickerValue,
     datePickerHelpers,
-    isOrgPlanLoading,
-    orgPlan,
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
@@ -71,19 +74,25 @@ const EdgeFunctionsUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const EDGEFN_CHARTS = getEdgeFunctionReportAttributes()
+  const reportConfig = useMemo(() => {
+    return edgeFunctionReports({
+      projectRef: ref!,
+      functions: functions ?? [],
+      startDate: selectedDateRange?.period_start?.date ?? '',
+      endDate: selectedDateRange?.period_end?.date ?? '',
+      interval: selectedDateRange?.interval ?? 'minute',
+      filters: {
+        functionIds,
+      },
+    })
+  }, [ref, functions, selectedDateRange, functionIds])
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
 
     setIsRefreshing(true)
-    queryClient.invalidateQueries(['edge-function-report', ref])
+    queryClient.invalidateQueries(['report-v2'])
     setTimeout(() => setIsRefreshing(false), 1000)
-  }
-
-  if (!ref) {
-    // Prevent rendering charts until the ref is available
-    return <></>
   }
 
   return (
@@ -101,6 +110,8 @@ const EdgeFunctionsUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
+              <ReportSettings chartId="edge-functions-charts" />
+
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -214,17 +225,21 @@ const EdgeFunctionsUsage = () => {
       >
         <div className="mt-8 flex flex-col gap-4">
           {selectedDateRange &&
-            EDGEFN_CHARTS.filter((attr) => !attr.hide).map((attr, i) => (
-              <ReportChart
-                key={`${attr.id}-${i}`}
-                chart={attr}
-                interval={selectedDateRange.interval}
-                startDate={selectedDateRange?.period_start?.date}
-                endDate={selectedDateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-                functionIds={functionIds}
-              />
-            ))}
+            reportConfig
+              .filter((report) => !report.hide)
+              .map((report) => (
+                <ReportChartV2
+                  key={`${report.id}`}
+                  report={report}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  functionIds={functionIds}
+                  syncId={chartSyncId}
+                />
+              ))}
         </div>
       </ReportStickyNav>
     </>
