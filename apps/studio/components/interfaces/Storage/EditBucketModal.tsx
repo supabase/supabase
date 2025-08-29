@@ -92,10 +92,10 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   const isPublicBucket = form.watch('public')
   const hasFileSizeLimit = form.watch('has_file_size_limit')
-  const formattedSizeLimit = form.watch('formatted_size_limit')
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(
-    isNonNullable(bucket?.allowed_mime_types?.length)
+    Boolean(bucket?.allowed_mime_types?.length)
   )
+
   const isChangingBucketVisibility = bucket?.public !== isPublicBucket
   const isMakingBucketPrivate = bucket?.public && !isPublicBucket
   const isMakingBucketPublic = !bucket?.public && isPublicBucket
