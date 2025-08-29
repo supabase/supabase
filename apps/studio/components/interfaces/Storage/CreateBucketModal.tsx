@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
-import { ChevronDown, Edit } from 'lucide-react'
-import Link from 'next/link'
+import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -26,10 +25,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -41,6 +36,7 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
   RadioGroupStacked,
@@ -79,7 +75,7 @@ const FormSchema = z
     formatted_size_limit: z.coerce
       .number()
       .min(0, 'File size upload limit has to be at least 0')
-      .default(0),
+      .optional(),
     allowed_mime_types: z.string().trim().default(''),
   })
   .superRefine((data, ctx) => {
@@ -122,7 +118,6 @@ const CreateBucketModal = () => {
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.BYTES)
-  const [showConfiguration, setShowConfiguration] = useState(false)
 
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -131,16 +126,18 @@ const CreateBucketModal = () => {
       public: false,
       type: 'STANDARD',
       has_file_size_limit: false,
-      formatted_size_limit: 0,
+      formatted_size_limit: undefined,
       allowed_mime_types: '',
     },
   })
+  const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
 
   const bucketName = snakeCase(form.watch('name'))
   const isPublicBucket = form.watch('public')
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
   const formattedSizeLimit = form.watch('formatted_size_limit')
+  const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
   const icebergWrapperExtensionState = useIcebergWrapperExtension()
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
@@ -148,21 +145,28 @@ const CreateBucketModal = () => {
     if (!ref) return console.error('Project ref is required')
 
     if (values.type === 'ANALYTICS' && !icebergCatalogEnabled) {
-      toast.error(
+      return toast.error(
         'The Analytics catalog feature is not enabled for your project. Please contact support to enable it.'
       )
-      return
     }
 
+    // [Joshen] Should shift this into superRefine in the form schema
     try {
-      const fileSizeLimit = values.has_file_size_limit
-        ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
-        : undefined
+      const fileSizeLimit =
+        values.has_file_size_limit && values.formatted_size_limit !== undefined
+          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
+          : undefined
 
-      const allowedMimeTypes =
-        values.allowed_mime_types.length > 0
+      const allowedMimeTypes = hasAllowedMimeTypes
+        ? values.allowed_mime_types.length > 0
           ? values.allowed_mime_types.split(',').map((x) => x.trim())
           : undefined
+        : undefined
+
+      if (!!fileSizeLimit && !!data?.fileSizeLimit && fileSizeLimit > data.fileSizeLimit) {
+        form.setError('formatted_size_limit', { type: 'manual', message: 'exceed_global_limit' })
+        return
+      }
 
       await createBucket({
         projectRef: ref,
@@ -183,20 +187,17 @@ const CreateBucketModal = () => {
       }
       form.reset()
       setSelectedUnit(StorageSizeUnits.BYTES)
-      setShowConfiguration(false)
       setVisible(false)
       toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
-    } catch (error) {
-      console.error(error)
-      toast.error('Failed to create bucket')
+    } catch (error: any) {
+      toast.error(`Failed to create bucket: ${error.message}`)
     }
   }
 
   const handleClose = () => {
     form.reset()
     setSelectedUnit(StorageSizeUnits.BYTES)
-    setShowConfiguration(false)
     setVisible(false)
   }
 
@@ -364,45 +365,32 @@ const CreateBucketModal = () => {
                 <DialogSectionSeparator />
 
                 <DialogSection>
-                  <Collapsible_Shadcn_
-                    open={showConfiguration}
-                    onOpenChange={() => setShowConfiguration(!showConfiguration)}
-                  >
-                    <CollapsibleTrigger_Shadcn_ asChild>
-                      <button className="w-full cursor-pointer flex items-center justify-between">
-                        <p className="text-sm">Additional configuration</p>
-                        <ChevronDown
-                          size={18}
-                          strokeWidth={2}
-                          className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
-                        />
-                      </button>
-                    </CollapsibleTrigger_Shadcn_>
-                    <CollapsibleContent_Shadcn_ className="pt-4 space-y-4">
-                      <div className="space-y-2">
-                        <FormField_Shadcn_
-                          key="has_file_size_limit"
-                          name="has_file_size_limit"
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItemLayout
-                              name="has_file_size_limit"
-                              label="Restrict file upload size for bucket"
-                              description="Prevent uploading of file sizes greater than a specified limit"
-                              layout="flex"
-                            >
-                              <FormControl_Shadcn_>
-                                <Switch
-                                  id="has_file_size_limit"
-                                  size="large"
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                        {hasFileSizeLimit && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <FormField_Shadcn_
+                        key="has_file_size_limit"
+                        name="has_file_size_limit"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItemLayout
+                            name="has_file_size_limit"
+                            label="Restrict file size"
+                            description="Prevent uploading of files larger than a specified limit"
+                            layout="flex"
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                id="has_file_size_limit"
+                                size="large"
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                      {hasFileSizeLimit && (
+                        <>
                           <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
                             <div className="col-span-8">
                               <FormField_Shadcn_
@@ -410,19 +398,14 @@ const CreateBucketModal = () => {
                                 name="formatted_size_limit"
                                 control={form.control}
                                 render={({ field }) => (
-                                  <FormItemLayout
-                                    name="formatted_size_limit"
-                                    description={`Equivalent to ${convertToBytes(
-                                      formattedSizeLimit,
-                                      selectedUnit as StorageSizeUnits
-                                    ).toLocaleString()} bytes.`}
-                                  >
+                                  <FormItemLayout hideMessage name="formatted_size_limit">
                                     <FormControl_Shadcn_>
                                       <Input_Shadcn_
                                         id="formatted_size_limit"
                                         aria-label="File size limit"
                                         type="number"
                                         min={0}
+                                        placeholder="0"
                                         {...field}
                                       />
                                     </FormControl_Shadcn_>
@@ -448,23 +431,57 @@ const CreateBucketModal = () => {
                                 ))}
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
-                            {IS_PLATFORM && (
-                              <div className="col-span-12">
-                                <p className="text-foreground-light text-sm">
-                                  Note: Individual bucket uploads will still be capped at the{' '}
-                                  <Link
-                                    href={`/project/${ref}/settings/storage`}
-                                    className="font-bold underline"
-                                  >
-                                    global upload limit
-                                  </Link>{' '}
-                                  of {formattedGlobalUploadLimit}
-                                </p>
-                              </div>
-                            )}
                           </div>
-                        )}
-                      </div>
+
+                          {formattedSizeLimitError?.message === 'exceed_global_limit' && (
+                            <FormMessage_Shadcn_>
+                              Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit
+                              in{' '}
+                              <InlineLink
+                                className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                                href={`/project/${ref}/settings/storage`}
+                              >
+                                Storage Settings
+                              </InlineLink>{' '}
+                              first.
+                            </FormMessage_Shadcn_>
+                          )}
+
+                          {IS_PLATFORM ? (
+                            <p className="text-sm text-foreground-light !mt-3">
+                              This project has a{' '}
+                              <InlineLink href={`/project/${ref}/settings/storage`}>
+                                global file size limit
+                              </InlineLink>{' '}
+                              of {formattedGlobalUploadLimit}.
+                            </p>
+                          ) : undefined}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </DialogSection>
+
+                <DialogSectionSeparator />
+
+                <DialogSection>
+                  <div className="space-y-2">
+                    <FormItemLayout
+                      name="has_allowed_mime_types"
+                      label="Restrict MIME types"
+                      description="Allow only certain types of files to be uploaded"
+                      layout="flex"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          id="has_allowed_mime_types"
+                          size="large"
+                          checked={hasAllowedMimeTypes}
+                          onCheckedChange={setHasAllowedMimeTypes}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                    {hasAllowedMimeTypes && (
                       <FormField_Shadcn_
                         key="allowed_mime_types"
                         name="allowed_mime_types"
@@ -474,7 +491,7 @@ const CreateBucketModal = () => {
                             name="allowed_mime_types"
                             label="Allowed MIME types"
                             labelOptional="Comma separated values"
-                            description="Wildcards are allowed, e.g. image/*. Leave blank to allow any MIME type."
+                            description="Wildcards are allowed, e.g. image/*."
                           >
                             <FormControl_Shadcn_>
                               <Input_Shadcn_
@@ -486,8 +503,8 @@ const CreateBucketModal = () => {
                           </FormItemLayout>
                         )}
                       />
-                    </CollapsibleContent_Shadcn_>
-                  </Collapsible_Shadcn_>
+                    )}
+                  </div>
                 </DialogSection>
               </>
             ) : (

@@ -29,7 +29,7 @@ export async function updateBucket({
   isPublic,
   file_size_limit,
   allowed_mime_types,
-}: BucketUpdateVariables) {
+}: BucketUpdateVariables): Promise<BucketUpdateResult> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!id) throw new Error('Bucket name is requried')
 
@@ -42,10 +42,15 @@ export async function updateBucket({
     body: payload as any,
   })
 
-  if (error) handleError(error)
-  return data
+  if (error) {
+    // Return the error instead of throwing it, so we can handle it gracefully
+    return { data: null, error }
+  }
+
+  return { data, error: null }
 }
 
+type BucketUpdateResult = { data: any; error: null } | { data: null; error: any }
 type BucketUpdateData = Awaited<ReturnType<typeof updateBucket>>
 
 export const useBucketUpdateMutation = ({
@@ -59,7 +64,13 @@ export const useBucketUpdateMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>(
-    (vars) => updateBucket(vars),
+    async (vars) => {
+      const result = await updateBucket(vars)
+      if (result.error) {
+        throw result.error
+      }
+      return result.data
+    },
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
