@@ -41,4 +41,5 @@ export interface ReportConfig {
   format?: (value: unknown) => string
   YAxisProps?: YAxisProps
   xAxisKey?: string
+  yAxisKey?: string
 }
