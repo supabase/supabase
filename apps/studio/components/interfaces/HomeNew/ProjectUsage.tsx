@@ -156,9 +156,7 @@ const ProjectUsage = () => {
     timestampEnd: previousEnd,
   })
 
-  const storageStatsPrev = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.EDGE,
+    table: LogsTableName.STORAGE,
     timestampStart: previousStart,
     timestampEnd: previousEnd,
   })
