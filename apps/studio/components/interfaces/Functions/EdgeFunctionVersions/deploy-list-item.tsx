@@ -14,11 +14,11 @@ export const DeployListItem = ({ deployment, isRestoring, onRestore }: DeployLis
       <td className="py-3 pr-2 align-top">{formatDateTime(deployment.created_at)}</td>
       <td className="py-3 pr-2 align-top">
         {deployment.status === 'ACTIVE' ? (
-          <Badge variant="default" className="text-xs">
+          <Badge variant="success" className="text-xs">
             Active
           </Badge>
         ) : (
-          <span className="text-xs text-muted-foreground">Inactive</span>
+          <Badge className="text-xs">Inactive</Badge>
         )}
       </td>
       <td className="py-3 pr-2 align-top text-foreground-light">
