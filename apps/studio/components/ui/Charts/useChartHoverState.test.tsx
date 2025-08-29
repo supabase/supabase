@@ -42,7 +42,7 @@ describe('useChartHoverState', () => {
     it('should initialize with default state', () => {
       const { result } = renderHook(() => useChartHoverState('chart1'))
 
-      expect(result.current.hoveredValue).toBe(null)
+      expect(result.current.hoveredIndex).toBe(null)
       expect(result.current.syncHover).toBe(false)
       expect(result.current.syncTooltip).toBe(false)
       expect(result.current.hoveredChart).toBe(null)
@@ -90,7 +90,7 @@ describe('useChartHoverState', () => {
         result.current.setHover(5)
       })
 
-      expect(result.current.hoveredValue).toBe(5)
+      expect(result.current.hoveredIndex).toBe(5)
       expect(result.current.hoveredChart).toBe('chart1')
       expect(result.current.isHovered).toBe(true)
       expect(result.current.isCurrentChart).toBe(true)
@@ -107,7 +107,7 @@ describe('useChartHoverState', () => {
         result.current.clearHover()
       })
 
-      expect(result.current.hoveredValue).toBe(null)
+      expect(result.current.hoveredIndex).toBe(null)
       expect(result.current.hoveredChart).toBe(null)
       expect(result.current.isHovered).toBe(false)
       expect(result.current.isCurrentChart).toBe(false)
@@ -124,11 +124,11 @@ describe('useChartHoverState', () => {
         result1.current.setHover(3)
       })
 
-      expect(result1.current.hoveredValue).toBe(3)
+      expect(result1.current.hoveredIndex).toBe(3)
       expect(result1.current.hoveredChart).toBe('chart1')
       expect(result1.current.isCurrentChart).toBe(true)
 
-      expect(result2.current.hoveredValue).toBe(3)
+      expect(result2.current.hoveredIndex).toBe(3)
       expect(result2.current.hoveredChart).toBe('chart1')
       expect(result2.current.isCurrentChart).toBe(false)
     })
@@ -145,9 +145,9 @@ describe('useChartHoverState', () => {
         result2.current.clearHover()
       })
 
-      expect(result1.current.hoveredValue).toBe(null)
+      expect(result1.current.hoveredIndex).toBe(null)
       expect(result1.current.hoveredChart).toBe(null)
-      expect(result2.current.hoveredValue).toBe(null)
+      expect(result2.current.hoveredIndex).toBe(null)
       expect(result2.current.hoveredChart).toBe(null)
     })
   })
@@ -239,11 +239,11 @@ describe('useChartHoverState', () => {
       act(() => {
         result2.current.setHover(7)
       })
-      expect(result1.current.hoveredValue).toBe(7)
+      expect(result1.current.hoveredIndex).toBe(7)
       expect(result1.current.hoveredChart).toBe('chart2')
-      expect(result2.current.hoveredValue).toBe(7)
+      expect(result2.current.hoveredIndex).toBe(7)
       expect(result2.current.hoveredChart).toBe('chart2')
-      expect(result3.current.hoveredValue).toBe(7)
+      expect(result3.current.hoveredIndex).toBe(7)
       expect(result3.current.hoveredChart).toBe('chart2')
     })
 
@@ -275,7 +275,7 @@ describe('useChartHoverState', () => {
         result.current.setHover(null)
       })
 
-      expect(result.current.hoveredValue).toBe(null)
+      expect(result.current.hoveredIndex).toBe(null)
       expect(result.current.hoveredChart).toBe(null)
     })
 
@@ -291,7 +291,7 @@ describe('useChartHoverState', () => {
         result.current.setHover(4)
       })
 
-      expect(result.current.hoveredValue).toBe(4)
+      expect(result.current.hoveredIndex).toBe(4)
       expect(result.current.hoveredChart).toBe('chart1')
     })
 
@@ -312,14 +312,14 @@ describe('useChartHoverState', () => {
     it('should correctly calculate isHovered for current chart', () => {
       const { result } = renderHook(() => useChartHoverState('chart1'))
 
-      expect(result.current.hoveredValue).toBe(null)
+      expect(result.current.hoveredIndex).toBe(null)
       expect(result.current.isHovered).toBe(false)
 
       act(() => {
         result.current.setHover(5)
       })
 
-      expect(result.current.hoveredValue).toBe(5)
+      expect(result.current.hoveredIndex).toBe(5)
       expect(result.current.isHovered).toBe(true)
     })
 
