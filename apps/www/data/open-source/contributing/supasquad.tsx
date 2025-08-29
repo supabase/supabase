@@ -239,7 +239,7 @@ const data = {
     title: 'Ready to make an impact?',
     primaryCta: {
       label: 'Apply to join',
-      url: '#',
+      url: 'https://www.notion.so/supabase/25c5004b775f804599b7eb886a15d6b2?pvs=106',
       type: 'primary' as any,
     },
   },
