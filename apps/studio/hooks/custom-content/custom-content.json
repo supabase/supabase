@@ -7,5 +7,7 @@
 
   "logs:default_query": null,
 
-  "connect:frameworks": null
+  "connect:frameworks": null,
+
+  "infra:cloud_providers": ["AWS", "AWS_K8S", "FLY"]
 }

@@ -72,13 +72,23 @@
           }
         }
       }
+    },
+
+    "infra:cloud_providers": {
+      "type": ["array"],
+      "description": "Filters the valid cloud providers",
+      "items": {
+        "type": "string",
+        "enum": ["AWS", "AWS_K8S", "AWS_NIMBUS", "FLY"]
+      }
     }
   },
   "required": [
     "organization:legal_documents",
     "project_homepage:example_projects",
     "logs:default_query",
-    "connect:frameworks"
+    "connect:frameworks",
+    "infra:cloud_providers"
   ],
   "additionalProperties": false
 }
