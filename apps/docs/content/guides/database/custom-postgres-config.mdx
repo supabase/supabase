@@ -167,7 +167,7 @@ postgres-config delete --config shared_buffers,work_mem
 
 By default, CLI v2 (≥ 2.0.0) checks the parameter’s context and requests the correct action (reload or restart):
 
-- If the setting is reloadable (`pg_settings.context = 'sighup'`), then the Management API will detect this and apply the change with a configuration reload.
+- If the setting can be reloaded (`pg_settings.context = 'sighup'`), then the Management API will detect this and apply the change with a configuration reload.
 - If the setting requires a restart (`pg_settings.context = 'postmaster'`), then both the primary and any read replicas will restart to apply the change.
 
 To check whether a parameter can be reloaded without a restart, see the [Postgres docs](https://www.postgresql.org/docs/current/runtime-config.html).
@@ -190,7 +190,7 @@ where name in ('max_slot_wal_keep_size', 'shared_buffers', 'max_connections');
 select pg_postmaster_start_time();
 ```
 
-You can also pass the `--no-restart` flag to attempt a reload-only apply. If the parameter isn’t reloadable, the change stays pending until the next restart.
+You can also pass the `--no-restart` flag to attempt a reload-only apply. If the parameter cannot be reloaded, the change stays pending until the next restart.
 
 <Admonition type="note" label="Read Replicas and Custom Config">
 
