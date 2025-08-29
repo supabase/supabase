@@ -156,13 +156,13 @@ export const DestinationPanel = ({
           datasetId: data.datasetId,
           serviceAccountKey: data.serviceAccountKey,
         }
-        if (data.maxStalenessMins !== null) {
+        if (!!data.maxStalenessMins) {
           bigQueryConfig.maxStalenessMins = data.maxStalenessMins
         }
 
         const batchConfig: any = {}
-        if (data.maxSize !== null) batchConfig.maxSize = data.maxSize
-        if (data.maxFillMs !== null) batchConfig.maxFillMs = data.maxFillMs
+        if (!!data.maxSize) batchConfig.maxSize = data.maxSize
+        if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
         const hasBothBatchFields = Object.keys(batchConfig).length === 2
 
         await updateDestinationPipeline({
@@ -202,16 +202,14 @@ export const DestinationPanel = ({
           datasetId: data.datasetId,
           serviceAccountKey: data.serviceAccountKey,
         }
-        if (data.maxStalenessMins !== null) {
+        if (!!data.maxStalenessMins) {
           bigQueryConfig.maxStalenessMins = data.maxStalenessMins
         }
 
         const batchConfig: any = {}
-        if (data.maxSize !== null) batchConfig.maxSize = data.maxSize
-        if (data.maxFillMs !== null) batchConfig.maxFillMs = data.maxFillMs
+        if (!!data.maxSize) batchConfig.maxSize = data.maxSize
+        if (!!data.maxFillMs) batchConfig.maxFillMs = data.maxFillMs
         const hasBothBatchFields = Object.keys(batchConfig).length === 2
-
-        console.log('Create', { batchConfig, hasBothBatchFields })
 
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
