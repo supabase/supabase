@@ -86,6 +86,29 @@ const FileExplorerColumn = ({
   const snap = useStorageExplorerStateSnapshot()
   const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
+  // Helper function to get the path for this column
+  const getColumnPath = () => {
+    // Use the index prop directly instead of trying to find it dynamically
+    const columnIndex = index
+
+    if (columnIndex >= 0) {
+      // Column index 0 = root level (empty path)
+      // Column index 1 = first folder level (e.g., "foldher")
+      // Column index 2 = second folder level (e.g., "foldher/nested-folder")
+      const path =
+        columnIndex === 0
+          ? ''
+          : snap.openedFolders
+              .slice(0, columnIndex)
+              .map((folder) => folder.name)
+              .join('/')
+
+      return path
+    }
+
+    return ''
+  }
+
   // Drop target for column background
   const [{ isOver }, drop] = useDrop({
     accept: 'storage-item',
@@ -110,14 +133,12 @@ const FileExplorerColumn = ({
       if (canUpdateStorage) {
         const targetDirectory = getColumnPath()
 
-        console.log('Column background drop - Moving item to:', targetDirectory)
-
         // Use the drag & drop function that doesn't interfere with the modal
         snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
       }
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver({ shallow: true }),
+      isOver: monitor.isOver({ shallow: false }),
     }),
   })
 
@@ -137,40 +158,6 @@ const FileExplorerColumn = ({
   useEffect(() => {
     setIsDraggedOver(false)
   }, [column.id])
-
-  // Helper function to get the path for this column
-  const getColumnPath = () => {
-    // Use the index prop directly instead of trying to find it dynamically
-    const columnIndex = index
-    console.log(
-      'getColumnPath called - Column index:',
-      columnIndex,
-      'Opened folders:',
-      snap.openedFolders.map((f) => f.name)
-    )
-    console.log(
-      'All columns:',
-      snap.columns.map((col, idx) => `${idx}: ${col.name} (${col.id})`)
-    )
-    console.log('Current column:', column.name, 'ID:', column.id, 'Index prop:', index)
-
-    if (columnIndex >= 0) {
-      // Column index 0 = root level (empty path)
-      // Column index 1 = first folder level (e.g., "foldher")
-      // Column index 2 = second folder level (e.g., "foldher/nested-folder")
-      const path =
-        columnIndex === 0
-          ? ''
-          : snap.openedFolders
-              .slice(0, columnIndex)
-              .map((folder) => folder.name)
-              .join('/')
-      console.log('Calculated column path:', path, '(column index:', columnIndex, ')')
-      return path
-    }
-    console.log('No column index found, returning empty path')
-    return ''
-  }
 
   const haveSelectedItems = selectedItems.length > 0
   const columnItemsId = column.items.map((item) => item.id)
@@ -233,9 +220,7 @@ const FileExplorerColumn = ({
       onDragLeave={(event) => {
         // Only reset if we're actually leaving the column (not just moving to a child element)
         if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-          console.log('Leaving column, resetting drag states')
           setIsDraggedOver(false)
-          setIsInternalDragOver(false)
         }
       }}
       onClick={(event) => {
@@ -308,67 +293,6 @@ const FileExplorerColumn = ({
         onLoadNextPage={() => onColumnLoadMore(index, column)}
       />
 
-      {/* List View Background Drag & Drop (separate from content) */}
-      {snap.view === STORAGE_VIEWS.LIST && (
-        <div
-          className={cn(
-            'absolute inset-0 pointer-events-none',
-            isInternalDragOver && 'pointer-events-auto'
-          )}
-          onDragOver={(event) => {
-            // Handle list view background drag over for internal file moves
-            if (event.dataTransfer.types.includes('application/json')) {
-              event.preventDefault()
-              if (!isInternalDragOver) {
-                setIsInternalDragOver(true)
-                // For list view, the target is the current folder level
-                const currentPath = snap.openedFolders.map((folder) => folder.name).join('/')
-                setMoveToPath(currentPath)
-                console.log('List view background drag over - Target path:', currentPath)
-              }
-            }
-          }}
-          onDrop={(event) => {
-            // Handle list view background drop for internal file moves
-            if (event.dataTransfer.types.includes('application/json')) {
-              event.preventDefault()
-              try {
-                const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
-                if (draggedItem && draggedItem.type === STORAGE_ROW_TYPES.FILE) {
-                  // Check if this is a drop to the same location (same opened folders)
-                  const draggedItemPath = snap.openedFolders
-                    .slice(0, draggedItem.columnIndex)
-                    .map((folder) => folder.name)
-                    .join('/')
-                  const currentPath = snap.openedFolders.map((folder) => folder.name).join('/')
-
-                  if (draggedItemPath === currentPath) {
-                    console.log('Same location drop detected in list view, ignoring move operation')
-                    return
-                  }
-
-                  const targetDirectory = moveToPath
-                  console.log('List view background drop - Target directory:', targetDirectory)
-
-                  // Use the new drag & drop function that doesn't interfere with the modal
-                  snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
-
-                  // Reset drag states
-                  setIsDraggedOver(false)
-                  setIsInternalDragOver(false)
-                  setMoveToPath('')
-
-                  console.log('List view file move completed')
-                  return
-                }
-              } catch (error) {
-                console.error('Failed to parse dragged item in list view:', error)
-              }
-            }
-          }}
-        />
-      )}
-
       {/* Drag drop upload CTA for when column is empty */}
       {!(snap.isSearching && itemSearchString.length > 0) &&
         column.items.length === 0 &&
@@ -404,11 +328,9 @@ const FileExplorerColumn = ({
         folderIsEmpty={isEmpty}
         onDragLeave={() => {
           setIsDraggedOver(false)
-          setIsInternalDragOver(false)
         }}
         onDrop={() => {
           setIsDraggedOver(false)
-          setIsInternalDragOver(false)
         }}
       />
 

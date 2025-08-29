@@ -134,6 +134,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     openFolder,
     downloadFolder,
     selectRangeItems,
+    foldersBeingMoved,
   } = snap
   const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
@@ -145,6 +146,18 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  // Check if this folder is currently being moved
+  const isBeingMoved =
+    item.type === STORAGE_ROW_TYPES.FOLDER &&
+    (() => {
+      const folderPath = openedFolders
+        .slice(0, columnIndex)
+        .map((folder) => folder.name)
+        .concat(item.name)
+        .join('/')
+      return foldersBeingMoved.has(folderPath)
+    })()
 
   // Drag source for files and folders
   const [{ isDragging }, drag] = useDrag({
@@ -164,26 +177,48 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     accept: 'storage-item',
     canDrop: (draggedItem: any) => {
       // Only allow drops on folders
-      if (item.type !== STORAGE_ROW_TYPES.FOLDER) return false
+      if (item.type !== STORAGE_ROW_TYPES.FOLDER) {
+        // Not a folder, canDrop returning false
+        return false
+      }
 
-      // Don't allow dropping on itself
-      if (draggedItem.id === item.id) return false
+      // Don't allow dropping on itself - compare paths instead of IDs
+      const draggedItemPath = snap.openedFolders
+        .slice(0, draggedItem.columnIndex)
+        .map((folder) => folder.name)
+        .join('/')
+      const targetItemPath = snap.openedFolders
+        .slice(0, columnIndex)
+        .map((folder) => folder.name)
+        .join('/')
+
+      const draggedItemFullPath =
+        draggedItemPath.length > 0 ? `${draggedItemPath}/${draggedItem.name}` : draggedItem.name
+      const targetItemFullPath =
+        targetItemPath.length > 0 ? `${targetItemPath}/${item.name}` : item.name
+
+      if (draggedItemFullPath === targetItemFullPath) {
+        // Dropping on itself (same path), canDrop returning false
+        return false
+      }
 
       // Don't allow dropping a folder into its own subfolder (circular reference)
       if (draggedItem.type === STORAGE_ROW_TYPES.FOLDER) {
-        const draggedItemPath = snap.openedFolders
-          .slice(0, draggedItem.columnIndex)
-          .map((folder) => folder.name)
-          .join('/')
         const targetPath = snap.openedFolders
           .slice(0, columnIndex)
           .map((folder) => folder.name)
           .concat(item.name)
           .join('/')
 
-        return !targetPath.startsWith(draggedItemPath + '/')
+        const wouldCreateCircularReference = targetPath.startsWith(draggedItemFullPath + '/')
+
+        if (wouldCreateCircularReference) {
+          // Would create circular reference, canDrop returning false
+          return false
+        }
       }
 
+      // canDrop returning true
       return true
     },
     drop: (draggedItem: any) => {
@@ -202,18 +237,20 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           .join('/')
 
         if (draggedItemPath === targetDirectory) {
-          console.log('Same location drop detected on folder, ignoring move operation')
+          // Same location drop detected on folder, ignoring move operation
           return
         }
 
-        console.log('Folder drop - Moving item to:', targetDirectory)
-
         // Use the drag & drop function that doesn't interfere with the modal
         snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
+      } else {
+        // 'Drop conditions not met:', {
+        // isFolder: item.type === STORAGE_ROW_TYPES.FOLDER,
+        // canUpdateFiles,
       }
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver({ shallow: true }),
+      isOver: monitor.isOver({ shallow: false }),
     }),
   })
 
@@ -392,7 +429,11 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   return (
     <div
       ref={ref}
-      className={cn('h-full border-b border-default', isDragging && 'opacity-50')}
+      className={cn(
+        'h-full border-b border-default',
+        isDragging && 'opacity-50',
+        isBeingMoved && 'opacity-50'
+      )}
       data-item-type={item.type.toLowerCase()}
       data-item-name={item.name}
       onContextMenu={(event) => {

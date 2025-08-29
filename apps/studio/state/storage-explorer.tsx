@@ -50,7 +50,35 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
-import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { Button, SONNER_DEFAULT_DURATION, SonnerProgress, Progress } from 'ui'
+
+// Custom progress toast component for folder moves
+const FolderMoveProgressToast = ({
+  current,
+  total,
+  folderName,
+}: {
+  current: number
+  total: number
+  folderName: string
+}) => {
+  const progress = total > 0 ? Math.round((current / total) * 100) : 0
+
+  return (
+    <div className="flex gap-3 w-full">
+      <div className="flex flex-col gap-2 w-full">
+        <div className="flex w-full justify-between">
+          <p className="text-foreground text-sm">Moving folder "{folderName}"...</p>
+          <p className="text-foreground-light text-sm font-mono">{`${progress}%`}</p>
+        </div>
+        <Progress value={progress} className="w-full" />
+        <small className="text-foreground-light text-xs">
+          Moved {current} / {total} items...
+        </small>
+      </div>
+    </div>
+  )
+}
 
 type UploadProgress = {
   percentage: number
@@ -156,6 +184,29 @@ function createStorageExplorerState({
     selectedItemsToMove: [] as StorageItemWithColumn[],
     setSelectedItemsToMove: (items: StorageItemWithColumn[]) => {
       state.selectedItemsToMove = items
+    },
+
+    // Track folders that are currently being moved (for visual feedback)
+    foldersBeingMoved: new Set<string>(),
+    addFolderBeingMoved: (folderPath: string) => {
+      state.foldersBeingMoved.add(folderPath)
+    },
+    removeFolderBeingMoved: (folderPath: string) => {
+      state.foldersBeingMoved.delete(folderPath)
+    },
+    // Progress tracking for folder moves
+    folderMoveProgress: new Map<
+      string,
+      { current: number; total: number; toastId: string | number }
+    >(),
+    setFolderMoveProgress: (
+      folderPath: string,
+      progress: { current: number; total: number; toastId: string | number }
+    ) => {
+      state.folderMoveProgress.set(folderPath, progress)
+    },
+    removeFolderMoveProgress: (folderPath: string) => {
+      state.folderMoveProgress.delete(folderPath)
     },
 
     selectedBucket: {} as Bucket,
@@ -1410,13 +1461,69 @@ function createStorageExplorerState({
       const formattedNewPathToFile = newPaths.join('/')
       let numberOfFilesMovedFail = 0
 
-      const toastId = toast(`Moving ${items.length} file${items.length > 1 ? 's' : ''}...`, {
-        description: STORAGE_PROGRESS_INFO_TEXT,
-        duration: Infinity,
-      })
+      // Check if any of the items are folders that need special handling
+      const folders = items.filter((item) => item.type === STORAGE_ROW_TYPES.FOLDER)
+      const files = items.filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
 
+      // Show appropriate toast message based on what's being moved
+      let toastId: string | number | undefined
+
+      if (folders.length > 0 && files.length === 0) {
+        // For folders only, show progress toast
+        if (folders.length === 1) {
+          // Single folder - show progress toast
+          const folder = folders[0]
+          const folderPath = state.openedFolders
+            .slice(0, folder.columnIndex)
+            .map((folder) => folder.name)
+            .join('/')
+          const fullFolderPath =
+            folderPath.length > 0 ? `${folderPath}/${folder.name}` : folder.name
+
+          // Initialize progress tracking
+          state.setFolderMoveProgress(fullFolderPath, { current: 0, total: 0, toastId: 'temp' })
+
+          toastId = toast(
+            <FolderMoveProgressToast current={0} total={0} folderName={folder.name} />,
+            {
+              duration: Infinity,
+            }
+          )
+
+          // Update the progress tracking with the actual toast ID
+          state.setFolderMoveProgress(fullFolderPath, { current: 0, total: 0, toastId })
+        } else {
+          // Multiple folders - show simple toast
+          toastId = toast(`Moving ${folders.length} folders...`, {
+            description: STORAGE_PROGRESS_INFO_TEXT,
+            duration: Infinity,
+          })
+        }
+      } else if (folders.length === 0 && files.length > 0) {
+        toastId = toast(`Moving ${files.length} file${files.length > 1 ? 's' : ''}...`, {
+          description: STORAGE_PROGRESS_INFO_TEXT,
+          duration: Infinity,
+        })
+      } else {
+        toastId = toast(`Moving ${items.length} item${items.length > 1 ? 's' : ''}...`, {
+          description: STORAGE_PROGRESS_INFO_TEXT,
+          duration: Infinity,
+        })
+      }
+
+      // Handle folder moves first (create new folder, move contents, delete original)
+      for (const folder of folders) {
+        try {
+          await state.moveFolderWithContents(folder, formattedNewPathToFile)
+        } catch (error: any) {
+          numberOfFilesMovedFail += 1
+          toast.error(`Failed to move folder ${folder.name}: ${error.message}`)
+        }
+      }
+
+      // Handle regular file moves
       await Promise.all(
-        items.map(async (item) => {
+        files.map(async (item) => {
           const pathToFile = state.openedFolders
             .slice(0, item.columnIndex)
             .map((folder) => folder.name)
@@ -1441,12 +1548,12 @@ function createStorageExplorerState({
       )
 
       if (numberOfFilesMovedFail === items.length) {
-        toast.error('Failed to move files')
+        toast.error('Failed to move items')
       } else {
         toast(
           `Successfully moved ${
             items.length - numberOfFilesMovedFail
-          } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
+          } items to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
         )
       }
 
@@ -1454,6 +1561,266 @@ function createStorageExplorerState({
 
       // TODO: invalidate the file preview cache when moving files
       await state.refetchAllOpenedFolders()
+    },
+
+    // New function to handle folder moves by creating new folder and moving contents
+    moveFolderWithContents: async (folder: StorageItemWithColumn, targetPath: string) => {
+      const folderName = folder.name
+      const sourcePath = state.openedFolders
+        .slice(0, folder.columnIndex)
+        .map((folder) => folder.name)
+        .join('/')
+
+      const sourceFullPath = sourcePath.length > 0 ? `${sourcePath}/${folderName}` : folderName
+      const targetFullPath = targetPath.length > 0 ? `${targetPath}/${folderName}` : folderName
+
+      // Add folder to the "being moved" set for visual feedback
+      state.addFolderBeingMoved(targetFullPath)
+
+      // Create a placeholder file to create the new folder
+      const placeholderContent = new Blob([''], { type: 'text/plain' })
+
+      try {
+        // Check if supabaseClient is available
+        if (!state.supabaseClient) {
+          throw new Error('Supabase Client is not available')
+        }
+
+        // Check if selectedBucket and projectRef are available
+        if (!state.selectedBucket || !state.selectedBucket.id) {
+          throw new Error('Selected bucket is not available')
+        }
+
+        if (!state.projectRef) {
+          throw new Error('Project reference is not available')
+        }
+
+        // Create the new folder by uploading a placeholder file
+        const { data: uploadData, error: uploadError } = await (
+          await state.supabaseClient()
+        ).storage
+          .from(state.selectedBucket.id)
+          .upload(targetFullPath + '/.folder-placeholder', placeholderContent, {
+            upsert: false,
+          })
+
+        if (uploadError) {
+          throw new Error(`Failed to create target folder: ${uploadError.message}`)
+        }
+
+        // Recursively discover all files and folders in the source directory
+        const getAllFilesRecursively = async (
+          path: string
+        ): Promise<Array<{ path: string; name: string; isFolder: boolean }>> => {
+          const allItems: Array<{ path: string; name: string; isFolder: boolean }> = []
+
+          const { data: items, error: listError } = await (await state.supabaseClient()).storage
+            .from(state.selectedBucket.id)
+            .list(path, {
+              limit: 1000,
+              offset: 0,
+              sortBy: { column: 'name', order: 'asc' },
+            })
+
+          if (listError) {
+            console.error(`Failed to list contents of ${path}:`, listError)
+            return allItems
+          }
+
+          if (!items) return allItems
+
+          for (const item of items) {
+            if (item.name === '.folder-placeholder') continue
+
+            const itemPath = `${path}/${item.name}`
+
+            // Check if this is a folder by trying to list its contents
+            try {
+              const { data: subItems } = await (await state.supabaseClient()).storage
+                .from(state.selectedBucket.id)
+                .list(itemPath, { limit: 1 })
+
+              if (subItems && subItems.length > 0) {
+                // This is a folder, recursively get its contents
+                const subFolderItems = await getAllFilesRecursively(itemPath)
+                allItems.push(...subFolderItems)
+              } else {
+                // This is a file
+                allItems.push({ path: itemPath, name: item.name, isFolder: false })
+              }
+            } catch (error) {
+              // If listing fails, assume it's a file
+              allItems.push({ path: itemPath, name: item.name, isFolder: false })
+            }
+          }
+
+          return allItems
+        }
+
+        // Get all files recursively
+        const allItemsToMove = await getAllFilesRecursively(sourceFullPath)
+        const filesToMove = allItemsToMove.filter((item) => !item.isFolder)
+
+        // Update progress tracking with total count
+        const initialProgressData = state.folderMoveProgress.get(sourceFullPath)
+        if (initialProgressData) {
+          state.setFolderMoveProgress(sourceFullPath, {
+            ...initialProgressData,
+            total: filesToMove.length,
+          })
+        }
+
+        // Move all files from source to target
+        let movedCount = 0
+        for (const fileItem of filesToMove) {
+          // Calculate the relative path from the source folder
+          const relativePath = fileItem.path.substring(sourceFullPath.length + 1) // +1 for the '/'
+          const toPath = `${targetFullPath}/${relativePath}`
+
+          try {
+            const moveParams = {
+              projectRef: state.projectRef,
+              bucketId: state.selectedBucket.id,
+              from: fileItem.path,
+              to: toPath,
+            }
+
+            await moveStorageObject(moveParams)
+            movedCount++
+
+            // Update progress and toast
+            const progressData = state.folderMoveProgress.get(sourceFullPath)
+            if (progressData) {
+              const newProgress = { ...progressData, current: movedCount }
+              state.setFolderMoveProgress(sourceFullPath, newProgress)
+
+              // Update the toast with new progress
+              toast.loading(
+                <FolderMoveProgressToast
+                  current={movedCount}
+                  total={filesToMove.length}
+                  folderName={folderName}
+                />,
+                { id: progressData.toastId }
+              )
+            }
+          } catch (error: any) {
+            console.error(`Failed to move file ${fileItem.path}:`, error)
+            // Continue with other files even if one fails
+          }
+        }
+
+        // Show completion toast if we have progress tracking
+        const finalProgressData = state.folderMoveProgress.get(sourceFullPath)
+        if (finalProgressData && filesToMove.length > 0) {
+          toast.success(
+            <FolderMoveProgressToast
+              current={filesToMove.length}
+              total={filesToMove.length}
+              folderName={folderName}
+            />,
+            { id: finalProgressData.toastId, duration: 3000 }
+          )
+        }
+
+        // Now delete all files from the source folder to effectively "delete" the folder
+        const sourceFilePaths = filesToMove.map((fileItem) => fileItem.path)
+
+        if (sourceFilePaths.length > 0) {
+          // Delete files in batches to avoid overwhelming the API
+          const batchSize = 10
+          for (let i = 0; i < sourceFilePaths.length; i += batchSize) {
+            const batch = sourceFilePaths.slice(i, i + batchSize)
+            const { error: deleteError } = await (await state.supabaseClient()).storage
+              .from(state.selectedBucket.id)
+              .remove(batch)
+
+            if (deleteError) {
+              console.error(`Failed to delete batch of files:`, deleteError)
+            }
+          }
+        } else {
+          console.log('Source folder is empty, no files to delete')
+        }
+
+        // Recursively clean up the entire source folder hierarchy
+        const cleanupFolderRecursively = async (path: string) => {
+          try {
+            const { data: items, error: listError } = await (await state.supabaseClient()).storage
+              .from(state.selectedBucket.id)
+              .list(path, {
+                limit: 1000,
+                offset: 0,
+                sortBy: { column: 'name', order: 'asc' },
+              })
+
+            if (listError || !items) return
+
+            // Remove all items in this directory
+            if (items.length > 0) {
+              const itemPaths = items.map((item) => `${path}/${item.name}`)
+              const { error: removeError } = await (await state.supabaseClient()).storage
+                .from(state.selectedBucket.id)
+                .remove(itemPaths)
+
+              if (removeError) {
+                console.error(`Failed to remove items from ${path}:`, removeError)
+              }
+            }
+
+            // Try to remove common hidden files
+            const hiddenFiles = [
+              `${path}/.DS_Store`,
+              `${path}/Thumbs.db`,
+              `${path}/.empty`,
+              `${path}/.folder-placeholder`,
+            ]
+
+            try {
+              await (await state.supabaseClient()).storage
+                .from(state.selectedBucket.id)
+                .remove(hiddenFiles)
+            } catch (hiddenError) {
+              // Hidden file removal errors are normal
+            }
+          } catch (error) {
+            console.error(`Error cleaning up ${path}:`, error)
+          }
+        }
+
+        // Clean up the source folder hierarchy recursively
+        await cleanupFolderRecursively(sourceFullPath)
+
+        // Delete the target folder placeholder
+        const { error: deleteTargetError } = await (await state.supabaseClient()).storage
+          .from(state.selectedBucket.id)
+          .remove([targetFullPath + '/.folder-placeholder'])
+
+        if (deleteTargetError) {
+          console.error('Failed to delete target folder placeholder:', deleteTargetError)
+        }
+
+        // Remove folder from "being moved" set
+        state.removeFolderBeingMoved(targetFullPath)
+
+        // Clean up progress tracking
+        state.removeFolderMoveProgress(sourceFullPath)
+
+        try {
+          await state.refetchAllOpenedFolders()
+          console.log('Storage explorer refresh completed')
+        } catch (refreshError) {
+          console.error('Failed to refresh storage explorer:', refreshError)
+        }
+      } catch (error: any) {
+        // Remove folder from "being moved" set on error
+        state.removeFolderBeingMoved(targetFullPath)
+
+        // Clean up progress tracking on error
+        state.removeFolderMoveProgress(sourceFullPath)
+
+        throw new Error(`Failed to move folder ${folderName}: ${error.message}`)
+      }
     },
 
     deleteFiles: async ({
