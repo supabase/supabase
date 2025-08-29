@@ -25,6 +25,7 @@
   "billing:all": false,
 
   "build:self-hosting": false,
+  "sdk:all": false,
 
   "database:replication": true,
   "database:roles": true,

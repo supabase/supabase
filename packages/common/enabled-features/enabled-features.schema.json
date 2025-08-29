@@ -88,6 +88,10 @@
       "type": "boolean",
       "description": "Enable Self-hosting in documentation"
     },
+    "sdk:all": {
+      "type": "boolean",
+      "description": "Are all SDKs used"
+    },
     "database:replication": {
       "type": "boolean",
       "description": "Enable the database replication page"

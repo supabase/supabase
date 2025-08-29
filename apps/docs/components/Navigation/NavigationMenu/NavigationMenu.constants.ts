@@ -7,6 +7,7 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 import { isFeatureEnabled } from 'common'
 const billingEnabled = isFeatureEnabled('billing:all')
 const selfHostingEnabled = isFeatureEnabled('build:self-hosting')
+const allSDKsEnabled = isFeatureEnabled('sdk:all')
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
@@ -162,38 +163,42 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/reference/javascript' as `/${string}`,
             level: 'reference_javascript',
           },
-          {
-            label: 'Flutter',
-            icon: 'reference-dart',
-            href: '/reference/dart' as `/${string}`,
-            level: 'reference_dart',
-          },
-          {
-            label: 'Swift',
-            icon: 'reference-swift',
-            href: '/reference/swift' as `/${string}`,
-            level: 'reference_swift',
-          },
-          {
-            label: 'Python',
-            icon: 'reference-python',
-            href: '/reference/python' as `/${string}`,
-            level: 'reference_python',
-          },
-          {
-            label: 'C#',
-            icon: 'reference-csharp',
-            href: '/reference/csharp' as `/${string}`,
-            level: 'reference_csharp',
-            community: true,
-          },
-          {
-            label: 'Kotlin',
-            icon: 'reference-kotlin',
-            href: '/reference/kotlin' as `/${string}`,
-            level: 'reference_kotlin',
-            community: true,
-          },
+          ...(allSDKsEnabled
+            ? [
+                {
+                  label: 'Flutter',
+                  icon: 'reference-dart',
+                  href: '/reference/dart' as `/${string}`,
+                  level: 'reference_dart',
+                },
+                {
+                  label: 'Swift',
+                  icon: 'reference-swift',
+                  href: '/reference/swift' as `/${string}`,
+                  level: 'reference_swift',
+                },
+                {
+                  label: 'Python',
+                  icon: 'reference-python',
+                  href: '/reference/python' as `/${string}`,
+                  level: 'reference_python',
+                },
+                {
+                  label: 'C#',
+                  icon: 'reference-csharp',
+                  href: '/reference/csharp' as `/${string}`,
+                  level: 'reference_csharp',
+                  community: true,
+                },
+                {
+                  label: 'Kotlin',
+                  icon: 'reference-kotlin',
+                  href: '/reference/kotlin' as `/${string}`,
+                  level: 'reference_kotlin',
+                  community: true,
+                },
+              ]
+            : []),
         ],
         [
           {
@@ -2603,38 +2608,42 @@ export const reference = {
           level: 'reference_javascript',
           icon: '/img/icons/menu/reference-javascript' as `/${string}`,
         },
-        {
-          name: 'supabase-dart',
-          url: '/reference/dart/start',
-          level: 'reference_dart',
-          icon: '/img/icons/menu/reference-dart' as `/${string}`,
-        },
-        {
-          name: 'supabase-csharp',
-          url: '/reference/csharp/start',
-          level: 'reference_csharp',
-          icon: '/img/icons/menu/reference-csharp' as `/${string}`,
-        },
-        {
-          name: 'supbase-python',
-          url: '/reference/python/start',
-          level: 'reference_python',
-          icon: '/img/icons/menu/reference-python' as `/${string}`,
-        },
-        {
-          name: 'supbase-swift',
-          url: '/reference/swift/start',
-          level: 'reference_swift',
-          items: [],
-          icon: '/img/icons/menu/reference-swift' as `/${string}`,
-        },
-        {
-          name: 'supabase-kt',
-          url: '/reference/kotlin/start',
-          level: 'reference_kotlin',
-          items: [],
-          icon: '/img/icons/menu/reference-kotlin' as `/${string}`,
-        },
+        ...(allSDKsEnabled
+          ? [
+              {
+                name: 'supabase-dart',
+                url: '/reference/dart/start',
+                level: 'reference_dart',
+                icon: '/img/icons/menu/reference-dart' as `/${string}`,
+              },
+              {
+                name: 'supabase-csharp',
+                url: '/reference/csharp/start',
+                level: 'reference_csharp',
+                icon: '/img/icons/menu/reference-csharp' as `/${string}`,
+              },
+              {
+                name: 'supbase-python',
+                url: '/reference/python/start',
+                level: 'reference_python',
+                icon: '/img/icons/menu/reference-python' as `/${string}`,
+              },
+              {
+                name: 'supbase-swift',
+                url: '/reference/swift/start',
+                level: 'reference_swift',
+                items: [],
+                icon: '/img/icons/menu/reference-swift' as `/${string}`,
+              },
+              {
+                name: 'supabase-kt',
+                url: '/reference/kotlin/start',
+                level: 'reference_kotlin',
+                items: [],
+                icon: '/img/icons/menu/reference-kotlin' as `/${string}`,
+              },
+            ]
+          : []),
       ],
     },
     {
@@ -2677,6 +2686,7 @@ export const reference_javascript_v2 = {
   },
 }
 
+// TODO: How to?
 export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
@@ -2850,40 +2860,44 @@ export const references = [
         icon: '/docs/img/icons/javascript-icon.svg',
         url: '/reference/javascript/start',
       },
-      {
-        label: 'supabase-py',
-        description: 'something about the reference',
-        icon: '/docs/img/icons/python-icon.svg',
-        url: '/reference/python/start',
-      },
-      {
-        label: 'supabase-dart',
-        versions: ['v1', 'v0'],
-        description: 'something about the reference',
-        icon: '/docs/img/icons/dart-icon.svg',
-        url: '/reference/dart/start',
-      },
-      {
-        label: 'supabase-csharp',
-        versions: ['v0'],
-        description: 'something about the reference',
-        icon: '/docs/img/icons/c-sharp-icon.svg',
-        url: '/reference/csharp/start',
-      },
-      {
-        label: 'supabase-swift',
-        versions: ['v2', 'v1'],
-        description: 'something about the reference',
-        icon: '/docs/img/icons/swift-icon.svg',
-        url: '/reference/swift/start',
-      },
-      {
-        label: 'supabase-kt',
-        versions: ['v3', 'v2', 'v1'],
-        description: 'something about the reference',
-        icon: '/docs/img/icons/kotlin-icon.svg',
-        url: '/reference/kotlin/start',
-      },
+      ...(allSDKsEnabled
+        ? [
+            {
+              label: 'supabase-py',
+              description: 'something about the reference',
+              icon: '/docs/img/icons/python-icon.svg',
+              url: '/reference/python/start',
+            },
+            {
+              label: 'supabase-dart',
+              versions: ['v1', 'v0'],
+              description: 'something about the reference',
+              icon: '/docs/img/icons/dart-icon.svg',
+              url: '/reference/dart/start',
+            },
+            {
+              label: 'supabase-csharp',
+              versions: ['v0'],
+              description: 'something about the reference',
+              icon: '/docs/img/icons/c-sharp-icon.svg',
+              url: '/reference/csharp/start',
+            },
+            {
+              label: 'supabase-swift',
+              versions: ['v2', 'v1'],
+              description: 'something about the reference',
+              icon: '/docs/img/icons/swift-icon.svg',
+              url: '/reference/swift/start',
+            },
+            {
+              label: 'supabase-kt',
+              versions: ['v3', 'v2', 'v1'],
+              description: 'something about the reference',
+              icon: '/docs/img/icons/kotlin-icon.svg',
+              url: '/reference/kotlin/start',
+            },
+          ]
+        : []),
     ],
   },
   {
