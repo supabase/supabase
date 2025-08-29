@@ -1,15 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
 
 export type BigQueryDestinationConfig = {
   projectId: string
   datasetId: string
   serviceAccountKey: string
-  maxStalenessMins: number
+  maxStalenessMins?: number
 }
 
 export type UpdateDestinationPipelineParams = {
@@ -23,7 +23,7 @@ export type UpdateDestinationPipelineParams = {
   sourceId: number
   pipelineConfig: {
     publicationName: string
-    batch: {
+    batch?: {
       maxSize: number
       maxFillMs: number
     }
@@ -39,10 +39,7 @@ async function updateDestinationPipeline(
     destinationConfig: {
       bigQuery: { projectId, datasetId, serviceAccountKey, maxStalenessMins },
     },
-    pipelineConfig: {
-      publicationName,
-      batch: { maxSize, maxFillMs },
-    },
+    pipelineConfig: { publicationName, batch },
     sourceId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
@@ -60,15 +57,17 @@ async function updateDestinationPipeline(
             project_id: projectId,
             dataset_id: datasetId,
             service_account_key: serviceAccountKey,
-            max_staleness_mins: maxStalenessMins,
+            ...(maxStalenessMins != null && { max_staleness_mins: maxStalenessMins }),
           },
         },
         pipeline_config: {
           publication_name: publicationName,
-          batch: {
-            max_size: maxSize,
-            max_fill_ms: maxFillMs,
-          },
+          ...(batch && {
+            batch: {
+              max_size: batch.maxSize,
+              max_fill_ms: batch.maxFillMs,
+            },
+          }),
         },
         source_id: sourceId,
       },
@@ -99,8 +98,12 @@ export const useUpdateDestinationPipelineMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
-        await queryClient.invalidateQueries(replicationKeys.pipelines(projectRef))
+
+        await Promise.all([
+          queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
+          queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

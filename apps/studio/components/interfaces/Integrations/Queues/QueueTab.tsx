@@ -4,8 +4,8 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import DeleteQueue from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
-import PurgeQueue from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
+import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
+import { PurgeQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
 import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
@@ -100,7 +100,8 @@ export const QueueTab = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-end gap-x-4 py-4 px-6 mb-0">
+      <div className="flex items-center justify-between gap-x-4 py-1.5 px-10 mb-0 bg-surface-200">
+        <QueueFilters selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes} />
         <div className="flex gap-x-2">
           <QueueSettings />
 
@@ -238,8 +239,8 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
         </div>
       </div>
 
-      <QueueFilters selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes} />
       <LoadingLine loading={isFetching} />
+
       <QueueMessagesDataGrid
         error={error}
         messages={messages || []}
