@@ -18,7 +18,7 @@ import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.consta
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
@@ -94,7 +94,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     },
   })
 
-  const canResumeProject = useCheckPermissions(
+  const { can: canResumeProject } = useAsyncCheckProjectPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.initialize_or_resume'
   )
