@@ -3,16 +3,30 @@ import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import type { NextPageWithLayout } from 'types'
+import { useState } from 'react'
+import { Toggle_Shadcn_ } from 'ui'
+import { ChartBar } from 'lucide-react'
 
 const UsersPage: NextPageWithLayout = () => {
+  const [showChart, setShowChart] = useState(true)
   return (
     <PageLayout
       title="Users"
-      subtitle="24 hours have signed in the last 7 days"
       isCompact
       size="full"
+      secondaryActions={
+        <Toggle_Shadcn_
+          pressed={showChart}
+          onPressedChange={setShowChart}
+          aria-label="Toggle users chart visibility"
+          variant="outline"
+          size="sm"
+        >
+          <ChartBar strokeWidth={1.5} size={16} />
+        </Toggle_Shadcn_>
+      }
     >
-      <UsersV2 />
+      <UsersV2 showChart={showChart} />
     </PageLayout>
   )
 }

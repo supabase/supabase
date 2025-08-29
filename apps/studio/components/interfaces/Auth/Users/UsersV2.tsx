@@ -59,7 +59,7 @@ export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
 // [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
 // Can change it to remove V2 thereafter
-export const UsersV2 = () => {
+export const UsersV2 = ({ showChart = true }: { showChart?: boolean }) => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -262,9 +262,11 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <div className="px-6 py-3">
-          <UsersBarChart />
-        </div>
+        {showChart && (
+          <div className="px-6 py-3">
+            <UsersBarChart />
+          </div>
+        )}
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
