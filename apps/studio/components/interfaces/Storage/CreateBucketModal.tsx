@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
 import { Edit } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -37,6 +36,7 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
   RadioGroupStacked,
@@ -130,6 +130,7 @@ const CreateBucketModal = () => {
       allowed_mime_types: '',
     },
   })
+  const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
 
   const bucketName = snakeCase(form.watch('name'))
   const isPublicBucket = form.watch('public')
@@ -144,10 +145,9 @@ const CreateBucketModal = () => {
     if (!ref) return console.error('Project ref is required')
 
     if (values.type === 'ANALYTICS' && !icebergCatalogEnabled) {
-      toast.error(
+      return toast.error(
         'The Analytics catalog feature is not enabled for your project. Please contact support to enable it.'
       )
-      return
     }
 
     try {
@@ -161,6 +161,11 @@ const CreateBucketModal = () => {
           ? values.allowed_mime_types.split(',').map((x) => x.trim())
           : undefined
         : undefined
+
+      if (!!fileSizeLimit && !!data?.fileSizeLimit && fileSizeLimit > data.fileSizeLimit) {
+        form.setError('formatted_size_limit', { type: 'manual', message: 'exceed_global_limit' })
+        return
+      }
 
       await createBucket({
         projectRef: ref,
@@ -385,63 +390,73 @@ const CreateBucketModal = () => {
                         )}
                       />
                       {hasFileSizeLimit && (
-                        <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
-                          <div className="col-span-8">
-                            <FormField_Shadcn_
-                              key="formatted_size_limit"
-                              name="formatted_size_limit"
-                              control={form.control}
-                              render={({ field }) => (
-                                <FormItemLayout
-                                  name="formatted_size_limit"
-                                  description={
-                                    IS_PLATFORM ? (
-                                      <>
-                                        This project has a{' '}
-                                        <Link
-                                          href={`/project/${ref}/settings/storage`}
-                                          className="font-bold underline"
-                                        >
-                                          global file size limit
-                                        </Link>{' '}
-                                        of {formattedGlobalUploadLimit}.
-                                      </>
-                                    ) : undefined
-                                  }
-                                >
-                                  <FormControl_Shadcn_>
-                                    <Input_Shadcn_
-                                      id="formatted_size_limit"
-                                      aria-label="File size limit"
-                                      type="number"
-                                      min={0}
-                                      placeholder="0"
-                                      {...field}
-                                    />
-                                  </FormControl_Shadcn_>
-                                </FormItemLayout>
-                              )}
-                            />
+                        <>
+                          <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
+                            <div className="col-span-8">
+                              <FormField_Shadcn_
+                                key="formatted_size_limit"
+                                name="formatted_size_limit"
+                                control={form.control}
+                                render={({ field }) => (
+                                  <FormItemLayout hideMessage name="formatted_size_limit">
+                                    <FormControl_Shadcn_>
+                                      <Input_Shadcn_
+                                        id="formatted_size_limit"
+                                        aria-label="File size limit"
+                                        type="number"
+                                        min={0}
+                                        placeholder="0"
+                                        {...field}
+                                      />
+                                    </FormControl_Shadcn_>
+                                  </FormItemLayout>
+                                )}
+                              />
+                            </div>
+                            <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger_Shadcn_
+                                aria-label="File size limit unit"
+                                size="small"
+                                className="col-span-4"
+                              >
+                                <SelectValue_Shadcn_ asChild>
+                                  <>{selectedUnit}</>
+                                </SelectValue_Shadcn_>
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                {Object.values(StorageSizeUnits).map((unit: string) => (
+                                  <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                                    <div>{unit}</div>
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
                           </div>
-                          <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                            <SelectTrigger_Shadcn_
-                              aria-label="File size limit unit"
-                              size="small"
-                              className="col-span-4"
-                            >
-                              <SelectValue_Shadcn_ asChild>
-                                <>{selectedUnit}</>
-                              </SelectValue_Shadcn_>
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              {Object.values(StorageSizeUnits).map((unit: string) => (
-                                <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
-                                  <div>{unit}</div>
-                                </SelectItem_Shadcn_>
-                              ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </div>
+
+                          {formattedSizeLimitError?.message === 'exceed_global_limit' && (
+                            <FormMessage_Shadcn_>
+                              Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit
+                              in{' '}
+                              <InlineLink
+                                className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                                href={`/project/${ref}/settings/storage`}
+                              >
+                                Storage Settings
+                              </InlineLink>{' '}
+                              first.
+                            </FormMessage_Shadcn_>
+                          )}
+
+                          {IS_PLATFORM ? (
+                            <p className="text-sm text-foreground-light !mt-3">
+                              This project has a{' '}
+                              <InlineLink href={`/project/${ref}/settings/storage`}>
+                                global file size limit
+                              </InlineLink>{' '}
+                              of {formattedGlobalUploadLimit}.
+                            </p>
+                          ) : undefined}
+                        </>
                       )}
                     </div>
                   </div>
