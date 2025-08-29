@@ -6,8 +6,8 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
@@ -15,10 +15,10 @@ import {
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import DeleteDestination from './DeleteDestination'
-import DestinationPanel from './DestinationPanel'
+import { DeleteDestination } from './DeleteDestination'
+import { DestinationPanel } from './DestinationPanel'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
@@ -160,11 +160,7 @@ export const DestinationRow = ({
                     {hasTableErrors && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="inline-flex items-center">
-                            <span className="inline-flex items-center justify-center px-1 min-w-4 h-4 rounded-full bg-destructive-600 text-white text-[10px] leading-none">
-                              {errorCount}
-                            </span>
-                          </span>
+                          <WarningIcon />
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
                           {errorCount} table{errorCount === 1 ? '' : 's'} have replication errors

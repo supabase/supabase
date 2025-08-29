@@ -8,7 +8,7 @@ interface DeleteDestinationProps {
   name: string
 }
 
-const DeleteDestination = ({
+export const DeleteDestination = ({
   visible,
   setVisible,
   onDelete,
@@ -18,7 +18,7 @@ const DeleteDestination = ({
   return (
     <>
       <TextConfirmModal
-        variant={'warning'}
+        variant="destructive"
         visible={visible}
         onCancel={() => setVisible(!visible)}
         onConfirm={onDelete}
@@ -44,5 +44,3 @@ const DeleteDestination = ({
     </>
   )
 }
-
-export default DeleteDestination
