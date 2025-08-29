@@ -1,7 +1,18 @@
 import { useState } from 'react'
 import { RefreshCw } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+} from 'ui'
 import type { EdgeFunctionDeployment } from './types'
 import { sortDeployments } from './utils'
 import { RollbackModal } from './rollback-modal'
@@ -99,30 +110,29 @@ export const EdgeFunctionVersionsList = () => {
           <p className="text-sm text-foreground-light mb-4">
             Showing up to the latest 10 deployments.
           </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-muted-foreground border-b">
-                  <th className="text-left py-2 pr-2">Deployed at</th>
-                  <th className="text-left py-2 pr-2">Status</th>
-                  <th className="text-left py-2 pr-2">Commit message</th>
-                  <th className="text-left py-2 pr-2">Hash</th>
-                  <th className="text-left py-2 pr-2">Size</th>
-                  <th className="text-right py-2 pl-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {limitedDeployments.map((deployment) => (
-                  <DeployListItem
-                    key={deployment.id}
-                    deployment={deployment}
-                    isRestoring={rollbackMutation.isLoading}
-                    onRestore={handleRollbackClick}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Deployed at</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Commit message</TableHead>
+                <TableHead>Hash</TableHead>
+                <TableHead>Size</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {limitedDeployments.map((deployment) => (
+                <DeployListItem
+                  key={deployment.id}
+                  deployment={deployment}
+                  isRestoring={rollbackMutation.isLoading}
+                  onRestore={handleRollbackClick}
+                />
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </CardContent>
 

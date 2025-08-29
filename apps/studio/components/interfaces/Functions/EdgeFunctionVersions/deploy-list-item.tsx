@@ -1,4 +1,4 @@
-import { Badge, Button, cn } from 'ui'
+import { Badge, Button, cn, TableRow, TableCell } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
 import { formatDateTime } from './utils'
 
@@ -10,9 +10,9 @@ export type DeployListItemProps = {
 
 export const DeployListItem = ({ deployment, isRestoring, onRestore }: DeployListItemProps) => {
   return (
-    <tr className={cn('border-b last:border-b-0')}>
-      <td className="py-3 pr-2 align-top">{formatDateTime(deployment.created_at)}</td>
-      <td className="py-3 pr-2 align-top">
+    <TableRow className={cn('')}>
+      <TableCell className="py-3 pr-2 align-top">{formatDateTime(deployment.created_at)}</TableCell>
+      <TableCell className="py-3 pr-2 align-top">
         {deployment.status === 'ACTIVE' ? (
           <Badge variant="default" className="text-xs">
             Active
@@ -20,21 +20,21 @@ export const DeployListItem = ({ deployment, isRestoring, onRestore }: DeployLis
         ) : (
           <span className="text-xs text-muted-foreground">Inactive</span>
         )}
-      </td>
-      <td className="py-3 pr-2 align-top text-foreground-light">
+      </TableCell>
+      <TableCell className="py-3 pr-2 align-top text-foreground-light">
         {deployment.commit_message ?? ''}
-      </td>
-      <td className="py-3 pr-2 align-top">
+      </TableCell>
+      <TableCell className="py-3 pr-2 align-top">
         {deployment.commit_hash ? (
           <span className="font-mono text-foreground-light">#{deployment.commit_hash}</span>
         ) : (
           ''
         )}
-      </td>
-      <td className="py-3 pr-2 align-top">
+      </TableCell>
+      <TableCell className="py-3 pr-2 align-top">
         {typeof deployment.size_kb === 'number' ? `${deployment.size_kb.toFixed(1)} KB` : ''}
-      </td>
-      <td className="py-3 pl-2 align-top text-right">
+      </TableCell>
+      <TableCell className="py-3 pl-2 align-top text-right">
         {deployment.status !== 'ACTIVE' && (
           <Button
             type="default"
@@ -46,7 +46,7 @@ export const DeployListItem = ({ deployment, isRestoring, onRestore }: DeployLis
             Restore
           </Button>
         )}
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   )
 }
