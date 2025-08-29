@@ -3,7 +3,7 @@ title: Manual Replication
 subtitle: Set up your own replication pipeline for more control
 ---
 
-ETL enables you to build replication pipelines from Postgres databases to various analytics-focused destinations such as BigQuery, DuckDB, Iceberg, and other specialized systems optimized for OLAP workloads, unlocking fast, scalable analysis with minimal setup and operational overhead.
+Postgres comes with built-in support for replication. If `pg_replicate` doesn't provide a destination that you need, or if you need more control over the replication process, you can set up your own replication pipeline using Postgres primitives.
 
 ## Replication and publications
 
