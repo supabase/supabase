@@ -208,6 +208,9 @@ export const edgeFunctionReports = ({
 
       const data = response?.result?.map((log: any) => ({
         ...log,
+        timestamp: isUnixMicro(log.timestamp)
+          ? unixMicroToIsoTimestamp(log.timestamp)
+          : dayjs.utc(log.timestamp).toISOString(),
         function_name: functions.find((f) => f.id === log.function_id)?.name ?? log.function_id,
       }))
 
@@ -282,6 +285,9 @@ export const edgeFunctionReports = ({
 
       const data = rawData.result?.map((point: any) => ({
         ...point,
+        timestamp: isUnixMicro(point.timestamp)
+          ? unixMicroToIsoTimestamp(point.timestamp)
+          : dayjs.utc(point.timestamp).toISOString(),
         function_name: functions.find((f) => f.id === point.function_id)?.name ?? point.function_id,
       }))
 
@@ -309,6 +315,12 @@ export const edgeFunctionReports = ({
     dataProvider: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters.functionIds)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
+      const data = rawData.result?.map((point: any) => ({
+        ...point,
+        timestamp: isUnixMicro(point.timestamp)
+          ? unixMicroToIsoTimestamp(point.timestamp)
+          : dayjs.utc(point.timestamp).toISOString(),
+      }))
 
       const attributes = [
         {
@@ -325,7 +337,7 @@ export const edgeFunctionReports = ({
         },
       ]
 
-      return { data: rawData.result, attributes, query: sql }
+      return { data, attributes, query: sql }
     },
   },
 ]
