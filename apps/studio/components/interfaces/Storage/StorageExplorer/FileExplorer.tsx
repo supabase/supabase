@@ -1,5 +1,7 @@
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
@@ -42,52 +44,54 @@ const FileExplorer = ({
   }, [columns])
 
   return (
-    <div
-      ref={fileExplorerRef}
-      className={cn(
-        'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
-        snap.view === STORAGE_VIEWS.LIST && 'flex-col'
-      )}
-    >
-      <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
-      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
-      <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
-      {snap.view === STORAGE_VIEWS.COLUMNS ? (
-        <div className="flex">
-          {columns.map((column, index) => (
-            <FileExplorerColumn
-              key={`column-${index}`}
-              index={index}
-              column={column}
-              selectedItems={selectedItems}
-              itemSearchString={itemSearchString}
-              onFilesUpload={onFilesUpload}
-              onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-              onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-              onColumnLoadMore={onColumnLoadMore}
-            />
-          ))}
-        </div>
-      ) : snap.view === STORAGE_VIEWS.LIST ? (
-        <>
-          {columns.length > 0 && (
-            <FileExplorerColumn
-              fullWidth
-              index={columns.length - 1}
-              column={columns[columns.length - 1]}
-              selectedItems={selectedItems}
-              itemSearchString={itemSearchString}
-              onFilesUpload={onFilesUpload}
-              onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-              onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-              onColumnLoadMore={onColumnLoadMore}
-            />
-          )}
-        </>
-      ) : (
-        <div>Unknown view: {snap.view}</div>
-      )}
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      <div
+        ref={fileExplorerRef}
+        className={cn(
+          'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
+          snap.view === STORAGE_VIEWS.LIST && 'flex-col'
+        )}
+      >
+        <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
+        <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
+        <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
+        {snap.view === STORAGE_VIEWS.COLUMNS ? (
+          <div className="flex">
+            {columns.map((column, index) => (
+              <FileExplorerColumn
+                key={`column-${index}`}
+                index={index}
+                column={column}
+                selectedItems={selectedItems}
+                itemSearchString={itemSearchString}
+                onFilesUpload={onFilesUpload}
+                onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+                onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+                onColumnLoadMore={onColumnLoadMore}
+              />
+            ))}
+          </div>
+        ) : snap.view === STORAGE_VIEWS.LIST ? (
+          <>
+            {columns.length > 0 && (
+              <FileExplorerColumn
+                fullWidth
+                index={columns.length - 1}
+                column={columns[columns.length - 1]}
+                selectedItems={selectedItems}
+                itemSearchString={itemSearchString}
+                onFilesUpload={onFilesUpload}
+                onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+                onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+                onColumnLoadMore={onColumnLoadMore}
+              />
+            )}
+          </>
+        ) : (
+          <div>Unknown view: {snap.view}</div>
+        )}
+      </div>
+    </DndProvider>
   )
 }
 

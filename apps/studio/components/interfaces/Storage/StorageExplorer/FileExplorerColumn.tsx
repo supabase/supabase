@@ -4,6 +4,7 @@ import { get, noop, sum } from 'lodash'
 import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
+import { useDrop } from 'react-dnd'
 import { toast } from 'sonner'
 
 import InfiniteList from 'components/ui/InfiniteList'
@@ -80,12 +81,48 @@ const FileExplorerColumn = ({
   onColumnLoadMore = noop,
 }: FileExplorerColumnProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
-  const [isInternalDragOver, setIsInternalDragOver] = useState(false)
-  const [moveToPath, setMoveToPath] = useState<string>('')
   const fileExplorerColumnRef = useRef<any>(null)
 
   const snap = useStorageExplorerStateSnapshot()
   const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  // Drop target for column background
+  const [{ isOver }, drop] = useDrop({
+    accept: 'storage-item',
+    canDrop: (draggedItem: any) => {
+      // Don't allow dropping on the same column
+      if (draggedItem.sourceColumnIndex === index) return false
+
+      // Don't allow dropping a folder into its own subfolder (circular reference)
+      if (draggedItem.type === STORAGE_ROW_TYPES.FOLDER) {
+        const draggedItemPath = snap.openedFolders
+          .slice(0, draggedItem.sourceColumnIndex)
+          .map((folder) => folder.name)
+          .join('/')
+        const targetPath = getColumnPath()
+
+        return !targetPath.startsWith(draggedItemPath + '/')
+      }
+
+      return true
+    },
+    drop: (draggedItem: any) => {
+      if (canUpdateStorage) {
+        const targetDirectory = getColumnPath()
+
+        console.log('Column background drop - Moving item to:', targetDirectory)
+
+        // Use the drag & drop function that doesn't interfere with the modal
+        snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
+      }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver({ shallow: true }),
+    }),
+  })
+
+  // Apply drop ref to the column
+  drop(fileExplorerColumnRef)
 
   useEffect(() => {
     if (fileExplorerColumnRef) {
@@ -99,27 +136,7 @@ const FileExplorerColumn = ({
   // Reset drag states when column changes
   useEffect(() => {
     setIsDraggedOver(false)
-    setIsInternalDragOver(false)
-    setMoveToPath('')
   }, [column.id])
-
-  // Listen for folder drag over events from child rows
-  useEffect(() => {
-    const handleFolderDragOver = (event: CustomEvent) => {
-      const { targetPath, folderName } = event.detail
-      console.log('Folder drag over detected:', folderName, 'Target path:', targetPath)
-      setMoveToPath(targetPath)
-    }
-
-    const columnElement = fileExplorerColumnRef.current
-    if (columnElement) {
-      columnElement.addEventListener('folderDragOver', handleFolderDragOver as EventListener)
-
-      return () => {
-        columnElement.removeEventListener('folderDragOver', handleFolderDragOver as EventListener)
-      }
-    }
-  }, [])
 
   // Helper function to get the path for this column
   const getColumnPath = () => {
@@ -177,163 +194,19 @@ const FileExplorerColumn = ({
     })
   }
 
-  const onDragOver = (event: any) => {
-    console.log('onDragOver called for column:', column.name, 'Event type:', event.type)
-
-    if (event) {
-      // Reset states if this is a new drag operation
-      if (event.type === 'dragenter' && !isDraggedOver && !isInternalDragOver) {
-        console.log('New drag operation started, resetting states')
-      }
-      // Check if the drag target is over a folder/item or just the column background
-      const target = event.target as HTMLElement
-      const isOverItem = target.closest('[data-item-type]') || target.closest('.storage-row')
-
-      console.log('Target element:', target)
-      console.log('Is over item:', isOverItem)
-
-      // Check if this is an internal file drag (from another column) or external file drag
-      let isInternalFileDrag = false
-
-      // Check if the dataTransfer contains our custom JSON type
-      if (event.dataTransfer.types.includes('application/json')) {
-        isInternalFileDrag = true
-        console.log('Internal file drag detected - JSON type found')
-      } else {
-        isInternalFileDrag = false
-        console.log('External drag - no JSON type found')
-      }
-
-      if (isOverItem) {
-        // Let the item handle the drag over event
-        // Hide the drag overlay since we're over an item
-        if (isDraggedOver) {
-          setIsDraggedOver(false)
-        }
-        if (isInternalDragOver) {
-          setIsInternalDragOver(false)
-        }
-        // Don't clear moveToPath here - let the folder row set it
-        console.log('Over item, returning early')
-        return
-      }
-
-      // We're over column background (not over a specific item)
-      if (isInternalFileDrag) {
-        // Check if this is a drag from the same column (same location)
-        try {
-          const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
-          if (draggedItem && draggedItem.columnIndex === index) {
-            // Same column drag - don't highlight or allow drop
-            console.log('Same column drag detected, ignoring')
-            return
-          }
-        } catch (error) {
-          // Can't parse data during dragover, continue with normal logic
-        }
-
-        // Internal file drag over column background - show blue ring to indicate valid drop zone
-        event.preventDefault()
-        if (event.type === 'dragover') {
-          if (!isInternalDragOver) {
-            setIsInternalDragOver(true)
-          }
-          // Always update the path when dragging over column background
-          const columnPath = getColumnPath()
-          setMoveToPath(columnPath)
-          console.log(
-            'Dragging over column background:',
-            column.name,
-            'Column index:',
-            snap.columns.findIndex((col) => col.id === column.id),
-            'Target path:',
-            columnPath,
-            'Setting moveToPath to:',
-            columnPath
-          )
-        }
-      } else {
-        // External file drag - show overlay for file uploads (both empty and non-empty columns)
-        event.preventDefault()
-        if (event.type === 'dragover' && !isDraggedOver) {
-          setIsDraggedOver(true)
-        }
-      }
-    }
-  }
-
-  const onDrop = (event: any) => {
-    console.log('onDrop called for column:', column.name)
-    onDragOver(event)
-
+  // Handle external file drops for uploads (separate from react-dnd)
+  const handleExternalFileDrop = (event: any) => {
     if (!canUpdateStorage) {
       toast('You need additional permissions to upload files to this project')
       return
     }
 
-    // Check if this is a file drop from another column
-    try {
-      const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
-      if (draggedItem && draggedItem.type === STORAGE_ROW_TYPES.FILE) {
-        // Check if the drop target is actually a folder item (not the column background)
-        // If it's a folder drop, let the folder handle it
-        const target = event.target as HTMLElement
-        const isFolderDrop =
-          target.closest('[data-item-type="folder"]') ||
-          target.closest('[data-item-type="file"]') ||
-          target.closest('.storage-row')
-
-        if (isFolderDrop) {
-          // This is a folder/file drop, let the item handle it
-          return
-        }
-
-        // Check if this is a drop to the same column (same location)
-        if (draggedItem.columnIndex === index) {
-          console.log('Same column drop detected, ignoring move operation')
-          return
-        }
-
-        // This is a column background drop
-        // Use the pre-calculated path from drag over
-        const targetDirectory = moveToPath
-
-        console.log(
-          'Column background drop - Target directory:',
-          targetDirectory,
-          'Column:',
-          column.name,
-          'Column index:',
-          snap.columns.findIndex((col) => col.id === column.id),
-          'Opened folders:',
-          snap.openedFolders.map((f) => f.name),
-          'MoveToPath:',
-          moveToPath,
-          'Current moveToPath state:',
-          moveToPath
-        )
-        console.log('Drop event target:', event.target)
-        console.log(
-          'Is over item check:',
-          target.closest('[data-item-type]') || target.closest('.storage-row')
-        )
-
-        // Use the new drag & drop function that doesn't interfere with the modal
-        snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
-
-        // Reset drag states after successful drop
-        setIsDraggedOver(false)
-        setIsInternalDragOver(false)
-
-        console.log('File move completed, drag states reset')
-        return
-      }
-    } catch (error) {
-      // Not a JSON drag, likely external file upload - continue with normal upload logic
+    // Check if this is an external file drop (not our internal storage-item type)
+    const hasInternalType = event.dataTransfer.types.includes('storage-item')
+    if (!hasInternalType) {
+      // This is an external file upload
+      onFilesUpload(event, index)
     }
-
-    // Normal file upload logic
-    onFilesUpload(event, index)
   }
 
   const SelectAllCheckbox = () => (
@@ -353,11 +226,10 @@ const FileExplorerColumn = ({
         fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
         snap.view === STORAGE_VIEWS.LIST && 'h-full',
         'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto',
-        (isDraggedOver || isInternalDragOver) && 'bg-selection/10'
+        (isOver || isDraggedOver) && 'bg-selection/10'
       )}
       onContextMenu={displayMenu}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
+      onDrop={handleExternalFileDrop}
       onDragLeave={(event) => {
         // Only reset if we're actually leaving the column (not just moving to a child element)
         if (!event.currentTarget.contains(event.relatedTarget as Node)) {

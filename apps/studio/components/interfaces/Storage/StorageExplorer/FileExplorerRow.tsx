@@ -15,7 +15,8 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useContextMenu } from 'react-contexify'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
@@ -114,6 +115,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
 }) => {
   const { ref: projectRef, bucketId } = useParams()
   const [isFolderDragOver, setIsFolderDragOver] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
   const snap = useStorageExplorerStateSnapshot()
   const {
@@ -144,6 +146,82 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
+  // Drag source for files and folders
+  const [{ isDragging }, drag] = useDrag({
+    type: 'storage-item',
+    item: () => ({
+      ...itemWithColumnIndex,
+      sourceColumnIndex: columnIndex,
+    }),
+    canDrag: () => canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET,
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+
+  // Drop target for folders
+  const [{ isOver }, drop] = useDrop({
+    accept: 'storage-item',
+    canDrop: (draggedItem: any) => {
+      // Only allow drops on folders
+      if (item.type !== STORAGE_ROW_TYPES.FOLDER) return false
+
+      // Don't allow dropping on itself
+      if (draggedItem.id === item.id) return false
+
+      // Don't allow dropping a folder into its own subfolder (circular reference)
+      if (draggedItem.type === STORAGE_ROW_TYPES.FOLDER) {
+        const draggedItemPath = snap.openedFolders
+          .slice(0, draggedItem.columnIndex)
+          .map((folder) => folder.name)
+          .join('/')
+        const targetPath = snap.openedFolders
+          .slice(0, columnIndex)
+          .map((folder) => folder.name)
+          .concat(item.name)
+          .join('/')
+
+        return !targetPath.startsWith(draggedItemPath + '/')
+      }
+
+      return true
+    },
+    drop: (draggedItem: any) => {
+      if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
+        // Calculate target directory path
+        const targetDirectory = snap.openedFolders
+          .slice(0, columnIndex)
+          .map((folder) => folder.name)
+          .concat(item.name)
+          .join('/')
+
+        // Check if this is a drop to the same location
+        const draggedItemPath = snap.openedFolders
+          .slice(0, draggedItem.columnIndex)
+          .map((folder) => folder.name)
+          .join('/')
+
+        if (draggedItemPath === targetDirectory) {
+          console.log('Same location drop detected on folder, ignoring move operation')
+          return
+        }
+
+        console.log('Folder drop - Moving item to:', targetDirectory)
+
+        // Use the drag & drop function that doesn't interfere with the modal
+        snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
+      }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver({ shallow: true }),
+    }),
+  })
+
+  // Apply drag and drop refs
+  if (canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET) {
+    drag(drop(ref))
+  }
+
   const onSelectFile = async (columnIndex: number, file: StorageItem) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
@@ -170,89 +248,6 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   const onDoubleClickName = () => {
     if (canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET) {
       setSelectedItemToRename(itemWithColumnIndex)
-    }
-  }
-
-  // Drag and drop handlers
-  const onDragStart = (event: React.DragEvent) => {
-    if (item.type === STORAGE_ROW_TYPES.FILE && canUpdateFiles) {
-      event.dataTransfer.setData('application/json', JSON.stringify(itemWithColumnIndex))
-      event.dataTransfer.effectAllowed = 'move'
-    }
-  }
-
-  const onDragOver = (event: React.DragEvent) => {
-    // Always prevent default for folders to allow drops
-    if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
-      event.preventDefault()
-      event.stopPropagation()
-      event.dataTransfer.dropEffect = 'move'
-      setIsFolderDragOver(true)
-
-      // Calculate and dispatch the target path for this folder
-      const targetDirectory = snap.openedFolders
-        .slice(0, columnIndex)
-        .map((folder) => folder.name)
-        .concat(item.name)
-        .join('/')
-
-      // Dispatch custom event to communicate with parent column
-      const customEvent = new CustomEvent('folderDragOver', {
-        detail: { targetPath: targetDirectory, folderName: item.name },
-      })
-      event.currentTarget.dispatchEvent(customEvent)
-    }
-  }
-
-  const onDragLeave = (event: React.DragEvent) => {
-    if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
-      setIsFolderDragOver(false)
-    }
-  }
-
-  const onDrop = (event: React.DragEvent) => {
-    if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
-      event.preventDefault()
-      console.log('Folder drop event triggered for:', item.name)
-      try {
-        const draggedItem = JSON.parse(event.dataTransfer.getData('application/json'))
-        if (draggedItem && draggedItem.type === STORAGE_ROW_TYPES.FILE) {
-          // Check if this is a drop to the same location (same opened folders)
-          const draggedItemPath = snap.openedFolders
-            .slice(0, draggedItem.columnIndex)
-            .map((folder) => folder.name)
-            .join('/')
-          const targetDirectory = snap.openedFolders
-            .slice(0, columnIndex)
-            .map((folder) => folder.name)
-            .concat(item.name)
-            .join('/')
-
-          if (draggedItemPath === targetDirectory) {
-            console.log('Same location drop detected on folder, ignoring move operation')
-            return
-          }
-
-          console.log(
-            'Folder drop - Target directory:',
-            targetDirectory,
-            'Folder:',
-            item.name,
-            'Column index:',
-            columnIndex,
-            'Opened folders:',
-            snap.openedFolders.map((f) => f.name)
-          )
-
-          // Use the new drag & drop function that doesn't interfere with the modal
-          snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
-
-          // Reset drag over state
-          setIsFolderDragOver(false)
-        }
-      } catch (error) {
-        console.error('Failed to parse dragged item:', error)
-      }
     }
   }
 
@@ -396,8 +391,8 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
 
   return (
     <div
-      className="h-full border-b border-default"
-      draggable={item.type === STORAGE_ROW_TYPES.FILE && canUpdateFiles}
+      ref={ref}
+      className={cn('h-full border-b border-default', isDragging && 'opacity-50')}
       data-item-type={item.type.toLowerCase()}
       data-item-name={item.name}
       onContextMenu={(event) => {
@@ -406,15 +401,6 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           ? displayMenu(event, STORAGE_ROW_TYPES.FILE)
           : displayMenu(event, STORAGE_ROW_TYPES.FOLDER)
       }}
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-      onDragEnter={(event) => {
-        if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
-          setIsFolderDragOver(true)
-        }
-      }}
     >
       <div
         className={cn(
@@ -422,7 +408,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
-          `${isFolderDragOver ? 'bg-blue-200 ring-2 ring-blue-500 shadow-lg' : ''}`,
+          `${isOver ? 'bg-blue-200 ring-2 ring-blue-500 shadow-lg' : ''}`,
           `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
         )}
         onClick={(event) => {
