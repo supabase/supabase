@@ -36,7 +36,7 @@ export const OptInToOpenAIToggle = () => {
             provide consent. With your permission, Supabase may share customer-generated prompts,
             database schema, database data, and project logs with these providers. This information
             is used solely to generate responses to your queries and is not retained by the
-            providers or used to train their foundation models.
+            providers or used to train their models.
           </p>
 
           <p>
