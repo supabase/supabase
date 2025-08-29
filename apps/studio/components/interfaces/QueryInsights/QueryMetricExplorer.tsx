@@ -219,7 +219,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           },
           strokeDasharray: '5 5', // Dashed line
           type: 'line',
-          strokeWidth: 4, // Even thicker line for more prominence
+          strokeWidth: 2, // Match Database Reports stroke width
         })
       }
 
@@ -275,7 +275,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         },
         strokeDasharray: '5 5', // Dashed line
         type: 'line',
-        strokeWidth: 4, // Even thicker line for more prominence
+        strokeWidth: 2, // Match Database Reports stroke width
       })
     }
 
