@@ -363,9 +363,7 @@ const StorageSettings = () => {
                               </Tooltip>{' '}
                               first
                             </>
-                          ) : (
-                            ''
-                          )}
+                          ) : null}
                         </p>
                       </>
                     ) : (
