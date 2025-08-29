@@ -60,7 +60,7 @@ export const LogsBarChart = ({
             },
           } satisfies ChartConfig
         }
-        className={`h-[${height}]`}
+        style={{ height }}
       >
         <RechartBarChart
           data={data}
