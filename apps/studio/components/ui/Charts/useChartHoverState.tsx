@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 interface ChartHoverState {
-  hoveredValue: string | number | null
+  hoveredIndex: number | null
   hoveredChart: string | null
   syncHover: boolean
   syncTooltip: boolean
@@ -12,7 +12,7 @@ const CHART_TOOLTIP_SYNC_STORAGE_KEY = 'supabase-chart-tooltip-sync-enabled'
 
 // Global state shared across all hook instances
 let globalState: ChartHoverState = {
-  hoveredValue: null,
+  hoveredIndex: null,
   hoveredChart: null,
   syncHover: false,
   syncTooltip: false,
@@ -84,19 +84,19 @@ export function useChartHoverState(chartId: string) {
 
   // Set hover state for this chart
   const setHover = useCallback(
-    (value: string | number | null) => {
+    (index: number | null) => {
       if (globalState.syncHover) {
         // If sync is enabled, update global state
         updateGlobalState({
-          hoveredValue: value,
-          hoveredChart: value !== null ? chartId : null,
+          hoveredIndex: index,
+          hoveredChart: index !== null ? chartId : null,
         })
       } else {
         // If sync is disabled, only update local state
         setState((prev) => ({
           ...prev,
-          hoveredValue: value,
-          hoveredChart: value !== null ? chartId : null,
+          hoveredIndex: index,
+          hoveredChart: index !== null ? chartId : null,
         }))
       }
     },
@@ -107,13 +107,13 @@ export function useChartHoverState(chartId: string) {
   const clearHover = useCallback(() => {
     if (globalState.syncHover) {
       updateGlobalState({
-        hoveredValue: null,
+        hoveredIndex: null,
         hoveredChart: null,
       })
     } else {
       setState((prev) => ({
         ...prev,
-        hoveredValue: null,
+        hoveredIndex: null,
         hoveredChart: null,
       }))
     }
@@ -142,10 +142,10 @@ export function useChartHoverState(chartId: string) {
 
   return {
     // Current state
-    hoveredValue: shouldShowSyncedState
-      ? state.hoveredValue
+    hoveredIndex: shouldShowSyncedState
+      ? state.hoveredIndex
       : isCurrentChart
-        ? state.hoveredValue
+        ? state.hoveredIndex
         : null,
     syncHover: state.syncHover,
     syncTooltip: state.syncTooltip,
@@ -158,7 +158,7 @@ export function useChartHoverState(chartId: string) {
     setSyncTooltip,
 
     // Helpers
-    isHovered: state.hoveredValue !== null && (isCurrentChart || shouldShowSyncedState),
+    isHovered: state.hoveredIndex !== null && (isCurrentChart || shouldShowSyncedState),
     isCurrentChart,
   }
 }
