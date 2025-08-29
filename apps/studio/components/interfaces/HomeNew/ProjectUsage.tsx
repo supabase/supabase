@@ -122,6 +122,8 @@ const ProjectUsage = () => {
     timestampEnd,
   })
 
+  const storageStats = useProjectUsageStats({
+    projectRef: projectRef as string,
     table: LogsTableName.STORAGE,
     timestampStart,
     timestampEnd,
@@ -156,6 +158,8 @@ const ProjectUsage = () => {
     timestampEnd: previousEnd,
   })
 
+  const storageStatsPrev = useProjectUsageStats({
+    projectRef: projectRef as string,
     table: LogsTableName.STORAGE,
     timestampStart: previousStart,
     timestampEnd: previousEnd,
