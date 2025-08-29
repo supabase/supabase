@@ -18,6 +18,7 @@ import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatBytes } from 'lib/helpers'
+import Link from 'next/link'
 import {
   Button,
   Card,
@@ -25,6 +26,7 @@ import {
   CardFooter,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   SelectContent_Shadcn_,
@@ -33,6 +35,9 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -42,6 +47,8 @@ import {
   StorageSizeUnits,
 } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+
+const formId = 'storage-settings-form'
 
 interface StorageSettingsState {
   fileSizeLimit: number
@@ -84,27 +91,6 @@ const StorageSettings = () => {
     imageTransformationEnabled: !isFreeTier,
   })
 
-  useEffect(() => {
-    if (isSuccess && config) {
-      const { fileSizeLimit, features } = config
-      const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
-
-      setInitialValues({
-        fileSizeLimit: value,
-        unit: unit,
-        imageTransformationEnabled,
-      })
-
-      // Reset the form values when the config values load
-      form.reset({
-        fileSizeLimit: value,
-        unit: unit,
-        imageTransformationEnabled,
-      })
-    }
-  }, [isSuccess, config])
-
   const maxBytes = useMemo(() => {
     if (organization?.plan.id === 'free') {
       return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
@@ -140,29 +126,16 @@ const StorageSettings = () => {
         if (fileSizeLimit < formattedMinBucketLimit) {
           // Get buckets that would be affected by this too-small global limit
           const affectedBuckets = buckets
-            .filter((bucket: any) => bucket.file_size_limit && bucket.file_size_limit > 0)
-            .map((bucket: any) => ({
-              name: bucket.name,
-              limit: bucket.file_size_limit!,
-              formattedLimit: convertFromBytes(bucket.file_size_limit!, unit).value,
-            }))
-            .filter((bucket) => bucket.formattedLimit > fileSizeLimit)
-            .sort((a, b) => b.formattedLimit - a.formattedLimit) // Sort by limit descending
+            .filter((bucket) => bucket.file_size_limit && bucket.file_size_limit > 0)
+            .filter(
+              (bucket) => convertFromBytes(bucket.file_size_limit!, unit).value > fileSizeLimit
+            )
+            .sort((a, b) => (b.file_size_limit ?? 0) - (a.file_size_limit ?? 0))
 
           if (affectedBuckets.length > 0) {
-            const primaryBucket = affectedBuckets[0]
-            const otherBucketsCount = affectedBuckets.length - 1
-
-            let errorMessage = `Cannot set global limit lower than that of individual buckets. Remove or decrease the limit on ${primaryBucket.name} (${formatBytes(primaryBucket.limit)})`
-
-            if (otherBucketsCount > 0) {
-              errorMessage += ` +${otherBucketsCount} other bucket${otherBucketsCount === 1 ? '' : 's'}`
-            }
-            errorMessage += ` first.`
-
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: errorMessage,
+              message: `bucketLimit:${affectedBuckets.map((x) => x.name).join(',')}`,
               path: ['fileSizeLimit'],
             })
           }
@@ -174,7 +147,16 @@ const StorageSettings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
-  const { fileSizeLimit: limit, unit: storageUnit } = form.watch()
+
+  const { unit: storageUnit } = form.watch()
+  const { fileSizeLimit: fileSizeLimitError } = form.formState.errors
+  const isBucketLimitError = !!fileSizeLimitError?.message?.startsWith('bucketLimit')
+  const affectedBuckets = isBucketLimitError
+    ? (fileSizeLimitError?.message ?? '').split(':')[1].split(',')
+    : []
+  const firstAffectBucketLimit = convertFromBytes(
+    buckets.find((x) => x.name === affectedBuckets[0])?.file_size_limit ?? 0
+  )
 
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
@@ -187,35 +169,6 @@ const StorageSettings = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!config) return console.error('Storage config is required')
 
-    // Server-side validation: Check if global limit would be smaller than any bucket's limit
-    if (!isLoadingBuckets && buckets.length > 0) {
-      const newGlobalLimitInBytes = convertToBytes(data.fileSizeLimit, data.unit)
-
-      const bucketsWithLimits = buckets.filter(
-        (bucket: any) => bucket.file_size_limit && bucket.file_size_limit > 0
-      )
-
-      const conflictingBuckets = bucketsWithLimits.filter(
-        (bucket: any) => bucket.file_size_limit! > newGlobalLimitInBytes
-      )
-
-      if (conflictingBuckets.length > 0) {
-        const primaryBucket = conflictingBuckets[0]
-        const otherBucketsCount = conflictingBuckets.length - 1
-
-        let errorMessage = `Cannot set global limit lower than the limit set on ${primaryBucket.name} (${formatBytes(primaryBucket.file_size_limit!)})`
-
-        if (otherBucketsCount > 0) {
-          errorMessage += ` +${otherBucketsCount} other bucket${otherBucketsCount === 1 ? '' : 's'}`
-        }
-
-        errorMessage += '. Remove or decrease those limits first.'
-
-        toast.error(errorMessage)
-        return
-      }
-    }
-
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
@@ -226,7 +179,26 @@ const StorageSettings = () => {
     })
   }
 
-  const formId = 'storage-settings-form'
+  useEffect(() => {
+    if (isSuccess && config) {
+      const { fileSizeLimit, features } = config
+      const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
+      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
+
+      setInitialValues({
+        fileSizeLimit: value,
+        unit: unit,
+        imageTransformationEnabled,
+      })
+
+      // Reset the form values when the config values load
+      form.reset({
+        fileSizeLimit: value,
+        unit: unit,
+        imageTransformationEnabled,
+      })
+    }
+  }, [isSuccess, config])
 
   if (!canReadStorageSettings) {
     return <NoPermission resourceText="view storage upload limit settings" />
@@ -279,6 +251,7 @@ const StorageSettings = () => {
                   name="fileSizeLimit"
                   render={({ field }) => (
                     <FormItemLayout
+                      hideMessage
                       layout="flex-row-reverse"
                       label="Global file size limit"
                       description={
@@ -338,6 +311,68 @@ const StorageSettings = () => {
                     </FormItemLayout>
                   )}
                 />
+                {fileSizeLimitError && (
+                  <FormMessage_Shadcn_ className="ml-auto mt-2 text-right w-1/2">
+                    {isBucketLimitError ? (
+                      <>
+                        <p>Global limit must be greater than that of individual buckets.</p>
+                        <p>
+                          Remove or decrease the limit on{' '}
+                          <InlineLink
+                            href={`/project/${projectRef}/storage/buckets/${affectedBuckets[0]}`}
+                            className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                          >
+                            {affectedBuckets[0]}
+                          </InlineLink>{' '}
+                          ({firstAffectBucketLimit.value}
+                          {firstAffectBucketLimit.unit})
+                          {affectedBuckets.length > 1 ? (
+                            <>
+                              {' '}
+                              and{' '}
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="underline underline-offset-2 decoration-destructive-500 hover:decoration-destructive">
+                                    +{affectedBuckets.length - 1} other bucket
+                                    {affectedBuckets.length > 2 ? 's' : ''}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  <ul>
+                                    {affectedBuckets.slice(1).map((name) => {
+                                      const bucket = buckets.find((x) => x.name === name)
+                                      const formattedLimit = convertFromBytes(
+                                        bucket?.file_size_limit ?? 0
+                                      )
+                                      return (
+                                        <li
+                                          key={name}
+                                          className="hover:underline underline-offset-2"
+                                        >
+                                          <Link
+                                            href={`/project/${projectRef}/storage/buckets/${name}`}
+                                          >
+                                            {bucket?.name} ({formattedLimit.value}
+                                            {formattedLimit.unit})
+                                          </Link>
+                                        </li>
+                                      )
+                                    })}
+                                  </ul>
+                                </TooltipContent>
+                              </Tooltip>{' '}
+                              first
+                            </>
+                          ) : (
+                            ''
+                          )}
+                        </p>
+                      </>
+                    ) : (
+                      fileSizeLimitError.message
+                    )}
+                  </FormMessage_Shadcn_>
+                )}
               </CardContent>
               {isFreeTier && (
                 <UpgradeToPro

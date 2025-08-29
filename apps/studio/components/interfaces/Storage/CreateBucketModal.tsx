@@ -150,6 +150,7 @@ const CreateBucketModal = () => {
       )
     }
 
+    // [Joshen] Should shift this into superRefine in the form schema
     try {
       const fileSizeLimit =
         values.has_file_size_limit && values.formatted_size_limit !== undefined
@@ -189,9 +190,8 @@ const CreateBucketModal = () => {
       setVisible(false)
       toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
-    } catch (error) {
-      console.error(error)
-      toast.error('Failed to create bucket')
+    } catch (error: any) {
+      toast.error(`Failed to create bucket: ${error.message}`)
     }
   }
 

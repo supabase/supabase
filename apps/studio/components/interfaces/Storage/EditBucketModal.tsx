@@ -104,6 +104,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     setIsUpdating(true)
 
     // Client-side validation: Check if bucket limit exceeds global limit
+    // [Joshen] Should shift this into superRefine in the form schema
     if (
       values.has_file_size_limit &&
       values.formatted_size_limit !== undefined &&
@@ -169,10 +170,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         toast.success(`Successfully updated bucket "${bucket?.name}"`)
         onClose()
       }
-    } catch (error) {
+    } catch (error: any) {
       // This should not happen anymore, but keeping as fallback
-      console.error('Unexpected error:', error)
-      toast.error('An unexpected error occurred')
+      toast.error(`Failed to update bucket: ${error.message}`)
     } finally {
       setIsUpdating(false)
     }
