@@ -1625,7 +1625,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          // retrieve all identites linked to a user
+          // retrieve all identities linked to a user
           const identities = await supabase.auth.getUserIdentities()
 
           // find the google identity

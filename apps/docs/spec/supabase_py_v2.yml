@@ -1550,7 +1550,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          # retrieve all identites linked to a user
+          # retrieve all identities linked to a user
           response = supabase.auth.get_user_identities()
 
           # find the google identity
