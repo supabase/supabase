@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
-import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
+import { OrganizationVercelSection } from 'components/interfaces/Settings/Integrations/VercelIntegration/OrganizationVercelSection'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
@@ -185,7 +185,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
       {showVercelIntegration && (
         <>
           <ScaffoldDivider />
-          <VercelSection isProjectScoped={false} />
+          <OrganizationVercelSection />
           <SidePanelVercelProjectLinker />
         </>
       )}
