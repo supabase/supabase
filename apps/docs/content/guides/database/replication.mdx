@@ -22,7 +22,7 @@ Choose the data syncing method based on your use case:
 
 1. For realtime features, see [Realtime](/docs/guides/realtime)
 2. For read replicas, see [Read Replicas](/docs/guides/platform/read-replicas)
-3. For syncing data to an external destination, see [`pg_replicate`](/docs/guides/database/replication/pg_replicate)
+3. For syncing data to an external destination, see [ETL](/docs/guides/database/replication/etl)
 4. For syncing data to a custom external destination, see [Manual Replication](/docs/guides/database/replication/manual-replication)
 
 ## Setting up and monitoring replication in Supabase
@@ -74,4 +74,3 @@ In order to mitigate this, Postgres has many options and settings that can be [t
 | [`wal_keep_size`](https://postgresqlco.nf/doc/en/param/wal_keep_size/)                   | Minimum size of WAL files to keep for replication      | No          |         |
 | [`max_slot_wal_keep_size`](https://postgresqlco.nf/doc/en/param/max_slot_wal_keep_size/) | Max WAL size that can be reserved by replication slots | No          |         |
 | [`checkpoint_timeout`](https://postgresqlco.nf/doc/en/param/checkpoint_timeout/)         | Max time between WAL checkpoints                       | No          |         |
->>>>>>> master

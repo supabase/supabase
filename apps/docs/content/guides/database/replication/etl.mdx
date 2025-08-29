@@ -1,13 +1,13 @@
 ---
-title: pg_replicate
+title: ETL
 description: Replicate your Supabase database to external destinations
 ---
 
-`pg_replicate` simplifies the process of syncing your data to an external destination. This could be another database, a data warehouse, or a specialized service such as customer management or business analytics software.
+`ETL` simplifies the process of syncing your data to an external destination. This could be another database, a data warehouse, or a specialized service such as customer management or business analytics software.
 
 <Admonition type="caution">
 
-`pg_replicate` is currently in alpha.
+`ETL` is currently in alpha.
 
 </Admonition>
 
@@ -63,9 +63,9 @@ Before setting up replication to BigQuery, you need:
    - **Service Account Key**: Enter your GCP service account key
 5. Review the [Advanced Settings](#advanced-settings) to change the limits for the replication.
 
-  - **Max size**: Changes are sent in batches. Max size limits the size of an individual batch.
-  - **Max fill seconds**: Number of seconds after which a batch should be sent, even if it hasn't reached the max size.
-  - **Max staleness**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
+- **Max size**: Changes are sent in batches. Max size limits the size of an individual batch.
+- **Max fill seconds**: Number of seconds after which a batch should be sent, even if it hasn't reached the max size.
+- **Max staleness**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
 
 6. Click **Create** to start the replication process.
 
