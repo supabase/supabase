@@ -15,7 +15,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useContextMenu } from 'react-contexify'
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import SVG from 'react-inlinesvg'
 
@@ -114,7 +114,6 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   selectedItems = [],
 }) => {
   const { ref: projectRef, bucketId } = useParams()
-  const [isFolderDragOver, setIsFolderDragOver] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   const snap = useStorageExplorerStateSnapshot()
@@ -178,7 +177,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     canDrop: (draggedItem: any) => {
       // Only allow drops on folders
       if (item.type !== STORAGE_ROW_TYPES.FOLDER) {
-        // Not a folder, canDrop returning false
+        // Not a folder
         return false
       }
 
@@ -198,32 +197,49 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
         targetItemPath.length > 0 ? `${targetItemPath}/${item.name}` : item.name
 
       if (draggedItemFullPath === targetItemFullPath) {
-        // Dropping on itself (same path), canDrop returning false
+        // Can't drop on itself (same path)
         return false
       }
 
-      // Don't allow dropping a folder into its own subfolder (circular reference)
+      // Don't allow dropping a folder into itself or any of its subdirectories (circular reference)
       if (draggedItem.type === STORAGE_ROW_TYPES.FOLDER) {
+        // For folder drops, the target is the folder itself
+        // When dropping on a folder item, we want to move INTO that folder
         const targetPath = snap.openedFolders
           .slice(0, columnIndex)
           .map((folder) => folder.name)
           .concat(item.name)
           .join('/')
 
-        const wouldCreateCircularReference = targetPath.startsWith(draggedItemFullPath + '/')
+        // Check if target path is the same as dragged item path (dropping on itself)
+        if (targetPath === draggedItemFullPath) {
+          return false
+        }
 
-        if (wouldCreateCircularReference) {
-          // Would create circular reference, canDrop returning false
+        // Check if target path is a subdirectory of the dragged item (would create circular reference)
+        const droppedOnOwnSubdir = targetPath.startsWith(draggedItemFullPath + '/')
+
+        if (droppedOnOwnSubdir) {
+          // Can't drop in own subdirectory
+          return false
+        }
+
+        // Check if target path is the IMMEDIATE parent of the dragged item
+        // This prevents dropping a folder into its direct parent, but allows moving to ancestor directories
+        const draggedItemImmediateParent = draggedItemFullPath.split('/').slice(0, -1).join('/')
+        const isDroppingOnImmediateParent = targetPath === draggedItemImmediateParent
+
+        if (isDroppingOnImmediateParent) {
+          // Cannot drop folder into its immediate parent directory (same directory)
           return false
         }
       }
 
-      // canDrop returning true
       return true
     },
-    drop: (draggedItem: any) => {
+    drop: (draggedItem: any, monitor: any) => {
       if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
-        // Calculate target directory path
+        // Calculate target directory path - for folder drops, target is the folder itself
         const targetDirectory = snap.openedFolders
           .slice(0, columnIndex)
           .map((folder) => folder.name)
@@ -244,9 +260,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
         // Use the drag & drop function that doesn't interfere with the modal
         snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
       } else {
-        // 'Drop conditions not met:', {
-        // isFolder: item.type === STORAGE_ROW_TYPES.FOLDER,
-        // canUpdateFiles,
+        // Drop conditions not met
       }
     },
     collect: (monitor) => ({

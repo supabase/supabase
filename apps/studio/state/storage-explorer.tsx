@@ -51,6 +51,7 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress, Progress } from 'ui'
+import { Loader2 } from 'lucide-react'
 
 // Custom progress toast component for folder moves
 const FolderMoveProgressToast = ({
@@ -63,17 +64,22 @@ const FolderMoveProgressToast = ({
   folderName: string
 }) => {
   const progress = total > 0 ? Math.round((current / total) * 100) : 0
+  const isCalculating = total === 0
 
   return (
     <div className="flex gap-3 w-full">
       <div className="flex flex-col gap-2 w-full">
         <div className="flex w-full justify-between">
-          <p className="text-foreground text-sm">Moving folder "{folderName}"...</p>
-          <p className="text-foreground-light text-sm font-mono">{`${progress}%`}</p>
+          <p className="text-foreground text-sm">Moving folder "{folderName}"</p>
+          {isCalculating ? (
+            <Loader2 className="animate-spin text-foreground-muted" size={16} />
+          ) : (
+            <p className="text-foreground-light text-sm font-mono">{`${progress}%`}</p>
+          )}
         </div>
-        <Progress value={progress} className="w-full" />
-        <small className="text-foreground-light text-xs">
-          Moved {current} / {total} items...
+        {!isCalculating && <Progress value={progress} className="w-full" />}
+        <small className="text-foreground-light text-xs flex items-center gap-0.5">
+          {isCalculating ? 'Calculating items to move...' : `Moved ${current} / ${total} items...`}
         </small>
       </div>
     </div>
@@ -1661,13 +1667,23 @@ function createStorageExplorerState({
         const allItemsToMove = await getAllFilesRecursively(sourceFullPath)
         const filesToMove = allItemsToMove.filter((item) => !item.isFolder)
 
-        // Update progress tracking with total count
+        // Update progress tracking with total count and show calculation complete
         const initialProgressData = state.folderMoveProgress.get(sourceFullPath)
         if (initialProgressData) {
           state.setFolderMoveProgress(sourceFullPath, {
             ...initialProgressData,
             total: filesToMove.length,
           })
+
+          // Update toast to show calculation complete and move starting
+          toast.loading(
+            <FolderMoveProgressToast
+              current={0}
+              total={filesToMove.length}
+              folderName={folderName}
+            />,
+            { id: initialProgressData.toastId }
+          )
         }
 
         // Move all files from source to target

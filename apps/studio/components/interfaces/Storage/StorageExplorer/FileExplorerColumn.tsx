@@ -92,16 +92,11 @@ const FileExplorerColumn = ({
     const columnIndex = index
 
     if (columnIndex >= 0) {
-      // Column index 0 = root level (empty path)
-      // Column index 1 = first folder level (e.g., "foldher")
-      // Column index 2 = second folder level (e.g., "foldher/nested-folder")
-      const path =
-        columnIndex === 0
-          ? ''
-          : snap.openedFolders
-              .slice(0, columnIndex)
-              .map((folder) => folder.name)
-              .join('/')
+      // The column index represents the folder level we're currently viewing
+      const path = snap.openedFolders
+        .slice(0, columnIndex)
+        .map((folder) => folder.name)
+        .join('/')
 
       return path
     }
@@ -110,13 +105,22 @@ const FileExplorerColumn = ({
   }
 
   // Drop target for column background
-  const [{ isOver }, drop] = useDrop({
+  const [dropProps, drop] = useDrop({
     accept: 'storage-item',
-    canDrop: (draggedItem: any) => {
+    canDrop: (draggedItem: any, monitor: any) => {
       // Don't allow dropping on the same column
       if (draggedItem.sourceColumnIndex === index) return false
 
-      // Don't allow dropping a folder into its own subfolder (circular reference)
+      // Only allow drops when we're actually hovering over the column background
+      // This prevents interference with folder item drops
+      const isOverColumnBackground = monitor.isOver({ shallow: true })
+
+      if (!isOverColumnBackground) {
+        // Not over column background, blocking drop
+        return false
+      }
+
+      // Don't allow dropping a folder into itself or any of its subdirectories (circular reference)
       if (draggedItem.type === STORAGE_ROW_TYPES.FOLDER) {
         const draggedItemPath = snap.openedFolders
           .slice(0, draggedItem.sourceColumnIndex)
@@ -124,12 +128,35 @@ const FileExplorerColumn = ({
           .join('/')
         const targetPath = getColumnPath()
 
-        return !targetPath.startsWith(draggedItemPath + '/')
+        // Build the full path of the dragged folder
+        const draggedItemFullPath =
+          draggedItemPath.length > 0 ? `${draggedItemPath}/${draggedItem.name}` : draggedItem.name
+
+        // Check if target path is the same as dragged item path (dropping on itself)
+        if (targetPath === draggedItemFullPath) {
+          // Cannot drop folder on itself
+          return false
+        }
+
+        // Additional check: Block column background drops for folders when the target would be invalid
+        // This prevents the column from intercepting drops that should go to folder items
+        // Allow valid moves (like moving a folder to root) while preventing invalid ones
+        const draggedItemCurrentPath = snap.openedFolders
+          .slice(0, draggedItem.sourceColumnIndex)
+          .map((folder) => folder.name)
+          .join('/')
+
+        // Block if the target path would be the same as the dragged item's current location
+        // (This prevents self-drops, but allows moves from subdirectories to parent directories)
+        if (targetPath === draggedItemCurrentPath) {
+          // Blocking folder drop to same location
+          return false
+        }
       }
 
       return true
     },
-    drop: (draggedItem: any) => {
+    drop: (draggedItem: any, monitor: any) => {
       if (canUpdateStorage) {
         const targetDirectory = getColumnPath()
 
@@ -213,7 +240,7 @@ const FileExplorerColumn = ({
         fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
         snap.view === STORAGE_VIEWS.LIST && 'h-full',
         'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto',
-        (isOver || isDraggedOver) && 'bg-selection/10'
+        (dropProps.isOver || isDraggedOver) && 'bg-selection/10'
       )}
       onContextMenu={displayMenu}
       onDrop={handleExternalFileDrop}
