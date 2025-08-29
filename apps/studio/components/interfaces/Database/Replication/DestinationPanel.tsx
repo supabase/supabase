@@ -145,10 +145,10 @@ export const DestinationPanel = ({
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!sourceId) return console.error('Source id is required')
 
     try {
       if (editMode && existingDestination) {
-        if (!sourceId) return console.error('Source id is required')
         if (!existingDestination.pipelineId) return console.error('Pipeline id is required')
 
         const bigQueryConfig: any = {
@@ -173,7 +173,7 @@ export const DestinationPanel = ({
           destinationConfig: { bigQuery: bigQueryConfig },
           pipelineConfig: {
             publicationName: data.publicationName,
-            ...(hasBothBatchFields && { batch: batchConfig }),
+            ...(hasBothBatchFields ? { batch: batchConfig } : {}),
           },
           sourceId,
         })
@@ -197,9 +197,6 @@ export const DestinationPanel = ({
         startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
-        if (!sourceId) {
-          return console.error('Source id is required')
-        }
         const bigQueryConfig: any = {
           projectId: data.projectId,
           datasetId: data.datasetId,
@@ -214,6 +211,8 @@ export const DestinationPanel = ({
         if (data.maxFillMs !== null) batchConfig.maxFillMs = data.maxFillMs
         const hasBothBatchFields = Object.keys(batchConfig).length === 2
 
+        console.log('Create', { batchConfig, hasBothBatchFields })
+
         const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
           destinationName: data.name,
@@ -221,7 +220,7 @@ export const DestinationPanel = ({
           sourceId,
           pipelineConfig: {
             publicationName: data.publicationName,
-            ...(hasBothBatchFields && { batch: batchConfig }),
+            ...(hasBothBatchFields ? { batch: batchConfig } : {}),
           },
         })
         // Set request status only right before starting, then fire and close
@@ -479,7 +478,7 @@ export const DestinationPanel = ({
               <Button disabled={isSaving} type="default" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="default" loading={isSaving} form={formId} htmlType="submit">
+              <Button loading={isSaving} form={formId} htmlType="submit">
                 {editMode
                   ? existingDestination?.enabled
                     ? 'Apply and restart'

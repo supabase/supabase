@@ -42,9 +42,12 @@ async function createDestinationPipeline(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
+  console.log('Create', { publicationName, batch })
+
   const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
     params: { path: { ref: projectRef } },
     body: {
+      source_id: sourceId,
       destination_name: destinationName,
       destination_config: {
         big_query: {
@@ -56,14 +59,15 @@ async function createDestinationPipeline(
       },
       pipeline_config: {
         publication_name: publicationName,
-        ...(batch && {
-          batch: {
-            max_size: batch.maxSize,
-            max_fill_ms: batch.maxFillMs,
-          },
-        }),
+        ...(batch
+          ? {
+              batch: {
+                max_size: batch.maxSize,
+                max_fill_ms: batch.maxFillMs,
+              },
+            }
+          : {}),
       },
-      source_id: sourceId,
     },
     signal,
   })
