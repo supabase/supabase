@@ -208,7 +208,6 @@ export default function GettingStartedSection({
                     value={selectedFramework}
                     onChange={setSelectedFramework}
                     items={FRAMEWORKS}
-                    label="Framework"
                   />
                 ),
               },
