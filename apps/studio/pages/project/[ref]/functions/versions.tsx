@@ -2,7 +2,7 @@ import { EdgeFunctionVersionsList } from 'components/interfaces/Functions/EdgeFu
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { Download, FileArchive, Send } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
@@ -17,11 +17,11 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 const VersionsPage: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer size="large">
-      <ScaffoldSection isFullWidth>
+    <ScaffoldSection isFullWidth>
+      <div className="px-6">
         <EdgeFunctionVersionsList />
-      </ScaffoldSection>
-    </ScaffoldContainer>
+      </div>
+    </ScaffoldSection>
   )
 }
 
@@ -57,6 +57,10 @@ VersionsPage.getLayout = (page) => {
         {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
+        },
+        {
+          label: 'Deployments',
+          href: `/project/${ref}/functions/versions`,
         },
       ]
     : []
