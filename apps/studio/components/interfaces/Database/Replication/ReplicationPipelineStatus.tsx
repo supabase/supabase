@@ -289,7 +289,7 @@ export const ReplicationPipelineStatus = () => {
                               Status unavailable while pipeline is {config.badge.toLowerCase()}
                             </p>
                           ) : (
-                            <div className="space-y-3">
+                            <div className="space-y-1">
                               <div className="text-sm text-foreground">
                                 {statusConfig.description}
                               </div>

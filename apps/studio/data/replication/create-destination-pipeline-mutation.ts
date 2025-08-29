@@ -42,8 +42,6 @@ async function createDestinationPipeline(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  console.log('Create', { publicationName, batch })
-
   const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
     params: { path: { ref: projectRef } },
     body: {
