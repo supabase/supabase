@@ -60,6 +60,121 @@ const CHART_INTERVALS: ChartIntervals[] = [
   },
 ]
 
+type LogsBarChartDatum = {
+  timestamp: string
+  error_count: number
+  ok_count: number
+  warning_count: number
+}
+
+type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+
+type ServiceEntry = {
+  key: ServiceKey
+  title: string
+  icon: React.ReactNode
+  href?: string
+  route: string
+  enabled: boolean
+}
+
+type ServiceComputed = ServiceEntry & {
+  data: LogsBarChartDatum[]
+  total: number
+  warn: number
+  err: number
+  stats: ReturnType<typeof useProjectUsageStats>
+}
+
+type ServiceStatsMap = Record<
+  ServiceKey,
+  {
+    current: ReturnType<typeof useProjectUsageStats>
+    previous: ReturnType<typeof useProjectUsageStats>
+  }
+>
+
+const useServiceStats = (
+  projectRef: string,
+  timestampStart: string,
+  timestampEnd: string,
+  previousStart: string,
+  previousEnd: string
+): ServiceStatsMap => {
+  const dbCurrent = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.EDGE,
+    timestampStart,
+    timestampEnd,
+  })
+  const dbPrevious = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.EDGE,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const fnCurrent = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.FN_EDGE,
+    timestampStart,
+    timestampEnd,
+  })
+  const fnPrevious = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.FN_EDGE,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const authCurrent = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.AUTH,
+    timestampStart,
+    timestampEnd,
+  })
+  const authPrevious = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.AUTH,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const storageCurrent = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.STORAGE,
+    timestampStart,
+    timestampEnd,
+  })
+  const storagePrevious = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.STORAGE,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  const realtimeCurrent = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.REALTIME,
+    timestampStart,
+    timestampEnd,
+  })
+  const realtimePrevious = useProjectUsageStats({
+    projectRef,
+    table: LogsTableName.REALTIME,
+    timestampStart: previousStart,
+    timestampEnd: previousEnd,
+  })
+
+  return {
+    db: { current: dbCurrent, previous: dbPrevious },
+    functions: { current: fnCurrent, previous: fnPrevious },
+    auth: { current: authCurrent, previous: authPrevious },
+    storage: { current: storageCurrent, previous: storagePrevious },
+    realtime: { current: realtimeCurrent, previous: realtimePrevious },
+  }
+}
+
 const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -90,7 +205,6 @@ const ProjectUsage = () => {
     }
   }, [selectedInterval]) // Only recalculate when interval changes
 
-  // Compute the previous period range for deltas
   const { previousStart, previousEnd } = useMemo(() => {
     const currentStart = dayjs(timestampStart)
     const currentEnd = dayjs(timestampEnd)
@@ -100,102 +214,13 @@ const ProjectUsage = () => {
     return { previousStart: prevStart.toISOString(), previousEnd: prevEnd.toISOString() }
   }, [timestampStart, timestampEnd])
 
-  // Fetch per-service event chart data
-  const dbStats = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.EDGE,
+  const statsByService = useServiceStats(
+    projectRef as string,
     timestampStart,
     timestampEnd,
-  })
-
-  const fnEdgeStats = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.FN_EDGE,
-    timestampStart,
-    timestampEnd,
-  })
-
-  const authStats = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.AUTH,
-    timestampStart,
-    timestampEnd,
-  })
-
-  const storageStats = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.STORAGE,
-    timestampStart,
-    timestampEnd,
-  })
-
-  const realtimeStats = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.REALTIME,
-    timestampStart,
-    timestampEnd,
-  })
-
-  // Fetch previous period data for deltas
-  const dbStatsPrev = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.EDGE,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const fnEdgeStatsPrev = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.FN_EDGE,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const authStatsPrev = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.AUTH,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const storageStatsPrev = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.STORAGE,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  const realtimeStatsPrev = useProjectUsageStats({
-    projectRef: projectRef as string,
-    table: LogsTableName.REALTIME,
-    timestampStart: previousStart,
-    timestampEnd: previousEnd,
-  })
-
-  // Transform eventChartData into LogsBarChart format
-  type LogsBarChartDatum = {
-    timestamp: string
-    error_count: number
-    ok_count: number
-    warning_count: number
-  }
-
-  type ServiceEntry = {
-    key: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
-    title: string
-    icon: React.ReactNode
-    href?: string
-    route: string
-    stats: ReturnType<typeof useProjectUsageStats>
-    enabled: boolean
-  }
-
-  type ServiceComputed = ServiceEntry & {
-    data: LogsBarChartDatum[]
-    total: number
-    warn: number
-    err: number
-  }
+    previousStart,
+    previousEnd
+  )
 
   const toLogsBarChartData = (rows: any[] = []): LogsBarChartDatum[] => {
     return rows.map((r) => ({
@@ -212,63 +237,65 @@ const ProjectUsage = () => {
     data.reduce((acc, r) => acc + r.warning_count, 0)
   const sumErrors = (data: LogsBarChartDatum[]) => data.reduce((acc, r) => acc + r.error_count, 0)
 
-  const serviceEntries: ServiceEntry[] = [
-    {
-      key: 'db',
-      title: 'Database requests',
-      icon: <Database strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
-      href: `/project/${projectRef}/editor`,
-      route: '/logs/postgres-logs',
-      stats: dbStats,
-      enabled: true,
-    },
-    {
-      key: 'functions',
-      title: 'Functions requests',
-      icon: <Code strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
-      route: '/logs/edge-functions-logs',
-      stats: fnEdgeStats,
-      enabled: true,
-    },
-    {
-      key: 'auth',
-      title: 'Auth requests',
-      icon: <Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
-      href: `/project/${projectRef}/auth/users`,
-      route: '/logs/auth-logs',
-      stats: authStats,
-      enabled: authEnabled,
-    },
-    {
-      key: 'storage',
-      title: 'Storage requests',
-      icon: <Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
-      href: `/project/${projectRef}/storage/buckets`,
-      route: '/logs/storage-logs',
-      stats: storageStats,
-      enabled: storageEnabled,
-    },
-    {
-      key: 'realtime',
-      title: 'Realtime requests',
-      icon: <Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
-      route: '/logs/realtime-logs',
-      stats: realtimeStats,
-      enabled: true,
-    },
-  ]
+  const serviceBase: ServiceEntry[] = useMemo(
+    () => [
+      {
+        key: 'db',
+        title: 'Database requests',
+        icon: <Database strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        href: `/project/${projectRef}/editor`,
+        route: '/logs/postgres-logs',
+        enabled: true,
+      },
+      {
+        key: 'functions',
+        title: 'Functions requests',
+        icon: <Code strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        route: '/logs/edge-functions-logs',
+        enabled: true,
+      },
+      {
+        key: 'auth',
+        title: 'Auth requests',
+        icon: <Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        href: `/project/${projectRef}/auth/users`,
+        route: '/logs/auth-logs',
+        enabled: authEnabled,
+      },
+      {
+        key: 'storage',
+        title: 'Storage requests',
+        icon: <Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        href: `/project/${projectRef}/storage/buckets`,
+        route: '/logs/storage-logs',
+        enabled: storageEnabled,
+      },
+      {
+        key: 'realtime',
+        title: 'Realtime requests',
+        icon: <Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+        route: '/logs/realtime-logs',
+        enabled: true,
+      },
+    ],
+    [projectRef, authEnabled, storageEnabled]
+  )
 
-  const services: ServiceComputed[] = serviceEntries.map((s) => {
-    const data = toLogsBarChartData(s.stats.eventChartData)
-    const total = sumTotal(data || [])
-    const warn = sumWarnings(data || [])
-    const err = sumErrors(data || [])
-    return { ...s, data, total, warn, err }
-  })
+  const services: ServiceComputed[] = useMemo(
+    () =>
+      serviceBase.map((s) => {
+        const currentStats = statsByService[s.key].current
+        const data = toLogsBarChartData(currentStats.eventChartData)
+        const total = sumTotal(data)
+        const warn = sumWarnings(data)
+        const err = sumErrors(data)
+        return { ...s, stats: currentStats, data, total, warn, err }
+      }),
+    [serviceBase, statsByService]
+  )
 
   const isLoading = services.some((s) => s.stats.isLoading)
 
-  // Handle bar click navigation to logs pages
   const handleBarClick = (logRoute: string) => (datum: any) => {
     if (!datum?.timestamp) return
 
@@ -289,21 +316,19 @@ const ProjectUsage = () => {
   const totalErrors = enabledServices.reduce((sum, s) => sum + (s.err || 0), 0)
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
 
-  // Compute previous totals for enabled services
-  const prevServiceTotals = [
-    { enabled: true, stats: dbStatsPrev },
-    { enabled: true, stats: fnEdgeStatsPrev },
-    { enabled: authEnabled, stats: authStatsPrev },
-    { enabled: storageEnabled, stats: storageStatsPrev },
-    { enabled: true, stats: realtimeStatsPrev },
-  ].map((entry) => {
-    const data = toLogsBarChartData(entry.stats.eventChartData)
-    return {
-      enabled: entry.enabled,
-      total: sumTotal(data || []),
-      err: sumErrors(data || []),
-    }
-  })
+  const prevServiceTotals = useMemo(
+    () =>
+      serviceBase.map((s) => {
+        const previousStats = statsByService[s.key].previous
+        const data = toLogsBarChartData(previousStats.eventChartData)
+        return {
+          enabled: s.enabled,
+          total: sumTotal(data),
+          err: sumErrors(data),
+        }
+      }),
+    [serviceBase, statsByService]
+  )
 
   const enabledPrev = prevServiceTotals.filter((s) => s.enabled)
   const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
