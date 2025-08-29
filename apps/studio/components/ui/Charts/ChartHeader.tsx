@@ -69,7 +69,9 @@ const ChartHeader = ({
   attributes,
   sql,
 }: ChartHeaderProps) => {
-  const { hoveredIndex, syncHover } = useChartHoverState(syncId || 'default')
+  const { hoveredValue, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
   const { ref } = useParams()
@@ -93,8 +95,8 @@ const ChartHeader = ({
   }
 
   useEffect(() => {
-    if (syncId && hoveredIndex !== null && syncHover && data && xAxisKey && yAxisKey) {
-      const activeDataPoint = data[hoveredIndex]
+    if (syncId && hoveredValue !== null && isHovered && data && xAxisKey && yAxisKey) {
+      const activeDataPoint = data[hoveredValue]
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
@@ -144,8 +146,8 @@ const ChartHeader = ({
       setLocalHighlightedLabel(highlightedLabel)
     }
   }, [
-    hoveredIndex,
-    syncHover,
+    hoveredValue,
+    isHovered,
     syncId,
     data,
     xAxisKey,
