@@ -67,7 +67,7 @@ export const ProjectCardStatus = ({
       case 'isResizing':
         return renderMode === 'badge' ? 'Resizing' : 'Project is resizing'
       case 'isComingUp':
-        return renderMode === 'badge' ? 'Starting' : 'Project is coming up'
+        return renderMode === 'badge' ? 'Starting' : 'Project is starting'
       case 'isRestoring':
         return renderMode === 'badge' ? 'Restoring' : 'Project is restoring'
       case 'isUpgrading':

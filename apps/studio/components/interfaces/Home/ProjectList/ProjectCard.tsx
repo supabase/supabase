@@ -1,4 +1,5 @@
 import { Github } from 'lucide-react'
+import { useMemo } from 'react'
 
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
@@ -11,6 +12,8 @@ import { BASE_PATH } from 'lib/constants'
 import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import { ProjectListItemStatus } from './ProjectListItemStatus'
+import { useProjectIssueCounts } from './useProjectIssueCounts'
 
 export interface ProjectCardProps {
   project: ProjectInfo
@@ -33,6 +36,9 @@ export const ProjectCard = ({
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
+
+  // Get issue counts using the shared hook
+  const issueCounts = useProjectIssueCounts(projectRef, project.status !== 'INACTIVE')
 
   const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
@@ -74,7 +80,15 @@ export const ProjectCard = ({
           </div>
         }
         footer={
-          <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
+          <div className="space-y-2">
+            <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
+            <ProjectListItemStatus
+              totalIssues={issueCounts.totalIssues}
+              hasErrors={issueCounts.hasErrors}
+              hasWarnings={issueCounts.hasWarnings}
+              renderMode="separate"
+            />
+          </div>
         }
         containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
       />

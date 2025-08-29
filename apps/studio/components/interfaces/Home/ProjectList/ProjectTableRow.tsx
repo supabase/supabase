@@ -9,8 +9,11 @@ import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
 import { TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import { ProjectListItemStatus } from './ProjectListItemStatus'
+import { useProjectIssueCounts } from './useProjectIssueCounts'
 
 export interface ProjectTableRowProps {
   project: ProjectInfo
@@ -30,6 +33,9 @@ export const ProjectTableRow = ({
   const router = useRouter()
   const { name, ref: projectRef } = project
   const projectStatus = inferProjectStatus(project)
+
+  // Get issue counts using the shared hook
+  const issueCounts = useProjectIssueCounts(projectRef, project.status !== 'INACTIVE')
 
   const url = rewriteHref ?? `/project/${project.ref}`
   const isBranchingEnabled = project.preview_branch_refs?.length > 0
@@ -53,6 +59,12 @@ export const ProjectTableRow = ({
           <div>
             <p className="font-medium">{name}</p>
             <p className="text-xs text-foreground-lighter">ID: {projectRef}</p>
+            <ProjectListItemStatus
+              totalIssues={issueCounts.totalIssues}
+              hasErrors={issueCounts.hasErrors}
+              hasWarnings={issueCounts.hasWarnings}
+              renderMode="inline"
+            />
           </div>
           {(isGithubIntegrated || isVercelIntegrated || isBranchingEnabled) && (
             <div className="flex items-center gap-x-2">
