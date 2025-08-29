@@ -75,7 +75,7 @@ const FormSchema = z
     formatted_size_limit: z.coerce
       .number()
       .min(0, 'File size upload limit has to be at least 0')
-      .default(0),
+      .optional(),
     allowed_mime_types: z.string().trim().default(''),
   })
   .superRefine((data, ctx) => {
@@ -126,7 +126,7 @@ const CreateBucketModal = () => {
       public: false,
       type: 'STANDARD',
       has_file_size_limit: false,
-      formatted_size_limit: 0,
+      formatted_size_limit: undefined,
       allowed_mime_types: '',
     },
   })
@@ -151,9 +151,10 @@ const CreateBucketModal = () => {
     }
 
     try {
-      const fileSizeLimit = values.has_file_size_limit
-        ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
-        : undefined
+      const fileSizeLimit =
+        values.has_file_size_limit && values.formatted_size_limit !== undefined
+          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
+          : undefined
 
       const allowedMimeTypes = hasAllowedMimeTypes
         ? values.allowed_mime_types.length > 0

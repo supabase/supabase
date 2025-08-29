@@ -71,7 +71,7 @@ describe(`CreateBucketModal`, () => {
     expect(sizeLimitToggle).toBeChecked()
 
     const sizeLimitInput = screen.getByLabelText(`File size limit`)
-    expect(sizeLimitInput).toHaveValue(0)
+    expect(sizeLimitInput).toHaveValue(null)
     await userEvent.type(sizeLimitInput, `25`)
 
     const sizeLimitUnitSelect = screen.getByLabelText(`File size limit unit`)
