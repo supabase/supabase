@@ -1,47 +1,65 @@
+import { UIEvent, useMemo } from 'react'
+
+import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { makeRandomString } from 'lib/helpers'
+import { isAtBottom } from 'lib/helpers'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
-import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { LoadingCardView, LoadingTableView, NoFilterResults, NoProjectsState } from './EmptyStates'
+import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  LoadingCardView,
+  LoadingTableRow,
+  LoadingTableView,
+  NoFilterResults,
+  NoProjectsState,
+} from './EmptyStates'
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
+import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
   rewriteHref?: (projectRef: string) => string
-  search?: string
-  filterStatus?: string[]
-  resetFilterStatus?: () => void
-  viewMode?: 'grid' | 'table'
 }
 
-export const ProjectList = ({
-  search = '',
-  organization: organization_,
-  rewriteHref,
-  filterStatus,
-  resetFilterStatus,
-  viewMode = 'grid',
-}: ProjectListProps) => {
+export const ProjectList = ({ organization: organization_, rewriteHref }: ProjectListProps) => {
+  const { slug: urlSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const [search] = useQueryState('search', parseAsString.withDefault(''))
+  const debouncedSearch = useDebounce(search, 500)
+
+  const [filterStatus, setFilterStatus] = useQueryState(
+    'status',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
+  const [viewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
+
   const organization = organization_ ?? selectedOrganization
+  const slug = organization?.slug ?? urlSlug
 
   const {
     data,
+    error: projectsError,
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
-    error: projectsError,
-  } = useProjectsQuery()
-  const allProjects = data?.projects ?? []
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useOrgProjectsInfiniteQuery({ slug, search: search.length === 0 ? search : debouncedSearch })
+  const orgProjects =
+    useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   const {
     isLoading: _isLoadingPermissions,
@@ -54,42 +72,20 @@ export const ProjectList = ({
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
 
-  const orgProjects = allProjects.filter((x) => x.organization_slug === organization?.slug)
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
-  const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
-  const noResultsFromSearch =
-    search.length > 0 &&
-    isSuccessProjects &&
-    orgProjects.filter((project) => {
-      return (
-        project.name.toLowerCase().includes(search.toLowerCase()) ||
-        project.ref.includes(search.toLowerCase())
-      )
-    }).length === 0
-  const noResultsFromStatusFilter =
-    hasFilterStatusApplied &&
-    isSuccessProjects &&
-    orgProjects.filter((project) => filterStatus.includes(project.status)).length === 0
-
-  const isEmpty = !orgProjects || orgProjects.length === 0
+  const isEmpty = debouncedSearch.length === 0 && (!orgProjects || orgProjects.length === 0)
   const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
-  const filteredProjects =
-    search.length > 0
-      ? sortedProjects.filter((project) => {
-          return (
-            project.name.toLowerCase().includes(search.toLowerCase()) ||
-            project.ref.includes(search.toLowerCase())
-          )
-        })
-      : sortedProjects
 
   const filteredProjectsByStatus =
-    filterStatus !== undefined
-      ? filterStatus.length === 2
-        ? filteredProjects
-        : filteredProjects.filter((project) => filterStatus.includes(project.status))
-      : filteredProjects
+    filterStatus.length === 0
+      ? sortedProjects
+      : sortedProjects.filter((project) => filterStatus.includes(project.status))
+
+  const noResultsFromSearch =
+    debouncedSearch.length > 0 && isSuccessProjects && orgProjects.length === 0
+  const noResultsFromStatusFilter =
+    filterStatus.length > 0 && isSuccessProjects && filteredProjectsByStatus.length === 0
 
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
@@ -110,6 +106,11 @@ export const ProjectList = ({
   const vercelConnections = integrations
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
+
+  const handleScroll = (event: UIEvent<HTMLDivElement | HTMLUListElement>) => {
+    if (isLoadingProjects || isFetchingNextPage || !isAtBottom(event)) return
+    fetchNextPage()
+  }
 
   if (isErrorPermissions) {
     return (
@@ -138,8 +139,14 @@ export const ProjectList = ({
   }
 
   if (viewMode === 'table') {
+    // [Joshen] Using calc for now sorry, couldn't figure out max height with flex grow for
+    // this particular one somehow, to make the scrollable area take up the remaining space max
     return (
-      <Card>
+      <Card
+        className="overflow-y-auto"
+        style={{ maxHeight: 'calc(100vh - 250px)' }}
+        onScroll={handleScroll}
+      >
         <Table>
           <TableHeader>
             <TableRow>
@@ -156,7 +163,7 @@ export const ProjectList = ({
                 <TableCell colSpan={5} className="p-0">
                   <NoFilterResults
                     filterStatus={filterStatus}
-                    resetFilterStatus={resetFilterStatus}
+                    resetFilterStatus={() => setFilterStatus([])}
                     className="border-0"
                   />
                 </TableCell>
@@ -168,22 +175,26 @@ export const ProjectList = ({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredProjectsByStatus?.map((project) => (
-                <ProjectTableRow
-                  key={project.ref}
-                  project={project}
-                  rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-                  resourceWarnings={resourceWarnings?.find(
-                    (resourceWarning) => resourceWarning.project === project.ref
-                  )}
-                  githubIntegration={githubConnections?.find(
-                    (connection) => connection.supabase_project_ref === project.ref
-                  )}
-                  vercelIntegration={vercelConnections?.find(
-                    (connection) => connection.supabase_project_ref === project.ref
-                  )}
-                />
-              ))
+              <>
+                {filteredProjectsByStatus?.map((project) => (
+                  <ProjectTableRow
+                    key={project.ref}
+                    project={project}
+                    organization={organization}
+                    rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                    resourceWarnings={resourceWarnings?.find(
+                      (resourceWarning) => resourceWarning.project === project.ref
+                    )}
+                    githubIntegration={githubConnections?.find(
+                      (connection) => connection.supabase_project_ref === project.ref
+                    )}
+                    vercelIntegration={vercelConnections?.find(
+                      (connection) => connection.supabase_project_ref === project.ref
+                    )}
+                  />
+                ))}
+                {hasNextPage && <LoadingTableRow />}
+              </>
             )}
           </TableBody>
         </Table>
@@ -194,14 +205,26 @@ export const ProjectList = ({
   return (
     <>
       {noResultsFromStatusFilter ? (
-        <NoFilterResults filterStatus={filterStatus} resetFilterStatus={resetFilterStatus} />
+        <NoFilterResults
+          filterStatus={filterStatus}
+          resetFilterStatus={() => setFilterStatus([])}
+        />
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <ul className="w-full mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <ul
+          onScroll={handleScroll}
+          // [Joshen] Likewise as per table view using calc for now sorry, ideally we figure out
+          // (and also make it a reusable component) a way to use flex-grow, max height, and overflow scroll
+          style={{ maxHeight: 'calc(100vh - 220px)' }}
+          className={cn(
+            'w-full mx-auto grid grid-cols-1 gap-2 md:gap-4 overflow-y-scroll',
+            'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
+          )}
+        >
           {filteredProjectsByStatus?.map((project) => (
             <ProjectCard
-              key={makeRandomString(5)}
+              key={project.ref}
               project={project}
               rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
               resourceWarnings={resourceWarnings?.find(
@@ -215,6 +238,7 @@ export const ProjectList = ({
               )}
             />
           ))}
+          {hasNextPage && [...Array(2)].map((_, i) => <ShimmeringCard key={i} />)}
         </ul>
       )}
     </>
