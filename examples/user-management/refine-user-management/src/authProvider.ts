@@ -1,6 +1,6 @@
 import { AuthBindings } from "@refinedev/core";
 
-import { supabaseClient } from "./utility";
+import { supabaseClient } from "./utility/supabaseClient";
 
 const authProvider: AuthBindings = {
   login: async ({ email }) => {

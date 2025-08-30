@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes'
 import { Toaster as Sonner } from 'sonner'
 
 import { cn } from '../../../lib/utils'
-import { buttonVariants } from '../../Button'
+import { buttonVariants } from '../../Button/Button'
 import { StatusIcon } from './../../StatusIcon'
 
 export const SONNER_DEFAULT_DURATION = 4000

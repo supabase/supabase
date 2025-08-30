@@ -9,7 +9,7 @@
 import { useTheme } from 'next-themes'
 import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { Button } from './../Button'
+import { Button } from './../Button/Button'
 import { cn } from './../../lib/utils/cn'
 import { copyToClipboard } from '../../lib/utils'
 import { dart } from './prism'

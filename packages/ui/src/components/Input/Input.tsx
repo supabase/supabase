@@ -10,7 +10,7 @@ import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
 import { copyToClipboard } from '../../lib/utils'
 import { cn } from '../../lib/utils/cn'
-import { Button } from '../Button'
+import { Button } from '../Button/Button'
 import { useFormContext } from '../Form/FormContext'
 
 export interface Props

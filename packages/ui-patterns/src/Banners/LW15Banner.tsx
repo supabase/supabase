@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Button } from 'ui/src/components/Button'
+import { Button } from 'ui'
 import announcement from '../Banners/data.json'
 
 export function LW15Banner() {

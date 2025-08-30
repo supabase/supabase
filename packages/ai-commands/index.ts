@@ -1,2 +1,2 @@
 export * from './src/errors'
-export * from './src/sql'
+export * from './src/sql/functions'

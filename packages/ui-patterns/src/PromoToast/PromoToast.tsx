@@ -3,7 +3,7 @@
 import { hasConsented, LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button } from 'ui/src/components/Button/Button'
+import { Button } from 'ui'
 import { cn } from 'ui/src/lib/utils/cn'
 import announcement from '../Banners/data.json'
 import './styles.css'

@@ -10,7 +10,7 @@ import { dataProvider, liveProvider } from '@refinedev/supabase';
 import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom';
 import './App.css';
 import authProvider from './authProvider';
-import { supabaseClient } from './utility';
+import { supabaseClient } from './utility/supabaseClient';
 import Account from './components/account';
 import Auth from './components/auth';
 

@@ -4,7 +4,7 @@ export * from './src/lib/Markdown'
 
 // GENERAL
 
-export * from './src/components/Button'
+export * from './src/components/Button/Button'
 export * from './src/components/Icon/IconBackground'
 export * from './src/components/Image'
 
@@ -12,11 +12,11 @@ export * from './src/components/Image'
 
 export { Card as Card_legacy_ } from './src/components/Card'
 export * from './src/components/Tabs'
-export * from './src/components/Alert'
+export * from './src/components/Alert/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
-export * from './src/components/CodeBlock'
-export * from './src/components/SimpleCodeBlock'
+export * from './src/components/CodeBlock/CodeBlock'
+export * from './src/components/SimpleCodeBlock/SimpleCodeBlock'
 
 // NAV
 
@@ -55,10 +55,10 @@ export * from './src/components/ExpandingTextArea'
 export * from './src/components/PrePostTab'
 
 // layout
-export * from './src/components/LoadingLine'
+export * from './src/components/LoadingLine/LoadingLine'
 
 // ai icon
-export * from './src/layout/ai-icon-animation'
+export * from './src/layout/ai-icon-animation/ai-icon-animation'
 
 // theme switcher
 export * from './src/components/ThemeProvider/themes'
@@ -246,7 +246,7 @@ export * from './src/components/shadcn/ui/resizable'
 export * from './src/components/radio-group-stacked'
 export * from './src/components/radio-group-card'
 
-export * from './src/components/TreeView'
+export * from './src/components/TreeView/TreeView'
 
 export * from './src/components/shadcn/ui/chart'
 export * from './src/components/shadcn/ui/sidebar'
