@@ -6,13 +6,18 @@ import { useMemo } from 'react'
  */
 export const useFillTimeseriesSorted = (...args: Parameters<typeof fillTimeseries>) => {
   return useMemo(() => {
-    const [data, timestampKey] = args
-    if (!data[0]?.[timestampKey])
+    const [data, timestampKey, _valueKey, _defaultValue, min, max] = args
+    // If no data and no bounds, or if there is data but timestamp key is missing, skip filling
+    if (
+      (Array.isArray(data) && data.length === 0 && !(min && max)) ||
+      (Array.isArray(data) && data.length > 0 && !data[0]?.[timestampKey])
+    ) {
       return {
         data,
         error: undefined,
         isError: false,
       }
+    }
 
     try {
       const filled = fillTimeseries(...args)
