@@ -197,12 +197,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-create-restore-point",
-        "title": "Create restore point",
-        "slug": "v1-create-restore-point",
-        "type": "operation"
-      },
-      {
         "id": "v1-disable-readonly-mode-temporarily",
         "title": "Disable readonly mode temporarily",
         "slug": "v1-disable-readonly-mode-temporarily",
@@ -257,12 +251,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-restore-point",
-        "title": "Get restore point",
-        "slug": "v1-get-restore-point",
-        "type": "operation"
-      },
-      {
         "id": "v1-get-ssl-enforcement-config",
         "title": "Get ssl enforcement config",
         "slug": "v1-get-ssl-enforcement-config",
@@ -308,12 +296,6 @@
         "id": "v1-setup-a-read-replica",
         "title": "Setup a read replica",
         "slug": "v1-setup-a-read-replica",
-        "type": "operation"
-      },
-      {
-        "id": "v1-undo",
-        "title": "Undo",
-        "slug": "v1-undo",
         "type": "operation"
       },
       {
@@ -539,12 +521,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-oauth-authorize-project-claim",
-        "title": "Oauth authorize project claim",
-        "slug": "v1-oauth-authorize-project-claim",
-        "type": "operation"
-      },
-      {
         "id": "v1-revoke-token",
         "title": "Revoke token",
         "slug": "v1-revoke-token",
@@ -557,12 +533,6 @@
     "title": "Organizations",
     "items": [
       {
-        "id": "v1-claim-project-for-organization",
-        "title": "Claim project for organization",
-        "slug": "v1-claim-project-for-organization",
-        "type": "operation"
-      },
-      {
         "id": "v1-create-an-organization",
         "title": "Create an organization",
         "slug": "v1-create-an-organization",
@@ -572,12 +542,6 @@
         "id": "v1-get-an-organization",
         "title": "Get an organization",
         "slug": "v1-get-an-organization",
-        "type": "operation"
-      },
-      {
-        "id": "v1-get-organization-project-claim",
-        "title": "Get organization project claim",
-        "slug": "v1-get-organization-project-claim",
         "type": "operation"
       },
       {
@@ -611,12 +575,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-create-project-claim-token",
-        "title": "Create project claim token",
-        "slug": "v1-create-project-claim-token",
-        "type": "operation"
-      },
-      {
         "id": "v1-delete-a-project",
         "title": "Delete a project",
         "slug": "v1-delete-a-project",
@@ -626,12 +584,6 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-project-claim-token",
-        "title": "Delete project claim token",
-        "slug": "v1-delete-project-claim-token",
         "type": "operation"
       },
       {
@@ -656,12 +608,6 @@
         "id": "v1-get-project",
         "title": "Get project",
         "slug": "v1-get-project",
-        "type": "operation"
-      },
-      {
-        "id": "v1-get-project-claim-token",
-        "title": "Get project claim token",
-        "slug": "v1-get-project-claim-token",
         "type": "operation"
       },
       {
