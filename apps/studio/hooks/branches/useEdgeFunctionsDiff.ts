@@ -201,13 +201,15 @@ export const useEdgeFunctionsDiff = ({
     const mainBody = mainBodiesMap[slug]
     if (!currentBody || !mainBody) return
 
-    const allFileKeys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
+    const allFileKeys = new Set(
+      [...currentBody.files, ...mainBody.files].map((f) => fileKey(f.name))
+    )
     const fileInfos: FileInfo[] = []
     let hasModifications = false
 
     for (const key of allFileKeys) {
-      const currentFile = currentBody.find((f) => fileKey(f.name) === key)
-      const mainFile = mainBody.find((f) => fileKey(f.name) === key)
+      const currentFile = currentBody.files.find((f) => fileKey(f.name) === key)
+      const mainFile = mainBody.files.find((f) => fileKey(f.name) === key)
 
       let status: FileStatus = 'unchanged'
 
@@ -236,7 +238,7 @@ export const useEdgeFunctionsDiff = ({
   addedSlugs.forEach((slug) => {
     const body = addedBodiesMap[slug]
     if (body) {
-      functionFileInfo[slug] = body.map((file) => ({
+      functionFileInfo[slug] = body.files.map((file) => ({
         key: fileKey(file.name),
         status: 'added' as FileStatus,
       }))
@@ -247,7 +249,7 @@ export const useEdgeFunctionsDiff = ({
   removedSlugs.forEach((slug) => {
     const body = removedBodiesMap[slug]
     if (body) {
-      functionFileInfo[slug] = body.map((file) => ({
+      functionFileInfo[slug] = body.files.map((file) => ({
         key: fileKey(file.name),
         status: 'removed' as FileStatus,
       }))
