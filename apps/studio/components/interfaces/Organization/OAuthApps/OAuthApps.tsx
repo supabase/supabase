@@ -13,7 +13,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, cn } from 'ui'
 import { AuthorizedAppRow } from './AuthorizedAppRow'
 import { DeleteAppModal } from './DeleteAppModal'
@@ -34,8 +34,8 @@ const OAuthApps = () => {
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
 
-  const canReadOAuthApps = useCheckPermissions(PermissionAction.READ, 'approved_oauth_apps')
-  const canCreateOAuthApps = useCheckPermissions(PermissionAction.CREATE, 'approved_oauth_apps')
+  const canReadOAuthApps = useAsyncCheckProjectPermissions(PermissionAction.READ, 'approved_oauth_apps')
+  const canCreateOAuthApps = useAsyncCheckProjectPermissions(PermissionAction.CREATE, 'approved_oauth_apps')
 
   const {
     data: publishedApps,
@@ -43,7 +43,7 @@ const OAuthApps = () => {
     isLoading: isLoadingPublishedApps,
     isSuccess: isSuccessPublishedApps,
     isError: isErrorPublishedApps,
-  } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
+  } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps.can })
 
   const sortedPublishedApps = publishedApps?.sort((a, b) => {
     return Number(new Date(a.created_at ?? '')) - Number(new Date(b.created_at ?? ''))

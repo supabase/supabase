@@ -9,7 +9,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
@@ -18,7 +18,7 @@ const PauseFailedState = () => {
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
 
-  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+  const canDeleteProject = useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'projects', {
     resource: { project_id: project?.id },
   })
 

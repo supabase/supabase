@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions  } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
 import CreditCard from './CreditCard'
 
@@ -31,7 +31,7 @@ const CurrentPaymentMethod = () => {
 
   const defaultPaymentMethod = paymentMethods?.data.find((pm) => pm.is_default)
 
-  const canReadPaymentMethods = useCheckPermissions(
+  const canReadPaymentMethods = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )
