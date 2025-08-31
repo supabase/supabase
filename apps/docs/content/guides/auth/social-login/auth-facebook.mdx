@@ -202,6 +202,119 @@ suspend fun signInWithFacebook() {
 ```
 
 </TabPanel>
+<TabPanel id="capacitor" label="Capacitor">
+
+For Capacitor apps, you can use the [@capgo/capacitor-social-login](https://github.com/Cap-go/capacitor-social-login) plugin for native Facebook authentication across iOS and Android platforms.
+
+<Admonition type="info">
+
+For comprehensive setup instructions including Facebook App configuration, see our [Capacitor Social Login guide](/docs/blog/setup-supabase-with-capacitor-social-login).
+
+</Admonition>
+
+1. Install the Capacitor Social Login plugin:
+
+```bash
+npm install @capgo/capacitor-social-login
+npx cap sync
+```
+
+2. Configure the plugin with your Facebook credentials:
+
+```typescript
+import { SocialLogin } from '@capgo/capacitor-social-login';
+
+await SocialLogin.initialize({
+  facebook: {
+    appId: 'YOUR_FACEBOOK_APP_ID',        // From Facebook Developer Dashboard
+    clientToken: 'YOUR_FACEBOOK_CLIENT_TOKEN', // From Facebook Developer Dashboard
+
+    // Optional: Use Facebook Limited Login (for enhanced privacy)
+    limitedLogin: false // Set to true for limited login
+  }
+});
+```
+
+3. Implement the authentication flow:
+
+```typescript
+import { SocialLogin } from '@capgo/capacitor-social-login';
+import { supabase } from './supabase';
+
+async function signInWithFacebook() {
+  try {
+    const result = await SocialLogin.login({
+      provider: 'facebook',
+      options: {
+        permissions: ['email', 'public_profile']
+      }
+    });
+
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'facebook',
+      token: result.result?.accessToken.token!,
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Facebook sign-in error:', error);
+    throw error;
+  }
+}
+```
+
+### Platform-Specific Configuration
+
+**iOS Configuration:**
+Add Facebook SDK configuration to your `ios/App/App/Info.plist`:
+
+```xml
+<!-- Facebook App ID -->
+<key>FacebookAppID</key>
+<string>YOUR_FACEBOOK_APP_ID</string>
+<key>FacebookClientToken</key>
+<string>YOUR_FACEBOOK_CLIENT_TOKEN</string>
+<key>FacebookDisplayName</key>
+<string>YOUR_APP_NAME</string>
+
+<!-- URL Scheme -->
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>fbYOUR_FACEBOOK_APP_ID</string>
+    </array>
+  </dict>
+</array>
+```
+
+**Android Configuration:**
+Add to your `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+
+<!-- Facebook configuration -->
+<meta-data
+  android:name="com.facebook.sdk.ApplicationId"
+  android:value="@string/facebook_app_id"/>
+<meta-data
+  android:name="com.facebook.sdk.ClientToken"
+  android:value="@string/facebook_client_token"/>
+```
+
+Add Facebook resources to `android/app/src/main/res/values/strings.xml`:
+
+```xml
+<string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
+<string name="facebook_client_token">YOUR_FACEBOOK_CLIENT_TOKEN</string>
+```
+
+For detailed platform-specific setup including Facebook SDK integration, refer to our [comprehensive Capacitor guide](/docs/blog/setup-supabase-with-capacitor-social-login).
+
+</TabPanel>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
