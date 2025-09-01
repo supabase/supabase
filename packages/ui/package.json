@@ -64,7 +64,7 @@
     "prism-react-renderer": "^2.3.1",
     "prop-types": "^15.7.2",
     "react": "catalog:",
-    "react-accessible-treeview": "^2.8.3",
+    "react-accessible-treeview": "^2.11.2",
     "react-copy-to-clipboard": "^5.1.0",
     "react-day-picker": "^8.8.0",
     "react-dom": "catalog:",
