@@ -13,7 +13,6 @@ import {
   DollarSign,
   Gift,
   TrendingUp,
-  ArrowBigDown,
   Heart,
   LifeBuoy,
   Wrench,
@@ -35,8 +34,17 @@ const ICONS = {
 
 type IconName = keyof typeof ICONS
 
+// Type guard to check if a string is a valid icon name
+function isValidIconName(icon: string): icon is IconName {
+  return icon in ICONS
+}
+
 export function IconComponent({ icon, className }: { icon: IconName; className?: string }) {
-  const Cmp = ICONS[icon] // no heuristics, no fallbacks
+  const Cmp = ICONS[icon]
+  if (!Cmp) {
+    console.warn(`Icon "${icon}" not found in ICONS object`)
+    return null
+  }
   return <Cmp className={className} aria-hidden focusable={false} />
 }
 
@@ -67,10 +75,13 @@ interface FeatureItemProps {
 }
 
 const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
+  console.log(feature.icon)
+
   return (
     <li className="flex flex-col gap-2 text-sm text-foreground-lighter">
-      {feature.icon && <IconComponent icon={feature.icon} className="w-7 h-7 mb-2 text-current" />}
-
+      {feature.icon && isValidIconName(feature.icon) ? (
+        <IconComponent icon={feature.icon} className="w-7 h-7 mb-2 text-current" />
+      ) : null}
       <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
         <span className={cn('h-full bg-foreground-lighter', 'h-7')} />
       </div>
