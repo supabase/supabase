@@ -11,7 +11,7 @@ import { ExternalLink } from 'lucide-react'
 interface LintDetailProps {
   lint: Lint
   projectRef: string
-  onAskAssistant: () => void
+  onAskAssistant?: () => void
 }
 
 const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
@@ -39,7 +39,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
         <Button
           icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
           onClick={() => {
-            onAskAssistant()
+            onAskAssistant?.()
             snap.newChat({
               name: 'Summarize lint',
               open: true,
