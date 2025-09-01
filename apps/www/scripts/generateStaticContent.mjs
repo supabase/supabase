@@ -7,7 +7,12 @@ import matter from 'gray-matter'
 // Constants
 const FILENAME_SUBSTRING = 11 // based on YYYY-MM-DD format
 const CMS_SITE_ORIGIN =
-  process.env.CMS_SITE_ORIGIN || process.env.CMS_URL || 'http://localhost:3030'
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? 'https://supabase.com'
+    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
+        typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
+      : 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
 /**

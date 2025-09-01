@@ -4,7 +4,7 @@ const CMS_SITE_ORIGIN =
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
         typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
-      : 'http://localhost:3000'
+      : 'http://localhost:3030'
 
 // Function to generate CMS remote patterns from CMS_SITE_ORIGIN
 function generateCMSRemotePatterns() {
