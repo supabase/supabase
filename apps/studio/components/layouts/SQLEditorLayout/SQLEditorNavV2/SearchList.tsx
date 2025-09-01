@@ -53,7 +53,11 @@ export const SearchList = ({ search }: SearchListProps) => {
   )
   const totalNumber = (count as unknown as { count: number })?.count ?? 0
 
-  const snippets = useMemo(() => data?.pages.flatMap((page) => page.content), [data?.pages])
+  const snippets = useMemo(
+    // [Joshen] Set folder_id to null to ensure flat list
+    () => data?.pages.flatMap((page) => page.content.map((x) => ({ ...x, folder_id: null }))),
+    [data?.pages]
+  )
   const treeState = formatFolderResponseForTreeView({ folders: [], contents: snippets as any })
 
   const snippetsLastItemIds = useMemo(() => getLastItemIds(treeState), [treeState])
@@ -117,6 +121,7 @@ export const SearchList = ({ search }: SearchListProps) => {
                       </span>
                     ),
                   }}
+                  isBranch={false}
                   isOpened={isOpened && !isPreview}
                   isSelected={isActive}
                   isPreview={isPreview}

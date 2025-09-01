@@ -91,15 +91,15 @@ export const ProjectDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
+  const { data, isLoading: isLoadingProjects } = useProjectsQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const isBranch = project?.parentRef !== project?.ref
 
-  const projects = allProjects
-    ?.filter((x) => x.organization_id === selectedOrganization?.id)
+  const projects = (data?.projects ?? [])
+    .filter((x) => x.organization_id === selectedOrganization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
     ? projects?.find((p) => p.ref === project?.parentRef)

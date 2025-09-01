@@ -4,7 +4,8 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-import { useParams } from 'common'
+
+import { useFlag, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
@@ -16,7 +17,6 @@ import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import {
   AlertCircle,

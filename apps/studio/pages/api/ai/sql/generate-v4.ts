@@ -124,7 +124,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const { model: rawModel, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
+  const {
+    model: rawModel,
+    error: modelError,
+    supportsCachePoint,
+  } = await getModel(projectRef, isLimited) // use project ref as routing key
 
   // Wrap AI SDK v5 model with Braintrust middleware for tracing
   const model = wrapLanguageModel({
@@ -178,12 +182,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        providerOptions: {
-          bedrock: {
-            // Always cache the system prompt (must not contain dynamic content)
-            cachePoint: { type: 'default' },
+        ...(supportsCachePoint && {
+          providerOptions: {
+            bedrock: {
+              // Always cache the system prompt (must not contain dynamic content)
+              cachePoint: { type: 'default' },
+            },
           },
-        },
+        }),
       },
       {
         role: 'assistant',

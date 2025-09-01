@@ -149,8 +149,10 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
     { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
     ref
   ) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data } = useProjectsQuery()
+    const project = (data?.projects ?? []).find(
+      (project) => project.ref === connection.supabase_project_ref
+    )
 
     return (
       <li
@@ -236,8 +238,10 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
 
 const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ connection, type, ...props }, ref) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data } = useProjectsQuery()
+    const project = (data?.projects ?? []).find(
+      (project) => project.ref === connection.supabase_project_ref
+    )
 
     return (
       <li

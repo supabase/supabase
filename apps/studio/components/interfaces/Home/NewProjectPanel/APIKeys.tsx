@@ -42,7 +42,10 @@ export const APIKeys = () => {
   ])
 
   const availableLanguages = [
-    ...(javascriptExampleEnabled ? [{ name: 'Javascript', key: 'js' }] : []),
+    {
+      name: javascriptExampleEnabled ? 'Javascript' : 'Typescript',
+      key: 'js',
+    },
     ...(dartExampleEnabled ? [{ name: 'Dart', key: 'dart' }] : []),
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])

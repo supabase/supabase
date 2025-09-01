@@ -18,7 +18,9 @@ const CATEGORIES = [
 ] as const
 
 export const AvailableIntegrations = () => {
-  const showStripeWrapper = useIsFeatureEnabled('integrations:show_stripe_wrapper')
+  const { integrationsShowStripeWrapper } = useIsFeatureEnabled([
+    'integrations:show_stripe_wrapper',
+  ])
 
   const [selectedCategory, setSelectedCategory] = useQueryState(
     'category',
@@ -41,7 +43,7 @@ export const AvailableIntegrations = () => {
   const installedIds = installedIntegrations.map((i) => i.id)
 
   // available integrations for install
-  const availableIntegrations = showStripeWrapper
+  const availableIntegrations = integrationsShowStripeWrapper
     ? allIntegrations
     : allIntegrations.filter((x) => x.id !== 'stripe_wrapper')
   const integrationsByCategory =
