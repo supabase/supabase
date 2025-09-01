@@ -1,15 +1,3 @@
-import {
-  Heart,
-  LifeBuoy,
-  Shield,
-  Award,
-  Zap,
-  MessageSquare,
-  DollarSign,
-  Gift,
-  TrendingUp,
-  Wrench,
-} from 'lucide-react'
 import { Image } from 'ui'
 import { companyStats } from '~/data/company-stats'
 
