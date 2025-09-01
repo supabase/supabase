@@ -16,6 +16,7 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import TopSection from 'components/interfaces/HomeNew/TopSection'
 import SortableSection from 'components/interfaces/HomeNew/SortableSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { AdvisorSection } from './AdvisorSection'
 
 const Home = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -100,11 +101,13 @@ const Home = () => {
                 strategy={verticalListSortingStrategy}
               >
                 {sectionOrder.map((id) => {
-                  return (
-                    <SortableSection key={id} id={id}>
-                      {id}
-                    </SortableSection>
-                  )
+                  if (id === 'advisor') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        <AdvisorSection />
+                      </SortableSection>
+                    )
+                  }
                 })}
               </SortableContext>
             </DndContext>
