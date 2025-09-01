@@ -35,19 +35,25 @@ export const useExecuteSqlMutation = ({
     (args) => executeSql(args),
     {
       async onSuccess(data, variables, context) {
+        // [Joshen] Default contextualInvalidation to false for now, only used for SQL editor to dynamically invalidate
         const { contextualInvalidation, sql, projectRef } = variables
 
-        // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
         const sqlLower = sql.toLowerCase()
         const isMutationSQL =
-          sqlLower.includes('create ') || sqlLower.includes('alter ') || sqlLower.includes('drop ')
+          sqlLower.includes('create ') ||
+          sqlLower.includes('alter ') ||
+          sqlLower.includes('drop ') ||
+          sqlLower.includes('insert')
         if (contextualInvalidation && projectRef && isMutationSQL) {
+          // [Joshen] IMO should avoid a blanket invalidation as this may cause a burst of requests
+          // and might also delay more important queries from invalidating earlier
           const databaseRelatedKeys = queryClient
             .getQueryCache()
             .findAll(['projects', projectRef])
             .map((x) => x.queryKey)
             .filter((x) => !INVALIDATION_KEYS_IGNORE.some((a) => x.includes(a)))
-          await Promise.all(databaseRelatedKeys.map((key) => queryClient.invalidateQueries(key)))
+
+          Promise.all(databaseRelatedKeys.map((key) => queryClient.invalidateQueries(key)))
         }
         await onSuccess?.(data, variables, context)
       },
