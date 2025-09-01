@@ -75,11 +75,11 @@ describe(`CreateBucketModal`, () => {
     await userEvent.type(sizeLimitInput, `25`)
 
     const sizeLimitUnitSelect = screen.getByLabelText(`File size limit unit`)
-    expect(sizeLimitUnitSelect).toHaveTextContent(`bytes`)
-    await userEvent.click(sizeLimitUnitSelect)
-    const mbOption = screen.getByRole(`option`, { name: `MB` })
-    await userEvent.click(mbOption)
     expect(sizeLimitUnitSelect).toHaveTextContent(`MB`)
+    await userEvent.click(sizeLimitUnitSelect)
+    const bytesOption = screen.getByRole(`option`, { name: `bytes` })
+    await userEvent.click(bytesOption)
+    expect(sizeLimitUnitSelect).toHaveTextContent(`bytes`)
 
     const mimeTypeToggle = screen.getByLabelText(`Restrict MIME types`)
     expect(mimeTypeToggle).not.toBeChecked()
