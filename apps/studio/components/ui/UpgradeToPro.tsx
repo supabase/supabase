@@ -8,6 +8,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
+import { RequestUpgradeToPaid } from './RequestUpgradeToPaid'
 
 interface UpgradeToProProps {
   icon?: ReactNode
@@ -54,7 +55,9 @@ const UpgradeToPro = ({
               <p className="text-sm text-foreground-light">{secondaryText}</p>
             </div>
           </div>
-          {!canUpdateSubscription || projectUpdateDisabled ? (
+          {!canUpdateSubscription ? (
+            <RequestUpgradeToPaid />
+          ) : projectUpdateDisabled ? (
             <ButtonTooltip
               disabled
               type="primary"
@@ -63,9 +66,7 @@ const UpgradeToPro = ({
                   side: 'bottom',
                   text: projectUpdateDisabled
                     ? 'Subscription changes are currently disabled, our engineers are working on a fix'
-                    : !canUpdateSubscription
-                      ? 'You need additional permissions to amend subscriptions'
-                      : undefined,
+                    : undefined,
                 },
               }}
             >
