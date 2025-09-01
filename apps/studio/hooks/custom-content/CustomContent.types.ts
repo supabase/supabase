@@ -1,4 +1,4 @@
-import { ConnectionType } from 'components/interfaces/Connect/Connect.constants'
+import { CONNECTION_TYPES } from 'components/interfaces/Connect/Connect.constants'
 import type { CloudProvider } from 'shared-data'
 
 export type CustomContentTypes = {
@@ -26,11 +26,7 @@ export type CustomContentTypes = {
    *
    * These could be helpful in rendering, for e.g an environment file like `.env`
    */
-  connectFrameworks: {
-    key: string
-    label: string
-    obj: ConnectionType[]
-  }
+  connectFrameworks: (typeof CONNECTION_TYPES)[number]
 
   infraCloudProviders: CloudProvider[]
 }
