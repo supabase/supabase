@@ -1,11 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { toast } from 'sonner'
 import {
   Button,
   CollapsibleContent_Shadcn_,
@@ -15,8 +14,8 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogSectionSeparator,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -30,6 +29,7 @@ import {
   Switch,
   cn,
 } from 'ui'
+import { z } from 'zod'
 
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
@@ -39,11 +39,11 @@ import {
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
-import { IS_PLATFORM } from 'lib/constants'
-import { Admonition } from 'ui-patterns'
 import { Bucket } from 'data/storage/buckets-query'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { IS_PLATFORM } from 'lib/constants'
 import { isNonNullable } from 'lib/isNonNullable'
+import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -128,6 +128,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     )
   }
 
+  useEffect(() => {
+    if (visible && bucket) {
+      setShowConfiguration(false)
+      const { unit } = convertFromBytes(bucket.file_size_limit ?? 0)
+      setSelectedUnit(unit)
+    }
+  }, [visible, bucket])
+
   return (
     <Dialog
       open={visible}
@@ -142,20 +150,19 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         <DialogHeader>
           <DialogTitle>{`Edit bucket "${bucket?.name}"`}</DialogTitle>
         </DialogHeader>
+
         <DialogSectionSeparator />
-        <DialogSection>
-          <Form_Shadcn_ {...form}>
-            <form
-              id={formId}
-              className="flex flex-col gap-4"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
+
+        <Form_Shadcn_ {...form}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-4">
               <FormField_Shadcn_
                 key="name"
                 name="name"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
+                    hideMessage
                     name="name"
                     label="Name of bucket"
                     labelOptional="Buckets cannot be renamed once created."
@@ -188,49 +195,49 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   </FormItemLayout>
                 )}
               />
-              {isChangingBucketVisibility && (
-                <Admonition
-                  type="warning"
-                  className="rounded-none border-x-0 border-b-0 mb-0 pb-0 px-0 [&>svg]:left-0 [&>div>p]:!leading-normal"
-                  title={
-                    isMakingBucketPublic
-                      ? 'Warning: Making bucket public'
-                      : isMakingBucketPrivate
-                        ? 'Warning: Making bucket private'
-                        : ''
-                  }
-                  description={
-                    <>
-                      {isMakingBucketPublic ? (
-                        <p>`This will make all objects in your bucket publicly accessible.`</p>
-                      ) : isMakingBucketPrivate ? (
-                        <p>
-                          `All objects in your bucket will be private and only accessible via signed
-                          URLs, or downloaded with the right authorisation headers.`
-                        </p>
-                      ) : null}
+            </DialogSection>
 
-                      {isMakingBucketPrivate && (
+            {isChangingBucketVisibility && (
+              <Admonition
+                type="warning"
+                className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                title={`Warning: Making bucket ${isMakingBucketPublic ? 'public' : 'private'}`}
+                description={
+                  <>
+                    {isMakingBucketPublic && (
+                      <p>This will make all objects in your bucket publicly accessible.</p>
+                    )}
+
+                    {isMakingBucketPrivate && (
+                      <>
+                        <p className="mb-2">
+                          All objects in your bucket will be private and only accessible via signed
+                          URLs, or downloaded with the right authorisation headers.
+                        </p>
                         <p>
-                          {
-                            'Assets cached in the CDN may still be publicly accessible. You can consider '
-                          }
+                          Assets cached in the CDN may still be publicly accessible. You can
+                          consider{' '}
                           <InlineLink href="https://supabase.com/docs/guides/storage/cdn/smart-cdn#cache-eviction">
                             purging the cache
-                          </InlineLink>
-                          {' or moving your assets to a new bucket.'}
+                          </InlineLink>{' '}
+                          or moving your assets to a new bucket.
                         </p>
-                      )}
-                    </>
-                  }
-                />
-              )}
+                      </>
+                    )}
+                  </>
+                }
+              />
+            )}
+
+            <DialogSectionSeparator />
+
+            <DialogSection>
               <Collapsible_Shadcn_
                 open={showConfiguration}
                 onOpenChange={() => setShowConfiguration(!showConfiguration)}
               >
                 <CollapsibleTrigger_Shadcn_ asChild>
-                  <button className="w-full cursor-pointer py-3 flex items-center justify-between border-t border-default">
+                  <button className="w-full cursor-pointer flex items-center justify-between">
                     <p className="text-sm">Additional configuration</p>
                     <ChevronDown
                       size={18}
@@ -239,7 +246,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     />
                   </button>
                 </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="py-4 space-y-4">
+                <CollapsibleContent_Shadcn_ className="pt-4 space-y-4">
                   <div className="space-y-2">
                     <FormField_Shadcn_
                       key="has_file_size_limit"
@@ -349,9 +356,10 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   />
                 </CollapsibleContent_Shadcn_>
               </Collapsible_Shadcn_>
-            </form>
-          </Form_Shadcn_>
-        </DialogSection>
+            </DialogSection>
+          </form>
+        </Form_Shadcn_>
+
         <DialogFooter>
           <Button
             type="default"
@@ -371,5 +379,3 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     </Dialog>
   )
 }
-
-export default EditBucketModal

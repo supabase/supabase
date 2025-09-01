@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -53,7 +53,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
@@ -430,7 +429,7 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
     if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi)
+      setAllProjects(allProjectsFromApi.projects)
     }
   }, [allProjectsFromApi, allProjects, setAllProjects])
 
@@ -490,7 +489,7 @@ const Wizard: NextPageWithLayout = () => {
                   canCreateProject &&
                   additionalMonthlySpend > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span>Additional Costs</span>
+                      <span>Additional costs</span>
                       <div className="text-brand flex gap-1 items-center font-mono font-medium">
                         <span>${additionalMonthlySpend}/m</span>
                         <InfoTooltip side="top" className="max-w-[450px] p-0">
@@ -736,7 +735,7 @@ const Wizard: NextPageWithLayout = () => {
                               layout="horizontal"
                               label={
                                 <div className="flex flex-col gap-y-4">
-                                  <span>Compute Size</span>
+                                  <span>Compute size</span>
 
                                   <div className="flex flex-col gap-y-2">
                                     <Link
@@ -745,7 +744,7 @@ const Wizard: NextPageWithLayout = () => {
                                       href="https://supabase.com/docs/guides/platform/compute-add-ons"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute Add-Ons</p>
+                                        <p className="text-sm m-0">Compute add-ons</p>
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
@@ -755,7 +754,7 @@ const Wizard: NextPageWithLayout = () => {
                                       href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute Billing</p>
+                                        <p className="text-sm m-0">Compute billing</p>
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
@@ -846,7 +845,7 @@ const Wizard: NextPageWithLayout = () => {
 
                           return (
                             <FormItemLayout
-                              label="Database Password"
+                              label="Database password"
                               layout="horizontal"
                               description={
                                 <>
@@ -927,7 +926,7 @@ const Wizard: NextPageWithLayout = () => {
                             <FormItemLayout
                               label="Custom Postgres version"
                               layout="horizontal"
-                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                              description="Specify a custom version of Postgres (defaults to the latest). This is only applicable for local/staging projects."
                             >
                               <FormControl_Shadcn_>
                                 <Input_Shadcn_

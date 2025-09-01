@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
@@ -15,7 +15,6 @@ import { useContentQuery } from 'data/content/content-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
