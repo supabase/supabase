@@ -6,10 +6,6 @@ import {
   transformInvocationData,
   aggregateInvocationsByTimestamp,
 } from './edge-functions.config'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-
-dayjs.extend(utc)
 
 describe('extractStatusCodesFromData', () => {
   it('should extract and sort unique status codes from the data', () => {
