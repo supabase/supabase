@@ -31,7 +31,16 @@ export default {
     'border-button',
     'border-button-hover',
   ],
-  text: ['text', 'text-light', 'text-lighter', 'text-muted', 'text-contrast'],
+  text: [
+    'text',
+    'text-light',
+    'text-lighter',
+    'text-muted',
+    'text-contrast',
+    'text-destructive',
+    'text-warning-600',
+    'text-brand-link',
+  ],
   colors: [
     'bg-destructive-200',
     'bg-destructive-300',
