@@ -141,6 +141,7 @@
     "use-stick-to-bottom": "^1.1.1",
     "uuid": "^9.0.1",
     "valtio": "catalog:",
+    "vaul": "^1.1.2",
     "yup": "^1.4.0",
     "zod": "^3.25.76",
     "zxcvbn": "^4.4.2"
