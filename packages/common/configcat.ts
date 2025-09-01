@@ -54,11 +54,13 @@ async function getClient() {
   return client
 }
 
-export async function getFlags(userEmail: string = '') {
+export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
   const client = await getClient()
 
   if (userEmail) {
-    return client.getAllValuesAsync(new configcat.User(userEmail))
+    return client.getAllValuesAsync(
+      new configcat.User(userEmail, undefined, undefined, customAttributes)
+    )
   } else {
     return client.getAllValuesAsync()
   }
