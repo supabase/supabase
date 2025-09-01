@@ -28,7 +28,7 @@ To enforce private channels you need to disable the 'Allow public access' settin
 
 Realtime uses the `messages` table in your database's `realtime` schema to generate access policies for your clients when they connect to a Channel topic.
 
-By creating RLS polices on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic.
+By creating RLS policies on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic.
 
 The validation is done when the user connects. When their WebSocket connection is established and a Channel topic is joined, their permissions are calculated based on:
 
@@ -373,9 +373,9 @@ When using Postgres Changes with RLS, database records are sent only to clients 
 
 ## Updating RLS policies
 
-Client access polices are cached for the duration of the connection. Your database is not queried for every Channel message.
+Client access policies are cached for the duration of the connection. Your database is not queried for every Channel message.
 
-Realtime updates the access policy cache for a client based on your RLS polices when:
+Realtime updates the access policy cache for a client based on your RLS policies when:
 
 - A client connects to Realtime and subscribes to a Channel
 - A new JWT is sent to Realtime from a client via the [`access_token` message](/docs/guides/realtime/protocol#access-token)
