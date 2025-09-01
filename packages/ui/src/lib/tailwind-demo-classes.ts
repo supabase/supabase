@@ -38,8 +38,8 @@ export default {
     'text-muted',
     'text-contrast',
     'text-destructive',
-    'text-warning-600',
-    'text-brand-link',
+    'text-warning',
+    'text-brand',
   ],
   colors: [
     'bg-destructive-200',
