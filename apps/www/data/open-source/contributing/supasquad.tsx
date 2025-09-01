@@ -115,28 +115,28 @@ export const data = {
     features: [
       {
         id: 'advocate',
-        icon: Heart,
+        icon: 'heart',
         heading: 'Advocate',
         subheading:
           "Spread the word on social channels and help answer Supabase-related questions across the broader developer community. Your voice helps more builders discover what's possible.",
       },
       {
         id: 'helper',
-        icon: LifeBuoy,
+        icon: 'life-buoy',
         heading: 'Helper',
         subheading:
           "Share your expertise by answering questions on Discord, GitHub Discussions, and other community platforms. Help improve docs and guides that make everyone's journey smoother.",
       },
       {
         id: 'maintainer',
-        icon: Wrench,
+        icon: 'wrench',
         heading: 'Maintainer',
         subheading:
           'Contribute to client libraries, manage issues, fix bugs, and improve the overall developer experience. Work directly with the core team to keep Supabase running smoothly.',
       },
       {
         id: 'moderator',
-        icon: Shield,
+        icon: 'shield',
         heading: 'Moderator',
         subheading:
           'Maintain welcoming community guidelines across GitHub, Discord, Reddit, and other platforms. Ensure our spaces remain productive and helpful for all members.',
