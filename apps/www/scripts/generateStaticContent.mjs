@@ -19,7 +19,7 @@ const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 console.log(`[DEBUG] Environment variables:`, {
   NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
   NEXT_PUBLIC_VERCEL_BRANCH_URL: process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL,
-  CMS_SITE_ORIGIN: process.env.CMS_SITE_ORIGIN,
+  CMS_SITE_ORIGIN: CMS_SITE_ORIGIN,
   CMS_URL: process.env.CMS_URL,
   PAYLOAD_API_KEY_present: !!process.env.PAYLOAD_API_KEY,
   CMS_READ_KEY_present: !!process.env.CMS_READ_KEY,
@@ -32,22 +32,58 @@ console.log(`[DEBUG] Resolved CMS_SITE_ORIGIN: ${CMS_SITE_ORIGIN}`)
 const sortDates = (a, b, direction = 'desc') => {
   // Ensure both posts have valid dates
   if (!a.date || !b.date) {
+    console.log(`[DEBUG] sortDates: Missing date - a.date: ${a.date}, b.date: ${b.date}`)
     return 0
   }
 
+  console.log(
+    `[DEBUG] sortDates: Comparing dates - a.date: "${a.date}" (${typeof a.date}), b.date: "${b.date}" (${typeof b.date})`
+  )
+
   const isAsc = direction === 'asc'
   var reg = /-|:|T|\+/ //The regex on which matches the string should be split (any used delimiter) -> could also be written like /[.:T\+]/
-  var parsed = [
-    //an array which holds the date parts for a and b
-    a.date.split(reg), //Split the datestring by the regex to get an array like [Year,Month,Day]
-    b.date.split(reg),
-  ]
-  var dates = [
-    //Create an array of dates for a and b
-    new Date(parsed[0][0], parsed[0][1], parsed[0][2]), //Constructs an date of the above parsed parts (Year,Month...
-    new Date(parsed[1][0], parsed[1][1], parsed[1][2]),
-  ]
-  return isAsc ? dates[0] - dates[1] : dates[1] - dates[0] //Returns the difference between the date (if b > a then a - b < 0)
+
+  // Handle different date formats more robustly
+  const parseDate = (dateString) => {
+    // If it's already a Date object, use it
+    if (dateString instanceof Date) {
+      return dateString
+    }
+
+    // Try to parse as ISO string first (for CMS dates)
+    const isoDate = new Date(dateString)
+    if (!isNaN(isoDate.getTime())) {
+      console.log(
+        `[DEBUG] sortDates: Successfully parsed "${dateString}" as ISO date: ${isoDate.toISOString()}`
+      )
+      return isoDate
+    }
+
+    // Fallback to original Safari workaround parsing
+    console.log(`[DEBUG] sortDates: Falling back to Safari workaround for: "${dateString}"`)
+    var parsed = dateString.split(reg)
+    console.log(`[DEBUG] sortDates: Parsed parts: [${parsed.join(', ')}]`)
+
+    // Month needs to be 0-indexed for JavaScript Date constructor
+    const year = parseInt(parsed[0])
+    const month = parseInt(parsed[1]) - 1 // JavaScript months are 0-indexed
+    const day = parseInt(parsed[2])
+
+    const fallbackDate = new Date(year, month, day)
+    console.log(`[DEBUG] sortDates: Fallback date created: ${fallbackDate.toISOString()}`)
+    return fallbackDate
+  }
+
+  var dates = [parseDate(a.date), parseDate(b.date)]
+
+  console.log(
+    `[DEBUG] sortDates: Final dates for comparison - a: ${dates[0].toISOString()}, b: ${dates[1].toISOString()}`
+  )
+
+  const result = isAsc ? dates[0] - dates[1] : dates[1] - dates[0]
+  console.log(`[DEBUG] sortDates: Sort result (${direction}): ${result}`)
+
+  return result
 }
 
 /**
