@@ -75,7 +75,7 @@ export async function generateStaticParams() {
   return [...staticPaths, ...cmsPaths].map((p) => ({ slug: p.params.slug }))
 }
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params
 
   if (!slug) {
@@ -180,7 +180,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
-export default async function BlogPostPage({ params }: { params: Params }) {
+export default async function BlogPostPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params
 
   if (!slug) {
