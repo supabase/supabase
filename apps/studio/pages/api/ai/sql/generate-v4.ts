@@ -9,7 +9,7 @@ import {
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-import { traced, BraintrustMiddleware, wrapTraced } from 'braintrust'
+import { traced, BraintrustMiddleware, wrapTraced, initLogger } from 'braintrust'
 
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -60,6 +60,11 @@ const requestBodySchema = z.object({
   table: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
+})
+
+const logger = initLogger({
+  projectName: 'supabase-studio-ai-assistant',
+  apiKey: process.env.BRAINTRUST_API_KEY,
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -288,13 +293,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             ) {
               firstTokenMs = Date.now() - startTime
               // Log TTFT once when the first text delta arrives
-              span.log({ metrics: { ttft_ms: firstTokenMs } })
+              span.log({ time_to_first_token: firstTokenMs })
             }
           },
-          onFinish: ({ text, usage, finishReason }) => {
+          onFinish: ({ text, finishReason }) => {
             const latencyMs = Date.now() - startTime
-            const { inputTokens, outputTokens, totalTokens, reasoningTokens, cachedInputTokens } =
-              usage
 
             span.log({
               output: text,
@@ -306,16 +309,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                 model: modelId,
                 provider: providerName,
               },
+              // time_to_first_token: firstTokenMs,
               metrics: {
                 latency_ms: latencyMs,
                 ...(firstTokenMs !== undefined ? { time_to_first_token_ms: firstTokenMs } : {}),
-                ...(totalTokens !== undefined ? { total_tokens: totalTokens } : {}),
-                ...(inputTokens !== undefined ? { input_tokens: inputTokens } : {}),
-                ...(outputTokens !== undefined ? { output_tokens: outputTokens } : {}),
-                ...(reasoningTokens !== undefined ? { reasoning_tokens: reasoningTokens } : {}),
-                ...(cachedInputTokens !== undefined
-                  ? { cached_input_tokens: cachedInputTokens }
-                  : {}),
+                // ...(totalTokens !== undefined ? { total_tokens: totalTokens } : {}),
+                // ...(inputTokens !== undefined ? { input_tokens: inputTokens } : {}),
+                // ...(outputTokens !== undefined ? { output_tokens: outputTokens } : {}),
+                // ...(reasoningTokens !== undefined ? { reasoning_tokens: reasoningTokens } : {}),
+                // ...(cachedInputTokens !== undefined
+                //   ? { cached_input_tokens: cachedInputTokens }
+                //   : {}),
               },
             })
           },
@@ -365,7 +369,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           },
         })
       },
-      { name: 'AI Assistant' }
+      // { name: 'AI Assistant' }
+      logger
     )
   } catch (error) {
     console.error('Error in handlePost:', error)
