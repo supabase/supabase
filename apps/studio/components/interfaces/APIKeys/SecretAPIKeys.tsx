@@ -152,7 +152,7 @@ export const SecretAPIKeys = () => {
       <TableContainer>
         <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
           <WarningIcon />
-          <p className="text-sm text-warning-600">Error loading Secret API Keys</p>
+          <p className="text-sm text-warning">Error loading Secret API Keys</p>
           <p className="text-warning/75">{error.message}</p>
         </div>
       </TableContainer>
