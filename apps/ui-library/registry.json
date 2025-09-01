@@ -1576,6 +1576,11 @@
           "path": "registry/default/ai-editor-rules/writing-supabase-edge-functions.mdc",
           "type": "registry:file",
           "target": "~/.cursor/rules/writing-supabase-edge-functions.mdc"
+        },
+        {
+          "path": "registry/default/ai-editor-rules/use-realtime.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/use-realtime.mdc"
         }
       ]
     }

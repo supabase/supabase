@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import JWTSecretKeysTable from 'components/interfaces/JwtSecrets/jwt-secret-keys-table'
+import { JWTSecretKeysTable } from 'components/interfaces/JwtSecrets/jwt-secret-keys-table'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'

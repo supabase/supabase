@@ -3,10 +3,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { Button, StatusIcon } from 'ui'
-import { useFlag } from './ui/useFlag'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()

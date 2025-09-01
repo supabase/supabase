@@ -6,18 +6,20 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
+import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { AlertCircle } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import DeleteDestination from './DeleteDestination'
-import DestinationPanel from './DestinationPanel'
+import { DeleteDestination } from './DeleteDestination'
+import { DestinationPanel } from './DestinationPanel'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
@@ -48,6 +50,7 @@ export const DestinationRow = ({
 }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
 
   const {
@@ -74,6 +77,15 @@ export const DestinationRow = ({
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
 
+  // Fetch table-level replication status to surface errors in list view
+  const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
+    { projectRef, pipelineId: pipeline?.id },
+    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
+  )
+  const tableStatuses = replicationStatusData?.table_statuses ?? []
+  const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
+  const hasTableErrors = errorCount > 0
+
   const onDeleteClick = async () => {
     if (!projectRef) {
       return console.error('Project ref is required')
@@ -83,14 +95,20 @@ export const DestinationRow = ({
     }
 
     try {
+      setIsDeleting(true)
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
       await deleteDestinationPipeline({
         projectRef,
         destinationId: destinationId,
         pipelineId: pipeline.id,
       })
+      // Close dialog after successful deletion
+      setShowDeleteDestinationForm(false)
+      toast.success(`Deleted destination "${destinationName}"`)
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -132,9 +150,21 @@ export const DestinationRow = ({
           </Table.td>
           <Table.td>
             <div className="flex items-center justify-end gap-x-2">
-              <Button asChild type="default">
+              <Button asChild type="default" className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View status
+                  <span className="inline-flex items-center gap-2">
+                    <span>View status</span>
+                    {hasTableErrors && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <AlertCircle size={14} />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {errorCount} table{errorCount === 1 ? '' : 's'} have replication errors
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </span>
                 </Link>
               </Button>
               <RowMenu
@@ -154,7 +184,7 @@ export const DestinationRow = ({
         visible={showDeleteDestinationForm}
         setVisible={setShowDeleteDestinationForm}
         onDelete={onDeleteClick}
-        isLoading={isPipelineStatusLoading}
+        isLoading={isDeleting}
         name={destinationName}
       />
       <DestinationPanel

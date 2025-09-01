@@ -2,10 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
+import { useFlag } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Button, cn } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
 
