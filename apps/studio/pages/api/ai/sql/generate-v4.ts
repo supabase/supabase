@@ -140,6 +140,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: modelError.message })
   }
 
+  // Best-effort model/provider identification for metrics
+  const modelId = (rawModel as any)?.modelId ?? (rawModel as any)?.spec?.modelId ?? 'unknown'
+  const providerName = (rawModel as any)?.provider ?? (rawModel as any)?.spec?.provider ?? 'unknown'
+
   try {
     // Get a list of all schemas to add to context
     const pgMetaSchemasList = pgMeta.schemas.list()
@@ -226,11 +230,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           input: coreMessages,
           metadata: {
             route: '/api/ai/sql/generate-v4',
+            endpoint: '/api/ai/sql/generate-v4',
+            use_case: 'sql_gen',
+            model: modelId,
+            provider: providerName,
             projectRef,
             orgSlug,
             chatName,
           },
         })
+
+        // Latency/TTFT measurement
+        const startTime = Date.now()
+        let firstTokenMs: number | undefined
 
         const abortController = new AbortController()
         let abortReason: string | undefined
@@ -245,11 +257,21 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         })
 
         abortController.signal.addEventListener('abort', () => {
+          const now = Date.now()
           span.log({
             error: 'Request aborted',
             metadata: {
               aborted: true,
               abort_reason: abortReason ?? 'abort_signal',
+              status: 'abort',
+              endpoint: '/api/ai/sql/generate-v4',
+              use_case: 'sql_gen',
+              model: modelId,
+              provider: providerName,
+            },
+            metrics: {
+              latency_ms: now - startTime,
+              ...(firstTokenMs !== undefined ? { ttft_ms: firstTokenMs } : {}),
             },
           })
         })
@@ -259,34 +281,83 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           stopWhen: stepCountIs(5),
           messages: coreMessages,
           tools: tracedTools,
-          onFinish: ({ text }) => span.log({ output: text }),
+          onChunk: ({ chunk }) => {
+            if (
+              firstTokenMs === undefined &&
+              (chunk?.type === 'text-delta' || chunk?.type === 'reasoning-delta')
+            ) {
+              firstTokenMs = Date.now() - startTime
+              // Log TTFT once when the first text delta arrives
+              span.log({ metrics: { ttft_ms: firstTokenMs } })
+            }
+          },
+          onFinish: ({ text, usage, finishReason }) => {
+            const latencyMs = Date.now() - startTime
+            const { inputTokens, outputTokens, totalTokens, reasoningTokens, cachedInputTokens } =
+              usage
+
+            span.log({
+              output: text,
+              metadata: {
+                status: 'ok',
+                finish_reason: finishReason,
+                endpoint: '/api/ai/sql/generate-v4',
+                use_case: 'sql_gen',
+                model: modelId,
+                provider: providerName,
+              },
+              metrics: {
+                latency_ms: latencyMs,
+                ...(firstTokenMs !== undefined ? { time_to_first_token_ms: firstTokenMs } : {}),
+                ...(totalTokens !== undefined ? { total_tokens: totalTokens } : {}),
+                ...(inputTokens !== undefined ? { input_tokens: inputTokens } : {}),
+                ...(outputTokens !== undefined ? { output_tokens: outputTokens } : {}),
+                ...(reasoningTokens !== undefined ? { reasoning_tokens: reasoningTokens } : {}),
+                ...(cachedInputTokens !== undefined
+                  ? { cached_input_tokens: cachedInputTokens }
+                  : {}),
+              },
+            })
+          },
           abortSignal: abortController.signal,
         })
 
         result.pipeUIMessageStreamToResponse(res, {
           onError: (error) => {
+            // Normalize error message
             let errorMessage: string
             if (error == null) {
               errorMessage = 'unknown error'
-            }
-
-            if (typeof error === 'string') {
+            } else if (typeof error === 'string') {
               errorMessage = error
-            }
-
-            if (error instanceof Error) {
+            } else if (error instanceof Error) {
               errorMessage = error.message
+            } else {
+              try {
+                errorMessage = JSON.stringify(error)
+              } catch {
+                errorMessage = String(error)
+              }
             }
 
-            errorMessage = JSON.stringify(error)
+            const latencyMs = Date.now() - startTime
 
-            // Log error to Braintrust
+            // Log error to Braintrust with breakdown-friendly fields
             span.log({
               error: errorMessage,
               metadata: {
-                error_type: 'stream_error',
+                status: 'error',
+                error_type: (error as any)?.name ?? 'stream_error',
                 error_name: error instanceof Error ? error.name : 'unknown',
                 error_stack: error instanceof Error ? error.stack : undefined,
+                endpoint: '/api/ai/sql/generate-v4',
+                use_case: 'sql_gen',
+                model: modelId,
+                provider: providerName,
+              },
+              metrics: {
+                latency_ms: latencyMs,
+                ...(firstTokenMs !== undefined ? { ttft_ms: firstTokenMs } : {}),
               },
             })
 
