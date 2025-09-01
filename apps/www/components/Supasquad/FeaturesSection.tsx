@@ -36,8 +36,6 @@ interface FeatureItemProps {
 }
 
 const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
-  console.log(feature.icon)
-
   return (
     <li className="flex flex-col gap-2 text-sm text-foreground-lighter">
       <FeatureIcon icon={feature.icon} iconNoStroke={feature.iconNoStroke} />
