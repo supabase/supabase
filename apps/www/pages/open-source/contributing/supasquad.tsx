@@ -31,7 +31,7 @@ const BeginnersPage: NextPage = () => {
           className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
           sectionContainerClassName="lg:gap-4"
         />
-        <Quotes {...content.quotes} />
+        {/* <Quotes {...content.quotes} /> */}
         <WhySupaSquad {...content.why} />
         <PerfectTiming
           id={content.timing.id}
@@ -40,11 +40,11 @@ const BeginnersPage: NextPage = () => {
           highlights={content.timing.highlights}
         />
         <Benefits {...content.benefits} />
-        {/* <CtaSection
+        <CtaSection
           id={content.ctaSection.id}
           title={content.ctaSection.title}
           primaryCta={content.ctaSection.primaryCta}
-        /> */}
+        />
       </Layout>
     </>
   )
