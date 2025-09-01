@@ -45,6 +45,7 @@ Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
 Emmett Folger
+Eric Kharitonashvili
 Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
