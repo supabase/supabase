@@ -114,7 +114,10 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
+        "CMS_API_URL",
         "CMS_READ_KEY",
+        "CMS_SITE_ORIGIN",
+        "CMS_URL",
         "NEXT_PUBLIC_CMS_URL",
         "NEXT_PUBLIC_MISC_USE_URL",
         "NEXT_PUBLIC_MISC_USE_ANON_KEY",
