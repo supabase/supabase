@@ -30,15 +30,19 @@ console.log(`[DEBUG] Resolved CMS_SITE_ORIGIN: ${CMS_SITE_ORIGIN}`)
  * Fixes Safari dates sorting bug
  */
 const sortDates = (a, b, direction = 'desc') => {
-  // Ensure both posts have valid dates
-  if (!a.date || !b.date) {
-    console.log(`[DEBUG] sortDates: Missing date - a.date: ${a.date}, b.date: ${b.date}`)
-    return 0
+  // Handle posts with missing dates - they should be sorted to the end
+  if (!a.date && !b.date) {
+    console.log(`[DEBUG] sortDates: Both missing dates - a.date: ${a.date}, b.date: ${b.date}`)
+    return 0 // Both missing dates, keep current order
   }
-
-  console.log(
-    `[DEBUG] sortDates: Comparing dates - a.date: "${a.date}" (${typeof a.date}), b.date: "${b.date}" (${typeof b.date})`
-  )
+  if (!a.date) {
+    console.log(`[DEBUG] sortDates: A missing date - a.date: ${a.date}, b.date: ${b.date}`)
+    return 1 // A has no date, put it after B
+  }
+  if (!b.date) {
+    console.log(`[DEBUG] sortDates: B missing date - a.date: ${a.date}, b.date: ${b.date}`)
+    return -1 // B has no date, put it after A
+  }
 
   const isAsc = direction === 'asc'
   var reg = /-|:|T|\+/ //The regex on which matches the string should be split (any used delimiter) -> could also be written like /[.:T\+]/
@@ -53,16 +57,11 @@ const sortDates = (a, b, direction = 'desc') => {
     // Try to parse as ISO string first (for CMS dates)
     const isoDate = new Date(dateString)
     if (!isNaN(isoDate.getTime())) {
-      console.log(
-        `[DEBUG] sortDates: Successfully parsed "${dateString}" as ISO date: ${isoDate.toISOString()}`
-      )
       return isoDate
     }
 
     // Fallback to original Safari workaround parsing
-    console.log(`[DEBUG] sortDates: Falling back to Safari workaround for: "${dateString}"`)
     var parsed = dateString.split(reg)
-    console.log(`[DEBUG] sortDates: Parsed parts: [${parsed.join(', ')}]`)
 
     // Month needs to be 0-indexed for JavaScript Date constructor
     const year = parseInt(parsed[0])
@@ -70,18 +69,11 @@ const sortDates = (a, b, direction = 'desc') => {
     const day = parseInt(parsed[2])
 
     const fallbackDate = new Date(year, month, day)
-    console.log(`[DEBUG] sortDates: Fallback date created: ${fallbackDate.toISOString()}`)
     return fallbackDate
   }
 
   var dates = [parseDate(a.date), parseDate(b.date)]
-
-  console.log(
-    `[DEBUG] sortDates: Final dates for comparison - a: ${dates[0].toISOString()}, b: ${dates[1].toISOString()}`
-  )
-
   const result = isAsc ? dates[0] - dates[1] : dates[1] - dates[0]
-  console.log(`[DEBUG] sortDates: Sort result (${direction}): ${result}`)
 
   return result
 }
@@ -200,7 +192,7 @@ const getCMSBlogPosts = async () => {
           slug: post.slug,
           title: post.title,
           description: post.description,
-          date: post.date || new Date().toISOString(),
+          date: post.date || null, // Keep null if no date instead of using current time
           formattedDate,
           url: `/blog/${post.slug}`,
           isCMS: true,
@@ -246,7 +238,7 @@ const getLatestBlogPosts = async () => {
   console.log(`[DEBUG] getLatestBlogPosts: Combined total posts: ${allPosts.length}`)
 
   // Filter out posts without valid dates and sort
-  const validPosts = allPosts.filter((post) => post.date).sort((a, b) => sortDates(a, b, 'desc'))
+  const validPosts = allPosts.sort((a, b) => sortDates(a, b, 'desc'))
   console.log(`[DEBUG] getLatestBlogPosts: Valid posts after filtering: ${validPosts.length}`)
 
   // Return latest 10 posts
