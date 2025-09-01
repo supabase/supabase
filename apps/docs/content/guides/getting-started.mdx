@@ -5,6 +5,8 @@ description: 'Resources for getting started with Supabase.'
 hideToc: true
 ---
 
+{/* TODO: Use existing code */}
+
 <div className="flex flex-col gap-12 my-12">
 
 <div>
@@ -101,6 +103,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a React app.',
       icon: '/docs/img/icons/react-icon',
+      js: true,
     },
     {
       title: 'Next.js',
@@ -109,6 +112,7 @@ hideToc: true
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
       icon: '/docs/img/icons/nextjs-icon',
       hasLightIcon: true,
+      js: true,
     },
     {
       title: 'Nuxt',
@@ -116,6 +120,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.',
       icon: '/docs/img/icons/nuxt-icon',
+      js: true,
     },
     {
       title: 'Hono',
@@ -123,6 +128,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, secure it with auth, and query the data from a Hono app.',
       icon: '/docs/img/icons/hono-icon',
+      js: true,
     },
     {
       title: 'RedwoodJS',
@@ -130,6 +136,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
       icon: '/docs/img/icons/redwood-icon',
+      js: true,
     },
     {
       title: 'Flutter',
@@ -137,6 +144,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Flutter app.',
       icon: '/docs/img/icons/flutter-icon',
+      js: false,
     },
     {
       title: 'iOS SwiftUI',
@@ -144,6 +152,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from an iOS app.',
       icon: '/docs/img/icons/swift-icon',
+      js: false,
     },
     {
       title: 'Android Kotlin',
@@ -151,6 +160,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Android Kotlin app.',
       icon: '/docs/img/icons/kotlin-icon',
+      js: false,
     },
     {
       title: 'SvelteKit',
@@ -158,6 +168,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.',
       icon: '/docs/img/icons/svelte-icon',
+      js: true,
     },
     {
       title: 'SolidJS',
@@ -165,6 +176,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SolidJS app.',
       icon: '/docs/img/icons/solidjs-icon',
+      js: true,
     },
     {
       title: 'Vue',
@@ -172,6 +184,7 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
       icon: '/docs/img/icons/vuejs-icon',
+      js: true,
     },
     {
       title: 'refine',
@@ -179,22 +192,25 @@ hideToc: true
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a refine app.',
       icon: '/docs/img/icons/refine-icon',
+      js: true,
     },
-  ].map((item) => {
-    return (
-      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
-        <GlassPanel
-          title={item.title}
-          span="col-span-6"
-          background={false}
-          icon={item.icon}
-          hasLightIcon={item.hasLightIcon}
-        >
-          {item.description}
-        </GlassPanel>
-      </Link>
-    )
-  })}
+  ]
+    .filter((item) => !(item.js === false))
+    .map((item) => {
+      return (
+        <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+          <GlassPanel
+            title={item.title}
+            span="col-span-6"
+            background={false}
+            icon={item.icon}
+            hasLightIcon={item.hasLightIcon}
+          >
+            {item.description}
+          </GlassPanel>
+        </Link>
+      )
+    })}
 </div>
 
 ### Web app demos
@@ -340,7 +356,9 @@ hideToc: true
         'Learn how to build a user management app with Ionic Angular and Supabase Database, Auth, and Storage functionality.',
       icon: '/docs/img/icons/ionic-icon'
     }
-  ].map((item) => {
+  ]
+                .filter(() => false)
+.map((item) => {
     return (
       <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
         <GlassPanel

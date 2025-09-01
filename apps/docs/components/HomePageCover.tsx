@@ -9,6 +9,8 @@ import { IconPanel } from 'ui-patterns/IconPanel'
 
 import DocsCoverLogo from './DocsCoverLogo'
 
+import { isFeatureEnabled } from 'common'
+
 function AiPrompt({ className }: { className?: string }) {
   return (
     <Link
@@ -32,56 +34,68 @@ const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
   const iconSize = isXs ? 'sm' : 'lg'
 
+  const allSDKsEnabled = isFeatureEnabled('sdk:all')
+
   const frameworks = [
     {
       tooltip: 'ReactJS',
       icon: '/docs/img/icons/react-icon',
       href: '/guides/getting-started/quickstarts/reactjs',
+      js: true
     },
     {
       tooltip: 'Next.js',
       icon: '/docs/img/icons/nextjs-icon',
       href: '/guides/getting-started/quickstarts/nextjs',
+      js: true
     },
     {
       tooltip: 'RedwoodJS',
       icon: '/docs/img/icons/redwoodjs-icon',
       href: '/guides/getting-started/quickstarts/redwoodjs',
+      js: true
     },
     {
       tooltip: 'Flutter',
       icon: '/docs/img/icons/flutter-icon',
       href: '/guides/getting-started/quickstarts/flutter',
+      js: false
     },
     {
       tooltip: 'Android Kotlin',
       icon: '/docs/img/icons/kotlin-icon',
       href: '/guides/getting-started/quickstarts/kotlin',
+      js: false
     },
     {
       tooltip: 'SvelteKit',
       icon: '/docs/img/icons/svelte-icon',
       href: '/guides/getting-started/quickstarts/sveltekit',
+      js: true
     },
     {
       tooltip: 'SolidJS',
       icon: '/docs/img/icons/solidjs-icon',
       href: '/guides/getting-started/quickstarts/solidjs',
+      js: true
     },
     {
       tooltip: 'Vue',
       icon: '/docs/img/icons/vuejs-icon',
       href: '/guides/getting-started/quickstarts/vue',
+      js: true
     },
     {
       tooltip: 'Nuxt',
       icon: '/docs/img/icons/nuxt-icon',
       href: '/guides/getting-started/quickstarts/nuxtjs',
+      js: true
     },
     {
       tooltip: 'refine',
       icon: '/docs/img/icons/refine-icon',
       href: '/guides/getting-started/quickstarts/refine',
+      js: true
     },
   ]
 
@@ -109,7 +123,9 @@ const HomePageCover = (props) => {
         </div>
         <div className="shrink-0">
           <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
-            {frameworks.map((framework, i) => (
+            {frameworks
+            .filter(framework => !(allSDKsEnabled === false && framework.js === false))
+            .map((framework, i) => (
               <Link key={i} href={framework.href} passHref className="no-underline">
                 <IconPanel
                   iconSize={iconSize}

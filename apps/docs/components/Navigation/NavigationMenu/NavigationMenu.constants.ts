@@ -281,24 +281,33 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
-        { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
-        { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
-        {
-          name: 'Android Kotlin',
-          url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
-        },
+        ...(allSDKsEnabled
+          ? [
+              { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
+              { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
+              {
+                name: 'Android Kotlin',
+                url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
+              },
+            ]
+          : []),
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
-        {
-          name: 'Laravel PHP',
-          url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
-        },
-        {
-          name: 'Ruby on Rails',
-          url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
-        },
+        ...(allSDKsEnabled
+          ? [
+              {
+                name: 'Laravel PHP',
+                url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
+              },
+              {
+                name: 'Ruby on Rails',
+                url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
+              },
+            ]
+          : []),
+
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         {
           name: 'RedwoodJS',
@@ -355,18 +364,28 @@ export const gettingstarted: NavMenuConstant = {
     {
       name: 'Mobile tutorials',
       items: [
-        {
-          name: 'Flutter',
-          url: '/guides/getting-started/tutorials/with-flutter' as `/${string}`,
-        },
+        ...(allSDKsEnabled
+          ? [
+              {
+                name: 'Flutter',
+                url: '/guides/getting-started/tutorials/with-flutter' as `/${string}`,
+              },
+            ]
+          : []),
+
         {
           name: 'Expo React Native',
           url: '/guides/getting-started/tutorials/with-expo-react-native' as `/${string}`,
         },
-        {
-          name: 'Android Kotlin',
-          url: '/guides/getting-started/tutorials/with-kotlin' as `/${string}`,
-        },
+        ...(allSDKsEnabled
+          ? [
+              {
+                name: 'Android Kotlin',
+                url: '/guides/getting-started/tutorials/with-kotlin' as `/${string}`,
+              },
+            ]
+          : []),
+
         {
           name: 'Ionic React',
           url: '/guides/getting-started/tutorials/with-ionic-react' as `/${string}`,
@@ -379,10 +398,14 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular' as `/${string}`,
         },
-        {
-          name: 'Swift',
-          url: '/guides/getting-started/tutorials/with-swift' as `/${string}`,
-        },
+        ...(allSDKsEnabled
+          ? [
+              {
+                name: 'Swift',
+                url: '/guides/getting-started/tutorials/with-swift' as `/${string}`,
+              },
+            ]
+          : []),
       ],
     },
     {

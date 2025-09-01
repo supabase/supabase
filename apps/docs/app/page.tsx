@@ -9,6 +9,8 @@ import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker
 import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
 import { BASE_PATH } from '~/lib/constants'
+import { isFeatureEnabled } from 'common'
+const allSDKsEnabled = isFeatureEnabled('sdk:all')
 
 const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata> => {
   const parentAlternates = (await parent).alternates
@@ -224,18 +226,22 @@ const HomePage = () => (
         </div>
 
         <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-          {clientLibraries.map((library) => {
-            return (
-              <Link
-                href={library.href}
-                key={library.title}
-                passHref
-                className="col-span-6 md:col-span-4"
-              >
-                <IconPanelWithIconPicker {...library} />
-              </Link>
-            )
-          })}
+          {clientLibraries
+            .filter(library => allSDKsEnabled === false && library.title === 'Javascript')
+
+            .map((library) => {
+
+              return (
+                <Link
+                  href={library.href}
+                  key={library.title}
+                  passHref
+                  className="col-span-6 md:col-span-4"
+                >
+                  <IconPanelWithIconPicker {...library} />
+                </Link>
+              )
+            })}
         </div>
       </div>
 
