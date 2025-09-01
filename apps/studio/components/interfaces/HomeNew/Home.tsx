@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -17,6 +17,7 @@ import TopSection from 'components/interfaces/HomeNew/TopSection'
 import SortableSection from 'components/interfaces/HomeNew/SortableSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { AdvisorSection } from './AdvisorSection'
+import { ProjectUsageSection } from './ProjectUsageSection'
 
 const Home = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -101,6 +102,13 @@ const Home = () => {
                 strategy={verticalListSortingStrategy}
               >
                 {sectionOrder.map((id) => {
+                  if (id === 'usage') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        {IS_PLATFORM && <ProjectUsageSection />}
+                      </SortableSection>
+                    )
+                  }
                   if (id === 'advisor') {
                     return (
                       <SortableSection key={id} id={id}>
