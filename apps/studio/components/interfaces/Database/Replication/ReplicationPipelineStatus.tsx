@@ -1,7 +1,3 @@
-// @ts-nocheck [Joshen] Temporarily silencing the TS checks here but please eventually remove
-// it's cause the API types are conflicting a bit - API types have probably been updated for the UI here
-// but the UI hasn't been updated yet to fit the new API types
-
 import { Activity, ChevronLeft, ExternalLink, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -24,7 +20,13 @@ import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ErroredTableDetails } from './ErroredTableDetails'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import {
+  PIPELINE_ACTIONABLE_STATES,
+  PIPELINE_DISABLE_ALLOWED_FROM,
+  PIPELINE_ENABLE_ALLOWED_FROM,
+  PIPELINE_ERROR_MESSAGES,
+  getStatusName,
+} from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { TableState } from './ReplicationPipelineStatus.types'
@@ -97,8 +99,9 @@ export const ReplicationPipelineStatus = () => {
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
   const isEnablingDisabling =
-    requestStatus === PipelineStatusRequestStatus.EnableRequested ||
-    requestStatus === PipelineStatusRequestStatus.DisableRequested
+    requestStatus === PipelineStatusRequestStatus.StartRequested ||
+    requestStatus === PipelineStatusRequestStatus.StopRequested ||
+    requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
   const onTogglePipeline = async () => {
@@ -110,12 +113,12 @@ export const ReplicationPipelineStatus = () => {
     }
 
     try {
-      if (statusName === 'stopped') {
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
         await startPipeline({ projectRef, pipelineId: pipeline.id })
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
-      } else if (statusName === 'started') {
+      } else if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
@@ -181,9 +184,9 @@ export const ReplicationPipelineStatus = () => {
             type={statusName === 'stopped' ? 'primary' : 'default'}
             onClick={() => onTogglePipeline()}
             loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-            disabled={!['failed', 'started', 'stopped', 'stopping'].includes(statusName ?? '')}
+            disabled={!PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)}
           >
-            {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
+            {statusName === 'stopped' ? 'Start' : 'Stop'} pipeline
           </Button>
         </div>
       </div>
@@ -286,7 +289,7 @@ export const ReplicationPipelineStatus = () => {
                               Status unavailable while pipeline is {config.badge.toLowerCase()}
                             </p>
                           ) : (
-                            <div className="space-y-3">
+                            <div className="space-y-1">
                               <div className="text-sm text-foreground">
                                 {statusConfig.description}
                               </div>

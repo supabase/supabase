@@ -39,8 +39,9 @@ export const UpdateRolesConfirmationModal = ({
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: projects } = useProjectsQuery()
   const { data: allRoles } = useOrganizationRolesV2Query({ slug: organization?.slug })
+  const { data } = useProjectsQuery()
+  const projects = data?.projects ?? []
 
   // [Joshen] Separate saving state instead of using RQ due to several successive steps
   const [saving, setSaving] = useState(false)
