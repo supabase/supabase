@@ -8,6 +8,7 @@ import { isFeatureEnabled } from 'common'
 const billingEnabled = isFeatureEnabled('billing:all')
 const selfHostingEnabled = isFeatureEnabled('build:self-hosting')
 const allSDKsEnabled = isFeatureEnabled('sdk:all')
+const allAuthProvidersEnabled = isFeatureEnabled('authentication:show_providers')
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
@@ -646,29 +647,40 @@ export const auth = {
             },
           ],
         },
-        { name: 'Password-based', url: '/guides/auth/passwords' },
-        { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email-passwordless' },
-        {
-          name: 'Phone Login',
-          url: '/guides/auth/phone-login' as `/${string}`,
-        },
-        {
-          name: 'Social Login (OAuth)',
-          url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
-        },
-        {
-          name: 'Enterprise SSO',
-          url: '/guides/auth/enterprise-sso',
-          items: [
-            {
-              name: 'SAML 2.0',
-              url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
-            },
-          ],
-        },
-        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
-        { name: 'Web3 (Sign in with Solana)', url: '/guides/auth/auth-web3' },
+        ...(allAuthProvidersEnabled
+          ? [
+              { name: 'Password-based', url: '/guides/auth/passwords' },
+              { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email-passwordless' },
+              ...(allAuthProvidersEnabled
+                ? [
+                    {
+                      name: 'Phone Login',
+                      url: '/guides/auth/phone-login' as `/${string}`,
+                    },
+
+                    {
+                      name: 'Social Login (OAuth)',
+                      url: '/guides/auth/social-login',
+                      items: [...SocialLoginItems],
+                    },
+                  ]
+                : []),
+
+              {
+                name: 'Enterprise SSO',
+                url: '/guides/auth/enterprise-sso',
+                items: [
+                  {
+                    name: 'SAML 2.0',
+                    url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
+                  },
+                ],
+              },
+
+              { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+              { name: 'Web3 (Sign in with Solana)', url: '/guides/auth/auth-web3' },
+            ]
+          : []),
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
         {
           name: 'Identity Linking',
@@ -695,17 +707,21 @@ export const auth = {
         { name: 'Troubleshooting', url: '/guides/auth/troubleshooting' },
       ],
     },
-    {
-      name: 'Third-party auth',
-      items: [
-        { name: 'Overview', url: '/guides/auth/third-party/overview' },
-        { name: 'Clerk', url: '/guides/auth/third-party/clerk' },
-        { name: 'Firebase Auth', url: '/guides/auth/third-party/firebase-auth' },
-        { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
-        { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
-        { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
-      ],
-    },
+    ...(allAuthProvidersEnabled
+      ? [
+          {
+            name: 'Third-party auth',
+            items: [
+              { name: 'Overview', url: '/guides/auth/third-party/overview' },
+              { name: 'Clerk', url: '/guides/auth/third-party/clerk' },
+              { name: 'Firebase Auth', url: '/guides/auth/third-party/firebase-auth' },
+              { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
+              { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
+              { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
+            ],
+          },
+        ]
+      : []),
     {
       name: 'Configuration',
       items: [
@@ -775,17 +791,21 @@ export const auth = {
         },
       ],
     },
-    {
-      name: 'Auth UI',
-      url: undefined,
-      items: [
-        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
-        {
-          name: 'Flutter Auth UI',
-          url: '/guides/auth/auth-helpers/flutter-auth-ui' as `/${string}`,
-        },
-      ],
-    },
+    ...(allAuthProvidersEnabled
+      ? [
+          {
+            name: 'Auth UI',
+            url: undefined,
+            items: [
+              { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
+              {
+                name: 'Flutter Auth UI',
+                url: '/guides/auth/auth-helpers/flutter-auth-ui' as `/${string}`,
+              },
+            ],
+          },
+        ]
+      : []),
   ],
 }
 
