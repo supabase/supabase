@@ -1,5 +1,5 @@
 # Supabase Design System
-Last updated: 2025-04-24T06:00:07.374Z
+Last updated: 2025-09-01T08:00:47.282Z
 
 ## Overview
 The Design System used in Supabase Studio.
@@ -8,7 +8,7 @@ The Design System used in Supabase Studio.
 - [Changelog](https://supabase-design-system.vercel.app/design-system/docs/changelog)
     - Latest updates and announcements.
 - [Color usage](https://supabase-design-system.vercel.app/design-system/docs/color-usage)
-    - Colors system breakdown with best practise
+    - Colors system breakdown with best practice
 - [Accordion](https://supabase-design-system.vercel.app/design-system/docs/components/accordion)
     - A vertically stacked set of interactive headings that each reveal a section of content.
 - [Alert](https://supabase-design-system.vercel.app/design-system/docs/components/alert copy)
