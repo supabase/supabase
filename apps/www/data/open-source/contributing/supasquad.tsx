@@ -161,14 +161,13 @@ const data = {
   },
   benefits: {
     id: 'benefits',
-    heading: <span className="text-foreground">Benefits for our members</span>,
-    subheading: (
+    heading: (
       <>
-        Contributing to SupaSquad comes with <span className="text-foreground">real benefits</span>.
-        From community recognition to paid opportunities,{' '}
-        <span className="text-foreground">we value your time and impact.</span>
+        <span className="text-foreground">Exclusive benefits</span> for our members
       </>
     ),
+    subheading:
+      'Contributing to SupaSquad comes with real and exclusive benefits. From community recognition to paid opportunities,we value your time and impact.',
     features: [
       {
         id: 'community-recognition',
