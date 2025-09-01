@@ -15,67 +15,23 @@ const CMS_SITE_ORIGIN =
       : 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
-// Debug logging for environment variables
-console.log(`[DEBUG] Environment variables:`, {
-  NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
-  NEXT_PUBLIC_VERCEL_BRANCH_URL: process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL,
-  CMS_SITE_ORIGIN: CMS_SITE_ORIGIN,
-  CMS_URL: process.env.CMS_URL,
-  PAYLOAD_API_KEY_present: !!process.env.PAYLOAD_API_KEY,
-  CMS_READ_KEY_present: !!process.env.CMS_READ_KEY,
-})
-console.log(`[DEBUG] Resolved CMS_SITE_ORIGIN: ${CMS_SITE_ORIGIN}`)
-
 /**
  * Fixes Safari dates sorting bug
  */
 const sortDates = (a, b, direction = 'desc') => {
-  // Handle posts with missing dates - they should be sorted to the end
-  if (!a.date && !b.date) {
-    console.log(`[DEBUG] sortDates: Both missing dates - a.date: ${a.date}, b.date: ${b.date}`)
-    return 0 // Both missing dates, keep current order
-  }
-  if (!a.date) {
-    console.log(`[DEBUG] sortDates: A missing date - a.date: ${a.date}, b.date: ${b.date}`)
-    return 1 // A has no date, put it after B
-  }
-  if (!b.date) {
-    console.log(`[DEBUG] sortDates: B missing date - a.date: ${a.date}, b.date: ${b.date}`)
-    return -1 // B has no date, put it after A
-  }
-
   const isAsc = direction === 'asc'
   var reg = /-|:|T|\+/ //The regex on which matches the string should be split (any used delimiter) -> could also be written like /[.:T\+]/
-
-  // Handle different date formats more robustly
-  const parseDate = (dateString) => {
-    // If it's already a Date object, use it
-    if (dateString instanceof Date) {
-      return dateString
-    }
-
-    // Try to parse as ISO string first (for CMS dates)
-    const isoDate = new Date(dateString)
-    if (!isNaN(isoDate.getTime())) {
-      return isoDate
-    }
-
-    // Fallback to original Safari workaround parsing
-    var parsed = dateString.split(reg)
-
-    // Month needs to be 0-indexed for JavaScript Date constructor
-    const year = parseInt(parsed[0])
-    const month = parseInt(parsed[1]) - 1 // JavaScript months are 0-indexed
-    const day = parseInt(parsed[2])
-
-    const fallbackDate = new Date(year, month, day)
-    return fallbackDate
-  }
-
-  var dates = [parseDate(a.date), parseDate(b.date)]
-  const result = isAsc ? dates[0] - dates[1] : dates[1] - dates[0]
-
-  return result
+  var parsed = [
+    //an array which holds the date parts for a and b
+    a.date.split(reg), //Split the datestring by the regex to get an array like [Year,Month,Day]
+    b.date.split(reg),
+  ]
+  var dates = [
+    //Create an array of dates for a and b
+    new Date(parsed[0][0], parsed[0][1], parsed[0][2]), //Constructs an date of the above parsed parts (Year,Month...
+    new Date(parsed[1][0], parsed[1][1], parsed[1][2]),
+  ]
+  return isAsc ? dates[0] - dates[1] : dates[1] - dates[0] //Returns the difference between the date (if b > a then a - b < 0)
 }
 
 /**
@@ -125,12 +81,8 @@ const getStaticBlogPosts = () => {
  * Get CMS blog posts
  */
 const getCMSBlogPosts = async () => {
-  console.log(`[DEBUG] getCMSBlogPosts: Starting fetch from ${CMS_SITE_ORIGIN}`)
-  console.log(`[DEBUG] getCMSBlogPosts: PAYLOAD_API_KEY present: ${!!PAYLOAD_API_KEY}`)
-
   try {
     const url = `${CMS_SITE_ORIGIN}/api/posts?depth=2&draft=false&where[_status][equals]=published`
-    console.log(`[DEBUG] getCMSBlogPosts: Fetching URL: ${url}`)
 
     const response = await fetch(url, {
       headers: {
@@ -139,17 +91,9 @@ const getCMSBlogPosts = async () => {
       },
     })
 
-    console.log(`[DEBUG] getCMSBlogPosts: Response status: ${response.status}`)
-    console.log(
-      `[DEBUG] getCMSBlogPosts: Response headers:`,
-      Object.fromEntries(response.headers.entries())
-    )
-
     if (!response.ok) {
       const responseText = await response.text()
-      console.error(
-        `[DEBUG] getCMSBlogPosts: HTTP error! status: ${response.status}, body: ${responseText.slice(0, 500)}`
-      )
+
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
@@ -163,52 +107,6 @@ const getCMSBlogPosts = async () => {
     }
 
     const data = await response.json()
-    console.log(`[DEBUG] getCMSBlogPosts: Raw response data:`, {
-      totalDocs: data.totalDocs,
-      docsCount: data.docs?.length,
-      hasNextPage: data.hasNextPage,
-      page: data.page,
-    })
-
-    if (data.docs && data.docs.length > 0) {
-      console.log(
-        `[DEBUG] getCMSBlogPosts: First few posts:`,
-        data.docs.slice(0, 3).map((post) => ({
-          slug: post.slug,
-          title: post.title,
-          _status: post._status,
-          date: post.date,
-          createdAt: post.createdAt,
-          updatedAt: post.updatedAt,
-        }))
-      )
-
-      // Log details about posts with and without dates
-      const postsWithDates = data.docs.filter((post) => post.date)
-      const postsWithoutDates = data.docs.filter((post) => !post.date)
-
-      console.log(`[DEBUG] getCMSBlogPosts: Posts with dates: ${postsWithDates.length}`)
-      if (postsWithDates.length > 0) {
-        console.log(
-          `[DEBUG] getCMSBlogPosts: Posts with dates:`,
-          postsWithDates.map((p) => ({
-            slug: p.slug,
-            date: p.date,
-          }))
-        )
-      }
-
-      console.log(`[DEBUG] getCMSBlogPosts: Posts without dates: ${postsWithoutDates.length}`)
-      if (postsWithoutDates.length > 0) {
-        console.log(
-          `[DEBUG] getCMSBlogPosts: Posts without dates:`,
-          postsWithoutDates.map((p) => ({
-            slug: p.slug,
-            title: p.title,
-          }))
-        )
-      }
-    }
 
     const posts = data.docs
       .filter((post) => post.slug && post.title && post.description)
@@ -228,15 +126,9 @@ const getCMSBlogPosts = async () => {
         }
       })
 
-    console.log(`[DEBUG] getCMSBlogPosts: Filtered posts count: ${posts.length}`)
-    console.log(
-      `[DEBUG] getCMSBlogPosts: Filtered post slugs:`,
-      posts.map((p) => p.slug)
-    )
-
     return posts
   } catch (error) {
-    console.error('[DEBUG] getCMSBlogPosts: Error fetching CMS blog posts:', error)
+    console.error('Error fetching CMS blog posts:', error)
     return []
   }
 }
@@ -245,29 +137,15 @@ const getCMSBlogPosts = async () => {
  * Get latest blog posts from both sources
  */
 const getLatestBlogPosts = async () => {
-  console.log(`[DEBUG] getLatestBlogPosts: Starting to fetch posts from both sources`)
-
   const staticPosts = getStaticBlogPosts()
-  console.log(`[DEBUG] getLatestBlogPosts: Found ${staticPosts.length} static posts`)
-  console.log(
-    `[DEBUG] getLatestBlogPosts: Static post slugs:`,
-    staticPosts.map((p) => p.slug)
-  )
 
   const cmsPosts = await getCMSBlogPosts()
-  console.log(`[DEBUG] getLatestBlogPosts: Found ${cmsPosts.length} CMS posts`)
-  console.log(
-    `[DEBUG] getLatestBlogPosts: CMS post slugs:`,
-    cmsPosts.map((p) => p.slug)
-  )
 
   // Combine and sort all posts by date
   const allPosts = [...staticPosts, ...cmsPosts]
-  console.log(`[DEBUG] getLatestBlogPosts: Combined total posts: ${allPosts.length}`)
 
   // Filter out posts without valid dates and sort
   const validPosts = allPosts.sort((a, b) => sortDates(a, b, 'desc'))
-  console.log(`[DEBUG] getLatestBlogPosts: Valid posts after filtering: ${validPosts.length}`)
 
   // Return latest 10 posts
   const latestPosts = validPosts
@@ -279,12 +157,6 @@ const getLatestBlogPosts = async () => {
       date,
       formattedDate,
     }))
-
-  console.log(`[DEBUG] getLatestBlogPosts: Final latest posts count: ${latestPosts.length}`)
-  console.log(
-    `[DEBUG] getLatestBlogPosts: Final latest post URLs:`,
-    latestPosts.map((p) => p.url)
-  )
 
   return latestPosts
 }
@@ -368,7 +240,3 @@ await fs.writeFile(
 )
 
 console.log(`✅ Generated static content with ${latestBlogPosts.length} blog posts`)
-console.log(
-  `[DEBUG] Final output - latestBlogPosts slugs:`,
-  latestBlogPosts.map((p) => p.url.replace('/blog/', ''))
-)
