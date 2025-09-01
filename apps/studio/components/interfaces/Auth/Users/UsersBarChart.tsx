@@ -1,14 +1,15 @@
 'use client'
 import dayjs from 'dayjs'
-import { ReactNode, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { useChartData } from 'hooks/useChartData'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { Loader2 } from 'lucide-react'
 
 const CHART_COLORS = {
-  TICK: 'hsl(var(--background-overlay-hover))',
   AXIS: 'hsl(var(--background-overlay-hover))',
   GREEN_1: 'hsl(var(--brand-default))',
   GREEN_2: 'hsl(var(--brand-500))',
@@ -29,7 +30,6 @@ export const UsersBarChart = ({
   timestampStart?: string
   timestampEnd?: string
   onBarClick?: (datum: UsersBarChartDatum, tooltipData?: CategoricalChartState) => void
-  EmptyState?: ReactNode
   DateTimeFormat?: string
   className?: string
 }) => {
@@ -70,31 +70,6 @@ export const UsersBarChart = ({
     enabled: true,
   })
 
-  // Generate mock data and replace fetched data before rendering (keeps all downstream logic)
-  //   const mockData = useMemo(() => {
-  //     const points: any[] = []
-  //     const from = dayjs(startDate)
-  //     const to = dayjs(endDate)
-  //     const match = interval.match(/^(\d+)([mhd])$/)
-  //     const amount = match ? parseInt(match[1], 10) : 1
-  //     const unitMap = { m: 'minute', h: 'hour', d: 'day' } as const
-  //     const unit = match ? unitMap[match[2] as 'm' | 'h' | 'd'] : 'hour'
-
-  //     let current = from.startOf(unit as any)
-  //     let i = 0
-  //     while (current.isBefore(to) || current.isSame(to)) {
-  //       const wave = Math.sin(i / 3) * 6 + 6
-  //       const noise = Math.random() * 3
-  //       const value = Math.max(0, Math.round(wave + noise - 4))
-  //       if (value > 0 && Math.random() < 0.65) {
-  //         points.push({ period_start: current.toISOString(), TotalSignUps: value })
-  //       }
-  //       current = current.add(amount, unit as any)
-  //       i++
-  //     }
-  //     return points
-  //   }, [startDate, endDate, interval])
-
   const chartDataArray = Array.isArray(data) ? data : []
   const { data: filledData, isError: isFillError } = useFillTimeseriesSorted(
     chartDataArray,
@@ -106,7 +81,6 @@ export const UsersBarChart = ({
     undefined,
     interval
   )
-  // Prefer filled data so we always render consistent intervals, even when original data is empty
   const finalData = !isFillError ? filledData : chartDataArray
 
   const transformedData: UsersBarChartDatum[] = useMemo(
@@ -118,7 +92,6 @@ export const UsersBarChart = ({
     [finalData]
   )
 
-  // Always render the chart; intervals will be filled to show empty periods as zero
   const startLabel = useMemo(() => {
     if (!transformedData.length) return ''
     return dayjs(transformedData[0]['timestamp']).format(DateTimeFormat)
@@ -128,73 +101,84 @@ export const UsersBarChart = ({
     return dayjs(transformedData[transformedData?.length - 1]?.['timestamp']).format(DateTimeFormat)
   }, [transformedData, DateTimeFormat])
 
+  const noData = chartDataArray.length === 0
+
   return (
-    <div
-      data-testid="users-bar-chart"
-      className={cn(
-        'flex flex-col gap-y-3',
-        className,
-        isLoading && 'opacity-60 transition-opacity'
+    <div data-testid="users-bar-chart" className={cn('flex flex-col gap-y-3', className)}>
+      {isLoading && (
+        <div className="flex items-center justify-center h-[96px]">
+          <Loader2 size={18} className="h-24 animate-spin text-border-strong" />
+        </div>
       )}
-    >
-      <ChartContainer
-        config={
-          {
-            count: { label: 'New users' },
-          } as ChartConfig
-        }
-        className="h-[80px]"
-      >
-        <RechartBarChart
-          data={transformedData}
-          onMouseMove={(e: any) => {
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
+
+      {noData && !isLoading ? (
+        <NoDataPlaceholder
+          size="tiny"
+          className="border-0 h-[80px] p-0"
+          description="It may take up to 24 hours for data to refresh"
+        />
+      ) : (
+        !isLoading && (
+          <ChartContainer
+            config={
+              {
+                count: { label: 'New users' },
+              } as ChartConfig
             }
-          }}
-          onMouseLeave={() => setFocusDataIndex(null)}
-          onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
-          }}
-        >
-          <YAxis
-            tick={false}
-            width={0}
-            axisLine={{ stroke: CHART_COLORS.AXIS }}
-            tickLine={{ stroke: CHART_COLORS.AXIS }}
-          />
-          <XAxis
-            dataKey="timestamp"
-            interval={transformedData.length - 2}
-            tick={false}
-            axisLine={{ stroke: CHART_COLORS.AXIS }}
-            tickLine={{ stroke: CHART_COLORS.AXIS }}
-          />
-          <ChartTooltip
-            content={
-              <ChartTooltipContent
-                className="text-foreground-light -mt-5"
-                labelFormatter={(v) => dayjs(v).format(DateTimeFormat)}
+            className="h-[96px]"
+          >
+            <RechartBarChart
+              data={transformedData}
+              onMouseMove={(e: any) => {
+                if (e.activeTooltipIndex !== focusDataIndex) {
+                  setFocusDataIndex(e.activeTooltipIndex)
+                }
+              }}
+              onMouseLeave={() => setFocusDataIndex(null)}
+              onClick={(tooltipData) => {
+                const datum = tooltipData?.activePayload?.[0]?.payload
+                if (onBarClick) onBarClick(datum, tooltipData)
+              }}
+            >
+              <YAxis
+                tick={false}
+                width={0}
+                axisLine={{ stroke: CHART_COLORS.AXIS }}
+                tickLine={{ stroke: CHART_COLORS.AXIS }}
               />
-            }
-          />
-          <Bar dataKey="count" fill={CHART_COLORS.GREEN_1} maxBarSize={24}>
-            {transformedData?.map((_entry: UsersBarChartDatum, index: number) => (
-              <Cell
-                className="cursor-pointer transition-colors"
-                key={`count-${index}`}
-                fill={
-                  focusDataIndex === index || focusDataIndex === null
-                    ? CHART_COLORS.GREEN_1
-                    : CHART_COLORS.GREEN_2
+              <XAxis
+                dataKey="timestamp"
+                interval={transformedData.length - 2}
+                tick={false}
+                axisLine={{ stroke: CHART_COLORS.AXIS }}
+                tickLine={{ stroke: CHART_COLORS.AXIS }}
+              />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    className="text-foreground-light -mt-5"
+                    labelFormatter={(v) => dayjs(v).format(DateTimeFormat)}
+                  />
                 }
               />
-            ))}
-          </Bar>
-        </RechartBarChart>
-      </ChartContainer>
-      {transformedData && transformedData.length > 0 && (
+              <Bar dataKey="count" fill={CHART_COLORS.GREEN_1} maxBarSize={24}>
+                {transformedData?.map((_entry: UsersBarChartDatum, index: number) => (
+                  <Cell
+                    className="cursor-pointer transition-colors"
+                    key={`count-${index}`}
+                    fill={
+                      focusDataIndex === index || focusDataIndex === null
+                        ? CHART_COLORS.GREEN_1
+                        : CHART_COLORS.GREEN_2
+                    }
+                  />
+                ))}
+              </Bar>
+            </RechartBarChart>
+          </ChartContainer>
+        )
+      )}
+      {transformedData.length > 0 && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>{startLabel}</span>
           <span>{endLabel}</span>
