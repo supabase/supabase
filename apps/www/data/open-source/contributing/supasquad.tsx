@@ -13,7 +13,7 @@ import {
 import { Image } from 'ui'
 import { companyStats } from '~/data/company-stats'
 
-const data = {
+export const data = {
   metadata: {
     metaTitle: 'SupaSquad - Supabase advocate program',
     metaDescription:
@@ -161,76 +161,52 @@ const data = {
   },
   benefits: {
     id: 'benefits',
-    heading: (
-      <>
-        <span className="text-foreground">Exclusive benefits</span> for our members
-      </>
-    ),
+    heading: <span className="text-foreground">Benefits for our members</span>,
     subheading:
-      'Contributing to SupaSquad comes with real and exclusive benefits. From community recognition to paid opportunities,we value your time and impact.',
+      'Contributing to SupaSquad comes with real benefits. From community recognition to paid opportunities, we value your time and impact.',
     features: [
       {
         id: 'community-recognition',
         heading: 'Community Recognition',
-        subheading: (
-          <>
-            Get a Badge on Discord and flair on Reddit showcasing your SupaSquad status in the
-            community.
-          </>
-        ),
-        icon: Award,
+        subheading:
+          'Get a Badge on Discord and flair on Reddit showcasing your SupaSquad status in the community.',
+
+        icon: 'award',
       },
       {
         id: 'early-access',
         heading: 'Early Access',
-        subheading: (
-          <>Get first access to new Supabase features and provide feedback directly to our team.</>
-        ),
-        icon: Zap,
+        subheading:
+          'Get first access to new Supabase features and provide feedback directly to our team.',
+        icon: 'zap',
       },
       {
         id: 'direct-team-access',
         heading: 'Direct Team Access',
-        subheading: (
-          <>
-            Direct communication channel with Supabase team members for questions, suggestions and
-            support.
-          </>
-        ),
-        icon: MessageSquare,
+        subheading:
+          'Direct communication channel with Supabase team members for questions, suggestions and support.',
+        icon: 'message-square',
       },
       {
         id: 'paid-contributions',
         heading: 'Paid Contributions',
-        subheading: (
-          <>
-            We invite top contributors to get paid for their efforts. Earn while you contribute with
-            a stipend that recognizes the value of your time and expertise.
-          </>
-        ),
-        icon: DollarSign,
+        subheading:
+          'We invite top contributors to get paid for their efforts. Earn while you contribute with a stipend that recognizes the value of your time and expertise.',
+        icon: 'dollar-sign',
       },
       {
         id: 'exclusive-swag',
         heading: 'Exclusive SWAG',
-        subheading: (
-          <>
-            Special Supabase merchandise reserved for SupaSquad members. Show your status with
-            pride.
-          </>
-        ),
-        icon: Gift,
+        subheading:
+          'Special Supabase merchandise reserved for SupaSquad members. Show your status with pride.',
+        icon: 'gift',
       },
       {
         id: 'growth-opportunities',
         heading: 'Growth Opportunities',
-        subheading: (
-          <>
-            Room to grow from volunteer to paid contributor to paid employee. Your path in the
-            Supabase ecosystem.
-          </>
-        ),
-        icon: TrendingUp,
+        subheading:
+          'Room to grow from volunteer to paid contributor to paid employee. Your path in the Supabase ecosystem.',
+        icon: 'trending-up',
       },
     ],
   },
@@ -244,5 +220,3 @@ const data = {
     },
   },
 }
-
-export default data
