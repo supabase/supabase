@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Alert, Button, cn, Input, Modal } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 

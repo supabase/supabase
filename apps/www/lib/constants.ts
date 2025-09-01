@@ -25,8 +25,6 @@ export enum PRODUCT_SHORTNAMES {
   VECTOR = 'vector',
 }
 
-// Launch Week
-
 export const SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
     ? 'https://supabase.com'
@@ -46,7 +44,7 @@ export const CMS_SITE_ORIGIN =
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('zone-www-dot-com-git-', 'cms-git-')}`
       : 'http://localhost:3030')
 
-export const LW_URL = `${SITE_ORIGIN}/launch-week/13`
+export const LW_URL = `${SITE_ORIGIN}/launch-week`
 
 export const LW12_DATE = 'August 12-16 / 7am PT'
 export const LW12_TITLE = 'Launch Week 12'

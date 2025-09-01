@@ -1,4 +1,4 @@
-import { GitBranch, Github } from 'lucide-react'
+import { Github } from 'lucide-react'
 
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
@@ -20,7 +20,7 @@ export interface ProjectCardProps {
   resourceWarnings?: ResourceWarning
 }
 
-const ProjectCard = ({
+export const ProjectCard = ({
   project,
   rewriteHref,
   githubIntegration,
@@ -62,11 +62,6 @@ const ProjectCard = ({
                   />
                 </div>
               )}
-              {isBranchingEnabled && (
-                <div className="w-fit p-1 border rounded-md flex items-center">
-                  <GitBranch size={12} strokeWidth={1.5} />
-                </div>
-              )}
               {isGithubIntegrated && (
                 <>
                   <div className="w-fit p-1 border rounded-md flex items-center">
@@ -86,5 +81,3 @@ const ProjectCard = ({
     </li>
   )
 }
-
-export default ProjectCard

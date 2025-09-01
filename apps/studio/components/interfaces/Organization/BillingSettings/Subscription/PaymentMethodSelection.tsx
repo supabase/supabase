@@ -14,7 +14,7 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
@@ -22,7 +22,6 @@ import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organizat
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Checkbox_Shadcn_, Listbox } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'

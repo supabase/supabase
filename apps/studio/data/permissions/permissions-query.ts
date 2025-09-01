@@ -1,4 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import * as Sentry from '@sentry/nextjs'
 
 import { useIsLoggedIn } from 'common'
 import { get, handleError } from 'data/fetchers'
@@ -10,7 +11,13 @@ export type PermissionsResponse = Permission[]
 
 export async function getPermissions(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/permissions', { signal })
-  if (error) handleError(error)
+  if (error) {
+    handleError(error)
+    Sentry.withScope(function (scope) {
+      scope.setTag('permissions-query-error', true)
+      Sentry.captureException(error)
+    })
+  }
 
   // [Joshen] TODO: Type this properly from the API
   return data as unknown as PermissionsResponse

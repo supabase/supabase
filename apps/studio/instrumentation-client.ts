@@ -152,3 +152,6 @@ function standardiseRouterUrl(url: string) {
 
   return finalUrl
 }
+
+// This export will instrument router navigations, and is only relevant if you enable tracing.
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

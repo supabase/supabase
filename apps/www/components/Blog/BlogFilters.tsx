@@ -1,6 +1,7 @@
 'use client'
 
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
+import { startCase } from 'lib/helpers'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/compat/router'
 import { useEffect, useState } from 'react'
@@ -17,7 +18,6 @@ import {
   Input,
   cn,
 } from 'ui'
-import { capitalize } from 'lodash'
 
 interface Props {
   allPosts: PostTypes[]
@@ -175,7 +175,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[200px] flex justify-between items-center py-2"
               >
-                {!activeCategory ? 'All Posts' : capitalize(activeCategory?.replaceAll('-', ' '))}
+                {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start">
@@ -192,7 +192,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
                       : ''
                   )}
                 >
-                  {category === 'all' ? 'All Posts' : capitalize(category.replaceAll('-', ' '))}
+                  {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -214,7 +214,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
             size={is2XL ? 'tiny' : 'small'}
             className="rounded-full"
           >
-            {category === 'all' ? 'All' : capitalize(category.replaceAll('-', ' '))}
+            {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}
           </Button>
         ))}
       </div>
