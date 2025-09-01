@@ -103,13 +103,13 @@ const useServiceStats = (
 ): ServiceStatsMap => {
   const dbCurrent = useProjectUsageStats({
     projectRef,
-    table: LogsTableName.EDGE,
+    table: LogsTableName.POSTGRES,
     timestampStart,
     timestampEnd,
   })
   const dbPrevious = useProjectUsageStats({
     projectRef,
-    table: LogsTableName.EDGE,
+    table: LogsTableName.POSTGRES,
     timestampStart: previousStart,
     timestampEnd: previousEnd,
   })
