@@ -653,5 +653,21 @@
     "position": "Security Engineer",
     "author_url": "https://github.com/staaldraad",
     "author_image_url": "https://avatars.githubusercontent.com/u/4200832?v=4"
+  },
+  {
+    "author_id": "dventimi",
+    "author": "David Ventimiglia",
+    "username": "dventimi",
+    "position": "Engineering",
+    "author_url": "https://github.com/dventimi",
+    "author_image_url": "https://avatars.githubusercontent.com/u/97983663?v=4"
+  },
+  {
+    "author_id": "jian_jie",
+    "author": "Jian Jie Liau",
+    "username": "jianji",
+    "position": "CTO and Co-Founder Mobbin",
+    "author_url": "https://github.com/liaujianjie",
+    "author_image_url": "https://avatars.githubusercontent.com/u/3143132?v=4"
   }
 ]
