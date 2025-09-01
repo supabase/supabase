@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
-import { Input_Shadcn_ } from 'ui'
+import { X } from 'lucide-react'
+import { Button, Input_Shadcn_ } from 'ui'
 import { FilterCondition as FilterConditionType, FilterProperty } from './types'
 
 type FilterConditionProps = {
@@ -16,6 +17,7 @@ type FilterConditionProps = {
   onBlur: () => void
   onLabelClick: () => void
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  onRemove: () => void
 }
 
 export function FilterCondition({
@@ -32,6 +34,7 @@ export function FilterCondition({
   onBlur,
   onLabelClick,
   onKeyDown,
+  onRemove,
 }: FilterConditionProps) {
   const operatorRef = useRef<HTMLInputElement>(null)
   const valueRef = useRef<HTMLInputElement>(null)
@@ -48,7 +51,7 @@ export function FilterCondition({
   if (!property) return null
 
   return (
-    <div className="flex items-center rounded px-2 h-6 bg-surface-400">
+    <div className="flex items-center rounded px-2 h-6 bg-surface-400 group">
       <span className="text-xs font-medium mr-1 font-mono cursor-pointer" onClick={onLabelClick}>
         {property.label}
       </span>
@@ -73,13 +76,27 @@ export function FilterCondition({
         onFocus={onValueFocus}
         onBlur={onBlur}
         onKeyDown={onKeyDown}
-        className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
+        className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6 mr-1"
         style={{
           width: `${Math.max((condition.value ?? '').toString().length, 1)}ch`,
           minWidth: '1ch',
         }}
         disabled={isLoading}
         aria-label={`Value for ${property.label}`}
+      />
+      <Button
+        type="text"
+        size="tiny"
+        icon={
+          <X
+            strokeWidth={1.5}
+            size={12}
+            className="group-hover:text-foreground text-foreground-light"
+          />
+        }
+        onClick={onRemove}
+        className="group hover:text-foreground !hover:bg-surface-600 p-0"
+        aria-label={`Remove ${property.label} filter`}
       />
     </div>
   )

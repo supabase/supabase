@@ -1,0 +1,124 @@
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { FilterProperty, FilterOptionObject, AsyncOptionsFunction } from './types'
+import { isAsyncOptionsFunction } from './utils'
+
+export type ActiveInput =
+  | { type: 'value'; path: number[] }
+  | { type: 'operator'; path: number[] }
+  | { type: 'group'; path: number[] }
+  | null
+
+export function useFilterBarState() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedCommandIndex, setSelectedCommandIndex] = useState(0)
+  const [isCommandMenuVisible, setIsCommandMenuVisible] = useState(false)
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [activeInput, setActiveInput] = useState<ActiveInput>(null)
+  const newPathRef = useRef<number[]>([])
+  const [dialogContent, setDialogContent] = useState<React.ReactElement | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [pendingPath, setPendingPath] = useState<number[] | null>(null)
+
+  const resetState = useCallback(() => {
+    setError(null)
+    setSelectedCommandIndex(0)
+    setIsCommandMenuVisible(false)
+    setActiveInput(null)
+    setDialogContent(null)
+    setIsDialogOpen(false)
+    setPendingPath(null)
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current)
+    }
+  }, [])
+
+  return {
+    isLoading,
+    setIsLoading,
+    error,
+    setError,
+    selectedCommandIndex,
+    setSelectedCommandIndex,
+    isCommandMenuVisible,
+    setIsCommandMenuVisible,
+    hideTimeoutRef,
+    activeInput,
+    setActiveInput,
+    newPathRef,
+    dialogContent,
+    setDialogContent,
+    isDialogOpen,
+    setIsDialogOpen,
+    pendingPath,
+    setPendingPath,
+    resetState,
+  }
+}
+
+export function useOptionsCache() {
+  const [loadingOptions, setLoadingOptions] = useState<Record<string, boolean>>({})
+  const [propertyOptionsCache, setPropertyOptionsCache] = useState<
+    Record<string, { options: (string | FilterOptionObject)[]; searchValue: string }>
+  >({})
+  const [optionsError, setOptionsError] = useState<string | null>(null)
+  const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const loadPropertyOptions = useCallback(
+    async (property: FilterProperty, search: string = '') => {
+      if (
+        !property.options ||
+        Array.isArray(property.options) ||
+        !isAsyncOptionsFunction(property.options)
+      ) {
+        return
+      }
+
+      const cached = propertyOptionsCache[property.name]
+      if (cached && cached.searchValue === search) return
+
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current)
+      }
+
+      loadTimeoutRef.current = setTimeout(async () => {
+        if (loadingOptions[property.name]) return
+
+        try {
+          setLoadingOptions((prev) => ({ ...prev, [property.name]: true }))
+          const asyncOptions = property.options as AsyncOptionsFunction
+          const rawOptions = await asyncOptions(search)
+          const options = rawOptions.map((option: string | FilterOptionObject) =>
+            typeof option === 'string' ? { label: option, value: option } : option
+          )
+          setPropertyOptionsCache((prev) => ({
+            ...prev,
+            [property.name]: { options, searchValue: search },
+          }))
+        } catch (error) {
+          console.error(`Error loading options for ${property.name}:`, error)
+          setOptionsError(`Failed to load options for ${property.label}`)
+        } finally {
+          setLoadingOptions((prev) => ({ ...prev, [property.name]: false }))
+        }
+      }, 300)
+    },
+    [loadingOptions, propertyOptionsCache]
+  )
+
+  useEffect(() => {
+    return () => {
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  return {
+    loadingOptions,
+    propertyOptionsCache,
+    loadPropertyOptions,
+    optionsError,
+    setOptionsError,
+  }
+}

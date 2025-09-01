@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { FilterProperty, FilterGroup as FilterGroupType } from './types'
-import { ActiveInput } from './FilterBar'
+import { ActiveInput } from './hooks'
 import { FilterCondition } from './FilterCondition'
 import { Input_Shadcn_ } from 'ui'
 
@@ -25,6 +25,9 @@ type FilterGroupProps = {
   isGroupFreeformActive: boolean
   // Logical operator props
   onLogicalOperatorChange?: (path: number[]) => void
+  supportsOperators?: boolean
+  // Remove functionality
+  onRemove: (path: number[]) => void
 }
 
 export function FilterGroup({
@@ -45,6 +48,8 @@ export function FilterGroup({
   groupFreeformValue,
   isGroupFreeformActive,
   onLogicalOperatorChange,
+  supportsOperators = false,
+  onRemove,
 }: FilterGroupProps) {
   const [localFreeformValue, setLocalFreeformValue] = useState('')
   const freeformInputRef = useRef<HTMLInputElement>(null)
@@ -117,7 +122,7 @@ export function FilterGroup({
 
           return (
             <React.Fragment key={index}>
-              {index > 0 && (
+              {index > 0 && supportsOperators && (
                 <span
                   className={`text-xs font-medium cursor-pointer ${
                     isHoveringOperator
@@ -151,6 +156,8 @@ export function FilterGroup({
                   groupFreeformValue={groupFreeformValue}
                   isGroupFreeformActive={isGroupFreeformActive}
                   onLogicalOperatorChange={onLogicalOperatorChange}
+                  supportsOperators={supportsOperators}
+                  onRemove={onRemove}
                 />
               ) : (
                 <FilterCondition
@@ -167,6 +174,7 @@ export function FilterGroup({
                   onBlur={onBlur}
                   onLabelClick={() => onLabelClick(currentPath)}
                   onKeyDown={onKeyDown}
+                  onRemove={() => onRemove(currentPath)}
                 />
               )}
             </React.Fragment>

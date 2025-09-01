@@ -31,7 +31,7 @@ export type FilterProperty = {
 
 export type FilterCondition = {
   propertyName: string
-  value: string | number | null
+  value: string | number | boolean | Date | null
   operator: string
 }
 
