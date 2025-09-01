@@ -39,7 +39,7 @@ const BeginnersPage: NextPage = () => {
           subheading={content.timing.subheading}
           highlights={content.timing.highlights}
         />
-        <Benefits {...content.benefits} />
+        <Benefits className="md:mt-24" {...content.benefits} />
         <CtaSection
           id={content.ctaSection.id}
           title={content.ctaSection.title}

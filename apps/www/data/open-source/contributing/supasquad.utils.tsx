@@ -69,6 +69,7 @@ export interface FeaturesSection {
   heading: JSX.Element
   subheading?: string | JSX.Element
   features: Feature[]
+  className?: string
   // {
   //   [key: string]: Feature
   // }

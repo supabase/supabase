@@ -38,9 +38,10 @@ function isValidIconName(icon: string): icon is IconName {
 interface FeatureIconProps {
   icon: Feature['icon']
   iconNoStroke: Feature['iconNoStroke']
+  strokeWidth?: number
 }
 
-const FeatureIcon: FC<FeatureIconProps> = ({ icon, iconNoStroke }) => {
+const FeatureIcon: FC<FeatureIconProps> = ({ icon, iconNoStroke, strokeWidth = 1.5 }) => {
   const Icon = icon && isValidIconName(icon) ? ICONS[icon] : null
   const iconSize = 7
   const iconWidth = `w-${iconSize}`
@@ -65,11 +66,14 @@ const FeatureIcon: FC<FeatureIconProps> = ({ icon, iconNoStroke }) => {
           strokeMiterlimit="10"
           strokeLinejoin="round"
           strokeLinecap="round"
-          strokeWidth="1"
+          strokeWidth={strokeWidth}
         />
       </svg>
     ) : (
-      <Icon className={cn('stroke-1 mb-2 text-current', iconWidth, iconHeight)} />
+      <Icon
+        className={cn('mb-2 text-foreground', iconWidth, iconHeight)}
+        strokeWidth={strokeWidth}
+      />
     ))
   )
 }

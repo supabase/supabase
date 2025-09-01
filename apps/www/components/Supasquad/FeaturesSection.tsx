@@ -11,7 +11,7 @@ const FeatureIcon = dynamic(() => import('~/components/Supasquad/FeatureIcon'), 
 
 const FeaturesSection = (props: FeaturesSectionType) => {
   return (
-    <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8">
+    <SectionContainer id={props.id} className={cn('flex flex-col gap-4 md:gap-8', props.className)}>
       <div className="flex flex-col gap-2 max-w-xl">
         <span className="label">{props.label}</span>
         <h2 className="h2 text-foreground-lighter">{props.heading}</h2>
