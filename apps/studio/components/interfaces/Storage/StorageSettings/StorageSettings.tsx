@@ -332,7 +332,7 @@ const StorageSettings = () => {
                               and{' '}
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span className="underline underline-offset-2 decoration-destructive-500 hover:decoration-destructive">
+                                  <span className="underline underline-offset-2 decoration-dotted decoration-destructive-500 hover:decoration-destructive cursor-default">
                                     +{affectedBuckets.length - 1} other bucket
                                     {affectedBuckets.length > 2 ? 's' : ''}
                                   </span>
@@ -364,6 +364,7 @@ const StorageSettings = () => {
                               first
                             </>
                           ) : null}
+                          .
                         </p>
                       </>
                     ) : (
