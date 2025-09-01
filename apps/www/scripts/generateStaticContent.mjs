@@ -178,8 +178,36 @@ const getCMSBlogPosts = async () => {
           title: post.title,
           _status: post._status,
           date: post.date,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
         }))
       )
+
+      // Log details about posts with and without dates
+      const postsWithDates = data.docs.filter((post) => post.date)
+      const postsWithoutDates = data.docs.filter((post) => !post.date)
+
+      console.log(`[DEBUG] getCMSBlogPosts: Posts with dates: ${postsWithDates.length}`)
+      if (postsWithDates.length > 0) {
+        console.log(
+          `[DEBUG] getCMSBlogPosts: Posts with dates:`,
+          postsWithDates.map((p) => ({
+            slug: p.slug,
+            date: p.date,
+          }))
+        )
+      }
+
+      console.log(`[DEBUG] getCMSBlogPosts: Posts without dates: ${postsWithoutDates.length}`)
+      if (postsWithoutDates.length > 0) {
+        console.log(
+          `[DEBUG] getCMSBlogPosts: Posts without dates:`,
+          postsWithoutDates.map((p) => ({
+            slug: p.slug,
+            title: p.title,
+          }))
+        )
+      }
     }
 
     const posts = data.docs
