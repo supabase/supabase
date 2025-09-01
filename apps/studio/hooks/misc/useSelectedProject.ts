@@ -48,7 +48,9 @@ export const useIsAwsCloudProvider = () => {
 
 export const useIsAwsK8sCloudProvider = () => {
   const { data: project } = useSelectedProjectQuery()
-  const isAwsK8s = project?.cloud_provider === PROVIDERS.AWS_K8S.id
+  const isAwsK8s =
+    project?.cloud_provider === PROVIDERS.AWS_K8S.id ||
+    project?.cloud_provider === PROVIDERS.AWS_NIMBUS.id
 
   return isAwsK8s
 }

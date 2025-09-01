@@ -37,7 +37,7 @@ export async function getDefaultRegionOption({
 
     if (locLatLon === undefined) return undefined
 
-    const isAWSProvider = ['AWS', 'AWS_K8S'].includes(cloudProvider)
+    const isAWSProvider = ['AWS', 'AWS_K8S', 'AWS_NIMBUS'].includes(cloudProvider)
 
     const allRegions = isAWSProvider ? AWS_REGIONS_COORDINATES : FLY_REGIONS_COORDINATES
     const locations =

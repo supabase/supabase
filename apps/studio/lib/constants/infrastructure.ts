@@ -36,7 +36,10 @@ export const PRICING_TIER_PRODUCT_IDS = {
 export const DEFAULT_PROVIDER: CloudProvider =
   process.env.NEXT_PUBLIC_ENVIRONMENT &&
   ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
-    ? 'AWS_K8S'
+    ? process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN &&
+      process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN.includes('supabase')
+      ? 'AWS_K8S'
+      : 'AWS_NIMBUS'
     : 'AWS'
 
 export const PROVIDERS = {
@@ -56,6 +59,13 @@ export const PROVIDERS = {
   AWS_K8S: {
     id: 'AWS_K8S',
     name: 'AWS (Revamped)',
+    DEFAULT_SSH_KEY: 'supabase-app-instance',
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+  },
+  AWS_NIMBUS: {
+    id: 'AWS_NIMBUS',
+    name: 'AWS (Nimbus)',
     DEFAULT_SSH_KEY: 'supabase-app-instance',
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },

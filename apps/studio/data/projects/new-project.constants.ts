@@ -31,7 +31,12 @@ export const instanceSizeSpecs: Record<
     cpu: '2-core',
     priceHourly: 0.01344,
     priceMonthly: 10,
-    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.FLY.id],
+    cloud_providers: [
+      PROVIDERS.AWS.id,
+      PROVIDERS.AWS_K8S.id,
+      PROVIDERS.AWS_NIMBUS.id,
+      PROVIDERS.FLY.id,
+    ],
   },
   small: {
     label: 'Small',
