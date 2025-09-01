@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
-import { ComponentProps, useState, useMemo } from 'react'
-import { useChartHoverState } from './useChartHoverState'
+import { ComponentProps, useMemo, useState } from 'react'
 import {
   Bar,
   CartesianGrid,
@@ -14,10 +13,11 @@ import {
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
-import ChartHeader from './ChartHeader'
+import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string

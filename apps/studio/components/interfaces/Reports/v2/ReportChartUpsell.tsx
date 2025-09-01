@@ -1,9 +1,9 @@
-import Panel from 'components/ui/Panel'
-import { Button, cn } from 'ui'
-import { ReportConfig } from 'data/reports/v2/reports.types'
-import { useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRef, useState } from 'react'
+
 import { LogChartHandler } from 'components/ui/Charts/LogChartHandler'
+import { ReportConfig } from 'data/reports/v2/reports.types'
+import { Button, Card, cn } from 'ui'
 
 export function ReportChartUpsell({ report, orgSlug }: { report: ReportConfig; orgSlug: string }) {
   const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
@@ -31,7 +31,7 @@ export function ReportChartUpsell({ report, orgSlug }: { report: ReportConfig; o
   const demoData = isHoveringUpgrade ? exponentialChartData.current : demoChartData.current
 
   return (
-    <Panel title={<p className="text-sm">{report.label}</p>} className={cn('h-[260px] relative')}>
+    <Card className={cn('h-[260px] relative')}>
       <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
         <h2 className="text-sm">{report.label}</h2>
         <p className="text-sm text-foreground-light">
@@ -76,6 +76,6 @@ export function ReportChartUpsell({ report, orgSlug }: { report: ReportConfig; o
           updateDateRange={() => {}}
         />
       </div>
-    </Panel>
+    </Card>
   )
 }

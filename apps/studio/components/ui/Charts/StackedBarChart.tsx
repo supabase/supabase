@@ -1,9 +1,8 @@
+import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { useChartHoverState } from './useChartHoverState'
-import ChartHeader from './ChartHeader'
+
+import { ChartHeader } from './ChartHeader'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -20,7 +19,7 @@ import {
   useStacked,
 } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-dayjs.extend(utc)
+import { useChartHoverState } from './useChartHoverState'
 
 interface Props extends CommonChartProps<any> {
   xAxisKey: string

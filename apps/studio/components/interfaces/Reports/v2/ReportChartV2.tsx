@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
 
+import { ComposedChart } from 'components/ui/Charts/ComposedChart'
+import type { AnalyticsInterval } from 'data/analytics/constants'
+import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Card, CardContent, cn } from 'ui'
-import type { AnalyticsInterval } from 'data/analytics/constants'
-import type { ReportConfig } from 'data/reports/v2/reports.types'
-import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import { ReportChartUpsell } from './ReportChartUpsell'
-import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
 
 export interface ReportChartV2Props {
   report: ReportConfig
@@ -94,51 +94,46 @@ export const ReportChartV2 = ({
   const showEmptyState = (!finalChartData || finalChartData.length === 0) && !isLoadingChart
 
   return (
-    <>
-      <Card
-        className={cn('relative w-full overflow-hidden scroll-mt-16', className)}
-        id={report.id}
-      >
-        <CardContent className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
-          {isLoadingChart ? (
-            <Loader2 className="size-5 animate-spin text-foreground-light" />
-          ) : showEmptyState ? (
-            <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-              No data available for the selected time range
-            </p>
-          ) : isErrorState ? (
-            <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-              Error loading chart data
-            </p>
-          ) : (
-            <div className="w-full">
-              <ComposedChart
-                attributes={dynamicAttributes}
-                data={finalChartData}
-                format={report.format ?? undefined}
-                xAxisKey={report.xAxisKey ?? 'timestamp'}
-                yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
-                highlightedValue={0}
-                title={report.label}
-                customDateFormat={undefined}
-                chartHighlight={undefined}
-                chartStyle={chartStyle}
-                showTooltip={report.showTooltip}
-                showLegend={report.showLegend}
-                showTotal={false}
-                showMaxValue={report.showMaxValue}
-                onChartStyleChange={setChartStyle}
-                updateDateRange={updateDateRange}
-                valuePrecision={report.valuePrecision}
-                hideChartType={report.hideChartType}
-                titleTooltip={report.titleTooltip}
-                syncId={syncId}
-                sql={queryResult?.query}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </>
+    <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
+      <CardContent className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
+        {isLoadingChart ? (
+          <Loader2 className="size-5 animate-spin text-foreground-light" />
+        ) : showEmptyState ? (
+          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
+            No data available for the selected time range
+          </p>
+        ) : isErrorState ? (
+          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
+            Error loading chart data
+          </p>
+        ) : (
+          <div className="w-full">
+            <ComposedChart
+              attributes={dynamicAttributes}
+              data={finalChartData}
+              format={report.format ?? undefined}
+              xAxisKey={report.xAxisKey ?? 'timestamp'}
+              yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
+              highlightedValue={0}
+              title={report.label}
+              customDateFormat={undefined}
+              chartHighlight={undefined}
+              chartStyle={chartStyle}
+              showTooltip={report.showTooltip}
+              showLegend={report.showLegend}
+              showTotal={false}
+              showMaxValue={report.showMaxValue}
+              onChartStyleChange={setChartStyle}
+              updateDateRange={updateDateRange}
+              valuePrecision={report.valuePrecision}
+              hideChartType={report.hideChartType}
+              titleTooltip={report.titleTooltip}
+              syncId={syncId}
+              sql={queryResult?.query}
+            />
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }

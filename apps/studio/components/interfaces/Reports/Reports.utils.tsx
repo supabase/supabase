@@ -1,7 +1,8 @@
+import dayjs from 'dayjs'
+
 import useDbQuery, { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import useLogsQuery, { LogsQueryHook } from 'hooks/analytics/useLogsQuery'
 import type { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
-import dayjs from 'dayjs'
 
 /**
  * Converts a query params string to an object

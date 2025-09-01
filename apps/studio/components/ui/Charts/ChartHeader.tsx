@@ -1,5 +1,4 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import dayjs from 'dayjs'
 import {
   Activity,
   BarChartIcon,
@@ -8,13 +7,14 @@ import {
   SquareTerminal,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
-import { useChartHoverState } from './useChartHoverState'
-import { numberFormatter } from './Charts.utils'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { formatBytes } from 'lib/helpers'
+import { numberFormatter } from './Charts.utils'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface ChartHeaderProps {
   title?: string
@@ -43,7 +43,7 @@ export interface ChartHeaderProps {
   sql?: string
 }
 
-const ChartHeader = ({
+export const ChartHeader = ({
   format,
   highlightedValue,
   highlightedLabel,
@@ -272,5 +272,3 @@ const ChartHeader = ({
     </div>
   )
 }
-
-export default ChartHeader

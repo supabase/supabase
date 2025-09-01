@@ -1,13 +1,3 @@
-/**
- * ReportChart
- *
- * A wrapper component that uses the useChartData hook to fetch data for a chart
- * and then passes the data and loading state to the ComposedChartHandler.
- *
- * This component acts as a bridge between the data-fetching logic and the
- * presentational chart component.
- */
-
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import LogChartHandler from 'components/ui/Charts/LogChartHandler'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
@@ -16,18 +6,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useChartData } from 'hooks/useChartData'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import { ReportChartUpsell } from './v2/ReportChartUpsell'
-import { AnalyticsInterval } from 'data/analytics/constants'
 
-const ReportChart = ({
-  chart,
-  startDate,
-  endDate,
-  interval,
-  updateDateRange,
-  functionIds,
-  isLoading,
-  className,
-}: {
+interface ReportChartProps {
   chart: any
   startDate: string
   endDate: string
@@ -35,8 +15,24 @@ const ReportChart = ({
   updateDateRange: UpdateDateRange
   functionIds?: string[]
   isLoading?: boolean
-  className?: string
-}) => {
+}
+
+/**
+ * A wrapper component that uses the useChartData hook to fetch data for a chart
+ * and then passes the data and loading state to the ComposedChartHandler.
+ *
+ * This component acts as a bridge between the data-fetching logic and the
+ * presentational chart component.
+ */
+export const ReportChart = ({
+  chart,
+  startDate,
+  endDate,
+  interval,
+  updateDateRange,
+  functionIds,
+  isLoading,
+}: ReportChartProps) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
   const orgPlanId = orgPlan?.id
@@ -98,4 +94,3 @@ const ReportChart = ({
     />
   )
 }
-export default ReportChart

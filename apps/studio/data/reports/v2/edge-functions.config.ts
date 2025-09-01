@@ -1,19 +1,17 @@
-import { get } from 'data/fetchers'
+import dayjs from 'dayjs'
+
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
 import type { AnalyticsInterval } from 'data/analytics/constants'
+import { get } from 'data/fetchers'
 import {
   analyticsIntervalToGranularity,
   REPORT_STATUS_CODE_COLORS,
 } from 'data/reports/report.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
-import {
-  isUnixMicro,
-  unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
 import { ReportConfig } from './reports.types'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-
-dayjs.extend(utc)
 
 const METRIC_SQL: Record<string, (interval: AnalyticsInterval, functionIds?: string[]) => string> =
   {

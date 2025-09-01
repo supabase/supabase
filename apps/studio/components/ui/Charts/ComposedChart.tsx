@@ -1,10 +1,7 @@
-'use client'
-
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useState } from 'react'
-import { useChartHoverState } from './useChartHoverState'
 import {
   Area,
   Bar,
@@ -18,9 +15,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
-import ChartHeader from './ChartHeader'
+import { ChartHeader } from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
 import {
   CHART_COLORS,
@@ -38,6 +36,7 @@ import {
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
