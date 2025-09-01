@@ -15,6 +15,17 @@ const CMS_SITE_ORIGIN =
       : 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
 
+// Debug logging for environment variables
+console.log(`[DEBUG] Environment variables:`, {
+  NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
+  NEXT_PUBLIC_VERCEL_BRANCH_URL: process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL,
+  CMS_SITE_ORIGIN: process.env.CMS_SITE_ORIGIN,
+  CMS_URL: process.env.CMS_URL,
+  PAYLOAD_API_KEY_present: !!process.env.PAYLOAD_API_KEY,
+  CMS_READ_KEY_present: !!process.env.CMS_READ_KEY,
+})
+console.log(`[DEBUG] Resolved CMS_SITE_ORIGIN: ${CMS_SITE_ORIGIN}`)
+
 /**
  * Fixes Safari dates sorting bug
  */
@@ -86,18 +97,31 @@ const getStaticBlogPosts = () => {
  * Get CMS blog posts
  */
 const getCMSBlogPosts = async () => {
+  console.log(`[DEBUG] getCMSBlogPosts: Starting fetch from ${CMS_SITE_ORIGIN}`)
+  console.log(`[DEBUG] getCMSBlogPosts: PAYLOAD_API_KEY present: ${!!PAYLOAD_API_KEY}`)
+
   try {
-    const response = await fetch(
-      `${CMS_SITE_ORIGIN}/api/posts?depth=2&draft=false&where[_status][equals]=published`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-        },
-      }
+    const url = `${CMS_SITE_ORIGIN}/api/posts?depth=2&draft=false&where[_status][equals]=published`
+    console.log(`[DEBUG] getCMSBlogPosts: Fetching URL: ${url}`)
+
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+      },
+    })
+
+    console.log(`[DEBUG] getCMSBlogPosts: Response status: ${response.status}`)
+    console.log(
+      `[DEBUG] getCMSBlogPosts: Response headers:`,
+      Object.fromEntries(response.headers.entries())
     )
 
     if (!response.ok) {
+      const responseText = await response.text()
+      console.error(
+        `[DEBUG] getCMSBlogPosts: HTTP error! status: ${response.status}, body: ${responseText.slice(0, 500)}`
+      )
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
@@ -111,6 +135,24 @@ const getCMSBlogPosts = async () => {
     }
 
     const data = await response.json()
+    console.log(`[DEBUG] getCMSBlogPosts: Raw response data:`, {
+      totalDocs: data.totalDocs,
+      docsCount: data.docs?.length,
+      hasNextPage: data.hasNextPage,
+      page: data.page,
+    })
+
+    if (data.docs && data.docs.length > 0) {
+      console.log(
+        `[DEBUG] getCMSBlogPosts: First few posts:`,
+        data.docs.slice(0, 3).map((post) => ({
+          slug: post.slug,
+          title: post.title,
+          _status: post._status,
+          date: post.date,
+        }))
+      )
+    }
 
     const posts = data.docs
       .filter((post) => post.slug && post.title && post.description)
@@ -130,9 +172,15 @@ const getCMSBlogPosts = async () => {
         }
       })
 
+    console.log(`[DEBUG] getCMSBlogPosts: Filtered posts count: ${posts.length}`)
+    console.log(
+      `[DEBUG] getCMSBlogPosts: Filtered post slugs:`,
+      posts.map((p) => p.slug)
+    )
+
     return posts
   } catch (error) {
-    console.warn('Error fetching CMS blog posts:', error)
+    console.error('[DEBUG] getCMSBlogPosts: Error fetching CMS blog posts:', error)
     return []
   }
 }
@@ -141,23 +189,48 @@ const getCMSBlogPosts = async () => {
  * Get latest blog posts from both sources
  */
 const getLatestBlogPosts = async () => {
+  console.log(`[DEBUG] getLatestBlogPosts: Starting to fetch posts from both sources`)
+
   const staticPosts = getStaticBlogPosts()
+  console.log(`[DEBUG] getLatestBlogPosts: Found ${staticPosts.length} static posts`)
+  console.log(
+    `[DEBUG] getLatestBlogPosts: Static post slugs:`,
+    staticPosts.map((p) => p.slug)
+  )
+
   const cmsPosts = await getCMSBlogPosts()
+  console.log(`[DEBUG] getLatestBlogPosts: Found ${cmsPosts.length} CMS posts`)
+  console.log(
+    `[DEBUG] getLatestBlogPosts: CMS post slugs:`,
+    cmsPosts.map((p) => p.slug)
+  )
 
   // Combine and sort all posts by date
   const allPosts = [...staticPosts, ...cmsPosts]
+  console.log(`[DEBUG] getLatestBlogPosts: Combined total posts: ${allPosts.length}`)
 
   // Filter out posts without valid dates and sort
   const validPosts = allPosts.filter((post) => post.date).sort((a, b) => sortDates(a, b, 'desc'))
+  console.log(`[DEBUG] getLatestBlogPosts: Valid posts after filtering: ${validPosts.length}`)
 
   // Return latest 10 posts
-  return validPosts.slice(0, 10).map(({ title, url, description, date, formattedDate }) => ({
-    title,
-    url,
-    description,
-    date,
-    formattedDate,
-  }))
+  const latestPosts = validPosts
+    .slice(0, 10)
+    .map(({ title, url, description, date, formattedDate }) => ({
+      title,
+      url,
+      description,
+      date,
+      formattedDate,
+    }))
+
+  console.log(`[DEBUG] getLatestBlogPosts: Final latest posts count: ${latestPosts.length}`)
+  console.log(
+    `[DEBUG] getLatestBlogPosts: Final latest post URLs:`,
+    latestPosts.map((p) => p.url)
+  )
+
+  return latestPosts
 }
 
 let stars = 0
@@ -239,3 +312,7 @@ await fs.writeFile(
 )
 
 console.log(`✅ Generated static content with ${latestBlogPosts.length} blog posts`)
+console.log(
+  `[DEBUG] Final output - latestBlogPosts slugs:`,
+  latestBlogPosts.map((p) => p.url.replace('/blog/', ''))
+)
