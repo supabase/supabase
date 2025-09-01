@@ -293,11 +293,6 @@ export const ReplicationPipelineStatus = () => {
                               <div className="text-sm text-foreground">
                                 {statusConfig.description}
                               </div>
-                              {'lag' in table.state && (
-                                <div className="text-xs text-foreground-light">
-                                  Lag: {table.state.lag}ms
-                                </div>
-                              )}
                               {table.state.name === 'error' && (
                                 <ErroredTableDetails
                                   state={table.state}
