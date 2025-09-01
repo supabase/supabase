@@ -23,7 +23,7 @@ Choose what data to sync by creating a publication in your database. A publicati
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Publications** in the sidebar.
-3. Control which database events to send by toggling **Insert**, **Update**, and **Delete**.
+3. To work with ETL, toggle **all** database events.
 4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
 <video width="99%" muted playsInline controls={true}>
@@ -62,15 +62,15 @@ Before setting up replication to BigQuery, you need:
    - **Service Account Key**: Enter your GCP service account key
 4. Review the [Advanced Settings](#advanced-settings) to change the limits for the replication.
 
-    - **Max size**: Changes are sent in batches. Max size limits the size of an individual batch.
-    - **Max fill seconds**: Number of seconds after which a batch should be sent, even if it hasn't reached the max size.
-    - **Max staleness**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
+   - **Max size**: Changes are sent in batches. Max size limits the size of an individual batch.
+   - **Max fill seconds**: Number of seconds after which a batch should be sent, even if it hasn't reached the max size.
+   - **Max staleness**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
 
 5. Click **Create** to start the replication process.
 
-<Admonition type="info">
+<Admonition type="note">
 
-Due to ingestion latency in BigQuery, there may be a delay in the dataflow.
+Due to ingestion latency in BigQuery, there may be a delay in the data flow.
 
 </Admonition>
 
@@ -80,5 +80,11 @@ After setting up replication, data begins flowing within a few minutes. You can 
 
 ## Limitations
 
-- Large values stored as [TOASTed values](https://www.postgresql.org/docs/current/storage-toast.html) are not replicated.
+- Large values stored as [TOASTed values](https://www.postgresql.org/docs/current/storage-toast.html) are replicated, but limited to 10MB.
 - Custom data types are not supported.
+- No support for picking event types to replicate. ETL needs all insert, update and delete events.
+- No column lists and row filter conditions support.
+- No partitioned tables support.
+- No generated columns support.
+- No support for changing schema in the source.
+- Tables should have a primary key set.
