@@ -66,7 +66,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
-  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.BYTES)
+  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const { value: fileSizeLimit } = convertFromBytes(bucket?.file_size_limit ?? 0)
   const bucketIdRef = useRef<string | null>(null)
 

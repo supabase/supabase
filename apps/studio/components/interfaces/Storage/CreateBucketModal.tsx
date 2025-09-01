@@ -117,7 +117,7 @@ const CreateBucketModal = () => {
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
-  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.BYTES)
+  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
 
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -186,7 +186,7 @@ const CreateBucketModal = () => {
         await createIcebergWrapper({ bucketName: values.name })
       }
       form.reset()
-      setSelectedUnit(StorageSizeUnits.BYTES)
+      setSelectedUnit(StorageSizeUnits.MB)
       setVisible(false)
       toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
@@ -197,7 +197,7 @@ const CreateBucketModal = () => {
 
   const handleClose = () => {
     form.reset()
-    setSelectedUnit(StorageSizeUnits.BYTES)
+    setSelectedUnit(StorageSizeUnits.MB)
     setVisible(false)
   }
 

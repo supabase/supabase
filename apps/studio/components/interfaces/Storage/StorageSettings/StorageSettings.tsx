@@ -87,7 +87,7 @@ const StorageSettings = () => {
 
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
-    unit: StorageSizeUnits.BYTES,
+    unit: StorageSizeUnits.MB,
     imageTransformationEnabled: !isFreeTier,
   })
 
