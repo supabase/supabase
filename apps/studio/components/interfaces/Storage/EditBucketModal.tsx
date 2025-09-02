@@ -12,7 +12,7 @@ import {
 } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { updateBucket } from 'data/storage/bucket-update-mutation'
+import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
 import {
@@ -61,7 +61,6 @@ const formId = 'edit-storage-bucket-form'
 export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
   const { ref } = useParams()
 
-  const [isUpdating, setIsUpdating] = useState(false)
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
@@ -69,6 +68,42 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const { value: fileSizeLimit } = convertFromBytes(bucket?.file_size_limit ?? 0)
   const bucketIdRef = useRef<string | null>(null)
+
+  const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation({
+    onSuccess: () => {
+      toast.success(`Successfully updated bucket "${bucket?.name}"`)
+      onClose()
+    },
+    onError: (error) => {
+      // Handle specific error cases for inline display
+      const errorMessage = error.message?.toLowerCase() || ''
+
+      if (
+        errorMessage.includes('exceeded the maximum allowed size') ||
+        errorMessage.includes('maximum allowed size') ||
+        errorMessage.includes('entity too large') ||
+        errorMessage.includes('payload too large')
+      ) {
+        // Set form error for the file size limit field
+        form.setError('formatted_size_limit', {
+          type: 'manual',
+          message: `Exceeds global limit of ${formattedGlobalUploadLimit}.`,
+        })
+      } else if (
+        errorMessage.includes('mime type') &&
+        (errorMessage.includes('is not supported') || errorMessage.includes('not supported'))
+      ) {
+        // Set form error for the MIME types field
+        form.setError('allowed_mime_types', {
+          type: 'manual',
+          message: 'Invalid MIME type format. Please check your input.',
+        })
+      } else {
+        // For other errors, show a toast as fallback
+        toast.error(`Failed to update bucket: ${error.message || 'Unknown error'}`)
+      }
+    },
+  })
 
   const defaultValues = {
     name: bucket?.name ?? '',
@@ -101,7 +136,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     if (ref === undefined) return console.error('Project ref is required')
 
     form.clearErrors()
-    setIsUpdating(true)
 
     // Client-side validation: Check if bucket limit exceeds global limit
     // [Joshen] Should shift this into superRefine in the form schema
@@ -117,65 +151,23 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
       if (bucketLimitInBytes > data.fileSizeLimit) {
         form.setError('formatted_size_limit', { type: 'manual', message: 'exceed_global_limit' })
-        return setIsUpdating(false)
       }
     }
 
-    try {
-      const result = await updateBucket({
-        projectRef: ref,
-        id: bucket.id,
-        isPublic: values.public,
-        file_size_limit:
-          values.has_file_size_limit && values.formatted_size_limit
-            ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
-            : null,
-        allowed_mime_types: hasAllowedMimeTypes
-          ? values.allowed_mime_types.length > 0
-            ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
-            : null
+    updateBucket({
+      projectRef: ref,
+      id: bucket.id,
+      isPublic: values.public,
+      file_size_limit:
+        values.has_file_size_limit && values.formatted_size_limit
+          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
           : null,
-      })
-
-      if (result.error) {
-        // Handle specific error cases for inline display
-        const errorMessage = result.error.message?.toLowerCase() || ''
-
-        if (
-          errorMessage.includes('exceeded the maximum allowed size') ||
-          errorMessage.includes('maximum allowed size') ||
-          errorMessage.includes('entity too large') ||
-          errorMessage.includes('payload too large')
-        ) {
-          // Set form error for the file size limit field
-          form.setError('formatted_size_limit', {
-            type: 'manual',
-            message: `Exceeds global limit of ${formattedGlobalUploadLimit}.`,
-          })
-        } else if (
-          errorMessage.includes('mime type') &&
-          (errorMessage.includes('is not supported') || errorMessage.includes('not supported'))
-        ) {
-          // Set form error for the MIME types field
-          form.setError('allowed_mime_types', {
-            type: 'manual',
-            message: 'Invalid MIME type format. Please check your input.',
-          })
-        } else {
-          // For other errors, show a toast as fallback
-          toast.error(`Failed to update bucket: ${result.error.message || 'Unknown error'}`)
-        }
-      } else {
-        // Success case
-        toast.success(`Successfully updated bucket "${bucket?.name}"`)
-        onClose()
-      }
-    } catch (error: any) {
-      // This should not happen anymore, but keeping as fallback
-      toast.error(`Failed to update bucket: ${error.message}`)
-    } finally {
-      setIsUpdating(false)
-    }
+      allowed_mime_types: hasAllowedMimeTypes
+        ? values.allowed_mime_types.length > 0
+          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
+          : null
+        : null,
+    })
   }
 
   useEffect(() => {
