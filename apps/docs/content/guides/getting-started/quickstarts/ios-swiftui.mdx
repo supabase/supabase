@@ -23,17 +23,27 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={3}>
+<StepHikeCompact.Step step={3}>
+  <StepHikeCompact.Details title="Install the Supabase client library">
+    Add the Supabase Swift SDK via Swift Package Manager:
 
-    <StepHikeCompact.Details title="Install the Supabase client library">
+    - In Xcode, open **File > Add Packages...** (or **File > Add Package Dependency...** in some Xcode versions).
+    - Paste the package URL:
+        ```
+        https://github.com/supabase-community/supabase-swift
+        ```
+    - Select the latest version and click **Add Package**.
+    - Ensure the **Supabase** product is added to your app target.
 
-      Install Supabase package dependency using Xcode by following Apple's [tutorial](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+    Alternatively, select your project in the Project navigator → **Package Dependencies** tab → click **+** and enter the same URL.
 
-      Make sure to add `Supabase` product package as dependency to the application.
+    <Callout type="note">
+      Menu labels can vary slightly by Xcode version. For more details on SPM, see
+      <a href="https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app">Apple’s guide</a>.
+    </Callout>
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
 
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
 
