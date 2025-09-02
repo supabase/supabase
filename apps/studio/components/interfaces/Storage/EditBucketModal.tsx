@@ -65,9 +65,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
+  const bucketIdRef = useRef<string | null>(null)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const { value: fileSizeLimit } = convertFromBytes(bucket?.file_size_limit ?? 0)
-  const bucketIdRef = useRef<string | null>(null)
 
   const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation({
     onSuccess: () => {
@@ -131,11 +131,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const isMakingBucketPrivate = bucket?.public && !isPublicBucket
   const isMakingBucketPublic = !bucket?.public && isPublicBucket
 
+  const closeModal = () => {
+    form.reset()
+    onClose()
+  }
+
   const onSubmit: SubmitHandler<z.infer<typeof BucketSchema>> = async (values) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
-
-    form.clearErrors()
 
     // Client-side validation: Check if bucket limit exceeds global limit
     // [Joshen] Should shift this into superRefine in the form schema
@@ -150,7 +153,10 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       )
 
       if (bucketLimitInBytes > data.fileSizeLimit) {
-        form.setError('formatted_size_limit', { type: 'manual', message: 'exceed_global_limit' })
+        return form.setError('formatted_size_limit', {
+          type: 'manual',
+          message: 'exceed_global_limit',
+        })
       }
     }
 
@@ -179,8 +185,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         setSelectedUnit(unit)
         bucketIdRef.current = bucket.id
       }
-      // Clear errors when modal opens
-      form.clearErrors()
     }
   }, [visible, bucket, form])
 
@@ -188,11 +192,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     <Dialog
       open={visible}
       onOpenChange={(open) => {
-        if (!open) {
-          form.reset()
-          form.clearErrors()
-          onClose()
-        }
+        if (!open) closeModal()
       }}
     >
       <DialogContent>
@@ -426,15 +426,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         </Form_Shadcn_>
 
         <DialogFooter>
-          <Button
-            type="default"
-            disabled={isUpdating}
-            onClick={() => {
-              form.reset()
-              form.clearErrors()
-              onClose()
-            }}
-          >
+          <Button type="default" disabled={isUpdating} onClick={closeModal}>
             Cancel
           </Button>
           <Button form={formId} htmlType="submit" loading={isUpdating}>
