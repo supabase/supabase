@@ -37,7 +37,7 @@ export function ComponentPreview({
   const index = styles.findIndex((style) => style.name === config.style)
 
   const Preview = React.useMemo(() => {
-    const Component = (Index['default'][name] as any)?.component
+    const Component = Index['default'][name]?.component
 
     if (!Component) {
       return (

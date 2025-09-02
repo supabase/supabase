@@ -30,15 +30,8 @@ export const Index = {
 
       return `
     "${item.name}": {
-      name: "${item.name}",
-      type: "${item.type}",
-      registryDependencies: [${item.registryDependencies.map((dep) => `"${dep}"`).join(',')}],
-      ${componentFile ? `component: React.lazy(() => import("@/${componentFile.path}")),` : ''}
-      source: "",
+      component: ${componentFile ? `React.lazy(() => import("@/${componentFile.path}"))` : 'null'},
       files: [${item.files?.map((file) => `"${file.path}"`).join(',')}],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
     }
     `
     })}
