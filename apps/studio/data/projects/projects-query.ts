@@ -31,7 +31,7 @@ export async function getProjects({
   // { projects: ProjectInfo[] } is intentional to be forward compatible with the structure of v2 for easier migration.
   const isProjectsArray = Array.isArray(data)
 
-  if (!isProjectsArray) {
+  if (!isProjectsArray && typeof data !== 'undefined') {
     Sentry.captureException(new Error('Projects response is not an array'), {
       extra: {
         data,
