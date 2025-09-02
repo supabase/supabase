@@ -182,8 +182,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     if (visible && bucket) {
       // Only set the selectedUnit when the bucket changes (different bucket ID)
       // This preserves the user's unit selection when reopening the modal for the same bucket
-      if (bucketIdRef.current !== bucket.id) {
-        const { unit } = convertFromBytes(bucket.file_size_limit ?? 0)
+      if (bucketIdRef.current !== bucket.id && bucket.file_size_limit) {
+        const { unit } = convertFromBytes(bucket.file_size_limit)
         setSelectedUnit(unit)
         bucketIdRef.current = bucket.id
       }
