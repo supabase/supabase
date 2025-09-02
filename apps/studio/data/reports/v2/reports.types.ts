@@ -19,7 +19,7 @@ export interface ReportDataProvider<FiltersType> {
   }> // [jordi] would be cool to have a type that forces data keys to match the attributes
 }
 
-export interface ReportConfig<FiltersType> {
+export interface ReportConfig<FiltersType = any> {
   id: string
   label: string
   dataProvider: ReportDataProvider<FiltersType>
