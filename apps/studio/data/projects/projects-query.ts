@@ -7,6 +7,7 @@ import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 import type { Project } from './project-detail-query'
+import * as Sentry from '@sentry/nextjs'
 
 export type ProjectsVariables = {
   ref?: string
@@ -28,7 +29,17 @@ export async function getProjects({
   // The /platform/projects endpoint has a v2 which is activated by passing a {version: '2'} header. The v1 API returns
   // all projects while the v2 returns paginated list of projects. Wrapping the v1 API response into a
   // { projects: ProjectInfo[] } is intentional to be forward compatible with the structure of v2 for easier migration.
-  return { projects: data }
+  const isProjectsArray = Array.isArray(data)
+
+  if (!isProjectsArray) {
+    Sentry.captureException(new Error('Projects response is not an array'), {
+      extra: {
+        data,
+      },
+    })
+  }
+
+  return { projects: isProjectsArray ? data : [] }
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
