@@ -162,7 +162,7 @@ export const BucketModal = ({ mode, visible, bucket, onClose, onSuccess }: Bucke
       }
     : {
         name: bucket?.name ?? '',
-        public: bucket?.public,
+        public: bucket?.public ?? false,
         has_file_size_limit: Boolean(bucket?.file_size_limit),
         formatted_size_limit: bucket?.file_size_limit
           ? convertFromBytes(bucket.file_size_limit).value ?? 0
@@ -201,6 +201,8 @@ export const BucketModal = ({ mode, visible, bucket, onClose, onSuccess }: Bucke
   }
 
   const handleCreate = async (values: CreateBucketForm) => {
+    if (!ref) return console.error('Project ref is required')
+
     if (values.type === 'ANALYTICS' && !icebergCatalogEnabled) {
       return toast.error(
         'The Analytics catalog feature is not enabled for your project. Please contact support to enable it.'
@@ -268,6 +270,7 @@ export const BucketModal = ({ mode, visible, bucket, onClose, onSuccess }: Bucke
 
   const handleEdit = async (values: EditBucketForm) => {
     if (!bucket) return console.error('Bucket is required')
+    if (!ref) return console.error('Project ref is required')
 
     form.clearErrors()
     setIsUpdating(true)
