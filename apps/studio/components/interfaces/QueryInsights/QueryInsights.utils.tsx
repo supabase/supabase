@@ -320,7 +320,7 @@ export const formatQueryInsightsColumns = ({
                 <span>
                   <Badge
                     variant="success"
-                    className="text-xs !text-center !inline-flex items-center"
+                    className="!text-[11px] !text-center !inline-flex items-center"
                   >
                     Optimized
                   </Badge>
@@ -333,7 +333,7 @@ export const formatQueryInsightsColumns = ({
                 <span>
                   <Badge
                     variant="warning"
-                    className="text-xs !text-center !inline-flex items-center"
+                    className="!text-[11px] !text-center !inline-flex items-center"
                   >
                     Not optimized
                   </Badge>
