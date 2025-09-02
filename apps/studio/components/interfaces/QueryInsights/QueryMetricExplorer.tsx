@@ -554,35 +554,41 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                   </div>
                 ) : chartData.data.length > 0 ? (
                   <>
-                    {selectedMetric === 'query_latency' && (
-                      <div className="flex flex-row gap-6 mt-2">
-                        <QueryMetricBlock
-                          label="Average p95"
-                          value={averageP95?.toFixed(2).toLocaleString() + 'ms'}
-                        />
-                        <QueryMetricBlock label="Slow queries" value={slowQueriesCount} />
-                      </div>
-                    )}
+                    {(() => {
+                      const metricsConfig = {
+                        query_latency: [
+                          {
+                            label: 'Average p95',
+                            value: averageP95?.toFixed(2).toLocaleString() + 'ms',
+                          },
+                          { label: 'Slow queries', value: slowQueriesCount },
+                        ],
+                        rows_read: [{ label: 'Total rows read', value: totalRowsRead }],
+                        calls: [{ label: 'Total calls', value: totalCalls }],
+                        cache_hits: [
+                          { label: 'Total hits', value: totalHits },
+                          { label: 'Cache hits', value: totalCacheHits },
+                          { label: 'Cache misses', value: totalCacheMisses },
+                        ],
+                      }
 
-                    {selectedMetric === 'rows_read' && (
-                      <div className="flex flex-row gap-6 mt-2">
-                        <QueryMetricBlock label="Total rows read" value={totalRowsRead} />
-                      </div>
-                    )}
+                      const currentMetrics =
+                        metricsConfig[selectedMetric as keyof typeof metricsConfig] || []
 
-                    {selectedMetric === 'calls' && (
-                      <div className="flex flex-row gap-6 mt-2">
-                        <QueryMetricBlock label="Total calls" value={totalCalls} />
-                      </div>
-                    )}
-
-                    {selectedMetric === 'cache_hits' && (
-                      <div className="flex flex-row gap-6 mt-2">
-                        <QueryMetricBlock label="Total hits" value={totalHits} />
-                        <QueryMetricBlock label="Cache hits" value={totalCacheHits} />
-                        <QueryMetricBlock label="Cache misses" value={totalCacheMisses} />
-                      </div>
-                    )}
+                      return (
+                        currentMetrics.length > 0 && (
+                          <div className="flex flex-row gap-6 mt-1 absolute w-full">
+                            {currentMetrics.map((metric, index) => (
+                              <QueryMetricBlock
+                                key={index}
+                                label={metric.label}
+                                value={metric.value}
+                              />
+                            ))}
+                          </div>
+                        )
+                      )
+                    })()}
 
                     <ComposedChart
                       data={chartData.data}
@@ -595,7 +601,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                       hideHighlightedValue={true}
                       hideHighlightedLabel={true}
                       showTooltip={true}
-                      showGrid={false}
+                      showGrid={true}
                       showLegend={
                         selectedMetric === 'query_latency' ||
                         selectedMetric === 'cache_hits' ||
@@ -609,6 +615,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                         width: 60,
                         tickFormatter: (value) => value.toLocaleString(),
                       }}
+                      className="my-3"
                     />
                   </>
                 ) : (
