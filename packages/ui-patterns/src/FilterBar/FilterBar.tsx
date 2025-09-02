@@ -221,11 +221,11 @@ export function FilterBar({
     <div ref={rootRef} className="w-full space-y-2 relative" data-filterbar-root>
       <div
         className={cn(
-          'relative flex items-center gap-2 w-full border rounded-md h-10 cursor-text p-0 pl-2',
+          'relative flex items-center gap-2 w-full border rounded-md h-10 bg-foreground/[.026] cursor-text p-0 px-2 overflow-auto',
           className
         )}
       >
-        <Search className="text-foreground-muted w-4 h-4" />
+        <Search className="text-foreground-muted w-4 h-4 sticky left-0 shrink-0" />
         <div className="flex-1 flex flex-wrap items-center gap-1 h-full">
           <FilterGroupComponent
             group={activeFilters}

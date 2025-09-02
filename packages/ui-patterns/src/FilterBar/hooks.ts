@@ -122,3 +122,59 @@ export function useOptionsCache() {
     setOptionsError,
   }
 }
+
+// Shared utilities
+export function useDeferredBlur(wrapperRef: React.RefObject<HTMLElement>, onBlur: () => void) {
+  return useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      setTimeout(() => {
+        const active = document.activeElement as HTMLElement | null
+        if (active && wrapperRef.current && wrapperRef.current.contains(active)) {
+          return
+        }
+        onBlur()
+      }, 0)
+    },
+    [wrapperRef, onBlur]
+  )
+}
+
+export function useHighlightNavigation(
+  itemsLength: number,
+  onEnter: (index: number) => void,
+  fallbackKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+) {
+  const [highlightedIndex, setHighlightedIndex] = useState(0)
+
+  useEffect(() => {
+    if (highlightedIndex > itemsLength - 1) {
+      setHighlightedIndex(itemsLength > 0 ? itemsLength - 1 : 0)
+    }
+  }, [itemsLength, highlightedIndex])
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setHighlightedIndex((prev) => (prev < itemsLength - 1 ? prev + 1 : prev))
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        onEnter(highlightedIndex)
+        return
+      }
+      if (fallbackKeyDown) fallbackKeyDown(e)
+    },
+    [itemsLength, highlightedIndex, onEnter, fallbackKeyDown]
+  )
+
+  const reset = useCallback(() => setHighlightedIndex(0), [])
+
+  return { highlightedIndex, setHighlightedIndex, handleKeyDown, reset }
+}

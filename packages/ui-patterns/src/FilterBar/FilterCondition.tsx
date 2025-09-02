@@ -7,15 +7,12 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverAnchor_Shadcn_,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
 } from 'ui'
 import { buildOperatorItems, buildValueItems, MenuItem } from './menuItems'
 import { FilterGroup as FilterGroupType } from './types'
 import { FilterCondition as FilterConditionType, FilterProperty } from './types'
+import { useDeferredBlur, useHighlightNavigation } from './hooks'
+import { DefaultCommandList } from './DefaultCommandList'
 
 type FilterConditionProps = {
   condition: FilterConditionType
@@ -69,8 +66,6 @@ export function FilterCondition({
   const valueRef = useRef<HTMLInputElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const property = filterProperties.find((p) => p.name === condition.propertyName)
-  const [opHighlightedIndex, setOpHighlightedIndex] = useState(0)
-  const [valHighlightedIndex, setValHighlightedIndex] = useState(0)
   const [showValueCustom, setShowValueCustom] = useState(false)
 
   useEffect(() => {
@@ -81,12 +76,8 @@ export function FilterCondition({
     }
   }, [isActive, isOperatorActive])
 
-  useEffect(() => {
-    if (!isOperatorActive) setOpHighlightedIndex(0)
-  }, [isOperatorActive])
-  useEffect(() => {
-    if (!isActive) setValHighlightedIndex(0)
-  }, [isActive])
+  const handleOperatorBlur = useDeferredBlur(wrapperRef as React.RefObject<HTMLElement>, onBlur)
+  const handleValueBlur = useDeferredBlur(wrapperRef as React.RefObject<HTMLElement>, onBlur)
 
   if (!property) return null
 
@@ -113,98 +104,48 @@ export function FilterCondition({
     [valueItems]
   )
 
+  const {
+    highlightedIndex: opHighlightedIndex,
+    handleKeyDown: handleOperatorKeyDown,
+    reset: resetOpHighlight,
+  } = useHighlightNavigation(operatorItems.length, (index) => {
+    if (operatorItems[index]) onSelectMenuItem(operatorItems[index])
+  })
+
+  const {
+    highlightedIndex: valHighlightedIndex,
+    handleKeyDown: handleValueKeyDown,
+    reset: resetValHighlight,
+  } = useHighlightNavigation(
+    valueItems.length,
+    (index) => {
+      const item = valueItems[index]
+      if (!item) return
+      if (item.isCustom) {
+        setShowValueCustom(true)
+      } else {
+        onSelectMenuItem(item)
+      }
+    },
+    onKeyDown
+  )
+
   useEffect(() => {
-    if (opHighlightedIndex > operatorItems.length - 1) {
-      setOpHighlightedIndex(operatorItems.length > 0 ? operatorItems.length - 1 : 0)
-    }
-  }, [operatorItems, opHighlightedIndex])
-
+    if (!isOperatorActive) resetOpHighlight()
+  }, [isOperatorActive, resetOpHighlight])
   useEffect(() => {
-    if (valHighlightedIndex > valueItems.length - 1) {
-      setValHighlightedIndex(valueItems.length > 0 ? valueItems.length - 1 : 0)
-    }
-  }, [valueItems, valHighlightedIndex])
-
-  const handleOperatorKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setOpHighlightedIndex((prev) => (prev < operatorItems.length - 1 ? prev + 1 : prev))
-        return
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setOpHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
-        return
-      }
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        if (operatorItems[opHighlightedIndex]) onSelectMenuItem(operatorItems[opHighlightedIndex])
-        return
-      }
-    },
-    [operatorItems, opHighlightedIndex, onSelectMenuItem]
-  )
-
-  const handleValueKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setValHighlightedIndex((prev) => (prev < valueItems.length - 1 ? prev + 1 : prev))
-        return
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setValHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
-        return
-      }
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        if (valueItems[valHighlightedIndex]) {
-          const item = valueItems[valHighlightedIndex]
-          if (item.isCustom) {
-            setShowValueCustom(true)
-          } else {
-            onSelectMenuItem(item)
-          }
-        }
-        return
-      }
-      onKeyDown(e)
-    },
-    [valueItems, valHighlightedIndex, onKeyDown, onSelectMenuItem]
-  )
-
-  const handleOperatorBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      // Defer to allow focus to land in popover content/custom component
-      setTimeout(() => {
-        const active = document.activeElement as HTMLElement | null
-        if (active && wrapperRef.current && wrapperRef.current.contains(active)) {
-          return
-        }
-        onBlur()
-      }, 0)
-    },
-    [onBlur]
-  )
-
-  const handleValueBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      setTimeout(() => {
-        const active = document.activeElement as HTMLElement | null
-        if (active && wrapperRef.current && wrapperRef.current.contains(active)) {
-          return
-        }
-        onBlur()
-      }, 0)
-    },
-    [onBlur]
-  )
+    if (!isActive) resetValHighlight()
+  }, [isActive, resetValHighlight])
 
   return (
-    <div ref={wrapperRef} className="flex items-center rounded px-2 h-6 bg-surface-400 group">
-      <span className="text-xs font-medium mr-1 font-mono cursor-pointer" onClick={onLabelClick}>
+    <div
+      ref={wrapperRef}
+      className="flex items-center rounded px-2 h-6 bg-muted border group shrink-0"
+    >
+      <span
+        className="text-xs font-medium mr-1 cursor-pointer shrink-0 whitespace-nowrap"
+        onClick={onLabelClick}
+      >
         {property.label}
       </span>
       <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
@@ -217,7 +158,7 @@ export function FilterCondition({
             onFocus={onOperatorFocus}
             onBlur={handleOperatorBlur}
             onKeyDown={handleOperatorKeyDown}
-            className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6 mr-1 text-foreground-light"
+            className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 mr-1 text-foreground-light"
             style={{
               width: `${Math.max(condition.operator.length, 1)}ch`,
               minWidth: '1ch',
@@ -238,23 +179,12 @@ export function FilterCondition({
             }
           }}
         >
-          <Command_Shadcn_>
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
-                {operatorItems.map((item, idx) => (
-                  <CommandItem_Shadcn_
-                    key={`${item.value}-${item.label}`}
-                    value={item.value}
-                    onSelect={() => onSelectMenuItem(item)}
-                    className={`text-xs font-mono ${idx === opHighlightedIndex ? 'bg-surface-400' : ''}`}
-                  >
-                    {item.label}
-                  </CommandItem_Shadcn_>
-                ))}
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
+          <DefaultCommandList
+            items={operatorItems}
+            highlightedIndex={opHighlightedIndex}
+            onSelect={onSelectMenuItem}
+            includeIcon={false}
+          />
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
       <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
@@ -267,7 +197,7 @@ export function FilterCondition({
             onFocus={onValueFocus}
             onBlur={handleValueBlur}
             onKeyDown={handleValueKeyDown}
-            className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6 mr-1"
+            className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 mr-1"
             style={{
               width: `${Math.max((condition.value ?? '').toString().length, 1)}ch`,
               minWidth: '1ch',
@@ -305,26 +235,14 @@ export function FilterCondition({
               search: (condition.value ?? '').toString(),
             })
           ) : (
-            <Command_Shadcn_>
-              <CommandList_Shadcn_>
-                <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-                <CommandGroup_Shadcn_>
-                  {valueItems.map((item, idx) => (
-                    <CommandItem_Shadcn_
-                      key={`${item.value}-${item.label}`}
-                      value={item.value}
-                      onSelect={() =>
-                        item.isCustom ? setShowValueCustom(true) : onSelectMenuItem(item)
-                      }
-                      className={`text-xs font-mono ${idx === valHighlightedIndex ? 'bg-surface-400' : ''}`}
-                    >
-                      {item.icon}
-                      {item.label}
-                    </CommandItem_Shadcn_>
-                  ))}
-                </CommandGroup_Shadcn_>
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
+            <DefaultCommandList
+              items={valueItems}
+              highlightedIndex={valHighlightedIndex}
+              onSelect={(item) =>
+                item.isCustom ? setShowValueCustom(true) : onSelectMenuItem(item)
+              }
+              includeIcon
+            />
           )}
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>

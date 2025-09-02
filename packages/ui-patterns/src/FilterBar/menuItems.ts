@@ -124,5 +124,3 @@ function getCachedOptionItems(options: any[]): MenuItem[] {
     return { value: option.value, label: option.label }
   })
 }
-
-

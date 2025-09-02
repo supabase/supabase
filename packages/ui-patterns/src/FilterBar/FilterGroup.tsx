@@ -2,18 +2,10 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { FilterProperty, FilterGroup as FilterGroupType } from './types'
 import { ActiveInput } from './hooks'
 import { FilterCondition } from './FilterCondition'
-import {
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
+import { Input_Shadcn_, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverAnchor_Shadcn_ } from 'ui'
 import { buildPropertyItems, MenuItem } from './menuItems'
+import { useDeferredBlur, useHighlightNavigation } from './hooks'
+import { DefaultCommandList } from './DefaultCommandList'
 
 type FilterGroupProps = {
   group: FilterGroupType
@@ -80,7 +72,6 @@ export function FilterGroup({
   const freeformInputRef = useRef<HTMLInputElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [isHoveringOperator, setIsHoveringOperator] = useState(false)
-  const [highlightedIndex, setHighlightedIndex] = useState(0)
   const isActive =
     isGroupFreeformActive &&
     activeInput?.type === 'group' &&
@@ -100,11 +91,7 @@ export function FilterGroup({
     }
   }, [isActive])
 
-  useEffect(() => {
-    if (!isActive) {
-      setHighlightedIndex(0)
-    }
-  }, [isActive])
+  const handleFreeformBlur = useDeferredBlur(wrapperRef as React.RefObject<HTMLElement>, onBlur)
 
   const handleFreeformChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalFreeformValue(e.target.value)
@@ -159,46 +146,37 @@ export function FilterGroup({
     ]
   )
 
-  useEffect(() => {
-    if (highlightedIndex > items.length - 1) {
-      setHighlightedIndex(items.length > 0 ? items.length - 1 : 0)
+  // Determine if this group is the last among its siblings to flex-grow and let input fill
+  const isLastGroupInParent = useMemo(() => {
+    if (path.length === 0) return true
+    const parentPath = path.slice(0, -1)
+    let current: any = rootFilters
+    for (let i = 0; i < parentPath.length; i++) {
+      const idx = parentPath[i]
+      const next = current?.conditions?.[idx]
+      if (!next || !('logicalOperator' in next)) return false
+      current = next
     }
-  }, [items, highlightedIndex])
+    const myIndex = path[path.length - 1]
+    const siblings = current?.conditions ?? []
+    return myIndex === siblings.length - 1
+  }, [path, rootFilters])
 
-  const handleFreeformKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setHighlightedIndex((prev) => (prev < items.length - 1 ? prev + 1 : prev))
-        return
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
-        return
-      }
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        if (items[highlightedIndex]) onSelectMenuItem(items[highlightedIndex])
-        return
-      }
-      onKeyDown(e)
+  const {
+    highlightedIndex,
+    handleKeyDown: handleFreeformKeyDown,
+    reset: resetFreeformHighlight,
+  } = useHighlightNavigation(
+    items.length,
+    (index) => {
+      if (items[index]) onSelectMenuItem(items[index])
     },
-    [items, highlightedIndex, onKeyDown, onSelectMenuItem]
+    onKeyDown
   )
 
-  const handleFreeformBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      setTimeout(() => {
-        const active = document.activeElement as HTMLElement | null
-        if (active && wrapperRef.current && wrapperRef.current.contains(active)) {
-          return
-        }
-        onBlur()
-      }, 0)
-    },
-    [onBlur]
-  )
+  useEffect(() => {
+    if (!isActive) resetFreeformHighlight()
+  }, [isActive, resetFreeformHighlight])
 
   return (
     <div
@@ -207,9 +185,9 @@ export function FilterGroup({
         path.length > 0
           ? "before:content-['('] before:text-foreground-muted after:content-[')'] after:text-foreground-muted"
           : ''
-      }`}
+      } ${isLastGroupInParent ? 'flex-1 min-w-0' : ''}`}
     >
-      <div className="flex items-center gap-1">
+      <div className={`flex items-center gap-1 ${isLastGroupInParent ? 'flex-1 min-w-0' : ''}`}>
         {group.conditions.map((condition, index) => {
           const currentPath = [...path, index]
 
@@ -229,7 +207,6 @@ export function FilterGroup({
                   {group.logicalOperator}
                 </span>
               )}
-              {/* Render condition or nested group */}
               {'logicalOperator' in condition ? (
                 <FilterGroup
                   filterProperties={filterProperties}
@@ -286,7 +263,6 @@ export function FilterGroup({
             </React.Fragment>
           )
         })}
-        {/* Add freeform input at the end */}
         <Popover_Shadcn_ open={isActive && !isLoading && items.length > 0}>
           <PopoverAnchor_Shadcn_ asChild>
             <Input_Shadcn_
@@ -297,18 +273,24 @@ export function FilterGroup({
               onFocus={() => onGroupFreeformFocus(path)}
               onBlur={handleFreeformBlur}
               onKeyDown={handleFreeformKeyDown}
-              className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
+              className={`border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 ${
+                isLastGroupInParent ? 'w-full flex-1 min-w-0' : ''
+              }`}
               placeholder={
                 path.length === 0 && group.conditions.length === 0 ? 'Search or filter...' : '+'
               }
               disabled={isLoading}
-              style={{
-                width: `${Math.max(
-                  (isActive ? groupFreeformValue : localFreeformValue).length || 1,
-                  path.length === 0 && group.conditions.length === 0 ? 18 : 1
-                )}ch`,
-                minWidth: path.length === 0 && group.conditions.length === 0 ? '18ch' : '1ch',
-              }}
+              style={
+                isLastGroupInParent
+                  ? { width: '100%', minWidth: 0 }
+                  : {
+                      width: `${Math.max(
+                        (isActive ? groupFreeformValue : localFreeformValue).length || 1,
+                        path.length === 0 && group.conditions.length === 0 ? 18 : 1
+                      )}ch`,
+                      minWidth: path.length === 0 && group.conditions.length === 0 ? '18ch' : '1ch',
+                    }
+              }
             />
           </PopoverAnchor_Shadcn_>
           <PopoverContent_Shadcn_
@@ -323,24 +305,12 @@ export function FilterGroup({
               }
             }}
           >
-            <Command_Shadcn_>
-              <CommandList_Shadcn_>
-                <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-                <CommandGroup_Shadcn_>
-                  {items.map((item, idx) => (
-                    <CommandItem_Shadcn_
-                      key={`${item.value}-${item.label}`}
-                      value={item.value}
-                      onSelect={() => onSelectMenuItem(item)}
-                      className={`text-xs font-mono ${idx === highlightedIndex ? 'bg-surface-400' : ''}`}
-                    >
-                      {item.icon}
-                      {item.label}
-                    </CommandItem_Shadcn_>
-                  ))}
-                </CommandGroup_Shadcn_>
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
+            <DefaultCommandList
+              items={items}
+              highlightedIndex={highlightedIndex}
+              onSelect={onSelectMenuItem}
+              includeIcon
+            />
           </PopoverContent_Shadcn_>
         </Popover_Shadcn_>
       </div>
