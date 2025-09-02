@@ -72,5 +72,7 @@
         ]
       }
     ]
-  }
+  },
+
+  "infra:cloud_providers": ["AWS_NIMBUS"]
 }
