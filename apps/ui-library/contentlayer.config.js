@@ -1,15 +1,12 @@
-import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
 import { defineDocumentType, defineNestedType, makeSource } from 'contentlayer2/source-files'
+import path from 'path'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
 import { codeImport } from 'remark-code-import'
 import remarkGfm from 'remark-gfm'
 import { visit } from 'unist-util-visit'
-
-import { rehypeComponent } from './lib/rehype-component'
-import { rehypeNpmCommand } from './lib/rehype-npm-command'
 
 /** @type {import('contentlayer2/source-files').ComputedFields} */
 const computedFields = {
@@ -112,7 +109,6 @@ export default makeSource({
     remarkPlugins: [remarkGfm, codeImport],
     rehypePlugins: [
       rehypeSlug,
-      rehypeComponent,
       () => (tree) => {
         visit(tree, (node) => {
           if (node?.type === 'element' && node?.tagName === 'pre') {

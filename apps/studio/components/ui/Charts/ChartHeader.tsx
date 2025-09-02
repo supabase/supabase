@@ -1,11 +1,20 @@
-import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import { Activity, BarChartIcon, GitCommitHorizontalIcon, InfoIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
+import {
+  Activity,
+  BarChartIcon,
+  GitCommitHorizontalIcon,
+  InfoIcon,
+  SquareTerminal,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { cn } from 'ui'
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { formatBytes } from 'lib/helpers'
-import { useChartHoverState } from './useChartHoverState'
 import { numberFormatter } from './Charts.utils'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface ChartHeaderProps {
   title?: string
@@ -33,9 +42,10 @@ export interface ChartHeaderProps {
   shouldFormatBytes?: boolean
   isNetworkChart?: boolean
   attributes?: any[]
+  sql?: string
 }
 
-const ChartHeader = ({
+export const ChartHeader = ({
   format,
   highlightedValue,
   highlightedLabel,
@@ -61,14 +71,23 @@ const ChartHeader = ({
   shouldFormatBytes = false,
   isNetworkChart = false,
   attributes,
+  sql,
 }: ChartHeaderProps) => {
-  const { hoveredIndex, syncHover } = useChartHoverState(syncId || 'default')
+  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
+  const { ref } = useParams()
+  const router = useRouter()
 
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
       return value
+    }
+
+    if (typeof format === 'function') {
+      return format(value)
     }
 
     if (shouldFormatBytes) {
@@ -80,7 +99,7 @@ const ChartHeader = ({
   }
 
   useEffect(() => {
-    if (syncId && hoveredIndex !== null && syncHover && data && xAxisKey && yAxisKey) {
+    if (syncId && hoveredIndex !== null && isHovered && data && xAxisKey && yAxisKey) {
       const activeDataPoint = data[hoveredIndex]
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
@@ -132,7 +151,7 @@ const ChartHeader = ({
     }
   }, [
     hoveredIndex,
-    syncHover,
+    isHovered,
     syncId,
     data,
     xAxisKey,
@@ -151,20 +170,21 @@ const ChartHeader = ({
         {title}
       </h3>
       {docsUrl && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              href={docsUrl}
-              target="_blank"
-              className="text-foreground-lighter hover:text-foreground-light"
-            >
-              <InfoIcon className="w-3 h-3" />
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent side="top" align="center">
-            Read docs
-          </TooltipContent>
-        </Tooltip>
+        <ButtonTooltip
+          type="text"
+          className="px-1"
+          asChild
+          tooltip={{
+            content: {
+              side: 'top',
+              text: 'Read docs',
+            },
+          }}
+        >
+          <Link href={docsUrl} target="_blank">
+            <InfoIcon className="w-4 h-4 text-foreground-lighter" />
+          </Link>
+        </ButtonTooltip>
       )}
     </div>
   )
@@ -174,10 +194,6 @@ const ChartHeader = ({
       className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
     >
       {localHighlightedValue !== undefined && formatHighlightedValue(localHighlightedValue)}
-      {format === 'seconds' ? ' ' : ''}
-      <span className="text-lg">
-        {typeof format === 'function' ? format(localHighlightedValue) : format}
-      </span>
     </h4>
   )
   const label = <h4 className="text-foreground-lighter text-xs">{localHighlightedLabel}</h4>
@@ -214,43 +230,57 @@ const ChartHeader = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {sql ? (
+          <ButtonTooltip
+            type="default"
+            className="px-1.5"
+            asChild
+            tooltip={{
+              content: {
+                side: 'top',
+                text: 'Open in Log Explorer',
+              },
+            }}
+          >
+            <Link href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}`}>
+              <SquareTerminal className="w-4 h-4 text-foreground-lighter" />
+            </Link>
+          </ButtonTooltip>
+        ) : null}
+
         {!hideChartType && onChartStyleChange && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="default"
-                className="px-1.5"
-                icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
-                onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="top" align="center">
-              View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
-            </TooltipContent>
-          </Tooltip>
+          <ButtonTooltip
+            type="default"
+            className="px-1.5"
+            icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+            onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: `View as ${chartStyle === 'bar' ? 'line chart' : 'bar chart'}`,
+              },
+            }}
+          />
         )}
         {setShowMaxValue && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type={showMaxValue ? 'default' : 'dashed'}
-                className="px-1.5"
-                icon={
-                  <GitCommitHorizontalIcon
-                    className={showMaxValue ? 'text-foreground-light' : 'text-foreground-lighter'}
-                  />
-                }
-                onClick={() => setShowMaxValue(!showMaxValue)}
+          <ButtonTooltip
+            type={showMaxValue ? 'default' : 'dashed'}
+            className="px-1.5"
+            icon={
+              <GitCommitHorizontalIcon
+                className={showMaxValue ? 'text-foreground-light' : 'text-foreground-lighter'}
               />
-            </TooltipTrigger>
-            <TooltipContent side="top" align="center">
-              {showMaxValue ? 'Hide' : 'Show'} limit
-            </TooltipContent>
-          </Tooltip>
+            }
+            onClick={() => setShowMaxValue(!showMaxValue)}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: `${showMaxValue ? 'Hide' : 'Show'} limit`,
+              },
+            }}
+          />
         )}
       </div>
     </div>
   )
 }
-
-export default ChartHeader

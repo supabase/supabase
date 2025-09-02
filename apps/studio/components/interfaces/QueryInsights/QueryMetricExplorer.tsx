@@ -19,7 +19,7 @@ import {
 } from 'data/query-insights/insights-metrics-query'
 import { useInsightsQueriesQuery } from 'data/query-insights/insights-queries-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import ComposedChart from 'components/ui/Charts/ComposedChart'
+import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import dayjs from 'dayjs'
 import { type InsightsQuery } from 'data/query-insights/insights-queries-query'

@@ -1654,6 +1654,10 @@ function createStorageExplorerState({
       const currentColumnItems = currentColumn.items.filter(
         (item) => item.status !== STORAGE_ROW_STATUS.EDITING
       )
+      // [Joshen] JFYI storage does support folders of the same name with different casing
+      // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
+      // for folders of the same name with different casing
+      // We should remove this check once all projects are on the List V2 endpoint
       const hasSameNameInColumn =
         currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length >
         0
