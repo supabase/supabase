@@ -2,11 +2,11 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
-import { handleError, patch } from 'data/fetchers'
+import { patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
-export type BucketUpdateVariables = {
+type BucketUpdateVariables = {
   projectRef: string
   id: string
   isPublic: boolean
@@ -23,7 +23,7 @@ type UpdateStorageBucketBody = Omit<
   file_size_limit: number | null
 }
 
-export async function updateBucket({
+async function updateBucket({
   projectRef,
   id,
   isPublic,
