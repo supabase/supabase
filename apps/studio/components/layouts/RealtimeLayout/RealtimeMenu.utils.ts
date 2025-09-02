@@ -20,6 +20,12 @@ export const generateRealtimeMenu = (
           url: `/project/${ref}/realtime/inspector`,
           items: [],
         },
+        {
+          name: 'Live Queries',
+          key: 'live-queries',
+          url: `/project/${ref}/realtime/live-queries`,
+          items: [],
+        },
       ],
     },
     {
