@@ -23,6 +23,9 @@ import ComposedChart from 'components/ui/Charts/ComposedChart'
 import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import dayjs from 'dayjs'
 import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
+import { useInsightsSingleQueryLatency } from 'data/query-insights/insights-single-ql-query'
+import { useInsightsSingleQueryRows } from 'data/query-insights/insights-single-ql-query'
+import { useInsightsSingleQueryCalls } from 'data/query-insights/insights-single-ql-query'
 
 interface QueryMetricExplorerProps {
   startTime?: string
@@ -52,7 +55,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
   const [selectedQuery, setSelectedQuery] = useState<InsightsQuery | undefined>()
   const [selectedQueryId, setSelectedQueryId] = useState<number | undefined>()
-  const [hoveredQuery, setHoveredQuery] = useState<InsightsQuery | undefined>()
 
   const [visiblePercentiles, setVisiblePercentiles] = useState({
     p50: true,
@@ -109,6 +111,40 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       enabled: !!project?.ref,
     }
   )
+
+  // Fetch single query data for selected query
+  const { data: selectedQueryData, isLoading: isLoadingSelectedQuery } =
+    useInsightsSingleQueryLatency(
+      project?.ref,
+      effectiveStartTime,
+      effectiveEndTime,
+      selectedQuery?.query_id?.toString(),
+      {
+        enabled: !!project?.ref && !!selectedQuery?.query_id && selectedMetric === 'query_latency',
+      }
+    )
+
+  const { data: selectedQueryRowsData, isLoading: isLoadingSelectedQueryRows } =
+    useInsightsSingleQueryRows(
+      project?.ref,
+      effectiveStartTime,
+      effectiveEndTime,
+      selectedQuery?.query_id?.toString(),
+      {
+        enabled: !!project?.ref && !!selectedQuery?.query_id && selectedMetric === 'rows_read',
+      }
+    )
+
+  const { data: selectedQueryCallsData, isLoading: isLoadingSelectedQueryCalls } =
+    useInsightsSingleQueryCalls(
+      project?.ref,
+      effectiveStartTime,
+      effectiveEndTime,
+      selectedQuery?.query_id?.toString(),
+      {
+        enabled: !!project?.ref && !!selectedQuery?.query_id && selectedMetric === 'calls',
+      }
+    )
 
   // Calculate queries with slowness_rating of "NOTICEABLE" and above
   const slowQueriesCount = useMemo(() => {
@@ -225,27 +261,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         })
       }
 
-      // Add hovered query attribute if available
-      if (hoveredQuery && hoveredQuery !== selectedQuery) {
-        const hoveredQueryAverage = hoveredQuery.mean_exec_time
-
-        if (hoveredQueryAverage !== undefined) {
-          attributes.push({
-            attribute: 'hovered',
-            label: 'Hovered',
-            format: 'ms',
-            provider: 'query-insights' as any,
-            color: {
-              light: '#7c3aed', // Purple color for hovered query
-              dark: '#a855f7',
-            },
-            strokeDasharray: '3 3', // Dotted line
-            type: 'line',
-            strokeWidth: 1.5, // Slightly thinner than selected
-          })
-        }
-      }
-
       return attributes
     }
 
@@ -302,40 +317,8 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       })
     }
 
-    // Add hovered query attribute if available
-    if (hoveredQuery && hoveredQuery !== selectedQuery) {
-      let hoveredQueryAverage: number | undefined
-
-      if (selectedMetric === 'calls') {
-        hoveredQueryAverage = hoveredQuery.calls
-      } else if (selectedMetric === 'rows_read') {
-        hoveredQueryAverage = hoveredQuery.rows_read || 0
-      } else if (selectedMetric === 'cache_hits') {
-        const totalBlocks =
-          (hoveredQuery.shared_blks_hit || 0) + (hoveredQuery.shared_blks_read || 0)
-        hoveredQueryAverage =
-          totalBlocks > 0 ? ((hoveredQuery.shared_blks_hit || 0) / totalBlocks) * 100 : 0
-      }
-
-      if (hoveredQueryAverage !== undefined) {
-        attributes.push({
-          attribute: 'hovered',
-          label: 'Hovered',
-          format: config.format,
-          provider: 'query-insights' as any,
-          color: {
-            light: '#7c3aed', // Purple color for hovered query
-            dark: '#a855f7',
-          },
-          strokeDasharray: '3 3', // Dotted line
-          type: 'line',
-          strokeWidth: 1.5, // Slightly thinner than selected
-        })
-      }
-    }
-
     return attributes
-  }, [selectedMetric, safeVisiblePercentiles, selectedQuery, hoveredQuery])
+  }, [selectedMetric, safeVisiblePercentiles, selectedQuery])
 
   const transformedChartAttributes = useMemo(() => {
     return getChartAttributes
@@ -471,55 +454,53 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
     // Add selected query data if available
     if (selectedQuery && selectedQueryAverage !== undefined) {
-      // Add the selected query average as a constant line across all data points
-      const transformedWithSelected = transformed.map((item) => ({
-        ...item,
-        selected: selectedQueryAverage,
-      }))
-      transformed.splice(0, transformed.length, ...transformedWithSelected)
+      // Get the appropriate single query data based on the selected metric
+      let selectedQueryTimeSeriesData: any[] = []
 
-      // Debug: Check if selected query data was added
-      console.log('Chart Data Merge Debug:', {
-        selectedQueryId: selectedQuery?.query_id,
-        selectedQueryAverage,
-        transformedLength: transformed.length,
-        hasSelectedData: transformed.some((item) => item.selected !== undefined),
-        sampleTransformedItem: transformed[0],
-        chartAttributes: getChartAttributes.map((attr) => ({
-          attribute: attr.attribute,
-          label: attr.label,
-          type: attr.type,
-        })),
-        hasSelectedAttribute: getChartAttributes.some((attr) => attr.attribute === 'selected'),
-      })
-    }
+      if (selectedMetric === 'query_latency' && selectedQueryData) {
+        selectedQueryTimeSeriesData = selectedQueryData
+      } else if (selectedMetric === 'rows_read' && selectedQueryRowsData) {
+        selectedQueryTimeSeriesData = selectedQueryRowsData
+      } else if (selectedMetric === 'calls' && selectedQueryCallsData) {
+        selectedQueryTimeSeriesData = selectedQueryCallsData
+      }
 
-    // Add hovered query data if available
-    if (hoveredQuery && hoveredQuery !== selectedQuery) {
-      const hoveredQueryAverage = (() => {
-        switch (selectedMetric) {
-          case 'query_latency':
-            return hoveredQuery.mean_exec_time
-          case 'calls':
-            return hoveredQuery.calls
-          case 'rows_read':
-            return hoveredQuery.rows_read || 0
-          case 'cache_hits':
-            const totalBlocks =
-              (hoveredQuery.shared_blks_hit || 0) + (hoveredQuery.shared_blks_read || 0)
-            return totalBlocks > 0 ? ((hoveredQuery.shared_blks_hit || 0) / totalBlocks) * 100 : 0
-          default:
-            return undefined
-        }
-      })()
+      if (selectedQueryTimeSeriesData.length > 0) {
+        // Transform the single query data to match the chart format
+        const selectedQueryTransformed = selectedQueryTimeSeriesData.map((item) => {
+          const periodStart = new Date(item.timestamp).toISOString()
+          const timestamp = new Date(item.timestamp).getTime()
 
-      if (hoveredQueryAverage !== undefined) {
-        // Add the hovered query average as a constant line across all data points
-        const transformedWithHovered = transformed.map((item) => ({
+          return {
+            period_start: periodStart,
+            timestamp: timestamp,
+            selected: item.value,
+          }
+        })
+
+        // Fill gaps in the data to ensure continuous lines
+        const filledSelectedData = transformed.map((mainItem) => {
+          // Find the closest timestamp within a reasonable range (5 minutes)
+          const timeWindow = 5 * 60 * 1000 // 5 minutes in milliseconds
+          const matchingSelectedItem = selectedQueryTransformed.find(
+            (selectedItem) => Math.abs(selectedItem.timestamp - mainItem.timestamp) <= timeWindow
+          )
+
+          return {
+            ...mainItem,
+            selected: matchingSelectedItem?.selected,
+          }
+        })
+
+        // Merge the selected query data with the main chart data
+        transformed.splice(0, transformed.length, ...filledSelectedData)
+      } else {
+        // Fallback to the old flat line approach if no time-series data
+        const transformedWithSelected = transformed.map((item) => ({
           ...item,
-          hovered: hoveredQueryAverage,
+          selected: selectedQueryAverage,
         }))
-        transformed.splice(0, transformed.length, ...transformedWithHovered)
+        transformed.splice(0, transformed.length, ...transformedWithSelected)
       }
     }
 
@@ -562,7 +543,9 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     safeVisiblePercentiles,
     selectedQuery,
     selectedQueryAverage,
-    hoveredQuery,
+    selectedQueryData,
+    selectedQueryRowsData,
+    selectedQueryCallsData,
   ])
 
   // Mock updateDateRange function for LogChartHandler
@@ -580,29 +563,15 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     [] // No dependencies to prevent unnecessary recreations
   )
 
-  // Handle query hover from child component
-  const handleQueryHover = useCallback(
-    (query: InsightsQuery | undefined) => {
-      setHoveredQuery(query)
-    },
-    [] // No dependencies to prevent unnecessary recreations
-  )
-
   // Clear selected query
   const clearSelectedQuery = useCallback(() => {
     setSelectedQuery(undefined)
     setSelectedQueryId(undefined)
   }, []) // No dependencies to prevent unnecessary recreations
 
-  // Clear hovered query
-  const clearHoveredQuery = useCallback(() => {
-    setHoveredQuery(undefined)
-  }, []) // No dependencies to prevent unnecessary recreations
-
   // Reset selection when date range changes
   useEffect(() => {
     clearSelectedQuery()
-    clearHoveredQuery()
   }, [effectiveStartTime, effectiveEndTime])
 
   return (
@@ -652,7 +621,11 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                     </Button>
                   </div>
                 )}
-                {isLoading || isLoadingQueries ? (
+                {isLoading ||
+                isLoadingQueries ||
+                (selectedQuery && selectedMetric === 'query_latency' && isLoadingSelectedQuery) ||
+                (selectedQuery && selectedMetric === 'rows_read' && isLoadingSelectedQueryRows) ||
+                (selectedQuery && selectedMetric === 'calls' && isLoadingSelectedQueryCalls) ? (
                   <div className="h-full min-h-[264px] flex items-center justify-center">
                     <div className="text-sm text-foreground-lighter">Loading metrics...</div>
                   </div>
@@ -681,7 +654,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
                       return (
                         currentMetrics.length > 0 && (
-                          <div className="flex flex-row gap-6 mt-1 absolute w-full">
+                          <div className="flex flex-row gap-6 mt-1 mb-5 relative w-full">
                             {currentMetrics.map((metric, index) => (
                               <QueryMetricBlock
                                 key={index}
@@ -702,8 +675,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                       title={''}
                       customDateFormat="HH:mm"
                       hideChartType={true}
-                      hideHighlightedValue={true}
-                      hideHighlightedLabel={true}
+                      hideHighlightArea={true}
                       showTooltip={true}
                       showGrid={true}
                       showLegend={
@@ -736,7 +708,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           endTime={effectiveEndTime}
           onQuerySelect={handleQuerySelect}
           selectedQueryId={selectedQueryId}
-          onQueryHover={handleQueryHover}
         />
       </Card>
     </div>

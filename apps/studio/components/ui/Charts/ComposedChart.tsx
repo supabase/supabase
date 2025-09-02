@@ -63,6 +63,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
   hideHighlightedLabel?: boolean
+  hideHighlightArea?: boolean
   syncId?: string
   docsUrl?: string
 }
@@ -100,6 +101,7 @@ export default function ComposedChart({
   hideYAxis,
   hideHighlightedValue,
   hideHighlightedLabel = false,
+  hideHighlightArea = false,
   syncId,
   docsUrl,
 }: ComposedChartProps) {
@@ -310,6 +312,7 @@ export default function ComposedChart({
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
         hideHighlightedLabel={hideHighlightedLabel}
+        hideHighlightArea={hideHighlightArea}
         minimalHeader={minimalHeader}
         hideChartType={hideChartType}
         chartStyle={chartStyle}
