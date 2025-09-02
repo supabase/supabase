@@ -11,7 +11,7 @@ const Quotes = dynamic(() => import('components/Supasquad/Quotes'))
 const WhySupaSquad = dynamic(() => import('components/Supasquad/FeaturesSection'))
 const PerfectTiming = dynamic(() => import('components/Supasquad/PerfectTiming'))
 const Benefits = dynamic(() => import('components/Supasquad/FeaturesSection'))
-const CtaSection = dynamic(() => import('components/Supasquad/CtaSection'))
+const ApplicationFormSection = dynamic(() => import('components/Supasquad/ApplicationFormSection'))
 
 const BeginnersPage: NextPage = () => {
   return (
@@ -40,10 +40,10 @@ const BeginnersPage: NextPage = () => {
           highlights={content.timing.highlights}
         />
         <Benefits className="md:mt-24" {...content.benefits} />
-        <CtaSection
+        <ApplicationFormSection
           id={content.ctaSection.id}
           title={content.ctaSection.title}
-          primaryCta={content.ctaSection.primaryCta}
+          cta={content.ctaSection.primaryCta}
         />
       </Layout>
     </>
