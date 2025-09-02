@@ -46,34 +46,7 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt'],
-    // livePreview: {
-    //   url: ({ data }) => {
-    //     const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
-    //     // Always use the preview route for live preview to ensure draft mode is enabled
-    //     return `${baseUrl}/api-v2/cms/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'secret'}`
-    //   },
-    //   breakpoints: [
-    //     {
-    //       label: 'Desktop',
-    //       name: 'desktop',
-    //       width: 1920,
-    //       height: 1080,
-    //     },
-    //     {
-    //       label: 'Tablet',
-    //       name: 'tablet',
-    //       width: 768,
-    //       height: 1024,
-    //     },
-    //     {
-    //       label: 'Mobile',
-    //       name: 'mobile',
-    //       width: 375,
-    //       height: 667,
-    //     },
-    //   ],
-    // },
+    defaultColumns: ['title', 'slug', 'updatedAt', 'publishedAt'],
     preview: (data) => {
       const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
       // Always use the preview route to ensure draft mode is enabled
@@ -108,7 +81,7 @@ export const Posts: CollectionConfig = {
       type: 'textarea',
       label: 'Description / subtitle',
       admin: {
-        description: 'Appears as subheading in the blog post preview',
+        description: 'Appears as subheading in the blog post preview.',
       },
     },
     {
@@ -144,26 +117,26 @@ export const Posts: CollectionConfig = {
               type: 'upload',
               relationTo: 'media',
               required: false,
+              admin: {
+                description: 'Will show up as the blog post cover. Required.',
+              },
             },
             {
-              name: 'image',
-              type: 'upload',
-              relationTo: 'media',
-              required: false,
+              name: 'authors',
+              type: 'relationship',
+              relationTo: 'authors',
+              hasMany: true,
+              admin: {
+                description: 'Authors must be one or more. Required.',
+              },
             },
             {
               name: 'categories',
               type: 'relationship',
               hasMany: true,
               relationTo: 'categories',
-            },
-            {
-              name: 'launchweek',
-              type: 'select',
-              options: launchweekOptions,
               admin: {
-                description:
-                  'Select a launch week to show launch week summary at the bottom of the blog post.',
+                description: 'Select only one category. Required.',
               },
             },
             {
@@ -174,25 +147,30 @@ export const Posts: CollectionConfig = {
               },
             },
             {
-              name: 'date',
-              type: 'date',
+              name: 'tags',
+              type: 'relationship',
+              relationTo: 'tags',
+              hasMany: true,
+              admin: {
+                description: 'Tags can be one or more. Optional.',
+              },
             },
             {
               name: 'toc_depth',
               type: 'number',
               defaultValue: 3,
+              admin: {
+                hidden: true,
+              },
             },
             {
-              name: 'authors',
-              type: 'relationship',
-              relationTo: 'authors',
-              hasMany: true,
-            },
-            {
-              name: 'tags',
-              type: 'relationship',
-              relationTo: 'tags',
-              hasMany: true,
+              name: 'launchweek',
+              type: 'select',
+              options: launchweekOptions,
+              admin: {
+                description:
+                  'Select a launch week to show launch week summary at the bottom of the blog post. Optional.',
+              },
             },
           ],
           label: 'Metadata',
@@ -208,12 +186,28 @@ export const Posts: CollectionConfig = {
             }),
             MetaTitleField({
               hasGenerateFn: true,
+              overrides: {
+                admin: {
+                  description: 'Defaults to the title of the post, if not set.',
+                },
+              },
             }),
             MetaImageField({
               relationTo: 'media',
+              overrides: {
+                admin: {
+                  description: 'Defaults to the "thumb" image, if not set.',
+                },
+              },
             }),
 
-            MetaDescriptionField({}),
+            MetaDescriptionField({
+              overrides: {
+                admin: {
+                  description: 'Defaults to the description of the post, if not set.',
+                },
+              },
+            }),
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,
@@ -226,6 +220,9 @@ export const Posts: CollectionConfig = {
         },
       ],
     },
+    /**
+     * "publishedAt" is only internal to cms to determine if the blog post is published or not, but it's not used for sorting blog posts in www
+     * */
     {
       name: 'publishedAt',
       type: 'date',
@@ -234,16 +231,38 @@ export const Posts: CollectionConfig = {
           pickerAppearance: 'dayAndTime',
         },
         position: 'sidebar',
+        hidden: true,
       },
       hooks: {
         beforeChange: [
           ({ siblingData, value }) => {
+            /**
+             * Set the "date" field to the current date if user doesn't set it
+             */
+            if (!siblingData.date) {
+              siblingData.date = new Date()
+            }
             if (siblingData._status === 'published' && !value) {
               return new Date()
             }
             return value
           },
         ],
+      },
+    },
+    /**
+     * "date" is used to determine the chronological order of the blog post in www
+     */
+    {
+      name: 'date',
+      type: 'date',
+      label: 'Blog Post Date',
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+        description: 'This date will determine the chronological order of the blog post. Required.',
+        position: 'sidebar',
       },
     },
   ],
@@ -255,9 +274,11 @@ export const Posts: CollectionConfig = {
   },
   versions: {
     drafts: {
+      // NOTE: disabled autosave as it might overload connections if many users are editing at the same time
       // autosave: {
       //   interval: 200,
       // },
+      // TODO: enable schedulePublish to work with cron job
       // schedulePublish: true,
     },
     maxPerDoc: 50,
