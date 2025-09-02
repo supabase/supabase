@@ -1,10 +1,101 @@
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, SortAsc, SortDesc } from 'lucide-react'
 import { Column } from 'react-data-grid'
+import { useEffect, useRef, useState } from 'react'
 
-import { Badge, CodeBlock, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  Badge,
+  CodeBlock,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
 import { ColumnConfiguration, QUERY_INSIGHTS_TABLE_COLUMNS } from './QueryInsights.constants'
 import { WarningIcon } from 'ui'
+
+// Header cell component for sorting dropdown
+const SortableHeaderCell = ({
+  col,
+  sort,
+  onSortChange,
+}: {
+  col: any
+  sort?: { column: string; order: 'asc' | 'desc' }
+  onSortChange: (column: string) => void
+}) => {
+  const ref = useRef<number>(0)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    ref.current = Number(new Date())
+  }, [open])
+
+  return (
+    <div className="flex items-center justify-between font-normal text-xs w-full">
+      <div className="flex items-center gap-x-2">
+        <p className="!text-foreground">{col.name}</p>
+      </div>
+      <div className="flex items-center gap-x-1">
+        {[
+          'query',
+          'total_time',
+          'mean_exec_time',
+          'calls',
+          'rows_read',
+          'avg_p90',
+          'avg_p95',
+          'health_score',
+          'total_cost_before',
+          'last_run',
+        ].includes(col.id) && (
+          <DropdownMenu
+            open={open}
+            onOpenChange={(val) => {
+              if (val === false && Number(new Date()) - ref.current > 100) setOpen(val)
+            }}
+          >
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="text"
+                icon={<ChevronDown />}
+                className="p-0 h-5 w-5"
+                onClick={() => setOpen(!open)}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-36">
+              <DropdownMenuItem
+                className="flex items-center gap-x-2"
+                onClick={() => {
+                  setOpen(false)
+                  onSortChange(col.id)
+                }}
+              >
+                <SortDesc size={14} />
+                Sort descending
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="flex items-center gap-x-2"
+                onClick={() => {
+                  setOpen(false)
+                  onSortChange(col.id)
+                }}
+              >
+                <SortAsc size={14} />
+                Sort ascending
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export const formatNumberWithCommas = (num: number | string | undefined | null): string => {
   if (num === undefined || num === null) return '0'
@@ -38,19 +129,7 @@ export const formatQueryInsightsColumns = ({
       minWidth: col.minWidth ?? 120,
       headerCellClass: col.id === 'query' ? 'first:pl-6 cursor-pointer' : 'cursor-pointer',
       renderHeaderCell: () => {
-        return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange(col.id)}
-          >
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
-            </div>
-            {sort?.column === col.id && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
-          </div>
-        )
+        return <SortableHeaderCell col={col} sort={sort} onSortChange={onSortChange} />
       },
       renderCell: (props) => {
         const value = props.row?.[col.id as keyof InsightsQuery]
