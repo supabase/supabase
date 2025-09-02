@@ -335,7 +335,7 @@ export const StorageSettings = () => {
                               </InlineLink>{' '}
                               ({firstAffectBucketLimit.value}
                               {firstAffectBucketLimit.unit})
-                              {affectedBuckets.length > 1 ? (
+                              {affectedBuckets.length > 1 && (
                                 <>
                                   {' '}
                                   and{' '}
@@ -372,7 +372,7 @@ export const StorageSettings = () => {
                                   </Tooltip>{' '}
                                   first
                                 </>
-                              ) : null}
+                              )}
                               .
                             </p>
                           </>

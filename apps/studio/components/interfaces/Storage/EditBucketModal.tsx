@@ -223,7 +223,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                 )}
               />
 
-              {/* Visibility */}
               <div className="flex flex-col gap-y-3">
                 <FormField_Shadcn_
                   key="public"
@@ -261,11 +260,11 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
                         {isMakingBucketPrivate && (
                           <>
-                            <p className="mb-2">
-                              All objects in your bucket will be private and only accessible via
-                              signed URLs, or downloaded with the right authorization headers.
+                            <p className="mb-2 !leading-normal">
+                              All objects in your bucket will only accessible via signed URLs, or
+                              downloaded with the right authorization headers.
                             </p>
-                            <p>
+                            <p className="!leading-normal">
                               Assets cached in the CDN may still be publicly accessible. You can
                               consider{' '}
                               <InlineLink href="https://supabase.com/docs/guides/storage/cdn/smart-cdn#cache-eviction">
@@ -335,14 +334,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                           <div className="col-span-4">
                             <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
                               <SelectTrigger_Shadcn_ aria-label="File size limit unit" size="small">
-                                <SelectValue_Shadcn_ asChild>
-                                  <>{selectedUnit}</>
-                                </SelectValue_Shadcn_>
+                                <SelectValue_Shadcn_>{selectedUnit}</SelectValue_Shadcn_>
                               </SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 {Object.values(StorageSizeUnits).map((unit: string) => (
                                   <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
-                                    <div>{unit}</div>
+                                    {unit}
                                   </SelectItem_Shadcn_>
                                 ))}
                               </SelectContent_Shadcn_>
@@ -366,7 +363,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     </FormMessage_Shadcn_>
                   )}
 
-                  {IS_PLATFORM ? (
+                  {IS_PLATFORM && (
                     <p className="text-sm text-foreground-lighter mt-2">
                       This project has a{' '}
                       <InlineLink
@@ -378,7 +375,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       </InlineLink>{' '}
                       of {formattedGlobalUploadLimit}.
                     </p>
-                  ) : undefined}
+                  )}
                 </div>
               )}
             </DialogSection>

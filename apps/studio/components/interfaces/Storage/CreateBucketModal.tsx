@@ -101,6 +101,7 @@ export const CreateBucketModal = () => {
   const { data: org } = useSelectedOrganizationQuery()
 
   const [visible, setVisible] = useState(false)
+  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
 
   const { can: canCreateBuckets } = useAsyncCheckProjectPermissions(
     PermissionAction.STORAGE_WRITE,
@@ -118,8 +119,6 @@ export const CreateBucketModal = () => {
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
-
-  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
 
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -158,15 +157,16 @@ export const CreateBucketModal = () => {
           ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
           : undefined
 
-      const allowedMimeTypes = hasAllowedMimeTypes
-        ? values.allowed_mime_types.length > 0
+      const allowedMimeTypes =
+        hasAllowedMimeTypes && values.allowed_mime_types.length > 0
           ? values.allowed_mime_types.split(',').map((x) => x.trim())
           : undefined
-        : undefined
 
       if (!!fileSizeLimit && !!data?.fileSizeLimit && fileSizeLimit > data.fileSizeLimit) {
-        form.setError('formatted_size_limit', { type: 'manual', message: 'exceed_global_limit' })
-        return
+        return form.setError('formatted_size_limit', {
+          type: 'manual',
+          message: 'exceed_global_limit',
+        })
       }
 
       await createBucket({
@@ -186,10 +186,12 @@ export const CreateBucketModal = () => {
       if (values.type === 'ANALYTICS' && icebergWrapperExtensionState === 'installed') {
         await createIcebergWrapper({ bucketName: values.name })
       }
+
+      toast.success(`Successfully created bucket ${values.name}`)
       form.reset()
+
       setSelectedUnit(StorageSizeUnits.MB)
       setVisible(false)
-      toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
     } catch (error: any) {
       // Handle specific error cases for inline display
@@ -426,9 +428,7 @@ export const CreateBucketModal = () => {
                                     aria-label="File size limit unit"
                                     size="small"
                                   >
-                                    <SelectValue_Shadcn_ asChild>
-                                      <>{selectedUnit}</>
-                                    </SelectValue_Shadcn_>
+                                    <SelectValue_Shadcn_>{selectedUnit}</SelectValue_Shadcn_>
                                   </SelectTrigger_Shadcn_>
                                   <SelectContent_Shadcn_>
                                     {Object.values(StorageSizeUnits).map((unit: string) => (
@@ -437,7 +437,7 @@ export const CreateBucketModal = () => {
                                         value={unit}
                                         className="text-xs"
                                       >
-                                        <div>{unit}</div>
+                                        {unit}
                                       </SelectItem_Shadcn_>
                                     ))}
                                   </SelectContent_Shadcn_>

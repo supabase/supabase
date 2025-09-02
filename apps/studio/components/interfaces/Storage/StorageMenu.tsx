@@ -53,8 +53,6 @@ const StorageMenu = () => {
       : sortedBuckets
   const tempNotSupported = error?.message.includes('Tenant config') && isBranch
 
-  console.log({ buckets })
-
   return (
     <>
       <Menu type="pills" className="mt-6 flex flex-grow flex-col">
