@@ -1,8 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { useParams } from 'common'
+import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { updateBucket } from 'data/storage/bucket-update-mutation'
+import { Bucket } from 'data/storage/buckets-query'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -24,18 +36,6 @@ import {
   Select_Shadcn_,
   Switch,
 } from 'ui'
-import { z } from 'zod'
-
-import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { updateBucket } from 'data/storage/bucket-update-mutation'
-import { Bucket } from 'data/storage/buckets-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -365,7 +365,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
                       <InlineLink
                         className="text-destructive decoration-destructive-500 hover:decoration-destructive"
-                        href={`/project/${ref}/settings/storage`}
+                        href={`/project/${ref}/storage/settings`}
+                        onClick={onClose}
                       >
                         Storage Settings
                       </InlineLink>{' '}
@@ -378,7 +379,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       This project has a{' '}
                       <InlineLink
                         className="text-foreground-light hover:text-foreground"
-                        href={`/project/${ref}/settings/storage`}
+                        href={`/project/${ref}/storage/settings`}
+                        onClick={onClose}
                       >
                         global file size limit
                       </InlineLink>{' '}

@@ -1,13 +1,13 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen, waitFor, fireEvent } from '@testing-library/dom'
+import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { addAPIMock } from 'tests/lib/msw'
 
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
-import CreateBucketModal from '../CreateBucketModal'
+import { CreateBucketModal } from '../CreateBucketModal'
 
 describe(`CreateBucketModal`, () => {
   beforeEach(() => {

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
 import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -7,7 +8,6 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
@@ -95,17 +95,19 @@ const formId = 'create-storage-bucket-form'
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
-const CreateBucketModal = () => {
-  const [visible, setVisible] = useState(false)
+export const CreateBucketModal = () => {
+  const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const router = useRouter()
+
+  const [visible, setVisible] = useState(false)
+
   const { can: canCreateBuckets } = useAsyncCheckProjectPermissions(
     PermissionAction.STORAGE_WRITE,
     '*'
   )
 
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
@@ -136,7 +138,6 @@ const CreateBucketModal = () => {
   const isPublicBucket = form.watch('public')
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
-  const formattedSizeLimit = form.watch('formatted_size_limit')
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
   const icebergWrapperExtensionState = useIcebergWrapperExtension()
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
@@ -332,7 +333,6 @@ const CreateBucketModal = () => {
 
             {isStandardBucket ? (
               <>
-                {/* Visibility */}
                 <DialogSection className="space-y-3">
                   <FormField_Shadcn_
                     key="public"
@@ -391,6 +391,7 @@ const CreateBucketModal = () => {
                       </FormItemLayout>
                     )}
                   />
+
                   {hasFileSizeLimit && (
                     <div>
                       <FormField_Shadcn_
@@ -451,7 +452,8 @@ const CreateBucketModal = () => {
                           Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
                           <InlineLink
                             className="text-destructive decoration-destructive-500 hover:decoration-destructive"
-                            href={`/project/${ref}/settings/storage`}
+                            href={`/project/${ref}/storage/settings`}
+                            onClick={() => setVisible(false)}
                           >
                             Storage Settings
                           </InlineLink>{' '}
@@ -459,18 +461,19 @@ const CreateBucketModal = () => {
                         </FormMessage_Shadcn_>
                       )}
 
-                      {IS_PLATFORM ? (
+                      {IS_PLATFORM && (
                         <p className="text-sm text-foreground-lighter mt-2">
                           This project has a{' '}
                           <InlineLink
                             className="text-foreground-light hover:text-foreground"
-                            href={`/project/${ref}/settings/storage`}
+                            href={`/project/${ref}/storage/settings`}
+                            onClick={() => setVisible(false)}
                           >
                             global file size limit
                           </InlineLink>{' '}
                           of {formattedGlobalUploadLimit}.
                         </p>
-                      ) : undefined}
+                      )}
                     </div>
                   )}
                 </DialogSection>
@@ -614,5 +617,3 @@ const CreateBucketModal = () => {
     </Dialog>
   )
 }
-
-export default CreateBucketModal
