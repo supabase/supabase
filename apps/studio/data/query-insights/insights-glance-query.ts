@@ -71,14 +71,12 @@ export function useInsightsGlanceQuery(
       if (!projectRef) throw new Error('Project ref is required')
 
       const sql = getInsightsGlanceMetrics(startTime, endTime)
-      console.log(`[useInsightsGlanceQuery] Executing SQL:`, sql)
 
       const { result } = await executeSql({
         projectRef,
         sql,
       })
 
-      console.log(`[useInsightsGlanceQuery] Result:`, result)
       return result[0] as InsightsGlance
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes

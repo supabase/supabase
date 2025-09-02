@@ -163,14 +163,11 @@ export function useInsightsMetricsQuery(
       if (!projectRef) throw new Error('Project ref is required')
 
       const sql = getMetricsSql(metric, startTime, endTime)
-      console.log(`[useInsightsMetricsQuery] Executing SQL for ${metric}:`, sql)
 
       const { result } = await executeSql({
         projectRef,
         sql,
       })
-
-      console.log(`[useInsightsMetricsQuery] Result for ${metric}:`, result)
 
       return result as InsightsMetric[]
     },
@@ -197,14 +194,11 @@ export function useAllMetricsQuery(
       if (!projectRef) throw new Error('Project ref is required')
 
       const sql = getAllMetricsSql(startTime, endTime)
-      console.log(`[useAllMetricsQuery] Executing SQL:`, sql)
 
       const { result } = await executeSql({
         projectRef,
         sql,
       })
-
-      console.log(`[useAllMetricsQuery] Result:`, result)
 
       return result[0] as {
         total_rows_read: number
@@ -242,14 +236,12 @@ export function useInsightsPrefetchQuery(
         queryKey: queryInsightsKeys.metrics(projectRef, metric.id, startTime, endTime),
         queryFn: async () => {
           const sql = getMetricsSql(metric.id, startTime, endTime)
-          console.log(`[useInsightsPrefetchQuery] Executing SQL for ${metric.id}:`, sql)
 
           const { result } = await executeSql({
             projectRef,
             sql,
           })
 
-          console.log(`[useInsightsPrefetchQuery] Result for ${metric.id}:`, result)
           return result as InsightsMetric[]
         },
         staleTime: 5 * 60 * 1000, // Cache for 5 minutes
