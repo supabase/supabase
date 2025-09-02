@@ -270,7 +270,7 @@ const FormContent = memo(function FormContent({
               render={({ field }) => (
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_ className="text-foreground">
-                    What track would you like to be considered for?
+                    What track would you like to be considered for? *
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
                     See longer descriptions of the 4 options above
@@ -324,7 +324,7 @@ const FormContent = memo(function FormContent({
               render={({ field }) => (
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_ className="text-foreground">
-                    Product Areas of Interest
+                    Product Areas of Interest *
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
                     What specific areas would you like to help with? Leave blank if you're not sure.
@@ -393,7 +393,7 @@ const FormContent = memo(function FormContent({
                 name="country"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="w-full md:flex-1">
-                    <FormLabel_Shadcn_ className="text-foreground">Country</FormLabel_Shadcn_>
+                    <FormLabel_Shadcn_ className="text-foreground">Country *</FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
                       <div className="relative mt-1">
                         {/* <Input_Shadcn_ type="text" placeholder="Country" {...field} /> */}
@@ -412,7 +412,7 @@ const FormContent = memo(function FormContent({
                 name="city"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="w-full md:flex-1">
-                    <FormLabel_Shadcn_ className="text-foreground">City</FormLabel_Shadcn_>
+                    <FormLabel_Shadcn_ className="text-foreground">City *</FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
                       <div className="relative mt-1">
                         <Input_Shadcn_ type="text" placeholder="City" {...field} />
@@ -459,7 +459,7 @@ const FormContent = memo(function FormContent({
               render={({ field }) => (
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_ className="text-foreground">
-                    Languages spoken
+                    Languages spoken *
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
                     What languages do you speak?
