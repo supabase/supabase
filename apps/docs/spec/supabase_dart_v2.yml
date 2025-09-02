@@ -558,12 +558,12 @@ functions:
   - id: sign-in-with-id-token
     title: 'signInWithIdToken()'
     description: |
-      Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) or [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
+      Allows you to perform native Google, Apple, and Facebook sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in), [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple), or [flutter_facebook_auth](https://pub.dev/packages/flutter_facebook_auth) packages.
     params:
       - name: provider
         isOptional: false
         type: OAuthProvider
-        description: The provider to perform the sign in with. Currently, `OAuthProvider.google` and `OAuthProvider.apple` are supported.
+        description: The provider to perform the sign in with.
       - name: idToken
         isOptional: false
         type: String
@@ -718,6 +718,36 @@ functions:
             idToken: idToken,
             nonce: rawNonce,
           );
+          ```
+      - id: sign-in-with-facebook
+        name: Native Facebook Sign in
+        description: |
+          You can perform native Facebook sign in using [flutter_facebook_auth](https://pub.dev/packages/flutter_facebook_auth).
+          
+          First, set up your Facebook app in the [Facebook Developer Console](https://developers.facebook.com) and configure it in your Supabase dashboard under `Authentication -> Providers -> Facebook`.
+        code: |
+          ```dart
+          import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+
+          Future<void> signInWithFacebook() async {
+            final LoginResult result = await FacebookAuth.instance.login(
+              permissions: ['public_profile', 'email'],
+            );
+
+            if (result.status == LoginStatus.success) {
+              final accessToken = result.accessToken!.tokenString;
+
+              final response = await supabase.auth.signInWithIdToken(
+                provider: OAuthProvider.facebook,
+                idToken: accessToken,
+              );
+            } else {
+              throw const AuthException(
+                'Facebook login failed: ${result.status}',
+              );
+            }
+          }
           ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'

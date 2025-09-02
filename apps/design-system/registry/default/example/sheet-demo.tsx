@@ -28,13 +28,13 @@ export default function SheetDemo() {
             <Label_Shadcn_ htmlFor="name" className="text-right">
               Name
             </Label_Shadcn_>
-            <Input_Shadcn_ id="name" value="Pedro Duarte" className="col-span-3" />
+            <Input_Shadcn_ id="name" value="Pedro Duarte" className="col-span-3" readOnly />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label_Shadcn_ htmlFor="username" className="text-right">
               Username
             </Label_Shadcn_>
-            <Input_Shadcn_ id="username" value="@peduarte" className="col-span-3" />
+            <Input_Shadcn_ id="username" value="@peduarte" className="col-span-3" readOnly />
           </div>
         </div>
         <SheetFooter>
