@@ -11,12 +11,88 @@ import {
   REPORT_STATUS_CODE_COLORS,
 } from 'data/reports/report.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
+import type { FilterGroup, FilterCondition } from 'ui-patterns/FilterBar'
 import { ReportConfig } from './reports.types'
 
-const METRIC_SQL: Record<string, (interval: AnalyticsInterval, functionIds?: string[]) => string> =
-  {
-    TotalInvocations: (interval, functionIds) => {
-      return `
+function buildFilterWhereClause(filters?: FilterGroup, freeformText?: string): string {
+  if (!filters && !freeformText) return ''
+
+  const conditions: string[] = []
+
+  if (freeformText && freeformText.trim()) {
+    conditions.push(`(
+      function_id ILIKE '%${freeformText.trim()}%' OR
+      CAST(res.status_code AS TEXT) ILIKE '%${freeformText.trim()}%' OR
+      h.x_sb_edge_region ILIKE '%${freeformText.trim()}%'
+    )`)
+  }
+
+  if (filters && filters.conditions.length > 0) {
+    const filterConditions = buildFilterConditions(filters)
+    if (filterConditions) {
+      conditions.push(filterConditions)
+    }
+  }
+
+  if (conditions.length === 0) return ''
+
+  return conditions.length === 1 ? `WHERE ${conditions[0]}` : `WHERE ${conditions.join(' AND ')}`
+}
+
+function buildFilterConditions(group: FilterGroup): string {
+  if (group.conditions.length === 0) return ''
+
+  const conditionStrings = group.conditions
+    .map((condition) => {
+      if ('logicalOperator' in condition) {
+        const subConditions = buildFilterConditions(condition as FilterGroup)
+        return subConditions ? `(${subConditions})` : ''
+      } else {
+        return buildSingleCondition(condition as FilterCondition)
+      }
+    })
+    .filter(Boolean)
+
+  if (conditionStrings.length === 0) return ''
+
+  return conditionStrings.join(` ${group.logicalOperator} `)
+}
+
+function buildSingleCondition(condition: FilterCondition): string {
+  const { propertyName, operator, value } = condition
+
+  if (value === null || value === undefined) return ''
+
+  const escapedValue = typeof value === 'string' ? `'${value.replace(/'/g, "''")}'` : value
+
+  let sqlCondition = ''
+  switch (propertyName) {
+    case 'function_id':
+      sqlCondition = `function_id ${operator} ${escapedValue}`
+      break
+    case 'status_code':
+      sqlCondition = `res.status_code ${operator} ${escapedValue}`
+      break
+    case 'region':
+      sqlCondition = `h.x_sb_edge_region ${operator} ${escapedValue}`
+      break
+    case 'execution_time_ms':
+      sqlCondition = `m.execution_time_ms ${operator} ${escapedValue}`
+      break
+    default:
+      sqlCondition = ''
+  }
+
+  return sqlCondition
+}
+
+const METRIC_SQL: Record<
+  string,
+  (interval: AnalyticsInterval, filters?: FilterGroup, freeformText?: string) => string
+> = {
+  TotalInvocations: (interval, filters, freeformText) => {
+    const whereClause = buildFilterWhereClause(filters, freeformText)
+    return `
 --edgefn-report-invocations
 select
   timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
@@ -25,46 +101,52 @@ select
 from
   function_edge_logs
   CROSS JOIN UNNEST(metadata) AS m
-  CROSS JOIN UNNEST(m.request) AS request
-  CROSS JOIN UNNEST(m.response) AS response
-  ${
-    functionIds && functionIds.length > 0
-      ? `WHERE function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
-      : ''
-  }
+  CROSS JOIN UNNEST(m.request) AS req
+  CROSS JOIN UNNEST(m.response) AS res
+  CROSS JOIN UNNEST(res.headers) AS h
+  ${whereClause}
 group by
   timestamp,
   function_id
 order by
   timestamp desc;
 `
-    },
-    ExecutionStatusCodes: (interval, functionIds) => {
-      return `
+  },
+  ExecutionStatusCodes: (interval, filters, freeformText) => {
+    const whereClause = buildFilterWhereClause(filters, freeformText)
+    return `
 --edgefn-report-execution-status-codes
 select
   timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
-  response.status_code as status_code,
-  count(response.status_code) as count
+  res.status_code as status_code,
+  count(res.status_code) as count
 from
   function_edge_logs
   cross join unnest(metadata) as m
-  cross join unnest(m.response) as response
-  ${
-    functionIds && functionIds.length > 0
-      ? `where function_id in (${functionIds.map((id) => `'${id}'`).join(',')})`
-      : ''
-  }
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+  ${whereClause}
 group by
   timestamp,
   status_code
 order by
   timestamp desc
 `
-    },
-    InvocationsByRegion: (interval, functionIds) => {
-      const granularity = analyticsIntervalToGranularity(interval)
-      return `
+  },
+  InvocationsByRegion: (interval, filters, freeformText) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    const whereClause = buildFilterWhereClause(filters, freeformText)
+
+    let finalWhereClause = ''
+    if (whereClause) {
+      // Wrap the filter conditions in parentheses and combine with region condition
+      const filterConditions = whereClause.replace('WHERE ', '')
+      finalWhereClause = `WHERE (${filterConditions}) AND h.x_sb_edge_region is not null`
+    } else {
+      finalWhereClause = 'WHERE h.x_sb_edge_region is not null'
+    }
+
+    return `
 --edgefn-report-invocations-by-region
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
@@ -73,43 +155,44 @@ select
 from
   function_edge_logs
   cross join unnest(metadata) as m
-  cross join unnest(m.response) as r
-  cross join unnest(r.headers) as h
-  where h.x_sb_edge_region is not null
-  ${
-    functionIds && functionIds.length > 0
-      ? `and function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
-      : ''
-  }
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+  ${finalWhereClause}
 group by
   timestamp,
   region
 order by
   timestamp desc
 `
-    },
-    ExecutionTime: (interval, functionIds) => {
-      const granularity = analyticsIntervalToGranularity(interval)
-      const hasFunctions = functionIds && functionIds.length > 0
-      return `
+  },
+  ExecutionTime: (interval, filters, freeformText) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    const whereClause = buildFilterWhereClause(filters, freeformText)
+    const hasFilters = filters?.conditions.some(
+      (condition) => 'propertyName' in condition && condition.propertyName === 'function_id'
+    )
+
+    return `
 --edgefn-report-execution-time
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
-  ${hasFunctions ? 'function_id,' : ''}
+  ${hasFilters ? 'function_id,' : ''}
   avg(m.execution_time_ms) as avg_execution_time
 from
   function_edge_logs
   cross join unnest(metadata) as m
-  cross join unnest(m.request) as request
-  ${hasFunctions ? `where function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})` : ''}
+  cross join unnest(m.request) as req
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+  ${whereClause}
 group by
   timestamp
-  ${hasFunctions ? ', function_id' : ''}
+  ${hasFilters ? ', function_id' : ''}
 order by
   timestamp desc
 `
-    },
-  }
+  },
+}
 
 async function runQuery(projectRef: string, sql: string, startDate: string, endDate: string) {
   const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
@@ -216,9 +299,7 @@ export const edgeFunctionReports = ({
   startDate: string
   endDate: string
   interval: AnalyticsInterval
-  filters: {
-    functionIds?: string[]
-  }
+  filters?: FilterGroup
 }): ReportConfig[] => [
   {
     id: 'total-invocations',
@@ -232,8 +313,16 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
-    dataProvider: async () => {
-      const sql = METRIC_SQL.TotalInvocations(interval, filters.functionIds)
+    dataProvider: async (
+      projectRef,
+      startDate,
+      endDate,
+      interval,
+      filters,
+      edgeFnIdToName,
+      freeformText
+    ) => {
+      const sql = METRIC_SQL.TotalInvocations(interval, filters, freeformText)
       const response = await runQuery(projectRef, sql, startDate, endDate)
 
       if (!response?.result) return { data: [] }
@@ -265,13 +354,15 @@ export const edgeFunctionReports = ({
     titleTooltip: 'The total number of edge function executions by status code.',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async (
-      projectRef: string,
-      startDate: string,
-      endDate: string,
-      interval: AnalyticsInterval,
-      functionIds?: string[]
+      projectRef,
+      startDate,
+      endDate,
+      interval,
+      filters,
+      edgeFnIdToName,
+      freeformText
     ) => {
-      const sql = METRIC_SQL.ExecutionStatusCodes(interval, functionIds)
+      const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters, freeformText)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
       if (!rawData?.result) return { data: [] }
@@ -307,8 +398,16 @@ export const edgeFunctionReports = ({
       tickFormatter: (value: number) => `${value}ms`,
     },
     format: (value: unknown) => `${Number(value).toFixed(0)}ms`,
-    dataProvider: async () => {
-      const sql = METRIC_SQL.ExecutionTime(interval, filters.functionIds)
+    dataProvider: async (
+      projectRef,
+      startDate,
+      endDate,
+      interval,
+      filters,
+      edgeFnIdToName,
+      freeformText
+    ) => {
+      const sql = METRIC_SQL.ExecutionTime(interval, filters, freeformText)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
 
       if (!rawData?.result) return { data: [] }
@@ -364,8 +463,16 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
     availableIn: ['pro', 'team', 'enterprise'],
-    dataProvider: async () => {
-      const sql = METRIC_SQL.InvocationsByRegion(interval, filters.functionIds)
+    dataProvider: async (
+      projectRef,
+      startDate,
+      endDate,
+      interval,
+      filters,
+      edgeFnIdToName,
+      freeformText
+    ) => {
+      const sql = METRIC_SQL.InvocationsByRegion(interval, filters, freeformText)
       const rawData = await runQuery(projectRef, sql, startDate, endDate)
       const data = rawData.result?.map((point: any) => ({
         ...point,

@@ -10,6 +10,7 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
+import { FilterGroup } from 'ui-patterns'
 
 export interface ReportChartV2Props {
   report: ReportConfig
@@ -18,8 +19,9 @@ export interface ReportChartV2Props {
   endDate: string
   interval: AnalyticsInterval
   updateDateRange: (from: string, to: string) => void
-  functionIds?: string[]
+  filters?: FilterGroup
   edgeFnIdToName?: (id: string) => string | undefined
+  freeformText?: string
   className?: string
   syncId?: string
 }
@@ -31,8 +33,9 @@ export const ReportChartV2 = ({
   endDate,
   interval,
   updateDateRange,
-  functionIds,
+  filters,
   edgeFnIdToName,
+  freeformText,
   className,
   syncId,
 }: ReportChartV2Props) => {
@@ -50,19 +53,26 @@ export const ReportChartV2 = ({
     isLoading: isLoadingChart,
     error,
   } = useQuery(
-    ['projects', projectRef, 'report-v2', report.id, { startDate, endDate, interval, functionIds }],
+    [
+      'projects',
+      projectRef,
+      'report-v2',
+      report.id,
+      { startDate, endDate, interval, filters, freeformText },
+    ],
     async () => {
       return await report.dataProvider(
         projectRef,
         startDate,
         endDate,
         interval,
-        functionIds,
-        edgeFnIdToName
+        filters,
+        edgeFnIdToName,
+        freeformText
       )
     },
     {
-      enabled: Boolean(projectRef && canFetch && isAvailable),
+      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
     }
   )
@@ -91,17 +101,16 @@ export const ReportChartV2 = ({
   }
 
   const isErrorState = error && !isLoadingChart
-  const showEmptyState = (!finalChartData || finalChartData.length === 0) && !isLoadingChart
+
+  if (report.hide) {
+    return null
+  }
 
   return (
     <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
       <CardContent className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
-        ) : showEmptyState ? (
-          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-            No data available for the selected time range
-          </p>
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data

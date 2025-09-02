@@ -1,9 +1,6 @@
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { YAxisProps } from 'recharts'
-
-type ReportDataProviderFilter = {
-  functionIds?: string[]
-}
+import { FilterGroup } from 'ui-patterns'
 
 export interface ReportDataProvider {
   (
@@ -11,9 +8,9 @@ export interface ReportDataProvider {
     startDate: string,
     endDate: string,
     interval: AnalyticsInterval,
-    functionIds?: string[],
+    filters?: FilterGroup,
     edgeFnIdToName?: (id: string) => string | undefined,
-    filters?: ReportDataProviderFilter[]
+    freeformText?: string
   ): Promise<{
     data: any
     attributes?: {
