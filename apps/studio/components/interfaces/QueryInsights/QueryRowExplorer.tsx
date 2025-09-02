@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+//import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -32,7 +32,7 @@ export const QueryRowExplorer = ({
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  // const { data: project } = useSelectedProjectQuery()
 
   const {
     data: queries,
@@ -41,18 +41,6 @@ export const QueryRowExplorer = ({
   } = useInsightsQueriesQuery(ref, startTime, endTime, {
     enabled: !!ref,
   })
-
-  // Debug logging (commented out to reduce console noise)
-  // console.log('QueryRowExplorer Debug:', {
-  //   ref,
-  //   startTime,
-  //   endTime,
-  //   queries,
-  //   isLoading,
-  //   error,
-  //   queriesLength: queries?.length,
-  //   refUndefined: !ref,
-  // })
 
   const [sort, setSort] = useState<{ column: string; order: 'asc' | 'desc' } | undefined>({
     column: 'last_run',
@@ -87,7 +75,6 @@ export const QueryRowExplorer = ({
     setSort(updatedSort)
   }
 
-  // Generate columns dynamically based on configuration
   const columns = formatQueryInsightsColumns({
     config: columnConfiguration ?? [],
     visibleColumns: selectedColumns,
@@ -95,10 +82,8 @@ export const QueryRowExplorer = ({
     onSortChange,
   })
 
-  // Use actual queries data or empty array if no queries found
   const reportData = queries || []
 
-  // Sort data based on current sort state
   const sortedData = [...reportData].sort((a, b) => {
     if (!sort) return 0
 
@@ -118,7 +103,6 @@ export const QueryRowExplorer = ({
     return 0
   })
 
-  // Filter data based on filter text
   const filteredData = filterText.trim()
     ? sortedData.filter((query) => query.query.toLowerCase().includes(filterText.toLowerCase()))
     : sortedData
@@ -127,7 +111,6 @@ export const QueryRowExplorer = ({
     return selectedRow !== undefined ? filteredData[selectedRow] : undefined
   }, [selectedRow, filteredData])
 
-  // Update selectedRow when selectedQueryId changes from parent
   useEffect(() => {
     if (selectedQueryId !== undefined) {
       const index = filteredData.findIndex((query) => query.query_id === selectedQueryId)
@@ -140,12 +123,10 @@ export const QueryRowExplorer = ({
     }
   }, [selectedQueryId, filteredData])
 
-  // Reset selection when date range changes
   useEffect(() => {
     setSelectedRow(undefined)
   }, [startTime, endTime])
 
-  // Initialize selected columns when column configuration changes
   useEffect(() => {
     if (columnConfiguration && columnConfiguration.length > 0) {
       setSelectedColumns(columnConfiguration.map((c) => c.id))
@@ -177,11 +158,6 @@ export const QueryRowExplorer = ({
           clearButtonText="Reset"
           activeOptions={selectedColumns}
           onSaveFilters={(value) => {
-            // When adding back hidden columns:
-            // (1) width set to default value if any
-            // (2) they will just get appended to the end
-            // (3) If "clearing", reset order of the columns to original
-
             let updatedConfig = (columnConfiguration ?? []).slice()
             if (value.length === 0) {
               updatedConfig = QUERY_INSIGHTS_TABLE_COLUMNS.map((c) => ({
@@ -214,9 +190,9 @@ export const QueryRowExplorer = ({
           headerRowHeight={36}
           columns={columns}
           rows={filteredData}
-          onRowsChange={(newRows) => {
-            // console.log('DataGrid rows changed:', newRows.length)
-          }}
+          // onRowsChange={(newRows) => {
+          // console.log('DataGrid rows changed:', newRows.length)
+          //}}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             return [
@@ -237,12 +213,10 @@ export const QueryRowExplorer = ({
                       const query = filteredData[idx]
                       const isAlreadySelected = selectedQuery?.query_id === query.query_id
 
-                      // If the query is already selected, deselect it
                       if (isAlreadySelected) {
                         setSelectedRow(undefined)
                         onQuerySelect?.(undefined)
                       } else {
-                        // Otherwise, select the new query
                         setSelectedRow(idx)
                         onQuerySelect?.(query)
                         gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })

@@ -23,7 +23,6 @@ export type InsightsQuery = {
   avg_p90: number
   avg_p95: number
   last_run: string
-  // index_advisor results
   startup_cost_before?: number
   startup_cost_after?: number
   total_cost_before?: number
@@ -31,7 +30,6 @@ export type InsightsQuery = {
   index_statements?: string[]
   errors?: string[]
   is_optimized?: boolean
-  // Error tracking fields
   error_count?: number
 }
 

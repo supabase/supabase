@@ -219,7 +219,6 @@ export function useAllMetricsQuery(
   })
 }
 
-// Hook to pre-fetch all metrics data for the current time range
 export function useInsightsPrefetchQuery(
   projectRef: string | undefined,
   startTime: string,
@@ -229,7 +228,6 @@ export function useInsightsPrefetchQuery(
 
   useEffect(() => {
     if (!projectRef) return
-
     // Pre-fetch all metric types
     const metricTypes: Array<{ id: string; label: string }> = [
       { id: 'query_latency', label: 'Query latency' },
@@ -239,7 +237,6 @@ export function useInsightsPrefetchQuery(
       { id: 'issues', label: 'Issues' },
     ]
 
-    // Pre-fetch metrics data
     metricTypes.forEach((metric) => {
       queryClient.prefetchQuery({
         queryKey: queryInsightsKeys.metrics(projectRef, metric.id, startTime, endTime),
@@ -261,7 +258,6 @@ export function useInsightsPrefetchQuery(
   }, [projectRef, startTime, endTime, queryClient])
 }
 
-// Hook for better cache management and manual refresh control
 export function useInsightsCacheManager(
   projectRef: string | undefined,
   startTime: string,
@@ -274,7 +270,6 @@ export function useInsightsCacheManager(
 
     const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits', 'issues']
 
-    // Invalidate and refetch all metrics
     await Promise.all([
       ...metricTypes.map((metric) =>
         queryClient.invalidateQueries({

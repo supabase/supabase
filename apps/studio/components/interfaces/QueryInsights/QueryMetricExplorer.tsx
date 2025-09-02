@@ -56,7 +56,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
   const [selectedQuery, setSelectedQuery] = useState<InsightsQuery | undefined>()
   const [selectedQueryId, setSelectedQueryId] = useState<number | undefined>()
 
-  const [visiblePercentiles, setVisiblePercentiles] = useState({
+  const [visiblePercentiles, _setVisiblePercentiles] = useState({
     p50: true,
     p75: true,
     p95: true,
@@ -76,7 +76,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     if (startTime && endTime) {
       return { startTime, endTime }
     }
-    // Fallback to last 24 hours if no date range provided
+
     const fallbackEndTime = new Date().toISOString()
     const fallbackStartTime = dayjs().subtract(24, 'hours').toISOString()
     return { startTime: fallbackStartTime, endTime: fallbackEndTime }
@@ -92,7 +92,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     enabled: !!project?.ref,
   })
 
-  // Fetch all metrics for the metric blocks
   const { data: allMetricsData, isLoading: isLoadingAllMetrics } = useAllMetricsQuery(
     project?.ref,
     effectiveStartTime,
@@ -102,7 +101,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     }
   )
 
-  // Fetch all queries to calculate slowness ratings
   const { data: allQueries, isLoading: isLoadingQueries } = useInsightsQueriesQuery(
     project?.ref,
     effectiveStartTime,
@@ -112,7 +110,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     }
   )
 
-  // Fetch single query data for selected query
   const { data: selectedQueryData, isLoading: isLoadingSelectedQuery } =
     useInsightsSingleQueryLatency(
       project?.ref,
@@ -146,7 +143,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }
     )
 
-  // Calculate queries with slowness_rating of "NOTICEABLE" and above
   const slowQueriesCount = useMemo(() => {
     if (!allQueries) return 0
 
@@ -156,7 +152,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     }).length
   }, [allQueries])
 
-  // Calculate the average value for the selected query based on the current metric
   const selectedQueryAverage = useMemo(() => {
     if (!selectedQuery) return undefined
 
@@ -234,7 +229,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         })
       }
 
-      // Ensure we always have at least one attribute (p95 as fallback)
       if (attributes.length === 0) {
         attributes.push({
           attribute: 'p95',
@@ -244,7 +238,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         })
       }
 
-      // Add selected query attribute if available
       if (selectedQuery && selectedQueryAverage !== undefined) {
         attributes.push({
           attribute: 'selected',
@@ -252,12 +245,12 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           format: 'ms',
           provider: 'query-insights' as any,
           color: {
-            light: '#dc2626', // Bright red color for selected query
+            light: '#dc2626',
             dark: '#ef4444',
           },
-          strokeDasharray: '5 5', // Dashed line
+          strokeDasharray: '5 5',
           type: 'line',
-          strokeWidth: 2, // Match Database Reports stroke width
+          strokeWidth: 2,
         })
       }
 
@@ -267,7 +260,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     const attributes: MultiAttribute[] = []
 
     if (selectedMetric === 'cache_hits') {
-      // For cache hits, show both hits and misses as separate lines
       attributes.push(
         {
           attribute: 'cache_hit_rate',
@@ -275,7 +267,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           format: '%',
           provider: 'query-insights' as any,
           color: {
-            light: '#10b981', // Green for hits
+            light: '#10b981',
             dark: '#34d399',
           },
         },
@@ -285,13 +277,12 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           format: '%',
           provider: 'query-insights' as any,
           color: {
-            light: '#ef4444', // Red for misses
+            light: '#ef4444',
             dark: '#f87171',
           },
         }
       )
     } else {
-      // For other metrics, use the default single attribute
       attributes.push({
         attribute: selectedMetric,
         label: config.label,
@@ -300,7 +291,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       })
     }
 
-    // Add selected query attribute if available
     if (selectedQuery && selectedQueryAverage !== undefined) {
       attributes.push({
         attribute: 'selected',
@@ -308,21 +298,23 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         format: config.format,
         provider: 'query-insights' as any,
         color: {
-          light: '#dc2626', // Bright red color for selected query
+          light: '#dc2626',
           dark: '#ef4444',
         },
-        strokeDasharray: '5 5', // Dashed line
+        strokeDasharray: '5 5',
         type: 'line',
-        strokeWidth: 2, // Match Database Reports stroke width
+        strokeWidth: 2,
       })
     }
 
     return attributes
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMetric, safeVisiblePercentiles, selectedQuery])
 
   const transformedChartAttributes = useMemo(() => {
     return getChartAttributes
-      .filter((attr) => attr.label && attr.format) // Filter out undefined values
+      .filter((attr) => attr.label && attr.format)
       .map((attr) => ({
         attribute: attr.attribute,
         label: attr.label!,
@@ -334,7 +326,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }))
   }, [getChartAttributes])
 
-  // Calculate average P95 for query latency
   const averageP95 = useMemo(() => {
     if (selectedMetric === 'query_latency' && metricsData && metricsData.length > 0) {
       const totalP95 = metricsData.reduce((sum, item) => sum + (item.p95 || 0), 0)
@@ -343,7 +334,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     return undefined
   }, [selectedMetric, metricsData])
 
-  // Get all metrics from the single query
   const totalRowsRead = useMemo(() => {
     if (allMetricsData?.total_rows_read !== undefined) {
       return formatNumberWithCommas(allMetricsData.total_rows_read)
@@ -393,7 +383,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     return '0%'
   }, [allMetricsData])
 
-  // Transform data for the chart
   const chartData = useMemo(() => {
     if (!metricsData || metricsData.length === 0) {
       return {
@@ -405,19 +394,16 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     }
 
     const transformed = metricsData.map((item) => {
-      // Convert timestamp to ISO string format as expected by ChartData
       const periodStart = new Date(item.timestamp).toISOString()
       const timestamp = new Date(item.timestamp).getTime()
       const value = item.value || 0
 
-      // Add percentile data for query latency
       if (selectedMetric === 'query_latency') {
         const percentileData: any = {
           period_start: periodStart,
           timestamp: timestamp,
         }
 
-        // Only include percentiles that are visible
         if (safeVisiblePercentiles.p50) percentileData.p50 = item.p50 || 0
         if (safeVisiblePercentiles.p75) percentileData.p75 = item.p75 || 0
         if (safeVisiblePercentiles.p95) percentileData.p95 = item.p95 || 0
@@ -427,7 +413,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         return percentileData
       }
 
-      // Handle cache_hits metric specially to show both hit and miss rates
       if (selectedMetric === 'cache_hits') {
         const sharedBlksHit = item.shared_blks_hit || 0
         const sharedBlksRead = item.shared_blks_read || 0
@@ -444,7 +429,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         }
       }
 
-      // For other non-query_latency metrics, use the selectedMetric as the key
       return {
         period_start: periodStart,
         timestamp: timestamp,
@@ -452,9 +436,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }
     })
 
-    // Add selected query data if available
     if (selectedQuery && selectedQueryAverage !== undefined) {
-      // Get the appropriate single query data based on the selected metric
       let selectedQueryTimeSeriesData: any[] = []
 
       if (selectedMetric === 'query_latency' && selectedQueryData) {
@@ -466,7 +448,6 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }
 
       if (selectedQueryTimeSeriesData.length > 0) {
-        // Transform the single query data to match the chart format
         const selectedQueryTransformed = selectedQueryTimeSeriesData.map((item) => {
           const periodStart = new Date(item.timestamp).toISOString()
           const timestamp = new Date(item.timestamp).getTime()
@@ -478,10 +459,8 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           }
         })
 
-        // Fill gaps in the data to ensure continuous lines
         const filledSelectedData = transformed.map((mainItem) => {
-          // Find the closest timestamp within a reasonable range (5 minutes)
-          const timeWindow = 5 * 60 * 1000 // 5 minutes in milliseconds
+          const timeWindow = 5 * 60 * 1000
           const matchingSelectedItem = selectedQueryTransformed.find(
             (selectedItem) => Math.abs(selectedItem.timestamp - mainItem.timestamp) <= timeWindow
           )
@@ -492,10 +471,8 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           }
         })
 
-        // Merge the selected query data with the main chart data
         transformed.splice(0, transformed.length, ...filledSelectedData)
       } else {
-        // Fallback to the old flat line approach if no time-series data
         const transformedWithSelected = transformed.map((item) => ({
           ...item,
           selected: selectedQueryAverage,
@@ -504,18 +481,14 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       }
     }
 
-    // Calculate totals for the ChartData format
     const total = transformed.reduce((sum, item) => {
       if (selectedMetric === 'query_latency') {
-        // For query latency, sum the p95 values as the main metric
         const p95Value = (item as any).p95 || 0
         return sum + p95Value
       } else if (selectedMetric === 'cache_hits') {
-        // For cache hits, use the hit rate as the main metric
         const hitRate = (item as any).cache_hit_rate || 0
         return sum + hitRate
       } else {
-        // For other metrics, use the selectedMetric key
         const value = (item as any)[selectedMetric]
         return sum + (typeof value === 'number' ? value : 0)
       }
@@ -537,6 +510,8 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       total,
       totalGrouped,
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     metricsData,
     selectedMetric,
@@ -548,30 +523,23 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     selectedQueryCallsData,
   ])
 
-  // Mock updateDateRange function for LogChartHandler
   const updateDateRange = () => {
-    // This is a no-op since we're not implementing date range updates in this component
     console.log('updateDateRange called - not implemented in QueryMetricExplorer')
   }
 
-  // Handle query selection from child component
-  const handleQuerySelect = useCallback(
-    (query: InsightsQuery | undefined) => {
-      setSelectedQuery(query)
-      setSelectedQueryId(query?.query_id)
-    },
-    [] // No dependencies to prevent unnecessary recreations
-  )
+  const handleQuerySelect = useCallback((query: InsightsQuery | undefined) => {
+    setSelectedQuery(query)
+    setSelectedQueryId(query?.query_id)
+  }, [])
 
-  // Clear selected query
   const clearSelectedQuery = useCallback(() => {
     setSelectedQuery(undefined)
     setSelectedQueryId(undefined)
-  }, []) // No dependencies to prevent unnecessary recreations
+  }, [])
 
-  // Reset selection when date range changes
   useEffect(() => {
     clearSelectedQuery()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectiveStartTime, effectiveEndTime])
 
   return (

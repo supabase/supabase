@@ -14,24 +14,14 @@ interface QueryQuickGlanceProps {
 export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  // Use provided date range or fall back to default
   const { startTime: effectiveStartTime, endTime: effectiveEndTime } = useMemo(() => {
     if (startTime && endTime) {
       return { startTime, endTime }
     }
-    // Fallback to last 24 hours if no date range provided
     const fallbackEndTime = new Date().toISOString()
     const fallbackStartTime = dayjs().subtract(24, 'hours').toISOString()
     return { startTime: fallbackStartTime, endTime: fallbackEndTime }
   }, [startTime, endTime])
-
-  // Debug logging (commented out to reduce console noise)
-  // console.log('QueryQuickGlance Debug:', {
-  //   props: { startTime, endTime },
-  //   effective: { startTime: effectiveStartTime, endTime: effectiveEndTime },
-  //   project: { ref: project?.ref, hasConnectionString: !!project?.connectionString },
-  //   projectRefUndefined: !project?.ref,
-  // })
 
   const {
     data: glanceData,
@@ -40,13 +30,6 @@ export const QueryQuickGlance = ({ startTime, endTime }: QueryQuickGlanceProps) 
   } = useInsightsGlanceQuery(project?.ref, effectiveStartTime, effectiveEndTime, {
     enabled: !!project?.ref,
   })
-
-  // Debug logging for glance results (commented out to reduce console noise)
-  // console.log('QueryQuickGlance Results:', {
-  //   glanceData,
-  //   isLoading,
-  //   error,
-  // })
 
   const cards = useMemo(() => {
     if (!glanceData) return []
