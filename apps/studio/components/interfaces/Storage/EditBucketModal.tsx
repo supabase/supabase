@@ -212,7 +212,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-6">
+            <DialogSection className="space-y-6">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -232,13 +232,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
               />
 
               {/* Visibility */}
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col gap-y-3">
                 <FormField_Shadcn_
                   key="public"
                   name="public"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
+                      hideMessage
                       name="public"
                       label="Public bucket"
                       description="Allow anyone to read objects without authorization"
@@ -270,7 +271,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                           <>
                             <p className="mb-2">
                               All objects in your bucket will be private and only accessible via
-                              signed URLs, or downloaded with the right authorisation headers.
+                              signed URLs, or downloaded with the right authorization headers.
                             </p>
                             <p>
                               Assets cached in the CDN may still be publicly accessible. You can
@@ -291,160 +292,144 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
             <DialogSectionSeparator />
 
-            <DialogSection>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <FormField_Shadcn_
-                    key="has_file_size_limit"
+            <DialogSection className="space-y-2">
+              <FormField_Shadcn_
+                key="has_file_size_limit"
+                name="has_file_size_limit"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
                     name="has_file_size_limit"
+                    label="Restrict file size"
+                    description="Prevent uploading of files larger than a specified limit"
+                    layout="flex"
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        id="has_file_size_limit"
+                        size="large"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              {hasFileSizeLimit && (
+                <div>
+                  <FormField_Shadcn_
+                    key="formatted_size_limit"
+                    name="formatted_size_limit"
                     control={form.control}
                     render={({ field }) => (
                       <FormItemLayout
-                        name="has_file_size_limit"
-                        label="Restrict file size"
-                        description="Prevent uploading of files larger than a specified limit"
-                        layout="flex"
+                        hideMessage
+                        name="formatted_size_limit"
+                        label="File size limit"
                       >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            id="has_file_size_limit"
-                            size="large"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl_Shadcn_>
+                        <div className="grid grid-cols-12 gap-x-2">
+                          <div className="col-span-8">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                id="formatted_size_limit"
+                                aria-label="File size limit"
+                                type="number"
+                                min={0}
+                                placeholder="0"
+                                {...field}
+                              />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <div className="col-span-4">
+                            <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger_Shadcn_ aria-label="File size limit unit" size="small">
+                                <SelectValue_Shadcn_ asChild>
+                                  <>{selectedUnit}</>
+                                </SelectValue_Shadcn_>
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                {Object.values(StorageSizeUnits).map((unit: string) => (
+                                  <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                                    <div>{unit}</div>
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
+                          </div>
+                        </div>
                       </FormItemLayout>
                     )}
                   />
-                  {hasFileSizeLimit && (
-                    <div>
-                      <FormField_Shadcn_
-                        key="formatted_size_limit"
-                        name="formatted_size_limit"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItemLayout
-                            name="formatted_size_limit"
-                            label="File size limit"
-                            hideMessage
-                          >
-                            <div className="grid grid-cols-12 gap-x-2">
-                              <div className="col-span-8">
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_
-                                    id="formatted_size_limit"
-                                    aria-label="File size limit"
-                                    type="number"
-                                    min={0}
-                                    placeholder="0"
-                                    {...field}
-                                  />
-                                </FormControl_Shadcn_>
-                              </div>
-                              <div className="col-span-4">
-                                <Select_Shadcn_
-                                  value={selectedUnit}
-                                  onValueChange={setSelectedUnit}
-                                >
-                                  <SelectTrigger_Shadcn_
-                                    aria-label="File size limit unit"
-                                    size="small"
-                                  >
-                                    <SelectValue_Shadcn_ asChild>
-                                      <>{selectedUnit}</>
-                                    </SelectValue_Shadcn_>
-                                  </SelectTrigger_Shadcn_>
-                                  <SelectContent_Shadcn_>
-                                    {Object.values(StorageSizeUnits).map((unit: string) => (
-                                      <SelectItem_Shadcn_
-                                        key={unit}
-                                        value={unit}
-                                        className="text-xs"
-                                      >
-                                        <div>{unit}</div>
-                                      </SelectItem_Shadcn_>
-                                    ))}
-                                  </SelectContent_Shadcn_>
-                                </Select_Shadcn_>
-                              </div>
-                            </div>
-                          </FormItemLayout>
-                        )}
-                      />
-                      {formattedSizeLimitError?.message === 'exceed_global_limit' && (
-                        <FormMessage_Shadcn_ className="mt-2">
-                          Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
-                          <InlineLink
-                            className="text-destructive decoration-destructive-500 hover:decoration-destructive"
-                            href={`/project/${ref}/settings/storage`}
-                          >
-                            Storage Settings
-                          </InlineLink>{' '}
-                          first.
-                        </FormMessage_Shadcn_>
-                      )}
-
-                      {IS_PLATFORM ? (
-                        <p className="text-sm text-foreground-lighter mt-2">
-                          This project has a{' '}
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href={`/project/${ref}/settings/storage`}
-                          >
-                            global file size limit
-                          </InlineLink>{' '}
-                          of {formattedGlobalUploadLimit}.
-                        </p>
-                      ) : undefined}
-                    </div>
+                  {formattedSizeLimitError?.message === 'exceed_global_limit' && (
+                    <FormMessage_Shadcn_ className="mt-2">
+                      Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
+                      <InlineLink
+                        className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                        href={`/project/${ref}/settings/storage`}
+                      >
+                        Storage Settings
+                      </InlineLink>{' '}
+                      first.
+                    </FormMessage_Shadcn_>
                   )}
+
+                  {IS_PLATFORM ? (
+                    <p className="text-sm text-foreground-lighter mt-2">
+                      This project has a{' '}
+                      <InlineLink
+                        className="text-foreground-light hover:text-foreground"
+                        href={`/project/${ref}/settings/storage`}
+                      >
+                        global file size limit
+                      </InlineLink>{' '}
+                      of {formattedGlobalUploadLimit}.
+                    </p>
+                  ) : undefined}
                 </div>
-              </div>
+              )}
             </DialogSection>
 
             <DialogSectionSeparator />
 
-            <DialogSection>
-              <div className="space-y-2">
-                <FormItemLayout
-                  name="has_allowed_mime_types"
-                  label="Restrict MIME types"
-                  description="Allow only certain types of files to be uploaded"
-                  layout="flex"
-                >
-                  <FormControl_Shadcn_>
-                    <Switch
-                      id="has_allowed_mime_types"
-                      size="large"
-                      checked={hasAllowedMimeTypes}
-                      onCheckedChange={setHasAllowedMimeTypes}
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-                {hasAllowedMimeTypes && (
-                  <FormField_Shadcn_
-                    key="allowed_mime_types"
-                    name="allowed_mime_types"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        name="allowed_mime_types"
-                        label="Allowed MIME types"
-                        labelOptional="Comma separated values"
-                        description="Wildcards are allowed, e.g. image/*."
-                      >
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            id="allowed_mime_types"
-                            {...field}
-                            placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
+            <DialogSection className="space-y-2">
+              <FormItemLayout
+                name="has_allowed_mime_types"
+                label="Restrict MIME types"
+                description="Allow only certain types of files to be uploaded"
+                layout="flex"
+              >
+                <FormControl_Shadcn_>
+                  <Switch
+                    id="has_allowed_mime_types"
+                    size="large"
+                    checked={hasAllowedMimeTypes}
+                    onCheckedChange={setHasAllowedMimeTypes}
                   />
-                )}
-              </div>
+                </FormControl_Shadcn_>
+              </FormItemLayout>
+              {hasAllowedMimeTypes && (
+                <FormField_Shadcn_
+                  key="allowed_mime_types"
+                  name="allowed_mime_types"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      name="allowed_mime_types"
+                      label="Allowed MIME types"
+                      labelOptional="Comma separated values"
+                      description="Wildcards are allowed, e.g. image/*."
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          id="allowed_mime_types"
+                          {...field}
+                          placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
             </DialogSection>
           </form>
         </Form_Shadcn_>
