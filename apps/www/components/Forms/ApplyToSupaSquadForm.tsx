@@ -107,7 +107,7 @@ const applicationSchema = z.object({
   tracks: z.array(z.string()).min(1, "Select at least 1 track"),
   areas_of_interest: z.array(z.string()).min(1, "Select at least 1 area of interest"),
   why_you_want_to_join: z.string().min(1, "This is required"),
-  monthly_commitment: z.string().min(1, "This is required"),
+  monthly_commitment: z.number().min(1, "This is required"),
   languages_spoken: z.array(z.string()).min(1, "Select at least 1 language"),
   skills: z.string().min(1, "This is required"),
   location: z.string().min(1, "Make sure to specify your city and country"),
@@ -369,8 +369,7 @@ const FormContent = memo(function FormContent({
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">
                       <Input_Shadcn_
-                        type="text"
-                        {...field}
+                        {...({ ...field, inputMode: "numeric", onChange: (e: any) => field.onChange(e.target.value ? parseInt(e.target.value) : '') } as any)}
                       />
                     </div>
                   </FormControl_Shadcn_>

@@ -10,7 +10,7 @@ const applicationSchema = z.object({
   tracks: z.array(z.string()).min(1, "Select at least 1 track"),
   areas_of_interest: z.array(z.string()).min(1, "Select at least 1 area of interest"),
   why_you_want_to_join: z.string().min(1, "This is required"),
-  monthly_commitment: z.string().min(1, "This is required"),
+  monthly_commitment: z.number().min(1, "This is required"),
   languages_spoken: z.array(z.string()).min(1, "Select at least 1 language"),
   skills: z.string().min(1, "This is required"),
   location: z.string().min(1, "Make sure to specify your city and country"),
@@ -113,15 +113,9 @@ export async function POST(req: Request) {
       date: { start: new Date().toISOString().split('T')[0] },
     },
   }
-  if (data.monthly_commitment) {
-    // Adjust property key to match your Notion DB (case & spacing sensitive)
-    props['Monthly commitment'] = {
-      rich_text: [
-        {
-          type: 'text',
-          text: { content: truncateRichText(data.monthly_commitment, 120) },
-        },
-      ],
+  if (!Number.isNaN(data.monthly_commitment)) {
+    props['How many hours can you commit per month?'] = {
+      number: data.monthly_commitment,
     }
   }
   if (data.skills) {
