@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import { CreateBucketModal } from 'components/interfaces/Storage/BucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
