@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
-import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
+import { EditBucketModal } from 'components/interfaces/Storage/BucketModal'
 import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
 import type { Bucket } from 'data/storage/buckets-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
