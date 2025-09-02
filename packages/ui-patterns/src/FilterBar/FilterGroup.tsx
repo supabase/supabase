@@ -1,13 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { FilterProperty, FilterGroup as FilterGroupType } from './types'
 import { ActiveInput } from './hooks'
 import { FilterCondition } from './FilterCondition'
-import { Input_Shadcn_ } from 'ui'
+import {
+  Input_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverAnchor_Shadcn_,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+} from 'ui'
+import { buildPropertyItems, MenuItem } from './menuItems'
 
 type FilterGroupProps = {
   group: FilterGroupType
   path: number[]
   isLoading?: boolean
+  rootFilters: FilterGroupType
   filterProperties: FilterProperty[]
   // Active state
   activeInput: ActiveInput
@@ -28,12 +40,20 @@ type FilterGroupProps = {
   supportsOperators?: boolean
   // Remove functionality
   onRemove: (path: number[]) => void
+  // Options/async
+  propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>
+  loadingOptions: Record<string, boolean>
+  // Menu/selection
+  aiApiUrl?: string
+  onSelectMenuItem: (item: MenuItem) => void
+  setActiveInput: (input: ActiveInput) => void
 }
 
 export function FilterGroup({
   group,
   path,
   isLoading,
+  rootFilters,
   activeInput,
   filterProperties,
   onOperatorChange,
@@ -50,10 +70,17 @@ export function FilterGroup({
   onLogicalOperatorChange,
   supportsOperators = false,
   onRemove,
+  propertyOptionsCache,
+  loadingOptions,
+  aiApiUrl,
+  onSelectMenuItem,
+  setActiveInput,
 }: FilterGroupProps) {
   const [localFreeformValue, setLocalFreeformValue] = useState('')
   const freeformInputRef = useRef<HTMLInputElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const [isHoveringOperator, setIsHoveringOperator] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(0)
   const isActive =
     isGroupFreeformActive &&
     activeInput?.type === 'group' &&
@@ -70,6 +97,12 @@ export function FilterGroup({
   useEffect(() => {
     if (isActive && freeformInputRef.current) {
       freeformInputRef.current.focus()
+    }
+  }, [isActive])
+
+  useEffect(() => {
+    if (!isActive) {
+      setHighlightedIndex(0)
     }
   }, [isActive])
 
@@ -108,8 +141,68 @@ export function FilterGroup({
     )
   }
 
+  const items = useMemo(
+    () =>
+      buildPropertyItems({
+        filterProperties,
+        inputValue: (isActive ? groupFreeformValue : localFreeformValue) || '',
+        aiApiUrl,
+        supportsOperators,
+      }),
+    [
+      filterProperties,
+      isActive,
+      groupFreeformValue,
+      localFreeformValue,
+      aiApiUrl,
+      supportsOperators,
+    ]
+  )
+
+  useEffect(() => {
+    if (highlightedIndex > items.length - 1) {
+      setHighlightedIndex(items.length > 0 ? items.length - 1 : 0)
+    }
+  }, [items, highlightedIndex])
+
+  const handleFreeformKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setHighlightedIndex((prev) => (prev < items.length - 1 ? prev + 1 : prev))
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0))
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        if (items[highlightedIndex]) onSelectMenuItem(items[highlightedIndex])
+        return
+      }
+      onKeyDown(e)
+    },
+    [items, highlightedIndex, onKeyDown, onSelectMenuItem]
+  )
+
+  const handleFreeformBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      setTimeout(() => {
+        const active = document.activeElement as HTMLElement | null
+        if (active && wrapperRef.current && wrapperRef.current.contains(active)) {
+          return
+        }
+        onBlur()
+      }, 0)
+    },
+    [onBlur]
+  )
+
   return (
     <div
+      ref={wrapperRef}
       className={`flex items-center gap-1 rounded ${
         path.length > 0
           ? "before:content-['('] before:text-foreground-muted after:content-[')'] after:text-foreground-muted"
@@ -143,6 +236,7 @@ export function FilterGroup({
                   group={condition}
                   path={currentPath}
                   isLoading={isLoading}
+                  rootFilters={rootFilters}
                   activeInput={activeInput}
                   onOperatorChange={onOperatorChange}
                   onValueChange={onValueChange}
@@ -158,6 +252,11 @@ export function FilterGroup({
                   onLogicalOperatorChange={onLogicalOperatorChange}
                   supportsOperators={supportsOperators}
                   onRemove={onRemove}
+                  propertyOptionsCache={propertyOptionsCache}
+                  loadingOptions={loadingOptions}
+                  aiApiUrl={aiApiUrl}
+                  onSelectMenuItem={onSelectMenuItem}
+                  setActiveInput={setActiveInput}
                 />
               ) : (
                 <FilterCondition
@@ -175,32 +274,75 @@ export function FilterGroup({
                   onLabelClick={() => onLabelClick(currentPath)}
                   onKeyDown={onKeyDown}
                   onRemove={() => onRemove(currentPath)}
+                  rootFilters={rootFilters}
+                  path={currentPath}
+                  propertyOptionsCache={propertyOptionsCache}
+                  loadingOptions={loadingOptions}
+                  aiApiUrl={aiApiUrl}
+                  onSelectMenuItem={onSelectMenuItem}
+                  setActiveInput={setActiveInput}
                 />
               )}
             </React.Fragment>
           )
         })}
         {/* Add freeform input at the end */}
-        <Input_Shadcn_
-          ref={freeformInputRef}
-          value={isActive ? groupFreeformValue : localFreeformValue}
-          onChange={handleFreeformChange}
-          onFocus={() => onGroupFreeformFocus(path)}
-          onBlur={onBlur}
-          onKeyDown={onKeyDown}
-          className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
-          placeholder={
-            path.length === 0 && group.conditions.length === 0 ? 'Search or filter...' : '+'
-          }
-          disabled={isLoading}
-          style={{
-            width: `${Math.max(
-              (isActive ? groupFreeformValue : localFreeformValue).length || 1,
-              path.length === 0 && group.conditions.length === 0 ? 18 : 1
-            )}ch`,
-            minWidth: path.length === 0 && group.conditions.length === 0 ? '18ch' : '1ch',
-          }}
-        />
+        <Popover_Shadcn_ open={isActive && !isLoading && items.length > 0}>
+          <PopoverAnchor_Shadcn_ asChild>
+            <Input_Shadcn_
+              ref={freeformInputRef}
+              type="text"
+              value={isActive ? groupFreeformValue : localFreeformValue}
+              onChange={handleFreeformChange}
+              onFocus={() => onGroupFreeformFocus(path)}
+              onBlur={handleFreeformBlur}
+              onKeyDown={handleFreeformKeyDown}
+              className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
+              placeholder={
+                path.length === 0 && group.conditions.length === 0 ? 'Search or filter...' : '+'
+              }
+              disabled={isLoading}
+              style={{
+                width: `${Math.max(
+                  (isActive ? groupFreeformValue : localFreeformValue).length || 1,
+                  path.length === 0 && group.conditions.length === 0 ? 18 : 1
+                )}ch`,
+                minWidth: path.length === 0 && group.conditions.length === 0 ? '18ch' : '1ch',
+              }}
+            />
+          </PopoverAnchor_Shadcn_>
+          <PopoverContent_Shadcn_
+            className="w-[260px] p-0"
+            align="start"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            onInteractOutside={(e) => {
+              const target = e.target as Node
+              if (wrapperRef.current && !wrapperRef.current.contains(target)) {
+                onBlur()
+              }
+            }}
+          >
+            <Command_Shadcn_>
+              <CommandList_Shadcn_>
+                <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                <CommandGroup_Shadcn_>
+                  {items.map((item, idx) => (
+                    <CommandItem_Shadcn_
+                      key={`${item.value}-${item.label}`}
+                      value={item.value}
+                      onSelect={() => onSelectMenuItem(item)}
+                      className={`text-xs font-mono ${idx === highlightedIndex ? 'bg-surface-400' : ''}`}
+                    >
+                      {item.icon}
+                      {item.label}
+                    </CommandItem_Shadcn_>
+                  ))}
+                </CommandGroup_Shadcn_>
+              </CommandList_Shadcn_>
+            </Command_Shadcn_>
+          </PopoverContent_Shadcn_>
+        </Popover_Shadcn_>
       </div>
     </div>
   )

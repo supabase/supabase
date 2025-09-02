@@ -8,21 +8,11 @@ export function useKeyboardNavigation({
   setActiveInput,
   activeFilters,
   onFilterChange,
-  setSelectedCommandIndex,
-  selectedCommandIndex,
-  setIsCommandMenuVisible,
-  commandItems,
-  handleCommandSelect,
 }: {
   activeInput: ActiveInput
   setActiveInput: (input: ActiveInput) => void
   activeFilters: FilterGroup
   onFilterChange: (filters: FilterGroup) => void
-  setSelectedCommandIndex: React.Dispatch<React.SetStateAction<number>>
-  selectedCommandIndex: number
-  setIsCommandMenuVisible: (visible: boolean) => void
-  commandItems: Array<{ value: string; label: string }>
-  handleCommandSelect: (value: string) => void
 }) {
   const removeFilterByPath = useCallback(
     (path: number[]) => {
@@ -42,20 +32,7 @@ export function useKeyboardNavigation({
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setSelectedCommandIndex((prevIndex: number) =>
-          prevIndex < commandItems.length - 1 ? prevIndex + 1 : prevIndex
-        )
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setSelectedCommandIndex((prevIndex: number) => (prevIndex > 0 ? prevIndex - 1 : 0))
-      } else if (e.key === 'Enter') {
-        e.preventDefault()
-        if (commandItems[selectedCommandIndex]) {
-          handleCommandSelect(commandItems[selectedCommandIndex].value)
-        }
-      } else if (e.key === 'Backspace') {
+      if (e.key === 'Backspace') {
         handleBackspace(e)
       } else if (e.key === ' ' && activeInput?.type === 'value') {
         e.preventDefault()
@@ -65,11 +42,10 @@ export function useKeyboardNavigation({
       } else if (e.key === 'ArrowRight') {
         handleArrowRight(e)
       } else if (e.key === 'Escape') {
-        setIsCommandMenuVisible(false)
         setActiveInput(null)
       }
     },
-    [activeInput, activeFilters, commandItems, selectedCommandIndex]
+    [activeInput, activeFilters]
   )
 
   const handleBackspace = useCallback(

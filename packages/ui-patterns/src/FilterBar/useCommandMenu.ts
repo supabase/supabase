@@ -4,6 +4,7 @@ import { Sparkles } from 'lucide-react'
 import { ActiveInput } from './hooks'
 import { FilterProperty, FilterGroup } from './types'
 import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'
+// Deprecated soon; kept for compatibility during refactor
 
 export type CommandItem = {
   value: string

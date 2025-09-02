@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { FilterBar } from './FilterBar'
 import { FilterProperty, FilterGroup } from './types'
 
@@ -67,10 +68,138 @@ describe('FilterBar', () => {
     expect(input).toBeInTheDocument()
   })
 
+  it('opens group popover and allows selecting a property', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={initialFilters}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
 
+    const freeform = screen.getByPlaceholderText('Search or filter...')
+    freeform.focus()
+    await user.click(freeform)
 
+    // Should show property items in popover
+    expect(await screen.findByText('Name')).toBeInTheDocument()
+    expect(screen.getByText('Status')).toBeInTheDocument()
 
+    // Select a property
+    await user.click(screen.getByText('Status'))
 
+    // Value input should appear for selected property
+    await waitFor(() => {
+      expect(screen.getByLabelText('Value for Status')).toBeInTheDocument()
+    })
+  })
+
+  it('selects array option for value with keyboard', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={initialFilters}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    const freeform = screen.getByPlaceholderText('Search or filter...')
+    await user.click(freeform)
+    await user.click(screen.getByText('Status'))
+
+    const valueInput = await screen.findByLabelText('Value for Status')
+    valueInput.focus()
+
+    // Popover should show value options
+    expect(await screen.findByText('active')).toBeInTheDocument()
+
+    // Arrow down and enter to select 'active'
+    await user.keyboard('{ArrowDown}{Enter}')
+
+    expect((valueInput as HTMLInputElement).value).toBe('active')
+  })
+
+  it('renders and applies custom value component inside popover', async () => {
+    const user = userEvent.setup()
+    const customProps: FilterProperty[] = [
+      ...mockFilterProperties,
+      {
+        label: 'Tag',
+        name: 'tag',
+        type: 'string',
+        operators: ['='],
+        options: {
+          label: 'Custom...',
+          component: ({
+            onChange,
+            onCancel,
+          }: {
+            onChange: (v: string) => void
+            onCancel: () => void
+          }) => (
+            <div>
+              <button onClick={() => onChange('foo')}>Pick Foo</button>
+              <button onClick={onCancel}>Cancel</button>
+            </div>
+          ),
+        },
+      },
+    ]
+
+    render(
+      <FilterBar
+        filterProperties={customProps}
+        filters={initialFilters}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    const freeform = screen.getByPlaceholderText('Search or filter...')
+    await user.click(freeform)
+    await user.click(screen.getByText('Tag'))
+
+    // The value list should include the custom entry
+    expect(await screen.findByText('Custom...')).toBeInTheDocument()
+    await user.click(screen.getByText('Custom...'))
+
+    // Custom UI should render inside the popover
+    const pickFoo = await screen.findByText('Pick Foo')
+    await user.click(pickFoo)
+
+    // Value should be applied
+    const valueInput = await screen.findByLabelText('Value for Tag')
+    expect((valueInput as HTMLInputElement).value).toBe('foo')
+  })
+
+  it('closes popover when clicking outside the filter bar', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={initialFilters}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    const freeform = screen.getByPlaceholderText('Search or filter...')
+    await user.click(freeform)
+    expect(await screen.findByText('Name')).toBeInTheDocument()
+
+    await user.click(document.body)
+    await waitFor(() => {
+      expect(screen.queryByText('Name')).not.toBeInTheDocument()
+    })
+  })
 
   it('handles existing filters in state', () => {
     const existingFilters: FilterGroup = {
