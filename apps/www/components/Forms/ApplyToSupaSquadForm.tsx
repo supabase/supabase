@@ -31,6 +31,7 @@ import {
   MultiSelectorTrigger,
   MultiSelectorItem,
 } from 'ui-patterns/multi-select'
+import { CountrySelector } from '../Supasquad/CountrySelector'
 
 interface FormItem_Shadcn_ {
   type: 'text' | 'textarea'
@@ -121,10 +122,11 @@ const applicationSchema = z.object({
     .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.number({ invalid_type_error: "Please enter a number" }).min(1, 'This is required'),
+  monthly_commitment: z.number({ invalid_type_error: "Please enter a number" }),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
   skills: z.string().optional(),
-  location: z.string().min(1, 'Make sure to specify your city and country'),
+  city: z.string().min(1, 'Specify your city'),
+  country: z.string().min(1, 'Specify your country'),
   github: z.string().optional(),
   twitter: z.string().optional(),
 })
@@ -184,7 +186,6 @@ const FormContent = memo(function FormContent({
                   <FormControl_Shadcn_>
                     <Input_Shadcn_
                       placeholder="Your first name"
-                      // autoFocus={!isMobile}
                       autoComplete="given-name"
                       {...field}
                     />
@@ -385,6 +386,44 @@ const FormContent = memo(function FormContent({
 
           <div className="space-y-6">
             <h3 className="h3 text-foreground">Location and Availability</h3>
+
+            <div className="flex flex-col md:flex-row gap-4 items-start text-left">
+              <FormField_Shadcn_
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="w-full md:flex-1">
+                    <FormLabel_Shadcn_ className="text-foreground">Country</FormLabel_Shadcn_>
+                    <FormControl_Shadcn_>
+                      <div className="relative mt-1">
+                        {/* <Input_Shadcn_ type="text" placeholder="Country" {...field} /> */}
+                        <CountrySelector value={field.value || ""}
+                          onValueChange={field.onChange}
+                        />
+                      </div>
+                    </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
+                )}
+              />
+
+              <FormField_Shadcn_
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="w-full md:flex-1">
+                    <FormLabel_Shadcn_ className="text-foreground">City</FormLabel_Shadcn_>
+                    <FormControl_Shadcn_>
+                      <div className="relative mt-1">
+                        <Input_Shadcn_ type="text" placeholder="City" {...field} />
+                      </div>
+                    </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
+                )}
+              />
+            </div>
+
             <FormField_Shadcn_
               control={form.control}
               name="monthly_commitment"
@@ -394,7 +433,7 @@ const FormContent = memo(function FormContent({
                     Monthly Commitment
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    How many hours can you commit per month?
+                    How many hours can you commit per month? If not sure, leave blank.
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">
@@ -413,21 +452,7 @@ const FormContent = memo(function FormContent({
                 </FormItem_Shadcn_>
               )}
             />
-            <FormField_Shadcn_
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_ className="text-foreground">City, Country</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
-                    <div className="relative mt-1">
-                      <Input_Shadcn_ type="text" placeholder="City, Country" {...field} />
-                    </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
-              )}
-            />
+
             <FormField_Shadcn_
               control={form.control}
               name="languages_spoken"
@@ -565,7 +590,8 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
       areas_of_interest: [],
       skills: '',
       why_you_want_to_join: '',
-      location: '',
+      city: '',
+      country: '',
       monthly_commitment: 0,
       languages_spoken: [],
       github: '',

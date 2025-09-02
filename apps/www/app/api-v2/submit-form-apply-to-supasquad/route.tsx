@@ -19,10 +19,11 @@ const applicationSchema = z.object({
     .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.number().min(1, 'This is required'),
+  monthly_commitment: z.number({ invalid_type_error: "Please enter a number" }),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
   skills: z.string().optional(),
-  location: z.string().min(1, 'Make sure to specify your city and country'),
+  city: z.string().min(1, 'Specify your city'),
+  country: z.string().min(1, 'Specify your country'),
   github: z.string().optional(),
   twitter: z.string().optional(),
 })
@@ -83,21 +84,12 @@ export async function POST(req: Request) {
   }
 
   const data = parsed.data
-  let titleProp: string
-  try {
-    titleProp = await getTitlePropertyName(NOTION_DB_ID, NOTION_API_KEY)
-  } catch (e: any) {
-    return new Response(JSON.stringify({ message: e.message || 'Cannot read Notion DB schema' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
-  }
 
   const fullName =
     `${data.first_name?.trim() || ''} ${data.last_name?.trim() || ''}`.trim() || 'Unnamed'
 
   const props: Record<string, any> = {
-    [titleProp]: {
+    'Name': {
       title: [{ type: 'text', text: { content: fullName } }],
     },
     'First name': {
@@ -119,6 +111,15 @@ export async function POST(req: Request) {
     'Date submitted': {
       date: { start: new Date().toISOString().split('T')[0] },
     },
+    'Country': {
+      select: { name: data.country }
+    },
+    'City': {
+      rich_text: [{ type: 'text', text: { content: truncateRichText(data.city, 120) } }],
+    },
+    'Location': {
+      rich_text: [{ type: 'text', text: { content: truncateRichText(data.city + ', ' + data.country, 120) } }],
+    }
   }
   if (!Number.isNaN(data.monthly_commitment)) {
     props['How many hours can you commit per month?'] = {
@@ -135,17 +136,6 @@ export async function POST(req: Request) {
       rich_text: [
         { type: 'text', text: { content: truncateRichText(data.why_you_want_to_join, 1800) } },
       ],
-    }
-  }
-  if (data.location) {
-    props['Location'] = {
-      rich_text: [{ type: 'text', text: { content: truncateRichText(data.location, 120) } }],
-    }
-    try {
-      const maybeCountry = data.location.split(',').slice(-1)[0]?.trim()
-      if (maybeCountry) props['Region'] = { multi_select: [{ name: maybeCountry }] }
-    } catch {
-      /* ignore */
     }
   }
   if (data.github) {
@@ -169,6 +159,7 @@ export async function POST(req: Request) {
       status: 201,
     })
   } catch (err: any) {
+    console.error('Error processing SupaSquad application:', err)
     return new Response(JSON.stringify({ message: 'Error sending your application', error: err?.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 502,
@@ -194,6 +185,8 @@ const savePersonAndEventInCustomerIO = async (data: any) => {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
+        city: data.city,
+        country: data.country,
         github: data.github,
         twitter: data.twitter,
       });
