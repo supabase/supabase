@@ -1,5 +1,3 @@
-import type { QueryKey } from '@tanstack/react-query'
-
 export const queryInsightsKeys = {
   all: (projectRef: string | undefined) => ['projects', projectRef, 'query-insights'] as const,
   metrics: (projectRef: string | undefined, metric: string, startTime: string, endTime: string) =>
