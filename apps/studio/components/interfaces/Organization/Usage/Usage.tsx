@@ -47,7 +47,7 @@ const Usage = () => {
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const orgProjects = (data?.projects ?? [])?.filter(
+  const orgProjects = (data?.projects ?? []).filter(
     (project) => project.organization_id === organization?.id
   )
 
