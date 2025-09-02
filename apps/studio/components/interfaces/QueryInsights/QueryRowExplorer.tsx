@@ -21,6 +21,7 @@ interface QueryRowExplorerProps {
   endTime: string
   onQuerySelect?: (query: InsightsQuery | undefined) => void
   selectedQueryId?: number
+  onQueryHover?: (query: InsightsQuery | undefined) => void
 }
 
 export const QueryRowExplorer = ({
@@ -28,6 +29,7 @@ export const QueryRowExplorer = ({
   endTime,
   onQuerySelect,
   selectedQueryId,
+  onQueryHover,
 }: QueryRowExplorerProps) => {
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
@@ -59,6 +61,7 @@ export const QueryRowExplorer = ({
     order: 'desc',
   })
   const [selectedRow, setSelectedRow] = useState<number>()
+  const [hoveredRow, setHoveredRow] = useState<number>()
   const [filterText, setFilterText] = useState<string>('')
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
 
@@ -127,6 +130,10 @@ export const QueryRowExplorer = ({
     return selectedRow !== undefined ? filteredData[selectedRow] : undefined
   }, [selectedRow, filteredData])
 
+  const hoveredQuery = useMemo(() => {
+    return hoveredRow !== undefined ? filteredData[hoveredRow] : undefined
+  }, [hoveredRow, filteredData])
+
   // Update selectedRow when selectedQueryId changes from parent
   useEffect(() => {
     if (selectedQueryId !== undefined) {
@@ -143,7 +150,13 @@ export const QueryRowExplorer = ({
   // Reset selection when date range changes
   useEffect(() => {
     setSelectedRow(undefined)
+    setHoveredRow(undefined)
   }, [startTime, endTime])
+
+  // Notify parent of hovered query changes
+  useEffect(() => {
+    onQueryHover?.(hoveredQuery)
+  }, [hoveredQuery, onQueryHover])
 
   // Initialize selected columns when column configuration changes
   useEffect(() => {
@@ -219,9 +232,11 @@ export const QueryRowExplorer = ({
           }}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
+            const isHovered = idx === hoveredRow
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+              `${isHovered && !isSelected ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
               '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell:first-child>div]:ml-4',
             ].join(' ')
@@ -232,6 +247,14 @@ export const QueryRowExplorer = ({
                 <Row
                   {...props}
                   key={`qre-row-${props.rowIdx}`}
+                  onMouseEnter={() => {
+                    if (typeof idx === 'number' && idx >= 0 && idx < filteredData.length) {
+                      setHoveredRow(idx)
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredRow(undefined)
+                  }}
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0 && idx < filteredData.length) {
                       const query = filteredData[idx]

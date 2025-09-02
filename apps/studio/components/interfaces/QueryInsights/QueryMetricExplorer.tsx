@@ -52,6 +52,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
   const [selectedQuery, setSelectedQuery] = useState<InsightsQuery | undefined>()
   const [selectedQueryId, setSelectedQueryId] = useState<number | undefined>()
+  const [hoveredQuery, setHoveredQuery] = useState<InsightsQuery | undefined>()
 
   const [visiblePercentiles, setVisiblePercentiles] = useState({
     p50: true,
@@ -224,6 +225,27 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
         })
       }
 
+      // Add hovered query attribute if available
+      if (hoveredQuery && hoveredQuery !== selectedQuery) {
+        const hoveredQueryAverage = hoveredQuery.mean_exec_time
+
+        if (hoveredQueryAverage !== undefined) {
+          attributes.push({
+            attribute: 'hovered',
+            label: 'Hovered',
+            format: 'ms',
+            provider: 'query-insights' as any,
+            color: {
+              light: '#7c3aed', // Purple color for hovered query
+              dark: '#a855f7',
+            },
+            strokeDasharray: '3 3', // Dotted line
+            type: 'line',
+            strokeWidth: 1.5, // Slightly thinner than selected
+          })
+        }
+      }
+
       return attributes
     }
 
@@ -280,8 +302,40 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       })
     }
 
+    // Add hovered query attribute if available
+    if (hoveredQuery && hoveredQuery !== selectedQuery) {
+      let hoveredQueryAverage: number | undefined
+
+      if (selectedMetric === 'calls') {
+        hoveredQueryAverage = hoveredQuery.calls
+      } else if (selectedMetric === 'rows_read') {
+        hoveredQueryAverage = hoveredQuery.rows_read || 0
+      } else if (selectedMetric === 'cache_hits') {
+        const totalBlocks =
+          (hoveredQuery.shared_blks_hit || 0) + (hoveredQuery.shared_blks_read || 0)
+        hoveredQueryAverage =
+          totalBlocks > 0 ? ((hoveredQuery.shared_blks_hit || 0) / totalBlocks) * 100 : 0
+      }
+
+      if (hoveredQueryAverage !== undefined) {
+        attributes.push({
+          attribute: 'hovered',
+          label: 'Hovered',
+          format: config.format,
+          provider: 'query-insights' as any,
+          color: {
+            light: '#7c3aed', // Purple color for hovered query
+            dark: '#a855f7',
+          },
+          strokeDasharray: '3 3', // Dotted line
+          type: 'line',
+          strokeWidth: 1.5, // Slightly thinner than selected
+        })
+      }
+    }
+
     return attributes
-  }, [selectedMetric, safeVisiblePercentiles, selectedQuery])
+  }, [selectedMetric, safeVisiblePercentiles, selectedQuery, hoveredQuery])
 
   const transformedChartAttributes = useMemo(() => {
     return getChartAttributes
@@ -440,6 +494,35 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       })
     }
 
+    // Add hovered query data if available
+    if (hoveredQuery && hoveredQuery !== selectedQuery) {
+      const hoveredQueryAverage = (() => {
+        switch (selectedMetric) {
+          case 'query_latency':
+            return hoveredQuery.mean_exec_time
+          case 'calls':
+            return hoveredQuery.calls
+          case 'rows_read':
+            return hoveredQuery.rows_read || 0
+          case 'cache_hits':
+            const totalBlocks =
+              (hoveredQuery.shared_blks_hit || 0) + (hoveredQuery.shared_blks_read || 0)
+            return totalBlocks > 0 ? ((hoveredQuery.shared_blks_hit || 0) / totalBlocks) * 100 : 0
+          default:
+            return undefined
+        }
+      })()
+
+      if (hoveredQueryAverage !== undefined) {
+        // Add the hovered query average as a constant line across all data points
+        const transformedWithHovered = transformed.map((item) => ({
+          ...item,
+          hovered: hoveredQueryAverage,
+        }))
+        transformed.splice(0, transformed.length, ...transformedWithHovered)
+      }
+    }
+
     // Calculate totals for the ChartData format
     const total = transformed.reduce((sum, item) => {
       if (selectedMetric === 'query_latency') {
@@ -473,7 +556,14 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
       total,
       totalGrouped,
     }
-  }, [metricsData, selectedMetric, safeVisiblePercentiles, selectedQuery, selectedQueryAverage])
+  }, [
+    metricsData,
+    selectedMetric,
+    safeVisiblePercentiles,
+    selectedQuery,
+    selectedQueryAverage,
+    hoveredQuery,
+  ])
 
   // Mock updateDateRange function for LogChartHandler
   const updateDateRange = () => {
@@ -490,15 +580,29 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
     [] // No dependencies to prevent unnecessary recreations
   )
 
+  // Handle query hover from child component
+  const handleQueryHover = useCallback(
+    (query: InsightsQuery | undefined) => {
+      setHoveredQuery(query)
+    },
+    [] // No dependencies to prevent unnecessary recreations
+  )
+
   // Clear selected query
   const clearSelectedQuery = useCallback(() => {
     setSelectedQuery(undefined)
     setSelectedQueryId(undefined)
   }, []) // No dependencies to prevent unnecessary recreations
 
+  // Clear hovered query
+  const clearHoveredQuery = useCallback(() => {
+    setHoveredQuery(undefined)
+  }, []) // No dependencies to prevent unnecessary recreations
+
   // Reset selection when date range changes
   useEffect(() => {
     clearSelectedQuery()
+    clearHoveredQuery()
   }, [effectiveStartTime, effectiveEndTime])
 
   return (
@@ -632,6 +736,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
           endTime={effectiveEndTime}
           onQuerySelect={handleQuerySelect}
           selectedQueryId={selectedQueryId}
+          onQueryHover={handleQueryHover}
         />
       </Card>
     </div>
