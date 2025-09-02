@@ -22,7 +22,7 @@ type EdgeFunctionReportFilters = {
   functions?: SelectFilters
 }
 
-function filterToWhereClause(filters?: EdgeFunctionReportFilters): string {
+export function filterToWhereClause(filters?: EdgeFunctionReportFilters): string {
   const whereClauses: string[] = []
 
   if (filters?.functions) {
