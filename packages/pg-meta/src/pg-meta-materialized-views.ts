@@ -1,10 +1,10 @@
-import { literal, ident } from './pg-format'
 import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList, coalesceRowsToArray } from './helpers'
-import { MATERIALIZED_VIEWS_SQL } from './sql/materialized-views'
-import { COLUMNS_SQL } from './sql/columns'
+import { coalesceRowsToArray, filterByList } from './helpers'
+import { ident, literal } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
+import { COLUMNS_SQL } from './sql/columns'
+import { MATERIALIZED_VIEWS_SQL } from './sql/materialized-views'
 
 export const pgMaterializedViewZod = z.object({
   id: z.number(),
@@ -86,7 +86,7 @@ export function retrieve(identifier: MaterializedViewIdentifier): {
   sql: string
   zod: typeof pgMaterializedViewOptionalZod
 } {
-  let whereClause = getIdentifierWhereClause(identifier)
+  const whereClause = getIdentifierWhereClause(identifier)
 
   const sql = `${generateEnrichedMaterializedViewsSql({ includeColumns: true })} where ${whereClause};`
   return {

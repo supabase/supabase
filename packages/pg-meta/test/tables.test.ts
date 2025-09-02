@@ -588,6 +588,26 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
         {
           "check": null,
           "comment": null,
+          "data_type": "integer",
+          "default_value": "nextval('memes_id_seq'::regclass)",
+          "enums": [],
+          "format": "int4",
+          "id": "16510.1",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
           "data_type": "text",
           "default_value": null,
           "enums": [],
@@ -661,26 +681,6 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "is_updatable": true,
           "name": "created_at",
           "ordinal_position": 5,
-          "schema": "public",
-          "table": "memes",
-          "table_id": 16510,
-        },
-        {
-          "check": null,
-          "comment": null,
-          "data_type": "integer",
-          "default_value": "nextval('memes_id_seq'::regclass)",
-          "enums": [],
-          "format": "int4",
-          "id": "16510.1",
-          "identity_generation": null,
-          "is_generated": false,
-          "is_identity": false,
-          "is_nullable": false,
-          "is_unique": false,
-          "is_updatable": true,
-          "name": "id",
-          "ordinal_position": 1,
           "schema": "public",
           "table": "memes",
           "table_id": 16510,
@@ -764,6 +764,26 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           {
             "check": null,
             "comment": null,
+            "data_type": "integer",
+            "default_value": "nextval('memes_id_seq'::regclass)",
+            "enums": [],
+            "format": "int4",
+            "id": "16510.1",
+            "identity_generation": null,
+            "is_generated": false,
+            "is_identity": false,
+            "is_nullable": false,
+            "is_unique": false,
+            "is_updatable": true,
+            "name": "id",
+            "ordinal_position": 1,
+            "schema": "public",
+            "table": "memes",
+            "table_id": 16510,
+          },
+          {
+            "check": null,
+            "comment": null,
             "data_type": "text",
             "default_value": null,
             "enums": [],
@@ -844,26 +864,6 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           {
             "check": null,
             "comment": null,
-            "data_type": "integer",
-            "default_value": "nextval('memes_id_seq'::regclass)",
-            "enums": [],
-            "format": "int4",
-            "id": "16510.1",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "id",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
             "data_type": "USER-DEFINED",
             "default_value": "'old'::meme_status",
             "enums": [
@@ -921,7 +921,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
   )
 })
 
-withTestDatabase('retrieve error if missing identifiers', async ({}) => {
+withTestDatabase('retrieve error if missing identifiers', async () => {
   await expect(async () => {
     //@ts-expect-error use with missing params
     await pgMeta.tables.retrieve({ name: 'memes' })
@@ -985,7 +985,7 @@ withTestDatabase('remove throws error for non-existent table', async ({ executeQ
   )
 })
 
-withTestDatabase('remove throws error with missing identifiers', async ({}) => {
+withTestDatabase('remove throws error with missing identifiers', async () => {
   await expect(async () => {
     //@ts-expect-error use with missing params
     await pgMeta.tables.remove({ name: 'some_table' })

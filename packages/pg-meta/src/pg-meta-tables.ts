@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { coalesceRowsToArray, filterByList, filterByValue } from './helpers'
-import { TABLES_SQL } from './sql/tables'
-import { COLUMNS_SQL } from './sql/columns'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
+import { coalesceRowsToArray, filterByList, filterByValue } from './helpers'
 import { ident, literal } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
+import { COLUMNS_SQL } from './sql/columns'
+import { TABLES_SQL } from './sql/tables'
 
 const pgTablePrimaryKeyZod = z.object({
   table_id: z.number(),
@@ -129,7 +129,9 @@ type TableCreateParams = {
   comment?: string
 }
 
-function create({ name, schema = 'public', comment }: TableCreateParams): { sql: string } {
+function create({ name, schema = 'public', comment }: TableCreateParams): {
+  sql: string
+} {
   const tableSql = `CREATE TABLE ${ident(schema)}.${ident(name)} ();`
   const commentSql =
     comment === undefined

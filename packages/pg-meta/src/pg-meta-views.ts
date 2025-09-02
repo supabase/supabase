@@ -1,10 +1,10 @@
-import { literal, ident } from './pg-format'
 import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList, coalesceRowsToArray } from './helpers'
-import { VIEWS_SQL } from './sql/views'
-import { COLUMNS_SQL } from './sql/columns'
+import { coalesceRowsToArray, filterByList } from './helpers'
+import { ident, literal } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
+import { COLUMNS_SQL } from './sql/columns'
+import { VIEWS_SQL } from './sql/views'
 
 export const pgViewZod = z.object({
   id: z.number(),
@@ -84,7 +84,7 @@ export function retrieve(identifier: ViewIdentifier): {
   sql: string
   zod: typeof pgViewOptionalZod
 } {
-  let whereClause = getIdentifierWhereClause(identifier)
+  const whereClause = getIdentifierWhereClause(identifier)
 
   const sql = `${generateEnrichedViewsSql({ includeColumns: true })} where ${whereClause};`
   return {
