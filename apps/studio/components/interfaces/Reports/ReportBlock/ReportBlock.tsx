@@ -29,6 +29,8 @@ interface ReportBlockProps {
     chart?: Partial<Dashboards.Chart>
     chartConfig?: Partial<ChartConfig>
   }) => void
+  dragAttributes?: Record<string, any>
+  dragListeners?: Record<string, any>
 }
 
 export const ReportBlock = ({
@@ -40,6 +42,8 @@ export const ReportBlock = ({
   isRefreshing,
   onRemoveChart,
   onUpdateChart,
+  dragAttributes,
+  dragListeners,
 }: ReportBlockProps) => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
@@ -71,6 +75,8 @@ export const ReportBlock = ({
           runQuery
           isChart
           draggable
+          dragAttributes={dragAttributes}
+          dragListeners={dragListeners}
           id={item.id}
           isLoading={isLoading}
           isRefreshing={isRefreshing}
@@ -166,6 +172,8 @@ export const ReportBlock = ({
           provider={item.provider}
           defaultChartStyle={item.chart_type}
           maxHeight={176}
+          dragAttributes={dragAttributes}
+          dragListeners={dragListeners}
           label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
           actions={
             !disableUpdate ? (

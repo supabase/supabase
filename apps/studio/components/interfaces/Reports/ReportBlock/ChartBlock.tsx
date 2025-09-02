@@ -42,6 +42,8 @@ interface ChartBlockProps {
     chart?: Partial<Dashboards.Chart>
     chartConfig?: Partial<ChartConfig>
   }) => void
+  dragAttributes?: Record<string, any>
+  dragListeners?: Record<string, any>
 }
 
 export const ChartBlock = ({
@@ -56,6 +58,8 @@ export const ChartBlock = ({
   actions,
   maxHeight,
   onUpdateChartConfig,
+  dragAttributes,
+  dragListeners,
 }: ChartBlockProps) => {
   const router = useRouter()
   const { ref } = router.query
@@ -180,6 +184,8 @@ export const ChartBlock = ({
       draggable
       showDragHandle
       loading={isFetching}
+      dragAttributes={dragAttributes}
+      dragListeners={dragListeners}
       icon={metric?.category?.icon('text-foreground-muted')}
       label={label}
       actions={
