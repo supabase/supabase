@@ -1,4 +1,13 @@
-export const COLUMNS_SQL = /* SQL */ `
+import type { SQLQueryPropsWithSchemaFilter } from './common.js'
+
+export const COLUMNS_SQL = (
+  props: SQLQueryPropsWithSchemaFilter & {
+    tableIdFilter?: string
+    tableIdentifierFilter?: string
+    columnNameFilter?: string
+    idsFilter?: string
+  }
+) => /* SQL */ `
 -- Adapted from information_schema.columns
 
 SELECT
@@ -98,6 +107,11 @@ FROM
     ORDER BY table_id, ordinal_position, oid asc
   ) AS check_constraints ON check_constraints.table_id = c.oid AND check_constraints.ordinal_position = a.attnum
 WHERE
+  ${props.schemaFilter ? `nc.nspname ${props.schemaFilter} AND` : ''}
+  ${props.idsFilter ? `(c.oid || '.' || a.attnum) ${props.idsFilter} AND` : ''}
+  ${props.columnNameFilter ? `(c.relname || '.' || a.attname) ${props.columnNameFilter} AND` : ''}
+  ${props.tableIdFilter ? `c.oid ${props.tableIdFilter} AND` : ''}
+  ${props.tableIdentifierFilter ? `(nc.nspname || '.' || c.relname) ${props.tableIdentifierFilter} AND` : ''}
   NOT pg_is_other_temp_schema(nc.oid)
   AND a.attnum > 0
   AND NOT a.attisdropped
@@ -110,4 +124,6 @@ WHERE
       'SELECT, INSERT, UPDATE, REFERENCES'
     )
   )
+${props.limit ? `limit ${props.limit}` : ''}
+${props.offset ? `offset ${props.offset}` : ''}
 `

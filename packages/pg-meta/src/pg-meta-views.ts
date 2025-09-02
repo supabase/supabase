@@ -95,7 +95,7 @@ export function retrieve(identifier: ViewIdentifier): {
 
 const generateEnrichedViewsSql = ({ includeColumns }: { includeColumns?: boolean }) => `
 with views as (${VIEWS_SQL})
-  ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
+  ${includeColumns ? `, columns as (${COLUMNS_SQL({})})` : ''}
 select
   *
   ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = views.id')}` : ''}

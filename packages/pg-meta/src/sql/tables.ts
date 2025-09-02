@@ -1,4 +1,8 @@
-export const TABLES_SQL = /* SQL */ `
+import type { SQLQueryPropsWithSchemaFilterAndIdsFilter } from './common'
+
+export const TABLES_SQL = (
+  props: SQLQueryPropsWithSchemaFilterAndIdsFilter & { tableIdentifierFilter?: string }
+) => /* SQL */ `
 SELECT
   c.oid :: int8 AS id,
   nc.nspname AS schema,
@@ -42,6 +46,8 @@ FROM
         pg_attribute a,
         pg_namespace n
       where
+        ${props.schemaFilter ? `n.nspname ${props.schemaFilter} AND` : ''}
+        ${props.tableIdentifierFilter ? `n.nspname || '.' || c.relname ${props.tableIdentifierFilter} AND` : ''}
         i.indrelid = c.oid
         and c.relnamespace = n.oid
         and a.attrelid = c.oid
@@ -74,11 +80,16 @@ FROM
       join pg_namespace nta on cta.relnamespace = nta.oid
     ) on ta.attrelid = c.confrelid and ta.attnum = any (c.confkey)
     where
+      ${props.schemaFilter ? `nsa.nspname ${props.schemaFilter} OR nta.nspname ${props.schemaFilter} AND` : ''}
+      ${props.tableIdentifierFilter ? `nsa.nspname || '.' || csa.relname ${props.tableIdentifierFilter} OR nta.nspname || '.' || cta.relname ${props.tableIdentifierFilter} AND` : ''}
       c.contype = 'f'
   ) as relationships
   on (relationships.source_schema = nc.nspname and relationships.source_table_name = c.relname)
   or (relationships.target_table_schema = nc.nspname and relationships.target_table_name = c.relname)
 WHERE
+  ${props.schemaFilter ? `nc.nspname ${props.schemaFilter} AND` : ''}
+  ${props.idsFilter ? `c.oid ${props.idsFilter} AND` : ''}
+  ${props.tableIdentifierFilter ? `nc.nspname || '.' || c.relname ${props.tableIdentifierFilter} AND` : ''}
   c.relkind IN ('r', 'p')
   AND NOT pg_is_other_temp_schema(nc.oid)
   AND (
@@ -97,4 +108,6 @@ group by
   c.relreplident,
   nc.nspname,
   pk.primary_keys
+${props.limit ? `limit ${props.limit}` : ''}
+${props.offset ? `offset ${props.offset}` : ''}
 `

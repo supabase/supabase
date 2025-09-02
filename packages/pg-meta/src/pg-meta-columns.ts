@@ -1,5 +1,5 @@
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList } from './helpers'
+import { filterByList, filterByValue } from './helpers'
 import { ident, literal } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
 import { z } from 'zod'
@@ -48,35 +48,14 @@ function list({
   sql: string
   zod: typeof pgColumnArrayZod
 } {
-  let sql = `
-with
-  columns as (${COLUMNS_SQL})
-select
-  *
-from
-  columns
-where
- true
-`
-
-  const filter = filterByList(
+  const schemaFilter = filterByList(
     includedSchemas,
     excludedSchemas,
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
+  const tableIdFilter = tableId ? filterByValue([tableId]) : undefined
+  const sql = COLUMNS_SQL({ schemaFilter, tableIdFilter, limit, offset })
 
-  if (filter) {
-    sql += ` and schema ${filter}`
-  }
-  if (tableId !== undefined) {
-    sql += ` and table_id = ${literal(tableId)} `
-  }
-  if (limit) {
-    sql = `${sql} limit ${limit}`
-  }
-  if (offset) {
-    sql = `${sql} offset ${offset}`
-  }
   return {
     sql,
     zod: pgColumnArrayZod,
@@ -85,24 +64,22 @@ where
 
 type ColumnIdentifier = Pick<PGColumn, 'id'> | Pick<PGColumn, 'name' | 'schema' | 'table'>
 
-function getIdentifierWhereClause(identifier: ColumnIdentifier) {
-  if ('id' in identifier && identifier.id) {
-    return `${ident('id')} = ${literal(identifier.id)}`
-  } else if ('name' in identifier && identifier.name && identifier.schema && identifier.table) {
-    return `schema = ${literal(identifier.schema)} AND ${ident('table')} = ${literal(identifier.table)} AND name = ${literal(identifier.name)}`
-  }
-  throw new Error('Must provide either id or schema, name and table')
-}
-
 function retrieve(identifier: ColumnIdentifier): {
   sql: string
   zod: typeof pgColumnOptionalZod
 } {
-  const sql = `WITH columns AS (${COLUMNS_SQL}) SELECT * FROM columns WHERE ${getIdentifierWhereClause(identifier)};`
-  return {
-    sql,
-    zod: pgColumnOptionalZod,
+  if ('id' in identifier && identifier.id) {
+    const idsFilter = filterByValue([identifier.id])
+    const sql = COLUMNS_SQL({ idsFilter })
+    return { sql, zod: pgColumnOptionalZod }
   }
+  if ('name' in identifier && identifier.name && identifier.schema && identifier.table) {
+    const schemaFilter = filterByList([identifier.schema], [])
+    const columnNameFilter = filterByValue([`${identifier.table}.${identifier.name}`])
+    const sql = COLUMNS_SQL({ schemaFilter, columnNameFilter })
+    return { sql, zod: pgColumnOptionalZod }
+  }
+  throw new Error('Must provide either id or schema, name and table')
 }
 
 function create({

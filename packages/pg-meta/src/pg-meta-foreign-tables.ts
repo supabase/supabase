@@ -92,7 +92,7 @@ export function retrieve(identifier: ForeignTableIdentifier): {
 
 const generateEnrichedForeignTablesSql = ({ includeColumns }: { includeColumns?: boolean }) => `
 with foreign_tables as (${FOREIGN_TABLES_SQL})
-  ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
+  ${includeColumns ? `, columns as (${COLUMNS_SQL({})})` : ''}
 select
   *
   ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = foreign_tables.id')}` : ''}

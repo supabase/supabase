@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { coalesceRowsToArray, filterByList } from './helpers'
+import { coalesceRowsToArray, filterByList, filterByValue } from './helpers'
 import { TABLES_SQL } from './sql/tables'
 import { COLUMNS_SQL } from './sql/columns'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
@@ -54,16 +54,6 @@ type TableBasedOnIncludeColumns<T extends boolean | undefined> = T extends true
 
 type TableIdentifier = Pick<PGTable, 'id'> | Pick<PGTable, 'name' | 'schema'>
 
-function getIdentifierWhereClause(identifier: TableIdentifier): string {
-  if ('id' in identifier && identifier.id) {
-    return `${ident('id')} = ${literal(identifier.id)}`
-  }
-  if ('name' in identifier && identifier.name && identifier.schema) {
-    return `${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)}`
-  }
-  throw new Error('Must provide either id or name and schema')
-}
-
 function list<T extends boolean | undefined = true>(
   {
     includeSystemSchemas = false,
@@ -84,21 +74,17 @@ function list<T extends boolean | undefined = true>(
   sql: string
   zod: z.ZodType<TableBasedOnIncludeColumns<T>[]>
 } {
-  let sql = generateEnrichedTablesSql({ includeColumns })
-  const filter = filterByList(
+  const schemaFilter = filterByList(
     includedSchemas,
     excludedSchemas,
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
-  if (filter) {
-    sql += ` where schema ${filter}`
-  }
-  if (limit) {
-    sql += ` limit ${limit}`
-  }
-  if (offset) {
-    sql += ` offset ${offset}`
-  }
+  const sql = generateEnrichedTablesSql({
+    includeColumns: Boolean(includeColumns),
+    schemaFilter,
+    limit,
+    offset,
+  })
   return {
     sql,
     zod: pgTableArrayZod,
@@ -109,13 +95,22 @@ function retrieve(identifier: TableIdentifier): {
   sql: string
   zod: z.ZodType<TableWithColumns>
 } {
-  let whereClause = getIdentifierWhereClause(identifier)
-
-  const sql = `${generateEnrichedTablesSql({ includeColumns: true })} where ${whereClause};`
-  return {
-    sql,
-    zod: pgTableZod,
+  if ('id' in identifier && identifier.id) {
+    const idsFilter = filterByValue([identifier.id])
+    const sql = generateEnrichedTablesSql({ includeColumns: true, idsFilter })
+    return { sql, zod: pgTableZod }
   }
+  if ('name' in identifier && identifier.name && identifier.schema) {
+    const tableIdentifierFilter = filterByValue([`${identifier.schema}.${identifier.name}`])
+    const schemaFilter = filterByList([identifier.schema], [])
+    const sql = generateEnrichedTablesSql({
+      includeColumns: true,
+      schemaFilter,
+      tableIdentifierFilter,
+    })
+    return { sql, zod: pgTableZod }
+  }
+  throw new Error('Must provide either id or name and schema')
 }
 
 function remove(
@@ -127,14 +122,6 @@ function remove(
   };`
   return { sql }
 }
-
-const generateEnrichedTablesSql = ({ includeColumns }: { includeColumns?: boolean }) => `
-  with tables as (${TABLES_SQL})
-  ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
-  select
-    *
-    ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = tables.id')}` : ''}
-  from tables`
 
 type TableCreateParams = {
   name: string
@@ -249,5 +236,27 @@ COMMIT;`
 
   return { sql }
 }
+
+const generateEnrichedTablesSql = ({
+  includeColumns,
+  schemaFilter,
+  tableIdentifierFilter,
+  idsFilter,
+  limit,
+  offset,
+}: {
+  includeColumns: boolean
+  schemaFilter?: string
+  tableIdentifierFilter?: string
+  idsFilter?: string
+  limit?: number
+  offset?: number
+}) => `
+with tables as (${TABLES_SQL({ schemaFilter, tableIdentifierFilter, idsFilter, limit, offset })})
+  ${includeColumns ? `, columns as (${COLUMNS_SQL({ schemaFilter, tableIdFilter: idsFilter, tableIdentifierFilter: tableIdentifierFilter })})` : ''}
+select
+  *
+  ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = tables.id')}` : ''}
+from tables`
 
 export { list, retrieve, remove, create, update }

@@ -97,7 +97,7 @@ export function retrieve(identifier: MaterializedViewIdentifier): {
 
 const generateEnrichedMaterializedViewsSql = ({ includeColumns }: { includeColumns?: boolean }) => `
 with materialized_views as (${MATERIALIZED_VIEWS_SQL})
-  ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
+  ${includeColumns ? `, columns as (${COLUMNS_SQL({})})` : ''}
 select
   *
   ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = materialized_views.id')}` : ''}
