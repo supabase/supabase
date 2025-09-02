@@ -134,13 +134,14 @@ pnpm add dotenv
 
 ```bash .env
 SUPABASE_URL=supabase_project_url
-SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key 
+SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
 </Tabs>
 
 ## Create a client
+
 {/* TODO: Can this be consolidated? */}
 You need setup code to configure a Supabase client to use cookies. Once you have the utility code, you can use the `createClient` utility functions to get a properly configured Supabase client.
 
@@ -212,6 +213,7 @@ The following code samples are for App Router. For help with Pages Router, see t
         - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
 
     </AccordionItem>
+
 </Accordion>
 
 <$CodeTabs>
@@ -239,7 +241,6 @@ language="typescript"
 
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
-
 <Tabs
   scrollable
   size="small"
@@ -266,33 +267,25 @@ language="typescript"
 
 Page components can get access to the Supabase client from the `data` object due to this load function.
 
+<$CodeTabs>
 <$CodeSample
 path="/auth/sveltekit/src/routes/+layout.ts"
+meta="name=src/routes/+layout.ts"
 language="typescript"
 />
 
-</TabPanel>
-
-<TabPanel id="layout-server" label="Root Server Layout">
-
-```ts +layout.server.ts
-import type { LayoutServerLoad } from './$types'
-
-export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
-  const { session, user } = await safeGetSession()
-
-  return {
-    session,
-    user,
-    cookies: cookies.getAll(),
-  }
-}
-```
+<$CodeSample
+path="/auth/sveltekit/src/routes/+layout.server.ts"
+meta="name=src/routes/+layout.server.ts"
+language="typescript"
+/>
+</$CodeTabs>
 
 </TabPanel>
-
+<TabPanel id="root_server_layout" label="Root Server Load">
+TBD
+</TabPanel>
 </Tabs>
-
 </TabPanel>
 <TabPanel id="astro" label="Astro">
 
@@ -796,7 +789,17 @@ export default app
 </TabPanel>
 </Tabs>
 
-## Create a login page
+## Next steps
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="next-next-steps"
+  queryGroup="nextsteps"
+>
+<TabPanel id="next-next-steps" label="NextJS">
+### Create a login page
 
 Create a login page for your app. Use a Server Action to call the Supabase signup function.
 
@@ -810,14 +813,6 @@ See the Next.js docs to learn more about [opting out of data caching](https://ne
 
 </Admonition>
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="nextjs"
-  queryGroup="framework"
->
-<TabPanel id="nextjs" label="Next.js">
 <$CodeTabs>
 <$CodeSample
 path="/auth/nextjs/app/login/page.tsx"
@@ -835,10 +830,8 @@ meta="name=app/error/page.tsx"
 language="typescript"
 />
 </$CodeTabs>
-</TabPanel>
-</Tabs>
 
-## Change the Auth confirmation path
+### Change the Auth confirmation path
 
 If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
 
@@ -846,20 +839,12 @@ Change the email template to support a server-side authentication flow.
 
 Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
-## Create a route handler for Auth confirmation
+### Create a route handler for Auth confirmation
 
 Create a Route Handler for `auth/confirm`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
 
 Since this is a Router Handler, use the Supabase client from `@/utils/supabase/server.ts`.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="nextjs"
-  queryGroup="framework"
->
-<TabPanel id="nextjs" label="Next.js">
 <$CodeTabs>
 <$CodeSample
 path="/auth/nextjs/app/auth/confirm/route.ts"
@@ -867,11 +852,8 @@ meta="name=app/auth/confirm/route.ts"
 language="typescript"
 />
 </$CodeTabs>
-</TabPanel>
-</Tabs>
 
-
-## Access user info from Server Component
+### Access user info from Server Component
 
 Server Components can read cookies, so you can get the Auth status and user info.
 
@@ -891,14 +873,6 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 
 </Admonition>
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="nextjs"
-  queryGroup="framework"
->
-<TabPanel id="nextjs" label="Next.js">
 <$CodeTabs>
 <$CodeSample
 path="/auth/nextjs/app/private/page.tsx"
@@ -906,9 +880,108 @@ meta="name=app/private/page.tsx"
 language="typescript"
 />
 </$CodeTabs>
+
+</TabPanel>
+
+<TabPanel id="sveltekit" label="SvelteKit">
+### Listen to Auth events
+
+Set up a listener for Auth events on the client, to handle session refreshes and signouts.
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/+layout.svelte"
+meta="name=src/routes/+layout.svelte"
+language="typescript"
+/>
+
+### Create your first page
+
+Create your first page. This example page calls Supabase from the server to get a list of colors from the database.
+
+This is an example of a public page that uses publicly readable data.
+
+To populate your database, run the [colors quickstart](/dashboard/project/_/sql/quickstarts) from your dashboard.
+
+<$CodeTabs>
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/+page.server.ts"
+meta="name=src/routes/+page.server.ts"
+language="typescript"
+/>
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/+page.svelte"
+meta="name=src/routes/+page.svelte"
+language="typescript"
+/>
+
+</$CodeTabs>
+
+### Change the Auth confirmation path
+
+If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
+
+Change the email template to support a server-side authentication flow.
+
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+
+### Create a login page
+
+Next, create a login page to let users sign up and log in.
+
+<$CodeTabs>
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/auth/+page.server.ts"
+meta="name=src/routes/auth/+page.server.ts"
+language="typescript"
+/>
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/auth/+page.svelte"
+meta="name=src/routes/auth/+page.svelte"
+language="typescript"
+/>
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/auth/+layout.svelte"
+meta="name=src/routes/auth/+layout.svelte"
+language="typescript"
+
+/>
+<$CodeSample
+path="/auth/sveltekit/src/routes/auth/error/+page.svelte"
+meta="name=src/routes/auth/error/+page.svelte"
+language="typescript"
+/>
+
+</$CodeTabs>
+
+### Create the signup confirmation route
+
+Finish the signup flow by creating the API route to handle email verification.
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/auth/confirm/+server.ts"
+meta="name=src/routes/auth/confirm/+server.ts"
+language="typescript"
+/>
+
+### Create private routes
+
+Create private routes that can only be accessed by authenticated users. The routes in the `private` directory are protected by the route guard in `hooks.server.ts`.
+
+To ensure that `hooks.server.ts` runs for every nested path, put a `+layout.server.ts` file in the `private` directory. This file can be empty, but must exist to protect routes that don't have their own `+layout|page.server.ts`.
+
+<$CodeSample
+path="/auth/sveltekit/src/routes/private/+layout.server.ts"
+meta="name=src/routes/private/+layout.server.ts"
+language="typescript"
+/>
+
 </TabPanel>
 </Tabs>
-
 ## Congratulations
 
 You're done! To recap, you've successfully:
