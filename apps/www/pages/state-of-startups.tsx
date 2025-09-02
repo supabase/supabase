@@ -22,10 +22,6 @@ function StateOfStartupsPage() {
   const router = useRouter()
   const isPageEnabled = useFlag('stateOfStartups')
 
-  useEffect(() => {
-    if (isPageEnabled !== undefined && !isPageEnabled) router.push('/')
-  }, [isPageEnabled, router])
-
   const meta_title = pageData.metaTitle || 'State of Startups 2025 | Supabase'
   const meta_description =
     pageData.metaDescription ||
@@ -37,6 +33,10 @@ function StateOfStartupsPage() {
   const tocRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const ctaBannerRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (isPageEnabled !== undefined && !isPageEnabled) router.push('/')
+  }, [isPageEnabled, router])
 
   // Scroll detection to show floating ToC
   useEffect(() => {
@@ -182,6 +182,8 @@ function StateOfStartupsPage() {
       </div>
     )
   }
+
+  if (!isPageEnabled) return null
 
   return (
     <>
