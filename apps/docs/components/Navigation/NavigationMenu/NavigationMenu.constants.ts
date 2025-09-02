@@ -938,10 +938,6 @@ export const database: NavMenuConstant = {
               name: 'ETL',
               url: '/guides/database/replication/etl',
             },
-            {
-              name: 'Manual replication',
-              url: '/guides/database/replication/manual-replication',
-            },
           ],
         },
         {
