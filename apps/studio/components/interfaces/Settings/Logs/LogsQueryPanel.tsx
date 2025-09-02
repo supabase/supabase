@@ -58,6 +58,7 @@ const LogsQueryPanel = ({
   onDateChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
+  const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
 
   const {
     projectAuthAll: authEnabled,
@@ -125,7 +126,7 @@ const LogsQueryPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {IS_PLATFORM && (
+            {IS_PLATFORM && logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>

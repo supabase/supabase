@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.34.3
+  version: 2.39.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -70,6 +70,10 @@ flags:
       - id: yaml
         name: yaml
         type: '[ env | pretty | json | toml | yaml ]'
+  - id: profile
+    name: --profile <string>
+    description: use a specific profile for connecting to Supabase API
+    default_value: supabase
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory

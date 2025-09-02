@@ -15,7 +15,7 @@ export async function deleteContents(
     headers: { Version: '2' },
     params: {
       path: { ref: projectRef },
-      query: { ids: String(ids) },
+      query: { ids: ids.join(',') },
     },
     signal,
   })

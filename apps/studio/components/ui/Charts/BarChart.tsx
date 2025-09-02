@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
-import { ComponentProps, useState, useMemo } from 'react'
-import { useChartSync } from './useChartSync'
+import { ComponentProps, useMemo, useState } from 'react'
 import {
   Bar,
   CartesianGrid,
@@ -14,10 +13,11 @@ import {
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
-import ChartHeader from './ChartHeader'
+import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -57,12 +57,9 @@ const BarChart = ({
   showGrid = false,
   syncId,
 }: BarChartProps) => {
+  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } =
+    useChartHoverState('default')
   const { Container } = useChartSize(size)
-  const {
-    state: syncState,
-    updateState: updateSyncState,
-    clearState: clearSyncState,
-  } = useChartSync(syncId)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // Transform data to ensure yAxisKey values are numbers
@@ -151,21 +148,12 @@ const BarChart = ({
               setFocusDataIndex(e.activeTooltipIndex)
             }
 
-            if (syncId) {
-              updateSyncState({
-                activeIndex: e.activeTooltipIndex,
-                activePayload: e.activePayload,
-                activeLabel: e.activeLabel,
-                isHovering: true,
-              })
-            }
+            setHover(e.activeTooltipIndex)
           }}
           onMouseLeave={() => {
             setFocusDataIndex(null)
 
-            if (syncId) {
-              clearSyncState()
-            }
+            clearHover()
           }}
           onClick={(tooltipData) => {
             const datum = tooltipData?.activePayload?.[0]?.payload
@@ -188,16 +176,13 @@ const BarChart = ({
           />
           <Tooltip
             content={(props) =>
-              syncId && syncState.isHovering && syncState.activeIndex !== null ? (
+              syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">
-                    {dayjs(data[syncState.activeIndex]?.[xAxisKey]).format(customDateFormat)}
+                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
                   </div>
                   <div>
-                    {numberFormatter(
-                      Number(data[syncState.activeIndex]?.[yAxisKey]) || 0,
-                      valuePrecision
-                    )}
+                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
                     {typeof format === 'string' ? format : ''}
                   </div>
                 </div>

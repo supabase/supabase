@@ -107,7 +107,7 @@ const BreadcrumbsInternal = ({
                   <DrawerTrigger aria-label="Toggle Menu">
                     <BreadcrumbEllipsis className="h-4 w-4" />
                   </DrawerTrigger>
-                  <DrawerContent showHandle={false}>
+                  <DrawerContent>
                     <div className="grid gap-1 px-4">
                       {breadcrumbs.slice(1, -2).map((crumb, index) =>
                         crumb.url ? (

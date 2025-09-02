@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
-import debounce from 'lodash/debounce'
+import { debounce } from 'lib/helpers'
 
 import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
