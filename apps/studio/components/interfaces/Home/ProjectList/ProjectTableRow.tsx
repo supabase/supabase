@@ -9,6 +9,7 @@ import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
 import { Organization } from 'types'
 import { TableCell, TableRow } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
@@ -113,15 +114,14 @@ export const ProjectTableRow = ({
         </span>
       </TableCell>
       <TableCell>
-        TBD
-        {/* {project.inserted_at ? (
+        {project.inserted_at ? (
           <TimestampInfo
             className="text-sm text-foreground-light"
             utcTimestamp={project.inserted_at}
           />
         ) : (
           <span className="text-sm text-foreground-light">N/A</span>
-        )} */}
+        )}
       </TableCell>
     </TableRow>
   )

@@ -6,6 +6,7 @@ export const projectKeys = {
       limit: number
       sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
       search?: string
+      statuses?: string[]
     }
   ) => ['all-projects', slug, params] as const,
   status: (projectRef: string | undefined) => ['project', projectRef, 'status'] as const,

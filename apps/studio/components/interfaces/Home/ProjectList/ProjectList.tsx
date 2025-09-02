@@ -15,7 +15,17 @@ import { IS_PLATFORM } from 'lib/constants'
 import { isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
-import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Card,
+  cn,
+  LoadingLine,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import {
   LoadingCardView,
   LoadingTableRow,
@@ -54,10 +64,20 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
+    isFetching,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useOrgProjectsInfiniteQuery({ slug, search: search.length === 0 ? search : debouncedSearch })
+  } = useOrgProjectsInfiniteQuery(
+    {
+      slug,
+      search: search.length === 0 ? search : debouncedSearch,
+      statuses: filterStatus,
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
   const orgProjects =
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
@@ -77,15 +97,10 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   const isEmpty = debouncedSearch.length === 0 && (!orgProjects || orgProjects.length === 0)
   const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
 
-  const filteredProjectsByStatus =
-    filterStatus.length === 0
-      ? sortedProjects
-      : sortedProjects.filter((project) => filterStatus.includes(project.status))
-
   const noResultsFromSearch =
     debouncedSearch.length > 0 && isSuccessProjects && orgProjects.length === 0
   const noResultsFromStatusFilter =
-    filterStatus.length > 0 && isSuccessProjects && filteredProjectsByStatus.length === 0
+    filterStatus.length > 0 && isSuccessProjects && orgProjects.length === 0
 
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
@@ -157,6 +172,11 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               <TableHead>Created</TableHead>
             </TableRow>
           </TableHeader>
+          <TableRow className="border-b-0 -translate-y-[1px]">
+            <TableCell colSpan={5} className="p-0">
+              <LoadingLine loading={isFetching} />
+            </TableCell>
+          </TableRow>
           <TableBody>
             {noResultsFromStatusFilter ? (
               <TableRow>
@@ -176,7 +196,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               </TableRow>
             ) : (
               <>
-                {filteredProjectsByStatus?.map((project) => (
+                {sortedProjects?.map((project) => (
                   <ProjectTableRow
                     key={project.ref}
                     project={project}
@@ -222,7 +242,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
             'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
           )}
         >
-          {filteredProjectsByStatus?.map((project) => (
+          {sortedProjects?.map((project) => (
             <ProjectCard
               key={project.ref}
               project={project}

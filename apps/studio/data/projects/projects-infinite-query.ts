@@ -17,6 +17,7 @@ interface GetOrgProjectsInfiniteVariables {
   sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
   search?: string
   page?: number
+  statuses?: string[]
 }
 
 export type OrgProject = components['schemas']['OrganizationProjectsResponse']['projects'][number]
@@ -28,6 +29,7 @@ async function getOrganizationProjects(
     page = 0,
     sort = 'name_asc',
     search,
+    statuses: _statuses = [],
   }: GetOrgProjectsInfiniteVariables,
   signal?: AbortSignal,
   headers?: Record<string, string>
@@ -35,8 +37,9 @@ async function getOrganizationProjects(
   if (!slug) throw new Error('Slug is required')
 
   const offset = page * limit
+  const statuses = _statuses.length === 0 ? undefined : _statuses.join(',')
   const { data, error } = await get('/platform/organizations/{slug}/projects', {
-    params: { path: { slug }, query: { limit, offset, sort, search } },
+    params: { path: { slug }, query: { limit, offset, sort, search, statuses } },
     signal,
     headers,
   })
@@ -49,7 +52,13 @@ export type OrgProjectsInfiniteData = Awaited<ReturnType<typeof getOrganizationP
 export type OrgProjectsInfiniteError = ResponseError
 
 export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
-  { slug, limit = DEFAULT_LIMIT, sort, search }: GetOrgProjectsInfiniteVariables,
+  {
+    slug,
+    limit = DEFAULT_LIMIT,
+    sort = 'name_asc',
+    search,
+    statuses = [],
+  }: GetOrgProjectsInfiniteVariables,
   {
     enabled = true,
     ...options
@@ -57,9 +66,9 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
 ) => {
   const { profile } = useProfile()
   return useInfiniteQuery<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData>(
-    projectKeys.infiniteListByOrg(slug, { limit, sort, search }),
+    projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
     ({ signal, pageParam }) =>
-      getOrganizationProjects({ slug, limit, page: pageParam, sort, search }, signal),
+      getOrganizationProjects({ slug, limit, page: pageParam, sort, search, statuses }, signal),
     {
       enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
       getNextPageParam(lastPage, pages) {

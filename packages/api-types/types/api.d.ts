@@ -570,6 +570,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/cli/login-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Create a login role for CLI with temporary password */
+    post: operations['v1-create-login-role']
+    /** [Beta] Delete existing login roles used by CLI */
+    delete: operations['v1-delete-login-roles']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/config/auth': {
     parameters: {
       query?: never
@@ -1255,7 +1273,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** [Alpha] Updates project's network restrictions by adding or removing CIDRs */
+    patch: operations['v1-patch-network-restrictions']
     trace?: never
   }
   '/v1/projects/{ref}/network-restrictions/apply': {
@@ -2137,6 +2156,15 @@ export interface components {
       }
       updated_at?: string
     }
+    CreateRoleBody: {
+      read_only: boolean
+    }
+    CreateRoleResponse: {
+      password: string
+      role: string
+      /** Format: int64 */
+      ttl_seconds: number
+    }
     CreateSecretBody: {
       /**
        * @description Secret name must not start with the SUPABASE_ prefix.
@@ -2250,6 +2278,10 @@ export interface components {
         metadata_xml?: string
       }
       updated_at?: string
+    }
+    DeleteRolesResponse: {
+      /** @enum {string} */
+      message: 'ok'
     }
     DeployFunctionResponse: {
       /** Format: int64 */
@@ -2557,11 +2589,23 @@ export interface components {
         type: string
       }[]
     }
+    NetworkRestrictionsPatchRequest: {
+      add?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+      remove?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+    }
     NetworkRestrictionsRequest: {
       dbAllowedCidrs?: string[]
       dbAllowedCidrsV6?: string[]
     }
     NetworkRestrictionsResponse: {
+      /** Format: date-time */
+      applied_at?: string
       /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
       config: {
         dbAllowedCidrs?: string[]
@@ -2576,6 +2620,34 @@ export interface components {
       }
       /** @enum {string} */
       status: 'stored' | 'applied'
+      /** Format: date-time */
+      updated_at?: string
+    }
+    NetworkRestrictionsV2Response: {
+      /** Format: date-time */
+      applied_at?: string
+      /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
+      config: {
+        dbAllowedCidrs?: {
+          address: string
+          /** @enum {string} */
+          type: 'v4' | 'v6'
+        }[]
+      }
+      /** @enum {string} */
+      entitlement: 'disallowed' | 'allowed'
+      /** @description Populated when a new config has been received, but not registered as successfully applied to a project. */
+      old_config?: {
+        dbAllowedCidrs?: {
+          address: string
+          /** @enum {string} */
+          type: 'v4' | 'v6'
+        }[]
+      }
+      /** @enum {string} */
+      status: 'stored' | 'applied'
+      /** Format: date-time */
+      updated_at?: string
     }
     OAuthRevokeTokenBody: {
       /** Format: uuid */
@@ -5077,6 +5149,80 @@ export interface operations {
       }
     }
   }
+  'v1-create-login-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateRoleBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateRoleResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create login role */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-login-roles': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DeleteRolesResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete login roles */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-auth-service-config': {
     parameters: {
       query?: never
@@ -7162,6 +7308,45 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve project's network restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-patch-network-restrictions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NetworkRestrictionsPatchRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkRestrictionsV2Response']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project network restrictions */
       500: {
         headers: {
           [name: string]: unknown
