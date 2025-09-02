@@ -40,9 +40,6 @@ type CMSBlogPost = {
   thumb?: {
     url: string
   }
-  image?: {
-    url: string
-  }
   createdAt: string
   updatedAt: string
   authors?: {
@@ -55,6 +52,105 @@ type CMSBlogPost = {
     }
     username: string
   }[]
+  meta?: {
+    title?: string | null
+    image?: (number | string | null) | Media
+    description?: string | null
+  }
+}
+
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number
+  alt?: string | null
+  caption?: {
+    root: {
+      type: string
+      children: {
+        type: string
+        version: number
+        [k: string]: unknown
+      }[]
+      direction: ('ltr' | 'rtl') | null
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | ''
+      indent: number
+      version: number
+    }
+    [k: string]: unknown
+  } | null
+  prefix?: string | null
+  updatedAt: string
+  createdAt: string
+  url?: string | null
+  thumbnailURL?: string | null
+  filename?: string | null
+  mimeType?: string | null
+  filesize?: number | null
+  width?: number | null
+  height?: number | null
+  focalX?: number | null
+  focalY?: number | null
+  sizes?: {
+    thumbnail?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      mimeType?: string | null
+      filesize?: number | null
+      filename?: string | null
+    }
+    square?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      mimeType?: string | null
+      filesize?: number | null
+      filename?: string | null
+    }
+    small?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      mimeType?: string | null
+      filesize?: number | null
+      filename?: string | null
+    }
+    medium?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      mimeType?: string | null
+      filesize?: number | null
+      filename?: string | null
+    }
+    large?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      mimeType?: string | null
+      filesize?: number | null
+      filename?: string | null
+    }
+    xlarge?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      mimeType?: string | null
+      filesize?: number | null
+      filename?: string | null
+    }
+    og?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      mimeType?: string | null
+      filesize?: number | null
+      filename?: string | null
+    }
+  }
 }
 
 type ProcessedPost = {
@@ -80,12 +176,16 @@ type ProcessedPost = {
   }>
   toc_depth: number
   thumb: string | null
-  image: string | null
   url: string
   path: string
   isCMS: boolean
   tags: string[]
   content: string
+  meta?: {
+    title?: string | null
+    image?: (number | string | null) | Media
+    description?: string | null
+  }
 }
 
 /**
@@ -319,11 +419,11 @@ async function processPostData(post: any) {
         ? post.thumb.url
         : `${PAYLOAD_URL}${post.thumb.url}`
       : null
-    const imageUrl = post.image?.url
-      ? typeof post.image.url === 'string' && post.image.url.includes('http')
-        ? post.image.url
-        : `${PAYLOAD_URL}${post.image.url}`
-      : null
+    const imageUrl = post.meta?.image
+      ? typeof post.meta?.image === 'string' && post.meta?.image.includes('http')
+        ? post.meta?.image
+        : `${PAYLOAD_URL}${post.meta?.image}`
+      : thumbUrl
 
     const processedData = {
       slug: post.slug,
@@ -430,11 +530,11 @@ export async function getAllCMSPosts({
             ? post.thumb.url
             : `${PAYLOAD_URL}${post.thumb.url}`
           : null
-        const imageUrl = post.image?.url
-          ? typeof post.image.url === 'string' && post.image.url.includes('http')
-            ? post.image.url
-            : `${PAYLOAD_URL}${post.image.url}`
-          : null
+        const imageUrl = post.meta?.image
+          ? typeof post.meta?.image === 'string' && post.meta?.image.includes('http')
+            ? post.meta?.image
+            : `${PAYLOAD_URL}${post.meta?.image}`
+          : thumbUrl
 
         return {
           slug: post.slug || '',
