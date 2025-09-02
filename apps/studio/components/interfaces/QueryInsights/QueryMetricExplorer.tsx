@@ -654,7 +654,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
                       return (
                         currentMetrics.length > 0 && (
-                          <div className="flex flex-row gap-6 mt-1 mb-5 relative w-full">
+                          <div className="flex flex-row gap-6 mt-1 mb-6 relative w-full">
                             {currentMetrics.map((metric, index) => (
                               <QueryMetricBlock
                                 key={index}
