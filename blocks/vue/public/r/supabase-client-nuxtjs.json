@@ -1,0 +1,34 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-nuxtjs",
+  "type": "registry:lib",
+  "title": "Supabase Client for Nuxt.js",
+  "description": "",
+  "dependencies": [
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/default/clients/nuxtjs/lib/supabase/client.ts",
+      "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nuxtjs/lib/supabase/middleware.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { getCookie, setCookie, deleteCookie } from 'h3'\nimport { defineNuxtRouteMiddleware, navigateTo, useRequestEvent } from 'nuxt/app'\n\nexport default defineNuxtRouteMiddleware(async (to) => {\n  const event = useRequestEvent()\n\n  // create Supabase SSR client directly here\n  const supabase = createServerClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        get: (key) => getCookie(event!, key),\n        set: (key, value, options) => setCookie(event!, key, value, options),\n        remove: (key, options) => deleteCookie(event!, key, options),\n      },\n    }\n  )\n\n  // check current user\n  const { data: { user } } = await supabase.auth.getUser()\n\n  if (!user && to.path !== '/login') {\n    return navigateTo('/login')\n  }\n})\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nuxtjs/lib/supabase/server.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { createError, defineEventHandler, getCookie, setCookie } from 'h3';\n\nexport default defineEventHandler(async (event) => {\n  // Create Supabase SSR client\n  const supabase = createServerClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        get: (key) => getCookie(event, key),\n        set: (key, value, options) => setCookie(event, key, JSON.stringify(options)),\n        remove: (key, options) => setCookie(event, key, '', { ...options, maxAge: -1 }),\n      },\n    }\n  );\n\n  // Example: get user session\n  const {\n    data: { user },\n  } = await supabase.auth.getUser();\n\n  if (!user) {\n    return { error: 'Not authenticated' };\n  }\n\n  // Fetch profile row\n  const { data, error } = await supabase\n    .from('profiles')\n    .select('*')\n    .eq('id', user.id)\n    .single();\n\n  if (error) {\n    throw createError({ statusCode: 500, statusMessage: error.message });\n  }\n\n  return { profile: data };\n});\n",
+      "type": "registry:lib"
+    }
+  ],
+  "envVars": {
+    "NUXT_PUBLIC_SUPABASE_URL": "",
+    "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+  },
+  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+}
