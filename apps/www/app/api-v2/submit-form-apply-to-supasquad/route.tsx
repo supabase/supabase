@@ -4,19 +4,19 @@ const NOTION_API_KEY = process.env.NOTION_API_KEY
 const NOTION_DB_ID = process.env.NOTION_DB_ID
 
 const applicationSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Please enter a valid email address"),
-  tracks: z.array(z.string()).min(1, "Select at least 1 track"),
-  areas_of_interest: z.array(z.string()).min(1, "Select at least 1 area of interest"),
-  why_you_want_to_join: z.string().min(1, "This is required"),
-  monthly_commitment: z.number().min(1, "This is required"),
-  languages_spoken: z.array(z.string()).min(1, "Select at least 1 language"),
-  skills: z.string().min(1, "This is required"),
-  location: z.string().min(1, "Make sure to specify your city and country"),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Please enter a valid email address'),
+  tracks: z.array(z.string()).min(1, 'Select at least 1 track'),
+  areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
+  why_you_want_to_join: z.string().min(1, 'This is required'),
+  monthly_commitment: z.number().min(1, 'This is required'),
+  languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
+  skills: z.string().min(1, 'This is required'),
+  location: z.string().min(1, 'Make sure to specify your city and country'),
   github: z.string().optional(),
   twitter: z.string().optional(),
-});
+})
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,12 +34,14 @@ function truncateRichText(s: string, max = 1900) {
 }
 
 function asMultiSelect(values: string[]) {
-  return values.map(v => ({ name: v }))
+  return values.map((v) => ({ name: v }))
 }
 
-function normalizeTrack(t: string) {
-  if (t === 'Builder/Maintainer') return 'Builder / Maintainer'
-  return t
+function normalizeTrack(t: { heading: string; description: string } | string) {
+  // Handle both old string format and new object format
+  const trackName = typeof t === 'string' ? t : t.heading
+  if (trackName === 'Builder/Maintainer') return 'Builder / Maintainer'
+  return trackName
 }
 
 async function getTitlePropertyName(dbId: string, apiKey: string): Promise<string> {
@@ -58,10 +60,13 @@ async function getTitlePropertyName(dbId: string, apiKey: string): Promise<strin
 
 export async function POST(req: Request) {
   if (!NOTION_API_KEY || !NOTION_DB_ID) {
-    return new Response(JSON.stringify({ message: 'Server misconfigured: missing Notion credentials' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
+    return new Response(
+      JSON.stringify({ message: 'Server misconfigured: missing Notion credentials' }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
   }
 
   let body: unknown
@@ -93,13 +98,14 @@ export async function POST(req: Request) {
     })
   }
 
-  const fullName = `${data.firstName?.trim() || ''} ${data.lastName?.trim() || ''}`.trim() || 'Unnamed'
+  const fullName =
+    `${data.firstName?.trim() || ''} ${data.lastName?.trim() || ''}`.trim() || 'Unnamed'
 
   const props: Record<string, any> = {
     [titleProp]: {
       title: [{ type: 'text', text: { content: fullName } }],
     },
-    'Email': { email: data.email },
+    Email: { email: data.email },
     'What track would you like to be considered for?': {
       multi_select: asMultiSelect(data.tracks.map(normalizeTrack)),
     },
@@ -125,7 +131,9 @@ export async function POST(req: Request) {
   }
   if (data.why_you_want_to_join) {
     props['Why do you want to join the program'] = {
-      rich_text: [{ type: 'text', text: { content: truncateRichText(data.why_you_want_to_join, 1800) } }],
+      rich_text: [
+        { type: 'text', text: { content: truncateRichText(data.why_you_want_to_join, 1800) } },
+      ],
     }
   }
   if (data.location) {
@@ -135,7 +143,9 @@ export async function POST(req: Request) {
     try {
       const maybeCountry = data.location.split(',').slice(-1)[0]?.trim()
       if (maybeCountry) props['Region'] = { multi_select: [{ name: maybeCountry }] }
-    } catch {/* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
   if (data.github) {
     props['GitHub Profile'] = {
@@ -180,9 +190,9 @@ export async function POST(req: Request) {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 502 }
     )
   } catch (err: any) {
-    return new Response(
-      JSON.stringify({ message: 'Notion API error', error: err?.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 502 }
-    )
+    return new Response(JSON.stringify({ message: 'Notion API error', error: err?.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 502,
+    })
   }
 }
