@@ -243,7 +243,7 @@ function StateOfStartupsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
               {/* Intro text */}
-              <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl">
+              <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
                 <p>{pageData.heroSection.subheader}</p>
                 <p>{pageData.heroSection.cta}</p>
               </div>

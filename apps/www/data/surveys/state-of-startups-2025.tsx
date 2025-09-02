@@ -14,7 +14,7 @@ const stateOfStartupsData = {
       title: 'Who’s Building Startups',
       shortTitle: 'Founder and Company',
       description:
-        "Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams. They've done this before.",
+        'Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams.',
       pullQuote: {
         quote:
           'Our team is just two people at the moment. We’re funding the proof-of-concept stage out of our own pockets.',
@@ -26,7 +26,7 @@ const stateOfStartupsData = {
         {
           title: 'Roles and Experience',
           description:
-            'Most builders are young, technical founders. Many are on their second or third company.',
+            'Founders are overwhelmingly technical and under 40, with most building their first company.',
           stats: [
             { percent: 81, label: 'Founders that are technical' },
             { percent: 82, label: 'Founders that are under 40' },
@@ -146,7 +146,7 @@ const stateOfStartupsData = {
         {
           title: 'Frameworks and Cloud Infra',
           description:
-            'Supabase and Postgres dominate backend infra. React and Node top the frontend and backend respectively. Cursor, Claude, and VS Code lead AI-assisted development. Developer tools like GitHub, Stripe, and Postman round out the stack.',
+            'Supabase and Postgres dominate backend infrastructure. React and Node top frontend and backend respectively. Cursor, Claude, and VS Code lead AI-assisted development. Developer tools like GitHub, Stripe, and Postman round out the stack.',
           stats: [
             {
               percent: 83,
@@ -248,7 +248,7 @@ const stateOfStartupsData = {
         {
           title: 'In-Product AI Use',
           description:
-            'AI is increasingly embedded in product workflows, not bolted on. Most startups are already integrating models like OpenAI or Claude, especially for semantic search, summarisation, and customer support. Half are building agents to automate real tasks, from onboarding flows to sales triage.',
+            'Most startups are already integrating models like OpenAI or Claude, especially for semantic search, summarisation, and customer support. Half are building agents to automate real tasks, from onboarding flows to sales triage.',
           stats: [
             {
               percent: 81,
@@ -285,7 +285,7 @@ const stateOfStartupsData = {
         {
           title: 'Online Communities',
           description:
-            'There is a healthy diaspora of important online communities used by respondents. That said, many are just lurking; few actively contribute to the discussion.',
+            'There is a healthy diaspora of important online communities. That said, many people just lurk; few actively contribute to the discussion.',
           stats: [
             { percent: 55, label: 'Engineers using LinkedIn regularly' },
             { percent: 45, label: 'Founders using X (Twitter) regularly' },
@@ -334,7 +334,7 @@ const stateOfStartupsData = {
         {
           title: 'Initial Customers',
           description:
-            'Founders earn their earliest customers through networks, communities, and inbound content. Not performance marketing. Paid acquisition rarely works early on.',
+            'Founders earn their earliest customers through networks, communities, and inbound content. Paid acquisition rarely works early on, nor does performance marketing.',
           stats: [
             {
               percent: 58,
@@ -412,7 +412,7 @@ const stateOfStartupsData = {
         {
           title: 'Worldview and Optimism',
           description:
-            "Most startup founders remain upbeat about the future, but that confidence isn't shared equally. Engineers and marketers show more caution.",
+            'Most startup founders remain upbeat about the future, but that confidence isn’t shared equally. Engineers and marketers show more caution.',
 
           stats: [
             { percent: 61, label: 'Founders that are optimistic' },
