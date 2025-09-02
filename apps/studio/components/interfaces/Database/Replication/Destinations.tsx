@@ -9,7 +9,7 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import NewDestinationPanel from './DestinationPanel'
+import { DestinationPanel } from './DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
@@ -159,7 +159,7 @@ export const Destinations = () => {
           </div>
         )}
 
-      <NewDestinationPanel
+      <DestinationPanel
         visible={showNewDestinationPanel}
         sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}

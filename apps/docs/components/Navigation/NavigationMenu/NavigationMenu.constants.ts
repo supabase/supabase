@@ -2203,7 +2203,7 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/project-transfer',
         },
         {
-          name: 'Duplicate Project',
+          name: 'Restore to a new project',
           url: '/guides/platform/clone-project',
         },
         {
