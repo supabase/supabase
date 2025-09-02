@@ -934,7 +934,7 @@ export interface Post {
   slug?: string | null;
   slugLock?: boolean | null;
   /**
-   * Appears as subheading in the blog post preview
+   * Appears as subheading in the blog post preview.
    */
   description?: string | null;
   content: {
@@ -952,27 +952,47 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  thumb?: (number | null) | Media;
-  image?: (number | null) | Media;
-  categories?: (number | Category)[] | null;
   /**
-   * Select a launch week to show launch week summary at the bottom of the blog post.
+   * Will show up as the blog post cover. Required.
+   */
+  thumb?: (number | null) | Media;
+  /**
+   * Authors must be one or more. Required.
+   */
+  authors?: (number | Author)[] | null;
+  /**
+   * Select only one category. Required.
+   */
+  categories?: (number | Category)[] | null;
+  readingTime?: number | null;
+  /**
+   * Tags can be one or more. Optional.
+   */
+  tags?: (number | Tag)[] | null;
+  toc_depth?: number | null;
+  /**
+   * Select a launch week to show launch week summary at the bottom of the blog post. Optional.
    */
   launchweek?: ('6' | '7' | '8' | 'x' | 'ga' | '12' | '13' | '14' | '15') | null;
-  readingTime?: number | null;
-  date?: string | null;
-  toc_depth?: number | null;
-  authors?: (number | Author)[] | null;
-  tags?: (number | Tag)[] | null;
   meta?: {
+    /**
+     * Defaults to the title of the post, if not set.
+     */
     title?: string | null;
     /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     * Defaults to the "thumb" image, if not set.
      */
     image?: (number | null) | Media;
+    /**
+     * Defaults to the description of the post, if not set.
+     */
     description?: string | null;
   };
   publishedAt?: string | null;
+  /**
+   * This date will determine the chronological order of the blog post. Required.
+   */
+  date?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1434,14 +1454,12 @@ export interface PostsSelect<T extends boolean = true> {
   description?: T;
   content?: T;
   thumb?: T;
-  image?: T;
-  categories?: T;
-  launchweek?: T;
-  readingTime?: T;
-  date?: T;
-  toc_depth?: T;
   authors?: T;
+  categories?: T;
+  readingTime?: T;
   tags?: T;
+  toc_depth?: T;
+  launchweek?: T;
   meta?:
     | T
     | {
@@ -1450,6 +1468,7 @@ export interface PostsSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  date?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
