@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
