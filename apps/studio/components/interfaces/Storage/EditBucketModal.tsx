@@ -212,7 +212,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4">
+            <DialogSection className="flex flex-col gap-y-6">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -230,61 +230,64 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
-                key="public"
-                name="public"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    name="public"
-                    label="Public bucket"
-                    description="Anyone can read any object without any authorization"
-                    layout="flex"
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        id="public"
-                        size="large"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </DialogSection>
 
-            {isChangingBucketVisibility && (
-              <Admonition
-                type="warning"
-                className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
-                title={`Warning: Making bucket ${isMakingBucketPublic ? 'public' : 'private'}`}
-                description={
-                  <>
-                    {isMakingBucketPublic && (
-                      <p>This will make all objects in your bucket publicly accessible.</p>
-                    )}
+              {/* Visibility */}
+              <div className="flex flex-col gap-y-2">
+                <FormField_Shadcn_
+                  key="public"
+                  name="public"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      name="public"
+                      label="Public bucket"
+                      description="Allow anyone to read objects without authorization"
+                      layout="flex"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          id="public"
+                          size="large"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
 
-                    {isMakingBucketPrivate && (
+                {isChangingBucketVisibility && (
+                  <Admonition
+                    type="warning"
+                    title={`Warning: Making bucket ${isMakingBucketPublic ? 'public' : 'private'}`}
+                    description={
                       <>
-                        <p className="mb-2">
-                          All objects in your bucket will be private and only accessible via signed
-                          URLs, or downloaded with the right authorisation headers.
-                        </p>
-                        <p>
-                          Assets cached in the CDN may still be publicly accessible. You can
-                          consider{' '}
-                          <InlineLink href="https://supabase.com/docs/guides/storage/cdn/smart-cdn#cache-eviction">
-                            purging the cache
-                          </InlineLink>{' '}
-                          or moving your assets to a new bucket.
-                        </p>
+                        {isMakingBucketPublic && (
+                          <p>This will make all objects in your bucket publicly accessible.</p>
+                        )}
+
+                        {isMakingBucketPrivate && (
+                          <>
+                            <p className="mb-2">
+                              All objects in your bucket will be private and only accessible via
+                              signed URLs, or downloaded with the right authorisation headers.
+                            </p>
+                            <p>
+                              Assets cached in the CDN may still be publicly accessible. You can
+                              consider{' '}
+                              <InlineLink href="https://supabase.com/docs/guides/storage/cdn/smart-cdn#cache-eviction">
+                                purging the cache
+                              </InlineLink>{' '}
+                              or moving your assets to a new bucket.
+                            </p>
+                          </>
+                        )}
                       </>
-                    )}
-                  </>
-                }
-              />
-            )}
+                    }
+                  />
+                )}
+              </div>
+            </DialogSection>
 
             <DialogSectionSeparator />
 
@@ -314,15 +317,19 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     )}
                   />
                   {hasFileSizeLimit && (
-                    <>
-                      <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
-                        <div className="col-span-8">
-                          <FormField_Shadcn_
-                            key="formatted_size_limit"
+                    <div>
+                      <FormField_Shadcn_
+                        key="formatted_size_limit"
+                        name="formatted_size_limit"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItemLayout
                             name="formatted_size_limit"
-                            control={form.control}
-                            render={({ field }) => (
-                              <FormItemLayout hideMessage name="formatted_size_limit">
+                            label="File size limit"
+                            hideMessage
+                          >
+                            <div className="grid grid-cols-12 gap-x-2">
+                              <div className="col-span-8">
                                 <FormControl_Shadcn_>
                                   <Input_Shadcn_
                                     id="formatted_size_limit"
@@ -333,32 +340,39 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                                     {...field}
                                   />
                                 </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </div>
-                        <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                          <SelectTrigger_Shadcn_
-                            aria-label="File size limit unit"
-                            size="small"
-                            className="col-span-4"
-                          >
-                            <SelectValue_Shadcn_ asChild>
-                              <>{selectedUnit}</>
-                            </SelectValue_Shadcn_>
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {Object.values(StorageSizeUnits).map((unit: string) => (
-                              <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
-                                <div>{unit}</div>
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </div>
-
+                              </div>
+                              <div className="col-span-4">
+                                <Select_Shadcn_
+                                  value={selectedUnit}
+                                  onValueChange={setSelectedUnit}
+                                >
+                                  <SelectTrigger_Shadcn_
+                                    aria-label="File size limit unit"
+                                    size="small"
+                                  >
+                                    <SelectValue_Shadcn_ asChild>
+                                      <>{selectedUnit}</>
+                                    </SelectValue_Shadcn_>
+                                  </SelectTrigger_Shadcn_>
+                                  <SelectContent_Shadcn_>
+                                    {Object.values(StorageSizeUnits).map((unit: string) => (
+                                      <SelectItem_Shadcn_
+                                        key={unit}
+                                        value={unit}
+                                        className="text-xs"
+                                      >
+                                        <div>{unit}</div>
+                                      </SelectItem_Shadcn_>
+                                    ))}
+                                  </SelectContent_Shadcn_>
+                                </Select_Shadcn_>
+                              </div>
+                            </div>
+                          </FormItemLayout>
+                        )}
+                      />
                       {formattedSizeLimitError?.message === 'exceed_global_limit' && (
-                        <FormMessage_Shadcn_>
+                        <FormMessage_Shadcn_ className="mt-2">
                           Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
                           <InlineLink
                             className="text-destructive decoration-destructive-500 hover:decoration-destructive"
@@ -371,15 +385,18 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       )}
 
                       {IS_PLATFORM ? (
-                        <p className="text-sm text-foreground-light !mt-3">
+                        <p className="text-sm text-foreground-lighter mt-2">
                           This project has a{' '}
-                          <InlineLink href={`/project/${ref}/settings/storage`}>
+                          <InlineLink
+                            className="text-foreground-light hover:text-foreground"
+                            href={`/project/${ref}/settings/storage`}
+                          >
                             global file size limit
                           </InlineLink>{' '}
                           of {formattedGlobalUploadLimit}.
                         </p>
                       ) : undefined}
-                    </>
+                    </div>
                   )}
                 </div>
               </div>

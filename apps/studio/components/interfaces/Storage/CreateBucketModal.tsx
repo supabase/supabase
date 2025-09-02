@@ -240,7 +240,7 @@ const CreateBucketModal = () => {
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection>
+            <DialogSection className="flex flex-col gap-y-2">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -318,49 +318,40 @@ const CreateBucketModal = () => {
             {isStandardBucket ? (
               <>
                 <DialogSection>
-                  <FormField_Shadcn_
-                    key="public"
-                    name="public"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        hideMessage
-                        name="public"
-                        label="Public bucket"
-                        description="Anyone can read any object without any authorization"
-                        layout="flex"
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            id="public"
-                            size="large"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
+                  {/* Visibility */}
+                  <div className="flex flex-col gap-y-2">
+                    <FormField_Shadcn_
+                      key="public"
+                      name="public"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout
+                          hideMessage
+                          name="public"
+                          label="Public bucket"
+                          description="Allow anyone to read objects without authorization"
+                          layout="flex"
+                        >
+                          <FormControl_Shadcn_>
+                            <Switch
+                              id="public"
+                              size="large"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                    {isPublicBucket && (
+                      <Admonition
+                        type="warning"
+                        title="Public buckets are not protected"
+                        description="Users can read objects in public buckets without any authorization. Row level security (RLS) policies are still required for other operations such as object uploads and deletes."
+                      />
                     )}
-                  />
+                  </div>
                 </DialogSection>
-
-                {isPublicBucket && (
-                  <Admonition
-                    type="warning"
-                    className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
-                    title="Public buckets are not protected"
-                    description={
-                      <>
-                        <p className="mb-2">
-                          Users can read objects in public buckets without any authorization.
-                        </p>
-                        <p>
-                          Row level security (RLS) policies are still required for other operations
-                          such as object uploads and deletes.
-                        </p>
-                      </>
-                    }
-                  />
-                )}
 
                 <DialogSectionSeparator />
 
