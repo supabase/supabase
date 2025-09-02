@@ -19,7 +19,6 @@ export interface ReportChartV2Props {
   updateDateRange: (from: string, to: string) => void
   className?: string
   syncId?: string
-  onDataLoaded?: (data: any) => void
   filters?: any
 }
 
@@ -32,7 +31,6 @@ export const ReportChartV2 = ({
   updateDateRange,
   className,
   syncId,
-  onDataLoaded,
   filters,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
@@ -48,7 +46,6 @@ export const ReportChartV2 = ({
     data: queryResult,
     isLoading: isLoadingChart,
     error,
-    isSuccess,
     isFetching,
   } = useQuery(
     ['report-v2', report.id, { startDate, endDate, interval, filters }],
@@ -61,12 +58,6 @@ export const ReportChartV2 = ({
       staleTime: 0,
     }
   )
-
-  useEffect(() => {
-    if (onDataLoaded && queryResult && isSuccess) {
-      onDataLoaded(queryResult.data)
-    }
-  }, [queryResult, isSuccess, onDataLoaded])
 
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
