@@ -22,9 +22,6 @@ export function useCommandHandling({
   onFreeformTextChange,
   handleInputChange,
   handleOperatorChange,
-  setDialogContent,
-  setIsDialogOpen,
-  setPendingPath,
   newPathRef,
   handleAIFilter,
 }: {
@@ -37,9 +34,6 @@ export function useCommandHandling({
   onFreeformTextChange: (text: string) => void
   handleInputChange: (path: number[], value: string) => void
   handleOperatorChange: (path: number[], value: string) => void
-  setDialogContent: (content: React.ReactElement | null) => void
-  setIsDialogOpen: (open: boolean) => void
-  setPendingPath: (path: number[] | null) => void
   newPathRef: React.MutableRefObject<number[]>
   handleAIFilter: () => void
 }) {
@@ -113,15 +107,7 @@ export function useCommandHandling({
         setActiveInput({ type: 'group', path: path.slice(0, -1) })
       }, 0)
     },
-    [
-      activeInput,
-      handleInputChange,
-      setActiveInput,
-      setDialogContent,
-      setIsDialogOpen,
-      setPendingPath,
-      removeFilterByPath,
-    ]
+    [activeInput, handleInputChange, setActiveInput, removeFilterByPath]
   )
 
   const handleOperatorCommand = useCallback(
@@ -172,15 +158,7 @@ export function useCommandHandling({
 
       // Custom property selection will be handled inline by the condition popover
     },
-    [
-      activeFilters,
-      onFilterChange,
-      setDialogContent,
-      setIsDialogOpen,
-      setPendingPath,
-      setActiveInput,
-      removeFilterByPath,
-    ]
+    [activeFilters, onFilterChange, setActiveInput, removeFilterByPath]
   )
 
   const handleNormalPropertySelection = useCallback(

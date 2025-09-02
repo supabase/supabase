@@ -2,7 +2,7 @@
 
 import React, { useRef, useCallback } from 'react'
 import { Search } from 'lucide-react'
-import { cn, Dialog, DialogContent } from 'ui'
+import { cn } from 'ui'
 import { FilterGroup as FilterGroupComponent } from './FilterGroup'
 import { FilterProperty, FilterGroup } from './types'
 import {
@@ -40,7 +40,6 @@ export function FilterBar({
   className,
   supportsOperators = false,
 }: FilterBarProps) {
-  const commandRef = useRef<HTMLDivElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const {
     isLoading,
@@ -53,12 +52,6 @@ export function FilterBar({
     activeInput,
     setActiveInput,
     newPathRef,
-    dialogContent,
-    setDialogContent,
-    isDialogOpen,
-    setIsDialogOpen,
-    pendingPath,
-    setPendingPath,
   } = useFilterBarState()
 
   const {
@@ -122,9 +115,6 @@ export function FilterBar({
     onFreeformTextChange,
     handleInputChange,
     handleOperatorChange,
-    setDialogContent,
-    setIsDialogOpen,
-    setPendingPath,
     newPathRef,
     handleAIFilter,
   })
@@ -259,11 +249,6 @@ export function FilterBar({
       {(error || optionsError) && (
         <div className="text-red-500 text-xs mt-1">{error || optionsError}</div>
       )}
-      <Dialog open={isDialogOpen} onOpenChange={(open: boolean) => setIsDialogOpen(open)}>
-        <DialogContent hideClose className="!w-fit max-w-screen">
-          {dialogContent}
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
