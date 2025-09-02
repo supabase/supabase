@@ -18,7 +18,7 @@ export type InsightsQuery = {
   timestamp: string
   cmd_type_text: string
   application_name: string
-  badness_score: number
+  health_score: number
   slowness_rating: string
   avg_p90: number
   avg_p95: number
@@ -67,7 +67,7 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
           SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
           SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END),
         1)
-      ) AS badness_score,
+      ) AS health_score,
       CASE 
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 100 THEN 'GREAT'
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 200 THEN 'ACCEPTABLE'
@@ -119,7 +119,7 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
       SELECT * 
       FROM index_advisor(q.query)
     ) ia ON q.query ILIKE 'SELECT%' OR q.query ILIKE 'WITH%'
-  ORDER BY badness_score DESC
+  ORDER BY health_score DESC
   LIMIT 9999
 `
 
@@ -157,7 +157,7 @@ const getQueriesWithErrorsSql = (startTime: string, endTime: string) => /* SQL *
           SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
           SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END),
         1)
-      ) AS badness_score,
+      ) AS health_score,
       CASE 
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 100 THEN 'GREAT'
         WHEN SUM(total_exec_time) / NULLIF(SUM(calls), 0) < 200 THEN 'ACCEPTABLE'
@@ -213,7 +213,7 @@ const getQueriesWithErrorsSql = (startTime: string, endTime: string) => /* SQL *
       SELECT * 
       FROM index_advisor(q.query)
     ) ia ON q.query ILIKE 'SELECT%' OR q.query ILIKE 'WITH%'
-  ORDER BY error_count DESC, badness_score DESC
+  ORDER BY error_count DESC, health_score DESC
   LIMIT 9999
 `
 

@@ -193,10 +193,16 @@ export const QueryRowExplorer = ({
           // onRowsChange={(newRows) => {
           // console.log('DataGrid rows changed:', newRows.length)
           //}}
-          rowClass={(_, idx) => {
+          rowClass={(row, idx) => {
             const isSelected = idx === selectedRow
+            const slownessRating = row.slowness_rating
+            const isSlowQuery =
+              slownessRating === 'NOTICEABLE' ||
+              slownessRating === 'SLOW' ||
+              slownessRating === 'CRITICAL'
+
             return [
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isSlowQuery ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
               '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell:first-child>div]:ml-4',

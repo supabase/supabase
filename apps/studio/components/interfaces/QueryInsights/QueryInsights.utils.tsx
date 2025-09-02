@@ -1,9 +1,10 @@
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Column } from 'react-data-grid'
 
-import { Badge, CodeBlock } from 'ui'
+import { Badge, CodeBlock, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
 import { ColumnConfiguration, QUERY_INSIGHTS_TABLE_COLUMNS } from './QueryInsights.constants'
+import { WarningIcon } from 'ui'
 
 export const formatNumberWithCommas = (num: number | string | undefined | null): string => {
   if (num === undefined || num === null) return '0'
@@ -12,10 +13,6 @@ export const formatNumberWithCommas = (num: number | string | undefined | null):
   if (isNaN(numberValue)) return '0'
 
   return numberValue.toLocaleString('en-US')
-}
-
-export const formatSlownessRating = (rating: string): string => {
-  return rating.charAt(0).toUpperCase() + rating.slice(1).toLowerCase()
 }
 
 export const formatQueryInsightsColumns = ({
@@ -59,46 +56,57 @@ export const formatQueryInsightsColumns = ({
         const value = props.row?.[col.id as keyof InsightsQuery]
 
         if (col.id === 'query') {
+          const slownessRating = props.row?.slowness_rating
+          const shouldShowWarning =
+            slownessRating === 'NOTICEABLE' ||
+            slownessRating === 'SLOW' ||
+            slownessRating === 'CRITICAL'
+
           return (
-            <div className="w-full flex items-center gap-x-2">
+            <div className="w-full flex items-center gap-x-4">
+              {shouldShowWarning && (
+                <span className="flex-1 flex">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <WarningIcon />
+                    </TooltipTrigger>
+                    <TooltipContent className="min-w-52">
+                      <h4 className="font-mono uppercase text-foreground-light text-xs pt-1 pb-1.5">
+                        Query Advisor
+                      </h4>
+                      <div className="flex flex-col gap-y-1 divide-y divide-dotted [&>div]:py-1.5 [&>div]:flex [&>div]:items-center [&>div]:justify-between">
+                        <div>
+                          <span className="text-foreground-lighter font-mono">Slowness</span>
+                          <span
+                            className={cn(
+                              'capitalize',
+                              slownessRating === 'NOTICEABLE' && 'text-warning',
+                              slownessRating === 'SLOW' && 'text-warning',
+                              slownessRating === 'CRITICAL' && 'text-destructive'
+                            )}
+                          >
+                            {slownessRating?.toLowerCase()}
+                          </span>
+                        </div>
+                        {props.row?.health_score !== undefined && (
+                          <div>
+                            <span className="text-foreground-lighter font-mono">Health score</span>
+                            <span>{props.row?.health_score?.toFixed(2)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </span>
+              )}
               <CodeBlock
                 language="sql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible"
+                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible line-clamp-1"
                 hideLineNumbers
                 hideCopy
                 value={value as string}
                 wrapLines={false}
               />
-            </div>
-          )
-        }
-
-        if (col.id === 'slowness_rating') {
-          const getBadgeVariant = (rating: string) => {
-            switch (rating) {
-              case 'GREAT':
-              case 'ACCEPTABLE':
-                return 'default'
-              case 'NOTICEABLE':
-              case 'SLOW':
-                return 'warning'
-              case 'CRITICAL':
-                return 'destructive'
-              default:
-                return 'default'
-            }
-          }
-
-          return (
-            <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
-              <span>
-                <Badge
-                  variant={getBadgeVariant(value as string)}
-                  className="text-xs !text-center !inline-flex items-center"
-                >
-                  {formatSlownessRating(value as string)}
-                </Badge>
-              </span>
             </div>
           )
         }
@@ -169,11 +177,20 @@ export const formatQueryInsightsColumns = ({
           )
         }
 
-        if (col.id === 'badness_score') {
+        if (col.id === 'health_score') {
           const formattedValue = value ? (value as number).toFixed(2) : ''
+          const scoreValue = value as number
+
+          let textColor = ''
+          if (scoreValue > 100) {
+            textColor = 'text-destructive'
+          } else if (scoreValue > 10) {
+            textColor = 'text-warning'
+          }
+
           return (
             <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
-              <p>{formattedValue}</p>
+              <p className={textColor}>{formattedValue}</p>
             </div>
           )
         }
@@ -183,22 +200,9 @@ export const formatQueryInsightsColumns = ({
           const numericValue = isNaN(costValue) ? 0 : costValue
           const formattedValue = numericValue.toFixed(2)
 
-          const getCostBadgeVariant = (cost: number) => {
-            if (cost <= 10) return 'success'
-            if (cost <= 1000) return 'warning'
-            return 'destructive'
-          }
-
           return (
-            <div className="w-full flex-col justify-center font-mono text-xs inline-flex">
-              <span>
-                <Badge
-                  variant={getCostBadgeVariant(numericValue)}
-                  className="text-xs !text-center !inline-flex items-center"
-                >
-                  {formattedValue}
-                </Badge>
-              </span>
+            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+              <p>{formattedValue}</p>
             </div>
           )
         }
