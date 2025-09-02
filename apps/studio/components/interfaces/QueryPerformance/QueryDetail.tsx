@@ -2,14 +2,8 @@ import { Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { formatSql } from 'lib/formatSql'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CodeBlock,
-  cn,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
+import { SqlMonacoBlock } from './SqlMonacoBlock'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_REPORTS,
@@ -43,16 +37,7 @@ export const QueryDetail = ({
     <QueryPanelContainer>
       <QueryPanelSection>
         <p className="text-sm">Query pattern</p>
-        <CodeBlock
-          hideLineNumbers
-          value={query}
-          language="sql"
-          className={cn(
-            'max-w-full max-h-[310px]',
-            '!py-3 !px-3.5 prose dark:prose-dark transition',
-            '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
-          )}
-        />
+        <SqlMonacoBlock value={query} height={310} lineNumbers="off" wrapperClassName="pl-3" />
         {isLinterWarning && (
           <Alert_Shadcn_
             variant="default"
