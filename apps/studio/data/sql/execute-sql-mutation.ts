@@ -33,47 +33,33 @@ export const useExecuteSqlMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    ExecuteSqlData,
-    QueryResponseError,
-    ExecuteSqlVariables & { granularInvalidation?: boolean }
-  >((args) => executeSql(args), {
-    async onSuccess(data, variables, context) {
-      const { granularInvalidation, contextualInvalidation, sql, projectRef } = variables
+  return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>(
+    (args) => executeSql(args),
+    {
+      async onSuccess(data, variables, context) {
+        const { contextualInvalidation, sql, projectRef } = variables
 
-      if (granularInvalidation && projectRef) {
-        const invalidationActions = await invalidateDataGranularly(sql, projectRef)
-        const promises = invalidationActions.map((action) =>
-          queryClient.invalidateQueries({
-            queryKey: action.key,
-            exact: action.exact,
-            refetchType: action.refetchType,
-          })
-        )
-        await Promise.allSettled(promises)
-      } else {
-        // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
-        const sqlLower = sql.toLowerCase()
-        const isMutationSQL =
-          sqlLower.includes('create ') || sqlLower.includes('alter ') || sqlLower.includes('drop ')
-        if (contextualInvalidation && projectRef && isMutationSQL) {
-          const databaseRelatedKeys = queryClient
-            .getQueryCache()
-            .findAll(['projects', projectRef])
-            .map((x) => x.queryKey)
-            .filter((x) => !INVALIDATION_KEYS_IGNORE.some((a) => x.includes(a)))
-          await Promise.all(databaseRelatedKeys.map((key) => queryClient.invalidateQueries(key)))
+        if (contextualInvalidation && projectRef) {
+          const invalidationActions = await invalidateDataGranularly(sql, projectRef)
+          const promises = invalidationActions.map((action) =>
+            queryClient.invalidateQueries({
+              queryKey: action.key,
+              exact: action.exact,
+              refetchType: action.refetchType,
+            })
+          )
+          await Promise.allSettled(promises)
         }
-      }
-      await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to execute SQL: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
-    },
-    ...options,
-  })
+        await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to execute SQL: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
+  )
 }

@@ -206,7 +206,7 @@ export const QueryBlock = ({
         projectRef: ref,
         connectionString: readOnlyConnectionString,
         sql,
-        granularInvalidation: true,
+        contextualInvalidation: true,
       })
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
@@ -343,7 +343,7 @@ export const QueryBlock = ({
                 projectRef: ref,
                 connectionString: postgresConnectionString,
                 sql,
-                granularInvalidation: true,
+                contextualInvalidation: true,
               })
               onRunQuery?.('mutation')
             }
