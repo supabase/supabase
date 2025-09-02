@@ -220,8 +220,6 @@ const savePersonAndEventInCustomerIO = async (data: any) => {
         customerioEvent
       );
 
-      console.log("Customer.io Track API integration completed");
-
 
       await sendConfirmationEmail({
         email: data.email,
@@ -235,8 +233,6 @@ const savePersonAndEventInCustomerIO = async (data: any) => {
 }
 
 const sendConfirmationEmail = async (emailData: { email: string; first_name: string; last_name: string; }) => {
-  console.log("Preparing to send confirmation email to:", emailData);
-
   const customerioApiKey = process.env.CUSTOMERIO_APP_API_KEY
 
   if (customerioApiKey) {
@@ -260,7 +256,6 @@ const sendConfirmationEmail = async (emailData: { email: string; first_name: str
 
       const emailResponse =
         await customerioAppClient.sendTransactionalEmail(emailRequest);
-      console.log("Confirmation email schedulled successfully:", emailResponse);
     } catch (error) {
       throw new Error(`Failed to send confirmation email: ${error}`);
     }
