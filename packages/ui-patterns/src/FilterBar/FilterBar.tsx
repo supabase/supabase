@@ -255,10 +255,15 @@ export function FilterBar({
   )
 
   return (
-    <div className={cn('w-full space-y-2 relative', className)}>
-      <div className="relative flex items-center w-full">
-        <Search className="absolute left-1 top-1/2 transform -translate-y-1/2 text-foreground-muted w-4 h-4" />
-        <div className="flex-1 flex flex-wrap items-center pl-6 pr-1 py-0 gap-1 h-full">
+    <div className="w-full space-y-2 relative">
+      <div
+        className={cn(
+          'relative flex items-center gap-2 w-full border rounded-md h-10 cursor-text p-0 pl-2',
+          className
+        )}
+      >
+        <Search className="text-foreground-muted w-4 h-4" />
+        <div className="flex-1 flex flex-wrap items-center gap-1 h-full">
           <FilterGroupComponent
             group={activeFilters}
             filterProperties={filterProperties}
@@ -286,7 +291,7 @@ export function FilterBar({
         <div className="text-red-500 text-xs mt-1">{error || optionsError}</div>
       )}
       {isCommandMenuVisible && !isLoading && activeInput !== null && commandItems.length > 0 && (
-        <Command_Shadcn_ ref={commandRef} className="absolute z-10 w-full h-auto shadow-md">
+        <Command_Shadcn_ ref={commandRef} className="absolute z-10 h-auto shadow-md">
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
