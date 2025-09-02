@@ -11,7 +11,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
 export interface ReportChartV2Props {
-  report: ReportConfig<any>
+  report: ReportConfig
   projectRef: string
   startDate: string
   endDate: string
