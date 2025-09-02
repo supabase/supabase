@@ -204,6 +204,7 @@ export const QueryRowExplorer = ({
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isSlowQuery ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+              `${isSelected && isSlowQuery ? '[&>div]:border-l-warning' : ''}`,
               '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell:first-child>div]:ml-4',
             ].join(' ')
