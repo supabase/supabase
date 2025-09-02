@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import React from 'react'
-import { Button, cn, Image } from 'ui'
+import { cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ApplyToSupaSquadForm from '../Forms/ApplyToSupaSquadForm'
+import ApplyToSupaSquadForm from '~/components/Forms/ApplyToSupaSquadForm'
 
 interface Props {
   id: string
@@ -29,13 +28,7 @@ const ApplicationFormSection = ({ id, title, subtitle, cta, className }: Props) 
         <div className="flex flex-col gap-6 text-center items-center max-w-5xl mx-auto">
           <h2 className="text-foreground-light text-2xl lg:text-3xl leading-tight">{title}</h2>
           {subtitle && <p className="text-foreground-light text-lg">{subtitle}</p>}
-          <ApplyToSupaSquadForm
-            trigger={
-              <Button type="primary" size="medium" icon={cta.icon}>
-                {cta.label}
-              </Button>
-            }
-          />
+          <ApplyToSupaSquadForm />
         </div>
       </div>
 

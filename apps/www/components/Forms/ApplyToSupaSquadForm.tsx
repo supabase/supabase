@@ -3,7 +3,6 @@ import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data as content } from 'data/open-source/contributing/supasquad'
 import {
   Button,
   Form_Shadcn_,
@@ -109,8 +108,8 @@ const languagesSpoken: string[] = [
 ]
 
 const applicationSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().min(1, 'Last name is required'),
   email: z.string().email('Please enter a valid email address'),
   tracks: z
     .array(
@@ -178,7 +177,7 @@ const FormContent = memo(function FormContent({
           <div className="flex flex-col md:flex-row gap-4 items-start text-left">
             <FormField_Shadcn_
               control={form.control}
-              name="firstName"
+              name="first_name"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="w-full md:flex-1">
                   <FormLabel_Shadcn_ className="text-foreground">First Name *</FormLabel_Shadcn_>
@@ -198,7 +197,7 @@ const FormContent = memo(function FormContent({
 
             <FormField_Shadcn_
               control={form.control}
-              name="lastName"
+              name="last_name"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="w-full md:flex-1">
                   <FormLabel_Shadcn_ className="text-foreground">Last Name *</FormLabel_Shadcn_>
@@ -558,8 +557,8 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
   const form = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
+      first_name: '',
+      last_name: '',
       email: '',
       tracks: [],
       areas_of_interest: [],

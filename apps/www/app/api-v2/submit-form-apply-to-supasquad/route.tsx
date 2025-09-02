@@ -4,15 +4,22 @@ const NOTION_API_KEY = process.env.NOTION_API_KEY
 const NOTION_DB_ID = process.env.NOTION_DB_ID
 
 const applicationSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().min(1, 'Last name is required'),
   email: z.string().email('Please enter a valid email address'),
-  tracks: z.array(z.string()).min(1, 'Select at least 1 track'),
+  tracks: z
+    .array(
+      z.object({
+        heading: z.string(),
+        description: z.string(),
+      })
+    )
+    .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
   monthly_commitment: z.number().min(1, 'This is required'),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
-  skills: z.string().min(1, 'This is required'),
+  skills: z.string().optional(),
   location: z.string().min(1, 'Make sure to specify your city and country'),
   github: z.string().optional(),
   twitter: z.string().optional(),
@@ -99,13 +106,19 @@ export async function POST(req: Request) {
   }
 
   const fullName =
-    `${data.firstName?.trim() || ''} ${data.lastName?.trim() || ''}`.trim() || 'Unnamed'
+    `${data.first_name?.trim() || ''} ${data.last_name?.trim() || ''}`.trim() || 'Unnamed'
 
   const props: Record<string, any> = {
     [titleProp]: {
       title: [{ type: 'text', text: { content: fullName } }],
     },
-    Email: { email: data.email },
+    'First name': {
+      rich_text: [{ type: 'text', text: { content: data.first_name || '' } }],
+    },
+    'Last name': {
+      rich_text: [{ type: 'text', text: { content: data.last_name || '' } }],
+    },
+    'Email': { email: data.email },
     'What track would you like to be considered for?': {
       multi_select: asMultiSelect(data.tracks.map(normalizeTrack)),
     },
