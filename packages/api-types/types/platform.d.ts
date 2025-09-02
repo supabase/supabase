@@ -4206,6 +4206,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/vercel/redirect/{installation_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the Vercel redirect url */
+    get: operations['VercelRedirectController_getRedirectUrl']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/workflow-runs': {
     parameters: {
       query?: never
@@ -6603,6 +6620,7 @@ export interface components {
         offset: number
       }
       projects: {
+        cloud_provider: string
         databases: {
           cloud_provider: string
           disk_last_modified_at?: string
@@ -6651,6 +6669,7 @@ export interface components {
           /** @enum {string} */
           type: 'PRIMARY' | 'READ_REPLICA'
         }[]
+        inserted_at: string
         is_branch: boolean
         name: string
         ref: string
@@ -9227,7 +9246,7 @@ export interface components {
       folder_id?: (null | (string | null)) | null
       id: string
       name: string
-      owner_id: number
+      owner_id?: number
       project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
@@ -9316,6 +9335,9 @@ export interface components {
         name: string
         score: number
       }[]
+    }
+    VercelRedirectResponse: {
+      url: string
     }
     WorkflowRunResponse: {
       branch_id: string
@@ -13233,6 +13255,10 @@ export interface operations {
         search?: string
         /** @description Sort order for projects */
         sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+        /** @description A comma-separated list of project statuses to filter by.
+         *
+         *     The following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`. */
+        statuses?: string
       }
       header?: never
       path: {
@@ -18448,6 +18474,10 @@ export interface operations {
           | 'realtime_channel_events'
           | 'realtime_channel_presence_events'
           | 'realtime_channel_db_events'
+          | 'realtime_authorization_rls_execution_time'
+          | 'realtime_payload_size'
+          | 'realtime_connected_clients'
+          | 'realtime_replication_connection_lag'
         databaseIdentifier?: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -21426,6 +21456,34 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  VercelRedirectController_getRedirectUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        installation_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['VercelRedirectResponse']
+        }
+      }
+      /** @description Failed to get Vercel redirect url */
+      500: {
         headers: {
           [name: string]: unknown
         }

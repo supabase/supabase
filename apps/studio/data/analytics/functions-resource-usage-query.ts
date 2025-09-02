@@ -6,7 +6,7 @@ import { analyticsKeys } from './keys'
 export type FunctionsResourceUsageVariables = {
   projectRef?: string
   functionId?: string
-  interval?: operations['FunctionResourceLogsController_getStatus']['parameters']['query']['interval']
+  interval?: operations['FunctionsLogsController_getResourceUsage']['parameters']['query']['interval']
 }
 
 export type FunctionsResourceUsageResponse = any
