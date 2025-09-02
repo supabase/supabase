@@ -28,7 +28,7 @@ async function getOrganizationProjects(
     limit = DEFAULT_LIMIT,
     page = 0,
     sort = 'name_asc',
-    search,
+    search: _search = '',
     statuses: _statuses = [],
   }: GetOrgProjectsInfiniteVariables,
   signal?: AbortSignal,
@@ -37,7 +37,9 @@ async function getOrganizationProjects(
   if (!slug) throw new Error('Slug is required')
 
   const offset = page * limit
+  const search = _search.length === 0 ? undefined : _search
   const statuses = _statuses.length === 0 ? undefined : _statuses.join(',')
+
   const { data, error } = await get('/platform/organizations/{slug}/projects', {
     params: { path: { slug }, query: { limit, offset, sort, search, statuses } },
     signal,
