@@ -132,6 +132,10 @@ export function useDeferredBlur(wrapperRef: React.RefObject<HTMLElement>, onBlur
         if (active && wrapperRef.current && wrapperRef.current.contains(active)) {
           return
         }
+        // Check if the active element is within a popover
+        if (active && active.closest('[data-radix-popper-content-wrapper]')) {
+          return
+        }
         onBlur()
       }, 0)
     },

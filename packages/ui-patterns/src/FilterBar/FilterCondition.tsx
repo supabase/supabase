@@ -168,8 +168,10 @@ export function FilterCondition({
           />
         </PopoverAnchor_Shadcn_>
         <PopoverContent_Shadcn_
-          className="w-[220px] p-0"
+          className="min-w-[220px] p-0"
           align="start"
+          side="bottom"
+          portal
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={(e) => {
