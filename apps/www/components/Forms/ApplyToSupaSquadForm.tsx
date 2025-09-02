@@ -402,9 +402,10 @@ const FormContent = memo(function FormContent({
                         {...({
                           ...field,
                           inputMode: 'numeric',
+                          value: field.value > 0 ? field.value : '',
                           onChange: (e: any) =>
                             field.onChange(e.target.value ? parseInt(e.target.value) : ''),
-                        } as any)}
+                        })}
                       />
                     </div>
                   </FormControl_Shadcn_>
@@ -565,25 +566,23 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
       skills: '',
       why_you_want_to_join: '',
       location: '',
+      monthly_commitment: 0,
       languages_spoken: [],
       github: '',
       twitter: '',
     },
     mode: 'onBlur',
     reValidateMode: 'onBlur',
-    resetOptions: {
-      keepDefaultValues: true
-    }
   })
 
   const handleCancel = () => {
-    // form.reset()
+    form.reset()
     setIsSubmitted(false)
   }
 
   const handleConfirmationClose = () => {
     setShowConfirmation(false)
-    // form.reset()
+    form.reset()
     setIsSubmitted(false)
     setErrors({})
   }
