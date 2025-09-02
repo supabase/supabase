@@ -649,6 +649,8 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                       showLegend={
                         selectedMetric === 'query_latency' ||
                         selectedMetric === 'cache_hits' ||
+                        selectedMetric === 'rows_read' ||
+                        selectedMetric === 'calls' ||
                         !!selectedQuery
                       }
                       showTotal={false}
