@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
+import Editor from '@monaco-editor/react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -7,7 +8,6 @@ import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
-  CodeBlock,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -75,7 +75,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const value = props.row?.[col.id]
         if (col.id === 'query') {
           return (
-            <div className="w-full flex items-center gap-x-2">
+            <div className="w-full flex items-center gap-x-2 pointer-events-none">
               {hasIndexRecommendations(props.row.index_advisor_result, true) && (
                 <IndexSuggestionIcon
                   indexAdvisorResult={props.row.index_advisor_result}
@@ -86,13 +86,37 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   }}
                 />
               )}
-              <CodeBlock
-                hideCopy
-                hideLineNumbers
-                language="sql"
+              <Editor
+                height={20}
+                theme="supabase"
+                language="pgsql"
                 value={value.replace(/\s+/g, ' ').trim()}
-                wrapLines={false}
-                className="p-0 !bg-transparent !border-0 whitespace-nowrap !overflow-hidden !text-xs"
+                wrapperProps={{
+                  className:
+                    '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent',
+                }}
+                options={{
+                  readOnly: true,
+                  domReadOnly: true,
+                  cursorBlinking: 'solid',
+                  tabIndex: -1,
+                  fontSize: 12,
+                  minimap: { enabled: false },
+                  lineNumbers: 'off',
+                  renderLineHighlight: 'none',
+                  scrollbar: { vertical: 'hidden', horizontal: 'hidden' },
+                  overviewRulerLanes: 0,
+                  overviewRulerBorder: false,
+                  glyphMargin: false,
+                  folding: false,
+                  lineDecorationsWidth: 0,
+                  lineNumbersMinChars: 0,
+                  wordWrap: 'off',
+                  scrollBeyondLastLine: false,
+                  contextmenu: false,
+                  selectionHighlight: false,
+                  occurrencesHighlight: 'off',
+                }}
               />
             </div>
           )
