@@ -161,7 +161,7 @@ export const QueryRowExplorer = ({
           size="tiny"
           placeholder="Filter by query keywords..."
           icon={<Search size={14} />}
-          className="w-64"
+          className="w-52"
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
         />

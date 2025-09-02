@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Column } from 'react-data-grid'
 
-import { Badge, CodeBlock, cn } from 'ui'
+import { Badge, CodeBlock } from 'ui'
 import { type InsightsQuery } from 'data/query-insights/insights-queries-query'
 import { ColumnConfiguration, QUERY_INSIGHTS_TABLE_COLUMNS } from './QueryInsights.constants'
 
@@ -179,15 +179,14 @@ export const formatQueryInsightsColumns = ({
         }
 
         if (col.id === 'total_cost_before') {
-          // Ensure costValue is a number, handle string conversion from jsonb
           const costValue = typeof value === 'string' ? parseFloat(value) : (value as number)
           const numericValue = isNaN(costValue) ? 0 : costValue
           const formattedValue = numericValue.toFixed(2)
 
           const getCostBadgeVariant = (cost: number) => {
-            if (cost <= 10) return 'success' // green
-            if (cost <= 1000) return 'warning' // yellow
-            return 'destructive' // red
+            if (cost <= 10) return 'success'
+            if (cost <= 1000) return 'warning'
+            return 'destructive'
           }
 
           return (
@@ -263,12 +262,10 @@ export const formatQueryInsightsColumns = ({
     return res
   })
 
-  // Filter columns based on visible columns
   if (visibleColumns.length > 0) {
     gridColumns = gridColumns.filter((col) => visibleColumns.includes(col.key))
   }
 
-  // Sort columns based on the saved configuration order
   gridColumns.sort((a, b) => {
     const aIndex = columnOrder.indexOf(a.key)
     const bIndex = columnOrder.indexOf(b.key)
