@@ -106,7 +106,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer size="full">
+    <ScaffoldContainer size="large">
       <ScaffoldSection isFullWidth>
         <div className="mb-4 flex flex-row gap-2 justify-between">
           <Input

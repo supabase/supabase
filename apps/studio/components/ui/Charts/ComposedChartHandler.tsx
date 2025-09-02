@@ -4,7 +4,7 @@ import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from '
 import { cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import ComposedChart from './ComposedChart'
+import { ComposedChart } from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
@@ -353,7 +353,7 @@ const useAttributeQueries = (
   return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries]
 }
 
-export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+export function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
   if (props.hide) return null
 
   return (

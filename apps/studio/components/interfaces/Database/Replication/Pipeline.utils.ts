@@ -22,16 +22,25 @@ export const getStatusName = (
   return undefined
 }
 
+export const PIPELINE_ENABLE_ALLOWED_FROM = ['stopped'] as const
+export const PIPELINE_DISABLE_ALLOWED_FROM = ['started', 'failed'] as const
+export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as const
+
 const PIPELINE_STATE_MESSAGES = {
   enabling: {
-    title: 'Pipeline enabling',
-    message: 'Starting the pipeline. Table replication will resume once enabled.',
-    badge: 'Enabling',
+    title: 'Starting pipeline',
+    message: 'Starting the pipeline. Table replication will resume once running.',
+    badge: 'Starting',
   },
   disabling: {
-    title: 'Pipeline disabling',
-    message: 'Stopping the pipeline. Table replication will be paused once disabled.',
-    badge: 'Disabling',
+    title: 'Stopping pipeline',
+    message: 'Stopping the pipeline. Table replication will be paused once stopped.',
+    badge: 'Stopping',
+  },
+  restarting: {
+    title: 'Restarting pipeline',
+    message: 'Applying settings and restarting the pipeline.',
+    badge: 'Restarting',
   },
   failed: {
     title: 'Pipeline failed',
@@ -40,7 +49,7 @@ const PIPELINE_STATE_MESSAGES = {
   },
   stopped: {
     title: 'Pipeline stopped',
-    message: 'Replication is paused. Enable the pipeline to resume data synchronization.',
+    message: 'Replication is paused. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
   },
   starting: {
@@ -60,8 +69,8 @@ const PIPELINE_STATE_MESSAGES = {
   },
   notRunning: {
     title: 'Pipeline not running',
-    message: 'Replication is not active. Enable the pipeline to start data synchronization.',
-    badge: 'Disabled',
+    message: 'Replication is not active. Start the pipeline to begin data synchronization.',
+    badge: 'Stopped',
   },
 } as const
 
@@ -69,23 +78,25 @@ export const getPipelineStateMessages = (
   requestStatus: PipelineStatusRequestStatus | undefined,
   statusName: string | undefined
 ) => {
-  // Always prioritize request status (enabling/disabling) over pipeline status
-  if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
+  // Reflect optimistic request intent immediately after click
+  if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
+    return PIPELINE_STATE_MESSAGES.restarting
+  }
+  if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
     return PIPELINE_STATE_MESSAGES.enabling
   }
-
-  if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
+  if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
     return PIPELINE_STATE_MESSAGES.disabling
   }
 
-  // Only check pipeline status if no request is in progress
+  // Fall back to steady states
   switch (statusName) {
+    case 'starting':
+      return PIPELINE_STATE_MESSAGES.starting
     case 'failed':
       return PIPELINE_STATE_MESSAGES.failed
     case 'stopped':
       return PIPELINE_STATE_MESSAGES.stopped
-    case 'starting':
-      return PIPELINE_STATE_MESSAGES.starting
     case 'started':
       return PIPELINE_STATE_MESSAGES.running
     case 'unknown':
