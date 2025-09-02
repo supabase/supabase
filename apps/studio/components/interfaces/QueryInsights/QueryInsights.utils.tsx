@@ -72,7 +72,7 @@ export const formatQueryInsightsColumns = ({
                     </TooltipTrigger>
                     <TooltipContent className="min-w-52">
                       <h4 className="font-mono uppercase text-foreground-light text-xs pt-1 pb-1.5">
-                        Query Advisor
+                        Latency Advisor
                       </h4>
                       <div className="flex flex-col gap-y-1 divide-y divide-dotted [&>div]:py-1.5 [&>div]:flex [&>div]:items-center [&>div]:justify-between">
                         <div>
