@@ -8,7 +8,7 @@ import type { ReportConfig } from 'data/reports/v2/reports.types'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Card, CardContent, cn } from 'ui'
+import { Badge, Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
 
 export interface ReportChartV2Props {
@@ -98,16 +98,12 @@ export const ReportChartV2 = ({
       <CardContent className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
-        ) : showEmptyState ? (
-          <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
-            No data available for the selected time range
-          </p>
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data
           </p>
         ) : (
-          <div className="w-full">
+          <div className="w-full relative">
             <ComposedChart
               attributes={dynamicAttributes}
               data={finalChartData}
@@ -130,6 +126,7 @@ export const ReportChartV2 = ({
               titleTooltip={report.titleTooltip}
               syncId={syncId}
               sql={queryResult?.query}
+              showNewBadge={report.showNewBadge}
             />
           </div>
         )}
