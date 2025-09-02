@@ -7,6 +7,7 @@ import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
+  CodeBlock,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -85,7 +86,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   }}
                 />
               )}
-              <div className="font-mono text-xs">{value}</div>
+              <CodeBlock
+                hideCopy
+                hideLineNumbers
+                language="sql"
+                value={value.replace(/\s+/g, ' ').trim()}
+                wrapLines={false}
+                className="p-0 !bg-transparent !border-0 whitespace-nowrap !overflow-hidden !text-xs"
+              />
             </div>
           )
         }
