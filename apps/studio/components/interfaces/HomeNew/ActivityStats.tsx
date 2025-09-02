@@ -1,18 +1,19 @@
 import dayjs from 'dayjs'
+import { GitBranch } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
+
 import { useParams } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useBranchesQuery } from 'data/branches/branches-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useBackupsQuery } from 'data/database/backups-query'
+import { useMigrationsQuery } from 'data/database/migrations-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Skeleton } from 'ui'
 import { ServiceStatus } from './ServiceStatus'
-import { GitBranch } from 'lucide-react'
 
-export function ActivityStats() {
-  const { data: project } = useSelectedProjectQuery()
+export const ActivityStats = () => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: branchesData, isLoading: isLoadingBranches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
@@ -60,54 +61,59 @@ export function ActivityStats() {
             <ServiceStatus />
           </div>
         </div>
-        <Link href={`/project/${ref}/database/migrations`} className="block">
+        <Link className="block" href={`/project/${ref}/database/migrations`}>
           <p className="heading-meta text-foreground-light mb-1">Last migration</p>
-          <p className="text-foreground">
-            {isLoadingMigrations ? (
-              <Skeleton className="h-4 w-16 mt-2" />
-            ) : latestMigration ? (
-              dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
-            ) : (
-              'No migrations'
-            )}
-          </p>
+          {isLoadingMigrations ? (
+            <Skeleton className="h-4 w-16 mt-2" />
+          ) : (
+            <p className="text-foreground">
+              {latestMigration
+                ? dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
+                : 'No migrations'}
+            </p>
+          )}
         </Link>
-        <Link href={`/project/${ref}/database/backups/scheduled`} className="block">
+        <Link className="block" href={`/project/${ref}/database/backups/scheduled`}>
           <p className="heading-meta text-foreground-light mb-1">Last backup</p>
-          <p className="text-foreground">
-            {isLoadingBackups ? (
-              <Skeleton className="h-4 w-16 mt-2" />
-            ) : backupsData?.pitr_enabled ? (
-              'PITR enabled'
-            ) : latestBackup ? (
-              dayjs(latestBackup.inserted_at).fromNow()
-            ) : (
-              'No backups'
-            )}
-          </p>
+          {isLoadingBackups ? (
+            <Skeleton className="h-4 w-16 mt-2" />
+          ) : (
+            <p className="text-foreground">
+              {backupsData?.pitr_enabled
+                ? 'PITR enabled'
+                : latestBackup
+                  ? dayjs(latestBackup.inserted_at).fromNow()
+                  : 'No backups'}
+            </p>
+          )}
         </Link>
-        <Link href={`/project/${ref}/branches`} className="block">
+        <Link className="block" href={`/project/${ref}/branches`}>
           <h4 className="heading-meta text-foreground-light mb-1">
             {isDefaultProject ? 'Recent branch' : 'Branch Created'}
           </h4>
-          <p className="text-foreground">
-            {isLoadingBranches ? (
-              <Skeleton className="h-4 w-24 mt-2" />
-            ) : isDefaultProject ? (
-              <div className="flex items-center gap-2">
-                <GitBranch size={16} strokeWidth={1.5} className="text-foreground-muted" />
-                {latestNonDefaultBranch?.name ?? '+ Create your first branch'}
-              </div>
-            ) : currentBranch?.created_at ? (
-              dayjs(currentBranch.created_at).fromNow()
-            ) : (
-              'Unknown'
-            )}
-          </p>
+
+          {isLoadingBranches ? (
+            <Skeleton className="h-4 w-24 mt-2" />
+          ) : (
+            <div className="text-foreground">
+              {isDefaultProject ? (
+                <div className="flex items-center gap-2">
+                  <div>
+                    <GitBranch size={16} strokeWidth={1.5} className="text-foreground-muted" />
+                  </div>
+                  <p className="truncate">
+                    {latestNonDefaultBranch?.name ?? '+ Create your first branch'}
+                  </p>
+                </div>
+              ) : currentBranch?.created_at ? (
+                dayjs(currentBranch.created_at).fromNow()
+              ) : (
+                'Unknown'
+              )}
+            </div>
+          )}
         </Link>
       </div>
     </div>
   )
 }
-
-export default ActivityStats

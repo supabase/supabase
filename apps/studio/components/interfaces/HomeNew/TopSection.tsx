@@ -1,13 +1,13 @@
 import Link from 'next/link'
 
-import ActivityStats from 'components/interfaces/HomeNew/ActivityStats'
-import { ReactFlowProvider } from 'reactflow'
+import { ActivityStats } from 'components/interfaces/HomeNew/ActivityStats'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
-import { cn, Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import InstanceConfiguration from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import { ReactFlowProvider } from 'reactflow'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
 interface TopSectionProps {
   projectName: string
@@ -20,7 +20,7 @@ interface TopSectionProps {
   isPaused: boolean
 }
 
-const TopSection = ({
+export const TopSection = ({
   projectName,
   isMainBranch,
   parentProject,
@@ -92,5 +92,3 @@ const TopSection = ({
     </div>
   )
 }
-
-export default TopSection

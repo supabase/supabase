@@ -1,14 +1,14 @@
 import { useFlag } from 'common'
+import Home from 'components/interfaces/Home/Home'
+import { HomeV2 } from 'components/interfaces/HomeNew/Home'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import type { NextPageWithLayout } from 'types'
-import HomeNew from 'components/interfaces/HomeNew/Home'
-import Home from 'components/interfaces/Home/Home'
 
 const HomePage: NextPageWithLayout = () => {
   const isHomeNew = useFlag('homeNew')
   if (isHomeNew) {
-    return <HomeNew />
+    return <HomeV2 />
   }
   return <Home />
 }
