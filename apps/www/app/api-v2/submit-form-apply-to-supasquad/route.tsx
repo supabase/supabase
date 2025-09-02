@@ -1,4 +1,5 @@
 import z from 'zod'
+import { getTitlePropertyName, insertPageInDatabase } from '~/lib/notion'
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY
 const NOTION_DB_ID = process.env.NOTION_DB_ID
@@ -49,20 +50,6 @@ function normalizeTrack(t: { heading: string; description: string } | string) {
   const trackName = typeof t === 'string' ? t : t.heading
   if (trackName === 'Builder/Maintainer') return 'Builder / Maintainer'
   return trackName
-}
-
-async function getTitlePropertyName(dbId: string, apiKey: string): Promise<string> {
-  const resp = await fetch(`https://api.notion.com/v1/databases/${dbId}`, {
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Notion-Version': '2022-06-28',
-    },
-  })
-  if (!resp.ok) throw new Error('Failed to retrieve database metadata')
-  const db: any = await resp.json()
-  const entry = Object.entries(db.properties).find(([, v]: any) => v?.type === 'title')
-  if (!entry) throw new Error('No title property found in database')
-  return entry[0]
 }
 
 export async function POST(req: Request) {
@@ -172,36 +159,12 @@ export async function POST(req: Request) {
   }
 
   try {
-    const notionRequest = await fetch('https://api.notion.com/v1/pages', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${NOTION_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28',
-      },
-      body: JSON.stringify({
-        parent: { type: 'database_id', database_id: NOTION_DB_ID },
-        properties: props,
-      }),
+    const newPageId = await insertPageInDatabase(NOTION_DB_ID, NOTION_API_KEY, props)
+
+    return new Response(JSON.stringify({ message: 'Submission successful', id: newPageId }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 201,
     })
-
-    const json = await notionRequest.json()
-
-    if (notionRequest.ok) {
-      return new Response(JSON.stringify({ message: 'Submission successful', id: json.id }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 201,
-      })
-    }
-
-    return new Response(
-      JSON.stringify({
-        message: 'Notion API error',
-        error: json?.message,
-        details: json,
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 502 }
-    )
   } catch (err: any) {
     return new Response(JSON.stringify({ message: 'Notion API error', error: err?.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
