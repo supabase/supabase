@@ -1,4 +1,5 @@
 import z from 'zod'
+import { CustomerioAppClient, CustomerioTrackClient } from '~/lib/customerio'
 import { getTitlePropertyName, insertPageInDatabase } from '~/lib/notion'
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY
@@ -161,14 +162,109 @@ export async function POST(req: Request) {
   try {
     const newPageId = await insertPageInDatabase(NOTION_DB_ID, NOTION_API_KEY, props)
 
+    await savePersonAndEventInCustomerIO({ ...data, tracks: data.tracks.map(normalizeTrack), notion_page_id: newPageId, source_url: req.headers.get('origin') })
+
     return new Response(JSON.stringify({ message: 'Submission successful', id: newPageId }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 201,
     })
   } catch (err: any) {
-    return new Response(JSON.stringify({ message: 'Notion API error', error: err?.message }), {
+    return new Response(JSON.stringify({ message: 'Error sending your application', error: err?.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 502,
     })
+  }
+}
+
+const savePersonAndEventInCustomerIO = async (data: any) => {
+  const customerioSiteId = process.env.CUSTOMERIO_SITE_ID;
+  const customerioApiKey = process.env.CUSTOMERIO_API_KEY;
+
+  if (customerioSiteId && customerioApiKey) {
+    try {
+      const customerioClient = new CustomerioTrackClient(
+        customerioSiteId,
+        customerioApiKey
+      );
+
+      // Create or update profile in Customer.io
+      // Note: only include personal information
+      // not application specific responses
+      await customerioClient.createOrUpdateProfile(data.email, {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        github: data.github,
+        twitter: data.twitter,
+      });
+
+      // Track the supasquad_application_form_submitted event
+      // This includes application specific responses
+      const customerioEvent = {
+        userId: data.email,
+        type: "track" as const,
+        event: "supasquad_application_form_submitted",
+        properties: {
+          ...data,
+          event_type: "supasquad_application_form_submitted",
+          source: "supasquad_application_form",
+          submitted_at: new Date().toISOString(),
+        },
+        timestamp: customerioClient.isoToUnixTimestamp(
+          new Date().toISOString()
+        ),
+      };
+
+      await customerioClient.trackEvent(
+        data.email,
+        customerioEvent
+      );
+
+      console.log("Customer.io Track API integration completed");
+
+
+      await sendConfirmationEmail({
+        email: data.email,
+        first_name: data.first_name,
+        last_name: data.last_name,
+      })
+    } catch (error) {
+      console.error("Customer.io Track API integration failed:", error);
+    }
+  }
+}
+
+const sendConfirmationEmail = async (emailData: { email: string; first_name: string; last_name: string; }) => {
+  console.log("Preparing to send confirmation email to:", emailData);
+
+  const customerioApiKey = process.env.CUSTOMERIO_APP_API_KEY
+
+  if (customerioApiKey) {
+    const customerioAppClient = new CustomerioAppClient(
+      customerioApiKey
+    );
+
+    try {
+      const emailRequest = {
+        transactional_message_id: 9,
+        to: emailData.email,
+        identifiers: {
+          email: emailData.email,
+        },
+        message_data: {
+          first_name: emailData.first_name,
+          last_name: emailData.last_name,
+        },
+        send_at: customerioAppClient.isoToUnixTimestamp(new Date(Date.now() + 60 * 1000).toISOString()), // Schedule to send after 1 minute
+      };
+
+      const emailResponse =
+        await customerioAppClient.sendTransactionalEmail(emailRequest);
+      console.log("Confirmation email schedulled successfully:", emailResponse);
+    } catch (error) {
+      throw new Error(`Failed to send confirmation email: ${error}`);
+    }
+  } else {
+    console.warn("Customer.io App API key is not set");
   }
 }

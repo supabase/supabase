@@ -121,7 +121,7 @@ const applicationSchema = z.object({
     .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.number().min(1, 'This is required'),
+  monthly_commitment: z.number({ invalid_type_error: "Please enter a number" }).min(1, 'This is required'),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
   skills: z.string().optional(),
   location: z.string().min(1, 'Make sure to specify your city and country'),
@@ -571,16 +571,19 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
     },
     mode: 'onBlur',
     reValidateMode: 'onBlur',
+    resetOptions: {
+      keepDefaultValues: true
+    }
   })
 
   const handleCancel = () => {
-    form.reset()
+    // form.reset()
     setIsSubmitted(false)
   }
 
   const handleConfirmationClose = () => {
     setShowConfirmation(false)
-    form.reset()
+    // form.reset()
     setIsSubmitted(false)
     setErrors({})
   }
@@ -649,7 +652,7 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
       </div>
 
       {/* Confirmation AlertDialog Overlay */}
-      <AlertDialog open={showConfirmation} onOpenChange={() => {}}>
+      <AlertDialog open={showConfirmation} onOpenChange={() => { }}>
         <AlertDialogContent className="z-[60]">
           <AlertDialogTitle className="sr-only">Application Submitted</AlertDialogTitle>
           <AlertDialogDescription className="sr-only">
