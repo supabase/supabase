@@ -64,16 +64,6 @@ const EdgeFunctionsUsage = () => {
   const [executionTimeFilter, setExecutionTimeFilter] = useState<NumericFilter | undefined>()
   const [functionFilter, setFunctionFilter] = useState<SelectFilters>({})
 
-  const filters = useMemo(
-    () => ({
-      status_code: statusCodeFilter,
-      region: regionFilter,
-      execution_time: executionTimeFilter,
-      functions: functionFilter,
-    }),
-    [statusCodeFilter, regionFilter, executionTimeFilter, functionFilter]
-  )
-
   const {
     selectedDateRange,
     updateDateRange,
@@ -94,9 +84,22 @@ const EdgeFunctionsUsage = () => {
       startDate: selectedDateRange?.period_start?.date ?? '',
       endDate: selectedDateRange?.period_end?.date ?? '',
       interval: selectedDateRange?.interval ?? 'minute',
-      filters,
+      filters: {
+        functions: functionFilter,
+        status_code: statusCodeFilter,
+        region: regionFilter,
+        execution_time: executionTimeFilter,
+      },
     })
-  }, [ref, functions, selectedDateRange, filters])
+  }, [
+    ref,
+    functions,
+    selectedDateRange,
+    functionFilter,
+    statusCodeFilter,
+    regionFilter,
+    executionTimeFilter,
+  ])
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
@@ -207,7 +210,12 @@ const EdgeFunctionsUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
-                  filters={filters}
+                  filters={{
+                    functions: functionFilter,
+                    status_code: statusCodeFilter,
+                    region: regionFilter,
+                    execution_time: executionTimeFilter,
+                  }}
                 />
               ))}
         </div>
