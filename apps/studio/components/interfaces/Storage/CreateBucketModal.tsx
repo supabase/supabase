@@ -191,7 +191,22 @@ const CreateBucketModal = () => {
       toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
     } catch (error: any) {
-      toast.error(`Failed to create bucket: ${error.message}`)
+      // Handle specific error cases for inline display
+      const errorMessage = error.message?.toLowerCase() || ''
+
+      if (
+        errorMessage.includes('mime type') &&
+        (errorMessage.includes('is not supported') || errorMessage.includes('not supported'))
+      ) {
+        // Set form error for the MIME types field
+        form.setError('allowed_mime_types', {
+          type: 'manual',
+          message: 'Invalid MIME type format. Please check your input.',
+        })
+      } else {
+        // For other errors, show a toast as fallback
+        toast.error(`Failed to create bucket: ${error.message}`)
+      }
     }
   }
 
