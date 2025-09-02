@@ -104,6 +104,15 @@ export function FilterCondition({
     [valueItems]
   )
 
+  // If the value options are only a custom component, open it immediately
+  useEffect(() => {
+    if (!isActive || isLoading) return
+    const hasOnlyCustom = valueItems.length > 0 && valueItems.every((i) => i.isCustom)
+    if (hasOnlyCustom && !showValueCustom) {
+      setShowValueCustom(true)
+    }
+  }, [isActive, isLoading, valueItems, showValueCustom])
+
   const {
     highlightedIndex: opHighlightedIndex,
     handleKeyDown: handleOperatorKeyDown,
@@ -209,7 +218,7 @@ export function FilterCondition({
           />
         </PopoverAnchor_Shadcn_>
         <PopoverContent_Shadcn_
-          className="w-[260px] p-0"
+          className="min-w-[220px] w-fit p-0"
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}

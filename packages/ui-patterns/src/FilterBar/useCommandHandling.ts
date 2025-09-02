@@ -156,7 +156,10 @@ export function useCommandHandling({
       onFilterChange(updatedFilters)
       const newPath = [...currentPath, group.conditions.length]
 
-      // Custom property selection will be handled inline by the condition popover
+      // Focus the newly added condition's value input so its popover opens immediately
+      setTimeout(() => {
+        setActiveInput({ type: 'value', path: newPath })
+      }, 0)
     },
     [activeFilters, onFilterChange, setActiveInput, removeFilterByPath]
   )
