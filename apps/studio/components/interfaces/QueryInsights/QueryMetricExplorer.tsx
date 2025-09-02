@@ -641,7 +641,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                       yAxisKey={getChartAttributes[0].attribute}
                       xAxisKey="period_start"
                       title={''}
-                      customDateFormat="HH:mm"
+                      customDateFormat="MMM D, YYYY hh:mm A"
                       hideChartType={true}
                       hideHighlightArea={true}
                       showTooltip={true}
@@ -659,6 +659,7 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                         width: 60,
                         tickFormatter: (value) => value.toLocaleString(),
                       }}
+                      xAxisIsDate={true}
                       className="my-3"
                     />
                   </>

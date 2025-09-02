@@ -142,9 +142,9 @@ export const formatQueryInsightsColumns = ({
             slownessRating === 'CRITICAL'
 
           return (
-            <div className="w-full flex items-center gap-x-4">
+            <div className="w-full flex items-center justify-start gap-x-4">
               {shouldShowWarning && (
-                <span className="flex-1 flex">
+                <span className="flex">
                   <Tooltip>
                     <TooltipTrigger>
                       <WarningIcon />
@@ -180,7 +180,7 @@ export const formatQueryInsightsColumns = ({
               )}
               <CodeBlock
                 language="sql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible line-clamp-1"
+                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-[68ch] flex-grow"
                 hideLineNumbers
                 hideCopy
                 value={value as string}
@@ -193,7 +193,7 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'calls') {
           const formattedValue = (value as number)?.toLocaleString() || ''
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
             </div>
           )
@@ -202,10 +202,12 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'total_time') {
           const formattedValue = value ? `${(value as number).toFixed(0)}ms` : ''
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
               {value && (
-                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+                <p className="text-foreground-lighter font-mono">
+                  {((value as number) / 1000).toFixed(2)}s
+                </p>
               )}
             </div>
           )
@@ -214,10 +216,12 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'mean_exec_time') {
           const formattedValue = value ? `${(value as number).toFixed(0)}ms` : ''
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
               {value && (
-                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+                <p className="text-foreground-lighter font-mono">
+                  {((value as number) / 1000).toFixed(2)}s
+                </p>
               )}
             </div>
           )
@@ -226,7 +230,7 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'rows_read') {
           const formattedValue = (value as number)?.toLocaleString() || ''
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
             </div>
           )
@@ -235,10 +239,12 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'avg_p90') {
           const formattedValue = value ? `${(value as number).toFixed(0)}ms` : ''
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
               {value && (
-                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+                <p className="text-foreground-lighter font-mono">
+                  {((value as number) / 1000).toFixed(2)}s
+                </p>
               )}
             </div>
           )
@@ -247,10 +253,12 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'avg_p95') {
           const formattedValue = value ? `${(value as number).toFixed(0)}ms` : ''
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
               {value && (
-                <p className="text-foreground-lighter">{((value as number) / 1000).toFixed(2)}s</p>
+                <p className="text-foreground-lighter font-mono">
+                  {((value as number) / 1000).toFixed(2)}s
+                </p>
               )}
             </div>
           )
@@ -268,7 +276,7 @@ export const formatQueryInsightsColumns = ({
           }
 
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p className={textColor}>{formattedValue}</p>
             </div>
           )
@@ -280,7 +288,7 @@ export const formatQueryInsightsColumns = ({
           const formattedValue = numericValue.toFixed(2)
 
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
             </div>
           )
@@ -289,7 +297,7 @@ export const formatQueryInsightsColumns = ({
         if (col.id === 'last_run') {
           if (!value)
             return (
-              <div className="w-full flex flex-col justify-center font-mono text-xs text-center">
+              <div className="w-full flex flex-col justify-center text-xs">
                 <p className="text-foreground-lighter">-</p>
               </div>
             )
@@ -297,7 +305,7 @@ export const formatQueryInsightsColumns = ({
           const date = new Date(value as string)
           const formattedValue = date.toLocaleString()
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{formattedValue}</p>
             </div>
           )
