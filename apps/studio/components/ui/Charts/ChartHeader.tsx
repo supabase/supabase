@@ -16,6 +16,7 @@ export interface ChartHeaderProps {
   highlightedLabel?: number | string | any | null
   highlightedValue?: number | string | any | null
   hideHighlightedValue?: boolean
+  hideHighlightedLabel?: boolean
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
@@ -38,6 +39,7 @@ const ChartHeader = ({
   highlightedValue,
   highlightedLabel,
   hideHighlightedValue = false,
+  hideHighlightedLabel = false,
   title,
   minimalHeader = false,
   hideChartType = false,
@@ -184,7 +186,7 @@ const ChartHeader = ({
         {title && chartTitle}
         <div className="flex flex-row items-baseline gap-x-2">
           {highlightedValue !== undefined && !hideHighlightedValue && highlighted}
-          {label}
+          {!hideHighlightedLabel && label}
         </div>
       </div>
     )
@@ -198,7 +200,7 @@ const ChartHeader = ({
         {title && chartTitle}
         <div className="h-4">
           {hasHighlightedValue && highlighted}
-          {label}
+          {!hideHighlightedLabel && label}
         </div>
       </div>
       <div className="flex items-center gap-2">

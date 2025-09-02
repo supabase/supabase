@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
+
 import {
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -281,6 +282,20 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
 
     return attributes
   }, [selectedMetric, safeVisiblePercentiles, selectedQuery])
+
+  const transformedChartAttributes = useMemo(() => {
+    return getChartAttributes
+      .filter((attr) => attr.label && attr.format) // Filter out undefined values
+      .map((attr) => ({
+        attribute: attr.attribute,
+        label: attr.label!,
+        format: attr.format!,
+        color: attr.color,
+        strokeDasharray: attr.strokeDasharray,
+        type: attr.type === 'line' ? ('line' as const) : undefined,
+        strokeWidth: typeof attr.strokeWidth === 'number' ? attr.strokeWidth : undefined,
+      }))
+  }, [getChartAttributes])
 
   // Calculate average P95 for query latency
   const averageP95 = useMemo(() => {
@@ -578,7 +593,9 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                       customDateFormat="HH:mm"
                       hideChartType={true}
                       hideHighlightedValue={true}
+                      hideHighlightedLabel={true}
                       showTooltip={true}
+                      showGrid={false}
                       showLegend={
                         selectedMetric === 'query_latency' ||
                         selectedMetric === 'cache_hits' ||
@@ -587,6 +604,11 @@ export const QueryMetricExplorer = ({ startTime, endTime }: QueryMetricExplorerP
                       showTotal={false}
                       showMaxValue={false}
                       updateDateRange={updateDateRange}
+                      YAxisProps={{
+                        tick: true,
+                        width: 60,
+                        tickFormatter: (value) => value.toLocaleString(),
+                      }}
                     />
                   </>
                 ) : (
