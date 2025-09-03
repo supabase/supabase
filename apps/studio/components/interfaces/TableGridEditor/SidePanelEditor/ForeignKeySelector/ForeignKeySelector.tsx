@@ -416,7 +416,7 @@ export const ForeignKeySelector = ({
                             <li key={`type-error-${idx}`}>
                               <div className="flex items-center gap-x-1">
                                 <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
-                                <ArrowRight /> {x.targetType}
+                                <ArrowRight size={14} /> {x.targetType}
                               </div>
                             </li>
                           )
