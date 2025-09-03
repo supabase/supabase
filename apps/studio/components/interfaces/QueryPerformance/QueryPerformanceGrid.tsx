@@ -1,8 +1,8 @@
 import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
-import Editor from '@monaco-editor/react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import dynamic from 'next/dynamic'
 
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
@@ -31,6 +31,11 @@ import {
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
+
+// Load the monaco editor client-side only (does not behave well server-side)
+const Editor = dynamic(() => import('@monaco-editor/react').then(({ Editor }) => Editor), {
+  ssr: false,
+})
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const router = useRouter()

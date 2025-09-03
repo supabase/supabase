@@ -1,9 +1,9 @@
 import { Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 
 import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
-import { SqlMonacoBlock } from './SqlMonacoBlock'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_REPORTS,
@@ -15,6 +15,14 @@ interface QueryDetailProps {
   selectedRow: any
   onClickViewSuggestion: () => void
 }
+
+// Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
+const SqlMonacoBlock = dynamic(
+  () => import('./SqlMonacoBlock').then(({ SqlMonacoBlock }) => SqlMonacoBlock),
+  {
+    ssr: false,
+  }
+)
 
 export const QueryDetail = ({
   reportType,
