@@ -49,8 +49,6 @@ const UsageSection = ({
         <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
       </ScaffoldContainer>
 
-      <ScaffoldDivider />
-
       {categoryMeta.attributes.map((attribute) =>
         attribute.key === 'diskSize' ? (
           <DiskUsage
