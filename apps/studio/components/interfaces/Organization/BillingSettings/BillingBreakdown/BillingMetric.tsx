@@ -87,13 +87,13 @@ const BillingMetric = ({
                   {metric.name}
                 </p>
                 {usageMeta.available_in_plan && (
-                  <span className="transition inline-block group-hover:transform group-hover:translate-x-0.5">
+                  <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
                     <ChevronRight strokeWidth={1.5} size={16} className="transition" />
                   </span>
                 )}
               </div>
             ) : (
-              <p className="text-xs text-foreground-light flex space-x-1">{metric.name}</p>
+              <p className="text-sm text-foreground-light flex space-x-1">{metric.name}</p>
             )}
             <span className="text-sm">{usageLabel}</span>&nbsp;
             {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
