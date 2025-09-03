@@ -54,19 +54,17 @@ export const ActivityStats = () => {
 
   return (
     <div className="@container">
-      <div className="grid grid-cols-2 gap-4 @md:grid-cols-4">
+      <div className="grid grid-cols-2 xl:flex xl:gap-10 gap-4 flex-wrap">
         <div className="block">
-          <p className="heading-meta text-foreground-light">Status</p>
-          <div className="flex items-center gap-2 mt-1">
-            <ServiceStatus />
-          </div>
+          <p className="heading-meta text-foreground-light mb-1">Status</p>
+          <ServiceStatus />
         </div>
         <Link className="block" href={`/project/${ref}/database/migrations`}>
           <p className="heading-meta text-foreground-light mb-1">Last migration</p>
           {isLoadingMigrations ? (
             <Skeleton className="h-4 w-16 mt-2" />
           ) : (
-            <p className="text-foreground">
+            <p className="text-foreground h-[34px] flex items-center">
               {latestMigration
                 ? dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
                 : 'No migrations'}
@@ -78,7 +76,7 @@ export const ActivityStats = () => {
           {isLoadingBackups ? (
             <Skeleton className="h-4 w-16 mt-2" />
           ) : (
-            <p className="text-foreground">
+            <p className="text-foreground h-[34px] flex items-center">
               {backupsData?.pitr_enabled
                 ? 'PITR enabled'
                 : latestBackup
@@ -95,9 +93,12 @@ export const ActivityStats = () => {
           {isLoadingBranches ? (
             <Skeleton className="h-4 w-24 mt-2" />
           ) : (
-            <div className="text-foreground truncate">
+            <div className="text-foreground truncate h-[34px] flex items-center">
               {isDefaultProject ? (
-                <p className="truncate">{latestNonDefaultBranch?.name ?? 'No branches'}</p>
+                <div className="flex items-center gap-2">
+                  <GitBranch size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <p className="truncate">{latestNonDefaultBranch?.name ?? 'No branches'}</p>
+                </div>
               ) : currentBranch?.created_at ? (
                 dayjs(currentBranch.created_at).fromNow()
               ) : (

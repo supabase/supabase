@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -28,11 +28,9 @@ const StatusMessage = ({
   status,
   isLoading,
   isHealthy,
-  isProjectNew,
 }: {
   isLoading: boolean
   isHealthy: boolean
-  isProjectNew: boolean
   status?: ProjectServiceStatus
 }) => {
   if (isHealthy) return 'Healthy'
@@ -40,7 +38,6 @@ const StatusMessage = ({
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
-  if (isProjectNew) return 'Coming up...'
   if (status) return status
   return 'Unable to connect'
 }
@@ -56,12 +53,10 @@ const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
 const StatusIcon = ({
   isLoading,
   isHealthy,
-  isProjectNew,
   projectStatus,
 }: {
   isLoading: boolean
   isHealthy: boolean
-  isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
   if (isHealthy) return <CheckIcon />
@@ -69,7 +64,6 @@ const StatusIcon = ({
   if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
-  if (isProjectNew) return <LoaderIcon />
   return <AlertIcon />
 }
 
@@ -97,15 +91,6 @@ export const ServiceStatus = () => {
     { projectRef: isBranch ? project?.parentRef : undefined },
     {
       enabled: isBranch,
-      refetchInterval: (data) => {
-        if (!data) return false
-        const currentBranch = data.find((branch) => branch.project_ref === ref)
-        return ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
-          currentBranch?.status || ''
-        )
-          ? false
-          : 5000
-      },
     }
   )
 
@@ -141,6 +126,12 @@ export const ServiceStatus = () => {
   const realtimeStatus = status?.find((service) => service.name === 'realtime')
   const storageStatus = status?.find((service) => service.name === 'storage')
   const dbStatus = status?.find((service) => service.name === 'db')
+
+  const isMigrationLoading =
+    isBranchesLoading ||
+    currentBranch?.status === 'CREATING_PROJECT' ||
+    currentBranch?.status === 'RUNNING_MIGRATIONS' ||
+    project?.status === 'COMING_UP'
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services: {
@@ -226,78 +217,52 @@ export const ServiceStatus = () => {
           },
         ]
       : []),
-    ...(isBranch
-      ? [
-          {
-            name: 'Migrations',
-            error: undefined,
-            docsUrl: undefined,
-            isLoading: isBranchesLoading,
-            isHealthy: currentBranch?.status === 'FUNCTIONS_DEPLOYED',
-            status: (currentBranch?.status === 'FUNCTIONS_DEPLOYED'
-              ? 'ACTIVE_HEALTHY'
-              : currentBranch?.status === 'FUNCTIONS_FAILED' ||
-                  currentBranch?.status === 'MIGRATIONS_FAILED'
-                ? 'UNHEALTHY'
-                : 'COMING_UP') as ProjectServiceStatus,
-            logsUrl: '/branches',
-          },
-        ]
-      : []),
+    {
+      name: 'Migrations',
+      error: undefined,
+      docsUrl: undefined,
+      isLoading: isBranch ? isBranchesLoading : false,
+      isHealthy: isBranch ? currentBranch?.status === 'FUNCTIONS_DEPLOYED' : !isMigrationLoading,
+      status: (isBranch
+        ? currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+          ? 'ACTIVE_HEALTHY'
+          : currentBranch?.status === 'FUNCTIONS_FAILED' ||
+              currentBranch?.status === 'MIGRATIONS_FAILED'
+            ? 'UNHEALTHY'
+            : 'COMING_UP'
+        : isMigrationLoading
+          ? 'COMING_UP'
+          : 'ACTIVE_HEALTHY') as ProjectServiceStatus,
+      logsUrl: isBranch ? '/branches' : '/logs/database-logs',
+    },
   ]
 
-  const isMigrationLoading =
-    isBranchesLoading ||
-    currentBranch?.status === 'CREATING_PROJECT' ||
-    currentBranch?.status === 'RUNNING_MIGRATIONS'
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isHealthy)
 
-  // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
-  const isProjectNew =
-    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD ||
-    project?.status === 'COMING_UP'
-
-  useEffect(() => {
-    let timer: any
-
-    if (isProjectNew) {
-      const secondsSinceProjectCreated = dayjs
-        .utc()
-        .diff(dayjs.utc(project?.inserted_at), 'seconds')
-      const remainingTimeTillNextCheck = SERVICE_STATUS_THRESHOLD * 60 - secondsSinceProjectCreated
-
-      timer = setTimeout(() => {
-        refetchServiceStatus()
-        refetchEdgeFunctionServiceStatus()
-      }, remainingTimeTillNextCheck * 1000)
-    }
-
-    return () => {
-      clearTimeout(timer)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProjectNew])
-
-  const anyUnhealthy = services.some((service) => !service.isHealthy)
-  const anyComingUp = services.some((service) => service.status === 'COMING_UP')
-  const overallStatusLabel = isLoadingChecks ? (
-    <Skeleton className="h-4 w-16 mt-2" />
-  ) : anyUnhealthy ? (
-    'Unhealthy'
-  ) : anyComingUp || isProjectNew ? (
-    'Coming up...'
-  ) : (
-    'Healthy'
+  const anyUnhealthy = services.some(
+    (service) => !service.isHealthy && service.status !== 'COMING_UP'
   )
+  const anyComingUp = services.some((service) => service.status === 'COMING_UP')
+  const overallStatusLabel = isLoadingChecks
+    ? 'Checking...'
+    : anyUnhealthy
+      ? 'Unhealthy'
+      : anyComingUp || isMigrationLoading
+        ? 'Coming up...'
+        : 'Healthy'
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
+          type="outline"
+          className="text-base h-auto px-2"
+          iconRight={<ChevronDown size={14} strokeWidth={1.5} />}
           icon={
-            isLoadingChecks ||
-            (!allServicesOperational && isProjectNew && isMigrationLoading) ? null : (
+            isLoadingChecks || anyComingUp || isMigrationLoading ? (
+              <Loader2 className="animate-spin" size={12} strokeWidth={1.5} />
+            ) : (
               <div
                 className={`w-2 h-2 rounded-full ${
                   allServicesOperational ? 'bg-brand' : 'bg-warning'
@@ -320,7 +285,6 @@ export const ServiceStatus = () => {
               <StatusIcon
                 isLoading={service.isLoading}
                 isHealthy={!!service.isHealthy}
-                isProjectNew={isProjectNew}
                 projectStatus={service.status}
               />
               <div className="flex-1">
@@ -329,7 +293,6 @@ export const ServiceStatus = () => {
                   <StatusMessage
                     isLoading={service.isLoading}
                     isHealthy={!!service.isHealthy}
-                    isProjectNew={isProjectNew}
                     status={service.status}
                   />
                 </p>
