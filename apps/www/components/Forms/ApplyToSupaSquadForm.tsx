@@ -122,7 +122,7 @@ const applicationSchema = z.object({
     .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.number({ invalid_type_error: "Please enter a number" }),
+  monthly_commitment: z.number({ invalid_type_error: 'Please enter a number' }),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
   skills: z.string().optional(),
   city: z.string().min(1, 'Specify your city'),
@@ -397,9 +397,7 @@ const FormContent = memo(function FormContent({
                     <FormControl_Shadcn_>
                       <div className="relative mt-1">
                         {/* <Input_Shadcn_ type="text" placeholder="Country" {...field} /> */}
-                        <CountrySelector value={field.value || ""}
-                          onValueChange={field.onChange}
-                        />
+                        <CountrySelector value={field.value || ''} onValueChange={field.onChange} />
                       </div>
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
@@ -438,13 +436,13 @@ const FormContent = memo(function FormContent({
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">
                       <Input_Shadcn_
-                        {...({
+                        {...{
                           ...field,
                           inputMode: 'numeric',
                           value: field.value > 0 ? field.value : '',
                           onChange: (e: any) =>
                             field.onChange(e.target.value ? parseInt(e.target.value) : ''),
-                        })}
+                        }}
                       />
                     </div>
                   </FormControl_Shadcn_>
@@ -677,7 +675,7 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
       </div>
 
       {/* Confirmation AlertDialog Overlay */}
-      <AlertDialog open={showConfirmation} onOpenChange={() => { }}>
+      <AlertDialog open={showConfirmation} onOpenChange={() => {}}>
         <AlertDialogContent className="z-[60]">
           <AlertDialogTitle className="sr-only">Application Submitted</AlertDialogTitle>
           <AlertDialogDescription className="sr-only">

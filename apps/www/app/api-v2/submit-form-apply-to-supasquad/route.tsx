@@ -6,22 +6,18 @@ import { insertPageInDatabase } from '~/lib/notion'
 
 // Using a separate Sentry client for community following this guide:
 // https://docs.sentry.io/platforms/javascript/best-practices/multiple-sentry-instances/
-const integrations = Sentry.getDefaultIntegrations({}).filter(
-  (defaultIntegration) => {
-    return !["BrowserApiErrors", "Breadcrumbs", "GlobalHandlers"].includes(
-      defaultIntegration.name,
-    );
-  },
-);
+const integrations = Sentry.getDefaultIntegrations({}).filter((defaultIntegration) => {
+  return !['BrowserApiErrors', 'Breadcrumbs', 'GlobalHandlers'].includes(defaultIntegration.name)
+})
 const sentryCommunityClient = new Sentry.BrowserClient({
   dsn: process.env.SENTRY_DSN_COMMUNITY,
   transport: Sentry.makeFetchTransport,
   stackParser: Sentry.defaultStackParser,
   integrations: [...integrations],
-});
+})
 
-const sentryCommunity = new Sentry.Scope();
-sentryCommunity.setClient(sentryCommunityClient);
+const sentryCommunity = new Sentry.Scope()
+sentryCommunity.setClient(sentryCommunityClient)
 
 const captureSentryCommunityException = (error: any) => {
   if (process.env.SENTRY_DSN_COMMUNITY) {
@@ -46,7 +42,7 @@ const applicationSchema = z.object({
     .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.number({ invalid_type_error: "Please enter a number" }),
+  monthly_commitment: z.number({ invalid_type_error: 'Please enter a number' }),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
   skills: z.string().optional(),
   city: z.string().min(1, 'Specify your city'),
@@ -118,7 +114,12 @@ export async function POST(req: Request) {
     const props = getNotionDBData(data)
     const newPageId = await insertPageInDatabase(NOTION_DB_ID, NOTION_API_KEY, props)
 
-    await savePersonAndEventInCustomerIO({ ...data, tracks: data.tracks.map(normalizeTrack), notion_page_id: newPageId, source_url: req.headers.get('origin') })
+    await savePersonAndEventInCustomerIO({
+      ...data,
+      tracks: data.tracks.map(normalizeTrack),
+      notion_page_id: newPageId,
+      source_url: req.headers.get('origin'),
+    })
 
     return new Response(JSON.stringify({ message: 'Submission successful', id: newPageId }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -126,23 +127,23 @@ export async function POST(req: Request) {
     })
   } catch (err: any) {
     captureSentryCommunityException(err)
-    return new Response(JSON.stringify({ message: 'Error sending your application', error: err?.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 502,
-    })
+    return new Response(
+      JSON.stringify({ message: 'Error sending your application', error: err?.message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 502,
+      }
+    )
   }
 }
 
 const savePersonAndEventInCustomerIO = async (data: any) => {
-  const customerioSiteId = process.env.CUSTOMERIO_SITE_ID;
-  const customerioApiKey = process.env.CUSTOMERIO_API_KEY;
+  const customerioSiteId = process.env.CUSTOMERIO_SITE_ID
+  const customerioApiKey = process.env.CUSTOMERIO_API_KEY
 
   if (customerioSiteId && customerioApiKey) {
     try {
-      const customerioClient = new CustomerioTrackClient(
-        customerioSiteId,
-        customerioApiKey
-      );
+      const customerioClient = new CustomerioTrackClient(customerioSiteId, customerioApiKey)
 
       // Create or update profile in Customer.io
       // Note: only include personal information
@@ -155,30 +156,24 @@ const savePersonAndEventInCustomerIO = async (data: any) => {
         country: data.country,
         github: data.github,
         twitter: data.twitter,
-      });
+      })
 
       // Track the supasquad_application_form_submitted event
       // This includes application specific responses
       const customerioEvent = {
         userId: data.email,
-        type: "track" as const,
-        event: "supasquad_application_form_submitted",
+        type: 'track' as const,
+        event: 'supasquad_application_form_submitted',
         properties: {
           ...data,
-          event_type: "supasquad_application_form_submitted",
-          source: "supasquad_application_form",
+          event_type: 'supasquad_application_form_submitted',
+          source: 'supasquad_application_form',
           submitted_at: new Date().toISOString(),
         },
-        timestamp: customerioClient.isoToUnixTimestamp(
-          new Date().toISOString()
-        ),
-      };
+        timestamp: customerioClient.isoToUnixTimestamp(new Date().toISOString()),
+      }
 
-      await customerioClient.trackEvent(
-        data.email,
-        customerioEvent
-      );
-
+      await customerioClient.trackEvent(data.email, customerioEvent)
 
       await sendConfirmationEmail({
         email: data.email,
@@ -186,18 +181,20 @@ const savePersonAndEventInCustomerIO = async (data: any) => {
         last_name: data.last_name,
       })
     } catch (error) {
-      console.error("Customer.io Track API integration failed:", error);
+      console.error('Customer.io Track API integration failed:', error)
     }
   }
 }
 
-const sendConfirmationEmail = async (emailData: { email: string; first_name: string; last_name: string; }) => {
+const sendConfirmationEmail = async (emailData: {
+  email: string
+  first_name: string
+  last_name: string
+}) => {
   const customerioApiKey = process.env.CUSTOMERIO_APP_API_KEY
 
   if (customerioApiKey) {
-    const customerioAppClient = new CustomerioAppClient(
-      customerioApiKey
-    );
+    const customerioAppClient = new CustomerioAppClient(customerioApiKey)
 
     try {
       const emailRequest = {
@@ -210,16 +207,17 @@ const sendConfirmationEmail = async (emailData: { email: string; first_name: str
           first_name: emailData.first_name,
           last_name: emailData.last_name,
         },
-        send_at: customerioAppClient.isoToUnixTimestamp(new Date(Date.now() + 60 * 1000).toISOString()), // Schedule to send after 1 minute
-      };
+        send_at: customerioAppClient.isoToUnixTimestamp(
+          new Date(Date.now() + 60 * 1000).toISOString()
+        ), // Schedule to send after 1 minute
+      }
 
-      const emailResponse =
-        await customerioAppClient.sendTransactionalEmail(emailRequest);
+      const emailResponse = await customerioAppClient.sendTransactionalEmail(emailRequest)
     } catch (error) {
-      throw new Error(`Failed to send confirmation email: ${error}`);
+      throw new Error(`Failed to send confirmation email: ${error}`)
     }
   } else {
-    console.warn("Customer.io App API key is not set");
+    console.warn('Customer.io App API key is not set')
   }
 }
 
@@ -228,7 +226,7 @@ const getNotionDBData = (data: any) => {
     `${data.first_name?.trim() || ''} ${data.last_name?.trim() || ''}`.trim() || 'Unnamed'
 
   const props: Record<string, any> = {
-    'Name': {
+    Name: {
       title: [{ type: 'text', text: { content: fullName } }],
     },
     'First name': {
@@ -237,7 +235,7 @@ const getNotionDBData = (data: any) => {
     'Last name': {
       rich_text: [{ type: 'text', text: { content: data.last_name || '' } }],
     },
-    'Email': { email: data.email },
+    Email: { email: data.email },
     'What track would you like to be considered for?': {
       multi_select: asMultiSelect(data.tracks.map(normalizeTrack)),
     },
@@ -250,15 +248,17 @@ const getNotionDBData = (data: any) => {
     'Date submitted': {
       date: { start: new Date().toISOString().split('T')[0] },
     },
-    'Country': {
-      select: { name: data.country }
+    Country: {
+      select: { name: data.country },
     },
-    'City': {
+    City: {
       rich_text: [{ type: 'text', text: { content: truncateRichText(data.city, 120) } }],
     },
-    'Location': {
-      rich_text: [{ type: 'text', text: { content: truncateRichText(data.city + ', ' + data.country, 120) } }],
-    }
+    Location: {
+      rich_text: [
+        { type: 'text', text: { content: truncateRichText(data.city + ', ' + data.country, 120) } },
+      ],
+    },
   }
   if (!Number.isNaN(data.monthly_commitment)) {
     props['How many hours can you commit per month?'] = {
