@@ -13,7 +13,7 @@ const CMS_SITE_ORIGIN =
         typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
       : 'http://localhost:3030'
-const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
+const CMS_API_KEY = process.env.CMS_API_KEY
 
 /**
  * Fixes Safari dates sorting bug
@@ -87,7 +87,7 @@ const getCMSBlogPosts = async () => {
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
-        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
       },
     })
 
@@ -127,8 +127,8 @@ const getCMSBlogPosts = async () => {
       })
 
     return posts
-  } catch (error) {
-    console.error('Error fetching CMS blog posts:', error)
+  } catch (_error) {
+    // don't console error to avoid noise if env vars not set
     return []
   }
 }

@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
     const draftParam = searchParams.get('draft') === 'true' // Explicit draft parameter
 
     const baseUrl = CMS_SITE_ORIGIN
-    const apiKey = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
+    const apiKey = process.env.CMS_API_KEY
 
     // Check if we're in draft mode (either Next.js draft mode OR explicit draft parameter)
     const { isEnabled: isDraftMode } = await draftMode()

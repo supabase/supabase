@@ -15,7 +15,7 @@ const CMS_SITE_ORIGIN =
         typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
       : 'http://localhost:3030'
-const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
+const CMS_API_KEY = process.env.CMS_API_KEY
 
 /**
  * Get CMS blog posts for sitemap
@@ -27,7 +27,7 @@ const getCMSBlogPosts = async () => {
       {
         headers: {
           'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
       }
     )

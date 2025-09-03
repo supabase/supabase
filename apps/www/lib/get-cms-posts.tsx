@@ -5,7 +5,7 @@ import { convertRichTextToMarkdown } from './cms/convertRichTextToMarkdown'
 
 // Payload API configuration
 const PAYLOAD_URL = CMS_SITE_ORIGIN || 'http://localhost:3030'
-const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY || process.env.CMS_READ_KEY
+const CMS_API_KEY = process.env.CMS_API_KEY
 
 type CMSBlogPost = {
   id: string
@@ -198,7 +198,7 @@ export async function getAllCMSPostSlugs() {
       {
         headers: {
           'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
       }
     )
@@ -236,8 +236,8 @@ export async function getAllCMSPostSlugs() {
           slug: post.slug,
         },
       }))
-  } catch (error) {
-    console.error('Error fetching CMS post slugs:', error)
+  } catch (_error) {
+    // don't console error to avoid noise if env vars not set
     return []
   }
 }
@@ -261,7 +261,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       response = await fetch(versionsUrl, {
         headers: {
           'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
         // For published posts: allow static generation with revalidation
         next: { revalidate: 60 }, // 1 minute
@@ -286,7 +286,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
         cache: 'no-store',
         next: { revalidate: 0 },
@@ -298,7 +298,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
         response = await fetch(url, {
           headers: {
             'Content-Type': 'application/json',
-            ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+            ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
           },
           cache: 'no-store',
           next: { revalidate: 0 },
@@ -311,7 +311,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
         // For published posts: allow static generation with revalidation
         next: { revalidate: 60 }, // 1 minute
@@ -349,7 +349,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       const publishedResponse = await fetch(publishedUrl, {
         headers: {
           'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
       })
 
@@ -488,7 +488,7 @@ export async function getAllCMSPosts({
       {
         headers: {
           'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
         cache: 'no-store', // Ensure we always get fresh data
         next: { revalidate: 0 }, // Disable caching for this fetch
@@ -589,8 +589,8 @@ export async function getAllCMSPosts({
     }
 
     return posts
-  } catch (error) {
-    console.error('Error fetching all CMS posts:', error)
+  } catch (_error) {
+    // don't console error to avoid noise if env vars not set
     return []
   }
 }

@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const path = searchParams.get('path') || 'blog'
 
   // Get the expected secret with fallback to match CMS configuration
-  const expectedSecret = process.env.PREVIEW_SECRET || 'secret'
+  const expectedSecret = process.env.CMS_PREVIEW_SECRET || 'secret'
 
   if (secret !== expectedSecret) {
     console.error('[preview] Token mismatch:', {
