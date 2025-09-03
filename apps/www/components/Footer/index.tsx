@@ -1,8 +1,9 @@
+'use client'
+
 import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
@@ -13,6 +14,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
+import { usePathname } from 'next/navigation'
 
 interface Props {
   className?: string
@@ -20,10 +22,10 @@ interface Props {
 }
 
 const Footer = (props: Props) => {
-  const { pathname } = useRouter()
+  const pathname = usePathname()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
-  const isGAWeek = pathname.includes('/ga-week')
+  const isGAWeek = pathname?.includes('/ga-week')
   const forceDark = isDarkLaunchWeek
 
   useEffect(() => {
@@ -48,7 +50,6 @@ const Footer = (props: Props) => {
         isGAWeek && 'dark:bg-alternative',
         props.className
       )}
-      aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
         Footer

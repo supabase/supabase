@@ -19,11 +19,3 @@ export const BlockItem = ({ name }: BlockItemProps) => {
     </div>
   )
 }
-
-export const BlockItemPreview = ({ title, src }: { title: string; src: string }) => {
-  return (
-    <div className="flex items-center justify-center relative border rounded-lg">
-      <iframe src={src} className="w-full h-[600px] border-0 rounded-md" title={title} />
-    </div>
-  )
-}

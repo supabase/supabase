@@ -28,7 +28,7 @@ export interface BucketRowProps {
   isSelected: boolean
 }
 
-const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
+export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
   const { can: canUpdateBuckets } = useAsyncCheckProjectPermissions(
     PermissionAction.STORAGE_WRITE,
     '*'
@@ -118,5 +118,3 @@ const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowPro
     </div>
   )
 }
-
-export default BucketRow

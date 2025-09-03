@@ -15,6 +15,7 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
   switch (cloudProvider) {
     case 'AWS':
     case 'AWS_K8S':
+    case 'AWS_NIMBUS':
       return AWS_REGIONS
     case 'FLY':
       return FLY_REGIONS
