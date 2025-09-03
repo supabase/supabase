@@ -64,8 +64,6 @@ export const ForeignKeySelector = ({
   const hasTypeErrors = (errors?.types ?? []).filter((x: any) => x !== undefined).length > 0
   const hasTypeNotices = (errors?.typeNotice ?? []).filter((x: any) => x !== undefined).length > 0
 
-  console.log(errors)
-
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
