@@ -136,11 +136,9 @@ export const ReportsNumericFilter = ({
       <PopoverContent align="start" className="p-0 w-72" portal={true}>
         <div className="p-2 border-b border-default flex items-center justify-between">
           <span className="text-sm text-foreground">{label}</span>
-          <div className="flex gap-2">
-            <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
-              Clear
-            </Button>
-          </div>
+          <Button size="tiny" type="outline" onClick={handleClearAll}>
+            Clear
+          </Button>
         </div>
 
         <form
