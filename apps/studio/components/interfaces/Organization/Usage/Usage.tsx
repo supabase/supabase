@@ -227,15 +227,18 @@ const Usage = () => {
         </ScaffoldContainer>
       </div>
 
-      {selectedProjectRef ? (
+      {selectedProjectRef && selectedProjectRef !== 'all-projects' ? (
         <ScaffoldContainer className="mt-5">
           <Admonition
             type="default"
             title="Usage filtered by project"
             description={
               <div>
-                You are currently viewing usage for the
-                {selectedProject?.name || selectedProjectRef} project. Supabase uses{' '}
+                You are currently viewing usage for the{' '}
+                <span className="font-medium text-foreground">
+                  {selectedProject?.name || selectedProjectRef}
+                </span>{' '}
+                project. Supabase uses{' '}
                 <Link
                   href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
                   target="_blank"
