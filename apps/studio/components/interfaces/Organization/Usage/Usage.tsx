@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import {
+  ScaffoldHeader,
   ScaffoldContainer,
   ScaffoldContainerLegacy,
   ScaffoldTitle,
@@ -118,9 +119,11 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainerLegacy>
-        <ScaffoldTitle>Usage</ScaffoldTitle>
-      </ScaffoldContainerLegacy>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Usage</ScaffoldTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
       <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
