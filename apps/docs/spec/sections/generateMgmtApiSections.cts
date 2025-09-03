@@ -41,6 +41,12 @@ function extractSectionsFromOpenApi(filePath, outputPath) {
         for (const route in openApiJson.paths) {
           const methods = openApiJson.paths[route]
           for (const method in methods) {
+            // We are using `x-internal` to hide endpoints from the docs,
+            // but still have them included in the spec so they generate types and can be used.
+            if (methods[method]['x-internal']) {
+              continue
+            }
+
             const tag = methods[method].tags?.[0]
             const operationId = methods[method].operationId
             // If operationId is not in the form of a slug ignore it.
