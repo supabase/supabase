@@ -1,10 +1,7 @@
-'use client'
-
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useState } from 'react'
-import { useChartHoverState } from './useChartHoverState'
 import {
   Area,
   Bar,
@@ -18,9 +15,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
-import ChartHeader from './ChartHeader'
+import { ChartHeader } from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
 import {
   CHART_COLORS,
@@ -38,6 +36,7 @@ import {
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -64,9 +63,10 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideHighlightedValue?: boolean
   syncId?: string
   docsUrl?: string
+  sql?: string
 }
 
-export default function ComposedChart({
+export function ComposedChart({
   data,
   attributes,
   yAxisKey,
@@ -100,6 +100,7 @@ export default function ComposedChart({
   hideHighlightedValue,
   syncId,
   docsUrl,
+  sql,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -325,6 +326,7 @@ export default function ComposedChart({
         shouldFormatBytes={shouldFormatBytes}
         isNetworkChart={isNetworkChart}
         attributes={attributes}
+        sql={sql}
       />
       <Container className="relative z-10">
         <RechartComposedChart

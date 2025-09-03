@@ -128,9 +128,7 @@ export const Grid = memo(
         }
       }
 
-      const removeAllFilters = () => {
-        onApplyFilters([])
-      }
+      const removeAllFilters = () => onApplyFilters([])
 
       return (
         <div

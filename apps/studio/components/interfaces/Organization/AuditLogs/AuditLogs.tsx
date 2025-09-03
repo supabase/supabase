@@ -7,11 +7,11 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DatePicker } from 'components/ui/DatePicker'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -31,7 +31,6 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -55,7 +54,8 @@ const AuditLogs = () => {
 
   const canReadAuditLogs = useCheckPermissions(PermissionAction.READ, 'notifications')
 
-  const { data: projects } = useProjectsQuery()
+  const { data: projectsData } = useProjectsQuery()
+  const projects = projectsData?.projects ?? []
   const { data: organizations } = useOrganizationsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: rolesData } = useOrganizationRolesV2Query({ slug })
