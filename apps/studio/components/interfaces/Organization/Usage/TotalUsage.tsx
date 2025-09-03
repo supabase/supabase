@@ -9,6 +9,7 @@ import {
 } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { cn } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
@@ -32,7 +33,7 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_THROUGHPUT_GP3,
 ]
 
-const TotalUsage = ({
+export const TotalUsage = ({
   orgSlug,
   projectRef,
   subscription,
@@ -41,6 +42,7 @@ const TotalUsage = ({
   currentBillingCycleSelected,
 }: ComputeProps) => {
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
+  const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   const {
     data: usage,
@@ -117,16 +119,18 @@ const TotalUsage = ({
           description: isUsageBillingEnabled
             ? `Your plan includes a limited amount of usage. If exceeded, you will be charged for the overages. It may take up to 1 hour to refresh.`
             : `Your plan includes a limited amount of usage. If exceeded, you may experience restrictions, as you are currently not billed for overages. It may take up to 1 hour to refresh.`,
-          links: [
-            {
-              name: 'How billing works',
-              url: 'https://supabase.com/docs/guides/platform/billing-on-supabase',
-            },
-            {
-              name: 'Supabase Plans',
-              url: 'https://supabase.com/pricing',
-            },
-          ],
+          links: billingAll
+            ? [
+                {
+                  name: 'How billing works',
+                  url: 'https://supabase.com/docs/guides/platform/billing-on-supabase',
+                },
+                {
+                  name: 'Supabase Plans',
+                  url: 'https://supabase.com/pricing',
+                },
+              ]
+            : [],
         }}
       >
         {isLoadingUsage && (
@@ -234,5 +238,3 @@ const TotalUsage = ({
     </div>
   )
 }
-
-export default TotalUsage

@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -38,8 +39,16 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           className="rounded-l-none border-l-0"
           disabled={!canReadAPIKeys || config.channelName.length === 0}
           icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
-          onClick={() => {
-            onChangeConfig({ ...config, enabled: !config.enabled })
+          onClick={async () => {
+            // [Joshen] Refresh if starting to listen + using temp API key, since it has a low refresh rate
+            if (!config.enabled && config.token.startsWith('sb_temp')) {
+              const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
+              const token = data.api_key
+              onChangeConfig({ ...config, token, enabled: !config.enabled })
+            } else {
+              onChangeConfig({ ...config, enabled: !config.enabled })
+            }
+
             if (!config.enabled) {
               // the user has clicked to start listening
               sendEvent({

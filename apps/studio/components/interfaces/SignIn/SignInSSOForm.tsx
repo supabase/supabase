@@ -1,28 +1,38 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
+import z from 'zod'
 
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
-import { Button, Form, Input } from 'ui'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
-const SignInSSOForm = () => {
+const schema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+})
+
+const formId = 'sso-sign-in-form'
+
+export const SignInSSOForm = () => {
   const queryClient = useQueryClient()
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [_, setLastSignInUsed] = useLastSignIn()
-
-  const signInSchema = object({
-    email: string().email('Must be a valid email').required('Email is required'),
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '' },
   })
+  const isSubmitting = form.formState.isSubmitting
 
-  const onSignIn = async ({ email }: { email: string }) => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email }) => {
     const toastId = toast.loading('Signing in...')
 
     let token = captchaToken
@@ -67,54 +77,45 @@ const SignInSSOForm = () => {
   }
 
   return (
-    <Form
-      validateOnBlur
-      id="signIn-form"
-      initialValues={{ email: '' }}
-      validationSchema={signInSchema}
-      onSubmit={onSignIn}
-    >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
-        return (
-          <div className="flex flex-col gap-4">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="gavin@hooli.com"
-              disabled={isSubmitting}
-            />
+    <Form_Shadcn_ {...form}>
+      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField_Shadcn_
+          key="email"
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <FormItemLayout name="email" label="Email">
+              <FormControl_Shadcn_>
+                <Input_Shadcn_
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  {...field}
+                  placeholder="gavin@hooli.com"
+                />
+              </FormControl_Shadcn_>
+            </FormItemLayout>
+          )}
+        />
 
-            <div className="self-center">
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            </div>
+        <div className="self-center">
+          <HCaptcha
+            ref={captchaRef}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            size="invisible"
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+            onExpire={() => {
+              setCaptchaToken(null)
+            }}
+          />
+        </div>
 
-            <Button
-              block
-              form="signIn-form"
-              htmlType="submit"
-              size="large"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Sign In
-            </Button>
-          </div>
-        )
-      }}
-    </Form>
+        <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
+          Sign In
+        </Button>
+      </form>
+    </Form_Shadcn_>
   )
 }
-
-export default SignInSSOForm

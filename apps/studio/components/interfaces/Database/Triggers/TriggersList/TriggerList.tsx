@@ -18,6 +18,8 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  TableRow,
+  TableCell,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
@@ -58,35 +60,35 @@ const TriggerList = ({
 
   if (_triggers.length === 0 && filterString.length === 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={7}>
+      <TableRow key={schema}>
+        <TableCell colSpan={7}>
           <p className="text-sm text-foreground">No triggers created yet</p>
           <p className="text-sm text-foreground-light">
             There are no triggers found in the schema "{schema}"
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
   if (_triggers.length === 0 && filterString.length > 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={7}>
+      <TableRow key={schema}>
+        <TableCell colSpan={7}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
   return (
     <>
       {_triggers.map((x: any) => (
-        <Table.tr key={x.id}>
-          <Table.td className="space-x-2">
+        <TableRow key={x.id}>
+          <TableCell className="space-x-2">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => editTrigger(x)}
@@ -98,35 +100,35 @@ const TriggerList = ({
                 {x.name}
               </TooltipContent>
             </Tooltip>
-          </Table.td>
+          </TableCell>
 
-          <Table.td className="break-all">
+          <TableCell className="break-all">
             <p title={x.table} className="truncate">
               {x.table}
             </p>
-          </Table.td>
+          </TableCell>
 
-          <Table.td className="space-x-2">
+          <TableCell className="space-x-2">
             <p title={x.function_name} className="truncate">
               {x.function_name}
             </p>
-          </Table.td>
+          </TableCell>
 
-          <Table.td>
+          <TableCell>
             <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}
             </div>
-          </Table.td>
+          </TableCell>
 
-          <Table.td className="space-x-2">
+          <TableCell className="space-x-2">
             <p title={x.orientation} className="truncate">
               {x.orientation}
             </p>
-          </Table.td>
+          </TableCell>
 
-          <Table.td>
+          <TableCell>
             <div className="flex items-center justify-center">
               {x.enabled_mode !== 'DISABLED' ? (
                 <Check strokeWidth={2} className="text-brand" />
@@ -134,9 +136,9 @@ const TriggerList = ({
                 <X strokeWidth={2} />
               )}
             </div>
-          </Table.td>
+          </TableCell>
 
-          <Table.td className="text-right">
+          <TableCell className="text-right">
             {!isLocked && (
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
@@ -216,8 +218,8 @@ const TriggerList = ({
                 )}
               </div>
             )}
-          </Table.td>
-        </Table.tr>
+          </TableCell>
+        </TableRow>
       ))}
     </>
   )

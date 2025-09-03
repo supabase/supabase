@@ -96,9 +96,8 @@ supabase.storage.create_bucket(
 ## Restricting uploads
 
 When creating a bucket you can add additional configurations to restrict the type or size of files you want this bucket to contain.
-For example, imagine you want to allow your users to upload only images to the `avatars` bucket and the size must not be greater than 1MB.
 
-You can achieve the following by providing: `allowedMimeTypes` and `maxFileSize`
+For example, imagine you want to allow your users to upload only images to the `avatars` bucket and the size must not be greater than 1MB. You can achieve the following by providing `allowedMimeTypes` and `maxFileSize`:
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -114,6 +113,4 @@ const { data, error } = await supabase.storage.createBucket('avatars', {
 })
 ```
 
-If an upload request doesn't meet the above restrictions it will be rejected.
-
-For more information check [File Limits](/docs/guides/storage/uploads/file-limits) Section.
+If an upload request doesn't meet the above restrictions it will be rejected. See [File Limits](/docs/guides/storage/uploads/file-limits) for more information.
