@@ -13,21 +13,4 @@ Sentry.init({
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
-
-  // Route events to different DNs
-  transport: Sentry.makeMultiplexedTransport(Sentry.makeFetchTransport, ({ getEvent }) => {
-    const event = getEvent();
-
-    // Send to different DSNs, based on the project tag
-    if (event?.tags?.project === "community" && process.env.SENTRY_DSN_COMMUNITY) {
-      return [{
-        dsn: process.env.SENTRY_DSN_COMMUNITY,
-        // Release is mandatory. Using commit sha as recommended in:
-        // https://docs.sentry.io/platforms/javascript/configuration/releases/
-        release: process.env.VERCEL_GIT_COMMIT_SHA || "unknown"
-      }];
-    }
-
-    return [];
-  }),
 })
