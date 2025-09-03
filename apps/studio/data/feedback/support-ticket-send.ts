@@ -52,7 +52,7 @@ export async function sendSupportTicket({
     },
   })
 
-  if (error)
+  if (error) {
     handleError(error, {
       alwaysCapture: true,
       sentryContext: {
@@ -61,6 +61,7 @@ export async function sendSupportTicket({
         },
       },
     })
+  }
   return data
 }
 
