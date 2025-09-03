@@ -54,6 +54,7 @@ Greg Kress
 Greg P
 Greg Richardson
 Guilherme Souza
+Hardik Maheshwari
 Haydn Maley
 Hieu Pham
 Ignacio Dobronich
@@ -124,6 +125,7 @@ Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
+Timothy Lim
 Tom Ashley
 Tom G
 Tyler Hillery

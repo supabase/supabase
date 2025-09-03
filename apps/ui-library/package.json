@@ -70,7 +70,6 @@
     "react-docgen": "^7.0.3",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
-    "react-inlinesvg": "^4.0.4",
     "react-markdown": "^10.1.0",
     "react-wrap-balancer": "^1.1.0",
     "recharts": "^2.8.0",
@@ -111,7 +110,6 @@
     "tsconfig": "workspace:*",
     "tsx": "^4.19.3",
     "typescript": "~5.5.0",
-    "unist-builder": "3.0.0",
     "vite": "catalog:"
   }
 }
