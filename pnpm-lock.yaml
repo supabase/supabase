@@ -1387,9 +1387,6 @@ importers:
       react-hook-form:
         specifier: ^7.45.0
         version: 7.47.0(react@18.3.1)
-      react-inlinesvg:
-        specifier: ^4.0.4
-        version: 4.0.4(react@18.3.1)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
@@ -1505,9 +1502,6 @@ importers:
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
-      unist-builder:
-        specifier: 3.0.0
-        version: 3.0.0
       vite:
         specifier: 'catalog:'
         version: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)

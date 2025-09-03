@@ -389,11 +389,6 @@ export const docsConfig: DocsConfig = {
           href: '/docs/components/textarea',
           items: [],
         },
-        // {
-        //   title: 'Toast',
-        //   href: '/docs/components/toast',
-        //   items: [],
-        // },
         {
           title: 'Toggle',
           href: '/docs/components/toggle',
