@@ -1009,13 +1009,12 @@ function createStorageExplorerState({
               Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
               {numberOfFilesRejected > 1 ? 'their' : 'its'} size
               {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of{' '}
-              {value}
-              {unit}.
+              {value} {unit}.
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
               <InlineLink href={`/project/${state.projectRef}/storage/settings`}>
-                Storage settings
+                Storage Settings
               </InlineLink>
               .
             </p>
@@ -1216,7 +1215,7 @@ function createStorageExplorerState({
                     case 413:
                       // Payload too large
                       toast.error(
-                        `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
+                        `Failed to upload ${file.name}: File size exceeds the bucket file size limit.`
                       )
                       break
                     case 409:
