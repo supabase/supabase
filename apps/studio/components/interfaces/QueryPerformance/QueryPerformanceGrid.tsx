@@ -192,7 +192,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
       if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
 
-      event.preventDefault()
+      // stop default RDG behavior (which moves focus to header when selectedRow is 0)
+      event.stopPropagation()
 
       let nextIndex = selectedRow
       if (event.key === 'ArrowUp' && selectedRow > 0) {
@@ -215,9 +216,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   )
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
+    // run before RDG to prevent header focus (the third param: true)
+    window.addEventListener('keydown', handleKeyDown, true)
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', handleKeyDown, true)
     }
   }, [handleKeyDown])
 
