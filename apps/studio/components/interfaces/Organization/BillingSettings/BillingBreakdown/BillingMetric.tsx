@@ -156,7 +156,7 @@ const BillingMetric = ({
         </div>
       </HoverCardTrigger>
       {usageMeta.available_in_plan && (
-        <HoverCardContent side="bottom" align="center" className="w-[368px]" animate="slide-in">
+        <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
           <div className="text-sm">
             <p className="font-medium" translate="no">
               {usageMeta.unit_price_desc}

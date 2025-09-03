@@ -55,7 +55,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
           ) : null}
         </div>
       </HoverCardTrigger>
-      <HoverCardContent side="bottom" align="end" className="w-[368px]" animate="slide-in">
+      <HoverCardContent side="bottom" align="end" className="w-[500px]" animate="slide-in">
         <div className="text-sm text-foreground space-y-2">
           <p className="font-medium" translate="no">
             {usageMeta?.unit_price_desc}
