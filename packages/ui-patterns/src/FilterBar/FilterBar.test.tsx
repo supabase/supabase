@@ -70,11 +70,16 @@ describe('FilterBar', () => {
 
   it('opens group popover and allows selecting a property', async () => {
     const user = userEvent.setup()
-    render(
+    let currentFilters = initialFilters
+    const handleFilterChange = vi.fn((filters) => {
+      currentFilters = filters
+    })
+    
+    const { rerender } = render(
       <FilterBar
         filterProperties={mockFilterProperties}
-        filters={initialFilters}
-        onFilterChange={mockOnFilterChange}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
         freeformText=""
         onFreeformTextChange={mockOnFreeformTextChange}
       />
@@ -91,6 +96,22 @@ describe('FilterBar', () => {
     // Select a property
     await user.click(screen.getByText('Status'))
 
+    // Wait for filter change callback and re-render with new state
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalled()
+    })
+    
+    // Re-render with updated filters
+    rerender(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
     // Value input should appear for selected property
     await waitFor(() => {
       expect(screen.getByLabelText('Value for Status')).toBeInTheDocument()
@@ -99,11 +120,16 @@ describe('FilterBar', () => {
 
   it('selects array option for value with keyboard', async () => {
     const user = userEvent.setup()
-    render(
+    let currentFilters = initialFilters
+    const handleFilterChange = vi.fn((filters) => {
+      currentFilters = filters
+    })
+    
+    const { rerender } = render(
       <FilterBar
         filterProperties={mockFilterProperties}
-        filters={initialFilters}
-        onFilterChange={mockOnFilterChange}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
         freeformText=""
         onFreeformTextChange={mockOnFreeformTextChange}
       />
@@ -113,16 +139,49 @@ describe('FilterBar', () => {
     await user.click(freeform)
     await user.click(screen.getByText('Status'))
 
-    const valueInput = await screen.findByLabelText('Value for Status')
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalled()
+    })
+    
+    rerender(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    const valueInput = await waitFor(
+      () => screen.getByLabelText('Value for Status'),
+      { timeout: 3000 }
+    )
     valueInput.focus()
 
     // Popover should show value options
     expect(await screen.findByText('active')).toBeInTheDocument()
 
-    // Arrow down and enter to select 'active'
-    await user.keyboard('{ArrowDown}{Enter}')
+    // Select 'active' (first item)
+    await user.keyboard('{Enter}')
 
-    expect((valueInput as HTMLInputElement).value).toBe('active')
+    // Wait for value to be updated
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalledTimes(2) // Once for property, once for value
+    })
+    
+    rerender(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    const updatedValueInput = await screen.findByLabelText('Value for Status')
+    expect((updatedValueInput as HTMLInputElement).value).toBe('active')
   })
 
   it('renders and applies custom value component inside popover', async () => {
@@ -152,11 +211,16 @@ describe('FilterBar', () => {
       },
     ]
 
-    render(
+    let currentFilters = initialFilters
+    const handleFilterChange = vi.fn((filters) => {
+      currentFilters = filters
+    })
+    
+    const { rerender } = render(
       <FilterBar
         filterProperties={customProps}
-        filters={initialFilters}
-        onFilterChange={mockOnFilterChange}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
         freeformText=""
         onFreeformTextChange={mockOnFreeformTextChange}
       />
@@ -166,17 +230,51 @@ describe('FilterBar', () => {
     await user.click(freeform)
     await user.click(screen.getByText('Tag'))
 
-    // The value list should include the custom entry
-    expect(await screen.findByText('Custom...')).toBeInTheDocument()
-    await user.click(screen.getByText('Custom...'))
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalled()
+    })
+    
+    rerender(
+      <FilterBar
+        filterProperties={customProps}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
 
-    // Custom UI should render inside the popover
+    // Wait for FilterCondition to be created
+    const valueInput = await waitFor(
+      () => screen.getByLabelText('Value for Tag'),
+      { timeout: 3000 }
+    )
+
+    // Focus the value input to show the popover
+    await user.click(valueInput)
+
+    // Custom UI should render inside the popover automatically (no menu for single custom option)
     const pickFoo = await screen.findByText('Pick Foo')
     await user.click(pickFoo)
 
+    // Wait for value change callback
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalledTimes(2) // Once for property, once for value
+    })
+    
+    rerender(
+      <FilterBar
+        filterProperties={customProps}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
     // Value should be applied
-    const valueInput = await screen.findByLabelText('Value for Tag')
-    expect((valueInput as HTMLInputElement).value).toBe('foo')
+    const updatedValueInput = await screen.findByLabelText('Value for Tag')
+    expect((updatedValueInput as HTMLInputElement).value).toBe('foo')
   })
 
   it('closes popover when clicking outside the filter bar', async () => {
