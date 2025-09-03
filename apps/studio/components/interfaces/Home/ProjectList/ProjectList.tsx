@@ -154,14 +154,8 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   }
 
   if (viewMode === 'table') {
-    // [Joshen] Using calc for now sorry, couldn't figure out max height with flex grow for
-    // this particular one somehow, to make the scrollable area take up the remaining space max
     return (
-      <Card
-        className="overflow-y-auto"
-        style={{ maxHeight: 'calc(100vh - 250px)' }}
-        onScroll={handleScroll}
-      >
+      <Card className="flex-1 min-h-0 overflow-y-auto mb-8" onScroll={handleScroll}>
         <Table>
           <TableHeader>
             <TableRow>
@@ -172,11 +166,13 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               <TableHead>Created</TableHead>
             </TableRow>
           </TableHeader>
-          <TableRow className="border-b-0 -translate-y-[1px]">
-            <TableCell colSpan={5} className="p-0">
-              <LoadingLine loading={isFetching} />
-            </TableCell>
-          </TableRow>
+          <TableHeader>
+            <TableRow className="!border-b-0">
+              <TableCell colSpan={5} className="p-0">
+                <LoadingLine loading={isFetching} />
+              </TableCell>
+            </TableRow>
+          </TableHeader>
           <TableBody>
             {noResultsFromStatusFilter ? (
               <TableRow>
@@ -234,10 +230,8 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       ) : (
         <ul
           onScroll={handleScroll}
-          // [Joshen] Likewise as per table view using calc for now sorry, ideally we figure out
-          // (and also make it a reusable component) a way to use flex-grow, max height, and overflow scroll
-          style={{ maxHeight: 'calc(100vh - 220px)' }}
           className={cn(
+            'min-h-0 flex-1 overflow-auto',
             'w-full mx-auto grid grid-cols-1 gap-2 md:gap-4 overflow-y-scroll',
             'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
           )}
