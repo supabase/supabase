@@ -164,6 +164,7 @@ const EdgeFunctionsUsage = () => {
                 }
                 value={functionFilter}
                 onChange={setFunctionFilter}
+                isLoading={isRefreshing}
               />
 
               <ReportsNumericFilter
@@ -171,6 +172,7 @@ const EdgeFunctionsUsage = () => {
                 value={statusCodeFilter}
                 onChange={setStatusCodeFilter}
                 defaultOperator="="
+                isLoading={isRefreshing}
               />
 
               <ReportsNumericFilter
@@ -181,6 +183,7 @@ const EdgeFunctionsUsage = () => {
                 min={0}
                 max={99999}
                 defaultOperator=">="
+                isLoading={isRefreshing}
               />
 
               <ReportsSelectFilter
