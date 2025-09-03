@@ -6,13 +6,13 @@ import type { ResponseError } from 'types'
 import { BucketType } from './buckets-query'
 import { storageKeys } from './keys'
 
-export type BucketDeleteVariables = {
+type BucketDeleteVariables = {
   projectRef: string
   id: string
   type: BucketType
 }
 
-export async function deleteBucket({ projectRef, id, type }: BucketDeleteVariables) {
+async function deleteBucket({ projectRef, id, type }: BucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!id) throw new Error('Bucket name is requried')
 
