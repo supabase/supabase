@@ -183,6 +183,57 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               </div>
             </SectionContainer>
 
+            <Separator />
+
+            <div id="positions" className="max-w-6xl mx-auto">
+              <SectionContainer>
+                <h2 className="text-xl sm:text-3xl xl:text-3xl tracking-[-1px] mb-3">
+                  Open positions
+                </h2>
+                <p className="max-w-xl text-foreground-lighter">
+                  Want to build the best developer platform?
+                  <br /> We’d love to talk to you.
+                </p>
+                <div className="mt-10 flex flex-col gap-4">
+                  {Object.entries(jobs).map(([team, teamJobs]) => (
+                    <div key={team}>
+                      <h3 className="text-foreground-lighter text-sm">{team}</h3>
+                      <div className="mt-2 -space-y-px">
+                        {teamJobs
+                          .filter((job) => !filterGenericJob(job))
+                          .map((job) => (
+                            <JobItem job={job} key={job.id} />
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {placeholderJob && (
+                  <div className="pt-4 mt-4 border-t border-muted -space-y-px">
+                    <JobItem job={placeholderJob} />
+                  </div>
+                )}
+                <div className="pt-8 mt-4 border-t border-muted flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2">
+                  <div>
+                    <h3>Don't see a role that fits?</h3>
+                    <p className="text-foreground-lighter text-sm">
+                      Join our talent community to stay updated on future opportunities.
+                    </p>
+                  </div>
+                  <Button asChild type="primary">
+                    <Link
+                      href="https://jobs.ashbyhq.com/supabase/form/talent-community-form"
+                      target="_blank"
+                    >
+                      Join community
+                    </Link>
+                  </Button>
+                </div>
+              </SectionContainer>
+            </div>
+
+            <Separator />
+
             <SectionContainer className="-mt-16 md:mt-16">
               <div className="md:flex md:gap-6">
                 <div className="md:w-1/2">
@@ -384,6 +435,11 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-none tracking-[-1px]">
                 Great people deserve great benefits
               </h2>
+              <Button asChild type="primary" className="mt-8">
+                <Link href="#positions">
+                  View {staticContent?.jobsCount > 0 ? staticContent?.jobsCount : ''} open positions
+                </Link>
+              </Button>
             </div>
             <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-16">
               {career.benefits.map((benefits, i) => {
@@ -399,53 +455,6 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             </div>
           </div>
         </SectionContainer>
-
-        <Separator />
-
-        <div id="positions" className="max-w-6xl mx-auto">
-          <SectionContainer>
-            <h2 className="text-xl sm:text-3xl xl:text-3xl tracking-[-1px] mb-3">Open positions</h2>
-            <p className="max-w-xl text-foreground-lighter">
-              Want to build the best developer platform?
-              <br /> We’d love to talk to you.
-            </p>
-            <div className="mt-10 flex flex-col gap-4">
-              {Object.entries(jobs).map(([team, teamJobs]) => (
-                <div key={team}>
-                  <h3 className="text-foreground-lighter text-sm">{team}</h3>
-                  <div className="mt-2 -space-y-px">
-                    {teamJobs
-                      .filter((job) => !filterGenericJob(job))
-                      .map((job) => (
-                        <JobItem job={job} key={job.id} />
-                      ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {placeholderJob && (
-              <div className="pt-4 mt-4 border-t border-muted -space-y-px">
-                <JobItem job={placeholderJob} />
-              </div>
-            )}
-            <div className="pt-8 mt-4 border-t border-muted flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2">
-              <div>
-                <h3>Don't see a role that fits?</h3>
-                <p className="text-foreground-lighter text-sm">
-                  Join our talent community to stay updated on future opportunities.
-                </p>
-              </div>
-              <Button asChild type="primary">
-                <Link
-                  href="https://jobs.ashbyhq.com/supabase/form/talent-community-form"
-                  target="_blank"
-                >
-                  Join community
-                </Link>
-              </Button>
-            </div>
-          </SectionContainer>
-        </div>
       </DefaultLayout>
     </>
   )
