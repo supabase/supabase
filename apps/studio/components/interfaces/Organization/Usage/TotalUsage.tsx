@@ -186,12 +186,14 @@ export const TotalUsage = ({
             )}
             <div className="grid grid-cols-12 mt-3">
               {sortedBillingMetrics.map((metric, i) => {
+                const isLastBillingMetric = i === sortedBillingMetrics.length - 1
+                const isLastInRow = isLastBillingMetric && computeMetrics.length === 0
                 return (
                   <div
                     className={cn(
                       'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
                       i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
-                      'border-b'
+                      !isLastInRow && 'border-b'
                     )}
                     key={metric.key}
                   >
@@ -207,30 +209,35 @@ export const TotalUsage = ({
                 )
               })}
 
-              {computeMetrics.map((metric, i) => (
-                <div
-                  className={cn(
-                    'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                    (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
-                    'border-b'
-                  )}
-                  key={metric}
-                >
-                  <ComputeMetric
-                    slug={orgSlug}
-                    metric={{
-                      key: metric,
-                      name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
-                      units: 'hours',
-                      anchor: 'compute',
-                      category: 'Compute',
-                      unitName: 'GB',
-                    }}
-                    relativeToSubscription={showRelationToSubscription}
-                    usage={usage}
-                  />
-                </div>
-              ))}
+              {computeMetrics.map((metric, i) => {
+                const isLastComputeMetric = i === computeMetrics.length - 1
+                return (
+                  <div
+                    className={cn(
+                      'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
+                      (i + sortedBillingMetrics.length) % 2 === 0
+                        ? 'md:border-r md:pr-4'
+                        : 'md:pl-4',
+                      !isLastComputeMetric && 'border-b'
+                    )}
+                    key={metric}
+                  >
+                    <ComputeMetric
+                      slug={orgSlug}
+                      metric={{
+                        key: metric,
+                        name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
+                        units: 'hours',
+                        anchor: 'compute',
+                        category: 'Compute',
+                        unitName: 'GB',
+                      }}
+                      relativeToSubscription={showRelationToSubscription}
+                      usage={usage}
+                    />
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
