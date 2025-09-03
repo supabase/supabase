@@ -19,7 +19,7 @@ interface StorageExplorerProps {
   bucket: Bucket
 }
 
-const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
+export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const { ref } = useParams()
   const storageExplorerRef = useRef(null)
   const {
@@ -211,4 +211,3 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 }
 
 StorageExplorer.displayName = 'StorageExplorer'
-export default StorageExplorer
