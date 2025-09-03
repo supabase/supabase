@@ -1,4 +1,4 @@
-import { AlertCircle, Info } from 'lucide-react'
+import { AlertCircle, Lock } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 
@@ -33,6 +33,9 @@ import {
   Alert_Shadcn_,
   Badge,
   Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
@@ -151,11 +154,21 @@ export const Addons = () => {
                     />
                   }
                   meta={
-                    ipv4Enabled ? (
-                      <Badge variant="success">Enabled</Badge>
-                    ) : (
-                      <Badge variant="default">Disabled</Badge>
-                    )
+                    <div className="flex items-center gap-4">
+                      {ipv4Enabled ? (
+                        <Badge variant="success">Enabled</Badge>
+                      ) : (
+                        <Badge variant="default">Disabled</Badge>
+                      )}
+                      {!canOpenIPv4 && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          </TooltipTrigger>
+                          <TooltipContent>You do not have permission to update IPv4</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
                   }
                 >
                   <div className="space-y-1">
@@ -195,11 +208,21 @@ export const Addons = () => {
                   />
                 }
                 meta={
-                  pitrEnabled ? (
-                    <Badge variant="success">Enabled</Badge>
-                  ) : (
-                    <Badge variant="default">Disabled</Badge>
-                  )
+                  <div className="flex items-center gap-4">
+                    {pitrEnabled ? (
+                      <Badge variant="success">Enabled</Badge>
+                    ) : (
+                      <Badge variant="default">Disabled</Badge>
+                    )}
+                    {!canOpenPITR && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                        </TooltipTrigger>
+                        <TooltipContent>You do not have permission to update PITR</TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
                 }
               >
                 <div className="space-y-1">
@@ -281,11 +304,23 @@ export const Addons = () => {
                     />
                   }
                   meta={
-                    customDomainEnabled ? (
-                      <Badge variant="success">Enabled</Badge>
-                    ) : (
-                      <Badge variant="default">Disabled</Badge>
-                    )
+                    <div className="flex items-center gap-4">
+                      {customDomainEnabled ? (
+                        <Badge variant="success">Enabled</Badge>
+                      ) : (
+                        <Badge variant="default">Disabled</Badge>
+                      )}
+                      {!canOpenCustomDomain && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            You do not have permission to update custom domain
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
                   }
                 >
                   <div className="space-y-1">
