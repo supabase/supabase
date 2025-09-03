@@ -64,6 +64,8 @@ export const ForeignKeySelector = ({
   const hasTypeErrors = (errors?.types ?? []).filter((x: any) => x !== undefined).length > 0
   const hasTypeNotices = (errors?.typeNotice ?? []).filter((x: any) => x !== undefined).length > 0
 
+  console.log(errors)
+
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -164,13 +166,7 @@ export const ForeignKeySelector = ({
 
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay
-      if (source === '' || target === '') {
-        return typeErrors.push(undefined)
-      }
-
-      if (sourceColumn?.isNewColumn && targetType !== '') {
-        return typeNotice.push({ sourceType, targetType })
-      }
+      if (source === '' || target === '') return
 
       // If source and target are in the same type of data types, thats okay
       if (
@@ -178,13 +174,14 @@ export const ForeignKeySelector = ({
         (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
         (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
         (sourceType === 'uuid' && targetType === 'uuid')
-      ) {
-        return typeErrors.push(undefined)
-      }
+      )
+        return
 
       // Otherwise just check if the format is equal to each other
-      if (sourceType === targetType) {
-        return typeErrors.push(undefined)
+      if (sourceType === targetType) return
+
+      if (sourceColumn?.isNewColumn && targetType !== '') {
+        return typeNotice.push({ sourceType, targetType })
       }
 
       typeErrors.push({ sourceType, targetType })
