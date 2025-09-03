@@ -295,7 +295,6 @@ export const ServiceStatus = () => {
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          className="p-0 border-0 h-auto text-base"
           icon={
             isLoadingChecks ||
             (!allServicesOperational && isProjectNew && isMigrationLoading) ? null : (
