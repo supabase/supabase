@@ -20,7 +20,12 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import {
+  PIPELINE_DISABLE_ALLOWED_FROM,
+  PIPELINE_ENABLE_ALLOWED_FROM,
+  PIPELINE_ERROR_MESSAGES,
+  getStatusName,
+} from './Pipeline.utils'
 import { PipelineStatusName } from './PipelineStatus'
 
 interface RowMenuProps {
@@ -44,13 +49,6 @@ export const RowMenu = ({
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
 
-  const getStatusName = (status: any) => {
-    if (status && typeof status === 'object' && 'name' in status) {
-      return status.name
-    }
-    return status
-  }
-
   const statusName = getStatusName(pipelineStatus)
   const pipelineEnabled = statusName !== PipelineStatusName.STOPPED
 
@@ -67,10 +65,13 @@ export const RowMenu = ({
     }
 
     try {
+      // Only show 'enabling' when transitioning from allowed states
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+        setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
+      }
       await startPipeline({ projectRef, pipelineId: pipeline.id })
-      toast(`Enabling pipeline ${pipeline.destination_name}`)
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
     } catch (error) {
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
     }
   }
@@ -86,10 +87,13 @@ export const RowMenu = ({
     }
 
     try {
+      // Only show 'disabling' when transitioning from allowed states
+      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
+        setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
+      }
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      toast(`Disabling pipeline ${pipeline.destination_name}`)
-      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
     } catch (error) {
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
     }
   }
@@ -109,12 +113,12 @@ export const RowMenu = ({
           {pipelineEnabled ? (
             <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
               <Pause size={14} />
-              <p>Disable pipeline</p>
+              <p>Stop pipeline</p>
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
               <Play size={14} />
-              <p>Enable pipeline</p>
+              <p>Start pipeline</p>
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />

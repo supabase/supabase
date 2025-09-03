@@ -81,17 +81,20 @@ export function setProjectStatus(
   projectRef: Project['ref'],
   status: Project['status']
 ) {
-  client.setQueriesData<Project[] | undefined>(
+  client.setQueriesData<PaginatedProjectsResponse | undefined>(
     projectKeys.list(),
     (old) => {
       if (!old) return old
 
-      return old.map((project) => {
-        if (project.ref === projectRef) {
-          return { ...project, status }
-        }
-        return project
-      })
+      return {
+        ...old,
+        projects: old.projects.map((project) => {
+          if (project.ref === projectRef) {
+            return { ...project, status }
+          }
+          return project
+        }),
+      }
     },
     { updatedAt: Date.now() }
   )

@@ -56,22 +56,23 @@ const EdgeFunctionDetailsLayout = ({
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
-  const { data: functionFiles = [], error: filesError } = useEdgeFunctionBodyQuery(
-    {
-      projectRef: ref,
-      slug: functionSlug,
-    },
-    {
-      retry: false,
-      retryOnMount: true,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchInterval: false,
-      refetchIntervalInBackground: false,
-    }
-  )
+  const { data: functionBody = { version: 0, files: [] }, error: filesError } =
+    useEdgeFunctionBodyQuery(
+      {
+        projectRef: ref,
+        slug: functionSlug,
+      },
+      {
+        retry: false,
+        retryOnMount: true,
+        refetchOnWindowFocus: false,
+        staleTime: Infinity,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchInterval: false,
+        refetchIntervalInBackground: false,
+      }
+    )
 
   const name = selectedFunction?.name || ''
 
@@ -112,7 +113,7 @@ const EdgeFunctionDetailsLayout = ({
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
-    functionFiles.forEach((file) => {
+    functionBody.files.forEach((file) => {
       const nameSections = file.name.split('/')
       const slugIndex = nameSections.indexOf(functionSlug ?? '')
       const fileName = nameSections.slice(slugIndex + 1).join('/')
