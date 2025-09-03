@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+
 import createClient from 'openapi-fetch'
 
 import { IS_PLATFORM } from 'common'
@@ -135,15 +136,17 @@ export const {
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean
+  sentryContext?: {
+    tags?: Record<string, string | boolean | number>
+  }
 }
 
-export const handleError = (
-  error: unknown,
-  options: HandleErrorOptions = { alwaysCapture: false }
-): never => {
+export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   if (error && typeof error === 'object') {
     if (options.alwaysCapture) {
-      Sentry.captureException(error)
+      Sentry.captureException(error, {
+        ...options.sentryContext,
+      })
     }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
@@ -169,7 +172,9 @@ export const handleError = (
 
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
-  Sentry.captureException(error)
+  Sentry.captureException(error, {
+    ...options.sentryContext,
+  })
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.

@@ -52,7 +52,15 @@ export async function sendSupportTicket({
     },
   })
 
-  if (error) handleError(error, { alwaysCapture: true })
+  if (error)
+    handleError(error, {
+      alwaysCapture: true,
+      sentryContext: {
+        tags: {
+          dashboardSupportForm: true,
+        },
+      },
+    })
   return data
 }
 
