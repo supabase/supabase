@@ -80,8 +80,8 @@ const BillingMetric = ({
     <HoverCard openDelay={50} closeDelay={200}>
       <HoverCardTrigger asChild>
         <div className="flex items-center justify-between">
-          <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
-            {metric.anchor ? (
+          {metric.anchor ? (
+            <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
               <div className="group flex items-center gap-1">
                 <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                   {metric.name}
@@ -92,18 +92,28 @@ const BillingMetric = ({
                   </span>
                 )}
               </div>
-            ) : (
+              <span className="text-sm">{usageLabel}</span>&nbsp;
+              {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
+                <span className="text-sm" translate="no">
+                  ({formatCurrency(usageMeta.cost)})
+                </span>
+              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+                <span className="text-sm">{percentageLabel}</span>
+              ) : null}
+            </Link>
+          ) : (
+            <div className="block w-full">
               <p className="text-sm text-foreground-light flex space-x-1">{metric.name}</p>
-            )}
-            <span className="text-sm">{usageLabel}</span>&nbsp;
-            {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
-              <span className="text-sm" translate="no">
-                ({formatCurrency(usageMeta.cost)})
-              </span>
-            ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
-              <span className="text-sm">{percentageLabel}</span>
-            ) : null}
-          </Link>
+              <span className="text-sm">{usageLabel}</span>&nbsp;
+              {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
+                <span className="text-sm" translate="no">
+                  ({formatCurrency(usageMeta.cost)})
+                </span>
+              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+                <span className="text-sm">{percentageLabel}</span>
+              ) : null}
+            </div>
+          )}
 
           {usageMeta.available_in_plan ? (
             <div>
