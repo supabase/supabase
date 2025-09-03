@@ -28,6 +28,13 @@ import {
  * For context, migrations are meant to be indicative for when creating branches or projects
  * with an initial SQL, so "healthy" migrations just means that migrations have all been successfully
  * ran. So it might be a matter of decoupling "ready" state vs "health checks"
+ *
+ * [Joshen] Another issue that requires investigation before we go live with the changes:
+ * We've removed the isProjectNew check in this component which we had that logic cause new
+ * projects would show unhealthy as the services are still starting up - but it causes a
+ * perceived negative impression as new projects were showing unhealthy, hence the 5 minute
+ * threshold check (we’d show “Coming up” instead of “unhealthy” if the project is within 5
+ * minutes of when it was created). Might be related to decoupling "ready" state vs "health checks"
  */
 
 const StatusMessage = ({

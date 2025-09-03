@@ -100,13 +100,11 @@ export const HomeV2 = () => {
                 )}
                 strategy={verticalListSortingStrategy}
               >
-                {sectionOrder.map((id) => {
-                  return (
-                    <SortableSection key={id} id={id}>
-                      {id}
-                    </SortableSection>
-                  )
-                })}
+                {sectionOrder.map((id) => (
+                  <SortableSection key={id} id={id}>
+                    {id}
+                  </SortableSection>
+                ))}
               </SortableContext>
             </DndContext>
           </ScaffoldSection>

@@ -41,7 +41,7 @@ import {
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
-const Home = () => {
+export const Home = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
@@ -295,4 +295,3 @@ const Home = () => {
     </div>
   )
 }
-export default Home

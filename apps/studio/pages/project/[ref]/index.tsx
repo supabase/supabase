@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import Home from 'components/interfaces/Home/Home'
+import { Home } from 'components/interfaces/Home/Home'
 import { HomeV2 } from 'components/interfaces/HomeNew/Home'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
