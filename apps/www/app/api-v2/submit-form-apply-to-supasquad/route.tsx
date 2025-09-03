@@ -1,9 +1,19 @@
+import * as Sentry from '@sentry/nextjs'
 import z from 'zod'
+
 import { CustomerioAppClient, CustomerioTrackClient } from '~/lib/customerio'
-import { getTitlePropertyName, insertPageInDatabase } from '~/lib/notion'
+import { insertPageInDatabase } from '~/lib/notion'
+
+const captureSentryCommunityException = (error: Error) => {
+  Sentry.captureException(error, {
+    tags: {
+      project: 'community',
+    },
+  })
+}
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY
-const NOTION_DB_ID = process.env.NOTION_DB_ID
+const NOTION_DB_ID = process.env.NOTION_SUPASQUAD_APPLICATIONS_DB_ID
 
 const applicationSchema = z.object({
   first_name: z.string().min(1, 'First name is required'),
@@ -56,6 +66,7 @@ function normalizeTrack(t: { heading: string; description: string } | string) {
 
 export async function POST(req: Request) {
   if (!NOTION_API_KEY || !NOTION_DB_ID) {
+    captureSentryCommunityException(new Error('Server misconfigured: missing Notion credentials'))
     return new Response(
       JSON.stringify({ message: 'Server misconfigured: missing Notion credentials' }),
       {
@@ -85,71 +96,8 @@ export async function POST(req: Request) {
 
   const data = parsed.data
 
-  const fullName =
-    `${data.first_name?.trim() || ''} ${data.last_name?.trim() || ''}`.trim() || 'Unnamed'
-
-  const props: Record<string, any> = {
-    'Name': {
-      title: [{ type: 'text', text: { content: fullName } }],
-    },
-    'First name': {
-      rich_text: [{ type: 'text', text: { content: data.first_name || '' } }],
-    },
-    'Last name': {
-      rich_text: [{ type: 'text', text: { content: data.last_name || '' } }],
-    },
-    'Email': { email: data.email },
-    'What track would you like to be considered for?': {
-      multi_select: asMultiSelect(data.tracks.map(normalizeTrack)),
-    },
-    'Product areas of interest': {
-      multi_select: asMultiSelect(data.areas_of_interest),
-    },
-    'Languages spoken': {
-      multi_select: asMultiSelect(data.languages_spoken),
-    },
-    'Date submitted': {
-      date: { start: new Date().toISOString().split('T')[0] },
-    },
-    'Country': {
-      select: { name: data.country }
-    },
-    'City': {
-      rich_text: [{ type: 'text', text: { content: truncateRichText(data.city, 120) } }],
-    },
-    'Location': {
-      rich_text: [{ type: 'text', text: { content: truncateRichText(data.city + ', ' + data.country, 120) } }],
-    }
-  }
-  if (!Number.isNaN(data.monthly_commitment)) {
-    props['How many hours can you commit per month?'] = {
-      number: data.monthly_commitment,
-    }
-  }
-  if (data.skills) {
-    props['Skills (frameworks, tools, languages)'] = {
-      rich_text: [{ type: 'text', text: { content: truncateRichText(data.skills) } }],
-    }
-  }
-  if (data.why_you_want_to_join) {
-    props['Why do you want to join the program'] = {
-      rich_text: [
-        { type: 'text', text: { content: truncateRichText(data.why_you_want_to_join, 1800) } },
-      ],
-    }
-  }
-  if (data.github) {
-    props['GitHub Profile'] = {
-      rich_text: [{ type: 'text', text: { content: data.github } }],
-    }
-  }
-  if (data.twitter) {
-    props['Twitter handle'] = {
-      rich_text: [{ type: 'text', text: { content: data.twitter } }],
-    }
-  }
-
   try {
+    const props = getNotionDBData(data)
     const newPageId = await insertPageInDatabase(NOTION_DB_ID, NOTION_API_KEY, props)
 
     await savePersonAndEventInCustomerIO({ ...data, tracks: data.tracks.map(normalizeTrack), notion_page_id: newPageId, source_url: req.headers.get('origin') })
@@ -159,7 +107,7 @@ export async function POST(req: Request) {
       status: 201,
     })
   } catch (err: any) {
-    console.error('Error processing SupaSquad application:', err)
+    captureSentryCommunityException(err)
     return new Response(JSON.stringify({ message: 'Error sending your application', error: err?.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 502,
@@ -255,4 +203,72 @@ const sendConfirmationEmail = async (emailData: { email: string; first_name: str
   } else {
     console.warn("Customer.io App API key is not set");
   }
+}
+
+const getNotionDBData = (data: any) => {
+  const fullName =
+    `${data.first_name?.trim() || ''} ${data.last_name?.trim() || ''}`.trim() || 'Unnamed'
+
+  const props: Record<string, any> = {
+    'Name': {
+      title: [{ type: 'text', text: { content: fullName } }],
+    },
+    'First name': {
+      rich_text: [{ type: 'text', text: { content: data.first_name || '' } }],
+    },
+    'Last name': {
+      rich_text: [{ type: 'text', text: { content: data.last_name || '' } }],
+    },
+    'Email': { email: data.email },
+    'What track would you like to be considered for?': {
+      multi_select: asMultiSelect(data.tracks.map(normalizeTrack)),
+    },
+    'Product areas of interest': {
+      multi_select: asMultiSelect(data.areas_of_interest),
+    },
+    'Languages spoken': {
+      multi_select: asMultiSelect(data.languages_spoken),
+    },
+    'Date submitted': {
+      date: { start: new Date().toISOString().split('T')[0] },
+    },
+    'Country': {
+      select: { name: data.country }
+    },
+    'City': {
+      rich_text: [{ type: 'text', text: { content: truncateRichText(data.city, 120) } }],
+    },
+    'Location': {
+      rich_text: [{ type: 'text', text: { content: truncateRichText(data.city + ', ' + data.country, 120) } }],
+    }
+  }
+  if (!Number.isNaN(data.monthly_commitment)) {
+    props['How many hours can you commit per month?'] = {
+      number: data.monthly_commitment,
+    }
+  }
+  if (data.skills) {
+    props['Skills (frameworks, tools, languages)'] = {
+      rich_text: [{ type: 'text', text: { content: truncateRichText(data.skills) } }],
+    }
+  }
+  if (data.why_you_want_to_join) {
+    props['Why do you want to join the program'] = {
+      rich_text: [
+        { type: 'text', text: { content: truncateRichText(data.why_you_want_to_join, 1800) } },
+      ],
+    }
+  }
+  if (data.github) {
+    props['GitHub Profile'] = {
+      rich_text: [{ type: 'text', text: { content: data.github } }],
+    }
+  }
+  if (data.twitter) {
+    props['Twitter handle'] = {
+      rich_text: [{ type: 'text', text: { content: data.twitter } }],
+    }
+  }
+
+  return props
 }
