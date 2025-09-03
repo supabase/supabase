@@ -106,9 +106,11 @@ const Usage = () => {
 
   if (!canReadSubscriptions) {
     return (
-      <ScaffoldContainer>
-        <NoPermission resourceText="view organization usage" />
-      </ScaffoldContainer>
+      <ScaffoldHeader>
+        <ScaffoldContainer>
+          <NoPermission resourceText="view organization usage" />
+        </ScaffoldContainer>
+      </ScaffoldHeader>
     )
   }
 
