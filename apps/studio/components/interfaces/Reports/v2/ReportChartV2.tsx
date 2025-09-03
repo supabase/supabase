@@ -48,7 +48,12 @@ export const ReportChartV2 = ({
     error,
     isFetching,
   } = useQuery(
-    ['report-v2', report.id, { startDate, endDate, interval, filters }],
+    [
+      'projects',
+      projectRef,
+      'report-v2',
+      { reportId: report.id, startDate, endDate, interval, filters },
+    ],
     async () => {
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },

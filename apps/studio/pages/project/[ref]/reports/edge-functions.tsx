@@ -32,6 +32,7 @@ import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.constants'
+import { BASE_PATH } from 'lib/constants'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (
@@ -105,7 +106,7 @@ const EdgeFunctionsUsage = () => {
     if (!selectedDateRange) return
 
     setIsRefreshing(true)
-    queryClient.invalidateQueries({ queryKey: ['report-v2'] })
+    queryClient.invalidateQueries({ queryKey: ['projects', ref, 'report-v2'] })
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
@@ -186,13 +187,24 @@ const EdgeFunctionsUsage = () => {
                 label="Region"
                 options={EDGE_FUNCTION_REGIONS.map((region) => ({
                   key: region.key,
-                  label: `${region.key} - ${region.label}`,
+                  label: (
+                    <div className="flex items-center gap-x-2">
+                      <img
+                        src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+                        alt={region.key}
+                        className="w-4 h-4"
+                      />
+                      <div className="flex flex-wrap gap-1 items-center">
+                        <span className="text-foreground text-sm">{region.label}</span>
+                        <span className="text-foreground-light text-sm">{region.key}</span>
+                      </div>
+                    </div>
+                  ),
                 }))}
                 value={regionFilter}
                 onChange={setRegionFilter}
               />
             </div>
-            {/* <pre>{JSON.stringify(filters, null, 2)}</pre> */}
           </div>
         }
       >

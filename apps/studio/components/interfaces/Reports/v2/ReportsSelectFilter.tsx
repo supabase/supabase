@@ -8,7 +8,7 @@ import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 
 export interface ReportSelectOption {
   key: string
-  label: string
+  label: React.ReactNode
   description?: string
 }
 
