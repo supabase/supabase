@@ -451,7 +451,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               Cancel
             </Button>
             <Button form={formId} htmlType="submit" loading={isCreating || isUpdating}>
-              Create trigger
+              {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>
         </SheetContent>
