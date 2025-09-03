@@ -18,6 +18,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 
 /**
@@ -25,9 +26,10 @@ import {
  * as I don't think it should live in the ServiceStatus component since its not indicative
  * of a project's "service". ServiceStatus's intention is to be an ongoing health/status check.
  *
- * For context, migrations are meant to be indicative for when creating branches or projects
+ * For context, migrations are meant to be indicative for only when creating branches or projects
  * with an initial SQL, so "healthy" migrations just means that migrations have all been successfully
  * ran. So it might be a matter of decoupling "ready" state vs "health checks"
+ * [Edit] Now that migrations are only showing up if the project is a branch, i think its okay for now
  *
  * [Joshen] Another issue that requires investigation before we go live with the changes:
  * We've removed the isProjectNew check in this component which we had that logic cause new
@@ -128,10 +130,11 @@ export const ServiceStatus = () => {
   const dbStatus = status?.find((service) => service.name === 'db')
 
   const isMigrationLoading =
-    isBranchesLoading ||
-    currentBranch?.status === 'CREATING_PROJECT' ||
-    currentBranch?.status === 'RUNNING_MIGRATIONS' ||
-    project?.status === 'COMING_UP'
+    project?.status === 'COMING_UP' ||
+    (isBranch &&
+      (isBranchesLoading ||
+        currentBranch?.status === 'CREATING_PROJECT' ||
+        currentBranch?.status === 'RUNNING_MIGRATIONS'))
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services: {
@@ -217,24 +220,30 @@ export const ServiceStatus = () => {
           },
         ]
       : []),
-    {
-      name: 'Migrations',
-      error: undefined,
-      docsUrl: undefined,
-      isLoading: isBranch ? isBranchesLoading : false,
-      isHealthy: isBranch ? currentBranch?.status === 'FUNCTIONS_DEPLOYED' : !isMigrationLoading,
-      status: (isBranch
-        ? currentBranch?.status === 'FUNCTIONS_DEPLOYED'
-          ? 'ACTIVE_HEALTHY'
-          : currentBranch?.status === 'FUNCTIONS_FAILED' ||
-              currentBranch?.status === 'MIGRATIONS_FAILED'
-            ? 'UNHEALTHY'
-            : 'COMING_UP'
-        : isMigrationLoading
-          ? 'COMING_UP'
-          : 'ACTIVE_HEALTHY') as ProjectServiceStatus,
-      logsUrl: isBranch ? '/branches' : '/logs/database-logs',
-    },
+    ...(isBranch
+      ? [
+          {
+            name: 'Migrations',
+            error: undefined,
+            docsUrl: undefined,
+            isLoading: isBranchesLoading,
+            isHealthy: isBranch
+              ? currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+              : !isMigrationLoading,
+            status: (isBranch
+              ? currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+                ? 'ACTIVE_HEALTHY'
+                : currentBranch?.status === 'FUNCTIONS_FAILED' ||
+                    currentBranch?.status === 'MIGRATIONS_FAILED'
+                  ? 'UNHEALTHY'
+                  : 'COMING_UP'
+              : isMigrationLoading
+                ? 'COMING_UP'
+                : 'ACTIVE_HEALTHY') as ProjectServiceStatus,
+            logsUrl: isBranch ? '/branches' : '/logs/database-logs',
+          },
+        ]
+      : []),
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)
@@ -261,12 +270,13 @@ export const ServiceStatus = () => {
           iconRight={<ChevronDown size={14} strokeWidth={1.5} />}
           icon={
             isLoadingChecks || anyComingUp || isMigrationLoading ? (
-              <Loader2 className="animate-spin" size={12} strokeWidth={1.5} />
+              <Loader2 className="animate-spin ml-1" size={12} strokeWidth={1.5} />
             ) : (
               <div
-                className={`w-2 h-2 rounded-full ${
+                className={cn(
+                  'w-2 h-2 rounded-full ml-1.5',
                   allServicesOperational ? 'bg-brand' : 'bg-warning'
-                }`}
+                )}
               />
             )
           }

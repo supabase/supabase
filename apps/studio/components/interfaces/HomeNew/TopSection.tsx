@@ -33,7 +33,7 @@ export const TopSection = ({
     <div className="flex flex-col gap-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 py-16 md:p-0 w-full items-center">
         <div className="flex flex-col">
-          <div className="flex flex-col md:flex-row md:items-end gap-3 w-full">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
             <div>
               {!isMainBranch && (
                 <Link
@@ -45,7 +45,7 @@ export const TopSection = ({
               )}
               <h1 className="text-3xl">{projectName}</h1>
             </div>
-            <div className="flex items-center gap-x-2 mb-1">
+            <div className="flex items-center gap-x-2">
               {isOrioleDb && (
                 <Tooltip>
                   <TooltipTrigger asChild>
