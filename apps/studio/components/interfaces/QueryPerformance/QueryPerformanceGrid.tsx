@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
@@ -185,6 +185,41 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   useEffect(() => {
     setSelectedRow(undefined)
   }, [preset, search, roles, urlSort, order])
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!reportData.length || selectedRow === undefined) return
+
+      if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
+
+      event.preventDefault()
+
+      let nextIndex = selectedRow
+      if (event.key === 'ArrowUp' && selectedRow > 0) {
+        nextIndex = selectedRow - 1
+      } else if (event.key === 'ArrowDown' && selectedRow < reportData.length - 1) {
+        nextIndex = selectedRow + 1
+      }
+
+      if (nextIndex !== selectedRow) {
+        setSelectedRow(nextIndex)
+        gridRef.current?.scrollToCell({ idx: 0, rowIdx: nextIndex })
+
+        const rowQuery = reportData[nextIndex]?.query ?? ''
+        if (!rowQuery.trim().toLowerCase().startsWith('select')) {
+          setView('details')
+        }
+      }
+    },
+    [reportData, selectedRow]
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
 
   return (
     <ResizablePanelGroup
