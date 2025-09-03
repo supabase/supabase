@@ -7,10 +7,10 @@ import type { NextPageWithLayout } from 'types'
 
 const HomePage: NextPageWithLayout = () => {
   const isHomeNew = useFlag('homeNew')
-  if (isHomeNew) {
+  // if (isHomeNew) {
     return <HomeV2 />
-  }
-  return <Home />
+  // }
+  // return <Home />
 }
 
 HomePage.getLayout = (page) => (

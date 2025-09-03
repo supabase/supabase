@@ -9,6 +9,7 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn, Skeleton } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { ServiceStatus } from './ServiceStatus'
 
 export const ActivityStats = () => {
@@ -64,16 +65,17 @@ export const ActivityStats = () => {
           {isLoadingMigrations ? (
             <Skeleton className="h-4 w-16 mt-2" />
           ) : (
-            <p
-              className={cn(
-                'h-[34px] flex items-center capitalize-sentence',
-                !latestMigration ? 'text-foreground-lighter' : 'text-foregorund'
+            <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
+              {latestMigration ? (
+                <TimestampInfo
+                  className="text-base"
+                  label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
+                  utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
+                />
+              ) : (
+                <p className="text-foreground-lighter">No migrations</p>
               )}
-            >
-              {latestMigration
-                ? dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
-                : 'No migrations'}
-            </p>
+            </div>
           )}
         </Link>
         <Link className="block" href={`/project/${ref}/database/backups/scheduled`}>
@@ -81,20 +83,19 @@ export const ActivityStats = () => {
           {isLoadingBackups ? (
             <Skeleton className="h-4 w-16 mt-2" />
           ) : (
-            <p
-              className={cn(
-                'h-[34px] flex items-center capitalize-sentence',
-                !backupsData?.pitr_enabled && !latestBackup
-                  ? 'text-foreground-lighter'
-                  : 'text-foreground'
+            <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
+              {backupsData?.pitr_enabled ? (
+                <p>PITR enabled</p>
+              ) : latestBackup ? (
+                <TimestampInfo
+                  className="text-base"
+                  label={dayjs(latestBackup.inserted_at).fromNow()}
+                  utcTimestamp={latestBackup.inserted_at}
+                />
+              ) : (
+                <p className="text-foreground-lighter">No backups</p>
               )}
-            >
-              {backupsData?.pitr_enabled
-                ? 'PITR enabled'
-                : latestBackup
-                  ? dayjs(latestBackup.inserted_at).fromNow()
-                  : 'No backups'}
-            </p>
+            </div>
           )}
         </Link>
         <Link className="block" href={`/project/${ref}/branches`}>
@@ -116,9 +117,13 @@ export const ActivityStats = () => {
                   </p>
                 </div>
               ) : currentBranch?.created_at ? (
-                dayjs(currentBranch.created_at).fromNow()
+                <TimestampInfo
+                  className="text-base"
+                  label={dayjs(currentBranch.created_at).fromNow()}
+                  utcTimestamp={currentBranch.created_at}
+                />
               ) : (
-                'Unknown'
+                <p className="text-foreground-lighter">Unknown</p>
               )}
             </div>
           )}
