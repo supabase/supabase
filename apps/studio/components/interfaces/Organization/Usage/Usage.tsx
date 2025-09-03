@@ -14,7 +14,15 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { cn, Listbox } from 'ui'
+import {
+  cn,
+  Select_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
@@ -26,7 +34,7 @@ import { TotalUsage } from './TotalUsage'
 const Usage = () => {
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
+  const [selectedProjectRef, setSelectedProjectRef] = useState<string>('all-projects')
 
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -155,35 +163,37 @@ const Usage = () => {
                     className="!w-48"
                   />
 
-                  <Listbox
-                    size="tiny"
-                    name="schema"
-                    className="w-[180px]"
+                  <Select_Shadcn_
                     value={selectedProjectRef}
-                    onChange={(value: any) => {
-                      if (value === 'all-projects') setSelectedProjectRef(undefined)
+                    onValueChange={(value) => {
+                      if (value === 'all-projects') setSelectedProjectRef('all-projects')
                       else setSelectedProjectRef(value)
                     }}
                   >
-                    <Listbox.Option
-                      key="all-projects"
-                      id="all-projects"
-                      label="All projects"
-                      value="all-projects"
-                    >
-                      All projects
-                    </Listbox.Option>
-                    {orgProjects?.map((project) => (
-                      <Listbox.Option
-                        key={project.ref}
-                        id={project.ref}
-                        value={project.ref}
-                        label={project.name}
-                      >
-                        {project.name}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox>
+                    <SelectTrigger_Shadcn_ size="tiny" className="w-[180px]">
+                      <SelectValue_Shadcn_ placeholder="Select a project" />
+                    </SelectTrigger_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      <SelectGroup_Shadcn_>
+                        <SelectItem_Shadcn_
+                          key="all-projects"
+                          value="all-projects"
+                          className="text-xs"
+                        >
+                          All projects
+                        </SelectItem_Shadcn_>
+                        {orgProjects?.map((project) => (
+                          <SelectItem_Shadcn_
+                            key={project.ref}
+                            value={project.ref}
+                            className="text-xs"
+                          >
+                            {project.name}
+                          </SelectItem_Shadcn_>
+                        ))}
+                      </SelectGroup_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
                 </div>
 
                 <div className="flex items-center gap-2">
