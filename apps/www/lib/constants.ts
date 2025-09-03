@@ -32,17 +32,14 @@ export const SITE_ORIGIN =
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
       : 'http://localhost:3000'
 
-// Prefer explicit environment configuration for CMS origin (CMS_SITE_ORIGIN or CMS_URL)
-const ENV_CMS_ORIGIN = process.env.CMS_SITE_ORIGIN || process.env.CMS_URL
 export const CMS_SITE_ORIGIN =
-  ENV_CMS_ORIGIN ||
-  (process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
     ? // In production, require env or fall back to localhost to avoid hitting supabase.com
       'http://localhost:3030'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
         typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('zone-www-dot-com-git-', 'cms-git-')}`
-      : 'http://localhost:3030')
+      : 'http://localhost:3030'
 
 export const LW_URL = `${SITE_ORIGIN}/launch-week`
 
@@ -68,5 +65,3 @@ export const LW15_URL = `${SITE_ORIGIN}/launch-week`
 export const SITE_NAME = 'Supabase'
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-
-export const CMS_API_URL = process.env.CMS_API_URL || 'http://localhost:1337'

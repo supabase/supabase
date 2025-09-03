@@ -114,11 +114,8 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
-        "CMS_API_URL",
-        "CMS_READ_KEY",
-        "CMS_SITE_ORIGIN",
-        "CMS_URL",
-        "NEXT_PUBLIC_CMS_URL",
+        "CMS_API_KEY",
+        "CMS_PREVIEW_SECRET",
         "NEXT_PUBLIC_MISC_USE_URL",
         "NEXT_PUBLIC_MISC_USE_ANON_KEY",
         "NEXT_PUBLIC_STUDIO_URL",
@@ -134,8 +131,6 @@
         "HCAPTCHA_SECRET_KEY",
         "NODE_ENV",
         "NEXT_PUBLIC_SENTRY_DSN",
-        "PAYLOAD_API_KEY",
-        "PREVIEW_SECRET",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
