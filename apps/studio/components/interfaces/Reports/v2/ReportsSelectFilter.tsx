@@ -8,7 +8,7 @@ import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 
 export interface ReportSelectOption {
   key: string
-  label: React.ReactNode
+  label: string
   description?: string
 }
 
@@ -100,11 +100,9 @@ export const ReportsSelectFilter = ({
         <div className="p-2 border-b border-default">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm text-foreground">{label}</span>
-            <div className="flex gap-2">
-              <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
-                Clear
-              </Button>
-            </div>
+            <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
+              Clear
+            </Button>
           </div>
         </div>
 
