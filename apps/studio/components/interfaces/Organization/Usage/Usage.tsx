@@ -125,7 +125,7 @@ const Usage = () => {
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription && (
-              <div className="w-full flex items-center justify-between">
+              <div className="flex lg:items-center items-start gap-3 flex-col lg:flex-row lg:justify-between w-full">
                 <div className="flex items-center gap-2">
                   <ShimmeringLoader className="w-48" />
                   <ShimmeringLoader className="w-48" />
