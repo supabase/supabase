@@ -1,21 +1,21 @@
-import { openai } from '@ai-sdk/openai'
 import { anthropic } from '@ai-sdk/anthropic'
+import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
+  AnthropicModel,
+  BedrockModel,
+  Model,
+  OpenAIModel,
   PROVIDERS,
+  ProviderModelConfig,
   ProviderName,
   getDefaultModelForProvider,
-  BedrockModel,
-  OpenAIModel,
-  AnthropicModel,
-  Model,
-  ProviderModelConfig,
 } from './model.utils'
 
-export type PromptProviderOptions = Record<string, any>
+type PromptProviderOptions = Record<string, any>
 
-export type ModelSuccess = {
+type ModelSuccess = {
   model: LanguageModel
   promptProviderOptions?: PromptProviderOptions
   error?: never
@@ -27,7 +27,7 @@ export type ModelError = {
   error: Error
 }
 
-export type ModelResponse = ModelSuccess | ModelError
+type ModelResponse = ModelSuccess | ModelError
 
 export const ModelErrorMessage = 'No valid AI model available based on available credentials.'
 
@@ -44,8 +44,12 @@ export type GetModelParams = {
  * - If isLimited is true, uses the provider's default model.
  * - Returns promptProviderOptions that callers can attach to the system message.
  */
-export async function getModel(params: GetModelParams): Promise<ModelResponse> {
-  const { provider, model, routingKey, isLimited = true } = params
+export async function getModel({
+  provider,
+  model,
+  routingKey,
+  isLimited = true,
+}: GetModelParams): Promise<ModelResponse> {
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
   let preferredProvider: ProviderName | undefined = provider
