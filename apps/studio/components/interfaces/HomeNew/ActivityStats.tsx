@@ -60,8 +60,10 @@ export const ActivityStats = () => {
           <p className="heading-meta text-foreground-light mb-1">Status</p>
           <ServiceStatus />
         </div>
+
         <Link className="block" href={`/project/${ref}/database/migrations`}>
-          <p className="heading-meta text-foreground-light mb-1">Last migration</p>
+          <h4 className="heading-meta text-foreground-light mb-1">Last migration</h4>
+
           <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
             {isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
@@ -76,8 +78,9 @@ export const ActivityStats = () => {
             )}
           </div>
         </Link>
+
         <Link className="block" href={`/project/${ref}/database/backups/scheduled`}>
-          <p className="heading-meta text-foreground-light mb-1">Last backup</p>
+          <h4 className="heading-meta text-foreground-light mb-1">Last backup</h4>
 
           <div className={cn('h-[34px] flex items-center capitalize-sentence')}>
             {isLoadingBackups ? (
@@ -95,6 +98,7 @@ export const ActivityStats = () => {
             )}
           </div>
         </Link>
+
         <Link className="block" href={`/project/${ref}/branches`}>
           <h4 className="heading-meta text-foreground-light mb-1">
             {isDefaultProject ? 'Recent branch' : 'Branch Created'}
