@@ -179,7 +179,7 @@ const Usage = () => {
                 <div className="flex items-center gap-2">
                   <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                     Organization is on the{' '}
-                    <span className="font-medium text-brand">{subscription.plan.name} plan </span>
+                    <span className="font-medium text-brand">{subscription.plan.name} Plan</span>
                   </p>
                   <span className="text-border-stronger">
                     <svg
