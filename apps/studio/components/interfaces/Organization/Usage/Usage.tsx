@@ -133,57 +133,75 @@ const Usage = () => {
             )}
 
             {isSuccessSubscription && (
-              <>
-                <DateRangePicker
-                  onChange={setDateRange}
-                  value={TIME_PERIODS_BILLING[0].key}
-                  options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-                  loading={isLoadingSubscription}
-                  currentBillingPeriodStart={subscription?.current_period_start}
-                  currentBillingPeriodEnd={subscription?.current_period_end}
-                  className="!w-48"
-                />
+              <div className="flex lg:items-center items-start gap-3 flex-col lg:flex-row lg:justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <DateRangePicker
+                    onChange={setDateRange}
+                    value={TIME_PERIODS_BILLING[0].key}
+                    options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
+                    loading={isLoadingSubscription}
+                    currentBillingPeriodStart={subscription?.current_period_start}
+                    currentBillingPeriodEnd={subscription?.current_period_end}
+                    className="!w-48"
+                  />
 
-                <Listbox
-                  size="tiny"
-                  name="schema"
-                  className="w-[180px]"
-                  value={selectedProjectRef}
-                  onChange={(value: any) => {
-                    if (value === 'all-projects') setSelectedProjectRef(undefined)
-                    else setSelectedProjectRef(value)
-                  }}
-                >
-                  <Listbox.Option
-                    key="all-projects"
-                    id="all-projects"
-                    label="All projects"
-                    value="all-projects"
+                  <Listbox
+                    size="tiny"
+                    name="schema"
+                    className="w-[180px]"
+                    value={selectedProjectRef}
+                    onChange={(value: any) => {
+                      if (value === 'all-projects') setSelectedProjectRef(undefined)
+                      else setSelectedProjectRef(value)
+                    }}
                   >
-                    All projects
-                  </Listbox.Option>
-                  {orgProjects?.map((project) => (
                     <Listbox.Option
-                      key={project.ref}
-                      id={project.ref}
-                      value={project.ref}
-                      label={project.name}
+                      key="all-projects"
+                      id="all-projects"
+                      label="All projects"
+                      value="all-projects"
                     >
-                      {project.name}
+                      All projects
                     </Listbox.Option>
-                  ))}
-                </Listbox>
+                    {orgProjects?.map((project) => (
+                      <Listbox.Option
+                        key={project.ref}
+                        id={project.ref}
+                        value={project.ref}
+                        label={project.name}
+                      >
+                        {project.name}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox>
+                </div>
 
-                <div className="flex flex-col xl:flex-row xl:gap-3">
+                <div className="flex items-center gap-2">
                   <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-                    Organization is on the {subscription.plan.name} plan
+                    Organization is on the{' '}
+                    <span className="font-medium text-brand">{subscription.plan.name} plan </span>
                   </p>
+                  <span className="text-border-stronger">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      shapeRendering="geometricPrecision"
+                    >
+                      <path d="M16 3.549L7.12 20.600" />
+                    </svg>
+                  </span>
                   <p className="text-sm text-foreground-light">
                     {billingCycleStart.format('DD MMM YYYY')} -{' '}
                     {billingCycleEnd.format('DD MMM YYYY')}
                   </p>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </ScaffoldContainer>
