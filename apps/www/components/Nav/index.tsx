@@ -9,10 +9,10 @@ import { useIsLoggedIn, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import { useSendTelemetryEvent } from 'lib/telemetry'
 import useDropdownMenu from './useDropdownMenu'
 
 import { getMenu } from 'data/nav'
