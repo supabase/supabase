@@ -121,10 +121,18 @@ const Usage = () => {
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
+      <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden">
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
-            {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
+            {isLoadingSubscription && (
+              <div className="w-full flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ShimmeringLoader className="w-48" />
+                  <ShimmeringLoader className="w-48" />
+                </div>
+                <ShimmeringLoader className="w-[280px]" />
+              </div>
+            )}
 
             {isErrorSubscription && (
               <AlertError
