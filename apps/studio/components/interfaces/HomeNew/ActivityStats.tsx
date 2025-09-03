@@ -64,7 +64,7 @@ export const ActivityStats = () => {
           {isLoadingMigrations ? (
             <Skeleton className="h-4 w-16 mt-2" />
           ) : (
-            <p className="text-foreground h-[34px] flex items-center">
+            <p className="text-foreground h-[34px] flex items-center capitalize-sentence">
               {latestMigration
                 ? dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()
                 : 'No migrations'}
@@ -76,7 +76,7 @@ export const ActivityStats = () => {
           {isLoadingBackups ? (
             <Skeleton className="h-4 w-16 mt-2" />
           ) : (
-            <p className="text-foreground h-[34px] flex items-center">
+            <p className="text-foreground h-[34px] flex items-center capitalize-sentence">
               {backupsData?.pitr_enabled
                 ? 'PITR enabled'
                 : latestBackup
@@ -93,7 +93,7 @@ export const ActivityStats = () => {
           {isLoadingBranches ? (
             <Skeleton className="h-4 w-24 mt-2" />
           ) : (
-            <div className="text-foreground truncate h-[34px] flex items-center">
+            <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
               {isDefaultProject ? (
                 <div className="flex items-center gap-2">
                   <GitBranch size={16} strokeWidth={1.5} className="text-foreground-lighter" />

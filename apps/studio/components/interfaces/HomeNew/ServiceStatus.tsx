@@ -1,7 +1,6 @@
-import dayjs from 'dayjs'
 import { AlertTriangle, CheckCircle2, ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
@@ -19,10 +18,17 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Skeleton,
 } from 'ui'
 
-const SERVICE_STATUS_THRESHOLD = 5 // minutes
+/**
+ * [Joshen] JFYI before we go live with this, we need to revisit the migrations section
+ * as I don't think it should live in the ServiceStatus component since its not indicative
+ * of a project's "service". ServiceStatus's intention is to be an ongoing health/status check.
+ *
+ * For context, migrations are meant to be indicative for when creating branches or projects
+ * with an initial SQL, so "healthy" migrations just means that migrations have all been successfully
+ * ran. So it might be a matter of decoupling "ready" state vs "health checks"
+ */
 
 const StatusMessage = ({
   status,
@@ -99,27 +105,14 @@ export const ServiceStatus = () => {
     : undefined
 
   // [Joshen] Need pooler service check eventually
-  const {
-    data: status,
-    isLoading,
-    refetch: refetchServiceStatus,
-  } = useProjectServiceStatusQuery(
-    {
-      projectRef: ref,
-    },
-    {
-      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
-    }
+  const { data: status, isLoading } = useProjectServiceStatusQuery(
+    { projectRef: ref },
+    { refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false) }
   )
-  const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
-    useEdgeFunctionServiceStatusQuery(
-      {
-        projectRef: ref,
-      },
-      {
-        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
-      }
-    )
+  const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery(
+    { projectRef: ref },
+    { refetchInterval: (data) => (!data?.healthy ? 5000 : false) }
+  )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
