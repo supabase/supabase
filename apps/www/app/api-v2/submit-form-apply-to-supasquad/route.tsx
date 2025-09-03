@@ -9,9 +9,9 @@ import { insertPageInDatabase } from '~/lib/notion'
 const integrations = Sentry.getDefaultIntegrations({}).filter((defaultIntegration) => {
   return !['BrowserApiErrors', 'Breadcrumbs', 'GlobalHandlers'].includes(defaultIntegration.name)
 })
-const sentryCommunityClient = new Sentry.BrowserClient({
+const sentryCommunityClient = new Sentry.NodeClient({
   dsn: process.env.SENTRY_DSN_COMMUNITY,
-  transport: Sentry.makeFetchTransport,
+  transport: Sentry.makeNodeTransport,
   stackParser: Sentry.defaultStackParser,
   integrations: [...integrations],
 })
