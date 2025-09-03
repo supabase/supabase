@@ -15,6 +15,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import career from '~/data/career.json'
+import staticContent from '.generated/staticContent/_index.json'
 import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
 
 const ContributorSchema = z.object({
@@ -124,7 +125,9 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             Explore remote opportunities and join our team to help us achieve it.
           </p>
           <Button asChild type="primary" className="mt-4">
-            <Link href="#positions">Open positions</Link>
+            <Link href="#positions">
+              View {staticContent?.jobsCount > 0 ? staticContent?.jobsCount : ''} open positions
+            </Link>
           </Button>
         </header>
 
