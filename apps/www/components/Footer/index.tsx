@@ -27,12 +27,14 @@ const Footer = (props: Props) => {
   const forceDark = isDarkLaunchWeek
 
   useEffect(() => {
-    const channel = supabase.channel('footer')
-    if (channel.state === REALTIME_CHANNEL_STATES.closed) {
-      channel.subscribe()
-    }
-    return () => {
-      channel.unsubscribe()
+    if (supabase) {
+      const channel = supabase.channel('footer')
+      if (channel.state === REALTIME_CHANNEL_STATES.closed) {
+        channel.subscribe()
+      }
+      return () => {
+        channel.unsubscribe()
+      }
     }
   }, [])
 

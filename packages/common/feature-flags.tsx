@@ -57,7 +57,7 @@ export const FeatureFlagProvider = ({
   getConfigCatFlags,
   children,
 }: PropsWithChildren<{
-  API_URL: string
+  API_URL?: string
   enabled?: boolean
   getConfigCatFlags?: (
     userEmail?: string
@@ -82,7 +82,7 @@ export const FeatureFlagProvider = ({
 
       // Run both async operations in parallel
       const [flags, flagValues] = await Promise.all([
-        getFeatureFlags(API_URL),
+        !!API_URL ? getFeatureFlags(API_URL) : Promise.resolve({}),
         typeof getConfigCatFlags === 'function'
           ? getConfigCatFlags(user?.email)
           : Promise.resolve([]),
