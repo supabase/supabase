@@ -39,11 +39,13 @@ const SectionContent = ({
                 </div>
                 {links && links.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm text-foreground mb-2">More information</p>
+                    <p className="text-xs font-mono uppercase text-foreground-lighter mb-2">
+                      More information
+                    </p>
                     {links.map((link) => (
                       <div key={link.url}>
                         <Link href={link.url} target="_blank" rel="noreferrer">
-                          <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <div className="inline-flex items-center space-x-2 text-foreground-light hover:text-foreground transition">
                             <p className="text-sm">{link.name}</p>
                             <ExternalLink size={16} strokeWidth={1.5} />
                           </div>
