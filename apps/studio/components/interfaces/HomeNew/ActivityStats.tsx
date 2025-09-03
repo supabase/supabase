@@ -95,16 +95,9 @@ export const ActivityStats = () => {
           {isLoadingBranches ? (
             <Skeleton className="h-4 w-24 mt-2" />
           ) : (
-            <div className="text-foreground">
+            <div className="text-foreground truncate">
               {isDefaultProject ? (
-                <div className="flex items-center gap-2">
-                  <div>
-                    <GitBranch size={16} strokeWidth={1.5} className="text-foreground-muted" />
-                  </div>
-                  <p className="truncate">
-                    {latestNonDefaultBranch?.name ?? '+ Create your first branch'}
-                  </p>
-                </div>
+                <p className="truncate">{latestNonDefaultBranch?.name ?? 'No branches'}</p>
               ) : currentBranch?.created_at ? (
                 dayjs(currentBranch.created_at).fromNow()
               ) : (
