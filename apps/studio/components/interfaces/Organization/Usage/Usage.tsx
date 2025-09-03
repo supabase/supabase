@@ -143,6 +143,7 @@ const Usage = () => {
                   loading={isLoadingSubscription}
                   currentBillingPeriodStart={subscription?.current_period_start}
                   currentBillingPeriodEnd={subscription?.current_period_end}
+                  className="!w-48"
                 />
 
                 <Listbox
