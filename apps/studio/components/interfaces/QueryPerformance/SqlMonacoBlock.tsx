@@ -45,7 +45,7 @@ export const SqlMonacoBlock = ({
         className={className}
         wrapperProps={{
           className:
-            '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.cursor]:!hidden',
+            '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.monaco-editor]:!outline-transparent [&_.cursor]:!hidden',
         }}
         options={{
           readOnly: true,

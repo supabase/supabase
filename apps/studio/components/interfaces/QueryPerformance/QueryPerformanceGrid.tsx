@@ -93,7 +93,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 value={value.replace(/\s+/g, ' ').trim()}
                 wrapperProps={{
                   className:
-                    '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent',
+                    '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.monaco-editor]:!outline-transparent',
                 }}
                 options={{
                   readOnly: true,
