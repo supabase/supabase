@@ -122,7 +122,7 @@ const Usage = () => {
         <ScaffoldTitle>Usage</ScaffoldTitle>
       </ScaffoldContainerLegacy>
       <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
-        <ScaffoldContainer className="">
+        <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
