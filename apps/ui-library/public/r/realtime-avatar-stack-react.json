@@ -40,7 +40,8 @@
     {
       "path": "registry/default/clients/react/lib/supabase/client.ts",
       "content": "import { createClient as createSupabaseClient } from '@supabase/supabase-js'\n\nexport function createClient() {\n  return createSupabaseClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
-      "type": "registry:lib"
+      "type": "registry:lib",
+      "target": "lib/supabase/client.ts"
     }
   ],
   "envVars": {
