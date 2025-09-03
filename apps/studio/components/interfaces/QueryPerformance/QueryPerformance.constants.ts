@@ -17,6 +17,7 @@ export const QUERY_PERFORMANCE_REPORTS = {
     { id: 'calls', name: 'Calls', description: undefined, minWidth: undefined },
     { id: 'total_time', name: 'Total time', description: 'latency', minWidth: 180 },
     { id: 'prop_total_time', name: 'Time consumed', description: undefined, minWidth: 150 },
+    { id: 'mean_time', name: 'Mean time', description: undefined, minWidth: undefined },
   ],
   [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: [
     { id: 'query', name: 'Query', description: undefined, minWidth: 600 },
