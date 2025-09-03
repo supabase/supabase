@@ -121,6 +121,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     model,
     error: modelError,
     promptProviderOptions,
+    providerOptions,
   } = await getModel({
     provider: 'openai',
     model: 'gpt-5-mini',
@@ -201,6 +202,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
+      ...(providerOptions && { providerOptions }),
       tools,
       abortSignal: abortController.signal,
     })

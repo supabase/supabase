@@ -18,12 +18,15 @@ export type ProviderModelConfig = {
 export type ProviderRegistry = {
   bedrock: {
     models: Record<BedrockModel, ProviderModelConfig>
+    providerOptions?: Record<string, any>
   }
   openai: {
     models: Record<OpenAIModel, ProviderModelConfig>
+    providerOptions?: Record<string, any>
   }
   anthropic: {
     models: Record<AnthropicModel, ProviderModelConfig>
+    providerOptions?: Record<string, any>
   }
 }
 
@@ -48,6 +51,11 @@ export const PROVIDERS: ProviderRegistry = {
     models: {
       'gpt-5': { default: false },
       'gpt-5-mini': { default: true },
+    },
+    providerOptions: {
+      openai: {
+        reasoningEffort: 'low',
+      },
     },
   },
   anthropic: {

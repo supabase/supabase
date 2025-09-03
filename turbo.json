@@ -85,7 +85,6 @@
         "DEFAULT_PROJECT_NAME",
         "DEFAULT_ORGANIZATION_NAME",
         "OPENAI_API_KEY",
-        "ANTHROPIC_API_KEY",
         "AUTH_JWT_SECRET",
         "LOGFLARE_URL",
         "LOGFLARE_PRIVATE_ACCESS_TOKEN",
@@ -103,8 +102,7 @@
         "VERCEL_URL",
         "IS_THROTTLED",
         "AI_PRO_MODEL",
-        "AI_NORMAL_MODEL",
-        "ANTHROPIC_API_KEY"
+        "AI_NORMAL_MODEL"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]

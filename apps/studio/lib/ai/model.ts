@@ -1,9 +1,7 @@
-import { anthropic } from '@ai-sdk/anthropic'
 import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
-  AnthropicModel,
   BedrockModel,
   Model,
   OpenAIModel,
@@ -14,16 +12,19 @@ import {
 } from './model.utils'
 
 type PromptProviderOptions = Record<string, any>
+type ProviderOptions = Record<string, any>
 
 type ModelSuccess = {
   model: LanguageModel
   promptProviderOptions?: PromptProviderOptions
+  providerOptions?: ProviderOptions
   error?: never
 }
 
 export type ModelError = {
   model?: never
   promptProviderOptions?: never
+  providerOptions?: never
   error: Error
 }
 
@@ -57,7 +58,6 @@ export async function getModel({
   const hasAwsCredentials = await checkAwsCredentials()
   const hasAwsBedrockRoleArn = !!process.env.AWS_BEDROCK_ROLE_ARN
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
-  const hasAnthropicKey = !!process.env.ANTHROPIC_API_KEY
 
   // Auto-pick a provider if not specified defaulting to Bedrock
   if (!preferredProvider) {
@@ -65,8 +65,6 @@ export async function getModel({
       preferredProvider = 'bedrock'
     } else if (hasOpenAIKey) {
       preferredProvider = 'openai'
-    } else if (hasAnthropicKey) {
-      preferredProvider = 'anthropic'
     }
   }
 
@@ -104,16 +102,7 @@ export async function getModel({
     return {
       model: openai(chosenModelId as OpenAIModel),
       promptProviderOptions: models[chosenModelId as OpenAIModel]?.promptProviderOptions,
-    }
-  }
-
-  if (preferredProvider === 'anthropic') {
-    if (!hasAnthropicKey) {
-      return { error: new Error('ANTHROPIC_API_KEY not available') }
-    }
-    return {
-      model: anthropic(chosenModelId as AnthropicModel),
-      promptProviderOptions: models[chosenModelId as AnthropicModel]?.promptProviderOptions,
+      providerOptions: providerRegistry.providerOptions,
     }
   }
 
