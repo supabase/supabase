@@ -83,6 +83,7 @@ describe('getModel', () => {
   it('returns specified provider and model when provided (openai gpt-5)', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(false)
     process.env.OPENAI_API_KEY = 'test-key'
+    process.env.IS_THROTTLED = 'false'
 
     const { model, error } = await getModel({
       provider: 'openai',
