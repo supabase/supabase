@@ -4,12 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import {
-  ScaffoldHeader,
-  ScaffoldContainer,
-  ScaffoldContainerLegacy,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldHeader, ScaffoldContainer, ScaffoldTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
@@ -111,9 +106,9 @@ const Usage = () => {
 
   if (!canReadSubscriptions) {
     return (
-      <ScaffoldContainerLegacy>
+      <ScaffoldContainer>
         <NoPermission resourceText="view organization usage" />
-      </ScaffoldContainerLegacy>
+      </ScaffoldContainer>
     )
   }
 
