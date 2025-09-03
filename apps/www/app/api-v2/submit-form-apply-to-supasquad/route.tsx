@@ -4,12 +4,29 @@ import z from 'zod'
 import { CustomerioAppClient, CustomerioTrackClient } from '~/lib/customerio'
 import { insertPageInDatabase } from '~/lib/notion'
 
-const captureSentryCommunityException = (error: Error) => {
-  Sentry.captureException(error, {
-    tags: {
-      project: 'community',
-    },
-  })
+// Using a separate Sentry client for community following this guide:
+// https://docs.sentry.io/platforms/javascript/best-practices/multiple-sentry-instances/
+const integrations = Sentry.getDefaultIntegrations({}).filter(
+  (defaultIntegration) => {
+    return !["BrowserApiErrors", "Breadcrumbs", "GlobalHandlers"].includes(
+      defaultIntegration.name,
+    );
+  },
+);
+const sentryCommunityClient = new Sentry.BrowserClient({
+  dsn: process.env.SENTRY_DSN_COMMUNITY,
+  transport: Sentry.makeFetchTransport,
+  stackParser: Sentry.defaultStackParser,
+  integrations: [...integrations],
+});
+
+const sentryCommunity = new Sentry.Scope();
+sentryCommunity.setClient(sentryCommunityClient);
+
+const captureSentryCommunityException = (error: any) => {
+  if (process.env.SENTRY_DSN_COMMUNITY) {
+    sentryCommunity.captureException(error)
+  }
 }
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY
@@ -79,7 +96,8 @@ export async function POST(req: Request) {
   let body: unknown
   try {
     body = await req.json()
-  } catch {
+  } catch (error: any) {
+    captureSentryCommunityException(new Error('Unable to parse JSON:`'))
     return new Response(JSON.stringify({ message: 'Invalid JSON' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
