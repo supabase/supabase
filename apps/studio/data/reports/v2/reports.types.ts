@@ -42,4 +42,5 @@ export interface ReportConfig {
   YAxisProps?: YAxisProps
   xAxisKey?: string
   yAxisKey?: string
+  showNewBadge?: boolean
 }

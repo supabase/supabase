@@ -15,6 +15,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { formatBytes } from 'lib/helpers'
 import { numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
+import { Badge } from 'ui'
 
 export interface ChartHeaderProps {
   title?: string
@@ -41,6 +42,7 @@ export interface ChartHeaderProps {
   isNetworkChart?: boolean
   attributes?: any[]
   sql?: string
+  showNewBadge?: boolean
 }
 
 export const ChartHeader = ({
@@ -68,6 +70,7 @@ export const ChartHeader = ({
   isNetworkChart = false,
   attributes,
   sql,
+  showNewBadge,
 }: ChartHeaderProps) => {
   const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
@@ -211,7 +214,10 @@ export const ChartHeader = ({
   return (
     <div className="flex-grow flex justify-between items-start min-h-16">
       <div className="flex flex-col">
-        {title && chartTitle}
+        <div className="flex items-center gap-2">
+          {title && chartTitle}
+          {showNewBadge && <Badge variant="success">New</Badge>}
+        </div>
         <div className="h-4">
           {hasHighlightedValue && highlighted}
           {label}
