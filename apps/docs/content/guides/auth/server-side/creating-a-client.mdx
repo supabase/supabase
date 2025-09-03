@@ -160,7 +160,7 @@ To access Supabase from a Next.js app, you need 2 types of Supabase clients:
 1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
 2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
-Since NextJS Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them.
+Since Next.js Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them.
 
 The middleware is responsible for:
 
@@ -789,16 +789,16 @@ export default app
 </TabPanel>
 </Tabs>
 
-## Next steps
+## Add pages
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="next-next-steps"
-  queryGroup="nextsteps"
+  defaultActiveId="nextjs"
+  queryGroup="framework"
 >
-<TabPanel id="next-next-steps" label="NextJS">
+<TabPanel id="nextjs" label="Next.js">
 ### Create a login page
 
 Create a login page for your app. Use a Server Action to call the Supabase signup function.
