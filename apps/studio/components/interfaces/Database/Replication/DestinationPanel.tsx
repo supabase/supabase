@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -13,7 +12,6 @@ import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
-import { replicationKeys } from 'data/replication/keys'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -87,7 +85,6 @@ export const DestinationPanel = ({
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const { setRequestStatus } = usePipelineRequestStatus()
-  const queryClient = useQueryClient()
 
   const editMode = !!existingDestination
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
@@ -197,7 +194,7 @@ export const DestinationPanel = ({
           )
           toast.success('Settings applied. Starting the pipeline...')
         }
-        await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
+        startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
         const bigQueryConfig: any = {
@@ -227,7 +224,7 @@ export const DestinationPanel = ({
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
         toast.success('Destination created. Starting the pipeline...')
-        await startPipeline({ projectRef, pipelineId })
+        startPipeline({ projectRef, pipelineId })
         onClose()
       }
     } catch (error) {
@@ -246,28 +243,6 @@ export const DestinationPanel = ({
       form.reset(defaultValues)
     }
   }, [destinationData, pipelineData, editMode, defaultValues, form])
-
-  // When the panel transitions from closed -> open, refresh item data and reset the form once
-  const wasVisibleRef = useRef<boolean>(visible)
-  useEffect(() => {
-    const becameOpen = !wasVisibleRef.current && visible
-    wasVisibleRef.current = visible
-    if (!becameOpen) return
-
-    // Reset immediately with whatever is cached to avoid showing stale edits
-    form.reset(defaultValues)
-
-    // Refetch fresh values in edit mode
-    if (!editMode || !projectRef) return
-    const destId = existingDestination?.destinationId
-    const pipeId = existingDestination?.pipelineId
-    if (destId) {
-      queryClient.invalidateQueries(replicationKeys.destinationById(projectRef, destId))
-    }
-    if (pipeId) {
-      queryClient.invalidateQueries(replicationKeys.pipelineById(projectRef, pipeId))
-    }
-  }, [visible])
 
   return sourceId ? (
     <>
