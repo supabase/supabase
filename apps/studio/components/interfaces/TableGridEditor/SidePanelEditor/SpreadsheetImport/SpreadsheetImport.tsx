@@ -90,9 +90,7 @@ const SpreadsheetImport = ({
       )
 
       if (errors.length > 0) {
-        toast.error(
-          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
-        )
+        toast.error('Some issues have been detected. More details below the content preview.')
       }
 
       setErrors(errors)
