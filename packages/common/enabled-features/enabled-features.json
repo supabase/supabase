@@ -27,6 +27,8 @@
   "database:replication": true,
   "database:roles": true,
 
+  "docs:self-hosting": true,
+
   "integrations:vercel": true,
   "integrations:show_stripe_wrapper": true,
 
@@ -53,5 +55,11 @@
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
 
-  "reports:all": true
+  "reports:all": true,
+
+  "sdk:csharp": true,
+  "sdk:dart": true,
+  "sdk:kotlin": true,
+  "sdk:python": true,
+  "sdk:swift": true
 }

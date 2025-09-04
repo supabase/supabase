@@ -97,11 +97,15 @@ export const useUpdateDestinationPipelineMutation = ({
     (vars) => updateDestinationPipeline(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+        const { projectRef, destinationId, pipelineId } = variables
 
         await Promise.all([
+          // Invalidate lists
           queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
           queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+          // Invalidate item-level caches used by the editor panel
+          queryClient.invalidateQueries(replicationKeys.destinationById(projectRef, destinationId)),
+          queryClient.invalidateQueries(replicationKeys.pipelineById(projectRef, pipelineId)),
         ])
 
         await onSuccess?.(data, variables, context)
