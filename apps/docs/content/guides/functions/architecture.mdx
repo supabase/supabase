@@ -5,7 +5,7 @@ description: 'Supabase Edge Functions Architecture'
 subtitle: 'Understanding the Architecture of Supabase Edge Functions'
 ---
 
-# Guide to Supabase Edge Functions: Architecture and How They Work
+# Guide to Supabase Edge Functions: Architecture and how they work
 
 <div class="video-container">
   <iframe
@@ -18,7 +18,7 @@ subtitle: 'Understanding the Architecture of Supabase Edge Functions'
 
 This guide explains the architecture and inner workings of Supabase Edge Functions, based on the concepts demonstrated in the video "Supabase Edge Functions Explained" by Lydia Hallie. Edge functions are serverless compute resources that run at the edge of the network, close to users, enabling low-latency execution for tasks like API endpoints, webhooks, and real-time data processing. We'll break it down into key sections: an example use case, deployment process, global distribution, and execution mechanics.
 
-## 1. Understanding Edge Functions Through an Example: Image Filtering
+## 1. Understanding Edge Functions through an example: Image filtering
 
 To illustrate how edge functions operate, consider a photo-sharing app where users upload images and apply filters (e.g., grayscale or sepia) before saving them.
 
@@ -38,7 +38,7 @@ To illustrate how edge functions operate, consider a photo-sharing app where use
 
 This example highlights edge functions as lightweight, on-demand code snippets that integrate seamlessly with Supabase services like Storage and Auth.
 
-## 2. Deployment Process
+## 2. Deployment process
 
 Deploying an edge function is straightforward and automated, requiring no manual server setup.
 
@@ -55,7 +55,7 @@ Deploying an edge function is straightforward and automated, requiring no manual
 
 Once deployed, the function is ready for invocation from anywhere, with Supabase handling scaling and availability.
 
-## 3. Global Distribution and Routing
+## 3. Global distribution and routing
 
 Edge functions leverage a distributed architecture to minimize latency by running code close to the user.
 
@@ -70,7 +70,7 @@ Edge functions leverage a distributed architecture to minimize latency by runnin
 
 This global edge network is what makes edge functions "edge-native," providing consistent performance regardless of user location.
 
-## 4. Execution Mechanics: Fast and Isolated
+## 4. Execution mechanics: Fast and isolated
 
 The core of edge functions' efficiency lies in their execution environment, which prioritizes speed, isolation, and scalability.
 
@@ -96,7 +96,7 @@ The core of edge functions' efficiency lies in their execution environment, whic
 
 Compared to traditional serverless or monolithic architectures, this setup offers lower latency, automatic scaling, and no infrastructure management, making it perfect for global apps.
 
-## Benefits and Use Cases
+## Benefits and use cases
 
 - **Advantages**:
   - **Low Latency**: Proximity to users reduces round-trip times.
