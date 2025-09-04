@@ -11,6 +11,7 @@ import { SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
+import SpreadsheetImportPreview from './SpreadsheetImportPreview'
 import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import { EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
@@ -20,7 +21,6 @@ import {
   parseSpreadsheet,
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
-import SpreadsheetImportPreview from './SpreadsheetImportPreview'
 import { useChanged } from 'hooks/misc/useChanged'
 
 interface SpreadsheetImportProps {
