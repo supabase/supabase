@@ -108,8 +108,6 @@ const Message = function Message({
 
   const hasTextContent = content && content.trim().length > 0
 
-  console.log(parts)
-
   return (
     <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
@@ -175,7 +173,7 @@ const Message = function Message({
                             )}
                             isStreaming={part.state === 'streaming'}
                           >
-                            {part.text}
+                            {part.text || part.text}
                           </Reasoning>
                         )
                       case 'text':
