@@ -10,11 +10,11 @@ import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import {
   ReportsNumericFilter,
-  type NumericFilter,
+  numericFilterSchema,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import {
   ReportsSelectFilter,
-  type SelectFilters,
+  selectFilterSchema,
 } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -33,6 +33,7 @@ import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.con
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { BASE_PATH } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { useQueryState, parseAsJson } from 'nuqs'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (
@@ -60,10 +61,24 @@ const EdgeFunctionsUsage = () => {
   useChartHoverState(chartSyncId)
 
   // Filters
-  const [statusCodeFilter, setStatusCodeFilter] = useState<NumericFilter | undefined>()
-  const [regionFilter, setRegionFilter] = useState<SelectFilters>({})
-  const [executionTimeFilter, setExecutionTimeFilter] = useState<NumericFilter | undefined>()
-  const [functionFilter, setFunctionFilter] = useState<SelectFilters>({})
+  const [statusCodeFilter, setStatusCodeFilter] = useQueryState(
+    'status_code',
+    parseAsJson(numericFilterSchema.parse)
+  )
+
+  const [regionFilter, setRegionFilter] = useQueryState(
+    'region',
+    parseAsJson(selectFilterSchema.parse)
+  )
+  const [executionTimeFilter, setExecutionTimeFilter] = useQueryState(
+    'execution_time',
+    parseAsJson(numericFilterSchema.parse)
+  )
+
+  const [functionFilter, setFunctionFilter] = useQueryState(
+    'functions',
+    parseAsJson(selectFilterSchema.parse)
+  )
 
   const {
     selectedDateRange,
@@ -86,9 +101,9 @@ const EdgeFunctionsUsage = () => {
       endDate: selectedDateRange?.period_end?.date ?? '',
       interval: selectedDateRange?.interval ?? 'minute',
       filters: {
-        functions: functionFilter,
+        functions: functionFilter ?? [],
         status_code: statusCodeFilter,
-        region: regionFilter,
+        region: regionFilter ?? [],
         execution_time: executionTimeFilter,
       },
     })
@@ -162,10 +177,10 @@ const EdgeFunctionsUsage = () => {
                 options={
                   functions?.map((fn: { name: string; id: string }) => ({
                     label: fn.name,
-                    key: fn.id,
+                    value: fn.id,
                   })) ?? []
                 }
-                value={functionFilter}
+                value={functionFilter ?? []}
                 onChange={setFunctionFilter}
                 isLoading={isRefreshing}
               />
@@ -173,7 +188,7 @@ const EdgeFunctionsUsage = () => {
               <ReportsNumericFilter
                 label="Status Code"
                 value={statusCodeFilter}
-                onChange={setStatusCodeFilter}
+                onChange={(value) => setStatusCodeFilter(value)}
                 defaultOperator="="
                 isLoading={isRefreshing}
               />
@@ -181,7 +196,7 @@ const EdgeFunctionsUsage = () => {
               <ReportsNumericFilter
                 label="Execution Time"
                 value={executionTimeFilter}
-                onChange={setExecutionTimeFilter}
+                onChange={(value) => setExecutionTimeFilter(value)}
                 placeholder="Enter time in ms"
                 min={0}
                 max={99999}
@@ -192,7 +207,7 @@ const EdgeFunctionsUsage = () => {
               <ReportsSelectFilter
                 label="Region"
                 options={EDGE_FUNCTION_REGIONS.map((region) => ({
-                  key: region.key,
+                  value: region.key,
                   label: (
                     <div className="flex items-center gap-x-2">
                       <img
@@ -207,7 +222,7 @@ const EdgeFunctionsUsage = () => {
                     </div>
                   ),
                 }))}
-                value={regionFilter}
+                value={regionFilter ?? []}
                 onChange={setRegionFilter}
               />
             </div>
