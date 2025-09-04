@@ -1,5 +1,13 @@
 const tweets = [
   {
+    text: 'I love everything about Supabase.',
+    // quality: 0.9,
+    url: 'https://x.com/pontusab/status/1234567890',
+    handle: 'pontusab',
+    img_url: '/images/twitter-profiles/JwLEqyeo_400x400.jpg',
+    // source: 'x',
+  },
+  {
     text: "Working with @supabase has been one of the best dev experiences I've had lately. Incredibly easy to set up, great documentation, and so many fewer hoops to jump through than the competition. I definitely plan to use it on any and all future projects.",
     url: 'https://twitter.com/thatguy_tex/status/1497602628410388480',
     handle: 'thatguy_tex',
@@ -210,16 +218,34 @@ const tweets = [
     img_url: '/images/twitter-profiles/iMBvvQdn_400x400.jpg',
   },
   {
-    text: "Did a website with @supabase last week with no prior experience with it. Up and running in 20 minutes. It's awesome to use. Thumbs up",
-    url: 'https://twitter.com/michael_webdev/status/1352885366928404481?s=20',
-    handle: 'michael_webdev',
-    img_url: '/images/twitter-profiles/SvAyLaWV_400x400.jpg',
-  },
-  {
     text: 'I just learned about @supabase and im in love 😍 Supabase is an open source Firebase alternative! EarListen (& react) to database changes 💁 Manage users & permissions 🔧 Simple UI for database interaction',
     url: 'https://twitter.com/0xBanana/status/1373677301905362948',
     handle: '0xBanana',
     img_url: '/images/twitter-profiles/pgHIGqZ0_400x400.jpg',
+  },
+  {
+    text: "@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase and the wonderful world of @PostgreSQL before it's too late!!",
+    url: 'https://twitter.com/jim_bisenius/status/1361772978841788416',
+    handle: 'jim_bisenius',
+    img_url: '/images/twitter-profiles/rLgwUZSB_400x400.jpg',
+  },
+  {
+    text: "@supabase is the answer to all of firebase's problems imo",
+    url: 'https://twitter.com/jim_bisenius/status/1358590362953142278',
+    handle: 'jim_bisenius',
+    img_url: '/images/twitter-profiles/rLgwUZSB_400x400.jpg',
+  },
+  {
+    text: "I'm probably the wrong person to ask because I pick tools based on UX. Supabase was immediately approachable: instant setup, fast web app, auth, and easy APIs. Same reason I liked Firebase when I first discovered.",
+    url: 'https://twitter.com/jasonbarone/status/1357015483619422210',
+    handle: 'jasonbarone',
+    img_url: '/images/twitter-profiles/6zCnwpvi_400x400.jpg',
+  },
+  {
+    text: 'Next.js, @supabase, @stripe, and @vercel. Supastack™',
+    url: 'https://twitter.com/jasonbarone/status/1356765411832922115',
+    handle: 'jasonbarone',
+    img_url: '/images/twitter-profiles/6zCnwpvi_400x400.jpg',
   },
 ]
 
