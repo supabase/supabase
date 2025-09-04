@@ -41,7 +41,10 @@ export const formatMemberRoleToProjectRoleConfiguration = (
       }
     })
     .filter(Boolean)
-    .flat() as ProjectRoleConfiguration[]
+    .flat()
+    .filter(
+      (p) => p !== undefined && 'baseRoleId' in p && p.ref !== undefined
+    ) as ProjectRoleConfiguration[]
 
   return roleConfiguration
 }
