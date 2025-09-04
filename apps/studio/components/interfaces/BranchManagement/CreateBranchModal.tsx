@@ -21,8 +21,8 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { projectKeys } from 'data/projects/keys'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
+import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -46,6 +46,9 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -86,12 +89,11 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
-  const {
-    data: cloneBackups,
-    error: cloneBackupsError,
-    isError: isErrorcloneBackups,
-  } = useCloneBackupsQuery({ projectRef })
+  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery({ projectRef })
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
+  const noPhysicalBackups = cloneBackupsError?.message.startsWith(
+    'Physical backups need to be enabled'
+  )
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -342,12 +344,6 @@ export const CreateBranchModal = () => {
                   )}
                 </>
               )}
-              {isErrorcloneBackups && (
-                <AlertError
-                  error={cloneBackupsError}
-                  subject="Failed to retrieve physical backup information"
-                />
-              )}
               {allowDataBranching && (
                 <FormField_Shadcn_
                   control={form.control}
@@ -358,9 +354,22 @@ export const CreateBranchModal = () => {
                       layout="flex-row-reverse"
                       description="Clone production data into this branch"
                     >
-                      <FormControl_Shadcn_>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <FormControl_Shadcn_>
+                            <Switch
+                              disabled={noPhysicalBackups}
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl_Shadcn_>
+                        </TooltipTrigger>
+                        {noPhysicalBackups && (
+                          <TooltipContent side="bottom">
+                            PITR is required for the project to clone data into the branch
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
                     </FormItemLayout>
                   )}
                 />
