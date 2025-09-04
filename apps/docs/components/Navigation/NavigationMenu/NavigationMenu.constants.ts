@@ -319,12 +319,12 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Laravel PHP',
           url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
-          enabled: jsOnly,
+          enabled: !jsOnly,
         },
         {
           name: 'Ruby on Rails',
           url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
-          enabled: jsOnly,
+          enabled: !jsOnly,
         },
 
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },

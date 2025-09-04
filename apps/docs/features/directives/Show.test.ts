@@ -7,11 +7,11 @@ import { showRemark } from './Show'
 import { fromDocsMarkdown } from './utils.server'
 
 // Mock the isFeatureEnabled function from common package
-vi.mock('common', () => ({
+vi.mock('common/enabled-features', () => ({
   isFeatureEnabled: vi.fn(),
 }))
 
-const { isFeatureEnabled } = await import('common')
+const { isFeatureEnabled } = await import('common/enabled-features')
 
 describe('$Show', () => {
   beforeEach(() => {

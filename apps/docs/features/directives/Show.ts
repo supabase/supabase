@@ -22,7 +22,7 @@ import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 
-import { isFeatureEnabled, type Feature } from 'common/enabled-features/index.ts'
+import { isFeatureEnabled, type Feature } from 'common/enabled-features'
 import { getAttributeValue } from './utils.server'
 
 export function showRemark() {
