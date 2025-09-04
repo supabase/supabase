@@ -11,6 +11,7 @@ export interface NavMenuSection {
   name: string
   url?: `/${string}` | `https://${string}`
   items: Partial<NavMenuSection>[]
+  enabled?: boolean
 }
 
 type MenuItem = {
@@ -20,6 +21,7 @@ type MenuItem = {
   level?: string
   hasLightIcon?: boolean
   community?: boolean
+  enabled?: boolean
 }
 
 export type DropdownMenuItem = MenuItem & {
