@@ -151,6 +151,11 @@ const ReportsMenu = () => {
               },
             ]
           : []),
+        {
+          name: 'Query Insights',
+          key: 'query-insights',
+          url: `/project/${ref}/reports/query-insights${preservedQueryParams}`,
+        },
         ...(realtimeEnabled
           ? [
               {
