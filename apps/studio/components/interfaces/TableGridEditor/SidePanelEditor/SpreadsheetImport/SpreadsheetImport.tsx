@@ -34,6 +34,9 @@ interface SpreadsheetImportProps {
   updateEditorDirty?: (value: boolean) => void
 }
 
+const csvParseErrorMessage =
+  'Some issues have been detected. More details below the content preview.'
+
 const SpreadsheetImport = ({
   visible = false,
   debounceDuration = 250,
@@ -90,7 +93,7 @@ const SpreadsheetImport = ({
       )
 
       if (errors.length > 0) {
-        toast.error('Some issues have been detected. More details below the content preview.')
+        toast.error(csvParseErrorMessage)
       }
 
       setErrors(errors)
@@ -126,9 +129,7 @@ const SpreadsheetImport = ({
     if (text.length > 0) {
       const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
       if (errors.length > 0) {
-        toast.error(
-          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
-        )
+        toast.error(csvParseErrorMessage)
       }
       setErrors(errors)
       setSelectedHeaders(headers)
