@@ -90,11 +90,17 @@ export const ReportsNumericFilter = ({
   }
 
   const handleValueChange = (inputValue: string) => {
-    const numericValue = parseFloat(inputValue) || null
-    setTempValue({
-      operator: tempValue?.operator ?? defaultOperator,
-      value: numericValue,
-    })
+    if (inputValue === '') {
+      setTempValue(null)
+    } else {
+      const numericValue = parseFloat(inputValue)
+      if (!isNaN(numericValue)) {
+        setTempValue({
+          operator: tempValue?.operator ?? defaultOperator,
+          value: numericValue,
+        })
+      }
+    }
   }
 
   const handleClearAll = () => {
