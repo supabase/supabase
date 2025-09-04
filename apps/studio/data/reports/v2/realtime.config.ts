@@ -204,7 +204,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Execution time of RLS (Row Level Security) checks for realtime authorization.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -242,7 +242,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Size of broadcast payloads sent through realtime.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}B`,
@@ -313,7 +313,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Time between database commit and broadcast when using broadcast from database.',
-    availableIn: ['pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
