@@ -73,8 +73,8 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 Insert a record from the Swift client:
 
@@ -98,8 +98,9 @@ try await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 Insert a record from the Python client:
 
@@ -116,6 +117,7 @@ supabase.from_('arraytest').insert(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## View the results
@@ -206,8 +208,8 @@ returns:
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 This returns the entire array field:
 
@@ -231,6 +233,7 @@ returns:
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

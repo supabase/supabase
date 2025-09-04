@@ -1,14 +1,31 @@
 import type { ComponentProps } from 'react'
 
-import type { IconPanel } from 'ui-patterns/IconPanel'
-
-import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
-// Toggle sections by features
 import { isFeatureEnabled } from 'common'
-const billingEnabled = isFeatureEnabled('billing:all')
-const selfHostingEnabled = isFeatureEnabled('build:self-hosting')
-const allSDKsEnabled = isFeatureEnabled('sdk:all')
-const allAuthProvidersEnabled = isFeatureEnabled('authentication:show_providers')
+import type { IconPanel } from 'ui-patterns/IconPanel'
+import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
+
+const {
+  authenticationShowProviders: allAuthProvidersEnabled,
+  billingAll: billingEnabled,
+  'docsSelf-hosting': selfHostingEnabled,
+  sdkCsharp: sdkCsharpEnabled,
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkPython: sdkPythonEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled([
+  'authentication:show_providers',
+  'billing:all',
+  'docs:self-hosting',
+  'sdk:csharp',
+  'sdk:dart',
+  'sdk:kotlin',
+  'sdk:python',
+  'sdk:swift',
+])
+
+const jsOnly =
+  !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
@@ -96,16 +113,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/deployment' as `/${string}`,
             level: 'deployment',
           },
-          ...(selfHostingEnabled
-            ? [
-                {
-                  label: 'Self-Hosting',
-                  icon: 'self-hosting',
-                  href: '/guides/self-hosting' as `/${string}`,
-                  level: 'self_hosting',
-                },
-              ]
-            : []),
+          {
+            label: 'Self-Hosting',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting' as `/${string}`,
+            level: 'self_hosting',
+            enabled: selfHostingEnabled,
+          },
           {
             label: 'Integrations',
             icon: 'integrations',
@@ -164,42 +178,43 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/reference/javascript' as `/${string}`,
             level: 'reference_javascript',
           },
-          ...(allSDKsEnabled
-            ? [
-                {
-                  label: 'Flutter',
-                  icon: 'reference-dart',
-                  href: '/reference/dart' as `/${string}`,
-                  level: 'reference_dart',
-                },
-                {
-                  label: 'Swift',
-                  icon: 'reference-swift',
-                  href: '/reference/swift' as `/${string}`,
-                  level: 'reference_swift',
-                },
-                {
-                  label: 'Python',
-                  icon: 'reference-python',
-                  href: '/reference/python' as `/${string}`,
-                  level: 'reference_python',
-                },
-                {
-                  label: 'C#',
-                  icon: 'reference-csharp',
-                  href: '/reference/csharp' as `/${string}`,
-                  level: 'reference_csharp',
-                  community: true,
-                },
-                {
-                  label: 'Kotlin',
-                  icon: 'reference-kotlin',
-                  href: '/reference/kotlin' as `/${string}`,
-                  level: 'reference_kotlin',
-                  community: true,
-                },
-              ]
-            : []),
+          {
+            label: 'Flutter',
+            icon: 'reference-dart',
+            href: '/reference/dart' as `/${string}`,
+            level: 'reference_dart',
+            enabled: sdkDartEnabled,
+          },
+          {
+            label: 'Swift',
+            icon: 'reference-swift',
+            href: '/reference/swift' as `/${string}`,
+            level: 'reference_swift',
+            enabled: sdkSwiftEnabled,
+          },
+          {
+            label: 'Python',
+            icon: 'reference-python',
+            href: '/reference/python' as `/${string}`,
+            level: 'reference_python',
+            enabled: sdkPythonEnabled,
+          },
+          {
+            label: 'C#',
+            icon: 'reference-csharp',
+            href: '/reference/csharp' as `/${string}`,
+            level: 'reference_csharp',
+            community: true,
+            enabled: sdkCsharpEnabled,
+          },
+          {
+            label: 'Kotlin',
+            icon: 'reference-kotlin',
+            href: '/reference/kotlin' as `/${string}`,
+            level: 'reference_kotlin',
+            community: true,
+            enabled: sdkKotlinEnabled,
+          },
         ],
         [
           {
@@ -282,32 +297,35 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
-        ...(allSDKsEnabled
-          ? [
-              { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
-              { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
-              {
-                name: 'Android Kotlin',
-                url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Flutter',
+          url: '/guides/getting-started/quickstarts/flutter',
+          enabled: sdkDartEnabled,
+        },
+        {
+          name: 'iOS SwiftUI',
+          url: '/guides/getting-started/quickstarts/ios-swiftui',
+          enabled: sdkSwiftEnabled,
+        },
+        {
+          name: 'Android Kotlin',
+          url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
+          enabled: sdkKotlinEnabled,
+        },
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
-        ...(allSDKsEnabled
-          ? [
-              {
-                name: 'Laravel PHP',
-                url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
-              },
-              {
-                name: 'Ruby on Rails',
-                url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Laravel PHP',
+          url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
+          enabled: jsOnly,
+        },
+        {
+          name: 'Ruby on Rails',
+          url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
+          enabled: jsOnly,
+        },
 
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         {
@@ -365,27 +383,21 @@ export const gettingstarted: NavMenuConstant = {
     {
       name: 'Mobile tutorials',
       items: [
-        ...(allSDKsEnabled
-          ? [
-              {
-                name: 'Flutter',
-                url: '/guides/getting-started/tutorials/with-flutter' as `/${string}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Flutter',
+          url: '/guides/getting-started/tutorials/with-flutter' as `/${string}`,
+          enabled: sdkDartEnabled,
+        },
 
         {
           name: 'Expo React Native',
           url: '/guides/getting-started/tutorials/with-expo-react-native' as `/${string}`,
         },
-        ...(allSDKsEnabled
-          ? [
-              {
-                name: 'Android Kotlin',
-                url: '/guides/getting-started/tutorials/with-kotlin' as `/${string}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Android Kotlin',
+          url: '/guides/getting-started/tutorials/with-kotlin' as `/${string}`,
+          enabled: sdkKotlinEnabled,
+        },
 
         {
           name: 'Ionic React',
@@ -399,14 +411,11 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular' as `/${string}`,
         },
-        ...(allSDKsEnabled
-          ? [
-              {
-                name: 'Swift',
-                url: '/guides/getting-started/tutorials/with-swift' as `/${string}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Swift',
+          url: '/guides/getting-started/tutorials/with-swift' as `/${string}`,
+          enabled: sdkSwiftEnabled,
+        },
       ],
     },
     {
@@ -647,40 +656,51 @@ export const auth = {
             },
           ],
         },
-        ...(allAuthProvidersEnabled
-          ? [
-              { name: 'Password-based', url: '/guides/auth/passwords' },
-              { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email-passwordless' },
-              ...(allAuthProvidersEnabled
-                ? [
-                    {
-                      name: 'Phone Login',
-                      url: '/guides/auth/phone-login' as `/${string}`,
-                    },
+        {
+          name: 'Password-based',
+          url: '/guides/auth/passwords',
+          enabled: allAuthProvidersEnabled,
+        },
+        {
+          name: 'Email (Magic Link or OTP)',
+          url: '/guides/auth/auth-email-passwordless',
+          enabled: allAuthProvidersEnabled,
+        },
+        {
+          name: 'Phone Login',
+          url: '/guides/auth/phone-login' as `/${string}`,
+          enabled: allAuthProvidersEnabled,
+        },
 
-                    {
-                      name: 'Social Login (OAuth)',
-                      url: '/guides/auth/social-login',
-                      items: [...SocialLoginItems],
-                    },
-                  ]
-                : []),
+        {
+          name: 'Social Login (OAuth)',
+          url: '/guides/auth/social-login',
+          items: [...SocialLoginItems],
+          enabled: allAuthProvidersEnabled,
+        },
 
-              {
-                name: 'Enterprise SSO',
-                url: '/guides/auth/enterprise-sso',
-                items: [
-                  {
-                    name: 'SAML 2.0',
-                    url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
-                  },
-                ],
-              },
+        {
+          name: 'Enterprise SSO',
+          url: '/guides/auth/enterprise-sso',
+          enabled: allAuthProvidersEnabled,
+          items: [
+            {
+              name: 'SAML 2.0',
+              url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
+            },
+          ],
+        },
 
-              { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
-              { name: 'Web3 (Sign in with Solana)', url: '/guides/auth/auth-web3' },
-            ]
-          : []),
+        {
+          name: 'Anonymous Sign-Ins',
+          url: '/guides/auth/auth-anonymous',
+          enabled: allAuthProvidersEnabled,
+        },
+        {
+          name: 'Web3 (Sign in with Solana)',
+          url: '/guides/auth/auth-web3',
+          enabled: allAuthProvidersEnabled,
+        },
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
         {
           name: 'Identity Linking',
@@ -707,21 +727,18 @@ export const auth = {
         { name: 'Troubleshooting', url: '/guides/auth/troubleshooting' },
       ],
     },
-    ...(allAuthProvidersEnabled
-      ? [
-          {
-            name: 'Third-party auth',
-            items: [
-              { name: 'Overview', url: '/guides/auth/third-party/overview' },
-              { name: 'Clerk', url: '/guides/auth/third-party/clerk' },
-              { name: 'Firebase Auth', url: '/guides/auth/third-party/firebase-auth' },
-              { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
-              { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
-              { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
-            ],
-          },
-        ]
-      : []),
+    {
+      name: 'Third-party auth',
+      enabled: allAuthProvidersEnabled,
+      items: [
+        { name: 'Overview', url: '/guides/auth/third-party/overview' },
+        { name: 'Clerk', url: '/guides/auth/third-party/clerk' },
+        { name: 'Firebase Auth', url: '/guides/auth/third-party/firebase-auth' },
+        { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
+        { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
+        { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
+      ],
+    },
     {
       name: 'Configuration',
       items: [
@@ -791,21 +808,18 @@ export const auth = {
         },
       ],
     },
-    ...(allAuthProvidersEnabled
-      ? [
-          {
-            name: 'Auth UI',
-            url: undefined,
-            items: [
-              { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
-              {
-                name: 'Flutter Auth UI',
-                url: '/guides/auth/auth-helpers/flutter-auth-ui' as `/${string}`,
-              },
-            ],
-          },
-        ]
-      : []),
+    {
+      name: 'Auth UI',
+      url: undefined,
+      enabled: allAuthProvidersEnabled,
+      items: [
+        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
+        {
+          name: 'Flutter Auth UI',
+          url: '/guides/auth/auth-helpers/flutter-auth-ui' as `/${string}`,
+        },
+      ],
+    },
   ],
 }
 
@@ -1487,14 +1501,11 @@ export const functions: NavMenuConstant = {
           name: 'Limits',
           url: '/guides/functions/limits' as `/${string}`,
         },
-        ...(billingEnabled
-          ? [
-              {
-                name: 'Pricing',
-                url: '/guides/functions/pricing' as `/${string}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Pricing',
+          url: '/guides/functions/pricing' as `/${string}`,
+          enabled: billingEnabled,
+        },
       ],
     },
     {
@@ -1689,9 +1700,11 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
-        ...(billingEnabled
-          ? [{ name: 'Pricing', url: '/guides/realtime/pricing' as `/${string}` }]
-          : []),
+        {
+          name: 'Pricing',
+          url: '/guides/realtime/pricing' as `/${string}`,
+          enabled: billingEnabled,
+        },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
@@ -1780,9 +1793,11 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
         { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
-        ...(billingEnabled
-          ? [{ name: 'Pricing', url: '/guides/storage/management/pricing' as `/${string}` }]
-          : []),
+        {
+          name: 'Pricing',
+          url: '/guides/storage/management/pricing' as `/${string}`,
+          enabled: billingEnabled,
+        },
       ],
     },
     {
@@ -2296,132 +2311,129 @@ export const platform: NavMenuConstant = {
         { name: 'PrivateLink', url: '/guides/platform/privatelink' as `/${string}` },
       ],
     },
-    ...(billingEnabled
-      ? [
-          {
-            name: 'Billing',
-            url: undefined,
-            items: [
-              {
-                name: 'About billing on Supabase',
-                url: '/guides/platform/billing-on-supabase' as `/${string}`,
-              },
-              {
-                name: 'Get set up for billing',
-                url: '/guides/platform/get-set-up-for-billing' as `/${string}`,
-              },
-              {
-                name: 'Manage your subscription',
-                url: '/guides/platform/manage-your-subscription' as `/${string}`,
-              },
-              {
-                name: 'Manage your usage',
-                url: '/guides/platform/manage-your-usage' as `/${string}`,
-                items: [
-                  { name: 'Usage limits', url: '/guides/platform/usage-limits' as `/${string}` },
-                  { name: 'Overages', url: '/guides/platform/overages' as `/${string}` },
-                  {
-                    name: 'Compute',
-                    url: '/guides/platform/manage-your-usage/compute' as `/${string}`,
-                  },
-                  {
-                    name: 'Egress',
-                    url: '/guides/platform/manage-your-usage/egress' as `/${string}`,
-                  },
-                  {
-                    name: 'Disk Size',
-                    url: '/guides/platform/manage-your-usage/disk-size' as `/${string}`,
-                  },
-                  {
-                    name: 'Disk Throughput',
-                    url: '/guides/platform/manage-your-usage/disk-throughput' as `/${string}`,
-                  },
-                  {
-                    name: 'Disk IOPS',
-                    url: '/guides/platform/manage-your-usage/disk-iops' as `/${string}`,
-                  },
-                  {
-                    name: 'Monthly Active Users',
-                    url: '/guides/platform/manage-your-usage/monthly-active-users' as `/${string}`,
-                  },
-                  {
-                    name: 'Monthly Active Third-Party Users',
-                    url: '/guides/platform/manage-your-usage/monthly-active-users-third-party' as `/${string}`,
-                  },
-                  {
-                    name: 'Monthly Active SSO Users',
-                    url: '/guides/platform/manage-your-usage/monthly-active-users-sso' as `/${string}`,
-                  },
-                  {
-                    name: 'Storage Size',
-                    url: '/guides/platform/manage-your-usage/storage-size' as `/${string}`,
-                  },
-                  {
-                    name: 'Storage Image Transformations',
-                    url: '/guides/platform/manage-your-usage/storage-image-transformations' as `/${string}`,
-                  },
-                  {
-                    name: 'Edge Function Invocations',
-                    url: '/guides/platform/manage-your-usage/edge-function-invocations' as `/${string}`,
-                  },
-                  {
-                    name: 'Realtime Messages',
-                    url: '/guides/platform/manage-your-usage/realtime-messages' as `/${string}`,
-                  },
-                  {
-                    name: 'Realtime Peak Connections',
-                    url: '/guides/platform/manage-your-usage/realtime-peak-connections' as `/${string}`,
-                  },
-                  {
-                    name: 'Custom Domains',
-                    url: '/guides/platform/manage-your-usage/custom-domains' as `/${string}`,
-                  },
-                  {
-                    name: 'Point-in-Time Recovery',
-                    url: '/guides/platform/manage-your-usage/point-in-time-recovery' as `/${string}`,
-                  },
-                  {
-                    name: 'IPv4',
-                    url: '/guides/platform/manage-your-usage/ipv4' as `/${string}`,
-                  },
-                  {
-                    name: 'MFA Phone',
-                    url: '/guides/platform/manage-your-usage/advanced-mfa-phone' as `/${string}`,
-                  },
-                  {
-                    name: 'Read Replicas',
-                    url: '/guides/platform/manage-your-usage/read-replicas' as `/${string}`,
-                  },
-                  {
-                    name: 'Branching',
-                    url: '/guides/platform/manage-your-usage/branching' as `/${string}`,
-                  },
-                  {
-                    name: 'Log Drains',
-                    url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
-                  },
-                ],
-              },
-              {
-                name: 'Your monthly invoice',
-                url: '/guides/platform/your-monthly-invoice' as `/${string}`,
-              },
-              {
-                name: 'Control your costs',
-                url: '/guides/platform/cost-control' as `/${string}`,
-              },
-              {
-                name: 'Credits',
-                url: '/guides/platform/credits' as `/${string}`,
-              },
-              {
-                name: 'Billing FAQ',
-                url: '/guides/platform/billing-faq' as `/${string}`,
-              },
-            ],
-          },
-        ]
-      : []),
+    {
+      name: 'Billing',
+      url: undefined,
+      enabled: billingEnabled,
+      items: [
+        {
+          name: 'About billing on Supabase',
+          url: '/guides/platform/billing-on-supabase' as `/${string}`,
+        },
+        {
+          name: 'Get set up for billing',
+          url: '/guides/platform/get-set-up-for-billing' as `/${string}`,
+        },
+        {
+          name: 'Manage your subscription',
+          url: '/guides/platform/manage-your-subscription' as `/${string}`,
+        },
+        {
+          name: 'Manage your usage',
+          url: '/guides/platform/manage-your-usage' as `/${string}`,
+          items: [
+            { name: 'Usage limits', url: '/guides/platform/usage-limits' as `/${string}` },
+            { name: 'Overages', url: '/guides/platform/overages' as `/${string}` },
+            {
+              name: 'Compute',
+              url: '/guides/platform/manage-your-usage/compute' as `/${string}`,
+            },
+            {
+              name: 'Egress',
+              url: '/guides/platform/manage-your-usage/egress' as `/${string}`,
+            },
+            {
+              name: 'Disk Size',
+              url: '/guides/platform/manage-your-usage/disk-size' as `/${string}`,
+            },
+            {
+              name: 'Disk Throughput',
+              url: '/guides/platform/manage-your-usage/disk-throughput' as `/${string}`,
+            },
+            {
+              name: 'Disk IOPS',
+              url: '/guides/platform/manage-your-usage/disk-iops' as `/${string}`,
+            },
+            {
+              name: 'Monthly Active Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users' as `/${string}`,
+            },
+            {
+              name: 'Monthly Active Third-Party Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-third-party' as `/${string}`,
+            },
+            {
+              name: 'Monthly Active SSO Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-sso' as `/${string}`,
+            },
+            {
+              name: 'Storage Size',
+              url: '/guides/platform/manage-your-usage/storage-size' as `/${string}`,
+            },
+            {
+              name: 'Storage Image Transformations',
+              url: '/guides/platform/manage-your-usage/storage-image-transformations' as `/${string}`,
+            },
+            {
+              name: 'Edge Function Invocations',
+              url: '/guides/platform/manage-your-usage/edge-function-invocations' as `/${string}`,
+            },
+            {
+              name: 'Realtime Messages',
+              url: '/guides/platform/manage-your-usage/realtime-messages' as `/${string}`,
+            },
+            {
+              name: 'Realtime Peak Connections',
+              url: '/guides/platform/manage-your-usage/realtime-peak-connections' as `/${string}`,
+            },
+            {
+              name: 'Custom Domains',
+              url: '/guides/platform/manage-your-usage/custom-domains' as `/${string}`,
+            },
+            {
+              name: 'Point-in-Time Recovery',
+              url: '/guides/platform/manage-your-usage/point-in-time-recovery' as `/${string}`,
+            },
+            {
+              name: 'IPv4',
+              url: '/guides/platform/manage-your-usage/ipv4' as `/${string}`,
+            },
+            {
+              name: 'MFA Phone',
+              url: '/guides/platform/manage-your-usage/advanced-mfa-phone' as `/${string}`,
+            },
+            {
+              name: 'Read Replicas',
+              url: '/guides/platform/manage-your-usage/read-replicas' as `/${string}`,
+            },
+            {
+              name: 'Branching',
+              url: '/guides/platform/manage-your-usage/branching' as `/${string}`,
+            },
+            {
+              name: 'Log Drains',
+              url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
+            },
+          ],
+        },
+        {
+          name: 'Your monthly invoice',
+          url: '/guides/platform/your-monthly-invoice' as `/${string}`,
+        },
+        {
+          name: 'Control your costs',
+          url: '/guides/platform/cost-control' as `/${string}`,
+        },
+        {
+          name: 'Credits',
+          url: '/guides/platform/credits' as `/${string}`,
+        },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq' as `/${string}`,
+        },
+      ],
+    },
   ],
 }
 
@@ -2472,7 +2484,7 @@ export const resources: NavMenuConstant = {
 }
 
 export const self_hosting: NavMenuConstant = {
-  title: 'Self-Hostings',
+  title: 'Self-Hosting',
   icon: 'self-hosting',
   url: '/guides/self-hosting',
   items: [
@@ -2651,42 +2663,43 @@ export const reference = {
           level: 'reference_javascript',
           icon: '/img/icons/menu/reference-javascript' as `/${string}`,
         },
-        ...(allSDKsEnabled
-          ? [
-              {
-                name: 'supabase-dart',
-                url: '/reference/dart/start',
-                level: 'reference_dart',
-                icon: '/img/icons/menu/reference-dart' as `/${string}`,
-              },
-              {
-                name: 'supabase-csharp',
-                url: '/reference/csharp/start',
-                level: 'reference_csharp',
-                icon: '/img/icons/menu/reference-csharp' as `/${string}`,
-              },
-              {
-                name: 'supbase-python',
-                url: '/reference/python/start',
-                level: 'reference_python',
-                icon: '/img/icons/menu/reference-python' as `/${string}`,
-              },
-              {
-                name: 'supbase-swift',
-                url: '/reference/swift/start',
-                level: 'reference_swift',
-                items: [],
-                icon: '/img/icons/menu/reference-swift' as `/${string}`,
-              },
-              {
-                name: 'supabase-kt',
-                url: '/reference/kotlin/start',
-                level: 'reference_kotlin',
-                items: [],
-                icon: '/img/icons/menu/reference-kotlin' as `/${string}`,
-              },
-            ]
-          : []),
+        {
+          name: 'supabase-dart',
+          url: '/reference/dart/start',
+          level: 'reference_dart',
+          icon: '/img/icons/menu/reference-dart' as `/${string}`,
+          enabled: sdkDartEnabled,
+        },
+        {
+          name: 'supabase-csharp',
+          url: '/reference/csharp/start',
+          level: 'reference_csharp',
+          icon: '/img/icons/menu/reference-csharp' as `/${string}`,
+          enabled: sdkCsharpEnabled,
+        },
+        {
+          name: 'supbase-python',
+          url: '/reference/python/start',
+          level: 'reference_python',
+          icon: '/img/icons/menu/reference-python' as `/${string}`,
+          enabled: sdkPythonEnabled,
+        },
+        {
+          name: 'supbase-swift',
+          url: '/reference/swift/start',
+          level: 'reference_swift',
+          items: [],
+          icon: '/img/icons/menu/reference-swift' as `/${string}`,
+          enabled: sdkSwiftEnabled,
+        },
+        {
+          name: 'supabase-kt',
+          url: '/reference/kotlin/start',
+          level: 'reference_kotlin',
+          items: [],
+          icon: '/img/icons/menu/reference-kotlin' as `/${string}`,
+          enabled: sdkKotlinEnabled,
+        },
       ],
     },
     {
@@ -2903,44 +2916,45 @@ export const references = [
         icon: '/docs/img/icons/javascript-icon.svg',
         url: '/reference/javascript/start',
       },
-      ...(allSDKsEnabled
-        ? [
-            {
-              label: 'supabase-py',
-              description: 'something about the reference',
-              icon: '/docs/img/icons/python-icon.svg',
-              url: '/reference/python/start',
-            },
-            {
-              label: 'supabase-dart',
-              versions: ['v1', 'v0'],
-              description: 'something about the reference',
-              icon: '/docs/img/icons/dart-icon.svg',
-              url: '/reference/dart/start',
-            },
-            {
-              label: 'supabase-csharp',
-              versions: ['v0'],
-              description: 'something about the reference',
-              icon: '/docs/img/icons/c-sharp-icon.svg',
-              url: '/reference/csharp/start',
-            },
-            {
-              label: 'supabase-swift',
-              versions: ['v2', 'v1'],
-              description: 'something about the reference',
-              icon: '/docs/img/icons/swift-icon.svg',
-              url: '/reference/swift/start',
-            },
-            {
-              label: 'supabase-kt',
-              versions: ['v3', 'v2', 'v1'],
-              description: 'something about the reference',
-              icon: '/docs/img/icons/kotlin-icon.svg',
-              url: '/reference/kotlin/start',
-            },
-          ]
-        : []),
+      {
+        label: 'supabase-py',
+        description: 'something about the reference',
+        icon: '/docs/img/icons/python-icon.svg',
+        url: '/reference/python/start',
+        enabled: sdkPythonEnabled,
+      },
+      {
+        label: 'supabase-dart',
+        versions: ['v1', 'v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/dart-icon.svg',
+        url: '/reference/dart/start',
+        enabled: sdkDartEnabled,
+      },
+      {
+        label: 'supabase-csharp',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/c-sharp-icon.svg',
+        url: '/reference/csharp/start',
+        enabled: sdkCsharpEnabled,
+      },
+      {
+        label: 'supabase-swift',
+        versions: ['v2', 'v1'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/swift-icon.svg',
+        url: '/reference/swift/start',
+        enabled: sdkSwiftEnabled,
+      },
+      {
+        label: 'supabase-kt',
+        versions: ['v3', 'v2', 'v1'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/kotlin-icon.svg',
+        url: '/reference/kotlin/start',
+        enabled: sdkKotlinEnabled,
+      },
     ],
   },
   {

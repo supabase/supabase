@@ -85,8 +85,8 @@ const { data, error } = await supabase.auth.signUp({
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final res = await supabase.auth.signUp(
@@ -100,8 +100,9 @@ final res = await supabase.auth.signUp(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase.auth.signUp(
@@ -115,8 +116,9 @@ try await supabase.auth.signUp(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.auth.signUpWith(Email) {
@@ -130,6 +132,7 @@ val data = supabase.auth.signUpWith(Email) {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
@@ -155,8 +158,8 @@ let metadata = user?.user_metadata
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final User? user = supabase.auth.currentUser;
@@ -164,8 +167,9 @@ final Map<String, dynamic>? metadata = user?.userMetadata;
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let user = try await supabase.auth.user()
@@ -173,8 +177,9 @@ let metadata = user.userMetadata
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val user = supabase.auth.retrieveUserForCurrentSession()
@@ -184,6 +189,7 @@ val metadata = user?.userMetadata
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Deleting users

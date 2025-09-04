@@ -91,8 +91,8 @@ const { data, error } = await supabase.rpc('hello_world')
 Reference: [`rpc()`](../../reference/javascript/rpc)
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final data = await supabase
@@ -102,8 +102,9 @@ final data = await supabase
 Reference: [`rpc()`](../../reference/dart/rpc)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase.rpc("hello_world").execute()
@@ -112,8 +113,9 @@ try await supabase.rpc("hello_world").execute()
 Reference: [`rpc()`](../../reference/swift/rpc)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.postgrest.rpc("hello_world")
@@ -122,8 +124,9 @@ val data = supabase.postgrest.rpc("hello_world")
 Reference: [`rpc()`](../../reference/kotlin/rpc)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = supabase.rpc('hello_world').execute()
@@ -132,6 +135,7 @@ data = supabase.rpc('hello_world').execute()
 Reference: [`rpc()`](../../reference/python/rpc)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Returning data sets
@@ -240,8 +244,8 @@ const { data, error } = supabase.rpc('get_planets').eq('id', 1)
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final data = await supabase
@@ -250,16 +254,18 @@ final data = await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase.rpc("get_planets").eq("id", value: 1).execute()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.postgrest.rpc("get_planets") {
@@ -270,14 +276,16 @@ val data = supabase.postgrest.rpc("get_planets") {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = supabase.rpc('get_planets').eq('id', 1).execute()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Passing parameters
@@ -324,8 +332,8 @@ const { data, error } = await supabase.rpc('add_planet', { name: 'Jakku' })
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final data = await supabase
@@ -333,8 +341,9 @@ final data = await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 Using `Encodable` type:
 
@@ -361,8 +370,9 @@ try await supabase.rpc(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val data = supabase.postgrest.rpc(
@@ -374,14 +384,16 @@ val data = supabase.postgrest.rpc(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 data = supabase.rpc('add_planet', params={'name': 'Jakku'}).execute()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Suggestions

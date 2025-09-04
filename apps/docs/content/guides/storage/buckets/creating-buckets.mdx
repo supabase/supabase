@@ -52,8 +52,8 @@ values
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() async {
@@ -68,8 +68,9 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase.storage.createBucket(
@@ -81,8 +82,9 @@ try await supabase.storage.createBucket(
 [Reference.](/docs/reference/swift/storage-createbucket)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 supabase.storage.create_bucket(
@@ -94,6 +96,7 @@ supabase.storage.create_bucket(
 [Reference.](/docs/reference/python/storage-createbucket)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Restricting uploads

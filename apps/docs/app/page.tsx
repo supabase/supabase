@@ -3,14 +3,21 @@ import Link from 'next/link'
 import { cn, IconBackground, TextLink } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
+import { isFeatureEnabled } from 'common'
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import { MIGRATION_PAGES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'
 import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
 import { BASE_PATH } from '~/lib/constants'
-import { isFeatureEnabled } from 'common'
-const allSDKsEnabled = isFeatureEnabled('sdk:all')
+
+const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
+  'sdk:csharp',
+  'sdk:dart',
+  'sdk:kotlin',
+  'sdk:python',
+  'sdk:swift',
+])
 
 const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata> => {
   const parentAlternates = (await parent).alternates
@@ -121,31 +128,37 @@ const clientLibraries = [
     title: 'Javascript',
     icon: 'reference-javascript',
     href: '/reference/javascript/introduction',
+    enabled: true,
   },
   {
     title: 'Flutter',
     icon: 'reference-dart',
     href: '/reference/dart/introduction',
+    enabled: sdkDart,
   },
   {
     title: 'Python',
     icon: 'reference-python',
     href: '/reference/python/introduction',
+    enabled: sdkPython,
   },
   {
     title: 'C#',
     icon: 'reference-csharp',
     href: '/reference/csharp/introduction',
+    enabled: sdkCsharp,
   },
   {
     title: 'Swift',
     icon: 'reference-swift',
     href: '/reference/swift/introduction',
+    enabled: sdkSwift,
   },
   {
     title: 'Kotlin',
     icon: 'reference-kotlin',
     href: '/reference/kotlin/introduction',
+    enabled: sdkKotlin,
   },
 ]
 
@@ -227,10 +240,9 @@ const HomePage = () => (
 
         <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
           {clientLibraries
-            .filter(library => allSDKsEnabled === false && library.title === 'Javascript')
+            .filter((library) => library.enabled)
 
             .map((library) => {
-
               return (
                 <Link
                   href={library.href}

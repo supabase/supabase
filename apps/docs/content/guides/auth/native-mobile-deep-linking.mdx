@@ -304,8 +304,9 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
   </TabPanel>
 
+<$Show if="sdk:swift">
+
   <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
   ### Deep link config
 
     1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
@@ -343,6 +344,8 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Android Kotlin">
   ### Deep link config
 
@@ -397,4 +400,5 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     The user will now be authenticated when your app receives a valid deep link!
 
   </TabPanel>
+  </$Show>
 </Tabs>

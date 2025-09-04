@@ -33,8 +33,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() {
@@ -50,8 +50,9 @@ final supabase = Supabase.instance.client;
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let supabaseURL = "https://<project>.supabase.co"
@@ -62,8 +63,9 @@ let realtime = supabase.realtime
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val supabaseUrl = "https://<project>.supabase.co"
@@ -74,8 +76,9 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 from supabase import create_client
@@ -87,6 +90,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Sync and track state
@@ -124,8 +128,8 @@ roomOne
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final supabase = Supabase.instance.client;
@@ -143,8 +147,9 @@ roomOne.onPresenceSync((_) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 Listen to the presence change stream, emitting a new `PresenceAction` whenever someone joins or leaves:
 
@@ -161,8 +166,9 @@ for await presence in presenceStream {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 Listen to the presence change flow, emitting new a new `PresenceAction` whenever someone joins or leaves:
 
@@ -180,8 +186,9 @@ roomOne.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
 
@@ -196,6 +203,7 @@ room_one
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Sending state
@@ -233,8 +241,8 @@ roomOne.subscribe(async (status) => {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final roomOne = supabase.channel('room_01');
@@ -253,8 +261,9 @@ roomOne.subscribe((status, error) async {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let roomOne = await supabase.channel("room_01")
@@ -279,8 +288,9 @@ await roomOne.track(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val roomOne = supabase.channel("room_01")
@@ -296,8 +306,9 @@ roomOne.track(userStatus)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 room_one = supabase.channel('room_01')
@@ -317,6 +328,7 @@ room_one.subscribe(on_subscribe)
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
@@ -349,8 +361,8 @@ untrackPresence()
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final roomOne = supabase.channel('room_01');
@@ -364,16 +376,18 @@ untrackPresence();
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 await roomOne.untrack()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 suspend fun untrackPresence() {
@@ -384,14 +398,16 @@ untrackPresence()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 room_one.untrack()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Presence options
@@ -425,8 +441,8 @@ const channelC = supabase.channel('test', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final channelC = supabase.channel(
@@ -436,8 +452,9 @@ final channelC = supabase.channel(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let channelC = await supabase.channel("test") {
@@ -446,8 +463,9 @@ let channelC = await supabase.channel("test") {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```kotlin
 val channelC = supabase.channel("test") {
@@ -458,8 +476,9 @@ val channelC = supabase.channel("test") {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 channel_c = supabase.channel('test', {
@@ -472,4 +491,5 @@ channel_c = supabase.channel('test', {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>

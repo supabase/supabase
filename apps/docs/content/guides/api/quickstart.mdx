@@ -156,28 +156,31 @@ const { data, error } = await supabase.from('todos').select()
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 final data = await supabase.from('todos').select('*');
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = supabase.table('todos').select("*").execute()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase.from("todos").select()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>

@@ -45,8 +45,9 @@ hideElidedLines={true}
 
 </TabPanel>
 
+<$Show if="sdk:dart">
+
 <TabPanel id="dart" label="Flutter">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 import 'package:clerk_flutter/clerk_flutter.dart';
@@ -64,9 +65,11 @@ await Supabase.initialize(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 import Clerk
@@ -86,6 +89,7 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 

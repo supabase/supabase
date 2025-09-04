@@ -72,8 +72,8 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 [Reference.](/docs/reference/javascript/storage-createbucket)
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() async {
@@ -88,8 +88,9 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 try await supabase.storage.createBucket("avatars")
@@ -98,8 +99,9 @@ try await supabase.storage.createBucket("avatars")
 [Reference.](/docs/reference/swift/storage-createbucket)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = supabase.storage.create_bucket('avatars')
@@ -108,6 +110,7 @@ response = supabase.storage.create_bucket('avatars')
 [Reference.](/docs/reference/python/storage-createbucket)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Upload a file
@@ -141,8 +144,8 @@ const { data, error } = await supabase.storage
 [Reference.](/docs/reference/javascript/storage-from-upload)
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() async {
@@ -161,6 +164,7 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Download a file
@@ -193,8 +197,8 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 [Reference.](/docs/reference/javascript/storage-from-download)
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```dart
 void main() async {
@@ -210,8 +214,9 @@ void main() async {
 [Reference.](/docs/reference/dart/storage-from-download)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```swift
 let response = try await supabase.storage.from("avatars").download(path: "public/avatar1.png")
@@ -220,8 +225,9 @@ let response = try await supabase.storage.from("avatars").download(path: "public
 [Reference.](/docs/reference/python/storage-from-download)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
-<$Partial path="not_all_sdks_warning.md" />
 
 ```python
 response = supabase.storage.from_('avatars').download('public/avatar1.png')
@@ -230,6 +236,7 @@ response = supabase.storage.from_('avatars').download('public/avatar1.png')
 [Reference.](/docs/reference/python/storage-from-download)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Add security rules

@@ -191,8 +191,9 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
 
   </TabPanel>
 
+<$Show if="sdk:kotlin">
+
   <TabPanel id="kotlin" label="Kotlin">
-<$Partial path="not_all_sdks_warning.md" />
 
     Kotlin supports resumable uploads natively for all targets:
 
@@ -223,6 +224,9 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
     ```
 
   </TabPanel>
+  </$Show>
+
+<$Show if="sdk:python">
 
   <TabPanel id="py" label="Python">
 
@@ -270,6 +274,7 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 
 ### Upload URL
