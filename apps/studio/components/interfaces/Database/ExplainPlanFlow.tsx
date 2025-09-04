@@ -107,6 +107,7 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
       <ReactFlow
         defaultNodes={[]}
         defaultEdges={[]}
+        nodesConnectable={false}
         defaultEdgeOptions={{
           type: 'smoothstep',
           animated: true,
