@@ -63,7 +63,7 @@ allow_list = [
     "[Gg]zip(s|ped|ping)?",
     "[Hh]r",
     "[Hh]ypertables?",
-    "[I]dempotency",
+    "[Ii]dempotency",
     "[KMG]bps",
     "[KMG]iB",
     "[Ll]iveness",
