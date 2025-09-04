@@ -34,7 +34,7 @@ export type NumericFilter = z.infer<typeof numericFilterSchema>
 
 interface ReportsNumericFilterProps {
   label: string
-  value?: NumericFilter
+  value: NumericFilter | null
   onChange: (value: NumericFilter | null) => void
   operators?: ComparisonOperator[]
   defaultOperator?: ComparisonOperator
