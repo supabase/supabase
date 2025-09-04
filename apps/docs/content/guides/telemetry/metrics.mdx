@@ -56,6 +56,18 @@ The pre-configured Supabase Grafana Dashboard is an advanced version of the [Das
 
 Instructions are included in the README for deploying the repository using docker.
 
+## Sending Metrics to SigNoz
+
+To monitor your Supabase metrics with [SigNoz](https://signoz.io/), an open-source OpenTelemetry native observability platform, you can leverage its support for Prometheus-compatible metrics. SigNoz enables you to visualize, analyze, and set up alerts for your Supabase metrics using powerful dashboards.
+
+To get started, refer to the [official SigNoz guide for Supabase metrics](https://signoz.io/docs/integrations/supabase/). This guide provides step-by-step instructions on:
+
+- Setting up the OpenTelemetry Collector to scrape metrics from your Supabase project
+- Sending the collected metrics to SigNoz
+- Visualizing and analyzing your Supabase metrics within SigNoz
+
+For setup help and troubleshooting, join the [SigNoz community on Slack](https://signoz.io/slack).
+
 ## Using the metrics endpoint in production
 
 To set up monitoring for your project, you will need two things:
