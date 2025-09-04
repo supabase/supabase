@@ -108,6 +108,8 @@ const Message = function Message({
 
   const hasTextContent = content && content.trim().length > 0
 
+  console.log(parts)
+
   return (
     <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
@@ -165,6 +167,7 @@ const Message = function Message({
                         return (
                           <Reasoning
                             key={`${message.id}-${index}}`}
+                            showReasoning={!!part.text}
                             className={cn(
                               'w-full dynamic-tool-item',
                               '[&:not(.dynamic-tool-item+.dynamic-tool-item)]:mt-4 [&.dynamic-tool-item+.dynamic-tool-item]:mt-1 first:!mt-0',
