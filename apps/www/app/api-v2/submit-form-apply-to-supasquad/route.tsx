@@ -112,17 +112,17 @@ export async function POST(req: Request) {
   const data = parsed.data
 
   try {
-    const props = getNotionDBData(data)
-    const newPageId = await insertPageInDatabase(NOTION_DB_ID, NOTION_API_KEY, props)
+    const notionProps = getNotionPageProps(data)
+    const notionPageId = await insertPageInDatabase(NOTION_DB_ID, NOTION_API_KEY, notionProps)
 
     await savePersonAndEventInCustomerIO({
       ...data,
       tracks: data.tracks.map(normalizeTrack),
-      notion_page_id: newPageId,
+      notion_page_id: notionPageId,
       source_url: req.headers.get('origin'),
     })
 
-    return new Response(JSON.stringify({ message: 'Submission successful', id: newPageId }), {
+    return new Response(JSON.stringify({ message: 'Submission successful', id: notionPageId }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 201,
     })
@@ -222,7 +222,7 @@ const sendConfirmationEmail = async (emailData: {
   }
 }
 
-const getNotionDBData = (data: any) => {
+const getNotionPageProps = (data: any) => {
   const fullName =
     `${data.first_name?.trim() || ''} ${data.last_name?.trim() || ''}`.trim() || 'Unnamed'
 

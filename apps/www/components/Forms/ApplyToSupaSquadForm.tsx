@@ -552,7 +552,7 @@ const FormContent = memo(function FormContent({
       </Form_Shadcn_>
 
       {Object.values(errors).length > 0 && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mt-6">
           <AlertCircle />
           <AlertDescription>{Object.values(errors).join('\n')}</AlertDescription>
         </Alert>

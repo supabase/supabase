@@ -184,7 +184,6 @@ export function CountrySelector({
         {countries.map((country) => (
           <SelectItem key={country.code} value={country.code}>
             <span className="flex items-center gap-2">
-              <span>{country.flag}</span>
               {country.name}
             </span>
           </SelectItem>
