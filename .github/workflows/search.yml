@@ -46,6 +46,7 @@ jobs:
             apps/docs
             apps/www/.env.local.example
             examples
+            packages
             supabase
 
       - uses: pnpm/action-setup@v4
