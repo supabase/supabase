@@ -387,6 +387,8 @@ function createStorageExplorerState({
       const formattedPathToEmptyPlaceholderFile =
         pathToFolder.length > 0 ? `${pathToFolder}/${emptyPlaceholderFile}` : emptyPlaceholderFile
 
+      if (!state.supabaseClient) throw new Error('Supabase client not available')
+
       await (await state.supabaseClient()).storage
         .from(state.selectedBucket.name)
         .upload(
@@ -637,7 +639,9 @@ function createStorageExplorerState({
 
         if (data.length === 0) {
           const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
-          await (await state.supabaseClient!())?.storage
+          if (!state.supabaseClient) return
+
+          await (await state.supabaseClient()).storage
             .from(state.selectedBucket.name)
             .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
         }
@@ -1622,6 +1626,11 @@ function createStorageExplorerState({
         ): Promise<Array<{ path: string; name: string; isFolder: boolean }>> => {
           const allItems: Array<{ path: string; name: string; isFolder: boolean }> = []
 
+          if (!state.supabaseClient) {
+            console.error('Supabase client not available')
+            return allItems
+          }
+
           const { data: items, error: listError } = await (await state.supabaseClient()).storage
             .from(state.selectedBucket.id)
             .list(path, {
@@ -1644,6 +1653,8 @@ function createStorageExplorerState({
 
             // Check if this is a folder by trying to list its contents
             try {
+              if (!state.supabaseClient) continue
+
               const { data: subItems } = await (await state.supabaseClient()).storage
                 .from(state.selectedBucket.id)
                 .list(itemPath, { limit: 1 })
@@ -1749,6 +1760,11 @@ function createStorageExplorerState({
           const batchSize = 10
           for (let i = 0; i < sourceFilePaths.length; i += batchSize) {
             const batch = sourceFilePaths.slice(i, i + batchSize)
+            if (!state.supabaseClient) {
+              console.error('Supabase client not available')
+              continue
+            }
+
             const { error: deleteError } = await (await state.supabaseClient()).storage
               .from(state.selectedBucket.id)
               .remove(batch)
@@ -1764,6 +1780,11 @@ function createStorageExplorerState({
         // Recursively clean up the entire source folder hierarchy
         const cleanupFolderRecursively = async (path: string) => {
           try {
+            if (!state.supabaseClient) {
+              console.error('Supabase client not available')
+              return
+            }
+
             const { data: items, error: listError } = await (await state.supabaseClient()).storage
               .from(state.selectedBucket.id)
               .list(path, {
@@ -1777,6 +1798,8 @@ function createStorageExplorerState({
             // Remove all items in this directory
             if (items.length > 0) {
               const itemPaths = items.map((item) => `${path}/${item.name}`)
+              if (!state.supabaseClient) return
+
               const { error: removeError } = await (await state.supabaseClient()).storage
                 .from(state.selectedBucket.id)
                 .remove(itemPaths)
@@ -1795,6 +1818,8 @@ function createStorageExplorerState({
             ]
 
             try {
+              if (!state.supabaseClient) return
+
               await (await state.supabaseClient()).storage
                 .from(state.selectedBucket.id)
                 .remove(hiddenFiles)
@@ -1810,12 +1835,14 @@ function createStorageExplorerState({
         await cleanupFolderRecursively(sourceFullPath)
 
         // Delete the target folder placeholder
-        const { error: deleteTargetError } = await (await state.supabaseClient()).storage
-          .from(state.selectedBucket.id)
-          .remove([targetFullPath + '/.folder-placeholder'])
+        if (state.supabaseClient) {
+          const { error: deleteTargetError } = await (await state.supabaseClient()).storage
+            .from(state.selectedBucket.id)
+            .remove([targetFullPath + '/.folder-placeholder'])
 
-        if (deleteTargetError) {
-          console.error('Failed to delete target folder placeholder:', deleteTargetError)
+          if (deleteTargetError) {
+            console.error('Failed to delete target folder placeholder:', deleteTargetError)
+          }
         }
 
         // Remove folder from "being moved" set
