@@ -55,6 +55,7 @@ export const PROVIDERS: ProviderRegistry = {
     providerOptions: {
       openai: {
         reasoningEffort: 'low',
+        textVerbosity: 'low',
       },
     },
   },
