@@ -7,12 +7,55 @@ sidebar_label: 'Overview'
 hideToc: true
 ---
 
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/za_loEtS4gs"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks). Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
 
 - It is open source.
 - It is portable. Supabase Edge Functions run locally, and on any other Deno-compatible platform (including self-hosted infrastructure).
 - It is TypeScript first and supports WASM.
 - Edge Functions are globally distributed for low-latency.
+
+## How it works
+
+- **Request enters an edge gateway (relay)** — the gateway routes traffic, handles auth headers/JWT validation, and applies routing/traffic rules.
+- **Auth & policies are applied** — the gateway (or your function) can validate Supabase JWTs, apply rate-limits, and centralize security checks before executing code.
+- **Deno edge runtime executes your function** — the function runs on a regionally-distributed Deno node closest to the user for minimal latency.
+- **Integrations & data access** — functions commonly call Supabase APIs (Auth, Postgres, Storage) or third-party APIs. For Postgres, prefer connection strategies suited for edge/serverless environments (see the `connect-to-postgres` guide).
+- **Observability and logs** — invocations emit logs and metrics you can explore in the dashboard or downstream monitoring (Sentry, etc.).
+- **Response returns via the gateway** — the gateway forwards the response back to the client and records request metadata.
+
+## Quick technical notes
+
+- **Runtime:** Deno (TypeScript-first). Functions are simple `.ts` files that export a handler.
+- **Local dev parity:** `supabase functions serve` provides a local runtime similar to production for faster iteration.
+- **Global deployment:** `supabase functions deploy` publishes functions to the edge network.
+- **Cold starts & concurrency:** cold starts are possible — design for short-lived, idempotent operations. Heavy long-running jobs should be moved to background workers.
+- **Database connections:** treat Postgres like a remote, pooled service — use connection pools or serverless-friendly drivers. See `/guides/functions/connect-to-postgres`.
+- **Secrets:** store credentials in Supabase project secrets and access them via environment variables.
+
+## When to use Edge Functions
+
+- Authenticated or public HTTP endpoints that need low latency.
+- Webhook receivers (Stripe, GitHub, etc.).
+- On-demand image or Open Graph generation.
+- Small AI inference tasks or orchestrating calls to external ML APIs.
+- Transformations, proxying, and facade endpoints for third-party services.
+
+## Best practices
+
+- Avoid long CPU-bound work; keep invocations short.
+- Reuse clients where possible but design for ephemeral execution contexts.
+- Prefer streaming or incremental responses for longer operations.
+- Use proper retry and idempotency for webhook handlers.
+- Monitor logs and set up error reporting (Sentry, etc.) for production observability.
 
 <div className="not-prose">
   <Button size="medium" asChild>
