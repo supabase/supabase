@@ -94,7 +94,10 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
 
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
-  const isEmpty = debouncedSearch.length === 0 && (!orgProjects || orgProjects.length === 0)
+  const isEmpty =
+    debouncedSearch.length === 0 &&
+    filterStatus.length === 0 &&
+    (!orgProjects || orgProjects.length === 0)
   const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
 
   const noResultsFromSearch =
@@ -157,7 +160,8 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     return (
       <Card className="flex-1 min-h-0 overflow-y-auto mb-8" onScroll={handleScroll}>
         <Table>
-          <TableHeader>
+          {/* [Joshen] Ideally we can figure out sticky table headers here */}
+          <TableHeader className="[&>tr>th]:sticky [&>tr>th]:top-0">
             <TableRow>
               <TableHead>Project</TableHead>
               <TableHead>Status</TableHead>
@@ -165,8 +169,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               <TableHead>Region</TableHead>
               <TableHead>Created</TableHead>
             </TableRow>
-          </TableHeader>
-          <TableHeader>
             <TableRow className="!border-b-0">
               <TableCell colSpan={5} className="p-0">
                 <LoadingLine loading={isFetching} />

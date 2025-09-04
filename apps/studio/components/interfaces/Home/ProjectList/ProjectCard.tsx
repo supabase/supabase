@@ -41,7 +41,7 @@ export const ProjectCard = ({
   const projectStatus = inferProjectStatus(project.status)
 
   return (
-    <li className="list-none">
+    <li className="list-none h-min">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         className="h-44 !px-0 group pt-5 pb-0"

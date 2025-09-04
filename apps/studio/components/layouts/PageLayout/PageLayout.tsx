@@ -75,7 +75,7 @@ export const PageLayout = ({
   const router = useRouter()
 
   return (
-    <div className="w-full min-h-full flex flex-col items-stretch">
+    <div className={cn('w-full min-h-full flex flex-col items-stretch', className)}>
       <ScaffoldContainer
         size={size}
         className={cn(
@@ -84,7 +84,6 @@ export const PageLayout = ({
             (isCompact ? 'max-w-none !px-6 border-b pt-4' : 'max-w-none pt-6 !px-10 border-b'),
           size !== 'full' && (isCompact ? 'pt-4' : 'pt-12'),
           navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
-          className
         )}
       >
         {/* Header section */}

@@ -114,14 +114,11 @@ const GenericProjectPage: NextPage = () => {
   }, [lastVisitedOrgSlug, isSuccessOrganizations])
 
   return (
-    <>
+    <div className="h-screen flex flex-col">
       <Header />
-      <PageLayout title="Select a project to continue">
-        <ScaffoldContainer>
-          <ScaffoldSection
-            isFullWidth
-            className="flex-grow py-6 overflow-y-auto pb-0 flex flex-col gap-y-4"
-          >
+      <PageLayout className="flex-grow min-h-0" title="Select a project to continue">
+        <ScaffoldContainer className="flex-grow flex flex-col">
+          <ScaffoldSection isFullWidth>
             <div className="flex items-center gap-x-2">
               <Select_Shadcn_ value={selectedSlug} onValueChange={setSlug}>
                 <SelectTrigger_Shadcn_ size="tiny" className="w-60 truncate">
@@ -140,7 +137,8 @@ const GenericProjectPage: NextPage = () => {
               </Select_Shadcn_>
               <HomePageActions hideNewProject />
             </div>
-
+          </ScaffoldSection>
+          <ScaffoldSection isFullWidth className="flex-grow pt-0 flex flex-col gap-y-4 h-px">
             {isLoadingOrganizations ? (
               <OrganizationLoadingState />
             ) : isErrorOrganizations ? (
@@ -154,7 +152,7 @@ const GenericProjectPage: NextPage = () => {
           </ScaffoldSection>
         </ScaffoldContainer>
       </PageLayout>
-    </>
+    </div>
   )
 }
 
