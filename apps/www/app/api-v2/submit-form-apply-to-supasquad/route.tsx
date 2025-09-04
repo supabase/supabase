@@ -9,6 +9,7 @@ import { insertPageInDatabase } from '~/lib/notion'
 const integrations = Sentry.getDefaultIntegrations({}).filter((defaultIntegration) => {
   return !['BrowserApiErrors', 'Breadcrumbs', 'GlobalHandlers'].includes(defaultIntegration.name)
 })
+
 const sentryCommunityClient = new Sentry.NodeClient({
   dsn: process.env.SENTRY_DSN_COMMUNITY,
   transport: Sentry.makeNodeTransport,
@@ -42,7 +43,7 @@ const applicationSchema = z.object({
     .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.number({ invalid_type_error: 'Please enter a number' }),
+  monthly_commitment: z.string().optional(),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
   skills: z.string().optional(),
   city: z.string().min(1, 'Specify your city'),
@@ -260,9 +261,9 @@ const getNotionDBData = (data: any) => {
       ],
     },
   }
-  if (!Number.isNaN(data.monthly_commitment)) {
+  if (data.monthly_commitment) {
     props['How many hours can you commit per month?'] = {
-      number: data.monthly_commitment,
+      rich_text: [{ type: 'text', text: { content: truncateRichText(data.monthly_commitment) } }],
     }
   }
   if (data.skills) {

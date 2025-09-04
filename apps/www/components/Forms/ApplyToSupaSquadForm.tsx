@@ -122,7 +122,7 @@ const applicationSchema = z.object({
     .min(1, 'Select at least 1 track'),
   areas_of_interest: z.array(z.string()).min(1, 'Select at least 1 area of interest'),
   why_you_want_to_join: z.string().min(1, 'This is required'),
-  monthly_commitment: z.number({ invalid_type_error: 'Please enter a number' }),
+  monthly_commitment: z.string().optional(),
   languages_spoken: z.array(z.string()).min(1, 'Select at least 1 language'),
   skills: z.string().optional(),
   city: z.string().min(1, 'Specify your city'),
@@ -162,13 +162,6 @@ const FormContent = memo(function FormContent({
 }) {
   return (
     <div className="flex flex-col">
-      {Object.values(errors).length > 0 && (
-        <Alert variant="destructive">
-          <AlertCircle />
-          <AlertDescription>{Object.values(errors).join('\n')}</AlertDescription>
-        </Alert>
-      )}
-
       <Form_Shadcn_ {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -435,15 +428,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">
-                      <Input_Shadcn_
-                        {...{
-                          ...field,
-                          inputMode: 'numeric',
-                          value: field.value > 0 ? field.value : '',
-                          onChange: (e: any) =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : ''),
-                        }}
-                      />
+                      <Input_Shadcn_ {...field} />
                     </div>
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
@@ -565,6 +550,13 @@ const FormContent = memo(function FormContent({
           />
         </form>
       </Form_Shadcn_>
+
+      {Object.values(errors).length > 0 && (
+        <Alert variant="destructive">
+          <AlertCircle />
+          <AlertDescription>{Object.values(errors).join('\n')}</AlertDescription>
+        </Alert>
+      )}
     </div>
   )
 })
@@ -590,7 +582,7 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
       why_you_want_to_join: '',
       city: '',
       country: '',
-      monthly_commitment: 0,
+      monthly_commitment: '',
       languages_spoken: [],
       github: '',
       twitter: '',
@@ -600,13 +592,13 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
   })
 
   const handleCancel = () => {
-    form.reset()
+    // form.reset()
     setIsSubmitted(false)
   }
 
   const handleConfirmationClose = () => {
+    // form.reset()
     setShowConfirmation(false)
-    form.reset()
     setIsSubmitted(false)
     setErrors({})
   }
