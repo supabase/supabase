@@ -244,6 +244,13 @@ export const DestinationPanel = ({
     }
   }, [destinationData, pipelineData, editMode, defaultValues, form])
 
+  // Ensure the form always reflects the freshest data whenever the panel opens
+  useEffect(() => {
+    if (visible) {
+      form.reset(defaultValues)
+    }
+  }, [visible, defaultValues, form])
+
   return sourceId ? (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
