@@ -83,7 +83,7 @@ export const PageLayout = ({
           size === 'full' &&
             (isCompact ? 'max-w-none !px-6 border-b pt-4' : 'max-w-none pt-6 !px-10 border-b'),
           size !== 'full' && (isCompact ? 'pt-4' : 'pt-12'),
-          navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
+          navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8')
         )}
       >
         {/* Header section */}
