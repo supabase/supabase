@@ -31,7 +31,7 @@ const DragPreview = ({ itemPositions }: { itemPositions: ItemPosition[] }) => {
           <div
             key={`${itemPos.item.id}-${index}`}
             className={cn(
-              'storage-row group flex gap-0.5 flex-1 min-h-[38px] items-center py-1 px-2 text-foreground-muted',
+              'storage-row opacity-90 group flex gap-0.5 flex-1 min-h-[38px] items-center py-1 px-2 text-foreground-muted',
               'bg-surface-200 rounded-none shadow-sm border border-border'
             )}
             style={{
