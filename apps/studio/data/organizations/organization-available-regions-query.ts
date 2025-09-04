@@ -6,7 +6,7 @@ import { organizationKeys } from './keys'
 
 export type OrganizationAvailableRegionsVariables = {
   slug?: string
-  cloudProvider: 'AWS' | 'FLY' | 'AWS_K8S'
+  cloudProvider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
 }
 
 export async function getOrganizationAvailableRegions(

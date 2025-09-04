@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
@@ -18,7 +19,6 @@ import {
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
-import Link from 'next/link'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
 import {
   Button,
@@ -214,7 +214,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
-    <div className={diagramOnly ? 'h-full' : 'nowheel border-y'}>
+    <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>
       <div
         className={`${diagramOnly ? 'h-full' : 'h-[500px]'} w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
@@ -367,12 +367,10 @@ interface InstanceConfigurationProps {
   diagramOnly?: boolean
 }
 
-const InstanceConfiguration = ({ diagramOnly = false }: InstanceConfigurationProps) => {
+export const InstanceConfiguration = ({ diagramOnly = false }: InstanceConfigurationProps) => {
   return (
     <ReactFlowProvider>
       <InstanceConfigurationUI diagramOnly={diagramOnly} />
     </ReactFlowProvider>
   )
 }
-
-export default InstanceConfiguration

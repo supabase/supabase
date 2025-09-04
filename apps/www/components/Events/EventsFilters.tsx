@@ -2,7 +2,7 @@ import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
 import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useKey } from 'react-use'
@@ -63,9 +63,9 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
   }, [q])
 
   const handleReplaceRouter = () => {
-    if (!searchTerm && category !== 'all') {
+    if (!searchTerm && category !== 'all' && router) {
       router.query.category = category
-      router.replace(router, undefined, { shallow: true, scroll: false })
+      router?.replace(router, undefined, { shallow: true, scroll: false })
     }
   }
 
@@ -89,19 +89,20 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
   }, [isMobile])
 
   useEffect(() => {
-    if (router.isReady && q) {
+    if (router?.isReady && q) {
       setSearchTerm(q)
     }
-    if (router.isReady && activeCategory && activeCategory !== 'all') {
+    if (router?.isReady && activeCategory && activeCategory !== 'all') {
       setCategory(activeCategory)
     }
-  }, [activeCategory, router.isReady, q])
+  }, [activeCategory, router?.isReady, q])
 
   const handleSearchByText = (text: string) => {
     setSearchTerm(text)
-    searchParams?.has('q') && router.replace('/events', undefined, { shallow: true, scroll: false })
-    router.replace(`/events?q=${text}`, undefined, { shallow: true, scroll: false })
-    if (text.length < 1) router.replace('/events', undefined, { shallow: true, scroll: false })
+    searchParams?.has('q') &&
+      router?.replace('/events', undefined, { shallow: true, scroll: false })
+    router?.replace(`/events?q=${text}`, undefined, { shallow: true, scroll: false })
+    if (text.length < 1) router?.replace('/events', undefined, { shallow: true, scroll: false })
 
     const matches = allEvents.filter((event: any) => {
       const found =
@@ -119,8 +120,8 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
     searchTerm && setSearchTerm('')
     setCategory(category)
     category === 'all'
-      ? router.replace('/events', undefined, { shallow: true, scroll: false })
-      : router.replace(`/events?category=${category}`, undefined, {
+      ? router?.replace('/events', undefined, { shallow: true, scroll: false })
+      : router?.replace(`/events?category=${category}`, undefined, {
           shallow: true,
           scroll: false,
         })

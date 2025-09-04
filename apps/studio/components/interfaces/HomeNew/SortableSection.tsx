@@ -1,6 +1,6 @@
-import type { CSSProperties, ReactNode } from 'react'
-import { GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
+import { GripVertical } from 'lucide-react'
+import type { CSSProperties, ReactNode } from 'react'
 import { cn } from 'ui'
 
 type SortableSectionProps = {
@@ -8,7 +8,7 @@ type SortableSectionProps = {
   children: ReactNode
 }
 
-export function SortableSection({ id, children }: SortableSectionProps) {
+export const SortableSection = ({ id, children }: SortableSectionProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   })
@@ -34,5 +34,3 @@ export function SortableSection({ id, children }: SortableSectionProps) {
     </div>
   )
 }
-
-export default SortableSection

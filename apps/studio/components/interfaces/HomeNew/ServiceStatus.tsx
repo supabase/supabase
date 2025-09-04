@@ -1,7 +1,6 @@
-import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
@@ -19,20 +18,34 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Skeleton,
+  cn,
 } from 'ui'
 
-const SERVICE_STATUS_THRESHOLD = 5 // minutes
+/**
+ * [Joshen] JFYI before we go live with this, we need to revisit the migrations section
+ * as I don't think it should live in the ServiceStatus component since its not indicative
+ * of a project's "service". ServiceStatus's intention is to be an ongoing health/status check.
+ *
+ * For context, migrations are meant to be indicative for only when creating branches or projects
+ * with an initial SQL, so "healthy" migrations just means that migrations have all been successfully
+ * ran. So it might be a matter of decoupling "ready" state vs "health checks"
+ * [Edit] Now that migrations are only showing up if the project is a branch, i think its okay for now
+ *
+ * [Joshen] Another issue that requires investigation before we go live with the changes:
+ * We've removed the isProjectNew check in this component which we had that logic cause new
+ * projects would show unhealthy as the services are still starting up - but it causes a
+ * perceived negative impression as new projects were showing unhealthy, hence the 5 minute
+ * threshold check (we’d show “Coming up” instead of “unhealthy” if the project is within 5
+ * minutes of when it was created). Might be related to decoupling "ready" state vs "health checks"
+ */
 
 const StatusMessage = ({
   status,
   isLoading,
   isHealthy,
-  isProjectNew,
 }: {
   isLoading: boolean
   isHealthy: boolean
-  isProjectNew: boolean
   status?: ProjectServiceStatus
 }) => {
   if (isHealthy) return 'Healthy'
@@ -40,7 +53,6 @@ const StatusMessage = ({
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
-  if (isProjectNew) return 'Coming up...'
   if (status) return status
   return 'Unable to connect'
 }
@@ -56,12 +68,10 @@ const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
 const StatusIcon = ({
   isLoading,
   isHealthy,
-  isProjectNew,
   projectStatus,
 }: {
   isLoading: boolean
   isHealthy: boolean
-  isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
   if (isHealthy) return <CheckIcon />
@@ -69,7 +79,6 @@ const StatusIcon = ({
   if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
-  if (isProjectNew) return <LoaderIcon />
   return <AlertIcon />
 }
 
@@ -97,15 +106,6 @@ export const ServiceStatus = () => {
     { projectRef: isBranch ? project?.parentRef : undefined },
     {
       enabled: isBranch,
-      refetchInterval: (data) => {
-        if (!data) return false
-        const currentBranch = data.find((branch) => branch.project_ref === ref)
-        return ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
-          currentBranch?.status || ''
-        )
-          ? false
-          : 5000
-      },
     }
   )
 
@@ -114,33 +114,27 @@ export const ServiceStatus = () => {
     : undefined
 
   // [Joshen] Need pooler service check eventually
-  const {
-    data: status,
-    isLoading,
-    refetch: refetchServiceStatus,
-  } = useProjectServiceStatusQuery(
-    {
-      projectRef: ref,
-    },
-    {
-      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
-    }
+  const { data: status, isLoading } = useProjectServiceStatusQuery(
+    { projectRef: ref },
+    { refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false) }
   )
-  const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
-    useEdgeFunctionServiceStatusQuery(
-      {
-        projectRef: ref,
-      },
-      {
-        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
-      }
-    )
+  const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery(
+    { projectRef: ref },
+    { refetchInterval: (data) => (!data?.healthy ? 5000 : false) }
+  )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
   const realtimeStatus = status?.find((service) => service.name === 'realtime')
   const storageStatus = status?.find((service) => service.name === 'storage')
   const dbStatus = status?.find((service) => service.name === 'db')
+
+  const isMigrationLoading =
+    project?.status === 'COMING_UP' ||
+    (isBranch &&
+      (isBranchesLoading ||
+        currentBranch?.status === 'CREATING_PROJECT' ||
+        currentBranch?.status === 'RUNNING_MIGRATIONS'))
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services: {
@@ -233,76 +227,56 @@ export const ServiceStatus = () => {
             error: undefined,
             docsUrl: undefined,
             isLoading: isBranchesLoading,
-            isHealthy: currentBranch?.status === 'FUNCTIONS_DEPLOYED',
-            status: (currentBranch?.status === 'FUNCTIONS_DEPLOYED'
-              ? 'ACTIVE_HEALTHY'
-              : currentBranch?.status === 'FUNCTIONS_FAILED' ||
-                  currentBranch?.status === 'MIGRATIONS_FAILED'
-                ? 'UNHEALTHY'
-                : 'COMING_UP') as ProjectServiceStatus,
-            logsUrl: '/branches',
+            isHealthy: isBranch
+              ? currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+              : !isMigrationLoading,
+            status: (isBranch
+              ? currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+                ? 'ACTIVE_HEALTHY'
+                : currentBranch?.status === 'FUNCTIONS_FAILED' ||
+                    currentBranch?.status === 'MIGRATIONS_FAILED'
+                  ? 'UNHEALTHY'
+                  : 'COMING_UP'
+              : isMigrationLoading
+                ? 'COMING_UP'
+                : 'ACTIVE_HEALTHY') as ProjectServiceStatus,
+            logsUrl: isBranch ? '/branches' : '/logs/database-logs',
           },
         ]
       : []),
   ]
 
-  const isMigrationLoading =
-    isBranchesLoading ||
-    currentBranch?.status === 'CREATING_PROJECT' ||
-    currentBranch?.status === 'RUNNING_MIGRATIONS'
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isHealthy)
 
-  // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
-  const isProjectNew =
-    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD ||
-    project?.status === 'COMING_UP'
-
-  useEffect(() => {
-    let timer: any
-
-    if (isProjectNew) {
-      const secondsSinceProjectCreated = dayjs
-        .utc()
-        .diff(dayjs.utc(project?.inserted_at), 'seconds')
-      const remainingTimeTillNextCheck = SERVICE_STATUS_THRESHOLD * 60 - secondsSinceProjectCreated
-
-      timer = setTimeout(() => {
-        refetchServiceStatus()
-        refetchEdgeFunctionServiceStatus()
-      }, remainingTimeTillNextCheck * 1000)
-    }
-
-    return () => {
-      clearTimeout(timer)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProjectNew])
-
-  const anyUnhealthy = services.some((service) => !service.isHealthy)
-  const anyComingUp = services.some((service) => service.status === 'COMING_UP')
-  const overallStatusLabel = isLoadingChecks ? (
-    <Skeleton className="h-4 w-16 mt-2" />
-  ) : anyUnhealthy ? (
-    'Unhealthy'
-  ) : anyComingUp || isProjectNew ? (
-    'Coming up...'
-  ) : (
-    'Healthy'
+  const anyUnhealthy = services.some(
+    (service) => !service.isHealthy && service.status !== 'COMING_UP'
   )
+  const anyComingUp = services.some((service) => service.status === 'COMING_UP')
+  const overallStatusLabel = isLoadingChecks
+    ? 'Checking...'
+    : anyUnhealthy
+      ? 'Unhealthy'
+      : anyComingUp || isMigrationLoading
+        ? 'Coming up...'
+        : 'Healthy'
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          className="p-0 border-0 h-auto text-base"
+          type="outline"
+          className="text-base h-auto px-2"
+          iconRight={<ChevronDown size={14} strokeWidth={1.5} />}
           icon={
-            isLoadingChecks ||
-            (!allServicesOperational && isProjectNew && isMigrationLoading) ? null : (
+            isLoadingChecks || anyComingUp || isMigrationLoading ? (
+              <Loader2 className="animate-spin ml-1" size={12} strokeWidth={1.5} />
+            ) : (
               <div
-                className={`w-2 h-2 rounded-full ${
+                className={cn(
+                  'w-2 h-2 rounded-full ml-1.5',
                   allServicesOperational ? 'bg-brand' : 'bg-warning'
-                }`}
+                )}
               />
             )
           }
@@ -321,7 +295,6 @@ export const ServiceStatus = () => {
               <StatusIcon
                 isLoading={service.isLoading}
                 isHealthy={!!service.isHealthy}
-                isProjectNew={isProjectNew}
                 projectStatus={service.status}
               />
               <div className="flex-1">
@@ -330,7 +303,6 @@ export const ServiceStatus = () => {
                   <StatusMessage
                     isLoading={service.isLoading}
                     isHealthy={!!service.isHealthy}
-                    isProjectNew={isProjectNew}
                     status={service.status}
                   />
                 </p>
