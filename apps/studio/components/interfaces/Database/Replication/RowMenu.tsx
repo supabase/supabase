@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash, Ban } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -24,6 +24,7 @@ import {
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
   PIPELINE_ERROR_MESSAGES,
+  PIPELINE_ACTIONABLE_STATES,
   getStatusName,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './PipelineStatus'
@@ -54,7 +55,10 @@ export const RowMenu = ({
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
+  const requestStatus = pipeline?.id
+    ? getRequestStatus(pipeline.id)
+    : PipelineStatusRequestStatus.None
 
   const onEnablePipeline = async () => {
     if (!projectRef) {
@@ -128,7 +132,17 @@ export const RowMenu = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           {(() => {
-            let label = 'No action allowed now'
+            // Disable actions during transient request states
+            if (requestStatus !== PipelineStatusRequestStatus.None) {
+              return (
+                <DropdownMenuItem className="space-x-2 opacity-50" disabled>
+                  <Ban size={14} />
+                  <p>Action unavailable</p>
+                </DropdownMenuItem>
+              )
+            }
+
+            let label = 'Action unavailable'
             let icon = <Play size={14} />
             let onClick: (() => void | Promise<void>) | undefined
             let disabled = false
@@ -152,8 +166,8 @@ export const RowMenu = ({
                 void onRestartPipeline()
               }
             } else {
-              disabled = true
-              icon = <Pause size={14} />
+              disabled = !PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)
+              icon = <Ban size={14} />
             }
 
             return (

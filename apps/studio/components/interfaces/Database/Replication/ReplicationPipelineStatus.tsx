@@ -1,4 +1,4 @@
-import { Activity, ChevronLeft, ExternalLink, Search, X } from 'lucide-react'
+import { Activity, ChevronLeft, ExternalLink, Search, X, Play, Pause, RotateCcw, Ban } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -188,20 +188,40 @@ export const ReplicationPipelineStatus = () => {
               View logs
             </Link>
           </Button>
-          <Button
-            type={statusName === 'stopped' ? 'primary' : 'default'}
-            onClick={onPrimaryAction}
-            loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-            disabled={!['stopped', 'started', 'failed'].includes(statusName || '')}
-          >
-            {statusName === 'stopped'
-              ? 'Start'
-              : statusName === 'started'
-              ? 'Stop'
-              : statusName === 'failed'
-              ? 'Restart'
-              : 'No action allowed now'}
-          </Button>
+          {(() => {
+            const isUnavailable =
+              isEnablingDisabling || !PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)
+
+            const label =
+              statusName === 'stopped'
+                ? 'Start'
+                : statusName === 'started'
+                ? 'Stop'
+                : statusName === 'failed'
+                ? 'Restart'
+                : 'Action unavailable'
+
+            const icon =
+              statusName === 'stopped'
+                ? <Play />
+                : statusName === 'started'
+                ? <Pause />
+                : statusName === 'failed'
+                ? <RotateCcw />
+                : <Ban />
+
+            return (
+              <Button
+                type={statusName === 'stopped' ? 'primary' : 'default'}
+                onClick={onPrimaryAction}
+                loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
+                disabled={isUnavailable}
+                icon={icon}
+              >
+                {label}
+              </Button>
+            )
+          })()}
         </div>
       </div>
 
