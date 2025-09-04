@@ -5,6 +5,7 @@ import {
   transformStatusCodeData,
   transformInvocationData,
   aggregateInvocationsByTimestamp,
+  filterToWhereClause,
 } from './edge-functions.config'
 
 describe('extractStatusCodesFromData', () => {
@@ -247,5 +248,192 @@ describe('aggregateInvocationsByTimestamp', () => {
       '2023-01-01T00:00:00.000Z',
       '2023-01-01T01:00:00.000Z',
     ])
+  })
+})
+
+describe('filterToWhereClause', () => {
+  it('should return empty string when no filters are provided', () => {
+    const result = filterToWhereClause()
+    expect(result).toBe('')
+  })
+
+  it('should return empty string when filters object is empty', () => {
+    const result = filterToWhereClause({})
+    expect(result).toBe('')
+  })
+
+  it('should generate WHERE clause for functions filter', () => {
+    const filters = {
+      functions: {
+        func1: true,
+        func2: true,
+        func3: false,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe("WHERE function_id IN ('func1','func2')")
+  })
+
+  it('should generate WHERE clause for status_code filter', () => {
+    const filters = {
+      status_code: {
+        operator: '>=' as const,
+        value: 400,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe('WHERE response.status_code >= 400')
+  })
+
+  it('should generate WHERE clause for region filter', () => {
+    const filters = {
+      region: {
+        'us-east-1': true,
+        'eu-west-1': true,
+        'ap-southeast-1': false,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe("WHERE h.x_sb_edge_region IN ('us-east-1','eu-west-1')")
+  })
+
+  it('should generate WHERE clause for execution_time filter', () => {
+    const filters = {
+      execution_time: {
+        operator: '<' as const,
+        value: 1000,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe('WHERE m.execution_time_ms < 1000')
+  })
+
+  it('should combine multiple filters with AND', () => {
+    const filters = {
+      functions: {
+        func1: true,
+        func2: false,
+      },
+      status_code: {
+        operator: '=' as const,
+        value: 200,
+      },
+      region: {
+        'us-east-1': true,
+      },
+      execution_time: {
+        operator: '<=' as const,
+        value: 500,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe(
+      "WHERE function_id IN ('func1') AND response.status_code = 200 AND h.x_sb_edge_region IN ('us-east-1') AND m.execution_time_ms <= 500"
+    )
+  })
+
+  it('should handle functions filter with no selected functions', () => {
+    const filters = {
+      functions: {
+        func1: false,
+        func2: false,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe('')
+  })
+
+  it('should handle region filter with no selected regions', () => {
+    const filters = {
+      region: {
+        'us-east-1': false,
+        'eu-west-1': false,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe('')
+  })
+
+  it('should handle single function selection', () => {
+    const filters = {
+      functions: {
+        'single-func': true,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe("WHERE function_id IN ('single-func')")
+  })
+
+  it('should handle single region selection', () => {
+    const filters = {
+      region: {
+        'single-region': true,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe("WHERE h.x_sb_edge_region IN ('single-region')")
+  })
+
+  it('should handle all comparison operators for status_code', () => {
+    const operators = ['=', '!=', '>', '>=', '<', '<='] as const
+
+    operators.forEach((operator) => {
+      const filters = {
+        status_code: {
+          operator,
+          value: 200,
+        },
+      }
+      const result = filterToWhereClause(filters)
+      expect(result).toBe(`WHERE response.status_code ${operator} 200`)
+    })
+  })
+
+  it('should handle all comparison operators for execution_time', () => {
+    const operators = ['=', '!=', '>', '>=', '<', '<='] as const
+
+    operators.forEach((operator) => {
+      const filters = {
+        execution_time: {
+          operator,
+          value: 100,
+        },
+      }
+      const result = filterToWhereClause(filters)
+      expect(result).toBe(`WHERE m.execution_time_ms ${operator} 100`)
+    })
+  })
+
+  it('should handle numeric values correctly', () => {
+    const filters = {
+      status_code: {
+        operator: '>' as const,
+        value: 0,
+      },
+      execution_time: {
+        operator: '>=' as const,
+        value: 1.5,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe('WHERE response.status_code > 0 AND m.execution_time_ms >= 1.5')
+  })
+
+  it('should handle special characters in function IDs and regions', () => {
+    const filters = {
+      functions: {
+        'func-with-dash': true,
+        func_with_underscore: true,
+        'func.with.dots': true,
+      },
+      region: {
+        'region-with-dash': true,
+        region_with_underscore: true,
+      },
+    }
+    const result = filterToWhereClause(filters)
+    expect(result).toBe(
+      "WHERE function_id IN ('func-with-dash','func_with_underscore','func.with.dots') AND h.x_sb_edge_region IN ('region-with-dash','region_with_underscore')"
+    )
   })
 })
