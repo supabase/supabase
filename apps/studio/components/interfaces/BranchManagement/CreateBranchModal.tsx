@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { DollarSign, GitMerge, Github, Loader2 } from 'lucide-react'
+import { DatabaseZap, DollarSign, GitMerge, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -22,6 +22,7 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { projectKeys } from 'data/projects/keys'
+import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -85,6 +86,12 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
+  const {
+    data: cloneBackups,
+    error: cloneBackupsError,
+    isError: isErrorcloneBackups,
+  } = useCloneBackupsQuery({ projectRef })
+  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -172,6 +179,7 @@ export const CreateBranchModal = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
+  const withData = form.watch('withData')
 
   const canSubmit = !isCreating && !isChecking
   const isDisabled =
@@ -334,6 +342,12 @@ export const CreateBranchModal = () => {
                   )}
                 </>
               )}
+              {isErrorcloneBackups && (
+                <AlertError
+                  error={cloneBackupsError}
+                  subject="Failed to retrieve physical backup information"
+                />
+              )}
               {allowDataBranching && (
                 <FormField_Shadcn_
                   control={form.control}
@@ -362,6 +376,30 @@ export const CreateBranchModal = () => {
                 promptProPlanUpgrade && 'opacity-25 pointer-events-none'
               )}
             >
+              {withData && (
+                <div className="flex flex-row gap-4">
+                  <div>
+                    <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                      <DatabaseZap className="text-info" size={20} strokeWidth={2} />
+                    </figure>
+                  </div>
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-sm text-foreground">
+                      Data branch takes longer time to create
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      Since your target database volume size is{' '}
+                      <code className="text-xs font-mono">{targetVolumeSizeGb} GB</code>, creating a
+                      data branch is estimated to take around{' '}
+                      <code className="text-xs font-mono">
+                        {Math.round((720 / 21000) * targetVolumeSizeGb) + 3} minutes
+                      </code>
+                      .
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {githubConnection && (
                 <div className="flex flex-row gap-4">
                   <div>
