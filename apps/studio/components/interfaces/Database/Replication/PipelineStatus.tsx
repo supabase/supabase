@@ -23,6 +23,7 @@ interface PipelineStatusProps {
   isError: boolean
   isSuccess: boolean
   requestStatus?: PipelineStatusRequestStatus
+  pipelineId?: number
 }
 
 export const PipelineStatus = ({
@@ -32,6 +33,7 @@ export const PipelineStatus = ({
   isError,
   isSuccess,
   requestStatus,
+  pipelineId,
 }: PipelineStatusProps) => {
   const { ref } = useParams()
 
@@ -156,8 +158,18 @@ export const PipelineStatus = ({
               <>
                 {' '}
                 Check the{' '}
-                <InlineLink href={`/project/${ref}/logs/etl-replication-logs`}>logs</InlineLink> for
-                more information.
+                <InlineLink
+                  href={
+                    pipelineId
+                      ? `/project/${ref}/logs/etl-replication-logs?f=${encodeURIComponent(
+                          JSON.stringify({ pipeline_id: pipelineId })
+                        )}`
+                      : `/project/${ref}/logs/etl-replication-logs`
+                  }
+                >
+                  logs
+                </InlineLink>{' '}
+                for more information.
               </>
             )}
           </TooltipContent>
