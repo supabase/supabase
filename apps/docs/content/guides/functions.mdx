@@ -18,35 +18,28 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
 
 - **Request enters an edge gateway (relay)** — the gateway routes traffic, handles auth headers/JWT validation, and applies routing/traffic rules.
 - **Auth & policies are applied** — the gateway (or your function) can validate Supabase JWTs, apply rate-limits, and centralize security checks before executing code.
-- **Deno edge runtime executes your function** — the function runs on a regionally-distributed Deno node closest to the user for minimal latency.
+- **[Edge runtime](https://github.com/supabase/edge-runtime) executes your function** — the function runs on a regionally-distributed Edge Runtime node closest to the user for minimal latency.
 - **Integrations & data access** — functions commonly call Supabase APIs (Auth, Postgres, Storage) or third-party APIs. For Postgres, prefer connection strategies suited for edge/serverless environments (see the `connect-to-postgres` guide).
 - **Observability and logs** — invocations emit logs and metrics you can explore in the dashboard or downstream monitoring (Sentry, etc.).
 - **Response returns via the gateway** — the gateway forwards the response back to the client and records request metadata.
 
 ## Quick technical notes
 
-- **Runtime:** Deno (TypeScript-first). Functions are simple `.ts` files that export a handler.
-- **Local dev parity:** `supabase functions serve` provides a local runtime similar to production for faster iteration.
-- **Global deployment:** `supabase functions deploy` publishes functions to the edge network.
+- **Runtime:** Supabase Edge Runtime (Deno compatible runtime with TypeScript first). Functions are simple `.ts` files that export a handler.
+- **Local dev parity:** Use Supabase CLI for a local runtime similar to production for faster iteration (`supabase functions serve` command).
+- **Global deployment:** Deploy your Edge Functions via Supabase Dashboard, CLI or MCP.
 - **Cold starts & concurrency:** cold starts are possible — design for short-lived, idempotent operations. Heavy long-running jobs should be moved to background workers.
-- **Database connections:** treat Postgres like a remote, pooled service — use connection pools or serverless-friendly drivers. See `/guides/functions/connect-to-postgres`.
-- **Secrets:** store credentials in Supabase project secrets and access them via environment variables.
+- **Database connections:** treat Postgres like a remote, pooled service — use connection pools or serverless-friendly drivers.
+- **Secrets:** store credentials in Supabase [project secrets](/docs/reference/cli/supabase-secrets) and access them via environment variables.
 
 ## When to use Edge Functions
 
 - Authenticated or public HTTP endpoints that need low latency.
 - Webhook receivers (Stripe, GitHub, etc.).
 - On-demand image or Open Graph generation.
-- Small AI inference tasks or orchestrating calls to external ML APIs.
-- Transformations, proxying, and facade endpoints for third-party services.
-
-## Best practices
-
-- Avoid long CPU-bound work; keep invocations short.
-- Reuse clients where possible but design for ephemeral execution contexts.
-- Prefer streaming or incremental responses for longer operations.
-- Use proper retry and idempotency for webhook handlers.
-- Monitor logs and set up error reporting (Sentry, etc.) for production observability.
+- Small AI inference tasks or orchestrating calls to external LLM APIs (like OpenAI)
+- Sending transactional emails.
+- Building messaging bots for Slack, Discord, etc.
 
 <div className="not-prose">
   <Button size="medium" asChild>
