@@ -58,6 +58,7 @@ allow_list = [
     "[Gg]apless",
     "[Gg]lobs?",
     "[Gg]lobstar",
+    "[Gg]rayscale",
     "[Gg]zip(s|ped|ping)?",
     "[Hh]r",
     "[Hh]ypertables?",
@@ -156,6 +157,7 @@ allow_list = [
     "Entra",
     "ePHI",
     "Erlang",
+    "ESZip",
     "Ethereum",
     "Figma",
     "Firestore",
@@ -166,6 +168,7 @@ allow_list = [
     "Git",
     "GitHub",
     "GitLab",
+    "geolocation"
     "GoTrue",
     "Golang",
     "Grafana",
