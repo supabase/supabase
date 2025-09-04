@@ -1,41 +1,33 @@
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useEffect, useRef } from 'react'
 import { IS_PLATFORM, useParams } from 'common'
+import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
+import { TopSection } from 'components/interfaces/HomeNew/TopSection'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsOrioleDb,
   useProjectByRefQuery,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
-
-import TopSection from 'components/interfaces/HomeNew/TopSection'
-import SortableSection from 'components/interfaces/HomeNew/SortableSection'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { AdvisorSection } from './AdvisorSection'
 import { ProjectUsageSection } from './ProjectUsageSection'
 
-const Home = () => {
+export const HomeV2 = () => {
+  const { ref, enableBranching } = useParams()
+  const isOrioleDb = useIsOrioleDb()
+  const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
-  const isOrioleDb = useIsOrioleDb()
-  const snap = useAppStateSnapshot()
-  const { ref, enableBranching } = useParams()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-
-  useEffect(() => {
-    if (enableBranching && !hasShownEnableBranchingModalRef.current) {
-      hasShownEnableBranchingModalRef.current = true
-      snap.setShowCreateBranchModal(true)
-    }
-  }, [enableBranching, snap])
 
   const { data: branches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
@@ -45,21 +37,22 @@ const Home = () => {
   const currentBranch = branches?.find((branch) => branch.project_ref === project?.ref)
   const isMainBranch = currentBranch?.name === mainBranch?.name
 
-  let projectName = 'Welcome to your project'
-  if (currentBranch && !isMainBranch) {
-    projectName = currentBranch.name
-  } else if (project?.name) {
-    projectName = project.name
-  }
+  const projectName =
+    currentBranch && !isMainBranch
+      ? currentBranch.name
+      : project?.name
+        ? project.name
+        : 'Welcome to your project'
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
     ['getting-started', 'usage', 'advisor', 'custom-report']
   )
 
-  const [gettingStartedState, setGettingStartedState] = useLocalStorage<
-    'empty' | 'code' | 'no-code' | 'hidden'
-  >(`home-getting-started-${project?.ref || 'default'}`, 'empty')
+  const [gettingStartedState] = useLocalStorage<'empty' | 'code' | 'no-code' | 'hidden'>(
+    `home-getting-started-${project?.ref || 'default'}`,
+    'empty'
+  )
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -73,6 +66,13 @@ const Home = () => {
       return arrayMove(items, oldIndex, newIndex)
     })
   }
+
+  useEffect(() => {
+    if (enableBranching && !hasShownEnableBranchingModalRef.current) {
+      hasShownEnableBranchingModalRef.current = true
+      snap.setShowCreateBranchModal(true)
+    }
+  }, [enableBranching, snap])
 
   return (
     <div className="w-full">
@@ -125,5 +125,3 @@ const Home = () => {
     </div>
   )
 }
-
-export default Home

@@ -144,11 +144,12 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/docs" legacyBehavior passHref>
-              <NavigationMenuLink className={buttonVariants({ type: 'text', size: 'small' })}>
-                Documentation
-              </NavigationMenuLink>
-            </Link>
+            <NavigationMenuLink
+              href="/docs"
+              className={buttonVariants({ type: 'text', size: 'small' })}
+            >
+              Documentation
+            </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
         <ScrollBar orientation="horizontal" />
