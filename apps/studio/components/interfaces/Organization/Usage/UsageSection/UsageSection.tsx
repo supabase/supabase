@@ -46,7 +46,11 @@ const UsageSection = ({
   return (
     <>
       <ScaffoldContainer>
-        <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
+        <SectionHeader
+          title={categoryMeta.name}
+          description={categoryMeta.description}
+          className="pb-0"
+        />
       </ScaffoldContainer>
 
       {categoryMeta.attributes.map((attribute) =>
