@@ -125,7 +125,20 @@ export const DestinationRow = ({
       )}
       {isPipelineSuccess && (
         <Table.tr>
-          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : destinationName}</Table.td>
+          <Table.td>
+            {isPipelineLoading ? (
+              <ShimmeringLoader />
+            ) : pipeline?.id ? (
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="cursor-help">{destinationName}</span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Pipeline ID: {pipeline.id}</TooltipContent>
+              </Tooltip>
+            ) : (
+              destinationName
+            )}
+          </Table.td>
           <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
           <Table.td>
             {isPipelineLoading || !pipeline ? (
