@@ -99,7 +99,7 @@ export const data = {
       </>
     ),
     subheading:
-      "SupaSquad recognizes that every contributor brings unique strengths, which is why we've created four distinct tracks to match how you want to make an impact. You can join one or multiple tracks based on your interests and skills.",
+      "We recognize that every contributor brings unique strengths, which is why we've created four distinct tracks to match how you want to make an impact. You can join one or multiple tracks based on your interests and skills.",
     features: [
       {
         id: 'advocate',
