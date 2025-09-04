@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --cache --write registry.json && rimraf -G public/r && shadcn build && tsx scripts/clean-registry.ts",
+    "build": "prettier --cache --write registry.json && rimraf -G public/r && shadcn build && tsx scripts/clean-registry.ts",
     "clean": "rimraf node_modules .next .turbo",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
