@@ -193,6 +193,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         confirmLabel="Disable"
         variant="destructive"
         confirmLabelLoading="Disabling"
+        loading={isDisabling}
         onCancel={() => setIsDisableModalOpen(false)}
         onConfirm={() => onConfirmDisable()}
       >
