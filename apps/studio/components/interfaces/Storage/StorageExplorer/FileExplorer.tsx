@@ -8,6 +8,7 @@ import { cn } from 'ui'
 import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import ColumnContextMenu from './ColumnContextMenu'
+import CustomDragLayer from './CustomDragLayer'
 import FileExplorerColumn from './FileExplorerColumn'
 import FolderContextMenu from './FolderContextMenu'
 import ItemContextMenu from './ItemContextMenu'
@@ -52,6 +53,7 @@ const FileExplorer = ({
           snap.view === STORAGE_VIEWS.LIST && 'flex-col'
         )}
       >
+        <CustomDragLayer />
         <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
         <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
         <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />

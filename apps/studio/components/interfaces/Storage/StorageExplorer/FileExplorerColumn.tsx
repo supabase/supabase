@@ -108,9 +108,6 @@ const FileExplorerColumn = ({
   const [dropProps, drop] = useDrop({
     accept: 'storage-item',
     canDrop: (draggedItem: any, monitor: any) => {
-      // Don't allow dropping on the same column
-      if (draggedItem.sourceColumnIndex === index) return false
-
       // Only allow drops when we're actually hovering over the column background
       // This prevents interference with folder item drops
       const isOverColumnBackground = monitor.isOver({ shallow: true })
@@ -119,6 +116,59 @@ const FileExplorerColumn = ({
         // Not over column background, blocking drop
         return false
       }
+
+      // Handle multi-item drops
+      if (draggedItem.type === 'multi-item') {
+        const items = draggedItem.items || []
+
+        // Check all items in the selection for drop validity
+        for (const draggedSubItem of items) {
+          // Don't allow dropping on the same column
+          if (draggedSubItem.columnIndex === index) return false
+
+          // Don't allow dropping a folder into itself or any of its subdirectories (circular reference)
+          if (draggedSubItem.type === STORAGE_ROW_TYPES.FOLDER) {
+            const draggedItemPath = snap.openedFolders
+              .slice(0, draggedSubItem.columnIndex)
+              .map((folder) => folder.name)
+              .join('/')
+            const targetPath = getColumnPath()
+
+            // Build the full path of the dragged folder
+            const draggedItemFullPath =
+              draggedItemPath.length > 0
+                ? `${draggedItemPath}/${draggedSubItem.name}`
+                : draggedSubItem.name
+
+            // Check if target path is the same as dragged item path (dropping on itself)
+            if (targetPath === draggedItemFullPath) {
+              // Cannot drop folder on itself
+              return false
+            }
+
+            // Additional check: Block column background drops for folders when the target would be invalid
+            // This prevents the column from intercepting drops that should go to folder items
+            // Allow valid moves (like moving a folder to root) while preventing invalid ones
+            const draggedItemCurrentPath = snap.openedFolders
+              .slice(0, draggedSubItem.columnIndex)
+              .map((folder) => folder.name)
+              .join('/')
+
+            // Block if the target path would be the same as the dragged item's current location
+            // (This prevents self-drops, but allows moves from subdirectories to parent directories)
+            if (targetPath === draggedItemCurrentPath) {
+              // Blocking folder drop to same location
+              return false
+            }
+          }
+        }
+
+        return true
+      }
+
+      // Handle single-item drops (existing logic)
+      // Don't allow dropping on the same column
+      if (draggedItem.sourceColumnIndex === index) return false
 
       // Don't allow dropping a folder into itself or any of its subdirectories (circular reference)
       if (draggedItem.type === STORAGE_ROW_TYPES.FOLDER) {
@@ -160,8 +210,16 @@ const FileExplorerColumn = ({
       if (canUpdateStorage) {
         const targetDirectory = getColumnPath()
 
-        // Use the drag & drop function that doesn't interfere with the modal
-        snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
+        // Handle multi-item drops
+        if (draggedItem.type === 'multi-item') {
+          const items = draggedItem.items || []
+          // Move all selected items
+          snap.moveFilesDragAndDrop(items, targetDirectory)
+        } else {
+          // Handle single-item drops (existing logic)
+          // Use the drag & drop function that doesn't interfere with the modal
+          snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
+        }
       }
     },
     collect: (monitor) => ({

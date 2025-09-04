@@ -15,8 +15,8 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useContextMenu } from 'react-contexify'
-import { useRef } from 'react'
-import { useDrag, useDrop } from 'react-dnd'
+import { useEffect, useRef } from 'react'
+import { useDrag, useDrop, useDragLayer } from 'react-dnd'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
@@ -135,6 +135,12 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     selectRangeItems,
     foldersBeingMoved,
   } = snap
+
+  // Track global drag state to show/hide items across all components
+  const { isDragging: isAnyItemDragging, draggedItem } = useDragLayer((monitor) => ({
+    isDragging: monitor.isDragging(),
+    draggedItem: monitor.getItem(),
+  }))
   const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
 
@@ -159,17 +165,60 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     })()
 
   // Drag source for files and folders
-  const [{ isDragging }, drag] = useDrag({
-    type: 'storage-item',
-    item: () => ({
-      ...itemWithColumnIndex,
-      sourceColumnIndex: columnIndex,
+  const [{ isDragging }, drag, preview] = useDrag(
+    () => ({
+      type: 'storage-item',
+      item: () => {
+        // If this item is selected and there are multiple selected items, drag all selected items
+        if (isSelected && selectedItems.length > 1) {
+          // Get the element's position in the viewport for the custom drag layer
+          const elementRect = ref.current?.getBoundingClientRect()
+
+          return {
+            type: 'multi-item',
+            items: selectedItems,
+            sourceColumnIndex: columnIndex,
+            draggedFromElement: {
+              rect: elementRect,
+              itemId: item.id,
+            },
+          }
+        }
+        // Otherwise, drag just this item
+        return {
+          ...itemWithColumnIndex,
+          sourceColumnIndex: columnIndex,
+        }
+      },
+      canDrag: () => canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET,
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
     }),
-    canDrag: () => canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  })
+    [
+      isSelected,
+      selectedItems,
+      columnIndex,
+      itemWithColumnIndex,
+      canUpdateFiles,
+      item.type,
+      item.id,
+    ]
+  )
+
+  // Always hide default preview for multi-item drags and set empty preview early
+  useEffect(() => {
+    if (isSelected && selectedItems.length > 1) {
+      // Create a completely transparent 1x1 pixel image
+      const emptyImage = document.createElement('img')
+      emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+      emptyImage.onload = () => {
+        preview(emptyImage, { captureDraggingState: true })
+      }
+      // Set it immediately as well
+      preview(emptyImage, { captureDraggingState: true })
+    }
+  }, [isSelected, selectedItems.length, preview])
 
   // Drop target for folders
   const [{ isOver }, drop] = useDrop({
@@ -181,9 +230,75 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
         return false
       }
 
-      // Don't allow dropping on itself - compare paths instead of IDs
+      // Handle multi-item drops
+      if (draggedItem.type === 'multi-item') {
+        const items = draggedItem.items || []
+
+        // Check all items in the selection for drop validity
+        for (const draggedSubItem of items) {
+          // Don't allow dropping on itself - compare paths instead of IDs
+          const draggedItemPath = snap.openedFolders
+            .slice(0, draggedSubItem.columnIndex)
+            .map((folder) => folder.name)
+            .join('/')
+          const targetItemPath = snap.openedFolders
+            .slice(0, columnIndex)
+            .map((folder) => folder.name)
+            .join('/')
+
+          const draggedItemFullPath =
+            draggedItemPath.length > 0
+              ? `${draggedItemPath}/${draggedSubItem.name}`
+              : draggedSubItem.name
+          const targetItemFullPath =
+            targetItemPath.length > 0 ? `${targetItemPath}/${item.name}` : item.name
+
+          if (draggedItemFullPath === targetItemFullPath) {
+            // Can't drop on itself (same path)
+            return false
+          }
+
+          // Don't allow dropping a folder into itself or any of its subdirectories (circular reference)
+          if (draggedSubItem.type === STORAGE_ROW_TYPES.FOLDER) {
+            // For folder drops, the target is the folder itself
+            // When dropping on a folder item, we want to move INTO that folder
+            const targetPath = snap.openedFolders
+              .slice(0, columnIndex)
+              .map((folder) => folder.name)
+              .concat(item.name)
+              .join('/')
+
+            // Check if target path is the same as dragged item path (dropping on itself)
+            if (targetPath === draggedItemFullPath) {
+              return false
+            }
+
+            // Check if target path is a subdirectory of the dragged item (would create circular reference)
+            const droppedOnOwnSubdir = targetPath.startsWith(draggedItemFullPath + '/')
+
+            if (droppedOnOwnSubdir) {
+              // Can't drop in own subdirectory
+              return false
+            }
+
+            // Check if target path is the IMMEDIATE parent of the dragged item
+            // This prevents dropping a folder into its direct parent, but allows moving to ancestor directories
+            const draggedItemImmediateParent = draggedItemFullPath.split('/').slice(0, -1).join('/')
+            const isDroppingOnImmediateParent = targetPath === draggedItemImmediateParent
+
+            if (isDroppingOnImmediateParent) {
+              // Cannot drop folder into its immediate parent directory (same directory)
+              return false
+            }
+          }
+        }
+
+        return true
+      }
+
+      // Handle single-item drops (existing logic)
       const draggedItemPath = snap.openedFolders
-        .slice(0, draggedItem.columnIndex)
+        .slice(0, draggedItem.columnIndex || draggedItem.sourceColumnIndex)
         .map((folder) => folder.name)
         .join('/')
       const targetItemPath = snap.openedFolders
@@ -246,19 +361,41 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           .concat(item.name)
           .join('/')
 
-        // Check if this is a drop to the same location
-        const draggedItemPath = snap.openedFolders
-          .slice(0, draggedItem.columnIndex)
-          .map((folder) => folder.name)
-          .join('/')
+        // Handle multi-item drops
+        if (draggedItem.type === 'multi-item') {
+          const items = draggedItem.items || []
 
-        if (draggedItemPath === targetDirectory) {
-          // Same location drop detected on folder, ignoring move operation
-          return
+          // Check if any item is being dropped to the same location
+          const shouldSkip = items.some((subItem: any) => {
+            const draggedItemPath = snap.openedFolders
+              .slice(0, subItem.columnIndex)
+              .map((folder) => folder.name)
+              .join('/')
+            return draggedItemPath === targetDirectory
+          })
+
+          if (shouldSkip) {
+            // Some items would be dropped to same location, ignoring move operation
+            return
+          }
+
+          // Move all selected items
+          snap.moveFilesDragAndDrop(items, targetDirectory)
+        } else {
+          // Handle single-item drops (existing logic)
+          const draggedItemPath = snap.openedFolders
+            .slice(0, draggedItem.columnIndex || draggedItem.sourceColumnIndex)
+            .map((folder) => folder.name)
+            .join('/')
+
+          if (draggedItemPath === targetDirectory) {
+            // Same location drop detected on folder, ignoring move operation
+            return
+          }
+
+          // Use the drag & drop function that doesn't interfere with the modal
+          snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
         }
-
-        // Use the drag & drop function that doesn't interfere with the modal
-        snap.moveFilesDragAndDrop([draggedItem], targetDirectory)
       } else {
         // Drop conditions not met
       }
@@ -452,7 +589,9 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
       className={cn(
         'h-full border-b border-default',
         isDragging && 'opacity-50',
-        isBeingMoved && 'opacity-50'
+        isBeingMoved && 'opacity-50',
+        // Add visual feedback for selected items being dragged
+        isDragging && isSelected && selectedItems.length > 1 && 'ring-2 ring-brand-500/50'
       )}
       data-item-type={item.type.toLowerCase()}
       data-item-name={item.name}
@@ -469,8 +608,17 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
-          `${isOver ? 'bg-blue-200 ring-2 ring-blue-500 shadow-lg' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+          `${isOver ? 'bg-selection' : ''}`,
+          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
+          // Add subtle highlight for all selected items when multiple items are selected
+          `${isSelected && selectedItems.length > 1 && 'bg-surface-200/50'}`,
+          // Hide selected items during multi-item drag (they'll be shown in custom drag layer)
+          `${
+            isAnyItemDragging &&
+            draggedItem?.type === 'multi-item' &&
+            draggedItem?.items?.some((draggedSubItem: any) => draggedSubItem.id === item.id) &&
+            'opacity-20'
+          }`
         )}
         onClick={(event) => {
           event.stopPropagation()
@@ -538,7 +686,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           </div>
           <p
             title={item.name}
-            className="truncate text-sm cursor-pointer hover:text-foreground"
+            className="truncate text-sm cursor-pointer hover:text-foreground relative"
             style={{ width: nameWidth }}
             onDoubleClick={onDoubleClickName}
             onKeyDown={(event) => {
@@ -550,6 +698,12 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             tabIndex={canUpdateFiles && item.type !== STORAGE_ROW_TYPES.BUCKET ? 0 : -1}
           >
             {item.name}
+            {/* Show badge for multi-item drag operations */}
+            {isDragging && isSelected && selectedItems.length > 1 && (
+              <span className="absolute -top-1 -right-1 bg-brand-500 text-foreground text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-medium shadow-md">
+                {selectedItems.length}
+              </span>
+            )}
           </p>
           {item.isCorrupted && (
             <Tooltip>

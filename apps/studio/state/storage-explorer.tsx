@@ -1564,6 +1564,9 @@ function createStorageExplorerState({
 
       toast.dismiss(toastId)
 
+      // Clear selected items after successful move operation
+      state.clearSelectedItems()
+
       // TODO: invalidate the file preview cache when moving files
       await state.refetchAllOpenedFolders()
     },
