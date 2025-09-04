@@ -94,23 +94,25 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
 
         {props.subItem.items && props.subItem.items.length > 0 && (
           <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            {props.subItem.items.map((subSubItem) => {
-              return (
-                <li key={props.subItem.name}>
-                  <Link
-                    href={`${subSubItem.url}`}
-                    className={[
-                      'cursor-pointer transition text-sm',
-                      subSubItem.url === pathname
-                        ? 'text-brand'
-                        : 'hover:text-brand text-foreground-lighter',
-                    ].join(' ')}
-                  >
-                    {subSubItem.name}
-                  </Link>
-                </li>
-              )
-            })}
+            {props.subItem.items
+              .filter((subItem) => subItem.enabled !== false)
+              .map((subSubItem) => {
+                return (
+                  <li key={props.subItem.name}>
+                    <Link
+                      href={`${subSubItem.url}`}
+                      className={[
+                        'cursor-pointer transition text-sm',
+                        subSubItem.url === pathname
+                          ? 'text-brand'
+                          : 'hover:text-brand text-foreground-lighter',
+                      ].join(' ')}
+                    >
+                      {subSubItem.name}
+                    </Link>
+                  </li>
+                )
+              })}
           </Accordion.Content>
         )}
       </Accordion.Item>
@@ -153,28 +155,30 @@ const Content = (props) => {
         </div>
       </Link>
 
-      {menu.items.map((x) => {
-        return (
-          <div key={x.name}>
-            {x.items && x.items.length > 0 ? (
-              <div className="flex flex-col gap-2.5">
-                {x.items.map((subItem, subItemIndex) => {
-                  return (
-                    <ContentAccordionLink
-                      key={subItem.name}
-                      subItem={subItem}
-                      subItemIndex={subItemIndex}
-                      parent={x}
-                    />
-                  )
-                })}
-              </div>
-            ) : x.url ? (
-              <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
-            ) : null}
-          </div>
-        )
-      })}
+      {menu.items
+        .filter((item) => item.enabled !== false)
+        .map((x) => {
+          return (
+            <div key={x.name}>
+              {x.items && x.items.length > 0 ? (
+                <div className="flex flex-col gap-2.5">
+                  {x.items.map((subItem, subItemIndex) => {
+                    return (
+                      <ContentAccordionLink
+                        key={subItem.name}
+                        subItem={subItem}
+                        subItemIndex={subItemIndex}
+                        parent={x}
+                      />
+                    )
+                  })}
+                </div>
+              ) : x.url ? (
+                <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
+              ) : null}
+            </div>
+          )
+        })}
     </ul>
   )
 }
