@@ -28,6 +28,7 @@ import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/S
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import { realtimeReports } from 'data/reports/v2/realtime.config'
 import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -140,6 +141,7 @@ const RealtimeUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
+              <ReportSettings chartId="realtime-charts" />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
