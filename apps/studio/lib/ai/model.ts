@@ -102,7 +102,7 @@ export async function getModel({
       return { error: new Error('OPENAI_API_KEY not available') }
     }
     const wrappedModel = wrapLanguageModel({
-      model: openai(chosenModelId as OpenAIModel),
+      model: openai.chat(chosenModelId as OpenAIModel),
       middleware: BraintrustMiddleware({ debug: true }),
     })
 

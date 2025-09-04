@@ -1,5 +1,5 @@
 import { Eval } from 'braintrust'
-import { Levenshtein } from 'autoevals'
+import { Factuality } from 'autoevals'
 import { generateTask } from './generate-task'
 
 // Evaluate how well the generate-v4-like function creates RLS policies
@@ -10,7 +10,7 @@ Eval('RLS Policy Generation', {
       {
         input:
           'Create RLS policies for table public.user_documents with column user_id so users can read/write only their own rows. Include select, insert, update, delete.',
-        expected: 'CREATE POLICY', // We check fuzzy string similarity; exact SQL compared by Levenshtein
+        expected: 'CREATE POLICY', // We check fuzzy string similarity; exact SQL compared by Factuality
       },
       // Multi-tenant via jwt claim pattern
       {
@@ -39,5 +39,5 @@ Eval('RLS Policy Generation', {
     })
     return output
   },
-  scores: [Levenshtein],
+  scores: [Factuality],
 })
