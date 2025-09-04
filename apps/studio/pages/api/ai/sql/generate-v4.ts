@@ -129,7 +129,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     providerOptions,
   } = await getModel({
     provider: 'openai',
-    model: 'gpt-5-mini',
+    model: 'gpt-5',
     routingKey: projectRef,
     isLimited,
   })
