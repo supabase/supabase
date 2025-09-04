@@ -1,3 +1,4 @@
+import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, Node } from 'reactflow'
 import 'reactflow/dist/style.css'
@@ -56,12 +57,28 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
     }
   }, [json])
 
+  const { resolvedTheme } = useTheme()
+  const miniMapMaskColor = resolvedTheme?.includes('dark')
+    ? 'rgb(17, 19, 24, .8)'
+    : 'rgb(237, 237, 237, .8)'
+
   return (
     <div className="w-full h-full border border-green-500">
       <ReactFlow
+        defaultNodes={[]}
+        defaultEdges={[]}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          animated: true,
+          deletable: false,
+          style: {
+            stroke: 'hsl(var(--border-stronger))',
+            strokeWidth: 1,
+          },
+        }}
+        fitView
         nodes={nodes}
         edges={edges}
-        defaultEdgeOptions={{ type: 'smoothstep', animated: true, deletable: false }}
         minZoom={0.8}
         maxZoom={1.8}
         proOptions={{ hideAttribution: true }}
@@ -70,7 +87,6 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
             setTimeout(() => instance.fitView({}))
           }
         }}
-        fitView
       >
         <Background
           gap={16}
@@ -78,7 +94,13 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
           variant={BackgroundVariant.Dots}
           color={'inherit'}
         />
-        <MiniMap pannable zoomable className="border rounded-md shadow-sm" />
+        <MiniMap
+          pannable
+          zoomable
+          nodeColor="#111318"
+          maskColor={miniMapMaskColor}
+          className="border rounded-md shadow-sm"
+        />
       </ReactFlow>
     </div>
   )
