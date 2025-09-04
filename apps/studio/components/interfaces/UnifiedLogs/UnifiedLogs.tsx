@@ -16,7 +16,7 @@ import {
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 
-import { useParams } from 'common'
+import { useDebounce, useParams } from 'common'
 import { arrSome, inDateRange } from 'components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from 'components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
 import { DataTableHeaderLayout } from 'components/ui/DataTable/DataTableHeaderLayout'
@@ -245,7 +245,8 @@ export const UnifiedLogs = () => {
     })
   }, [facets])
 
-  useEffect(() => {
+  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly
+  const applyFilterSearch = () => {
     const columnFiltersWithNullable = filterFields.map((field) => {
       const filterValue = columnFilters.find((filter) => filter.id === field.value)
       if (!filterValue) return { id: field.value, value: null }
@@ -262,9 +263,14 @@ export const UnifiedLogs = () => {
     )
 
     setSearch(search)
+  }
 
+  const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 1000)
+
+  useEffect(() => {
+    debouncedApplyFilterSearch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnFilters])
+  }, [columnFilters, debouncedApplyFilterSearch])
 
   useEffect(() => {
     setSearch({ sort: sorting?.[0] || null })
