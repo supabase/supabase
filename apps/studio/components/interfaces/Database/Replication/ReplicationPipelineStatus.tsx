@@ -104,21 +104,20 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.RestartRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
 
-  const onTogglePipeline = async () => {
-    if (!projectRef) {
-      return console.error('Project ref is required')
-    }
-    if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-    }
+  const onPrimaryAction = async () => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
 
     try {
-      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (statusName === 'stopped') {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
         await startPipeline({ projectRef, pipelineId: pipeline.id })
-      } else if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
+      } else if (statusName === 'started') {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      } else if (statusName === 'failed') {
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
+        await startPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
@@ -191,11 +190,17 @@ export const ReplicationPipelineStatus = () => {
           </Button>
           <Button
             type={statusName === 'stopped' ? 'primary' : 'default'}
-            onClick={() => onTogglePipeline()}
+            onClick={onPrimaryAction}
             loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
-            disabled={!PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)}
+            disabled={!['stopped', 'started', 'failed'].includes(statusName || '')}
           >
-            {statusName === 'stopped' ? 'Start' : 'Stop'} pipeline
+            {statusName === 'stopped'
+              ? 'Start'
+              : statusName === 'started'
+              ? 'Stop'
+              : statusName === 'failed'
+              ? 'Restart'
+              : 'No action allowed now'}
           </Button>
         </div>
       </div>

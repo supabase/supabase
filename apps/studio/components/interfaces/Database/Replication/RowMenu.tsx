@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -98,6 +98,23 @@ export const RowMenu = ({
     }
   }
 
+  const onRestartPipeline = async () => {
+    if (!projectRef) {
+      return console.error('Project ref is required')
+    }
+    if (!pipeline) {
+      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    }
+
+    try {
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
+      await startPipeline({ projectRef, pipelineId: pipeline.id })
+    } catch (error) {
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
+      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+    }
+  }
+
   return (
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader />}
@@ -110,17 +127,46 @@ export const RowMenu = ({
           <Button type="default" className="px-1.5" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
-          {pipelineEnabled ? (
-            <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
-              <Pause size={14} />
-              <p>Stop pipeline</p>
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
-              <Play size={14} />
-              <p>Start pipeline</p>
-            </DropdownMenuItem>
-          )}
+          {(() => {
+            let label = 'No action allowed now'
+            let icon = <Play size={14} />
+            let onClick: (() => void | Promise<void>) | undefined
+            let disabled = false
+
+            if (statusName === PipelineStatusName.STOPPED) {
+              label = 'Start pipeline'
+              icon = <Play size={14} />
+              onClick = () => {
+                void onEnablePipeline()
+              }
+            } else if (statusName === PipelineStatusName.STARTED) {
+              label = 'Stop pipeline'
+              icon = <Pause size={14} />
+              onClick = () => {
+                void onDisablePipeline()
+              }
+            } else if (statusName === PipelineStatusName.FAILED) {
+              label = 'Restart pipeline'
+              icon = <RotateCcw size={14} />
+              onClick = () => {
+                void onRestartPipeline()
+              }
+            } else {
+              disabled = true
+              icon = <Pause size={14} />
+            }
+
+            return (
+              <DropdownMenuItem
+                className={`space-x-2 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={disabled}
+                onClick={onClick}
+              >
+                {icon}
+                <p>{label}</p>
+              </DropdownMenuItem>
+            )
+          })()}
           <DropdownMenuSeparator />
           <DropdownMenuItem className="space-x-2" onClick={onEditClick}>
             <Edit size={14} />

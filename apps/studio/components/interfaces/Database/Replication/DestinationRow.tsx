@@ -131,7 +131,7 @@ export const DestinationRow = ({
             ) : pipeline?.id ? (
               <Tooltip>
                 <TooltipTrigger>
-                  <span className="cursor-help">{destinationName}</span>
+                  <span className="cursor-default">{destinationName}</span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Pipeline ID: {pipeline.id}</TooltipContent>
               </Tooltip>
@@ -209,7 +209,8 @@ export const DestinationRow = ({
           sourceId,
           destinationId: destinationId,
           pipelineId: pipeline?.id,
-          enabled: statusName === PipelineStatusName.STARTED,
+          enabled:
+            statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
         }}
       />
     </>
