@@ -211,6 +211,7 @@ export const DestinationRow = ({
           pipelineId: pipeline?.id,
           enabled:
             statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
+          statusName,
         }}
       />
     </>
