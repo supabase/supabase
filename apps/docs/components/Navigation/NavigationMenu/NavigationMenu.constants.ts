@@ -1369,6 +1369,10 @@ export const functions: NavMenuConstant = {
           name: 'Development Environment',
           url: '/guides/functions/development-environment',
         },
+        {
+          name: 'Architecture',
+          url: '/guides/functions/architecture',
+        },
       ],
     },
     {
