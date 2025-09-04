@@ -531,3 +531,66 @@ export const DEPRECATED_REPORTS = [
   'total_storage_patch_requests',
   'total_options_requests',
 ]
+
+export const EDGE_FUNCTION_REGIONS = [
+  {
+    key: 'ap-northeast-1',
+    label: 'Tokyo',
+  },
+  {
+    key: 'ap-northeast-2',
+    label: 'Seoul',
+  },
+  {
+    key: 'ap-south-1',
+    label: 'Mumbai',
+  },
+  {
+    key: 'ap-southeast-1',
+    label: 'Singapore',
+  },
+  {
+    key: 'ap-southeast-2',
+    label: 'Sydney',
+  },
+  {
+    key: 'ca-central-1',
+    label: 'Canada Central',
+  },
+  {
+    key: 'us-east-1',
+    label: 'N. Virginia',
+  },
+  {
+    key: 'us-west-1',
+    label: 'N. California',
+  },
+  {
+    key: 'ap-northeast-2',
+    label: 'Seoul',
+  },
+  {
+    key: 'us-west-2',
+    label: 'Oregon',
+  },
+  {
+    key: 'eu-central-1',
+    label: 'Frankfurt',
+  },
+  {
+    key: 'eu-west-1',
+    label: 'Ireland',
+  },
+  {
+    key: 'eu-west-2',
+    label: 'London',
+  },
+  {
+    key: 'eu-west-3',
+    label: 'Paris',
+  },
+  {
+    key: 'sa-east-1',
+    label: 'São Paulo',
+  },
+]

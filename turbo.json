@@ -131,6 +131,8 @@
         "HCAPTCHA_SECRET_KEY",
         "NODE_ENV",
         "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_PUBLIC_SURVEY_SUPABASE_URL",
+        "NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
