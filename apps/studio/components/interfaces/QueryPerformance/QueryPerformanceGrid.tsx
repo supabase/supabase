@@ -90,6 +90,22 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           )
         }
 
+        if (col.id === 'rolname') {
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs">
+              <p>{value || 'n/a'}</p>
+            </div>
+          )
+        }
+
+        if (col.id === 'prop_total_time') {
+          return (
+            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+              <p>{value || 'n/a'}</p>
+            </div>
+          )
+        }
+
         const isTime = col.name.includes('time')
         const formattedValue =
           !!value && typeof value === 'number' && !isNaN(value) && isFinite(value)
