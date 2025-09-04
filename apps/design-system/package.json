@@ -6,9 +6,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --turbopack --port 3003",
-    "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && next build",
+    "build": "pnpm run content:build && pnpm run build:registry && next build",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
-    "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
     "start": "next start",
     "lint": "next lint",
     "content:build": "contentlayer2 build",
@@ -18,6 +17,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "contentlayer2": "0.4.6",
+    "date-fns": "^2.30.0",
     "eslint-config-supabase": "workspace:*",
     "icons": "workspace:*",
     "jotai": "^2.8.0",

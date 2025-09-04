@@ -19,20 +19,24 @@ const redirects = async () => {
   return redirects
 }
 
-const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : undefined || process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+const WWW_SITE_ORIGIN =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? 'https://supabase.com'
+    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
+        typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('cms-git-', 'zone-www-dot-com-git-')}`
+      : 'http://localhost:3000'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
+      ...[WWW_SITE_ORIGIN /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
 
         return {
           hostname: url.hostname,
-          protocol: url.protocol.replace(':', ''),
+          protocol: url.protocol?.replace(':', ''),
         }
       }),
     ],
@@ -43,6 +47,12 @@ const nextConfig = {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    // Ensure compatibility with Turbopack and Sharp
+    serverComponentsExternalPackages: ['sharp'],
+  },
+  // Configure Sharp as an external package for server-side rendering
+  serverExternalPackages: ['sharp'],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })
