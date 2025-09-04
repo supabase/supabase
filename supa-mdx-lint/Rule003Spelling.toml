@@ -56,6 +56,7 @@ allow_list = [
     "[Ff]atals",
     "[Ff]rontend",
     "[Gg]apless",
+    "[Gg]eolocation",
     "[Gg]lobs?",
     "[Gg]lobstar",
     "[Gg]rayscale",
@@ -168,7 +169,6 @@ allow_list = [
     "Git",
     "GitHub",
     "GitLab",
-    "geolocation"
     "GoTrue",
     "Golang",
     "Grafana",
