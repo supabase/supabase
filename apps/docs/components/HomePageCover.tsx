@@ -144,7 +144,7 @@ const HomePageCover = (props) => {
             <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">{props.title}</h1>
             <p className="m-0 text-foreground-light">
               Learn how to get up and running with Supabase through tutorials, APIs and platform
-              resources. Differences TBD.
+              resources.
             </p>
           </div>
         </div>
