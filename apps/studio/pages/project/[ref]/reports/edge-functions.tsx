@@ -188,7 +188,7 @@ const EdgeFunctionsUsage = () => {
               <ReportsNumericFilter
                 label="Status Code"
                 value={statusCodeFilter}
-                onChange={(value) => setStatusCodeFilter(value)}
+                onChange={setStatusCodeFilter}
                 defaultOperator="="
                 isLoading={isRefreshing}
               />
@@ -196,7 +196,7 @@ const EdgeFunctionsUsage = () => {
               <ReportsNumericFilter
                 label="Execution Time"
                 value={executionTimeFilter}
-                onChange={(value) => setExecutionTimeFilter(value)}
+                onChange={setExecutionTimeFilter}
                 placeholder="Enter time in ms"
                 min={0}
                 max={99999}
