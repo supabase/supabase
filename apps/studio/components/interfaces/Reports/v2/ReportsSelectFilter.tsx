@@ -5,16 +5,16 @@ import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { Button, cn } from 'ui'
+import { z } from 'zod'
 
 export interface ReportSelectOption {
-  key: string
   label: React.ReactNode
+  value: string
   description?: string
 }
 
-export interface SelectFilters {
-  [key: string]: boolean
-}
+export const selectFilterSchema = z.array(z.string())
+export type SelectFilters = z.infer<typeof selectFilterSchema>
 
 interface ReportsSelectFilterProps {
   label: string
@@ -36,8 +36,7 @@ export const ReportsSelectFilter = ({
   const [open, setOpen] = useState(false)
   const [tempValue, setTempValue] = useState<SelectFilters>(value)
 
-  const selectedCount = Object.values(value).filter(Boolean).length
-  const isActive = selectedCount > 0
+  const isActive = tempValue.length > 0
 
   useEffect(() => {
     if (!open) {
@@ -51,7 +50,7 @@ export const ReportsSelectFilter = ({
   }
 
   const handleClearAll = () => {
-    setTempValue({})
+    setTempValue([])
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -75,7 +74,7 @@ export const ReportsSelectFilter = ({
         >
           <span>
             {label}
-            {selectedCount > 0 && <span className="ml-1 text-xs">({selectedCount})</span>}
+            {tempValue.length > 0 && <span className="ml-1 text-xs">({tempValue.length})</span>}
           </span>
         </Button>
       </PopoverTrigger>
@@ -97,21 +96,21 @@ export const ReportsSelectFilter = ({
           ) : (
             options.map((option) => (
               <Label
-                key={option.key}
-                htmlFor={`${label}-${option.key}`}
+                key={option.value}
                 className={cn(
                   'flex items-center hover:bg-overlay-hover overflow-hidden px-1.5 py-1.5 rounded-sm gap-x-3',
                   'transition-all duration-150 ease-in-out cursor-pointer'
                 )}
               >
                 <Checkbox
-                  id={`${label}-${option.key}`}
-                  checked={Boolean(tempValue[option.key])}
+                  id={`${label}-${option.value}`}
+                  checked={tempValue.includes(option.value)}
                   onCheckedChange={(checked) => {
-                    setTempValue({
-                      ...tempValue,
-                      [option.key]: Boolean(checked),
-                    })
+                    setTempValue(
+                      checked
+                        ? [...tempValue, option.value]
+                        : tempValue.filter((x) => x !== option.value)
+                    )
                   }}
                   onKeyDown={handleKeyDown}
                 />
