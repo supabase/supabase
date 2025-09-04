@@ -214,7 +214,7 @@ const sendConfirmationEmail = async (emailData: {
         ), // Schedule to send after 1 minute
       }
 
-      const emailResponse = await customerioAppClient.sendTransactionalEmail(emailRequest)
+      await customerioAppClient.sendTransactionalEmail(emailRequest)
     } catch (error) {
       throw new Error(`Failed to send confirmation email: ${error}`)
     }

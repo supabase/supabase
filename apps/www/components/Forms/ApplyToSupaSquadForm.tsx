@@ -592,12 +592,12 @@ const ApplyToSupaSquadForm: FC<Props> = ({ className }) => {
   })
 
   const handleCancel = () => {
-    // form.reset()
+    form.reset()
     setIsSubmitted(false)
   }
 
   const handleConfirmationClose = () => {
-    // form.reset()
+    form.reset()
     setShowConfirmation(false)
     setIsSubmitted(false)
     setErrors({})
