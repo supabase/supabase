@@ -1,8 +1,9 @@
-import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash, Ban } from 'lucide-react'
+import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
@@ -21,17 +22,17 @@ import {
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
+  PIPELINE_ACTIONABLE_STATES,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
   PIPELINE_ERROR_MESSAGES,
-  PIPELINE_ACTIONABLE_STATES,
   getStatusName,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './PipelineStatus'
 
 interface RowMenuProps {
   pipeline: Pipeline | undefined
-  pipelineStatus: any
+  pipelineStatus?: ReplicationPipelineStatusData['status']
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
@@ -49,9 +50,7 @@ export const RowMenu = ({
   onDeleteClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
-
   const statusName = getStatusName(pipelineStatus)
-  const pipelineEnabled = statusName !== PipelineStatusName.STOPPED
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
@@ -60,13 +59,33 @@ export const RowMenu = ({
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
+  const hasPipelineAction =
+    requestStatus === PipelineStatusRequestStatus.None &&
+    [PipelineStatusName.STOPPED, PipelineStatusName.STARTED, PipelineStatusName.FAILED].includes(
+      statusName as PipelineStatusName
+    )
+
+  const pipelineActionIcon =
+    statusName === PipelineStatusName.STOPPED ? (
+      <Play size={14} />
+    ) : statusName === PipelineStatusName.STARTED ? (
+      <Pause size={14} />
+    ) : statusName === PipelineStatusName.FAILED ? (
+      <RotateCcw size={14} />
+    ) : null
+
+  const pipelineActionLabel =
+    statusName === PipelineStatusName.STOPPED
+      ? 'Start pipeline'
+      : statusName === PipelineStatusName.STARTED
+        ? 'Stop pipeline'
+        : statusName === PipelineStatusName.FAILED
+          ? 'Restart pipeline'
+          : null
+
   const onEnablePipeline = async () => {
-    if (!projectRef) {
-      return console.error('Project ref is required')
-    }
-    if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
 
     try {
       // Only show 'enabling' when transitioning from allowed states
@@ -81,14 +100,8 @@ export const RowMenu = ({
   }
 
   const onDisablePipeline = async () => {
-    if (!projectRef) {
-      console.error('Project ref is required')
-      return
-    }
-    if (!pipeline) {
-      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-      return
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
 
     try {
       // Only show 'disabling' when transitioning from allowed states
@@ -103,12 +116,8 @@ export const RowMenu = ({
   }
 
   const onRestartPipeline = async () => {
-    if (!projectRef) {
-      return console.error('Project ref is required')
-    }
-    if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
 
     try {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
@@ -122,6 +131,7 @@ export const RowMenu = ({
   return (
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader />}
+
       {isError && (
         <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
       )}
@@ -130,58 +140,30 @@ export const RowMenu = ({
         <DropdownMenuTrigger asChild>
           <Button type="default" className="px-1.5" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
+
         <DropdownMenuContent side="bottom" align="end" className="w-52">
-          {(() => {
-            // Disable actions during transient request states
-            if (requestStatus !== PipelineStatusRequestStatus.None) {
-              return (
-                <DropdownMenuItem className="space-x-2 opacity-50" disabled>
-                  <Ban size={14} />
-                  <p>Action unavailable</p>
-                </DropdownMenuItem>
-              )
-            }
-
-            let label = 'Action unavailable'
-            let icon = <Play size={14} />
-            let onClick: (() => void | Promise<void>) | undefined
-            let disabled = false
-
-            if (statusName === PipelineStatusName.STOPPED) {
-              label = 'Start pipeline'
-              icon = <Play size={14} />
-              onClick = () => {
-                void onEnablePipeline()
-              }
-            } else if (statusName === PipelineStatusName.STARTED) {
-              label = 'Stop pipeline'
-              icon = <Pause size={14} />
-              onClick = () => {
-                void onDisablePipeline()
-              }
-            } else if (statusName === PipelineStatusName.FAILED) {
-              label = 'Restart pipeline'
-              icon = <RotateCcw size={14} />
-              onClick = () => {
-                void onRestartPipeline()
-              }
-            } else {
-              disabled = !PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)
-              icon = <Ban size={14} />
-            }
-
-            return (
+          {hasPipelineAction && (
+            <>
               <DropdownMenuItem
-                className={`space-x-2 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={disabled}
-                onClick={onClick}
+                className="space-x-2"
+                disabled={!PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)}
+                onClick={() => {
+                  if (statusName === PipelineStatusName.STOPPED) {
+                    onEnablePipeline()
+                  } else if (statusName === PipelineStatusName.STARTED) {
+                    onDisablePipeline()
+                  } else if (statusName === PipelineStatusName.FAILED) {
+                    onRestartPipeline()
+                  }
+                }}
               >
-                {icon}
-                <p>{label}</p>
+                {pipelineActionIcon}
+                <p>{pipelineActionLabel}</p>
               </DropdownMenuItem>
-            )
-          })()}
-          <DropdownMenuSeparator />
+              <DropdownMenuSeparator />
+            </>
+          )}
+
           <DropdownMenuItem className="space-x-2" onClick={onEditClick}>
             <Edit size={14} />
             <p>Edit destination</p>

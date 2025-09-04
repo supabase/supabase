@@ -179,8 +179,8 @@ export const DestinationPanel = ({
           sourceId,
         })
         // Set request status only right before starting, then fire and close
-        const snapshot = existingDestination.statusName ??
-          (existingDestination.enabled ? 'started' : 'stopped')
+        const snapshot =
+          existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
         if (existingDestination.enabled) {
           setRequestStatus(
             existingDestination.pipelineId,

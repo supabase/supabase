@@ -104,9 +104,7 @@ export const useUpdateDestinationPipelineMutation = ({
           queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
           queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
           // Invalidate item-level caches used by the editor panel
-          queryClient.invalidateQueries(
-            replicationKeys.destinationById(projectRef, destinationId)
-          ),
+          queryClient.invalidateQueries(replicationKeys.destinationById(projectRef, destinationId)),
           queryClient.invalidateQueries(replicationKeys.pipelineById(projectRef, pipelineId)),
         ])
 
