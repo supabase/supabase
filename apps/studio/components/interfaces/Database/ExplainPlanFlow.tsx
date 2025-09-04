@@ -15,26 +15,34 @@ type PlanRoot = { Plan: RawPlan }
 
 const DEFAULT_NODE_TYPE = 'default'
 
-const buildGraphFromPlan = (planJson: PlanRoot[]): { nodes: Node[]; edges: Edge[] } => {
-  console.log({ planJson })
+const X_STEP = 280
+const Y_STEP = 120
 
+const buildGraphFromPlan = (planJson: PlanRoot[]): { nodes: Node[]; edges: Edge[] } => {
   const nodes: Node[] = []
   const edges: Edge[] = []
+  const levelCounts: Record<number, number> = {}
 
-  const addPlan = (plan: RawPlan, parentId?: string, index: number = 0) => {
+  const addPlan = (plan: RawPlan, parentId?: string, index: number = 0, depth: number = 0) => {
     const id = parentId ? `${parentId}-${index}` : 'root'
     const label = plan['Node Type'] ?? 'Node'
-    nodes.push({ id, type: DEFAULT_NODE_TYPE, data: { label }, position: { x: 0, y: 0 } })
+    const yIndex = levelCounts[depth] ?? 0
+    levelCounts[depth] = yIndex + 1
+    nodes.push({
+      id,
+      type: DEFAULT_NODE_TYPE,
+      data: { label },
+      position: { x: depth * X_STEP, y: yIndex * Y_STEP },
+    })
     if (parentId)
       edges.push({ id: `${parentId}->${id}`, source: parentId, target: id, animated: true })
     const children: RawPlan[] = plan['Plans'] ?? []
-    children.forEach((child, i) => addPlan(child, id, i))
+    children.forEach((child, i) => addPlan(child, id, i, depth + 1))
   }
 
   if (Array.isArray(planJson) && planJson.length > 0 && planJson[0].Plan) {
     addPlan(planJson[0].Plan)
   }
-
   return { nodes, edges }
 }
 
@@ -48,11 +56,8 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
     }
   }, [json])
 
-  console.log({ nodes })
-  console.log({ edges })
-
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full border border-green-500">
       <ReactFlow
         nodes={nodes}
         edges={edges}
