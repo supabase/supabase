@@ -26,7 +26,7 @@ const captureSentryCommunityException = (error: any) => {
   }
 }
 
-const NOTION_API_KEY = process.env.NOTION_API_KEY
+const NOTION_API_KEY = process.env.NOTION_SUPASQUAD_API_KEY
 const NOTION_DB_ID = process.env.NOTION_SUPASQUAD_APPLICATIONS_DB_ID
 
 const applicationSchema = z.object({
@@ -127,6 +127,7 @@ export async function POST(req: Request) {
       status: 201,
     })
   } catch (err: any) {
+    console.error(err)
     captureSentryCommunityException(err)
     return new Response(
       JSON.stringify({ message: 'Error sending your application', error: err?.message }),
@@ -262,7 +263,7 @@ const getNotionPageProps = (data: any) => {
     },
   }
   if (data.monthly_commitment) {
-    props['How many hours can you commit per month?'] = {
+    props['Monthly commitment'] = {
       rich_text: [{ type: 'text', text: { content: truncateRichText(data.monthly_commitment) } }],
     }
   }
