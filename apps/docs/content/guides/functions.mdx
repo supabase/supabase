@@ -28,7 +28,7 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
 - **Runtime:** Supabase Edge Runtime (Deno compatible runtime with TypeScript first). Functions are simple `.ts` files that export a handler.
 - **Local dev parity:** Use Supabase CLI for a local runtime similar to production for faster iteration (`supabase functions serve` command).
 - **Global deployment:** Deploy your Edge Functions via Supabase Dashboard, CLI or MCP.
-- **Cold starts & concurrency:** cold starts are possible — design for short-lived, idempotent operations. Heavy long-running jobs should be moved to background workers.
+- **Cold starts & concurrency:** cold starts are possible — design for short-lived, idempotent operations. Heavy long-running jobs should be moved to [background workers](/docs/guides/functions/background-tasks).
 - **Database connections:** treat Postgres like a remote, pooled service — use connection pools or serverless-friendly drivers.
 - **Secrets:** store credentials in Supabase [project secrets](/docs/reference/cli/supabase-secrets) and access them via environment variables.
 
