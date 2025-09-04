@@ -10,6 +10,11 @@ import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 // we need to fix this before running them through mdx
 // also checks for <br> and <hr>
 function addSelfClosingTags(htmlString: string): string {
+  // Handle cases where htmlString might be undefined, null, or not a string
+  if (!htmlString || typeof htmlString !== 'string') {
+    return ''
+  }
+
   const modifiedHTML = htmlString.replace(/<img[^>]*>|<br[^>]*>|<hr[^>]*>/g, (match) => {
     if (match.endsWith('/>')) {
       return match
@@ -21,7 +26,50 @@ function addSelfClosingTags(htmlString: string): string {
   return modifiedHTML
 }
 
-export async function mdxSerialize(source: string) {
+type TocItem = { content: string; slug: string; lvl: number }
+
+function createRemarkCollectToc(maxDepth: number) {
+  return function remarkCollectToc() {
+    return function transformer(tree: any) {
+      const items: TocItem[] = []
+
+      const getText = (node: any): string => {
+        if (!node) return ''
+        if (node.type === 'text') return node.value || ''
+        if (Array.isArray(node.children)) return node.children.map(getText).join('')
+        return ''
+      }
+
+      const slugify = (input: string) =>
+        input
+          .trim()
+          .toLowerCase()
+          .replace(/[`~!@#$%^&*()+=|{}\[\]\\:";'<>?,./]+/g, '')
+          .replace(/\s+/g, '-')
+
+      const walk = (node: any) => {
+        if (node.type === 'heading' && typeof node.depth === 'number') {
+          if (node.depth <= maxDepth) {
+            const text = getText(node)
+            if (text) {
+              items.push({ content: text, slug: slugify(text), lvl: node.depth })
+            }
+          }
+        }
+        if (node.children) {
+          for (const child of node.children) walk(child)
+        }
+      }
+
+      walk(tree)
+
+      // Attach to tree data for retrieval post-serialize
+      ;(tree.data || (tree.data = {})).__collectedToc = items
+    }
+  }
+}
+
+export async function mdxSerialize(source: string, options?: { tocDepth?: number }) {
   const formattedSource = addSelfClosingTags(source)
   const codeHikeOptions: CodeHikeConfig = {
     theme: codeHikeTheme,
@@ -31,18 +79,48 @@ export async function mdxSerialize(source: string) {
     autoImport: false,
   }
 
+  const tocDepth = options?.tocDepth ?? 2
+  let collectedToc: TocItem[] = []
+
   const mdxSource: any = await serialize(formattedSource, {
     scope: {
       chCodeConfig: codeHikeOptions,
     },
     mdxOptions: {
-      remarkPlugins: [[remarkCodeHike, codeHikeOptions], remarkGfm],
+      remarkPlugins: [
+        [remarkCodeHike, codeHikeOptions],
+        remarkGfm,
+        // Collect headings into a simple TOC structure
+        function () {
+          const plugin = createRemarkCollectToc(tocDepth)
+          const transformer = (plugin as any)()
+          return function (tree: any) {
+            transformer(tree)
+            if (tree?.data?.__collectedToc) {
+              collectedToc = tree.data.__collectedToc as TocItem[]
+            }
+          }
+        },
+      ],
       rehypePlugins: [
         // @ts-ignore
         rehypeSlug, // add IDs to any h1-h6 tag that doesn't have one, using a slug made from its text
       ],
     },
   })
+
+  // Expose TOC via scope for consumers (keeps function signature stable)
+  const tocMarkdown = collectedToc
+    .map((h) => `${'  '.repeat(Math.max(0, h.lvl - 1))}- [${h.content}](#${h.slug})`)
+    .join('\n')
+
+  mdxSource.scope = {
+    ...(mdxSource.scope || {}),
+    toc: {
+      content: tocMarkdown,
+      json: collectedToc,
+    },
+  }
 
   return mdxSource
 }
