@@ -1,5 +1,7 @@
 import { openai } from '@ai-sdk/openai'
-import { LanguageModel } from 'ai'
+import { LanguageModel, wrapLanguageModel } from 'ai'
+import { LanguageModelV2 } from '@ai-sdk/provider'
+import { BraintrustMiddleware } from 'braintrust'
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
   BedrockModel,
@@ -15,7 +17,7 @@ type PromptProviderOptions = Record<string, any>
 type ProviderOptions = Record<string, any>
 
 type ModelSuccess = {
-  model: LanguageModel
+  model: LanguageModel | LanguageModelV2
   promptProviderOptions?: PromptProviderOptions
   providerOptions?: ProviderOptions
   error?: never
@@ -99,10 +101,14 @@ export async function getModel({
     if (!hasOpenAIKey) {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
+    const wrappedModel = wrapLanguageModel({
+      model: openai(chosenModelId as OpenAIModel),
+      middleware: BraintrustMiddleware({ debug: true }),
+    })
+
     return {
-      model: openai.chat(chosenModelId as OpenAIModel),
+      model: wrappedModel,
       promptProviderOptions: models[chosenModelId as OpenAIModel]?.promptProviderOptions,
-      providerOptions: providerRegistry.providerOptions,
     }
   }
 

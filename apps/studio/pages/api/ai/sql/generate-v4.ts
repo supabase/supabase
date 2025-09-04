@@ -3,7 +3,7 @@ import { convertToModelMessages, ModelMessage, stepCountIs, streamText } from 'a
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod/v4'
-
+import { initLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -27,6 +27,11 @@ export const maxDuration = 120
 export const config = {
   api: { bodyParser: true },
 }
+
+// Initialize Braintrust logging
+initLogger({
+  projectName: 'supabase',
+})
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
