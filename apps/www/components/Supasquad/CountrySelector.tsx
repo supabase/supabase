@@ -183,9 +183,7 @@ export function CountrySelector({
       <SelectContent>
         {countries.map((country) => (
           <SelectItem key={country.code} value={country.code}>
-            <span className="flex items-center gap-2">
-              {country.name}
-            </span>
+            <span className="flex items-center gap-2">{country.name}</span>
           </SelectItem>
         ))}
       </SelectContent>
