@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react'
-import { X, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-import { Button, cn, Input } from 'ui'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { Label } from '@ui/components/shadcn/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import {
   Select,
   SelectContent,
@@ -11,6 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
+import { Button, cn } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 export type ComparisonOperator = '=' | '!=' | '>' | '>=' | '<' | '<='
 
@@ -116,9 +117,7 @@ export const ReportsNumericFilter = ({
           type={isActive ? 'default' : 'outline'}
           className={cn(
             'min-w-20 border-dashed relative group justify-between',
-            {
-              'border-solid': isActive,
-            },
+            { 'border-solid': isActive },
             className
           )}
           iconRight={<ChevronDown size={14} />}
@@ -135,7 +134,7 @@ export const ReportsNumericFilter = ({
       </PopoverTrigger>
       <PopoverContent align="start" className="p-0 w-72" portal={true}>
         <div className="p-2 border-b border-default flex items-center justify-between">
-          <span className="text-sm text-foreground">{label}</span>
+          <span className="text-xs text-foreground">{label}</span>
           <Button size="tiny" type="outline" onClick={handleClearAll}>
             Clear
           </Button>
@@ -146,31 +145,32 @@ export const ReportsNumericFilter = ({
             e.preventDefault()
             handleApply()
           }}
-          className="px-3 py-2 space-y-3"
+          className="px-3 py-3 flex flex-col gap-y-3"
         >
-          <div className="space-y-2">
-            <Label>Operator</Label>
+          <div className="flex flex-col gap-y-1">
+            <Label className="text-xs">Operator</Label>
             <Select
               value={tempValue?.operator || defaultOperator}
               onValueChange={handleOperatorChange}
             >
-              <SelectTrigger className="font-mono">
+              <SelectTrigger className="text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {operators.map((op) => (
-                  <SelectItem key={op} value={op} className="flex items-center gap-1 font-mono">
-                    {op}{' '}
-                    <span className="text-xs text-foreground-light">{OPERATOR_LABELS[op]}</span>
+                  <SelectItem key={op} value={op} className="text-xs flex items-center">
+                    <span className="font-mono">{op}</span>
+                    <span className="text-foreground-light ml-2">{OPERATOR_LABELS[op]}</span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Value</Label>
+          <div className="flex flex-col gap-y-1">
+            <Label className="text-xs">Value</Label>
             <Input
+              autoFocus
               type="number"
               placeholder={placeholder}
               value={tempValue?.value || ''}
@@ -179,7 +179,6 @@ export const ReportsNumericFilter = ({
               min={min}
               max={max}
               step={step}
-              autoFocus
             />
             {(min !== undefined || max !== undefined) && (
               <p className="text-xs text-foreground-light">

@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
-import { X, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-import { Button, cn } from 'ui'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { Label } from '@ui/components/shadcn/ui/label'
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
+import { Label } from '@ui/components/shadcn/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { Button, cn } from 'ui'
 
 export interface ReportSelectOption {
   key: string
@@ -21,7 +21,6 @@ interface ReportsSelectFilterProps {
   options: ReportSelectOption[]
   value: SelectFilters
   onChange: (value: SelectFilters) => void
-  placeholder?: string
   isLoading?: boolean
   className?: string
 }
@@ -31,7 +30,6 @@ export const ReportsSelectFilter = ({
   options,
   value,
   onChange,
-  placeholder = 'Select options',
   isLoading = false,
   className,
 }: ReportsSelectFilterProps) => {
@@ -47,22 +45,9 @@ export const ReportsSelectFilter = ({
     }
   }, [open, value])
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onChange({})
-  }
-
   const handleApply = () => {
     onChange(tempValue)
     setOpen(false)
-  }
-
-  const handleSelectAll = () => {
-    const allSelected = options.reduce((acc, option) => {
-      acc[option.key] = true
-      return acc
-    }, {} as SelectFilters)
-    setTempValue(allSelected)
   }
 
   const handleClearAll = () => {
@@ -83,9 +68,7 @@ export const ReportsSelectFilter = ({
           type={isActive ? 'default' : 'outline'}
           className={cn(
             'min-w-20 border-dashed relative group justify-between',
-            {
-              'border-solid': isActive,
-            },
+            { 'border-solid': isActive },
             className
           )}
           iconRight={<ChevronDown size={14} />}
@@ -99,7 +82,7 @@ export const ReportsSelectFilter = ({
       <PopoverContent align="start" className="p-0 w-72" portal={true}>
         <div className="p-2 border-b border-default">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-sm text-foreground">{label}</span>
+            <span className="text-xs text-foreground">{label}</span>
             <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
               Clear
             </Button>
@@ -116,25 +99,26 @@ export const ReportsSelectFilter = ({
               <Label
                 key={option.key}
                 htmlFor={`${label}-${option.key}`}
-                className="flex items-start hover:bg-overlay-hover overflow-hidden p-2 m-1 rounded-sm gap-3 transition-all duration-150 ease-in-out cursor-pointer"
+                className={cn(
+                  'flex items-center hover:bg-overlay-hover overflow-hidden px-1.5 py-1.5 rounded-sm gap-x-3',
+                  'transition-all duration-150 ease-in-out cursor-pointer'
+                )}
               >
-                <div>
-                  <Checkbox
-                    id={`${label}-${option.key}`}
-                    checked={Boolean(tempValue[option.key])}
-                    onCheckedChange={(checked) => {
-                      setTempValue({
-                        ...tempValue,
-                        [option.key]: Boolean(checked),
-                      })
-                    }}
-                    onKeyDown={handleKeyDown}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span>{option.label}</span>
+                <Checkbox
+                  id={`${label}-${option.key}`}
+                  checked={Boolean(tempValue[option.key])}
+                  onCheckedChange={(checked) => {
+                    setTempValue({
+                      ...tempValue,
+                      [option.key]: Boolean(checked),
+                    })
+                  }}
+                  onKeyDown={handleKeyDown}
+                />
+                <div className="flex flex-col text-xs">
+                  {option.label}
                   {option.description && (
-                    <span className="text-sm text-foreground-lighter">{option.description}</span>
+                    <span className="text-foreground-lighter">{option.description}</span>
                   )}
                 </div>
               </Label>

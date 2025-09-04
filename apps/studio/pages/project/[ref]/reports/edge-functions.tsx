@@ -2,20 +2,20 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
-import {
-  ReportsSelectFilter,
-  type SelectFilters,
-} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import {
   ReportsNumericFilter,
   type NumericFilter,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import {
+  ReportsSelectFilter,
+  type SelectFilters,
+} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
@@ -29,10 +29,10 @@ import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Re
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
-import type { NextPageWithLayout } from 'types'
-import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.constants'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { BASE_PATH } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (
@@ -125,12 +125,14 @@ const EdgeFunctionsUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
+
               <ReportSettings chartId="edge-functions-charts" />
 
               <LogsDatePicker
-                onSubmit={handleDatePickerChange}
+                align="start"
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                onSubmit={handleDatePickerChange}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}
@@ -139,6 +141,7 @@ const EdgeFunctionsUsage = () => {
                 description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
                 source="edgeFunctionsReportDateRange"
               />
+
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
                   <p className="text-foreground-light">
@@ -179,7 +182,7 @@ const EdgeFunctionsUsage = () => {
                 label="Execution Time"
                 value={executionTimeFilter}
                 onChange={setExecutionTimeFilter}
-                placeholder={`Enter time in ms`}
+                placeholder="Enter time in ms"
                 min={0}
                 max={99999}
                 defaultOperator=">="
@@ -197,9 +200,9 @@ const EdgeFunctionsUsage = () => {
                         alt={region.key}
                         className="w-4 h-4"
                       />
-                      <div className="flex flex-wrap gap-1 items-center">
-                        <span className="text-foreground text-sm">{region.label}</span>
-                        <span className="text-foreground-light text-sm">{region.key}</span>
+                      <div className="flex flex-wrap gap-x-2 items-center">
+                        <span className="text-foreground text-xs">{region.label}</span>
+                        <span className="text-foreground-lighter text-xs">{region.key}</span>
                       </div>
                     </div>
                   ),
