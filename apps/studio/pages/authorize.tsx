@@ -199,8 +199,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             <WarningIcon />
             <AlertTitle_Shadcn_>MCP Client Connection</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              This is an MCP (Model Context Protocol) client designed to connect with AI applications. 
-              Please ensure you trust this application before granting access to your organization's data.
+              This is an MCP (Model Context Protocol) client designed to connect with AI
+              applications. Please ensure you trust this application before granting access to your
+              organization's data.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
