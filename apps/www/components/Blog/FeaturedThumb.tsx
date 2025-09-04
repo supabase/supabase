@@ -1,22 +1,66 @@
+import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
-import authors from 'lib/authors.json'
-import PostTypes from '../../types/post'
+import type PostTypes from 'types/post'
 
-function FeaturedThumb(blog: PostTypes) {
-  // @ts-ignore
-  const authorArray = blog.author.split(',')
+// Extend PostTypes for CMS blog posts
+interface CMSPostTypes extends PostTypes {
+  isCMS?: boolean
+  authors?: Array<{
+    author: string
+    author_id: string
+    position: string
+    author_url: string
+    author_image_url: {
+      url: string
+    }
+    username: string
+  }>
+}
 
+function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
+  // First check if this is a CMS post
+  if ('isCMS' in blog && blog.isCMS) {
+    // For CMS posts, display author directly from the blog data
+    const cmsBlog = blog as CMSPostTypes
+    const author =
+      cmsBlog.authors?.map((author) => ({
+        author: author.author || 'Unknown Author',
+        author_image_url: author.author_image_url || null,
+        author_url: author.author_url || '#',
+        position: author.position || '',
+      })) || []
+
+    return renderFeaturedThumb(blog, author)
+  }
+
+  // For static posts, look up author info from authors.json
+  const authorArray = blog.author?.split(',') || []
   const author = []
+
   for (let i = 0; i < authorArray.length; i++) {
-    // @ts-ignore
     author.push(
       authors.find((authors: any) => {
-        // @ts-ignore
         return authors.author_id === authorArray[i]
       })
     )
   }
+
+  return renderFeaturedThumb(blog, author)
+}
+
+function renderFeaturedThumb(blog: PostTypes, author: any[]) {
+  const imageUrl = blog.isCMS
+    ? blog.thumb
+      ? blog.thumb
+      : blog.image
+        ? blog.image
+        : '/images/blog/blog-placeholder.png'
+    : blog.thumb
+      ? `/images/blog/${blog.thumb}`
+      : blog.image
+        ? `/images/blog/${blog.image}`
+        : '/images/blog/blog-placeholder.png'
 
   return (
     <div key={blog.slug} className="w-full">
@@ -26,11 +70,12 @@ function FeaturedThumb(blog: PostTypes) {
       >
         <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image
-            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+            src={imageUrl}
             fill
             sizes="100%"
             quality={100}
-            className="object-cover"
+            priority
+            className="object-cover bg-alternative"
             alt="blog thumbnail"
           />
         </div>
@@ -47,13 +92,21 @@ function FeaturedThumb(blog: PostTypes) {
           </div>
 
           <div className="flex flex-col w-max gap-2">
-            {author.map((author: any, i: number) => {
+            {author.filter(Boolean).map((author: any, i: number) => {
+              const authorImageUrl =
+                typeof author.author_image_url === 'string'
+                  ? author.author_image_url
+                  : (author.author_image_url as { url: string })?.url || ''
+
               return (
-                <div className="flex items-center space-x-2" key={i}>
-                  {author.author_image_url && (
+                <div
+                  className="flex items-center space-x-2"
+                  key={`author-feat-${i}-${author.author}`}
+                >
+                  {imageUrl && (
                     <div className="relative h-6 w-6 overflow-auto">
                       <Image
-                        src={author.author_image_url}
+                        src={authorImageUrl}
                         alt={`${author.author} avatar`}
                         className="rounded-full object-cover"
                         fill
