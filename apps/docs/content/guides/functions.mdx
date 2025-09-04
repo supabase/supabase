@@ -7,13 +7,14 @@ sidebar_label: 'Overview'
 hideToc: true
 ---
 
-<div class="video-container">
+<div className="video-container mb-8">
   <iframe
+    className="w-full"
     src="https://www.youtube-nocookie.com/embed/za_loEtS4gs"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
+    title="Edge Functions behind the scenes"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
 </div>
 
 Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks). Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
