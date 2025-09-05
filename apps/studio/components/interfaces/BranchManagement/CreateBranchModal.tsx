@@ -100,6 +100,7 @@ export const CreateBranchModal = () => {
     }
   )
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
+  const overMaxVolumeSize = targetVolumeSizeGb > 18
   const noPhysicalBackups = cloneBackupsError?.message.startsWith(
     'Physical backups need to be enabled'
   )
@@ -367,17 +368,24 @@ export const CreateBranchModal = () => {
                         <TooltipTrigger>
                           <FormControl_Shadcn_>
                             <Switch
-                              disabled={!disableBackupsCheck && noPhysicalBackups}
+                              disabled={
+                                !disableBackupsCheck && noPhysicalBackups && overMaxVolumeSize
+                              }
                               checked={field.value}
                               onCheckedChange={field.onChange}
                             />
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
-                        {!disableBackupsCheck && noPhysicalBackups && (
-                          <TooltipContent side="bottom">
-                            PITR is required for the project to clone data into the branch
-                          </TooltipContent>
-                        )}
+                        {!disableBackupsCheck &&
+                          (noPhysicalBackups ? (
+                            <TooltipContent side="bottom">
+                              PITR is required for the project to clone data into the branch
+                            </TooltipContent>
+                          ) : overMaxVolumeSize ? (
+                            <TooltipContent side="bottom">
+                              Your target database volume exceeds the max supported size of 18 GB
+                            </TooltipContent>
+                          ) : undefined)}
                       </Tooltip>
                     </FormItemLayout>
                   )}
