@@ -87,7 +87,7 @@ export const RegionSelector = ({
         <>
           <p>Select the region closest to your users for the best performance.</p>
           {showNonProdFields && (
-            <div className="mt-2 text-warning-600">
+            <div className="mt-2 text-warning">
               <p>Only these regions are supported for local/staging projects:</p>
               <ul className="list-disc list-inside mt-1">
                 <li>East US (North Virginia)</li>

@@ -119,7 +119,7 @@ export const GlassPanel = ({
         </div>
 
         {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
-        {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
+        {showLink && <span className="text-brand-link justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

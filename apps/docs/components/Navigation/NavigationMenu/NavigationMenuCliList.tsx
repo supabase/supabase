@@ -22,7 +22,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
       <li key={id} className="function-link-item text-foreground-lighter leading-3">
         <Link
           href={`#${id}`}
-          className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand flex gap-3"
+          className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand-link flex gap-3"
         >
           {icon && <img className="w-3" src={`${BASE_PATH}${icon}`} />}
           {title}
@@ -99,7 +99,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           href={`${menu.parent ?? '/'}`}
           className={[
             'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
+            'text-base transition-all duration-200 text-brand-link hover:text-brand-600 hover:cursor-pointer ',
           ].join(' ')}
         >
           <div className="relative w-2">

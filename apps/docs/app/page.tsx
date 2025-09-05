@@ -268,7 +268,7 @@ const HomePage = () => (
           <TextLink
             label="Explore more resources"
             url="/guides/resources"
-            className="no-underline text-brand text-sm"
+            className="no-underline text-brand-link text-sm"
           />
         </div>
 
@@ -328,7 +328,7 @@ const HomePage = () => (
             <TextLink
               label="More on Self-Hosting"
               url="/guides/self-hosting"
-              className="no-underline text-brand text-sm"
+              className="no-underline text-brand-link text-sm"
             />
           </div>
         </div>

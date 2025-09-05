@@ -252,7 +252,7 @@ const VercelIntegrationConnectionForm = ({
           </div>
 
           {form.formState.isDirty ? (
-            <p className="mt-2 text-sm text-warning-600">
+            <p className="mt-2 text-sm text-warning">
               Note: Changing these settings will <strong>not</strong> trigger a resync of
               environment variables.
             </p>

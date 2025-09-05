@@ -52,24 +52,24 @@ export const PipelineStatus = ({
     if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
       return {
         label: 'Restarting',
-        dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
-        color: 'text-warning-600',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-warning" />,
+        color: 'text-warning',
         tooltip: stateMessages.message,
       }
     }
     if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
       return {
         label: 'Starting',
-        dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
-        color: 'text-warning-600',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-warning" />,
+        color: 'text-warning',
         tooltip: stateMessages.message,
       }
     }
     if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
       return {
         label: 'Stopping',
-        dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
-        color: 'text-warning-600',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-warning" />,
+        color: 'text-warning',
         tooltip: stateMessages.message,
       }
     }
@@ -86,8 +86,8 @@ export const PipelineStatus = ({
         case PipelineStatusName.STARTING:
           return {
             label: 'Starting',
-            dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
-            color: 'text-warning-600',
+            dot: <Loader2 className="animate-spin w-3 h-3 text-warning" />,
+            color: 'text-warning',
             tooltip: stateMessages.message,
           }
         case PipelineStatusName.STARTED:
@@ -108,7 +108,7 @@ export const PipelineStatus = ({
           return {
             label: 'Unknown',
             dot: <div className="w-2 h-2 bg-warning-600 rounded-full" />,
-            color: 'text-warning-600',
+            color: 'text-warning',
             tooltip: stateMessages.message,
           }
         default:

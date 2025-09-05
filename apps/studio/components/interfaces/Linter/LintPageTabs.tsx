@@ -103,7 +103,7 @@ const LintPageTabs = ({
                   tab.id === LINTER_LEVELS.ERROR
                     ? 'text-destructive-600'
                     : tab.id === LINTER_LEVELS.WARN
-                      ? 'text-warning-600'
+                      ? 'text-warning'
                       : 'text-brand-500'
                 }
               >

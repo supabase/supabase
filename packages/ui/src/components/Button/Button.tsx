@@ -177,7 +177,7 @@ const IconContainerVariants = cva('', {
       link: 'text-brand-600',
       text: 'text-foreground-lighter',
       danger: 'text-destructive-600',
-      warning: 'text-warning-600',
+      warning: 'text-warning',
     },
   },
 })
@@ -195,7 +195,7 @@ const loadingVariants = cva('', {
       link: 'text-brand-600',
       text: 'text-foreground-muted',
       danger: 'text-destructive-600',
-      warning: 'text-warning-600',
+      warning: 'text-warning',
     },
     loading: {
       default: '',
