@@ -5,6 +5,7 @@ import ReactFlow, {
   BackgroundVariant,
   MiniMap,
   Position,
+  Handle,
   type Node,
   type Edge,
 } from 'reactflow'
@@ -22,7 +23,7 @@ type RawPlan = {
 
 type PlanRoot = { Plan: RawPlan }
 
-const DEFAULT_NODE_TYPE = 'default'
+const NODE_TYPE = 'plan'
 const DEFAULT_NODE_WIDTH = 180
 const DEFAULT_NODE_HEIGHT = 40
 
@@ -70,7 +71,7 @@ const buildGraphFromPlan = (planJson: PlanRoot[]): { nodes: Node[]; edges: Edge[
     const label = plan['Node Type'] ?? 'Node'
     nodes.push({
       id,
-      type: DEFAULT_NODE_TYPE,
+      type: NODE_TYPE,
       data: { label },
       position: { x: 0, y: 0 },
     })
@@ -85,6 +86,19 @@ const buildGraphFromPlan = (planJson: PlanRoot[]): { nodes: Node[]; edges: Edge[
   }
 
   return getLayoutedElementsViaDagre(nodes, edges)
+}
+/**
+ * @see: https://github.com/wbkd/react-flow/discussions/2698
+ */
+const hiddenNodeConnector = 'opacity-0'
+const PlanNode = ({ data }: { data: { label: string } }) => {
+  return (
+    <div className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded bg-alternative flex gap-1 items-center">
+      <Handle type="target" position={Position.Top} className={hiddenNodeConnector} />
+      <span>{data.label}</span>
+      <Handle type="source" position={Position.Bottom} className={hiddenNodeConnector} />
+    </div>
+  )
 }
 
 export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
@@ -102,6 +116,13 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
     ? 'rgb(17, 19, 24, .8)'
     : 'rgb(237, 237, 237, .8)'
 
+  const nodeTypes = useMemo(
+    () => ({
+      [NODE_TYPE]: PlanNode,
+    }),
+    []
+  )
+
   return (
     <div className="w-full h-full border border-green-500">
       <ReactFlow
@@ -118,6 +139,7 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
           },
         }}
         fitView
+        nodeTypes={nodeTypes}
         nodes={nodes}
         edges={edges}
         minZoom={0.8}
