@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -9,8 +9,7 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button } from 'ui'
-import { TextSearchPopover } from './TextSearchPopover'
+import { Button, Input } from 'ui'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
@@ -64,7 +63,18 @@ export const QueryPerformanceFilterBar = ({
     <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
-          <p className="text-xs prose">Filter by</p>
+          <Input
+            size="tiny"
+            autoComplete="off"
+            icon={<Search size={12} />}
+            value={searchInputVal}
+            onChange={(e: any) => onSearchQueryChange(e.target.value)}
+            name="keyword"
+            id="keyword"
+            placeholder="Filter by keyword"
+            className="w-48"
+          />
+
           <FilterPopover
             name="Roles"
             options={roles}
@@ -74,7 +84,7 @@ export const QueryPerformanceFilterBar = ({
             onSaveFilters={onFilterRolesChange}
           />
 
-          <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} />
+          {/* <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} /> */}
         </div>
       </div>
 

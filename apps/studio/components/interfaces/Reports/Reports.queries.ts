@@ -16,7 +16,6 @@ export type QueryPerformanceSort = {
 
 export type QueryPerformanceQueryOpts = {
   preset: 'mostFrequentlyInvoked' | 'mostTimeConsuming' | 'slowestExecutionTime' | 'queryHitRate'
-  searchQuery?: string
   orderBy?: QueryPerformanceSort
   roles?: string[]
   runIndexAdvisor?: boolean
@@ -25,7 +24,6 @@ export type QueryPerformanceQueryOpts = {
 export const useQueryPerformanceQuery = ({
   preset,
   orderBy,
-  searchQuery = '',
   roles,
   runIndexAdvisor = false,
 }: QueryPerformanceQueryOpts) => {
@@ -36,7 +34,6 @@ export const useQueryPerformanceQuery = ({
     roles !== undefined && roles.length > 0
       ? `auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`
       : '',
-    searchQuery.length > 0 ? `statements.query ~ '${searchQuery}'` : '',
   ]
     .filter((x) => x.length > 0)
     .join(' AND ')
