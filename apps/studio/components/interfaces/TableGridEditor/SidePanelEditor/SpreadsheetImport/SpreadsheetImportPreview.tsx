@@ -138,8 +138,8 @@ export const SpreadsheetImportPreview = ({
                   {!isCompatible && (
                     <div className="space-y-2">
                       <div className="flex items-start space-x-2">
-                        <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
-                          <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
+                        <div className="size-[14px] flex items-center justify-center translate-y-[3px]">
+                          <div className="size-[6px] rounded-full bg-foreground-lighter" />
                         </div>
                         <p className="text-sm">
                           The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
@@ -166,8 +166,8 @@ export const SpreadsheetImportPreview = ({
                                 className={`transform ${isExpanded ? 'rotate-90' : ''}`}
                               />
                             ) : (
-                              <div className="w-[14px] h-[14px] flex items-center justify-center">
-                                <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
+                              <div className="size-[14px] flex items-center justify-center">
+                                <div className="size-[6px] rounded-full bg-foreground-lighter" />
                               </div>
                             )}
                             <p className="text-sm">Row {error.row}:</p>
