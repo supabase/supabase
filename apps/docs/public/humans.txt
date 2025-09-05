@@ -31,6 +31,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Craig Cannon
+Cuong Do
 Danny White
 Darren Cunningham
 Dave Wilson
@@ -54,6 +55,7 @@ Greg Kress
 Greg P
 Greg Richardson
 Guilherme Souza
+Hardik Maheshwari
 Haydn Maley
 Hieu Pham
 Ignacio Dobronich
@@ -110,6 +112,7 @@ Riccardo Busetti
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
+Sam Meech-Ward
 Sam Rose
 Sean Oliver
 Sergio Cioban Filho

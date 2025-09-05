@@ -1,9 +1,9 @@
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { StoragePolicies } from 'components/interfaces/Storage/StoragePolicies/StoragePolicies'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { StoragePolicies } from 'components/interfaces/Storage'
-import type { NextPageWithLayout } from 'types'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import type { NextPageWithLayout } from 'types'
 
 const StoragePoliciesPage: NextPageWithLayout = () => {
   return <StoragePolicies />

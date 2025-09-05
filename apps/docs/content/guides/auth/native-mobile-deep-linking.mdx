@@ -304,6 +304,8 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
   </TabPanel>
 
+<$Show if="sdk:swift">
+
   <TabPanel id="swift" label="Swift">
   ### Deep link config
 
@@ -342,6 +344,8 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Android Kotlin">
   ### Deep link config
 
@@ -396,4 +400,5 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     The user will now be authenticated when your app receives a valid deep link!
 
   </TabPanel>
+  </$Show>
 </Tabs>
