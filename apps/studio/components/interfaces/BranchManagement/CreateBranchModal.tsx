@@ -92,7 +92,11 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
-  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery(
+  const {
+    data: cloneBackups,
+    error: cloneBackupsError,
+    isLoading: isLoadingCloneBackups,
+  } = useCloneBackupsQuery(
     { projectRef },
     {
       // [Joshen] Only trigger this request when the modal is opened
@@ -192,12 +196,10 @@ export const CreateBranchModal = () => {
   })
   const withData = form.watch('withData')
 
-  const canSubmit = !isCreating && !isChecking
+  const canSubmit = !isCreating && !isChecking && !isLoadingCloneBackups
   const isDisabled =
     !isSuccessConnections ||
-    isCreating ||
     !canSubmit ||
-    isChecking ||
     (!gitlessBranching && !githubConnection) ||
     promptProPlanUpgrade ||
     !canCreateBranch
@@ -241,7 +243,7 @@ export const CreateBranchModal = () => {
         <DialogSectionSeparator />
 
         <Form_Shadcn_ {...form}>
-          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          <form id={formId}>
             {promptProPlanUpgrade && (
               <>
                 <UpgradeToPro
@@ -408,7 +410,7 @@ export const CreateBranchModal = () => {
                     <p className="text-sm text-foreground-light">
                       Since your target database volume size is{' '}
                       <code className="text-xs font-mono">{targetVolumeSizeGb} GB</code>, creating a
-                      data branch is estimated to take around{' '}
+                      data branch will take approximately{' '}
                       <code className="text-xs font-mono">
                         {Math.round((720 / 21000) * targetVolumeSizeGb) + 3} minutes
                       </code>
