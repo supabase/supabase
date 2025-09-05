@@ -121,7 +121,6 @@ const PageLayout: NextPageWithLayout = () => {
     startDate.toISOString(),
     endDate.toISOString()
   )
-  console.log(combinedStatsChartData)
 
   const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckProjectPermissions(
     PermissionAction.FUNCTIONS_READ,
