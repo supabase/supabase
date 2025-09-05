@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import tmpl from 'tmpl'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -69,7 +69,7 @@ const SSLConfiguration = () => {
 
   const { sslCertificateUrl: sslCertificateUrlTemplate } = useCustomContent(['ssl:certificate_url'])
   const sslCertificateUrl = useMemo(
-    () => tmpl(sslCertificateUrlTemplate ?? '', { env }),
+    () => template(sslCertificateUrlTemplate ?? '')({ env }),
     [sslCertificateUrlTemplate, env]
   )
 
