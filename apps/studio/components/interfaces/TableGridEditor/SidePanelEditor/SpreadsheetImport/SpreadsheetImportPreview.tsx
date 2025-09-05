@@ -54,7 +54,11 @@ const SpreadsheetImportPreview = ({
             <div className="flex items-center space-x-2">
               <p className="text-sm">Preview data to be imported</p>
               {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
-              {errors.length > 0 && <Badge variant="warning">1 issue found</Badge>}
+              {errors.length > 0 && (
+                <Badge variant="warning">
+                  {errors.length} {errors.length === 1 ? 'issue' : 'issues'} found
+                </Badge>
+              )}
             </div>
             <Button
               type="text"
