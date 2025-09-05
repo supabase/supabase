@@ -98,7 +98,9 @@ export const ReportsSelectFilter = ({
                 <CommandItem_Shadcn_ key={option.value}>
                   <Label
                     key={option.value}
-                    className={cn('flex items-center overflow-hidden p-1 rounded-sm gap-x-3')}
+                    className={
+                      'flex items-center overflow-hidden p-1 rounded-sm gap-x-3 w-full h-full'
+                    }
                   >
                     <Checkbox
                       id={`${label}-${option.value}`}
