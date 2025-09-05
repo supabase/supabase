@@ -56,6 +56,15 @@ export const SpreadsheetImportPreview = ({
     }
   }
 
+  /**
+   * Remove items with duplicate row and code values because of the papaparse issue
+   * @link https://github.com/supabase/supabase/pull/38422#issue-3381886843
+   **/
+  const dedupedErrors = errors.filter(
+    (error, index, self) =>
+      index === self.findIndex((t) => t.row === error.row && t.code === error.code)
+  )
+
   return (
     <Collapsible open={expandPreview} onOpenChange={setExpandPreview} className={''}>
       <Collapsible.Trigger asChild>
@@ -64,9 +73,9 @@ export const SpreadsheetImportPreview = ({
             <div className="flex items-center space-x-2">
               <p className="text-sm">Preview data to be imported</p>
               {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
-              {errors.length > 0 && (
+              {dedupedErrors.length > 0 && (
                 <Badge variant="warning">
-                  {errors.length} {errors.length === 1 ? 'issue' : 'issues'} found
+                  {dedupedErrors.length} {dedupedErrors.length === 1 ? 'issue' : 'issues'} found
                 </Badge>
               )}
             </div>
@@ -117,7 +126,7 @@ export const SpreadsheetImportPreview = ({
               </div>
             )}
           </div>
-          {(!isCompatible || errors.length > 0) && (
+          {(!isCompatible || dedupedErrors.length > 0) && (
             <Alert_Shadcn_ variant="warning" className="my-4">
               <WarningIcon />
               <AlertTitle_Shadcn_>Issues found in spreadsheet</AlertTitle_Shadcn_>
@@ -126,8 +135,8 @@ export const SpreadsheetImportPreview = ({
                   {isCompatible ? (
                     <p className="text-sm">
                       {selectedTable !== undefined
-                        ? `This CSV can still be imported, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`
-                        : `You can still create the table, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`}
+                        ? `This CSV can still be imported, but we found ${dedupedErrors.length === 1 ? 'an issue' : 'issues'}:`
+                        : `You can still create the table, but we found ${dedupedErrors.length === 1 ? 'an issue' : 'issues'}:`}
                     </p>
                   ) : (
                     <p className="text-sm">
@@ -150,7 +159,7 @@ export const SpreadsheetImportPreview = ({
                     </div>
                   )}
                   <div className="space-y-2">
-                    {errors.map((error: any, idx: number) => {
+                    {dedupedErrors.map((error: any, idx: number) => {
                       const key = `import-error-${idx}`
                       const isExpanded = expandedErrors.includes(key)
 

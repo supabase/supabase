@@ -84,16 +84,7 @@ export const parseSpreadsheet = (
         rowCount += results.data.length
         previewRows = results.data.slice(0, 20)
         if (results.errors.length > 0) {
-          /**
-           * Remove items with duplicate row and code values because of the papaparse issue
-           * @link https://github.com/supabase/supabase/pull/38422#issue-3381886843
-           **/
-          const dedupedErrors = results.errors.filter(
-            (error, index, self) =>
-              index === self.findIndex((t) => t.row === error.row && t.code === error.code)
-          )
-
-          const formattedErrors = dedupedErrors.map((error) => {
+          const formattedErrors = results.errors.map((error) => {
             if (error) return { ...error, data: results.data[error.row] }
           })
           errors.push(...formattedErrors)
