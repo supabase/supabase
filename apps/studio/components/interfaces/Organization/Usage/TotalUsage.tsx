@@ -12,9 +12,9 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { cn } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
-import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
-import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeMetric'
-import SectionContent from './SectionContent'
+import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
+import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
+import { SectionContent } from './SectionContent'
 
 export interface ComputeProps {
   orgSlug: string
@@ -188,11 +188,12 @@ export const TotalUsage = ({
               {sortedBillingMetrics.map((metric, i) => {
                 const isLastBillingMetric = i === sortedBillingMetrics.length - 1
                 const isLastInRow = isLastBillingMetric && computeMetrics.length === 0
+
                 return (
                   <div
                     className={cn(
                       'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                      i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
+                      i % 2 === 0 && 'md:border-r',
                       !isLastInRow && 'border-b'
                     )}
                     key={metric.key}
@@ -204,21 +205,19 @@ export const TotalUsage = ({
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
+                      className={cn(i % 2 === 0 ? 'md:pr-4' : 'md:pl-4')}
                     />
                   </div>
                 )
               })}
 
               {computeMetrics.map((metric, i) => {
-                const isLastComputeMetric = i === computeMetrics.length - 1
                 return (
                   <div
                     className={cn(
                       'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                      (i + sortedBillingMetrics.length) % 2 === 0
-                        ? 'md:border-r md:pr-4'
-                        : 'md:pl-4',
-                      !isLastComputeMetric && 'border-b'
+                      (i + sortedBillingMetrics.length) % 2 === 0 && 'md:border-r',
+                      'border-b last:border-b-0'
                     )}
                     key={metric}
                   >
@@ -234,6 +233,9 @@ export const TotalUsage = ({
                       }}
                       relativeToSubscription={showRelationToSubscription}
                       usage={usage}
+                      className={cn(
+                        (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
+                      )}
                     />
                   </div>
                 )
