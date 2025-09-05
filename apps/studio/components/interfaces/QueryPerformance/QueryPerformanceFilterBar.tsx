@@ -71,7 +71,7 @@ export const QueryPerformanceFilterBar = ({
             onChange={(e: any) => onSearchQueryChange(e.target.value)}
             name="keyword"
             id="keyword"
-            placeholder="Filter by keyword"
+            placeholder="Filter by query"
             className="w-48"
           />
 
