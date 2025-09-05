@@ -128,6 +128,7 @@ const { error } = await supabase.from('restaurants').insert([
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -148,6 +149,8 @@ await supabase.from('restaurants').insert([
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -168,6 +171,8 @@ try await supabase.from("restaurants")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -187,6 +192,7 @@ val data = supabase.from("restaurants").insert(listOf(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, just a single space.
@@ -241,6 +247,7 @@ const { data, error } = await supabase.rpc('nearby_restaurants', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -251,6 +258,8 @@ final data = await supabase.rpc('nearby_restaurants',params: {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -279,6 +288,8 @@ let response: Response = try await supabase.rpc(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -292,6 +303,7 @@ val data = supabase.postgrest.rpc(
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="result" label="Result">
 
 ```json
@@ -367,6 +379,7 @@ const { data, error } = await supabase.rpc('restaurants_in_view', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -379,6 +392,8 @@ final data = await supabase.rpc('restaurants_in_view', params: {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -403,6 +418,8 @@ let response: Response = try await supabase.rpc(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -418,6 +435,7 @@ val data = supabase.postgrest.rpc(
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="result" label="Result">
 
 ```json

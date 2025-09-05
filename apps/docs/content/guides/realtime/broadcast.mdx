@@ -33,6 +33,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     ```
 
   </TabPanel>
+  <$Show if="sdk:dart">
   <TabPanel id="dart" label="Dart">
 
     ```dart
@@ -50,6 +51,8 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
 
     ```swift
@@ -62,6 +65,8 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
 
     ```kotlin
@@ -73,6 +78,8 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
 
     ```python
@@ -88,6 +95,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 
 ### Receiving Broadcast messages
@@ -129,6 +137,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
     ```
 
   </TabPanel>
+  <$Show if="sdk:dart">
   <TabPanel id="dart" label="Dart">
 
     {/* prettier-ignore */}
@@ -150,6 +159,8 @@ You can provide a callback for the `broadcast` channel to receive messages. This
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
 
     ```swift
@@ -166,6 +177,8 @@ You can provide a callback for the `broadcast` channel to receive messages. This
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
 
     {/* prettier-ignore */}
@@ -182,6 +195,8 @@ You can provide a callback for the `broadcast` channel to receive messages. This
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
     <Admonition type="note">
 
@@ -205,6 +220,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 
 ## Send messages
@@ -260,6 +276,8 @@ You can use the Supabase client libraries to send Broadcast messages.
 
   </TabPanel>
 
+<$Show if="sdk:dart">
+
   <TabPanel id="dart" label="Dart">
 
     {/* prettier-ignore */}
@@ -287,6 +305,8 @@ You can use the Supabase client libraries to send Broadcast messages.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
 
     {/* prettier-ignore */}
@@ -307,6 +327,8 @@ You can use the Supabase client libraries to send Broadcast messages.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
     ```kotlin
     val myChannel = supabase.channel("test-channel") {
@@ -329,6 +351,9 @@ You can use the Supabase client libraries to send Broadcast messages.
     ```
 
   </TabPanel>
+  </$Show>
+
+<$Show if="sdk:python">
 
   <TabPanel id="python" label="Python">
 
@@ -356,6 +381,7 @@ You can use the Supabase client libraries to send Broadcast messages.
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 ### Broadcast from the Database
@@ -484,6 +510,7 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  <$Show if="sdk:dart">
   <TabPanel id="dart" label="Dart">
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `self` parameter to `true`.
@@ -512,6 +539,8 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
@@ -534,6 +563,8 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
@@ -562,6 +593,8 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
 
     <Admonition type="note">
@@ -595,6 +628,7 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 
 ### Acknowledge messages
@@ -636,6 +670,7 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  <$Show if="sdk:dart">
   <TabPanel id="dart" label="Dart">
 
     ```dart
@@ -659,6 +694,8 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
 
     You can confirm that Realtime received your message by setting Broadcast's `acknowledgeBroadcasts` config to `true`.
@@ -674,6 +711,8 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `acknowledgeBroadcasts` parameter to `true`.
@@ -691,9 +730,12 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
   Unsupported in Python yet.
   </TabPanel>
+  </$Show>
 </Tabs>
 
 Use this to guarantee that the server has received the message before resolving `channelD.send`'s promise. If the `ack` config is not set to `true` when creating the channel, the promise returned by `channelD.send` will resolve immediately.
@@ -736,6 +778,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
     ```
 
   </TabPanel>
+  <$Show if="sdk:dart">
   <TabPanel id="dart" label="Dart">
     ```dart
     // No need to subscribe to channel
@@ -751,6 +794,8 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
     ```swift
     let myChannel = await supabase.channel("room-2") {
@@ -763,6 +808,8 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
     ```kotlin
     val myChannel = supabase.channel("room-2") {
@@ -779,9 +826,12 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
   Unsupported in Python yet.
   </TabPanel>
+  </$Show>
 </Tabs>
 
 ## Trigger broadcast messages from your database

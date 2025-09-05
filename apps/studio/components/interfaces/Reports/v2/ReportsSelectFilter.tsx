@@ -4,17 +4,25 @@ import { useEffect, useState } from 'react'
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { Button, cn } from 'ui'
+import {
+  Button,
+  cn,
+  Command_Shadcn_ as Command,
+  CommandInput_Shadcn_ as CommandInput,
+  CommandItem_Shadcn_,
+} from 'ui'
+import { CommandList_Shadcn_ as CommandList, CommandEmpty_Shadcn_ as CommandEmpty } from 'ui'
+import { z } from 'zod'
+import { CommandGroup } from '@ui/components/shadcn/ui/command'
 
 export interface ReportSelectOption {
-  key: string
   label: React.ReactNode
+  value: string
   description?: string
 }
 
-export interface SelectFilters {
-  [key: string]: boolean
-}
+export const selectFilterSchema = z.array(z.string())
+export type SelectFilters = z.infer<typeof selectFilterSchema>
 
 interface ReportsSelectFilterProps {
   label: string
@@ -23,6 +31,7 @@ interface ReportsSelectFilterProps {
   onChange: (value: SelectFilters) => void
   isLoading?: boolean
   className?: string
+  showSearch?: boolean
 }
 
 export const ReportsSelectFilter = ({
@@ -32,12 +41,12 @@ export const ReportsSelectFilter = ({
   onChange,
   isLoading = false,
   className,
+  showSearch = false,
 }: ReportsSelectFilterProps) => {
   const [open, setOpen] = useState(false)
   const [tempValue, setTempValue] = useState<SelectFilters>(value)
 
-  const selectedCount = Object.values(value).filter(Boolean).length
-  const isActive = selectedCount > 0
+  const isActive = tempValue.length > 0
 
   useEffect(() => {
     if (!open) {
@@ -51,7 +60,7 @@ export const ReportsSelectFilter = ({
   }
 
   const handleClearAll = () => {
-    setTempValue({})
+    setTempValue([])
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -75,60 +84,52 @@ export const ReportsSelectFilter = ({
         >
           <span>
             {label}
-            {selectedCount > 0 && <span className="ml-1 text-xs">({selectedCount})</span>}
+            {tempValue.length > 0 && <span className="ml-1 text-xs">({tempValue.length})</span>}
           </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="p-0 w-72" portal={true}>
-        <div className="p-2 border-b border-default">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-foreground">{label}</span>
-            <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
-              Clear
-            </Button>
-          </div>
-        </div>
-
-        <div className="max-h-60 overflow-y-auto p-1" onKeyDown={handleKeyDown}>
-          {options.length === 0 ? (
-            <div className="p-4 text-center text-sm text-foreground-light">
-              {isLoading ? 'Loading options...' : 'No options available'}
-            </div>
-          ) : (
-            options.map((option) => (
-              <Label
-                key={option.key}
-                htmlFor={`${label}-${option.key}`}
-                className={cn(
-                  'flex items-center hover:bg-overlay-hover overflow-hidden px-1.5 py-1.5 rounded-sm gap-x-3',
-                  'transition-all duration-150 ease-in-out cursor-pointer'
-                )}
-              >
-                <Checkbox
-                  id={`${label}-${option.key}`}
-                  checked={Boolean(tempValue[option.key])}
-                  onCheckedChange={(checked) => {
-                    setTempValue({
-                      ...tempValue,
-                      [option.key]: Boolean(checked),
-                    })
-                  }}
-                  onKeyDown={handleKeyDown}
-                />
-                <div className="flex flex-col text-xs">
-                  {option.label}
-                  {option.description && (
-                    <span className="text-foreground-lighter">{option.description}</span>
-                  )}
-                </div>
-              </Label>
-            ))
-          )}
-        </div>
+        <Command>
+          {showSearch && <CommandInput placeholder="Search..." />}
+          <CommandList>
+            <CommandEmpty>No options found.</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem_Shadcn_ key={option.value}>
+                  <Label
+                    key={option.value}
+                    className={
+                      'flex items-center overflow-hidden p-1 rounded-sm gap-x-3 w-full h-full'
+                    }
+                  >
+                    <Checkbox
+                      id={`${label}-${option.value}`}
+                      checked={tempValue.includes(option.value)}
+                      onCheckedChange={(checked) => {
+                        setTempValue(
+                          checked
+                            ? [...tempValue, option.value]
+                            : tempValue.filter((x) => x !== option.value)
+                        )
+                      }}
+                      onKeyDown={handleKeyDown}
+                    />
+                    <div className="flex flex-col text-xs">
+                      {option.label}
+                      {option.description && (
+                        <span className="text-foreground-lighter">{option.description}</span>
+                      )}
+                    </div>
+                  </Label>
+                </CommandItem_Shadcn_>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
 
         <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-          <Button size="tiny" type="default" onClick={() => setOpen(false)} htmlType="button">
-            Cancel
+          <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
+            Clear
           </Button>
           <Button
             loading={isLoading}
