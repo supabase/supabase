@@ -24,14 +24,13 @@ const SpreadsheetImportPreview = ({
   incompatibleHeaders,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
-  const [isErrorExpanded, setIsErrorExpanded] = useState(false)
+  const [expandedErrors, setExpandedErrors] = useState<string[]>([])
 
   const { headers, rows } = spreadsheetData
   const previewHeaders = headers
     .filter((header) => selectedHeaders.includes(header))
     .slice(0, MAX_HEADERS)
   const previewRows = rows.slice(0, MAX_ROWS)
-  const firstError = errors[0]
 
   const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
 
@@ -39,7 +38,13 @@ const SpreadsheetImportPreview = ({
     setExpandPreview(true)
   }, [spreadsheetData])
 
-  const onToggleExpandError = () => setIsErrorExpanded(!isErrorExpanded)
+  const onSelectExpandError = (key: string) => {
+    if (expandedErrors.includes(key)) {
+      setExpandedErrors(expandedErrors.filter((error) => error !== key))
+    } else {
+      setExpandedErrors(expandedErrors.concat([key]))
+    }
+  }
 
   return (
     <Collapsible open={expandPreview} onOpenChange={setExpandPreview} className={''}>
@@ -105,8 +110,8 @@ const SpreadsheetImportPreview = ({
                 {isCompatible && (
                   <p className="text-sm text-foreground-light">
                     {selectedTable !== undefined
-                      ? 'This CSV can still be imported, but we found an issue:'
-                      : 'You can still create the table, but we found an issue:'}
+                      ? `This CSV can still be imported, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`
+                      : `You can still create the table, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`}
                   </p>
                 )}
               </div>
@@ -128,45 +133,49 @@ const SpreadsheetImportPreview = ({
                     </div>
                   </div>
                 )}
-                {firstError && (
-                  <div className="space-y-2">
-                    <div
-                      className="flex items-center space-x-2 cursor-pointer"
-                      onClick={onToggleExpandError}
-                    >
-                      {firstError.data !== undefined ? (
-                        <ChevronRight
-                          size={14}
-                          className={`transform ${isErrorExpanded ? 'rotate-90' : ''}`}
+                {errors.map((error: any, idx: number) => {
+                  const key = `import-error-${idx}`
+                  const isExpanded = expandedErrors.includes(key)
+
+                  return (
+                    <div key={key} className="space-y-2">
+                      <div
+                        className="flex items-center space-x-2 cursor-pointer"
+                        onClick={() => onSelectExpandError(key)}
+                      >
+                        {error.data !== undefined ? (
+                          <ChevronRight
+                            size={14}
+                            className={`transform ${isExpanded ? 'rotate-90' : ''}`}
+                          />
+                        ) : (
+                          <div className="w-[14px] h-[14px] flex items-center justify-center">
+                            <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
+                          </div>
+                        )}
+                        <p className="text-sm">Row {error.row}:</p>
+                        <p className="text-sm">{error.message}</p>
+                        {error.data?.__parsed_extra && (
+                          <>
+                            <ArrowRight size={14} />
+                            <p className="text-sm">Extra field(s):</p>
+                            {error.data?.__parsed_extra.map((value: any, i: number) => (
+                              <code key={i} className="text-xs">
+                                {value}
+                              </code>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                      {error.data !== undefined && isExpanded && (
+                        <SpreadsheetPreviewGrid
+                          headers={spreadsheetData.headers}
+                          rows={[error.data]}
                         />
-                      ) : (
-                        <div className="w-[14px] h-[14px] flex items-center justify-center">
-                          <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
-                        </div>
-                      )}
-                      <p className="text-sm">
-                        Row {firstError.row}: {firstError.message.split(' (')[0]}
-                      </p>
-                      {firstError.data?.__parsed_extra && (
-                        <>
-                          <ArrowRight size={14} />
-                          <p className="text-sm">Extra field(s):</p>
-                          {firstError.data?.__parsed_extra.map((value: any, i: number) => (
-                            <code key={i} className="text-xs">
-                              {value}
-                            </code>
-                          ))}
-                        </>
                       )}
                     </div>
-                    {firstError.data !== undefined && isErrorExpanded && (
-                      <SpreadsheetPreviewGrid
-                        headers={spreadsheetData.headers}
-                        rows={[firstError.data]}
-                      />
-                    )}
-                  </div>
-                )}
+                  )
+                })}
               </div>
             </div>
           )}
