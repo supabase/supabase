@@ -34,7 +34,6 @@ export function useIndexInvalidation() {
   const roles = router?.query?.roles ?? []
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
-    searchQuery,
     orderBy,
     preset,
     roles: typeof roles === 'string' ? [roles] : roles,
