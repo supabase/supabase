@@ -238,7 +238,12 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [516, 515, 517, 518]
+                          "children": [
+                            516,
+                            515,
+                            517,
+                            518
+                          ]
                         }
                       ]
                     }
@@ -251,17 +256,24 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [505]
+              "children": [
+                505
+              ]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [510, 511]
+              "children": [
+                510,
+                511
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [512]
+              "children": [
+                512
+              ]
             }
           ],
           "sources": [
@@ -665,7 +677,12 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [386, 385, 384, 387]
+                              "children": [
+                                386,
+                                385,
+                                384,
+                                387
+                              ]
                             }
                           ]
                         }
@@ -742,7 +759,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [389, 390]
+                                  "children": [
+                                    389,
+                                    390
+                                  ]
                                 }
                               ]
                             }
@@ -798,7 +818,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [392, 393]
+                                  "children": [
+                                    392,
+                                    393
+                                  ]
                                 }
                               ]
                             }
@@ -922,7 +945,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [427]
+                                          "children": [
+                                            427
+                                          ]
                                         }
                                       ]
                                     }
@@ -951,7 +976,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [425, 428]
+                                  "children": [
+                                    425,
+                                    428
+                                  ]
                                 }
                               ]
                             }
@@ -1007,7 +1035,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [430, 431]
+                                  "children": [
+                                    430,
+                                    431
+                                  ]
                                 }
                               ]
                             }
@@ -1131,7 +1162,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [416]
+                                          "children": [
+                                            416
+                                          ]
                                         }
                                       ]
                                     }
@@ -1160,7 +1193,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [414, 417]
+                                  "children": [
+                                    414,
+                                    417
+                                  ]
                                 }
                               ]
                             }
@@ -1216,7 +1252,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [419, 420]
+                                  "children": [
+                                    419,
+                                    420
+                                  ]
                                 }
                               ]
                             }
@@ -1384,7 +1423,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [374, 375]
+                                  "children": [
+                                    374,
+                                    375
+                                  ]
                                 }
                               ]
                             }
@@ -1440,7 +1482,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [377, 378]
+                                  "children": [
+                                    377,
+                                    378
+                                  ]
                                 }
                               ]
                             }
@@ -1548,7 +1593,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [365, 366]
+                                  "children": [
+                                    365,
+                                    366
+                                  ]
                                 }
                               ]
                             }
@@ -1604,7 +1652,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [368, 369]
+                                  "children": [
+                                    368,
+                                    369
+                                  ]
                                 }
                               ]
                             }
@@ -1779,7 +1830,11 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [401, 400, 399]
+                              "children": [
+                                401,
+                                400,
+                                399
+                              ]
                             }
                           ]
                         }
@@ -1846,7 +1901,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [405]
+                                          "children": [
+                                            405
+                                          ]
                                         }
                                       ]
                                     }
@@ -1875,7 +1932,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [403, 406]
+                                  "children": [
+                                    403,
+                                    406
+                                  ]
                                 }
                               ]
                             }
@@ -1931,7 +1991,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [408, 409]
+                                  "children": [
+                                    408,
+                                    409
+                                  ]
                                 }
                               ]
                             }
@@ -1961,12 +2024,22 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [336]
+              "children": [
+                336
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [379, 421, 410, 349, 370, 362, 394]
+              "children": [
+                379,
+                421,
+                410,
+                349,
+                370,
+                362,
+                394
+              ]
             }
           ],
           "sources": [
@@ -2045,7 +2118,9 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [500]
+              "children": [
+                500
+              ]
             }
           ],
           "sources": [
@@ -2168,12 +2243,16 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [521]
+              "children": [
+                521
+              ]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [525]
+              "children": [
+                525
+              ]
             }
           ],
           "sources": [
@@ -2402,7 +2481,17 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [439, 440, 438, 434, 436, 437, 442, 435, 441]
+              "children": [
+                439,
+                440,
+                438,
+                434,
+                436,
+                437,
+                442,
+                435,
+                441
+              ]
             }
           ],
           "sources": [
@@ -2445,7 +2534,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [478]
+              "children": [
+                478
+              ]
             }
           ],
           "sources": [
@@ -2493,7 +2584,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [485]
+              "children": [
+                485
+              ]
             }
           ],
           "sources": [
@@ -2757,7 +2850,17 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [439, 440, 438, 434, 436, 437, 442, 435, 441]
+                      "children": [
+                        439,
+                        440,
+                        438,
+                        434,
+                        436,
+                        437,
+                        442,
+                        435,
+                        441
+                      ]
                     }
                   ],
                   "sources": [
@@ -2913,7 +3016,17 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [445, 452, 449, 447, 450, 451, 444, 446, 448]
+              "children": [
+                445,
+                452,
+                449,
+                447,
+                450,
+                451,
+                444,
+                446,
+                448
+              ]
             }
           ],
           "sources": [
@@ -3194,7 +3307,21 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [457, 462, 463, 459, 464, 454, 460, 465, 466, 456, 461, 458, 455]
+              "children": [
+                457,
+                462,
+                463,
+                459,
+                464,
+                454,
+                460,
+                465,
+                466,
+                456,
+                461,
+                458,
+                455
+              ]
             }
           ],
           "sources": [
@@ -3379,7 +3506,14 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [471, 472, 474, 476, 475, 473]
+              "children": [
+                471,
+                472,
+                474,
+                476,
+                475,
+                473
+              ]
             }
           ],
           "sources": [
@@ -3420,7 +3554,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [487]
+              "children": [
+                487
+              ]
             }
           ],
           "sources": [
@@ -3587,7 +3723,10 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [468, 469]
+                      "children": [
+                        468,
+                        469
+                      ]
                     }
                   ],
                   "sources": [
@@ -3605,7 +3744,12 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [480, 481, 483, 482]
+              "children": [
+                480,
+                481,
+                483,
+                482
+              ]
             }
           ],
           "sources": [
@@ -3668,7 +3812,10 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [468, 469]
+              "children": [
+                468,
+                469
+              ]
             }
           ],
           "sources": [
@@ -3820,7 +3967,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [493, 490, 492, 491, 489]
+              "children": [
+                493,
+                490,
+                492,
+                491,
+                489
+              ]
             }
           ],
           "sources": [
@@ -3979,22 +4132,43 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [504, 335, 499, 520]
+          "children": [
+            504,
+            335,
+            499,
+            520
+          ]
         },
         {
           "title": "Interfaces",
           "kind": 256,
-          "children": [433, 477, 484, 443, 453, 470, 486, 479, 467, 488]
+          "children": [
+            433,
+            477,
+            484,
+            443,
+            453,
+            470,
+            486,
+            479,
+            467,
+            488
+          ]
         },
         {
           "title": "Type Aliases",
           "kind": 4194304,
-          "children": [432, 494]
+          "children": [
+            432,
+            494
+          ]
         },
         {
           "title": "Functions",
           "kind": 64,
-          "children": [496]
+          "children": [
+            496
+          ]
         }
       ],
       "sources": [
@@ -4388,7 +4562,12 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [51, 50, 49, 52]
+                              "children": [
+                                51,
+                                50,
+                                49,
+                                52
+                              ]
                             }
                           ]
                         }
@@ -4465,7 +4644,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [54, 55]
+                                  "children": [
+                                    54,
+                                    55
+                                  ]
                                 }
                               ]
                             }
@@ -4521,7 +4703,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [57, 58]
+                                  "children": [
+                                    57,
+                                    58
+                                  ]
                                 }
                               ]
                             }
@@ -4635,7 +4820,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [92]
+                                          "children": [
+                                            92
+                                          ]
                                         }
                                       ]
                                     }
@@ -4664,7 +4851,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [90, 93]
+                                  "children": [
+                                    90,
+                                    93
+                                  ]
                                 }
                               ]
                             }
@@ -4720,7 +4910,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [95, 96]
+                                  "children": [
+                                    95,
+                                    96
+                                  ]
                                 }
                               ]
                             }
@@ -4834,7 +5027,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [81]
+                                          "children": [
+                                            81
+                                          ]
                                         }
                                       ]
                                     }
@@ -4863,7 +5058,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [79, 82]
+                                  "children": [
+                                    79,
+                                    82
+                                  ]
                                 }
                               ]
                             }
@@ -4919,7 +5117,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [84, 85]
+                                  "children": [
+                                    84,
+                                    85
+                                  ]
                                 }
                               ]
                             }
@@ -5030,7 +5231,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [39, 40]
+                                  "children": [
+                                    39,
+                                    40
+                                  ]
                                 }
                               ]
                             }
@@ -5086,7 +5290,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [42, 43]
+                                  "children": [
+                                    42,
+                                    43
+                                  ]
                                 }
                               ]
                             }
@@ -5184,7 +5391,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [30, 31]
+                                  "children": [
+                                    30,
+                                    31
+                                  ]
                                 }
                               ]
                             }
@@ -5240,7 +5450,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [33, 34]
+                                  "children": [
+                                    33,
+                                    34
+                                  ]
                                 }
                               ]
                             }
@@ -5405,7 +5618,11 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [66, 65, 64]
+                              "children": [
+                                66,
+                                65,
+                                64
+                              ]
                             }
                           ]
                         }
@@ -5472,7 +5689,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [70]
+                                          "children": [
+                                            70
+                                          ]
                                         }
                                       ]
                                     }
@@ -5501,7 +5720,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [68, 71]
+                                  "children": [
+                                    68,
+                                    71
+                                  ]
                                 }
                               ]
                             }
@@ -5557,7 +5779,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [73, 74]
+                                  "children": [
+                                    73,
+                                    74
+                                  ]
                                 }
                               ]
                             }
@@ -5577,12 +5802,21 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [4]
+              "children": [
+                4
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [44, 86, 75, 35, 27, 59]
+              "children": [
+                44,
+                86,
+                75,
+                35,
+                27,
+                59
+              ]
             }
           ],
           "sources": [
@@ -5605,7 +5839,9 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [3]
+          "children": [
+            3
+          ]
         }
       ],
       "sources": [
@@ -5896,7 +6132,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [478]
+                              "children": [
+                                478
+                              ]
                             }
                           ],
                           "sources": [
@@ -5970,7 +6208,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [221]
+                                          "children": [
+                                            221
+                                          ]
                                         }
                                       ]
                                     }
@@ -5999,7 +6239,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [219, 222]
+                                  "children": [
+                                    219,
+                                    222
+                                  ]
                                 }
                               ]
                             }
@@ -6055,7 +6298,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [224, 225]
+                                  "children": [
+                                    224,
+                                    225
+                                  ]
                                 }
                               ]
                             }
@@ -6151,7 +6397,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [174]
+                              "children": [
+                                174
+                              ]
                             }
                           ]
                         }
@@ -6254,7 +6502,11 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [180, 178, 179]
+                                          "children": [
+                                            180,
+                                            178,
+                                            179
+                                          ]
                                         }
                                       ]
                                     }
@@ -6283,7 +6535,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [176, 181]
+                                  "children": [
+                                    176,
+                                    181
+                                  ]
                                 }
                               ]
                             }
@@ -6339,7 +6594,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [183, 184]
+                                  "children": [
+                                    183,
+                                    184
+                                  ]
                                 }
                               ]
                             }
@@ -6618,7 +6876,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [493, 490, 492, 491, 489]
+                                      "children": [
+                                        493,
+                                        490,
+                                        492,
+                                        491,
+                                        489
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -6636,7 +6900,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [232, 233]
+                              "children": [
+                                232,
+                                233
+                              ]
                             }
                           ]
                         }
@@ -6703,7 +6970,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [237]
+                                          "children": [
+                                            237
+                                          ]
                                         }
                                       ]
                                     }
@@ -6732,7 +7001,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [235, 238]
+                                  "children": [
+                                    235,
+                                    238
+                                  ]
                                 }
                               ]
                             }
@@ -6788,7 +7060,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [240, 241]
+                                  "children": [
+                                    240,
+                                    241
+                                  ]
                                 }
                               ]
                             }
@@ -6910,7 +7185,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [248]
+                              "children": [
+                                248
+                              ]
                             }
                           ]
                         }
@@ -7033,7 +7310,11 @@
                                           {
                                             "title": "Properties",
                                             "kind": 1024,
-                                            "children": [252, 253, 254]
+                                            "children": [
+                                              252,
+                                              253,
+                                              254
+                                            ]
                                           }
                                         ]
                                       }
@@ -7063,7 +7344,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [250, 255]
+                                  "children": [
+                                    250,
+                                    255
+                                  ]
                                 }
                               ]
                             }
@@ -7119,7 +7403,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [257, 258]
+                                  "children": [
+                                    257,
+                                    258
+                                  ]
                                 }
                               ]
                             }
@@ -7352,7 +7639,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [493, 490, 492, 491, 489]
+                                      "children": [
+                                        493,
+                                        490,
+                                        492,
+                                        491,
+                                        489
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -7370,7 +7663,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [264]
+                              "children": [
+                                264
+                              ]
                             }
                           ]
                         }
@@ -7435,7 +7730,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [266, 267]
+                                  "children": [
+                                    266,
+                                    267
+                                  ]
                                 }
                               ]
                             }
@@ -7491,7 +7789,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [269, 270]
+                                  "children": [
+                                    269,
+                                    270
+                                  ]
                                 }
                               ]
                             }
@@ -7601,7 +7902,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [284, 285]
+                                  "children": [
+                                    284,
+                                    285
+                                  ]
                                 }
                               ]
                             }
@@ -7657,7 +7961,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [287, 288]
+                                  "children": [
+                                    287,
+                                    288
+                                  ]
                                 }
                               ]
                             }
@@ -7922,7 +8229,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [493, 490, 492, 491, 489]
+                                      "children": [
+                                        493,
+                                        490,
+                                        492,
+                                        491,
+                                        489
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -7940,7 +8253,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [294, 295]
+                              "children": [
+                                294,
+                                295
+                              ]
                             }
                           ]
                         }
@@ -8001,7 +8317,9 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [299]
+                                  "children": [
+                                    299
+                                  ]
                                 }
                               ]
                             }
@@ -8012,7 +8330,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [297]
+                          "children": [
+                            297
+                          ]
                         }
                       ]
                     }
@@ -8123,7 +8443,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [275, 276]
+                                  "children": [
+                                    275,
+                                    276
+                                  ]
                                 }
                               ]
                             }
@@ -8179,7 +8502,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [278, 279]
+                                  "children": [
+                                    278,
+                                    279
+                                  ]
                                 }
                               ]
                             }
@@ -8405,7 +8731,10 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [468, 469]
+                                      "children": [
+                                        468,
+                                        469
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -8423,7 +8752,12 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [480, 481, 483, 482]
+                              "children": [
+                                480,
+                                481,
+                                483,
+                                482
+                              ]
                             }
                           ],
                           "sources": [
@@ -8485,7 +8819,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [485]
+                              "children": [
+                                485
+                              ]
                             }
                           ],
                           "sources": [
@@ -8559,7 +8895,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [315, 316]
+                                  "children": [
+                                    315,
+                                    316
+                                  ]
                                 }
                               ]
                             }
@@ -8615,7 +8954,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [318, 319]
+                                  "children": [
+                                    318,
+                                    319
+                                  ]
                                 }
                               ]
                             }
@@ -8729,7 +9071,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [478]
+                              "children": [
+                                478
+                              ]
                             }
                           ],
                           "sources": [
@@ -8803,7 +9147,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [208]
+                                          "children": [
+                                            208
+                                          ]
                                         }
                                       ]
                                     }
@@ -8832,7 +9178,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [206, 209]
+                                  "children": [
+                                    206,
+                                    209
+                                  ]
                                 }
                               ]
                             }
@@ -8888,7 +9237,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [211, 212]
+                                  "children": [
+                                    211,
+                                    212
+                                  ]
                                 }
                               ]
                             }
@@ -9005,7 +9357,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [304, 305]
+                                  "children": [
+                                    304,
+                                    305
+                                  ]
                                 }
                               ]
                             }
@@ -9061,7 +9416,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [307, 308]
+                                  "children": [
+                                    307,
+                                    308
+                                  ]
                                 }
                               ]
                             }
@@ -9421,7 +9779,14 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [471, 472, 474, 476, 475, 473]
+                              "children": [
+                                471,
+                                472,
+                                474,
+                                476,
+                                475,
+                                473
+                              ]
                             }
                           ],
                           "sources": [
@@ -9531,7 +9896,11 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [195, 193, 194]
+                                          "children": [
+                                            195,
+                                            193,
+                                            194
+                                          ]
                                         }
                                       ]
                                     }
@@ -9560,7 +9929,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [191, 196]
+                                  "children": [
+                                    191,
+                                    196
+                                  ]
                                 }
                               ]
                             }
@@ -9616,7 +9988,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [198, 199]
+                                  "children": [
+                                    198,
+                                    199
+                                  ]
                                 }
                               ]
                             }
@@ -9869,7 +10244,14 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [471, 472, 474, 476, 475, 473]
+                              "children": [
+                                471,
+                                472,
+                                474,
+                                476,
+                                475,
+                                473
+                              ]
                             }
                           ],
                           "sources": [
@@ -9979,7 +10361,11 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [149, 147, 148]
+                                          "children": [
+                                            149,
+                                            147,
+                                            148
+                                          ]
                                         }
                                       ]
                                     }
@@ -10008,7 +10394,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [145, 150]
+                                  "children": [
+                                    145,
+                                    150
+                                  ]
                                 }
                               ]
                             }
@@ -10064,7 +10453,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [152, 153]
+                                  "children": [
+                                    152,
+                                    153
+                                  ]
                                 }
                               ]
                             }
@@ -10331,7 +10723,14 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [471, 472, 474, 476, 475, 473]
+                              "children": [
+                                471,
+                                472,
+                                474,
+                                476,
+                                475,
+                                473
+                              ]
                             }
                           ],
                           "sources": [
@@ -10425,7 +10824,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [164, 163]
+                                          "children": [
+                                            164,
+                                            163
+                                          ]
                                         }
                                       ]
                                     }
@@ -10456,7 +10858,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [161, 165]
+                                  "children": [
+                                    161,
+                                    165
+                                  ]
                                 }
                               ]
                             }
@@ -10506,7 +10911,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [167, 168]
+                                  "children": [
+                                    167,
+                                    168
+                                  ]
                                 }
                               ]
                             }
@@ -10526,13 +10934,29 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [99]
+              "children": [
+                99
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
               "children": [
-                213, 169, 226, 242, 259, 280, 289, 271, 309, 200, 300, 323, 185, 139, 154
+                213,
+                169,
+                226,
+                242,
+                259,
+                280,
+                289,
+                271,
+                309,
+                200,
+                300,
+                323,
+                185,
+                139,
+                154
               ]
             }
           ],
@@ -10549,7 +10973,9 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [98]
+          "children": [
+            98
+          ]
         }
       ],
       "sources": [
@@ -10565,7 +10991,11 @@
     {
       "title": "Modules",
       "kind": 2,
-      "children": [1, 2, 97]
+      "children": [
+        1,
+        2,
+        97
+      ]
     }
   ]
 }
