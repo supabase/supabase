@@ -7,7 +7,7 @@ import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSel
 import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 import GitHubSection from './GithubIntegration/GithubSection'
-import VercelSection from './VercelIntegration/VercelSection'
+import { ProjectVercelSection } from './VercelIntegration/ProjectVercelSection'
 
 export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -49,7 +49,7 @@ const IntegrationSettings = () => {
       {showVercelIntegration && (
         <>
           <ScaffoldDivider />
-          <VercelSection isProjectScoped={true} />
+          <ProjectVercelSection />
           <SidePanelVercelProjectLinker />
         </>
       )}
