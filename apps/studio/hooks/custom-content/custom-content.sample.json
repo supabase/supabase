@@ -74,5 +74,7 @@
     ]
   },
 
-  "infra:cloud_providers": ["AWS_NIMBUS"]
+  "infra:cloud_providers": ["AWS_NIMBUS"],
+
+  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
 }

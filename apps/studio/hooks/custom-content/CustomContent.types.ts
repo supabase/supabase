@@ -29,4 +29,6 @@ export type CustomContentTypes = {
   connectFrameworks: (typeof CONNECTION_TYPES)[number]
 
   infraCloudProviders: CloudProvider[]
+
+  sslCertificateUrl: string
 }

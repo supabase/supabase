@@ -9,5 +9,7 @@
 
   "connect:frameworks": null,
 
-  "infra:cloud_providers": ["AWS", "AWS_K8S", "FLY"]
+  "infra:cloud_providers": ["AWS", "AWS_K8S", "FLY"],
+
+  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
 }
