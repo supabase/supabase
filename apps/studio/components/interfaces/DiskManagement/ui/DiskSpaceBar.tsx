@@ -19,7 +19,7 @@ interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
 }
 
-export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
+export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { formState, watch } = form
