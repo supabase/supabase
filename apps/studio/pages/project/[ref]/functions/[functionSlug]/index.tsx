@@ -28,6 +28,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
+import { useFlag } from 'common'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -63,6 +64,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
+  const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const { data: selectedFunction } = useEdgeFunctionQuery({
@@ -190,16 +192,20 @@ const PageLayout: NextPageWithLayout = () => {
                       format="ms"
                       highlightedValue={meanBy(props.data, 'avg_execution_time')}
                     />
-                    <AreaChart
-                      title="Max execution time"
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      customDateFormat={selectedInterval.format}
-                      yAxisKey="max_execution_time"
-                      data={props.data}
-                      format="ms"
-                      highlightedValue={maxBy(props.data, 'max_execution_time')?.max_execution_time}
-                    />
+                    {newChartsEnabled && (
+                      <AreaChart
+                        title="Max execution time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_execution_time"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={
+                          maxBy(props.data, 'max_execution_time')?.max_execution_time
+                        }
+                      />
+                    )}
                   </div>
                 )
               }}
@@ -284,22 +290,24 @@ const PageLayout: NextPageWithLayout = () => {
                           )
                         }}
                       />
-                      <StackedBarChart
-                        title="Worker Logs"
-                        className="w-full"
-                        xAxisKey="timestamp"
-                        yAxisKey="count"
-                        stackKey="status"
-                        data={logsData}
-                        highlightedValue={sumBy(logsData, 'count')}
-                        customDateFormat={selectedInterval.format}
-                        stackColors={['red', 'brand', 'yellow']}
-                        onBarClick={() => {
-                          router.push(
-                            `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
-                          )
-                        }}
-                      />
+                      {newChartsEnabled && (
+                        <StackedBarChart
+                          title="Worker Logs"
+                          className="w-full"
+                          xAxisKey="timestamp"
+                          yAxisKey="count"
+                          stackKey="status"
+                          data={logsData}
+                          highlightedValue={sumBy(logsData, 'count')}
+                          customDateFormat={selectedInterval.format}
+                          stackColors={['red', 'brand', 'yellow']}
+                          onBarClick={() => {
+                            router.push(
+                              `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
+                            )
+                          }}
+                        />
+                      )}
                     </div>
                   )
                 }
@@ -331,16 +339,18 @@ const PageLayout: NextPageWithLayout = () => {
                       format="ms"
                       highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
                     />
-                    <AreaChart
-                      title="Max CPU Time"
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      customDateFormat={selectedInterval.format}
-                      yAxisKey="max_cpu_time_used"
-                      data={props.data}
-                      format="ms"
-                      highlightedValue={maxBy(props.data, 'max_cpu_time_used')?.max_cpu_time_used}
-                    />
+                    {newChartsEnabled && (
+                      <AreaChart
+                        title="Max CPU Time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_cpu_time_used"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={maxBy(props.data, 'max_cpu_time_used')?.max_cpu_time_used}
+                      />
+                    )}
                   </div>
                 )
               }}
@@ -390,18 +400,20 @@ const PageLayout: NextPageWithLayout = () => {
                       format="MB"
                       highlightedValue={meanBy(props.data, 'avg_memory_used')}
                     />
-                    <StackedBarChart
-                      title="Average Memory Usage by Type"
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      yAxisKey="count"
-                      stackKey="type"
-                      format="MB"
-                      data={memoryData}
-                      highlightedValue={sumBy(memoryData, 'count')}
-                      customDateFormat={selectedInterval.format}
-                      stackColors={['blue', 'brand']}
-                    />
+                    {newChartsEnabled && (
+                      <StackedBarChart
+                        title="Average Memory Usage by Type"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        yAxisKey="count"
+                        stackKey="type"
+                        format="MB"
+                        data={memoryData}
+                        highlightedValue={sumBy(memoryData, 'count')}
+                        customDateFormat={selectedInterval.format}
+                        stackColors={['blue', 'brand']}
+                      />
+                    )}
                   </div>
                 )
               }}
