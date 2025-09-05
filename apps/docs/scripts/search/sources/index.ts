@@ -1,4 +1,4 @@
-import { sep } from 'node:path'
+// Use string manipulation instead of path utilities
 
 import {
   GitHubDiscussionLoader,
@@ -37,8 +37,67 @@ export async function fetchGuideSources() {
           ({ path }) =>
             /\.mdx?$/.test(path) &&
             !ignoredFiles.includes(path) &&
-            !path.split(sep).some((part) => part.startsWith('_'))
+            !path.split('/').some((part) => part.startsWith('_'))
         )
+        .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
+    )
+  ).flat()
+}
+
+// Interface to define guide categories
+interface GuideCategory {
+  path: string
+  title: string
+  urlPath: string
+}
+
+// Function to get all guide categories dynamically
+export async function getGuideCategories(): Promise<GuideCategory[]> {
+  const allFiles = await walk('content/guides')
+  const directories = new Set<string>()
+  
+  allFiles
+    .filter(({ path }) => /\.mdx?$/.test(path))
+    .forEach(({ path }) => {
+      // Get directory path relative to content/guides using string manipulation
+      const relativePath = path.replace('content/guides/', '')
+      const dirPath = relativePath.includes('/') ? relativePath.substring(0, relativePath.lastIndexOf('/')) : '.'
+      
+      // Add directory and all parent directories
+      if (dirPath !== '.') {
+        const parts = dirPath.split('/')
+        for (let i = 1; i <= parts.length; i++) {
+          directories.add(parts.slice(0, i).join('/'))
+        }
+      }
+    })
+
+  return Array.from(directories)
+    .sort()
+    .map(path => ({
+      path: `content/guides/${path}`,
+      title: `${path.split('/').map(part => 
+        part.charAt(0).toUpperCase() + part.slice(1).replace('-', ' ')
+      ).join(' ')} Guides`,
+      urlPath: `docs/guides/${path}`
+    }))
+}
+
+// Function to fetch guides for a specific category
+export async function fetchGuidesForCategory(categoryPath: string) {
+  const allFiles = await walk('content/guides')
+  
+  return (
+    await Promise.all(
+      allFiles
+        .filter(({ path }) => {
+          return (
+            /\.mdx?$/.test(path) &&
+            !ignoredFiles.includes(path) &&
+            !path.split('/').some((part) => part.startsWith('_')) &&
+            path.startsWith(categoryPath)
+          )
+        })
         .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
     )
   ).flat()
