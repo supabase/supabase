@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import { isFeatureEnabled } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
 import type { IconPanel } from 'ui-patterns/IconPanel'
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
