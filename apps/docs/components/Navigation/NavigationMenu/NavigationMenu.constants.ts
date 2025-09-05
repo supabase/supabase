@@ -591,7 +591,7 @@ export const PhoneLoginsItems = [
   },
 ]
 
-export const auth = {
+export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
   items: [
@@ -1876,7 +1876,7 @@ export const vectorIndexItems = [
   },
 ]
 
-export const ai = {
+export const ai: NavMenuConstant = {
   icon: 'ai',
   title: 'AI & Vectors',
   url: '/guides/ai',
