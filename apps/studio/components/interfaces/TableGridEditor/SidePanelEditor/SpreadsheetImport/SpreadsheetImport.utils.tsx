@@ -85,7 +85,7 @@ export const parseSpreadsheet = (
         previewRows = results.data.slice(0, 20)
         if (results.errors.length > 0) {
           const formattedErrors = results.errors.map((error) => {
-            return { ...error, data: results.data[error.row] }
+            if (error) return { ...error, data: results.data[error.row] }
           })
           errors.push(...formattedErrors)
         }
