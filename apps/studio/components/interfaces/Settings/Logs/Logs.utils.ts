@@ -15,7 +15,7 @@ import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
  * Convert a micro timestamp from number/string to iso timestamp
  */
 export const unixMicroToIsoTimestamp = (unix: string | number): string => {
-  return dayjs.unix(Number(unix) / 1000 / 1000).toISOString()
+  return dayjs.utc(Number(unix) / 1000).toISOString()
 }
 
 export const isUnixMicro = (unix: string | number): boolean => {
@@ -483,19 +483,22 @@ export const fillTimeseries = (
   // If we have more points than minPointsToFill, just normalize timestamps and return
   if (timeseriesData.length > minPointsToFill) {
     return timeseriesData.map((datum) => {
-      const iso = dayjs.utc(datum[timestampKey]).toISOString()
+      const timestamp = datum[timestampKey]
+      const iso = isUnixMicro(timestamp)
+        ? unixMicroToIsoTimestamp(timestamp)
+        : dayjs.utc(timestamp).toISOString()
       datum[timestampKey] = iso
       return datum
     })
   }
 
-  if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
+  if (timeseriesData.length <= 1 && !(min && max)) return timeseriesData
   const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
 
   const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
   const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
 
-  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  // When no data exists but min/max are provided, we need to determine truncation from the time range
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
   let truncation: 'second' | 'minute' | 'hour' | 'day'
   let step = 1
@@ -515,11 +518,21 @@ export const fillTimeseries = (
     truncation = getTimestampTruncation(truncationSamples as Dayjs[])
   }
 
+  // If no data exists and no interval specified, default to minute precision
+  if (timeseriesData.length === 0 && !interval) {
+    truncation = 'minute'
+  }
+
   const newData = timeseriesData.map((datum) => {
     const timestamp = datum[timestampKey]
     const iso = isUnixMicro(timestamp)
       ? unixMicroToIsoTimestamp(timestamp)
       : dayjs.utc(timestamp).toISOString()
+
+    if (Array.isArray(valueKey) && valueKey.length === 0) {
+      return { [timestampKey]: iso }
+    }
+
     datum[timestampKey] = iso
     return datum
   })
@@ -533,7 +546,8 @@ export const fillTimeseries = (
         d_date.month() === currentDate.month() &&
         d_date.date() === currentDate.date() &&
         d_date.hour() === currentDate.hour() &&
-        d_date.minute() === currentDate.minute()
+        d_date.minute() === currentDate.minute() &&
+        d_date.second() === currentDate.second()
       )
     })
     if (!found) {

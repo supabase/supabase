@@ -1,7 +1,8 @@
+import { AlertTriangle, Loader2 } from 'lucide-react'
+
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-import { AlertTriangle, Loader2 } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
@@ -23,6 +24,7 @@ interface PipelineStatusProps {
   isError: boolean
   isSuccess: boolean
   requestStatus?: PipelineStatusRequestStatus
+  pipelineId?: number
 }
 
 export const PipelineStatus = ({
@@ -32,6 +34,7 @@ export const PipelineStatus = ({
   isError,
   isSuccess,
   requestStatus,
+  pipelineId,
 }: PipelineStatusProps) => {
   const { ref } = useParams()
 
@@ -129,6 +132,12 @@ export const PipelineStatus = ({
 
   const statusConfig = getStatusConfig()
 
+  const pipelineLogsUrl = pipelineId
+    ? `/project/${ref}/logs/etl-replication-logs?f=${encodeURIComponent(
+        JSON.stringify({ pipeline_id: pipelineId })
+      )}`
+    : `/project/${ref}/logs/etl-replication-logs`
+
   return (
     <>
       {isLoading && <ShimmeringLoader />}
@@ -155,9 +164,7 @@ export const PipelineStatus = ({
             {['unknown', 'failed'].includes(pipelineStatus?.name ?? '') && (
               <>
                 {' '}
-                Check the{' '}
-                <InlineLink href={`/project/${ref}/logs/etl-replication-logs`}>logs</InlineLink> for
-                more information.
+                Check the <InlineLink href={pipelineLogsUrl}>logs</InlineLink> for more information.
               </>
             )}
           </TooltipContent>

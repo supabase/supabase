@@ -3,6 +3,17 @@ import * as configcat from 'configcat-js'
 let client: configcat.IConfigCatClient
 const endpoint = '/configuration-files/configcat-proxy/frontend-v2/config_v6.json'
 
+/**
+ * To set up ConfigCat for another app
+ * - Declare `FeatureFlagProvider` at the _app level
+ * - Pass in `getFlags` as `getConfigCatFlags` into `FeatureFlagProvider`
+ *   - [Joshen] Wondering if this should just be baked into FeatureFlagProvider, rather than passed as a prop
+ * - Ensure that your app has the `NEXT_PUBLIC_CONFIGCAT_PROXY_URL` env var
+ *   - [Joshen] Wondering if we can just set a default value for each env var, so can skip setting up env var in Vercel
+ * - Verify that your flags are now loading by console logging `flagValues` in `FeatureFlagProvider`'s useEffect
+ * - Can now use ConfigCat feature flags with the `useFlag` hook
+ */
+
 export const fetchHandler: typeof fetch = async (input, init) => {
   try {
     return await fetch(input, init)
@@ -16,9 +27,13 @@ export const fetchHandler: typeof fetch = async (input, init) => {
 }
 
 async function getClient() {
-  if (client) {
-    return client
+  if (!process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL) {
+    console.error(
+      'Failed to get ConfigCat client: missing env var "NEXT_PUBLIC_CONFIGCAT_PROXY_URL"'
+    )
   }
+
+  if (client) return client
 
   const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
   const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
@@ -39,11 +54,14 @@ async function getClient() {
   return client
 }
 
-export async function getFlags(userEmail: string = '') {
-  if (userEmail) {
-    const client = await getClient()
-    return client.getAllValuesAsync(new configcat.User(userEmail))
-  }
+export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
+  const client = await getClient()
 
-  return []
+  if (userEmail) {
+    return client.getAllValuesAsync(
+      new configcat.User(userEmail, undefined, undefined, customAttributes)
+    )
+  } else {
+    return client.getAllValuesAsync()
+  }
 }

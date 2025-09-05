@@ -145,6 +145,8 @@ To use Google's pre-built signin buttons:
 
   </TabPanel>
 
+<$Show if="sdk:swift">
+
   <TabPanel id="swift" label="Swift">
 
     Google sign-in with Supabase is done through the [`GoogleSignIn-iOS`](https://github.com/google/GoogleSignIn-iOS) package.
@@ -189,6 +191,7 @@ To use Google's pre-built signin buttons:
     3. Add web client ID and iOS client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_, separated by a comma. Enable the `Skip nonce check` option.
 
   </TabPanel>
+  </$Show>
 
   <TabPanel id="android" label="Android (Kotlin)">
 

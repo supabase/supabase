@@ -95,6 +95,11 @@
       "description": "Enable the database roles page"
     },
 
+    "docs:self-hosting": {
+      "type": "boolean",
+      "description": "Enable documentation for self-hosting"
+    },
+
     "integrations:vercel": {
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
@@ -182,6 +187,27 @@
     "reports:all": {
       "type": "boolean",
       "description": "Enable the project reports page"
+    },
+
+    "sdk:csharp": {
+      "type": "boolean",
+      "description": "Enable the C# SDK"
+    },
+    "sdk:dart": {
+      "type": "boolean",
+      "description": "Enable the Dart/Flutter SDK"
+    },
+    "sdk:kotlin": {
+      "type": "boolean",
+      "description": "Enable the Kotlin SDK"
+    },
+    "sdk:python": {
+      "type": "boolean",
+      "description": "Enable the Python SDK"
+    },
+    "sdk:swift": {
+      "type": "boolean",
+      "description": "Enable the Swift SDK"
     }
   },
   "required": [
@@ -206,6 +232,7 @@
     "billing:all",
     "database:replication",
     "database:roles",
+    "docs:self-hosting",
     "integrations:vercel",
     "integrations:show_stripe_wrapper",
     "profile:show_email",
@@ -225,7 +252,12 @@
     "project_settings:log_drains",
     "project_connection:javascript_example",
     "project_connection:dart_example",
-    "reports:all"
+    "reports:all",
+    "sdk:csharp",
+    "sdk:dart",
+    "sdk:kotlin",
+    "sdk:python",
+    "sdk:swift"
   ],
   "additionalProperties": false
 }

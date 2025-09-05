@@ -29,13 +29,14 @@ export type DatePickerValue = {
   text?: string
 }
 
-interface Props {
+interface LogsDatePickerProps {
   value: DatePickerValue
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
   popoverContentProps?: typeof PopoverContent_Shadcn_
   hideWarnings?: boolean
+  align?: 'start' | 'end' | 'center'
 }
 
 export const LogsDatePicker = ({
@@ -45,7 +46,8 @@ export const LogsDatePicker = ({
   buttonTriggerProps,
   popoverContentProps,
   hideWarnings,
-}: PropsWithChildren<Props>) => {
+  align = 'end',
+}: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
 
   const todayButtonRef = useRef<HTMLButtonElement>(null)
@@ -253,7 +255,7 @@ export const LogsDatePicker = ({
       <PopoverContent_Shadcn_
         className="flex w-full p-0"
         side="bottom"
-        align="end"
+        align={align}
         portal={true}
         {...popoverContentProps}
       >

@@ -1,13 +1,14 @@
 import * as Sentry from '@sentry/nextjs'
+
 import createClient from 'openapi-fetch'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { IS_PLATFORM } from 'common'
 import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
@@ -135,15 +136,13 @@ export const {
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean
+  sentryContext?: Parameters<typeof Sentry.captureException>[1]
 }
 
-export const handleError = (
-  error: unknown,
-  options: HandleErrorOptions = { alwaysCapture: false }
-): never => {
+export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   if (error && typeof error === 'object') {
     if (options.alwaysCapture) {
-      Sentry.captureException(error)
+      Sentry.captureException(error, options.sentryContext)
     }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
@@ -169,7 +168,7 @@ export const handleError = (
 
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
-  Sentry.captureException(error)
+  Sentry.captureException(error, options.sentryContext)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.

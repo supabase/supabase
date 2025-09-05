@@ -1,29 +1,46 @@
-import authors from 'lib/authors.json'
+import blogAuthors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import type Author from '~/types/author'
 import type PostTypes from '~/types/post'
 import dayjs from 'dayjs'
 import { Badge } from 'ui'
+import type { CMSPostTypes } from '~/types/post'
 
 interface Props {
-  post: PostTypes
+  post: PostTypes | CMSPostTypes
+}
+
+const getAuthors = (post: PostTypes | CMSPostTypes) => {
+  if ('isCMS' in post && post.isCMS) {
+    // For CMS posts, display author directly from the blog data
+    const cmsBlog = post as CMSPostTypes
+    const authors =
+      cmsBlog.authors?.map((author) => ({
+        author: author.author || 'Unknown Author',
+        author_image_url: author.author_image_url || null,
+        author_url: author.author_url || '#',
+        position: author.position || '',
+      })) || []
+
+    return authors
+  }
+
+  const authorArray = post.author?.split(',') || []
+  const authors = []
+
+  for (let i = 0; i < authorArray.length; i++) {
+    authors.push(
+      blogAuthors.find((authors: any) => {
+        return authors.author_id === authorArray[i]
+      })
+    )
+  }
+  return authors
 }
 
 const BlogListItem = ({ post }: Props) => {
-  const authorArray: string[] | undefined = post.author ? post.author.split(',') : []
-  const author = []
-
-  if (authorArray) {
-    for (let i = 0; i < authorArray.length; i++) {
-      author.push(
-        authors.find((authors: Author) => {
-          return authors.author_id === authorArray[i]
-        })
-      )
-    }
-  }
+  const authors = getAuthors(post)
 
   const sanitizeCategory = (category: string) => category.replaceAll('-', ' ')
 
@@ -37,7 +54,7 @@ const BlogListItem = ({ post }: Props) => {
       </div>
       <div className="lg:col-span-2 xl:col-span-4 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-3 gap-2 text-sm">
         <div className="hidden lg:flex items-center -space-x-2">
-          {author.map((author: any, i: number) => {
+          {authors.map((author: any, i: number) => {
             return (
               <div className="relative ring-background w-6 h-6 rounded-full ring-2" key={i}>
                 {author.author_image_url && (
