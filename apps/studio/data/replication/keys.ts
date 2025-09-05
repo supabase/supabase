@@ -15,4 +15,6 @@ export const replicationKeys = {
     ['projects', projectRef, 'pipelines', pipelineId, 'status'] as const,
   pipelinesReplicationStatus: (projectRef: string | undefined, pipelineId: number | undefined) =>
     ['projects', projectRef, 'pipelines', pipelineId, 'replication-status'] as const,
+  pipelinesVersion: (projectRef: string | undefined, pipelineId: number | undefined) =>
+    ['projects', projectRef, 'pipelines', pipelineId, 'version'] as const,
 }
