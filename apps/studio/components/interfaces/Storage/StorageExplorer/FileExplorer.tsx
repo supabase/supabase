@@ -5,10 +5,10 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
 import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
-import ColumnContextMenu from './ColumnContextMenu'
-import FileExplorerColumn from './FileExplorerColumn'
-import FolderContextMenu from './FolderContextMenu'
-import ItemContextMenu from './ItemContextMenu'
+import { ColumnContextMenu } from './ColumnContextMenu'
+import { FileExplorerColumn } from './FileExplorerColumn'
+import { FolderContextMenu } from './FolderContextMenu'
+import { ItemContextMenu } from './ItemContextMenu'
 
 export interface FileExplorerProps {
   columns: StorageColumn[]
@@ -20,7 +20,7 @@ export interface FileExplorerProps {
   onColumnLoadMore: (index: number, column: StorageColumn) => void
 }
 
-const FileExplorer = ({
+export const FileExplorer = ({
   columns = [],
   selectedItems = [],
   itemSearchString,
@@ -90,5 +90,3 @@ const FileExplorer = ({
     </div>
   )
 }
-
-export default FileExplorer
