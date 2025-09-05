@@ -273,11 +273,9 @@ const PreviewFilterPanelWithUniversal = ({
           newFilters[propertyName] = {}
         }
 
-        if (!condition.value) {
-          return
-        }
-
-        ;(newFilters[propertyName] as Record<string, boolean>)[condition.value] = true
+        const key = String(condition.value ?? '')
+        if (!key) return
+        ;(newFilters[propertyName] as Record<string, boolean>)[key] = true
       }
     })
 
