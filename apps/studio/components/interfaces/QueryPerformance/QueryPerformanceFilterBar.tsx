@@ -1,5 +1,6 @@
 import { RefreshCw, Search } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -26,10 +27,11 @@ export const QueryPerformanceFilterBar = ({
     true
   )
 
-  const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
-  const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
+  const [{ search: searchQuery }, setSearchParams] = useQueryStates({
+    search: parseAsString.withDefault(''),
+  })
 
-  const [searchInputVal, setSearchInputVal] = useState(defaultSearchQueryValue)
+  const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
   const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
     roles: typeof defaultFilterRoles === 'string' ? [defaultFilterRoles] : defaultFilterRoles,
     query: '',
@@ -43,15 +45,7 @@ export const QueryPerformanceFilterBar = ({
   const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
 
   const onSearchQueryChange = (value: string) => {
-    setSearchInputVal(value)
-
-    if (!value || typeof value !== 'string') {
-      // if user has deleted the search query, remove it from the url
-      const { search, ...rest } = router.query
-      router.push({ ...router, query: { ...rest } })
-    } else {
-      router.push({ ...router, query: { ...router.query, search: value } })
-    }
+    setSearchParams({ search: value || '' })
   }
 
   const onFilterRolesChange = (roles: string[]) => {
@@ -67,7 +61,7 @@ export const QueryPerformanceFilterBar = ({
             size="tiny"
             autoComplete="off"
             icon={<Search size={12} />}
-            value={searchInputVal}
+            value={searchQuery}
             onChange={(e: any) => onSearchQueryChange(e.target.value)}
             name="keyword"
             id="keyword"

@@ -44,7 +44,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const roles = router?.query?.roles ?? []
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
-    // searchQuery,
+    searchQuery,
     orderBy,
     preset,
     roles: typeof roles === 'string' ? [roles] : roles,
