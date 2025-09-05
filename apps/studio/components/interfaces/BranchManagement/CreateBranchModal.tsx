@@ -89,7 +89,13 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
-  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery({ projectRef })
+  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery(
+    { projectRef },
+    {
+      // [Joshen] Only trigger this request when the modal is opened
+      enabled: showCreateBranchModal,
+    }
+  )
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
   const noPhysicalBackups = cloneBackupsError?.message.startsWith(
     'Physical backups need to be enabled'
