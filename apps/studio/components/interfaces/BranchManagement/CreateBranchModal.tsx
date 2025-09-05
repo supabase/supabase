@@ -65,7 +65,7 @@ export const CreateBranchModal = () => {
   const allowDataBranching = useFlag('allowDataBranching')
   // [Joshen] This is meant to be short lived while we're figuring out how to control
   // requests to this endpoint. Kill switch in case we need to stop the requests
-  const disableBackupsCheck = useFlag('DisableBackupsCheckInCreatebranchmodal')
+  const disableBackupsCheck = useFlag('disableBackupsCheckInCreatebranchmodal')
 
   const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
