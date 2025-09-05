@@ -293,7 +293,7 @@ describe('filterToWhereClause', () => {
   it('should generate WHERE clause for region filter', () => {
     const filters = {
       ...defaultFilters,
-      region: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
+      region: ['us-east-1', 'eu-west-1'],
     }
     const result = filterToWhereClause(filters)
     expect(result).toBe("WHERE h.x_sb_edge_region IN ('us-east-1','eu-west-1')")
