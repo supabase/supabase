@@ -28,7 +28,7 @@ export function Command({ name, highlight }: CommandCopyProps) {
   }
 
   const baseUrl = getBaseUrl()
-  const componentPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/r/${name}.json`
+  const componentPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/api/blocks/${name}.json`
 
   const commands: Record<PackageManager, string> = {
     npm: `npx shadcn@latest add ${baseUrl}${componentPath}`,

@@ -7,11 +7,6 @@
   "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
   "files": [
     {
-      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx",
-      "type": "registry:page",
-      "target": "app/auth/login/page.tsx"
-    },
-    {
       "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/error/page.tsx",
       "type": "registry:page",
       "target": "app/auth/error/page.tsx"
@@ -25,10 +20,6 @@
       "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/confirm/route.ts",
       "type": "registry:page",
       "target": "app/auth/confirm/route.ts"
-    },
-    {
-      "path": "registry/default/blocks/password-based-auth-nextjs/components/login-form.tsx",
-      "type": "registry:component"
     },
     {
       "path": "registry/default/blocks/password-based-auth-nextjs/middleware.ts",
@@ -69,6 +60,10 @@
     },
     {
       "path": "registry/default/blocks/password-based-auth-nextjs/components/logout-button.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/components/password-login-form.tsx",
       "type": "registry:component"
     }
   ]

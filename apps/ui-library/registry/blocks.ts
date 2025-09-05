@@ -1,4 +1,4 @@
-import { type Registry, type RegistryItem } from 'shadcn/registry'
+import { type RegistryItem } from 'shadcn/schema'
 import { clients } from './clients'
 import { registryItemAppend } from './utils'
 
@@ -9,6 +9,7 @@ import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry
 import realtimeChat from './default/blocks/realtime-chat/registry-item.json' with { type: 'json' }
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' with { type: 'json' }
 
+import commonAuthNextjs from './default/blocks/common-auth-nextjs/registry-item.json' with { type: 'json' }
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' with { type: 'json' }
 import passwordBasedAuthReactRouter from './default/blocks/password-based-auth-react-router/registry-item.json' with { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' with { type: 'json' }
@@ -19,7 +20,7 @@ import socialAuthReactRouter from './default/blocks/social-auth-react-router/reg
 import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
 import socialAuthTanstack from './default/blocks/social-auth-tanstack/registry-item.json' with { type: 'json' }
 
-const combine = (component: Registry['items'][number]) => {
+const combine = (component: RegistryItem) => {
   return clients.flatMap((client) => {
     return registryItemAppend(
       {
@@ -37,6 +38,8 @@ const tanstackClient = clients.find((client) => client.name === 'supabase-client
 const reactRouterClient = clients.find((client) => client.name === 'supabase-client-react-router')
 
 export const blocks = [
+  registryItemAppend(commonAuthNextjs as RegistryItem, [nextjsClient!]),
+
   registryItemAppend(passwordBasedAuthNextjs as RegistryItem, [nextjsClient!]),
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
   registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),
@@ -54,4 +57,4 @@ export const blocks = [
   ...combine(realtimeChat as RegistryItem),
   // infinite query hook is intentionally not combined with the clients since it depends on clients having database types.
   infiniteQueryHook as RegistryItem,
-] as Registry['items']
+] as RegistryItem[]
