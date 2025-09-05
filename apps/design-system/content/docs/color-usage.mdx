@@ -1,9 +1,15 @@
 ---
 title: Color usage
-description: Colors system breakdown with best practice
+description: Colors system breakdown with best practices
 ---
 
 The shorthand utility classes below simplify our full color palette by providing sensible, contrast-checked defaults. Use them whenever possible to ensure accessible text colors and balanced background fills.
+
+## Text
+
+Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
+
+<Colors definition={'text'} />
 
 ## Background
 
@@ -54,12 +60,6 @@ Dealing with large areas of empty space in data display should also be catered f
 We use the `./bg-overlay` background color for overlays.
 This is not to be confused with `Dialogs`, they require to use the same app background color as the site.
 
-## Text
-
-Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
-
-<Colors definition={'text'} />
-
 ## Border
 
 <Colors definition={'border'} />
@@ -69,4 +69,3 @@ Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid 
 These can also be accessed with `foreground`. Like `text-foreground-light`.
 
 <Colors definition={'colors'} />
-```
