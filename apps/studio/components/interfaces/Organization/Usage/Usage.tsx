@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldHeader, ScaffoldContainer, ScaffoldTitle } from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
@@ -17,11 +17,11 @@ import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metric
 import {
   cn,
   Select_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
@@ -34,7 +34,7 @@ import { TotalUsage } from './TotalUsage'
 const Usage = () => {
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedProjectRef, setSelectedProjectRef] = useState<string | undefined>(undefined)
+  const [selectedProjectRef, setSelectedProjectRef] = useState<string | undefined>('all-projects')
 
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -166,7 +166,7 @@ const Usage = () => {
                   <Select_Shadcn_
                     value={selectedProjectRef}
                     onValueChange={(value) => {
-                      if (value === 'all-projects') setSelectedProjectRef(undefined)
+                      if (value === 'all-projects') setSelectedProjectRef('all-projects')
                       else setSelectedProjectRef(value)
                     }}
                   >

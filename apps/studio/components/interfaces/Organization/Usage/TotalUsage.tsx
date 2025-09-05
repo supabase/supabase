@@ -58,7 +58,7 @@ export const TotalUsage = ({
   })
 
   // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
-  const showRelationToSubscription = currentBillingCycleSelected && !projectRef
+  const showRelationToSubscription = currentBillingCycleSelected && projectRef === 'all-projects'
 
   const hasExceededAnyLimits =
     showRelationToSubscription &&
