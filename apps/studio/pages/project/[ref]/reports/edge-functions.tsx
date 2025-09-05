@@ -183,6 +183,7 @@ const EdgeFunctionsUsage = () => {
                 value={functionFilter ?? []}
                 onChange={setFunctionFilter}
                 isLoading={isRefreshing}
+                showSearch
               />
 
               <ReportsNumericFilter
@@ -224,6 +225,7 @@ const EdgeFunctionsUsage = () => {
                 }))}
                 value={regionFilter ?? []}
                 onChange={setRegionFilter}
+                showSearch
               />
             </div>
           </div>
