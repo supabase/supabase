@@ -8,8 +8,10 @@ import AlertError from 'components/ui/AlertError'
 import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
 import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { AlertCircle } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
@@ -24,6 +26,7 @@ import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'
+import { useUpdatePipelineVersionMutation } from 'data/replication/update-pipeline-version-mutation'
 
 interface DestinationRowProps {
   sourceId: number | undefined
@@ -66,13 +69,15 @@ export const DestinationRow = ({
     },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
+  const { mutateAsync: updatePipelineVersion } = useUpdatePipelineVersionMutation({})
+  const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
@@ -85,6 +90,39 @@ export const DestinationRow = ({
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const hasTableErrors = errorCount > 0
+
+  // Check if a newer pipeline version is available (one-time check cached for session)
+  const { data: versionData } = useReplicationPipelineVersionQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
+  const hasUpdate = Boolean(versionData?.new_version)
+  const onUpdateClick = async () => {
+    if (!projectRef || !pipeline?.id) return
+    const versionId = versionData?.new_version?.id
+    if (!versionId) return
+    try {
+      await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
+      // Restart/start pipeline similar to applying changes UX
+      const isActive = statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
+      setRequestStatus(
+        pipeline.id,
+        isActive
+          ? PipelineStatusRequestStatus.RestartRequested
+          : PipelineStatusRequestStatus.StartRequested,
+        statusName
+      )
+      // Collapse any open editor panel for a clean UX
+      setShowEditDestinationPanel(false)
+      await startPipeline({ projectRef, pipelineId: pipeline.id })
+    } catch (e: any) {
+      // If update returned 404, we already invalidated version in the mutation; no restart
+      if (e?.code === 404) return
+      // If restart failed, clear the transient status and notify
+      if (pipeline?.id) setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
+      toast.error('Failed to restart pipeline after update')
+    }
+  }
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -189,6 +227,8 @@ export const DestinationRow = ({
                 isError={isPipelineStatusError}
                 onDeleteClick={() => setShowDeleteDestinationForm(true)}
                 onEditClick={() => setShowEditDestinationPanel(true)}
+                hasUpdate={hasUpdate}
+                onUpdateClick={onUpdateClick}
               />
             </div>
           </Table.td>

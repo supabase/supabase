@@ -1,0 +1,58 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
+import { fetchGet, handleError } from 'data/fetchers'
+import { ResponseError } from 'types'
+import { replicationKeys } from './keys'
+
+type ReplicationPipelineVersionParams = { projectRef?: string; pipelineId?: number }
+
+export interface ReplicationPipelineVersion {
+  id: number
+  name: string
+}
+
+export interface ReplicationPipelineVersionResponse {
+  pipeline_id: number
+  version: ReplicationPipelineVersion
+  new_version?: ReplicationPipelineVersion
+}
+
+export async function fetchReplicationPipelineVersion(
+  { projectRef, pipelineId }: ReplicationPipelineVersionParams,
+  signal?: AbortSignal
+) {
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!pipelineId) throw new Error('pipelineId is required')
+
+  const url = `/platform/replication/${projectRef}/pipelines/${pipelineId}/version`
+  const data = await fetchGet<ReplicationPipelineVersionResponse>(url, { abortSignal: signal })
+  if ((data as any)?.error) {
+    handleError((data as any).error)
+  }
+
+  return data as ReplicationPipelineVersionResponse
+}
+
+export type ReplicationPipelineVersionData = ReplicationPipelineVersionResponse
+
+export const useReplicationPipelineVersionQuery = <TData = ReplicationPipelineVersionData>(
+  { projectRef, pipelineId }: ReplicationPipelineVersionParams,
+  {
+    enabled = true,
+    staleTime = Infinity,
+    refetchOnMount = false,
+    refetchOnWindowFocus = false,
+    ...options
+  }: UseQueryOptions<ReplicationPipelineVersionData, ResponseError, TData> = {}
+) =>
+  useQuery<ReplicationPipelineVersionData, ResponseError, TData>(
+    replicationKeys.pipelinesVersion(projectRef, pipelineId),
+    ({ signal }) => fetchReplicationPipelineVersion({ projectRef, pipelineId }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
+      staleTime,
+      refetchOnMount,
+      refetchOnWindowFocus,
+      ...options,
+    }
+  )
