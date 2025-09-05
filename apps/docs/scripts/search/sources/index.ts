@@ -55,14 +55,16 @@ interface GuideCategory {
 export async function getGuideCategories(): Promise<GuideCategory[]> {
   const allFiles = await walk('content/guides')
   const directories = new Set<string>()
-  
+
   allFiles
     .filter(({ path }) => /\.mdx?$/.test(path))
     .forEach(({ path }) => {
       // Get directory path relative to content/guides using string manipulation
       const relativePath = path.replace('content/guides/', '')
-      const dirPath = relativePath.includes('/') ? relativePath.substring(0, relativePath.lastIndexOf('/')) : '.'
-      
+      const dirPath = relativePath.includes('/')
+        ? relativePath.substring(0, relativePath.lastIndexOf('/'))
+        : '.'
+
       // Add directory and all parent directories
       if (dirPath !== '.') {
         const parts = dirPath.split('/')
@@ -74,19 +76,20 @@ export async function getGuideCategories(): Promise<GuideCategory[]> {
 
   return Array.from(directories)
     .sort()
-    .map(path => ({
+    .map((path) => ({
       path: `content/guides/${path}`,
-      title: `${path.split('/').map(part => 
-        part.charAt(0).toUpperCase() + part.slice(1).replace('-', ' ')
-      ).join(' ')} Guides`,
-      urlPath: `docs/guides/${path}`
+      title: `${path
+        .split('/')
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1).replace('-', ' '))
+        .join(' ')} Guides`,
+      urlPath: `docs/guides/${path}`,
     }))
 }
 
 // Function to fetch guides for a specific category
 export async function fetchGuidesForCategory(categoryPath: string) {
   const allFiles = await walk('content/guides')
-  
+
   return (
     await Promise.all(
       allFiles

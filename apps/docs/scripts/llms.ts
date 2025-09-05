@@ -32,7 +32,7 @@ function toLink(source: Source) {
 // Dynamic function to generate guide sources
 async function generateGuideSources(): Promise<Source[]> {
   const categories = await getGuideCategories()
-  
+
   const guideSources: Source[] = [
     // Keep the main guides.txt for backward compatibility
     {
@@ -41,13 +41,13 @@ async function generateGuideSources(): Promise<Source[]> {
       fetch: fetchGuideSources,
     },
     // Add category-specific sources
-    ...categories.map(category => ({
+    ...categories.map((category) => ({
       title: category.title,
       relPath: `${category.urlPath}/llms.txt`,
       fetch: () => fetchGuidesForCategory(category.path),
-    }))
+    })),
   ]
-  
+
   return guideSources
 }
 
@@ -129,22 +129,19 @@ async function generateSourceLlmsTxt(sourceDefn: Source) {
   // Ensure directory exists
   const dirPath = `public/${sourceDefn.relPath}`.split('/').slice(0, -1).join('/')
   await fs.mkdir(dirPath, { recursive: true })
-  
+
   await fs.writeFile(`public/${sourceDefn.relPath}`, fullText)
 }
 
 async function generateLlmsTxt() {
   try {
     await fs.mkdir('public/llms', { recursive: true })
-    
+
     // Generate guide sources dynamically
     const guideSources = await generateGuideSources()
     const allSources = [...guideSources, ...REFERENCE_SOURCES]
-    
-    await Promise.all([
-      generateMainLlmsTxt(allSources),
-      ...allSources.map(generateSourceLlmsTxt)
-    ])
+
+    await Promise.all([generateMainLlmsTxt(allSources), ...allSources.map(generateSourceLlmsTxt)])
   } catch (err) {
     console.error(err)
   }
