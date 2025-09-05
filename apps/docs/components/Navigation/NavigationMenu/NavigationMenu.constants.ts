@@ -1425,6 +1425,10 @@ export const functions: NavMenuConstant = {
       url: '/guides/functions',
     },
     {
+      name: 'Architecture',
+      url: '/guides/functions/architecture',
+    },
+    {
       name: 'Getting started',
       url: undefined,
       items: [
