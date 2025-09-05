@@ -26,7 +26,7 @@ interface SpreadsheetImportPreviewProps {
   incompatibleHeaders: string[]
 }
 
-const SpreadsheetImportPreview = ({
+export const SpreadsheetImportPreview = ({
   selectedTable,
   spreadsheetData,
   errors = [],
@@ -203,5 +203,3 @@ const SpreadsheetImportPreview = ({
     </Collapsible>
   )
 }
-
-export default SpreadsheetImportPreview
