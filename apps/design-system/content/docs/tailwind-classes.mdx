@@ -4,7 +4,7 @@ description: Theming support for Tailwind classes.
 ---
 
 Supabase uses Tailwind classes that in turn use CSS properties.
-This is to support the concept of theming, so that
+This is to support the concept of theming, so that:
 
 1. We can update themes from one place.
 2. We can offer custom or additional themes in the future.
@@ -17,8 +17,8 @@ We define primitive color values using these tokens:
 - `foreground`
 - `border`
 - `brand`
-- `destructive`
 - `warning`
+- `destructive`
 
 These values are exported from Figma as a .json file and transformed into Tailwind utilities through some scripts under `packages/ui/internals/tokens`.
 
@@ -82,7 +82,9 @@ This means all the color options in our themes can support opacity rules. For ex
 
 ## Usage
 
-The following Tailwind classes are a combination of Tailwind utilities and our primitives. They're under development and are likely to change but most are now in use and will probably be permanent fixtures.
+The following Tailwind classes are a combination of Tailwind utilities and our primitives.
+
+Note that the shade of the `DEFAULT` value on each scale pattern is variable. Sometimes it is fixed at a particular shade (such as `500` or `600`), but only when contrast is sufficient.
 
 ### Foreground (Text)
 
