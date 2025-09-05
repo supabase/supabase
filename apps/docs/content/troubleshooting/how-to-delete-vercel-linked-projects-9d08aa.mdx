@@ -5,7 +5,6 @@ keywords = [ "vercel", "delete", "marketplace", "projects", "organization" ]
 database_id = "9d08aa12-3456-789a-bcde-f012345678ab"
 
 [api]
-
 # No specific API endpoints affected
 ---
 
@@ -18,73 +17,74 @@ When you create Supabase projects through the Vercel Marketplace, complete delet
 This method requires two steps - first delete in Supabase, then clean up in Vercel.
 
 1. **Delete from Supabase Dashboard**
-   
+
    Go to your [project settings](https://supabase.com/dashboard/project/_/settings/general) and click **"Delete project"**. This permanently removes your database and marks it as "uninstalled" in Vercel.
 
-   <Image 
-     alt="Delete project button in Supabase project settings" 
-     src="/docs/img/troubleshooting/54428354-a1f4-4c44-bd03-d87f4b925d94.png" 
+   <Image
+     alt="Delete project button in Supabase project settings"
+     src="/docs/img/troubleshooting/54428354-a1f4-4c44-bd03-d87f4b925d94.png"
      zoomable
    />
 
 2. **Clean up in Vercel**
-   
+
    After deleting from Supabase, clean up in Vercel:
+
    - Navigate to your [Vercel dashboard](https://vercel.com/dashboard)
    - Go to the **Storage** tab
    - Click on the Supabase project (it will show as "uninstalled")
-   
-   <Image 
-     alt="Uninstalled Supabase project in Vercel Storage" 
-     src="/docs/img/troubleshooting/cf450bca-aad3-4783-ae3b-5cc83e0afa54.png" 
+
+   <Image
+     alt="Uninstalled Supabase project in Vercel Storage"
+     src="/docs/img/troubleshooting/cf450bca-aad3-4783-ae3b-5cc83e0afa54.png"
      zoomable
    />
 
    - Scroll down and find the **Settings** tab in the sidebar
-   
-   <Image 
-     alt="Vercel project settings navigation" 
-     src="/docs/img/troubleshooting/da70bc33-f123-4567-8901-abcdef123456.png" 
+
+   <Image
+     alt="Vercel project settings navigation"
+     src="/docs/img/troubleshooting/da70bc33-f123-4567-8901-abcdef123456.png"
      zoomable
    />
-   
+
    - Click **Delete Database** to completely remove it
-   
-   <Image 
-     alt="Delete Database button in Vercel settings" 
-     src="/docs/img/troubleshooting/c4e7b193-4567-8901-abcd-ef1234567890.png" 
+
+   <Image
+     alt="Delete Database button in Vercel settings"
+     src="/docs/img/troubleshooting/c4e7b193-4567-8901-abcd-ef1234567890.png"
      zoomable
-   /> 
+   />{' '}
 
 ### Method 2: Delete directly from Vercel (removes from both platforms)
 
 This method deletes the project from both Vercel and Supabase in one action.
 
 1. **Open Vercel dashboard**
-   
+
    Navigate to your [Vercel dashboard](https://vercel.com/dashboard) and go to the **Storage** tab.
 
 2. **Select your project**
-   
+
    Click on your Supabase project to open it.
 
 3. **Navigate to Settings**
-   
+
    Find and click the **Settings** tab in the sidebar.
 
-   <Image 
-     alt="Vercel project settings navigation" 
-     src="/docs/img/troubleshooting/da70bc33-f123-4567-8901-abcdef123456.png" 
+   <Image
+     alt="Vercel project settings navigation"
+     src="/docs/img/troubleshooting/da70bc33-f123-4567-8901-abcdef123456.png"
      zoomable
    />
 
 4. **Delete the project**
-   
+
    Scroll down and click **Delete Database**. This removes the project from both Vercel and Supabase simultaneously.
 
-   <Image 
-     alt="Delete Database button in Vercel settings" 
-     src="/docs/img/troubleshooting/c4e7b193-4567-8901-abcd-ef1234567890.png" 
+   <Image
+     alt="Delete Database button in Vercel settings"
+     src="/docs/img/troubleshooting/c4e7b193-4567-8901-abcd-ef1234567890.png"
      zoomable
    />
 
@@ -97,22 +97,22 @@ Delete all associated projects before deleting the organization.
 </Admonition>
 
 1. **Navigate to organization settings and delete**
-   
+
    Go to your [organization settings](https://supabase.com/dashboard/org/_/general) and click **"Delete organization in Vercel Marketplace"**. This opens the Vercel settings page.
 
-   <Image 
-     alt="Delete organization in Vercel Marketplace button" 
-     src="/docs/img/troubleshooting/ff01bba8-abcd-ef12-3456-7890abcdef12.png" 
+   <Image
+     alt="Delete organization in Vercel Marketplace button"
+     src="/docs/img/troubleshooting/ff01bba8-abcd-ef12-3456-7890abcdef12.png"
      zoomable
    />
 
 2. **Uninstall integration**
-   
+
    Scroll down and click **Uninstall Integration** to fully remove the organization and disconnect it from Vercel.
 
-   <Image 
-     alt="Uninstall Integration button in Vercel settings" 
-     src="/docs/img/troubleshooting/f294a4d6-ef12-3456-7890-abcdef123456.png" 
+   <Image
+     alt="Uninstall Integration button in Vercel settings"
+     src="/docs/img/troubleshooting/f294a4d6-ef12-3456-7890-abcdef123456.png"
      zoomable
    />
 
