@@ -27,17 +27,9 @@ Auth uses your project's Postgres database under the hood, storing user data and
 
 Auth also enables access control to your database's automatically generated [REST API](/docs/guides/api). When using Supabase SDKs, your data requests are automatically sent with the user's Auth Token. The Auth Token scopes database access on a row-by-row level when used along with [RLS policies](/docs/guides/database/postgres/row-level-security).
 
-## Providers
-
-Supabase Auth works with many popular Auth methods, including Social and Phone Auth using third-party providers. See the following sections for a list of supported third-party providers.
-
-### Social Auth
-
-<AuthProviders type="social" />
-
-### Phone Auth
-
-<AuthProviders type="phone" />
+<$Show if="authentication:show_providers">
+<$Partial path="providers.mdx" />
+</$Show>
 
 ## Pricing
 

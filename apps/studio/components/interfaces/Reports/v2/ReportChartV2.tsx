@@ -40,7 +40,7 @@ export const ReportChartV2 = ({
   const isAvailable =
     report.availableIn === undefined || (orgPlanId && report.availableIn.includes(orgPlanId))
 
-  const canFetch = orgPlanId !== undefined
+  const canFetch = orgPlanId !== undefined && isAvailable
 
   const {
     data: queryResult,
@@ -83,7 +83,7 @@ export const ReportChartV2 = ({
 
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
 
-  if (!isAvailable && !isLoadingChart) {
+  if (!isAvailable) {
     return <ReportChartUpsell report={report} orgSlug={org?.slug ?? ''} />
   }
 

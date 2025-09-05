@@ -42,6 +42,7 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -55,6 +56,8 @@ final url = supabase.storage.from('bucket').getPublicUrl(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -66,6 +69,8 @@ let url = try await supabase.storage.from("bucket")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -75,6 +80,8 @@ val url = supabase.storage.from("bucket").publicRenderUrl("image.jpg") {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -90,6 +97,7 @@ url = supabase.storage.from_('avatars').get_public_url(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 An example URL could look like this:
@@ -125,6 +133,7 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -139,6 +148,8 @@ final url = await supabase.storage.from('bucket').createSignedUrl(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -154,6 +165,8 @@ let url = try await supabase.storage.from("bucket")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -163,6 +176,7 @@ val url = supabase.storage.from("bucket").createSignedUrl("image.jpg", 60.second
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The transformation options are embedded into the token attached to the URL — they cannot be changed once signed.
@@ -194,6 +208,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -207,6 +222,8 @@ final data = await supabase.storage.from('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -221,6 +238,8 @@ let data = try await supabase.storage.from("bucket")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -240,6 +259,8 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -253,6 +274,7 @@ response = supabase.storage.from_('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Automatic image optimization (WebP)
@@ -295,6 +317,7 @@ await supabase.storage.from('bucket').download('image.jpeg', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -309,6 +332,8 @@ final data = await supabase.storage.from('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -324,6 +349,8 @@ let data = try await supabase.storage.from("bucket")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -345,6 +372,8 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -361,6 +390,7 @@ response = supabase.storage.from_('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Next.js loader
@@ -430,6 +460,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -442,6 +473,8 @@ final data = await supabase.storage.from('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -455,6 +488,8 @@ let data = try await supabase.storage.from("bucket")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -474,6 +509,8 @@ supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -488,6 +525,7 @@ response = supabase.storage.from_('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Resizing
@@ -532,6 +570,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -546,6 +585,8 @@ final data = supabase.storage.from('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -561,6 +602,8 @@ let data = try await supabase.storage.from("bucket")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -582,6 +625,8 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -598,6 +643,7 @@ response = supabase.storage.from_('bucket').download(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Limits
@@ -621,11 +667,9 @@ response = supabase.storage.from_('bucket').download(
 | BMP    | `bmp`     | ☑️     | ☑️     |
 | TIFF   | `tiff`    | ☑️     | ☑️     |
 
-## Pricing
-
+<$Show if="billing:all">
 <$Partial path="billing/pricing/pricing_storage_image_transformations.mdx" />
-
-For a detailed breakdown of how charges are calculated, refer to [Manage Storage Image Transformations usage](/docs/guides/platform/manage-your-usage/storage-image-transformations).
+</$Show>
 
 ## Self hosting
 

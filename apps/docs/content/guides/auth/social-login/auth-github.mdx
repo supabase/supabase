@@ -103,6 +103,7 @@ Future<void> signInWithGithub() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 When your user signs in, call [`signInWithOAuth`](/docs/reference/swift/auth-signinwithoauth) with `.github` as the `Provider`:
@@ -117,6 +118,8 @@ func signInWithGithub() async throws {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with [`Github`](https://github.com/supabase-community/supabase-kt/blob/master/Auth/src/commonMain/kotlin/io/github/jan/supabase/auth/providers/Providers.kt#L16-L20) as the `Provider`:
@@ -128,6 +131,7 @@ suspend fun signInWithGithub() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -168,6 +172,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -179,6 +184,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

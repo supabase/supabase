@@ -570,6 +570,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/cli/login-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Create a login role for CLI with temporary password */
+    post: operations['v1-create-login-role']
+    /** [Beta] Delete existing login roles used by CLI */
+    delete: operations['v1-delete-login-roles']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/config/auth': {
     parameters: {
       query?: never
@@ -1255,7 +1273,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** [Alpha] Updates project's network restrictions by adding or removing CIDRs */
+    patch: operations['v1-patch-network-restrictions']
     trace?: never
   }
   '/v1/projects/{ref}/network-restrictions/apply': {
@@ -1488,6 +1507,23 @@ export interface paths {
     get: operations['v1-list-all-buckets']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/storage/buckets/{id}/objects': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Gets list of objects with the given bucket */
+    post: operations['v1-list-storage-objects']
     delete?: never
     options?: never
     head?: never
@@ -2104,6 +2140,12 @@ export interface components {
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
+      /** @enum {string} */
+      name_id_format?:
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       /**
        * @description What type of provider will be created
        * @enum {string}
@@ -2134,8 +2176,23 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
+    }
+    CreateRoleBody: {
+      read_only: boolean
+    }
+    CreateRoleResponse: {
+      password: string
+      role: string
+      /** Format: int64 */
+      ttl_seconds: number
     }
     CreateSecretBody: {
       /**
@@ -2248,8 +2305,18 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
+    }
+    DeleteRolesResponse: {
+      /** @enum {string} */
+      message: 'ok'
     }
     DeployFunctionResponse: {
       /** Format: int64 */
@@ -2357,6 +2424,12 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
     }
@@ -2543,6 +2616,12 @@ export interface components {
           id: string
           metadata_url?: string
           metadata_xml?: string
+          /** @enum {string} */
+          name_id_format?:
+            | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+            | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+            | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+            | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
         }
         updated_at?: string
       }[]
@@ -2557,11 +2636,23 @@ export interface components {
         type: string
       }[]
     }
+    NetworkRestrictionsPatchRequest: {
+      add?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+      remove?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+    }
     NetworkRestrictionsRequest: {
       dbAllowedCidrs?: string[]
       dbAllowedCidrsV6?: string[]
     }
     NetworkRestrictionsResponse: {
+      /** Format: date-time */
+      applied_at?: string
       /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
       config: {
         dbAllowedCidrs?: string[]
@@ -2576,6 +2667,34 @@ export interface components {
       }
       /** @enum {string} */
       status: 'stored' | 'applied'
+      /** Format: date-time */
+      updated_at?: string
+    }
+    NetworkRestrictionsV2Response: {
+      /** Format: date-time */
+      applied_at?: string
+      /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
+      config: {
+        dbAllowedCidrs?: {
+          address: string
+          /** @enum {string} */
+          type: 'v4' | 'v6'
+        }[]
+      }
+      /** @enum {string} */
+      entitlement: 'disallowed' | 'allowed'
+      /** @description Populated when a new config has been received, but not registered as successfully applied to a project. */
+      old_config?: {
+        dbAllowedCidrs?: {
+          address: string
+          /** @enum {string} */
+          type: 'v4' | 'v6'
+        }[]
+      }
+      /** @enum {string} */
+      status: 'stored' | 'applied'
+      /** Format: date-time */
+      updated_at?: string
     }
     OAuthRevokeTokenBody: {
       /** Format: uuid */
@@ -3227,6 +3346,12 @@ export interface components {
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
+      /** @enum {string} */
+      name_id_format?:
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
     }
     UpdateProviderResponse: {
       created_at?: string
@@ -3252,6 +3377,12 @@ export interface components {
         id: string
         metadata_url?: string
         metadata_xml?: string
+        /** @enum {string} */
+        name_id_format?:
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       }
       updated_at?: string
     }
@@ -3437,6 +3568,43 @@ export interface components {
       name?: string
       version: string
     }[]
+    V1ListStorageObjectsBody: {
+      options?: {
+        limit?: number
+        offset?: number
+        search?: string
+        sort_by?: string
+        /** @enum {string} */
+        sort_order?: 'asc' | 'desc'
+      }
+      path?: string
+    }
+    V1ListStorageObjectsResponse: {
+      items: {
+        bucket_id: string
+        buckets: {
+          allowed_mime_types?: string[]
+          created_at: string
+          file_size_limit?: number
+          id: string
+          name: string
+          owner: string
+          public: boolean
+          /** @enum {string} */
+          type?: 'STANDARD' | 'ANALYTICS'
+          updated_at: string
+        }
+        created_at: string
+        id: string
+        last_accessed_at: string
+        metadata: {
+          [key: string]: unknown
+        }
+        name: string
+        owner: string
+        updated_at: string
+      }[]
+    }
     V1OrganizationMemberResponse: {
       email?: string
       mfa_enabled: boolean
@@ -5070,6 +5238,80 @@ export interface operations {
         content?: never
       }
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-login-role': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateRoleBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateRoleResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create login role */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-login-roles': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DeleteRolesResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete login roles */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -7170,6 +7412,45 @@ export interface operations {
       }
     }
   }
+  'v1-patch-network-restrictions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NetworkRestrictionsPatchRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkRestrictionsV2Response']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project network restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-update-network-restrictions': {
     parameters: {
       query?: never
@@ -7815,6 +8096,47 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get list of buckets */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-list-storage-objects': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage bucket id */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1ListStorageObjectsBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ListStorageObjectsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get list of objects with the given bucket */
       500: {
         headers: {
           [name: string]: unknown

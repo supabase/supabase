@@ -171,6 +171,7 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  <$Show if="sdk:dart">
   <TabPanel id="dart" label="Dart">
     ```dart
     final channel = supabase.channel(
@@ -190,6 +191,8 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
     ```swift
     let channel = supabase.channel("room-1") {
@@ -207,6 +210,8 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
     ```kotlin
     val channel = supabase.channel("room-1") {
@@ -220,6 +225,8 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
     ```py
     channel = realtime.channel(
@@ -238,6 +245,7 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 
 #### Allow a user to send a Broadcast message
