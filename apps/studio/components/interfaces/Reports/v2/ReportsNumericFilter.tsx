@@ -130,13 +130,6 @@ export const ReportsNumericFilter = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="p-0 w-72" portal={true}>
-        <div className="p-2 border-b border-default flex items-center justify-between">
-          <span className="text-xs text-foreground">{label}</span>
-          <Button size="tiny" type="outline" onClick={handleClearAll}>
-            Clear
-          </Button>
-        </div>
-
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -189,8 +182,8 @@ export const ReportsNumericFilter = ({
         </form>
 
         <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-          <Button size="tiny" type="default" onClick={() => setOpen(false)} htmlType="button">
-            Cancel
+          <Button size="tiny" type="outline" onClick={handleClearAll}>
+            Clear
           </Button>
           <Button
             loading={isLoading}
