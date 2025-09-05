@@ -82,6 +82,7 @@ export const QueryPerformanceFilterBar = ({
             valueKey="name"
             activeOptions={isLoadingRoles ? [] : filters.roles}
             onSaveFilters={onFilterRolesChange}
+            className="w-56"
           />
 
           {/* <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} /> */}
