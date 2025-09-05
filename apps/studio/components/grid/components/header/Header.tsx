@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
-import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
+import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
@@ -56,9 +56,10 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
 
 export type HeaderProps = {
   customHeader: ReactNode
+  isRefetching: boolean
 }
 
-const Header = ({ customHeader }: HeaderProps) => {
+export const Header = ({ customHeader, isRefetching }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
 
   return (
@@ -71,13 +72,11 @@ const Header = ({ customHeader }: HeaderProps) => {
         ) : (
           <DefaultHeader />
         )}
-        <GridHeaderActions table={snap.originalTable} />
+        <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
       </div>
     </div>
   )
 }
-
-export default Header
 
 const DefaultHeader = () => {
   const { ref: projectRef } = useParams()
