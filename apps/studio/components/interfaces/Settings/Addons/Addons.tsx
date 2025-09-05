@@ -1,33 +1,21 @@
-import dayjs from 'dayjs'
-import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
+import { AlertCircle, Lock } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo } from 'react'
 
 import { useFlag, useParams } from 'common'
 import {
   getAddons,
   subscriptionHasHipaaAddon,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
+import { ResourceItem } from 'components/ui/Resource/ResourceItem'
+import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -35,15 +23,24 @@ import {
   useProjectByRefQuery,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { ComputeBadge } from 'ui-patterns/ComputeBadge'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Badge,
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import Image from 'next/image'
 
 export const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -69,26 +66,12 @@ export const Addons = () => {
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && settings?.is_sensitive
 
-  const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
   const sufficientPgVersion =
     // introduced as generatedSemantic version could be < 141044 even if actual version is indeed past it
     // eg. 15.1.1.2 leads to 15112
     getDatabaseMajorVersion(selectedProject?.dbVersion ?? '') > 14 ||
     getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
-
-  // [Joshen] We could possibly look into reducing the interval to be more "realtime"
-  // I tried setting the interval to 1m but no data was returned, may need to experiment
-  const startDate = useMemo(() => dayjs().subtract(15, 'minutes').millisecond(0).toISOString(), [])
-  const endDate = useMemo(() => dayjs().millisecond(0).toISOString(), [])
-  const { data: ioBudgetData } = useInfraMonitoringQuery({
-    projectRef,
-    attribute: 'disk_io_budget',
-    interval: '5m',
-    startDate,
-    endDate,
-  })
-  const [mostRecentRemainingIOBudget] = (ioBudgetData?.data ?? []).slice(-1)
 
   const {
     data: addons,
@@ -98,28 +81,27 @@ export const Addons = () => {
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-  const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
-
-  const meta = useMemo(() => {
-    const computeMeta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
-
-    if (!computeMeta && selectedProject?.infra_compute_size === 'nano') {
-      return INSTANCE_NANO_SPECS
-    } else if (selectedProject?.infra_compute_size === 'micro') {
-      return INSTANCE_MICRO_SPECS
-    }
-
-    return computeMeta
-  }, [selectedProject, computeInstance])
+  const { pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
   const canUpdateIPv4 = settings?.db_ip_addr_config === 'ipv6'
 
-  return (
-    <>
-      <ScaffoldDivider />
+  const ipv4Enabled = ipv4 !== undefined
+  const pitrEnabled = pitr !== undefined
+  const customDomainEnabled = customDomain !== undefined
 
-      {isBranch && (
-        <ScaffoldContainer>
+  const canOpenIPv4 = isProjectActive && !projectUpdateDisabled && (canUpdateIPv4 || ipv4Enabled)
+  const canOpenPITR =
+    isProjectActive &&
+    !projectUpdateDisabled &&
+    sufficientPgVersion &&
+    !hasHipaaAddon &&
+    !isOrioleDbInAws
+  const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled
+
+  return (
+    <ScaffoldContainer>
+      <ScaffoldSection isFullWidth>
+        {isBranch && (
           <Alert_Shadcn_ variant="default" className="mt-6">
             <AlertCircle strokeWidth={2} />
             <AlertTitle_Shadcn_>
@@ -134,486 +116,241 @@ export const Addons = () => {
               .
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-        </ScaffoldContainer>
-      )}
+        )}
 
-      {isLoading && (
-        <ScaffoldContainer>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <GenericSkeletonLoader />
+        {isLoading && (
+          <ResourceList>
+            <div className="py-4 px-6 border-b last:border-b-none">
+              <HorizontalShimmerWithIcon />
             </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      )}
-
-      {isError && (
-        <ScaffoldContainer>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <AlertError error={error} subject="Failed to retrieve project addons" />
+            <div className="py-4 px-6 border-b last:border-b-none">
+              <HorizontalShimmerWithIcon />
             </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      )}
+            <div className="py-4 px-6 border-b last:border-b-none">
+              <HorizontalShimmerWithIcon />
+            </div>
+          </ResourceList>
+        )}
 
-      {isSuccess && (
-        <>
-          {selectedProject?.infra_compute_size === 'nano' && subscription?.plan.id !== 'free' && (
-            <ScaffoldContainer className="mt-4">
-              <Alert_Shadcn_ variant="default">
-                <Info strokeWidth={2} />
-                <AlertTitle_Shadcn_>Free compute upgrade to Micro</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Paid Plans include a free upgrade to Micro compute. Your project is ready to
-                  upgrade for no additional charges.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            </ScaffoldContainer>
-          )}
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <ScaffoldSectionDetail>
-                <div className="space-y-6">
-                  <p className="m-0">Compute Size</p>
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light m-0">More information</p>
-                    <div>
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/compute-add-ons"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">About compute add-ons</p>
-                          <ExternalLink size={16} strokeWidth={1.5} />
-                        </div>
-                      </Link>
-                    </div>
-                    <div>
-                      <Link
-                        href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">Connection Pooler</p>
-                          <ExternalLink size={16} strokeWidth={1.5} />
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </ScaffoldSectionDetail>
-              <ScaffoldSectionContent>
-                <div className="flex space-x-6">
-                  <div>
-                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                      <Image
-                        alt="Compute size"
-                        width={160}
-                        height={96}
-                        src={
-                          ['nano', 'micro'].includes(selectedProject?.infra_compute_size || 'micro')
-                            ? `${BASE_PATH}/img/optimized-compute-off${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                            : `${BASE_PATH}/img/optimized-compute-on${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="flex-grow">
-                    <p className="text-sm text-foreground-light">Current option:</p>
-                    {isLoading || (computeInstance === undefined && isLoadingProject) ? (
-                      <ShimmeringLoader className="w-32" />
-                    ) : (
-                      <div className="flex py-3">
-                        <ComputeBadge
-                          infraComputeSize={selectedProject?.infra_compute_size}
-                          size={'large'}
-                        />
-                      </div>
-                    )}
+        {isError && <AlertError error={error} subject="Failed to retrieve project addons" />}
 
-                    <NoticeBar
-                      visible={true}
-                      type="default"
-                      title="Compute size has moved"
-                      description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
-                      actions={
-                        <Button type="default" asChild>
-                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                            Go to Compute and Disk
-                          </Link>
-                        </Button>
+        {isSuccess && (
+          <>
+            <ResourceList>
+              {projectAddonsDedicatedIpv4Address && (
+                <ResourceItem
+                  onClick={canOpenIPv4 ? () => setPanel('ipv4') : undefined}
+                  media={
+                    <Image
+                      className="bg rounded-lg border"
+                      alt="IPv4"
+                      width={160}
+                      height={96}
+                      src={
+                        ipv4Enabled
+                          ? `${BASE_PATH}/img/ipv4-on${resolvedTheme?.includes('dark') ? '' : '--light'}.svg?v=2`
+                          : `${BASE_PATH}/img/ipv4-off${resolvedTheme?.includes('dark') ? '' : '--light'}.svg?v=2`
                       }
                     />
-
-                    {Number(mostRecentRemainingIOBudget?.disk_io_budget) === 0 ? (
-                      <Alert
-                        withIcon
-                        className="mt-4"
-                        variant="danger"
-                        title="Your disk IO budget has run out for today"
-                      >
-                        <p>
-                          Your workload is currently running at the baseline disk IO bandwidth at{' '}
-                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps and may suffer
-                          degradation in performance.
-                        </p>
-                        <p className="mt-1">
-                          Consider upgrading to a larger compute instance for a higher baseline
-                          throughput.
-                        </p>
-                      </Alert>
-                    ) : Number(mostRecentRemainingIOBudget?.disk_io_budget) <= 10 ? (
-                      <Alert
-                        withIcon
-                        className="mt-4"
-                        variant="warning"
-                        title="Your disk IO budget is running out for today"
-                      >
-                        <p>
-                          If the disk IO budget drops to zero, your workload will run at the
-                          baseline disk IO bandwidth at{' '}
-                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps and may suffer
-                          degradation in performance.
-                        </p>
-                        <p className="mt-1">
-                          Consider upgrading to a larger compute instance for a higher baseline
-                          throughput.
-                        </p>
-                      </Alert>
-                    ) : null}
-                    <div className="mt-2 w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Memory
-                          </p>
-                          <ChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
-                        </div>
-                      </Link>
-                      <p className="text-sm">{meta?.memory_gb ?? '-'} GB</p>
+                  }
+                  meta={
+                    <div className="flex items-center gap-4">
+                      {ipv4Enabled ? (
+                        <Badge variant="success">Enabled</Badge>
+                      ) : (
+                        <Badge variant="default">Disabled</Badge>
+                      )}
+                      {!canOpenIPv4 && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          </TooltipTrigger>
+                          <TooltipContent>You do not have permission to update IPv4</TooltipContent>
+                        </Tooltip>
+                      )}
                     </div>
-                    <div className="w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            CPU
-                          </p>
-                          <ChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
-                        </div>
-                      </Link>
-                      <p className="text-sm">
-                        {meta?.cpu_cores ?? '?'}-core {cpuArchitecture}{' '}
-                        {meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
-                      </p>
-                    </div>
-                    <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-foreground-light">No. of direct connections</p>
-                      <p className="text-sm">{meta?.connections_direct ?? '-'}</p>
-                    </div>
-                    <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-foreground-light">No. of pooler connections</p>
-                      <p className="text-sm">{meta?.connections_pooler ?? '-'}</p>
-                    </div>
-                  </div>
-                </div>
-              </ScaffoldSectionContent>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-
-          {projectAddonsDedicatedIpv4Address && (
-            <>
-              <ScaffoldDivider />
-              <ScaffoldContainer>
-                <ScaffoldSection>
-                  <ScaffoldSectionDetail>
-                    <div className="space-y-6">
-                      <p className="m-0">Dedicated IPv4 address</p>
-                      <div className="space-y-2">
-                        <p className="text-sm text-foreground-light m-0">More information</p>
-                        <div>
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/ipv4-address"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                              <p className="text-sm m-0">About IPv4 deprecation</p>
-                              <ExternalLink size={16} strokeWidth={1.5} />
-                            </div>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </ScaffoldSectionDetail>
-                  <ScaffoldSectionContent>
-                    <div className="flex space-x-6">
-                      <div>
-                        <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                          <img
-                            alt="IPv4"
-                            width={160}
-                            height={96}
-                            src={
-                              ipv4 !== undefined
-                                ? `${BASE_PATH}/img/ipv4-on${
-                                    resolvedTheme?.includes('dark') ? '' : '--light'
-                                  }.svg?v=2`
-                                : `${BASE_PATH}/img/ipv4-off${
-                                    resolvedTheme?.includes('dark') ? '' : '--light'
-                                  }.svg?v=2`
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-foreground-light">Current option:</p>
-                        <p>
-                          {ipv4 !== undefined
-                            ? 'Dedicated IPv4 address is enabled'
-                            : 'Dedicated IPv4 address is not enabled'}
-                        </p>
-                        <ButtonTooltip
-                          type="default"
-                          className="mt-2 pointer-events-auto"
-                          onClick={() => setPanel('ipv4')}
-                          disabled={
-                            !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
-                          }
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !(canUpdateIPv4 || ipv4)
-                                ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
-                                : undefined,
-                            },
-                          }}
-                        >
-                          Change dedicated IPv4 address
-                        </ButtonTooltip>
-                      </div>
-                    </div>
-                  </ScaffoldSectionContent>
-                </ScaffoldSection>
-              </ScaffoldContainer>
-            </>
-          )}
-
-          <ScaffoldDivider />
-
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <ScaffoldSectionDetail>
-                <div className="space-y-6">
-                  <p className="m-0">Point in time recovery</p>
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light m-0">More information</p>
+                  }
+                >
+                  <div className="space-y-1">
+                    <div>Dedicated IPv4 address</div>
+                    <p className="m-0 text-foreground-light text-sm">
+                      Reserve a dedicated IPv4 address for your project.
+                    </p>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+                        href="https://supabase.com/docs/guides/platform/ipv4-address"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-link"
+                      >
+                        <div className="inline-flex items-center gap-2 opacity-50 hover:opacity-100 transition">
+                          <span className="text-sm">About IPv4 deprecation</span>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </ResourceItem>
+              )}
+
+              <ResourceItem
+                onClick={canOpenPITR ? () => setPanel('pitr') : undefined}
+                media={
+                  <Image
+                    className="bg"
+                    alt="PITR"
+                    width={160}
+                    height={96}
+                    src={
+                      pitrEnabled
+                        ? `${BASE_PATH}/img/pitr-on${resolvedTheme?.includes('dark') ? '' : '--light'}.svg`
+                        : `${BASE_PATH}/img/pitr-off${resolvedTheme?.includes('dark') ? '' : '--light'}.svg`
+                    }
+                  />
+                }
+                meta={
+                  <div className="flex items-center gap-4">
+                    {pitrEnabled ? (
+                      <Badge variant="success">Enabled</Badge>
+                    ) : (
+                      <Badge variant="default">Disabled</Badge>
+                    )}
+                    {!canOpenPITR && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                        </TooltipTrigger>
+                        <TooltipContent>You do not have permission to update PITR</TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                }
+              >
+                <div className="space-y-1">
+                  <div>Point in time recovery</div>
+                  <p className="m-0 text-foreground-light text-sm">
+                    Restore your database to a specific moment in the past.
+                  </p>
+                  <div>
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-link"
+                    >
+                      <div className="inline-flex items-center gap-2 opacity-50 hover:opacity-100 transition">
+                        <span className="text-sm">About PITR backups</span>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              </ResourceItem>
+              {hasHipaaAddon ? (
+                <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
+                  <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    All projects should have PITR enabled by default and cannot be changed with
+                    HIPAA enabled. Contact support for further assistance.
+                  </AlertDescription_Shadcn_>
+                  <div className="mt-4">
+                    <Button type="default" asChild>
+                      <Link href="/support/new">Contact support</Link>
+                    </Button>
+                  </div>
+                </Alert_Shadcn_>
+              ) : !sufficientPgVersion ? (
+                <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
+                  <AlertTitle_Shadcn_>Your project is too old to enable PITR</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    <p className="text-sm leading-normal mb-2">
+                      Reach out to us via support if you're interested
+                    </p>
+                    <Button asChild type="default">
+                      <Link
+                        className="text-link"
+                        href={`/support/new?projectRef=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                      >
+                        <a>Contact support</a>
+                      </Link>
+                    </Button>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : isOrioleDbInAws ? (
+                <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
+                  <AlertTitle_Shadcn_>PITR not supported</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    Point in time recovery is not supported with OrioleDB
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : null}
+
+              {projectSettingsCustomDomains && (
+                <ResourceItem
+                  onClick={canOpenCustomDomain ? () => setPanel('customDomain') : undefined}
+                  media={
+                    <Image
+                      className="bg rounded-lg border"
+                      alt="Custom Domain"
+                      width={160}
+                      height={96}
+                      src={
+                        customDomainEnabled
+                          ? `${BASE_PATH}/img/custom-domain-on${
+                              resolvedTheme?.includes('dark') ? '' : '--light'
+                            }.svg`
+                          : `${BASE_PATH}/img/custom-domain-off${
+                              resolvedTheme?.includes('dark') ? '' : '--light'
+                            }.svg`
+                      }
+                    />
+                  }
+                  meta={
+                    <div className="flex items-center gap-4">
+                      {customDomainEnabled ? (
+                        <Badge variant="success">Enabled</Badge>
+                      ) : (
+                        <Badge variant="default">Disabled</Badge>
+                      )}
+                      {!canOpenCustomDomain && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            You do not have permission to update custom domain
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  }
+                >
+                  <div className="space-y-1">
+                    <div>Custom domain</div>
+                    <p className="m-0 text-foreground-light text-sm">
+                      Serve your project on your own domain name.
+                    </p>
+                    <div>
+                      <Link
+                        className="text-link"
+                        href="https://supabase.com/docs/guides/platform/custom-domains"
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">About PITR backups</p>
-                          <ExternalLink size={16} strokeWidth={1.5} />
+                        <div className="inline-flex items-center gap-2 opacity-50 hover:opacity-100 transition">
+                          <span className="text-sm">About custom domains</span>
                         </div>
                       </Link>
                     </div>
                   </div>
-                </div>
-              </ScaffoldSectionDetail>
-              <ScaffoldSectionContent>
-                {hasHipaaAddon && (
-                  <Alert_Shadcn_>
-                    <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      All projects should have PITR enabled by default and cannot be changed with
-                      HIPAA enabled. Contact support for further assistance.
-                    </AlertDescription_Shadcn_>
-                    <div className="mt-4">
-                      <Button type="default" asChild>
-                        <Link href="/support/new">Contact support</Link>
-                      </Button>
-                    </div>
-                  </Alert_Shadcn_>
-                )}
-                <div className="flex space-x-6">
-                  <div>
-                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                      <Image
-                        alt="Point-In-Time-Recovery"
-                        width={160}
-                        height={96}
-                        src={
-                          pitr !== undefined
-                            ? `${BASE_PATH}/img/pitr-on${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                            : `${BASE_PATH}/img/pitr-off${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>
-                      {pitr !== undefined
-                        ? `Point in time recovery of ${(pitr.variant.meta as any)?.backup_duration_days} days is enabled`
-                        : 'Point in time recovery is not enabled'}
-                    </p>
-                    {!sufficientPgVersion ? (
-                      <Alert_Shadcn_ className="mt-2">
-                        <AlertTitle_Shadcn_>
-                          Your project is too old to enable PITR
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          <p className="text-sm leading-normal mb-2">
-                            Reach out to us via support if you're interested
-                          </p>
-                          <Button asChild type="default">
-                            <Link
-                              href={`/support/new?projectRef=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
-                            >
-                              <a>Contact support</a>
-                            </Link>
-                          </Button>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    ) : isOrioleDbInAws ? (
-                      <ButtonTooltip
-                        disabled
-                        type="default"
-                        className="mt-2"
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: 'Point in time recovery is not supported with OrioleDB',
-                          },
-                        }}
-                      >
-                        Change point in time recovery
-                      </ButtonTooltip>
-                    ) : (
-                      <ProjectUpdateDisabledTooltip
-                        projectUpdateDisabled={projectUpdateDisabled}
-                        projectNotActive={!isProjectActive}
-                      >
-                        <Button
-                          type="default"
-                          className="mt-2 pointer-events-auto"
-                          onClick={() => setPanel('pitr')}
-                          disabled={
-                            !isProjectActive ||
-                            projectUpdateDisabled ||
-                            !sufficientPgVersion ||
-                            hasHipaaAddon
-                          }
-                        >
-                          Change point in time recovery
-                        </Button>
-                      </ProjectUpdateDisabledTooltip>
-                    )}
-                  </div>
-                </div>
-              </ScaffoldSectionContent>
-            </ScaffoldSection>
-          </ScaffoldContainer>
+                </ResourceItem>
+              )}
+            </ResourceList>
+          </>
+        )}
 
-          {projectSettingsCustomDomains && (
-            <>
-              <ScaffoldDivider />
-              <ScaffoldContainer>
-                <ScaffoldSection>
-                  <ScaffoldSectionDetail>
-                    <div className="space-y-6">
-                      <p className="m-0">Custom domain</p>
-                      <div className="space-y-2">
-                        <p className="text-sm text-foreground-light m-0">More information</p>
-                        <div>
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/custom-domains"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                              <p className="text-sm m-0">About custom domains</p>
-                              <ExternalLink size={16} strokeWidth={1.5} />
-                            </div>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </ScaffoldSectionDetail>
-                  <ScaffoldSectionContent>
-                    <div className="flex space-x-6">
-                      <div>
-                        <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                          <img
-                            alt="Custom Domain"
-                            width={160}
-                            height={96}
-                            src={
-                              customDomain !== undefined
-                                ? `${BASE_PATH}/img/custom-domain-on${
-                                    resolvedTheme?.includes('dark') ? '' : '--light'
-                                  }.svg`
-                                : `${BASE_PATH}/img/custom-domain-off${
-                                    resolvedTheme?.includes('dark') ? '' : '--light'
-                                  }.svg`
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-foreground-light">Current option:</p>
-                        <p>
-                          {customDomain !== undefined
-                            ? 'Custom domain is enabled'
-                            : 'Custom domain is not enabled'}
-                        </p>
-                        <ProjectUpdateDisabledTooltip
-                          projectUpdateDisabled={projectUpdateDisabled}
-                          projectNotActive={!isProjectActive}
-                        >
-                          <Button
-                            type="default"
-                            className="mt-2 pointer-events-auto"
-                            onClick={() => setPanel('customDomain')}
-                            disabled={!isProjectActive || projectUpdateDisabled}
-                          >
-                            Change custom domain
-                          </Button>
-                        </ProjectUpdateDisabledTooltip>
-                      </div>
-                    </div>
-                  </ScaffoldSectionContent>
-                </ScaffoldSection>
-              </ScaffoldContainer>
-            </>
-          )}
-        </>
-      )}
-
-      <PITRSidePanel />
-      <CustomDomainSidePanel />
-      <IPv4SidePanel />
-    </>
+        <PITRSidePanel />
+        <CustomDomainSidePanel />
+        <IPv4SidePanel />
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
