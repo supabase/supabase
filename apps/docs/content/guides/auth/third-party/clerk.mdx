@@ -45,6 +45,8 @@ hideElidedLines={true}
 
 </TabPanel>
 
+<$Show if="sdk:dart">
+
 <TabPanel id="dart" label="Flutter">
 
 ```dart
@@ -63,6 +65,9 @@ await Supabase.initialize(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
 
@@ -84,6 +89,7 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 

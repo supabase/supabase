@@ -63,6 +63,9 @@ export const CreateBranchModal = () => {
 
   const gitlessBranching = useIsBranching2Enabled()
   const allowDataBranching = useFlag('allowDataBranching')
+  // [Joshen] This is meant to be short lived while we're figuring out how to control
+  // requests to this endpoint. Kill switch in case we need to stop the requests
+  const disableBackupsCheck = useFlag('disableBackupsCheckInCreatebranchmodal')
 
   const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
@@ -89,7 +92,13 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
-  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery({ projectRef })
+  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery(
+    { projectRef },
+    {
+      // [Joshen] Only trigger this request when the modal is opened
+      enabled: showCreateBranchModal && !disableBackupsCheck,
+    }
+  )
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
   const noPhysicalBackups = cloneBackupsError?.message.startsWith(
     'Physical backups need to be enabled'
@@ -358,13 +367,13 @@ export const CreateBranchModal = () => {
                         <TooltipTrigger>
                           <FormControl_Shadcn_>
                             <Switch
-                              disabled={noPhysicalBackups}
+                              disabled={!disableBackupsCheck && noPhysicalBackups}
                               checked={field.value}
                               onCheckedChange={field.onChange}
                             />
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
-                        {noPhysicalBackups && (
+                        {!disableBackupsCheck && noPhysicalBackups && (
                           <TooltipContent side="bottom">
                             PITR is required for the project to clone data into the branch
                           </TooltipContent>
