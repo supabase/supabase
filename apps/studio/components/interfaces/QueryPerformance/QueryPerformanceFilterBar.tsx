@@ -84,8 +84,6 @@ export const QueryPerformanceFilterBar = ({
             onSaveFilters={onFilterRolesChange}
             className="w-56"
           />
-
-          {/* <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} /> */}
         </div>
       </div>
 
