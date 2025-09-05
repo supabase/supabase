@@ -12,8 +12,7 @@ import {
 } from '@ui/components/shadcn/ui/select'
 import { Button, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-
-export type ComparisonOperator = '=' | '!=' | '>' | '>=' | '<' | '<='
+import { z } from 'zod'
 
 const OPERATOR_LABELS = {
   '=': 'Equals',
@@ -24,15 +23,19 @@ const OPERATOR_LABELS = {
   '!=': 'Not equal to',
 } satisfies Record<ComparisonOperator, string>
 
-export interface NumericFilter {
-  operator: ComparisonOperator
-  value: number
-}
+const comparisonOperatorSchema = z.enum(['=', '>=', '<=', '>', '<', '!='])
+export type ComparisonOperator = z.infer<typeof comparisonOperatorSchema>
+
+export const numericFilterSchema = z.object({
+  operator: comparisonOperatorSchema,
+  value: z.number(),
+})
+export type NumericFilter = z.infer<typeof numericFilterSchema>
 
 interface ReportsNumericFilterProps {
   label: string
-  value?: NumericFilter
-  onChange: (value: NumericFilter | undefined) => void
+  value: NumericFilter | null
+  onChange: (value: NumericFilter | null) => void
   operators?: ComparisonOperator[]
   defaultOperator?: ComparisonOperator
   placeholder?: string
@@ -57,20 +60,15 @@ export const ReportsNumericFilter = ({
   className,
 }: ReportsNumericFilterProps) => {
   const [open, setOpen] = useState(false)
-  const [tempValue, setTempValue] = useState<NumericFilter | undefined>(value)
+  const [tempValue, setTempValue] = useState<NumericFilter | null>(value)
 
-  const isActive = value !== undefined
+  const isActive = value !== null
 
   useEffect(() => {
     if (!open) {
       setTempValue(value)
     }
   }, [open, value])
-
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onChange(undefined)
-  }
 
   const handleApply = () => {
     onChange(tempValue)
@@ -87,27 +85,26 @@ export const ReportsNumericFilter = ({
   const handleOperatorChange = (operator: ComparisonOperator) => {
     setTempValue({
       operator,
-      value: tempValue?.value || 0,
+      value: tempValue?.value ?? 0,
     })
   }
 
   const handleValueChange = (inputValue: string) => {
-    const numericValue = parseFloat(inputValue) || 0
-    setTempValue({
-      operator: tempValue?.operator || defaultOperator,
-      value: numericValue,
-    })
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleApply()
+    if (inputValue === '') {
+      setTempValue(null)
+    } else {
+      const numericValue = parseFloat(inputValue)
+      if (!isNaN(numericValue)) {
+        setTempValue({
+          operator: tempValue?.operator ?? defaultOperator,
+          value: numericValue,
+        })
+      }
     }
   }
 
   const handleClearAll = () => {
-    setTempValue(undefined)
+    setTempValue(null)
   }
 
   return (
@@ -133,13 +130,6 @@ export const ReportsNumericFilter = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="p-0 w-72" portal={true}>
-        <div className="p-2 border-b border-default flex items-center justify-between">
-          <span className="text-xs text-foreground">{label}</span>
-          <Button size="tiny" type="outline" onClick={handleClearAll}>
-            Clear
-          </Button>
-        </div>
-
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -175,7 +165,6 @@ export const ReportsNumericFilter = ({
               placeholder={placeholder}
               value={tempValue?.value || ''}
               onChange={(e) => handleValueChange(e.target.value)}
-              onKeyDown={handleKeyDown}
               min={min}
               max={max}
               step={step}
@@ -193,8 +182,8 @@ export const ReportsNumericFilter = ({
         </form>
 
         <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-          <Button size="tiny" type="default" onClick={() => setOpen(false)} htmlType="button">
-            Cancel
+          <Button size="tiny" type="outline" onClick={handleClearAll}>
+            Clear
           </Button>
           <Button
             loading={isLoading}
