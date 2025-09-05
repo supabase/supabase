@@ -36,6 +36,7 @@ const nextConfig = {
   experimental: {
     webpackBuildWorker: true,
   },
+  // serverExternalPackages: ['libpg-query'],
   async rewrites() {
     return [
       {
@@ -484,15 +485,7 @@ const nextConfig = {
       },
     ],
   },
-  transpilePackages: [
-    'ui',
-    'ui-patterns',
-    'common',
-    'shared-data',
-    'api-types',
-    'icons',
-    'libpg-query',
-  ],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
   turbopack: {
     rules: {
       '*.md': {
