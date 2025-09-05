@@ -460,7 +460,7 @@ export const NativeMobileLoginItems = [
   },
 ]
 
-export const SocialLoginItems = [
+export const SocialLoginItems: Array<Partial<NavMenuSection>> = [
   {
     name: 'Google',
     icon: '/docs/img/icons/google-icon',
@@ -1865,7 +1865,7 @@ export const storage: NavMenuConstant = {
   ],
 }
 
-export const vectorIndexItems = [
+export const vectorIndexItems: Array<Partial<NavMenuSection>> = [
   {
     name: 'HNSW indexes',
     url: '/guides/ai/vector-indexes/hnsw-indexes',
