@@ -29,6 +29,8 @@
 
   "docs:self-hosting": true,
 
+  "feedback:docs": true,
+
   "integrations:vercel": true,
   "integrations:show_stripe_wrapper": true,
 
