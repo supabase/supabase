@@ -1,0 +1,34 @@
+{
+  "name": "common-auth-nextjs",
+  "type": "registry:block",
+  "title": "Common Auth flow for Nextjs and Supabase",
+  "description": "Common Auth flow for Nextjs and Supabase",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/common-auth-nextjs/app/auth/login/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/login/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/common-auth-nextjs/app/auth/error/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/error/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/common-auth-nextjs/app/protected/page.tsx",
+      "type": "registry:page",
+      "target": "app/protected/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/common-auth-nextjs/middleware.ts",
+      "type": "registry:file",
+      "target": "middleware.ts"
+    },
+    {
+      "path": "registry/default/blocks/common-auth-nextjs/components/logout-button.tsx",
+      "type": "registry:component"
+    }
+  ]
+}
