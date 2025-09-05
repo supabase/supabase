@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { number, object, string } from 'yup'
+import { number, object, string, boolean } from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -32,6 +32,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Switch,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -79,6 +80,10 @@ const phoneSchema = object({
   MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
 })
 
+const securitySchema = object({
+  MFA_ALLOW_LOW_AAL: boolean().required(),
+})
+
 const MfaAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
@@ -87,6 +92,7 @@ const MfaAuthSettingsForm = () => {
   // Separate loading states for each form
   const [isUpdatingTotpForm, setIsUpdatingTotpForm] = useState(false)
   const [isUpdatingPhoneForm, setIsUpdatingPhoneForm] = useState(false)
+  const [isUpdatingSecurityForm, setIsUpdatingSecurityForm] = useState(false)
 
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false)
 
@@ -126,6 +132,13 @@ const MfaAuthSettingsForm = () => {
     },
   })
 
+  const securityForm = useForm({
+    resolver: yupResolver(securitySchema),
+    defaultValues: {
+      MFA_ALLOW_LOW_AAL: false,
+    },
+  })
+
   useEffect(() => {
     if (authConfig) {
       if (!isUpdatingTotpForm) {
@@ -150,8 +163,14 @@ const MfaAuthSettingsForm = () => {
           MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
         })
       }
+
+      if (!isUpdatingSecurityForm) {
+        securityForm.reset({
+          MFA_ALLOW_LOW_AAL: authConfig?.MFA_ALLOW_LOW_AAL ?? true,
+        })
+      }
     }
-  }, [authConfig, isUpdatingTotpForm, isUpdatingPhoneForm])
+  }, [authConfig, isUpdatingTotpForm, isUpdatingPhoneForm, isUpdatingSecurityForm])
 
   const onSubmitTotpForm = (values: any) => {
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
@@ -176,6 +195,26 @@ const MfaAuthSettingsForm = () => {
         onSuccess: () => {
           toast.success('Successfully updated TOTP settings')
           setIsUpdatingTotpForm(false)
+        },
+      }
+    )
+  }
+
+  const onSubmitSecurityForm = (values: any) => {
+    const payload = { ...values }
+
+    setIsUpdatingSecurityForm(true)
+
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          toast.error(`Failed to update phone MFA settings: ${error?.message}`)
+          setIsUpdatingSecurityForm(false)
+        },
+        onSuccess: () => {
+          toast.success('Successfully updated phone MFA settings')
+          setIsUpdatingSecurityForm(false)
         },
       }
     )
@@ -461,6 +500,7 @@ const MfaAuthSettingsForm = () => {
           </form>
         </Form_Shadcn_>
       </ScaffoldSection>
+
       <ConfirmationModal
         visible={isConfirmationModalVisible}
         title="Confirm SMS MFA"
@@ -480,6 +520,55 @@ const MfaAuthSettingsForm = () => {
           customers are using SMS MFA.
         </p>
       </ConfirmationModal>
+
+      <ScaffoldSection isFullWidth>
+        <ScaffoldSectionTitle className="mb-4">Enhanced MFA Security</ScaffoldSectionTitle>
+
+        <Form_Shadcn_ {...securityForm}>
+          <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)} className="space-y-4">
+            <Card>
+              <CardContent className="pt-6">
+                <FormField_Shadcn_
+                  control={securityForm.control}
+                  name="MFA_ALLOW_LOW_AAL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Limit duration of AAL1 sessions"
+                      description="A user's session will be terminated unless they verify one of their factors within 15 minutes of initial sign in. Recommendation: ON"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          checked={!field.value}
+                          onCheckedChange={(value) => field.onChange(!value)}
+                          disabled={!canUpdateConfig}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+              <CardFooter className="justify-end space-x-2">
+                {securityForm.formState.isDirty && (
+                  <Button type="default" onClick={() => securityForm.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={
+                    !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
+                  }
+                  loading={isUpdatingPhoneForm}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form_Shadcn_>
+      </ScaffoldSection>
     </>
   )
 }

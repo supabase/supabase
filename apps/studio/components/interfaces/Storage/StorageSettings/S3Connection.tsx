@@ -171,7 +171,7 @@ export const S3Connection = () => {
                 </CardContent>
 
                 {!canUpdateStorageSettings && (
-                  <CardContent className="pt-0">
+                  <CardContent>
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update storage settings
                     </p>

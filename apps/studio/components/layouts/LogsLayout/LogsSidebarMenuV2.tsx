@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
@@ -15,7 +15,6 @@ import { useContentQuery } from 'data/content/content-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
@@ -106,14 +105,17 @@ export function LogsSidebarMenuV2() {
     },
     {
       enabled: enablePgReplicate,
+      retry: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     }
   )
 
   // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
   const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  const { plan: orgPlan } = useCurrentOrgPlan()
+  const isFreePlan = orgPlan?.id === 'free'
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,

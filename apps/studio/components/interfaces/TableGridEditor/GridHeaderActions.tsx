@@ -65,7 +65,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
-  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
   const { mutate: updateTable } = useTableUpdateMutation({
@@ -210,6 +210,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </TooltipContent>
             </Tooltip>
           )}
+
           {isTable && !isSchemaLocked ? (
             table.rls_enabled ? (
               <>
@@ -306,6 +307,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </Popover_Shadcn_>
             )
           ) : null}
+
           {isView && viewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -356,6 +358,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
+
           {isMaterializedView && materializedViewHasLints && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -398,6 +401,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
+
           {isForeignTable && table.schema === 'public' && (
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -435,7 +439,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
+
           <RoleImpersonationPopover serviceRoleLabel="postgres" />
+
           {isTable && realtimeEnabled && (
             <Button
               type="default"

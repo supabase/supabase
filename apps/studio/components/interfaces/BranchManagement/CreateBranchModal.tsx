@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { DollarSign, GitMerge, Github, Loader2 } from 'lucide-react'
+import { DatabaseZap, DollarSign, GitMerge, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from 'components/ui/AlertError'
@@ -21,13 +21,13 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -46,19 +46,23 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const CreateBranchModal = () => {
-  const allowDataBranching = useFlag('allowDataBranching')
   const { ref } = useParams()
   const router = useRouter()
   const queryClient = useQueryClient()
   const { data: projectDetails } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
+
+  const gitlessBranching = useIsBranching2Enabled()
+  const allowDataBranching = useFlag('allowDataBranching')
 
   const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
@@ -85,6 +89,17 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
+  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery(
+    { projectRef },
+    {
+      // [Joshen] Only trigger this request when the modal is opened
+      enabled: showCreateBranchModal,
+    }
+  )
+  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
+  const noPhysicalBackups = cloneBackupsError?.message.startsWith(
+    'Physical backups need to be enabled'
+  )
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -172,6 +187,7 @@ export const CreateBranchModal = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
+  const withData = form.watch('withData')
 
   const canSubmit = !isCreating && !isChecking
   const isDisabled =
@@ -344,9 +360,22 @@ export const CreateBranchModal = () => {
                       layout="flex-row-reverse"
                       description="Clone production data into this branch"
                     >
-                      <FormControl_Shadcn_>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <FormControl_Shadcn_>
+                            <Switch
+                              disabled={noPhysicalBackups}
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl_Shadcn_>
+                        </TooltipTrigger>
+                        {noPhysicalBackups && (
+                          <TooltipContent side="bottom">
+                            PITR is required for the project to clone data into the branch
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
                     </FormItemLayout>
                   )}
                 />
@@ -362,6 +391,30 @@ export const CreateBranchModal = () => {
                 promptProPlanUpgrade && 'opacity-25 pointer-events-none'
               )}
             >
+              {withData && (
+                <div className="flex flex-row gap-4">
+                  <div>
+                    <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                      <DatabaseZap className="text-info" size={20} strokeWidth={2} />
+                    </figure>
+                  </div>
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-sm text-foreground">
+                      Data branch takes longer time to create
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      Since your target database volume size is{' '}
+                      <code className="text-xs font-mono">{targetVolumeSizeGb} GB</code>, creating a
+                      data branch is estimated to take around{' '}
+                      <code className="text-xs font-mono">
+                        {Math.round((720 / 21000) * targetVolumeSizeGb) + 3} minutes
+                      </code>
+                      .
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {githubConnection && (
                 <div className="flex flex-row gap-4">
                   <div>
