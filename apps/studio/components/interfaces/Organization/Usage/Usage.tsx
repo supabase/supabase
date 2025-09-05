@@ -34,7 +34,7 @@ import { TotalUsage } from './TotalUsage'
 const Usage = () => {
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedProjectRef, setSelectedProjectRef] = useState<string>('all-projects')
+  const [selectedProjectRef, setSelectedProjectRef] = useState<string | undefined>(undefined)
 
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -166,7 +166,7 @@ const Usage = () => {
                   <Select_Shadcn_
                     value={selectedProjectRef}
                     onValueChange={(value) => {
-                      if (value === 'all-projects') setSelectedProjectRef('all-projects')
+                      if (value === 'all-projects') setSelectedProjectRef(undefined)
                       else setSelectedProjectRef(value)
                     }}
                   >
