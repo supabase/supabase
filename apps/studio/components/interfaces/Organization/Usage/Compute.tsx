@@ -9,7 +9,7 @@ import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-s
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import SectionContent from './SectionContent'
+import { SectionContent } from './SectionContent'
 import { Attribute, AttributeColor } from './Usage.constants'
 import UsageBarChart from './UsageBarChart'
 
