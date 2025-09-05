@@ -1,7 +1,17 @@
 import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { Badge, Button, cn, Collapsible, SidePanel } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  Collapsible,
+  SidePanel,
+  Alert_Shadcn_,
+  AlertTitle_Shadcn_,
+  AlertDescription_Shadcn_,
+  WarningIcon,
+} from 'ui'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
 
@@ -108,80 +118,85 @@ const SpreadsheetImportPreview = ({
             )}
           </div>
           {(!isCompatible || errors.length > 0) && (
-            <div className="space-y-2 my-4">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm">Issues found in spreadsheet</p>
-                {isCompatible && (
-                  <p className="text-sm text-foreground-light">
-                    {selectedTable !== undefined
-                      ? `This CSV can still be imported, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`
-                      : `You can still create the table, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                {!isCompatible && (
+            <Alert_Shadcn_ variant="warning" className="my-4">
+              <WarningIcon />
+              <AlertTitle_Shadcn_>Issues found in spreadsheet</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <div className="space-y-2">
+                  {isCompatible ? (
+                    <p className="text-sm">
+                      {selectedTable !== undefined
+                        ? `This CSV can still be imported, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`
+                        : `You can still create the table, but we found ${errors.length === 1 ? 'an issue' : 'issues'}:`}
+                    </p>
+                  ) : (
+                    <p className="text-sm">
+                      This CSV <span className="text-red-900">cannot</span> be imported into your
+                      table due to incompatible headers.
+                    </p>
+                  )}
+                  {!isCompatible && (
+                    <div className="space-y-2">
+                      <div className="flex items-start space-x-2">
+                        <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
+                          <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
+                        </div>
+                        <p className="text-sm">
+                          The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
+                          {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
+                          {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <div className="space-y-2">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
-                        <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
-                      </div>
-                      <p className="text-sm">
-                        This CSV <span className="text-red-900">cannot</span> be imported into your
-                        table due to incompatible headers:
-                        <br />
-                        The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
-                        {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
-                        {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {errors.map((error: any, idx: number) => {
-                  const key = `import-error-${idx}`
-                  const isExpanded = expandedErrors.includes(key)
+                    {errors.map((error: any, idx: number) => {
+                      const key = `import-error-${idx}`
+                      const isExpanded = expandedErrors.includes(key)
 
-                  return (
-                    <div key={key} className="space-y-2">
-                      <div
-                        className="flex items-center space-x-2 cursor-pointer"
-                        onClick={() => onSelectExpandError(key)}
-                      >
-                        {error.data !== undefined ? (
-                          <ChevronRight
-                            size={14}
-                            className={`transform ${isExpanded ? 'rotate-90' : ''}`}
-                          />
-                        ) : (
-                          <div className="w-[14px] h-[14px] flex items-center justify-center">
-                            <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
+                      return (
+                        <div key={key} className="space-y-2">
+                          <div
+                            className="flex items-center space-x-2 cursor-pointer"
+                            onClick={() => onSelectExpandError(key)}
+                          >
+                            {error.data !== undefined ? (
+                              <ChevronRight
+                                size={14}
+                                className={`transform ${isExpanded ? 'rotate-90' : ''}`}
+                              />
+                            ) : (
+                              <div className="w-[14px] h-[14px] flex items-center justify-center">
+                                <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
+                              </div>
+                            )}
+                            <p className="text-sm">Row {error.row}:</p>
+                            <p className="text-sm">{error.message}</p>
+                            {error.data?.__parsed_extra && (
+                              <>
+                                <ArrowRight size={14} />
+                                <p className="text-sm">Extra field(s):</p>
+                                {error.data?.__parsed_extra.map((value: any, i: number) => (
+                                  <code key={i} className="text-xs">
+                                    {value}
+                                  </code>
+                                ))}
+                              </>
+                            )}
                           </div>
-                        )}
-                        <p className="text-sm">Row {error.row}:</p>
-                        <p className="text-sm">{error.message}</p>
-                        {error.data?.__parsed_extra && (
-                          <>
-                            <ArrowRight size={14} />
-                            <p className="text-sm">Extra field(s):</p>
-                            {error.data?.__parsed_extra.map((value: any, i: number) => (
-                              <code key={i} className="text-xs">
-                                {value}
-                              </code>
-                            ))}
-                          </>
-                        )}
-                      </div>
-                      {error.data !== undefined && isExpanded && (
-                        <SpreadsheetPreviewGrid
-                          headers={spreadsheetData.headers}
-                          rows={[error.data]}
-                        />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+                          {error.data !== undefined && isExpanded && (
+                            <SpreadsheetPreviewGrid
+                              headers={spreadsheetData.headers}
+                              rows={[error.data]}
+                            />
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
           )}
         </SidePanel.Content>
       </Collapsible.Content>
