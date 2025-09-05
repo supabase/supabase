@@ -1,8 +1,7 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useEffect, useRef } from 'react'
-
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -16,6 +15,8 @@ import {
 } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { AdvisorSection } from './AdvisorSection'
+import { ProjectUsageSection } from './ProjectUsageSection'
 
 export const HomeV2 = () => {
   const { ref, enableBranching } = useParams()
@@ -100,11 +101,22 @@ export const HomeV2 = () => {
                 )}
                 strategy={verticalListSortingStrategy}
               >
-                {sectionOrder.map((id) => (
-                  <SortableSection key={id} id={id}>
-                    {id}
-                  </SortableSection>
-                ))}
+                {sectionOrder.map((id) => {
+                  if (id === 'usage') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        {IS_PLATFORM && <ProjectUsageSection />}
+                      </SortableSection>
+                    )
+                  }
+                  if (id === 'advisor') {
+                    return (
+                      <SortableSection key={id} id={id}>
+                        <AdvisorSection />
+                      </SortableSection>
+                    )
+                  }
+                })}
               </SortableContext>
             </DndContext>
           </ScaffoldSection>
