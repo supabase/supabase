@@ -43,8 +43,8 @@ describe('useChartHoverState', () => {
       const { result } = renderHook(() => useChartHoverState('chart1'))
 
       expect(result.current.hoveredIndex).toBe(null)
-      expect(result.current.syncHover).toBe(false)
-      expect(result.current.syncTooltip).toBe(false)
+      expect(result.current.syncHover).toBe(true)
+      expect(result.current.syncTooltip).toBe(true)
       expect(result.current.hoveredChart).toBe(null)
       expect(result.current.isHovered).toBe(false)
       expect(result.current.isCurrentChart).toBe(false)
@@ -76,8 +76,8 @@ describe('useChartHoverState', () => {
 
       const { result } = renderHook(() => useChartHoverStateWithCorrupted('chart1'))
 
-      expect(result.current.syncHover).toBe(false)
-      expect(result.current.syncTooltip).toBe(false)
+      expect(result.current.syncHover).toBe(true)
+      expect(result.current.syncTooltip).toBe(true)
       expect(consoleWarnSpy).toHaveBeenCalled()
     })
   })
@@ -301,7 +301,7 @@ describe('useChartHoverState', () => {
       const initialSyncHover = result.current.syncHover
 
       act(() => {
-        result.current.setSyncHover(false)
+        result.current.setSyncHover(initialSyncHover)
       })
 
       expect(result.current.syncHover).toBe(initialSyncHover)
