@@ -13,9 +13,9 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 import { Shortcuts } from './components/common/Shortcuts'
-import Footer from './components/footer/Footer'
+import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
-import Header, { HeaderProps } from './components/header/Header'
+import { Header, HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { GridProps } from './types'
 
@@ -84,7 +84,7 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header customHeader={customHeader} />
+        <Header customHeader={customHeader} isRefetching={isRefetching} />
 
         {children || (
           <>
@@ -99,7 +99,7 @@ export const SupabaseGrid = ({
               filters={filters}
               onApplyFilters={onApplyFilters}
             />
-            <Footer isRefetching={isRefetching} />
+            <Footer />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}
