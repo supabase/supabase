@@ -37,7 +37,7 @@ interface SpreadsheetImportProps {
 const csvParseErrorMessage =
   'Some issues have been detected. More details below the content preview.'
 
-const SpreadsheetImport = ({
+export const SpreadsheetImport = ({
   visible = false,
   debounceDuration = 250,
   headers = [],
@@ -255,5 +255,3 @@ const SpreadsheetImport = ({
     </SidePanel>
   )
 }
-
-export default SpreadsheetImport
