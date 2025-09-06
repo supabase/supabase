@@ -4,7 +4,7 @@
 
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common'
-import { IS_PLATFORM } from 'common/constants/environment'
+import { IS_PLATFORM } from 'common/constants'
 import { match } from 'path-to-regexp'
 
 // This is a workaround to ignore hCaptcha related errors.

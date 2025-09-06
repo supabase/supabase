@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useCallback } from 'react'
 
 import { sendTelemetryEvent } from 'common'
-import { TelemetryEvent } from 'common/telemetry-constants'
+import { TelemetryEvent } from 'common'
 import { API_URL } from 'lib/constants'
 
 export function useSendTelemetryEvent() {

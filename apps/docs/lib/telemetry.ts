@@ -1,5 +1,4 @@
-import { sendTelemetryEvent } from 'common'
-import { TelemetryEvent } from 'common/telemetry-constants'
+import { sendTelemetryEvent, type TelemetryEvent } from 'common'
 import { usePathname } from 'next/navigation'
 import { useCallback } from 'react'
 import { API_URL } from './constants'

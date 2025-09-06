@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Accordion, cn } from 'ui'
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { useBreakpoint } from 'common'
 
 import {
   AccordionHeader,

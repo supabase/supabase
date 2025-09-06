@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 /**
  * Custom hook to enable closing bottom drawers by dragging down.
  */
-const useDragToClose = ({
+export const useDragToClose = ({
   onClose,
   threshold = 100,
 }: {
@@ -44,5 +44,3 @@ const useDragToClose = ({
 
   return { ref, handleTouchStart, handleTouchMove, handleTouchEnd }
 }
-
-export default useDragToClose

@@ -1,7 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
-import { sendTelemetryEvent } from 'common'
-import { TelemetryEvent } from 'common/telemetry-constants'
+import { sendTelemetryEvent, type TelemetryEvent } from 'common'
 import { handleError } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
