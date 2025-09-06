@@ -51,6 +51,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
+  const isMcpClient = requester?.registration_type === 'dynamic'
 
   const searchParams =
     typeof window !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams()
@@ -193,6 +194,18 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     <Card>
       <CardHeader>Authorize API access for {requester?.name}</CardHeader>
       <CardContent className="space-y-8">
+        {isMcpClient && (
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>MCP Client Connection</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              This is an MCP (Model Context Protocol) client designed to connect with AI
+              applications. Please ensure you trust this application before granting access to your
+              organization's data.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+
         <AuthorizeRequesterDetails
           icon={requester.icon}
           name={requester.name}
