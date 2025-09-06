@@ -52,6 +52,26 @@ export const NoFilterResults = ({
   )
 }
 
+export const LoadingTableRow = () => (
+  <TableRow>
+    <TableCell>
+      <Skeleton className="bg-surface-400 h-4 w-32"></Skeleton>
+    </TableCell>
+    <TableCell>
+      <Skeleton className="bg-surface-400 h-4 w-16"></Skeleton>
+    </TableCell>
+    <TableCell>
+      <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
+    </TableCell>
+    <TableCell>
+      <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
+    </TableCell>
+    <TableCell>
+      <Skeleton className="bg-surface-400 h-4 w-24"></Skeleton>
+    </TableCell>
+  </TableRow>
+)
+
 export const LoadingTableView = () => {
   return (
     <Card>
@@ -67,23 +87,7 @@ export const LoadingTableView = () => {
         </TableHeader>
         <TableBody>
           {[...Array(3)].map((_, i) => (
-            <TableRow key={i}>
-              <TableCell>
-                <Skeleton className="bg-surface-400 h-4 w-32"></Skeleton>
-              </TableCell>
-              <TableCell>
-                <Skeleton className="bg-surface-400 h-4 w-16"></Skeleton>
-              </TableCell>
-              <TableCell>
-                <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
-              </TableCell>
-              <TableCell>
-                <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
-              </TableCell>
-              <TableCell>
-                <Skeleton className="bg-surface-400 h-4 w-24"></Skeleton>
-              </TableCell>
-            </TableRow>
+            <LoadingTableRow key={i} />
           ))}
         </TableBody>
       </Table>
