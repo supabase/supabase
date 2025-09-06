@@ -186,14 +186,6 @@ This error occurs when your credentials are incorrect. Double-check your usernam
 
 Supabase’s default direct connection supports IPv6 only. To connect over IPv4, consider using the Supavisor session or transaction modes, or a connection pooler (shared or dedicated), which support both IPv4 and IPv6.
 
-### How do you choose a connection method?
-
-- Direct connection: Persistent backend services (IPv6 only)
-- Supavisor session mode: Persistent backend needing IPv4
-- Supavisor transaction mode: Serverless functions
-- Shared pooler: General-purpose connections with IPv4 and IPv6
-- Dedicated pooler: High-performance apps requiring dedicated resources (paid tier)
-
 ### Where is the Postgres connection string in Supabase?
 
 Your connection string is located in the Supabase Dashboard. Click the "Connect" button at the top of the page.
@@ -293,6 +285,12 @@ The port helps route the connection to the right pooler/mode.
 Because the dedicated pooler is hosted on the same machine as your database, it connects with lower latency than the shared pooler, which is hosted on a separate server. Direct connections have no pooler overhead but require IPv6 unless you have the IPv4 add-on.
 
 ### How to choose the right connection method?
+
+- Direct connection: Persistent backend services (IPv6 only)
+- Supavisor session mode: Persistent backend needing IPv4
+- Supavisor transaction mode: Serverless functions
+- Shared pooler: General-purpose connections with IPv4 and IPv6
+- Dedicated pooler: High-performance apps requiring dedicated resources (paid tier)
 
 You can follow the decision flow in the connection method diagram to quickly choose the right option for your environment.
 
