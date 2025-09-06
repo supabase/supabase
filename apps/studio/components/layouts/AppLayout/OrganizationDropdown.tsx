@@ -59,7 +59,7 @@ export const OrganizationDropdown = () => {
           {orgName ?? 'Select an organization'}
         </span>
         {!!selectedOrganization && (
-          <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
+          <Badge variant="default">{selectedOrganization?.plan?.name ?? 'Free'}</Badge>
         )}
       </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
