@@ -292,15 +292,15 @@ The port helps route the connection to the right pooler/mode.
 
 Because the dedicated pooler is hosted on the same machine as your database, it connects with lower latency than the shared pooler, which is hosted on a separate server. Direct connections have no pooler overhead but require IPv6 unless you have the IPv4 add-on.
 
-### How do you choose the right connection method?
+### How to choose the right connection method?
 
 You can follow the decision flow in the connection method diagram to quickly choose the right option for your environment.
 
 <Image
   alt="Decision tree diagram showing when to connect directly to Postgres or use a connection pooler."
   src={{
-    dark: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree.png',
-    light: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree-light.png',
+    dark: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree.svg',
+    light: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree-light.svg',
   }}
   caption="Choosing between direct Postgres connections and connection pooling"
   zoomable
