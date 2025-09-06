@@ -208,15 +208,15 @@ psql "your_connection_string"
 
 Ensure you have `psql` installed locally before running this command.
 
-### Should I use Supavisor and PgBouncer together?
+### Can you use Supavisor and PgBouncer together?
 
 You can technically use both, but it’s not recommended unless you’re specifically trying to increase the total number of concurrent client connections. In most cases, it is better to choose either PgBouncer or Supavisor for pooled or transaction-based traffic. Direct connections remain the best choice for long-lived sessions, and, if IPv4 is required for those sessions, Supavisor session mode can be used as an alternative. Running both poolers simultaneously increases the risk of hitting your database’s maximum connection limit on smaller compute tiers.
 
-### How does default pool size work?
+### How does the default pool size work?
 
 Supavisor and PgBouncer work independently, but both reference the same pool size setting. For example, if you set the pool size to 30, Supavisor can open up to 30 server-side connections to Postgres each for its session mode port (5432) and transaction mode port (6543), and PgBouncer can also open up to 30. If both poolers are active and reach their roles/modes limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections. You can adjust the pool size in [Database settings](https://supabase.com/dashboard/project/_/database/settings) in the dashboard.
 
-### Client connections vs Backend connections and how to calculate?
+### What is the difference between client connections and backend connections?
 
 There are two different limits to understand when working with poolers. The first is client connections, which refers to how many clients can connect to a pooler at the same time. This number is capped by your [compute tier’s “max pooler clients” limit](https://supabase.com/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections), and it applies independently to Supavisor and PgBouncer. The second is backend connections, which is the number of active connections a pooler opens to Postgres. This number is set by the pool size for that pooler.
 
@@ -232,7 +232,7 @@ Total backend load on Postgres =
 
 The “max pooler clients” limit for your compute tier applies separately to Supavisor and PgBouncer. One pooler reaching its client limit does not affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones are closed, but the other pooler remains unaffected. You can check your tier’s connection limits in the [compute and disk limits documentation](https://supabase.com/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections).
 
-### Where can I see my current connection usage?
+### Where can you see current connection usage?
 
 You can track connection usage from the [Reports](https://supabase.com/dashboard/project/_/reports/database) section in your project dashboard. There are three key reports:
 
@@ -273,11 +273,11 @@ JOIN pg_stat_activity
  ON pg_stat_ssl.pid = pg_stat_activity.pid;
 ```
 
-### Why am I seeing active connections when my app is idle?
+### Why are there active connections when the app is idle?
 
 Even if your application isn’t making queries, some Supabase services keep persistent connections to your database. For example, Storage, PostgREST, and our health checker all maintain long-lived connections. You’ll usually see a small baseline of active connections from these services.
 
-### Why does connection strings have different ports?
+### Why do connection strings have different ports?
 
 Different modes use different ports:
 
@@ -288,11 +288,11 @@ Different modes use different ports:
 
 The port helps route the connection to the right pooler/mode.
 
-### Does Supabase connection pooling affect latency?
+### Does connection pooling affect latency?
 
 Because the dedicated pooler is hosted on the same machine as your database, it connects with lower latency than the shared pooler, which is hosted on a separate server. Direct connections have no pooler overhead but require IPv6 unless you have the IPv4 add-on.
 
-### How do I choose the right connection method?
+### How do you choose the right connection method?
 
 You can follow the decision flow in the connection method diagram to quickly choose the right option for your environment.
 
