@@ -23,7 +23,7 @@ interface StoragePoliciesBucketRowProps {
   label: string
   bucket?: Bucket
   policies: PostgresPolicy[]
-  onSelectPolicyAdd: (bucketName: string, table: string) => void
+  onSelectPolicyAdd: (bucketName: string | undefined, table: string) => void
   onSelectPolicyEdit: (policy: PostgresPolicy, bucketName: string, table: string) => void
   onSelectPolicyDelete: (policy: PostgresPolicy) => void
 }
@@ -45,11 +45,9 @@ export const StoragePoliciesBucketRow = ({
           <CardTitle>{label}</CardTitle>
           {bucket?.public && <Badge variant="warning">Public</Badge>}
         </div>
-        {!!bucket && (
-          <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
-            New policy
-          </Button>
-        )}
+        <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
+          New policy
+        </Button>
       </CardHeader>
       {policies.length === 0 ? (
         <CardContent>
