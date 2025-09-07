@@ -177,7 +177,9 @@ export const SpreadsheetImportPreview = ({
                             >
                               <ChevronRight
                                 size={14}
-                                className={`transform ${isExpanded ? 'rotate-90' : ''}`}
+                                className={cn('transform transition-transform', {
+                                  'rotate-90': isExpanded,
+                                })}
                                 aria-hidden="true"
                               />
                               <span
