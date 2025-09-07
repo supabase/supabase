@@ -158,14 +158,14 @@ export const SpreadsheetImportPreview = ({
                       </div>
                     </div>
                   )}
-                  <div className="space-y-2">
+                  <ul className="space-y-2 list-none">
                     {dedupedErrors.map((error: any, idx: number) => {
                       const key = `import-error-${idx}`
                       const isExpanded = expandedErrors.includes(key)
                       const errorData = error.data
 
                       return (
-                        <div key={key} className="space-y-2">
+                        <li key={key} className="space-y-2">
                           <div
                             className={cn(
                               'flex items-center space-x-2',
@@ -203,10 +203,10 @@ export const SpreadsheetImportPreview = ({
                               rows={[errorData]}
                             />
                           )}
-                        </div>
+                        </li>
                       )
                     })}
-                  </div>
+                  </ul>
                 </div>
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
