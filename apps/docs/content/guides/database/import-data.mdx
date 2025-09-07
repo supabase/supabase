@@ -1,38 +1,36 @@
----
-id: 'database'
-title: 'Import data into Supabase'
----
+--Selamat datang di Website Promosi Kesehatan RSUD Praya.  
+Kami hadir untuk memberikan informasi kesehatan terkini, 
+edukasi yang bermanfaat, serta layanan promosi kesehatan 
+bagi masyarakat.  
 
-You can import data into Supabase in multiple ways. The best method depends on your data size and app requirements.
+Mari bersama-sama membangun pola hidup sehat demi 
+terwujudnya masyarakat yang lebih sejahtera.
 
-If you're working with small datasets in development, you can experiment quickly using CSV import in the Supabase dashboard. If you're working with a large dataset in production, you should plan your data import to minimize app latency and ensure data integrity.
+Visi & Misi Singkat
 
-## How to import data into Supabase
+Judul: Visi & Misi
+Isi:
 
-You have multiple options for importing your data into Supabase:
+Visi: “Mewujudkan masyarakat yang sehat melalui promosi kesehatan yang berkesinambungan.”
 
-1. [CSV import via the Supabase dashboard](#option-1-csv-import-via-supabase-dashboard)
-2. [Bulk import using `pgloader`](#option-2-bulk-import-using-pgloader)
-3. [Using the Postgres `COPY` command](#option-3-using-postgres-copy-command)
-4. [Using the Supabase API](#option-4-using-the-supabase-api)
+Misi:
 
-<Admonition type="tip">
+Memberikan edukasi kesehatan yang akurat.
 
-If you're importing a large dataset or importing data into production, plan ahead and [prepare your database](#preparing-to-import-data).
+Mendukung pencegahan penyakit di masyarakat.
 
-</Admonition>
+Meningkatkan kesadaran hidup sehat.
+<
+Layanan Kami
+Isi (dalam 3 kolom):
 
-### Option 1: CSV import via Supabase dashboard
+📘 Edukasi Kesehatan → Artikel, poster, video.
 
-Supabase dashboard provides a user-friendly way to import data. However, for very large datasets, this method may not be the most efficient choice, given the size limit is 100MB. It's generally better suited for smaller datasets and quick data imports. Consider using alternative methods like pgloader for large-scale data imports.
+👩‍⚕️ Konsultasi Kesehatan → Tanya jawab online.
 
-1. Navigate to the relevant table in the [Table Editor.](/dashboard/project/_/editor)
-2. Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
+📅 Kegiatan Promosi → Seminar, workshop, penyuluhan.
 
-### Option 2: Bulk import using pgloader
-
-[pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a Postgres database that supports a wide range of source database engines, including MySQL and MS SQL.
-
+Bersama kita wujudkan masyarakat yang lebih sehat.”
 You can use it in conjunction with Supabase by following these steps:
 
 1. Install pgloader on your local machine or a server. For more info, you can refer to the [official pgloader installation page](https://pgloader.readthedocs.io/en/latest/install.html).
