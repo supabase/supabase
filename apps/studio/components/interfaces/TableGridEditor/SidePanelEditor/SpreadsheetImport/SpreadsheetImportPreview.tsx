@@ -162,14 +162,18 @@ export const SpreadsheetImportPreview = ({
                     {dedupedErrors.map((error: any, idx: number) => {
                       const key = `import-error-${idx}`
                       const isExpanded = expandedErrors.includes(key)
+                      const errorData = error.data
 
                       return (
                         <div key={key} className="space-y-2">
                           <div
-                            className="flex items-center space-x-2 cursor-pointer"
+                            className={cn(
+                              'flex items-center space-x-2',
+                              errorData && 'cursor-pointer'
+                            )}
                             onClick={() => onSelectExpandError(key)}
                           >
-                            {error.data !== undefined ? (
+                            {errorData !== undefined ? (
                               <ChevronRight
                                 size={14}
                                 className={`transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -181,11 +185,11 @@ export const SpreadsheetImportPreview = ({
                             )}
                             <p className="text-sm">Row {error.row}:</p>
                             <p className="text-sm">{error.message}</p>
-                            {error.data?.__parsed_extra && (
+                            {errorData?.__parsed_extra && (
                               <>
                                 <ArrowRight size={14} />
                                 <p className="text-sm">Extra field(s):</p>
-                                {error.data?.__parsed_extra.map((value: any, i: number) => (
+                                {errorData?.__parsed_extra.map((value: any, i: number) => (
                                   <code key={i} className="text-xs">
                                     {value}
                                   </code>
@@ -193,10 +197,10 @@ export const SpreadsheetImportPreview = ({
                               </>
                             )}
                           </div>
-                          {error.data !== undefined && isExpanded && (
+                          {errorData !== undefined && isExpanded && (
                             <SpreadsheetPreviewGrid
                               headers={spreadsheetData.headers}
-                              rows={[error.data]}
+                              rows={[errorData]}
                             />
                           )}
                         </div>
