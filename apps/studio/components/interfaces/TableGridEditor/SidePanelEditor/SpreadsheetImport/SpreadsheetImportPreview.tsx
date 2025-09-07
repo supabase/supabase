@@ -166,37 +166,52 @@ export const SpreadsheetImportPreview = ({
 
                       return (
                         <li key={key} className="space-y-2">
-                          <div
-                            className={cn(
-                              'flex items-center space-x-2',
-                              errorData && 'cursor-pointer'
-                            )}
-                            onClick={() => onSelectExpandError(key)}
-                          >
-                            {errorData !== undefined ? (
+                          {errorData !== undefined ? (
+                            <button
+                              type="button"
+                              className="flex items-center space-x-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                              onClick={() => onSelectExpandError(key)}
+                              aria-expanded={isExpanded}
+                              aria-controls={`${key}-panel`}
+                              aria-labelledby={`${key}-summary`}
+                            >
                               <ChevronRight
                                 size={14}
                                 className={`transform ${isExpanded ? 'rotate-90' : ''}`}
+                                aria-hidden="true"
                               />
-                            ) : (
-                              <div className="size-[14px] flex items-center justify-center">
+                              <span
+                                id={`${key}-summary`}
+                                className="sr-only"
+                              >{`Toggle details for row ${error.row}`}</span>
+                              <p className="text-sm">Row {error.row}:</p>
+                              <p className="text-sm">{error.message}</p>
+                              {errorData?.__parsed_extra && (
+                                <>
+                                  <ArrowRight size={14} aria-hidden="true" />
+                                  <p className="text-sm">Extra field(s):</p>
+                                  <ul className="ml-2 list-disc">
+                                    {errorData.__parsed_extra.map((value: string, i: number) => (
+                                      <li key={i}>
+                                        <code className="text-xs">{value}</code>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </>
+                              )}
+                            </button>
+                          ) : (
+                            <div className="flex items-center space-x-2">
+                              <div
+                                className="size-[14px] flex items-center justify-center"
+                                aria-hidden="true"
+                              >
                                 <div className="size-[6px] rounded-full bg-foreground-lighter" />
                               </div>
-                            )}
-                            <p className="text-sm">Row {error.row}:</p>
-                            <p className="text-sm">{error.message}</p>
-                            {errorData?.__parsed_extra && (
-                              <>
-                                <ArrowRight size={14} />
-                                <p className="text-sm">Extra field(s):</p>
-                                {errorData?.__parsed_extra.map((value: any, i: number) => (
-                                  <code key={i} className="text-xs">
-                                    {value}
-                                  </code>
-                                ))}
-                              </>
-                            )}
-                          </div>
+                              <p className="text-sm">Row {error.row}:</p>
+                              <p className="text-sm">{error.message}</p>
+                            </div>
+                          )}
                           {errorData !== undefined && isExpanded && (
                             <SpreadsheetPreviewGrid
                               headers={spreadsheetData.headers}
