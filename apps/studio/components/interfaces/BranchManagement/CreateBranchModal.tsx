@@ -359,26 +359,26 @@ export const CreateBranchModal = () => {
                   name="withData"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Include data"
+                      label={
+                        <>
+                          <Label className="mr-2">Include data</Label>
+                          {!disableBackupsCheck && noPhysicalBackups && (
+                            <Badge variant="warning" size="small">
+                              Requires PITR
+                            </Badge>
+                          )}
+                        </>
+                      }
                       layout="flex-row-reverse"
                       description="Clone production data into this branch"
                     >
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <FormControl_Shadcn_>
-                            <Switch
-                              disabled={!disableBackupsCheck && noPhysicalBackups}
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!disableBackupsCheck && noPhysicalBackups && (
-                          <TooltipContent side="bottom">
-                            PITR is required for the project to clone data into the branch
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
+                      <FormControl_Shadcn_>
+                        <Switch
+                          disabled={!disableBackupsCheck && noPhysicalBackups}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
