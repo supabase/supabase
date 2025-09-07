@@ -32,8 +32,8 @@ export const OptInToOpenAIToggle = () => {
           </p>
 
           <p>
-            By default, the AI assistant shares schema data with third-party AI providers. This is
-            not retained by them nor used as training data. With your permission, Supabase may also
+            By default, only schema data is shared with third-party AI providers. This is not
+            retained by them nor used as training data. With your permission, Supabase may also
             share customer-generated prompts, database data, and project logs with these providers.
             This information is used solely to generate responses to your queries and is not
             retained by the providers or used to train their models.
