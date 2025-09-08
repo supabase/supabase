@@ -52,7 +52,7 @@ export const UpdateVersionModal = ({
           <p className="text-xs text-foreground-light">New version</p>
           <Badge variant="brand">{newVersionName ?? 'New version'}</Badge>
         </div>
-        <p className="text-sm text-foreground-light text-center">
+        <p className="mt-4 text-sm text-foreground-light text-center">
           Updating the replication pipeline version briefly pauses the pipeline and then resumes it
           automatically. If there is a long-running transaction during the restart, some data might
           be duplicated.
