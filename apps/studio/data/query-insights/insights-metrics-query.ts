@@ -103,20 +103,6 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
         ORDER BY timestamp ASC
       `
 
-    case 'issues':
-      return /* SQL */ `
-        SELECT
-          bucket_start_time as timestamp,
-          COUNT(CASE WHEN mean_exec_time > 1000 AND calls > 1 THEN 1 END) as value,
-          datname as database
-        FROM pg_stat_monitor
-        WHERE bucket_start_time >= '${startTime}'::timestamptz
-          AND bucket_start_time <= '${endTime}'::timestamptz
-          AND bucket_done = true
-        GROUP BY bucket_start_time, datname
-        ORDER BY timestamp ASC
-      `
-
     default:
       return /* SQL */ `
         SELECT
@@ -211,7 +197,6 @@ export function useInsightsPrefetchQuery(
       { id: 'rows_read', label: 'Rows read' },
       { id: 'calls', label: 'Calls' },
       { id: 'cache_hits', label: 'Cache hits' },
-      { id: 'issues', label: 'Issues' },
     ]
 
     metricTypes.forEach((metric) => {
