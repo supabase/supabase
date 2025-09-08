@@ -1,15 +1,17 @@
 import React, { FC } from 'react'
-
+import dynamic from 'next/dynamic'
 import { cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import type {
   Feature,
   FeaturesSection as FeaturesSectionType,
-} from '~/data/solutions/solutions.utils'
+} from '~/data/open-source/contributing/supasquad.utils'
 
-const FeaturesSection: FC<FeaturesSectionType> = (props) => {
+const FeatureIcon = dynamic(() => import('~/components/Supasquad/FeatureIcon'), { ssr: false })
+
+const FeaturesSection = (props: FeaturesSectionType) => {
   return (
-    <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8">
+    <SectionContainer id={props.id} className={cn('flex flex-col gap-4 md:gap-8', props.className)}>
       <div className="flex flex-col gap-2 max-w-xl">
         <span className="label">{props.label}</span>
         <h2 className="h2 text-foreground-lighter">{props.heading}</h2>
@@ -22,7 +24,7 @@ const FeaturesSection: FC<FeaturesSectionType> = (props) => {
         )}
       >
         {props.features?.map((feature: Feature, index: number) => (
-          <FeatureItem feature={feature} key={index} />
+          <FeatureItem feature={feature} key={feature.id} />
         ))}
       </ul>
     </SectionContainer>
@@ -34,39 +36,11 @@ interface FeatureItemProps {
 }
 
 const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
-  const Icon = feature.icon
-  const iconSize = 7
-  const iconWidth = `w-${iconSize}`
-  const iconHeight = `h-${iconSize}`
-
   return (
     <li className="flex flex-col gap-2 text-sm text-foreground-lighter">
-      {Icon &&
-        (typeof Icon === 'string' ? (
-          <svg
-            width="25"
-            height="25"
-            viewBox="0 0 25 25"
-            fill={feature.iconNoStroke ? 'currentColor' : 'none'}
-            className="w-7 h-7 mb-2"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d={Icon}
-              fillRule="evenodd"
-              clipRule="evenodd"
-              stroke={feature.iconNoStroke ? 'none' : 'currentColor'}
-              strokeMiterlimit="10"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="1"
-            />
-          </svg>
-        ) : (
-          <Icon className={cn('mb-2 text-current', iconWidth, iconHeight)} strokeWidth={1.5} />
-        ))}
+      <FeatureIcon icon={feature.icon} iconNoStroke={feature.iconNoStroke} />
       <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
-        <span className={cn('h-full bg-foreground-lighter', iconWidth)} />
+        <span className={cn('h-full bg-foreground-lighter', 'h-7')} />
       </div>
       <h4 className="text-foreground text-lg lg:text-xl mt-1">{feature.heading}</h4>
       <p className="text-foreground-lighter text-sm">{feature.subheading}</p>
