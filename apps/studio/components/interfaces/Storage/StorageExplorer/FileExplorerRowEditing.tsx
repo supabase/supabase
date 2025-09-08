@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { RowIcon } from './FileExplorerRow'
+import { RowIcon } from './RowIcon'
 
 export interface FileExplorerRowEditingProps {
   item: StorageItem

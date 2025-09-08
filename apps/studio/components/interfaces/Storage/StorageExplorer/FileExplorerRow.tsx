@@ -5,24 +5,18 @@ import {
   Clipboard,
   Download,
   Edit,
-  File,
-  Film,
-  Image,
   Loader,
   MoreVertical,
   Move,
-  Music,
   Trash2,
 } from 'lucide-react'
-import { useContextMenu } from 'react-contexify'
 import { useEffect, useRef } from 'react'
-import { useDrag, useDrop, useDragLayer } from 'react-dnd'
-import SVG from 'react-inlinesvg'
+import { useContextMenu } from 'react-contexify'
+import { useDrag, useDragLayer, useDrop } from 'react-dnd'
 
 import { useParams } from 'common'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
@@ -50,55 +44,9 @@ import {
 } from '../Storage.constants'
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
+import { RowIcon } from './RowIcon'
 import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
-
-export const RowIcon = ({
-  view,
-  status,
-  fileType,
-  mimeType,
-}: {
-  view: STORAGE_VIEWS
-  status: STORAGE_ROW_STATUS
-  fileType: string
-  mimeType: string | undefined
-}) => {
-  if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return <Loader size={16} strokeWidth={2} className="animate-spin" />
-  }
-
-  if (fileType === STORAGE_ROW_TYPES.BUCKET || fileType === STORAGE_ROW_TYPES.FOLDER) {
-    const iconSrc =
-      fileType === STORAGE_ROW_TYPES.BUCKET
-        ? `${BASE_PATH}/img/bucket-filled.svg`
-        : fileType === STORAGE_ROW_TYPES.FOLDER
-          ? `${BASE_PATH}/img/folder-filled.svg`
-          : `${BASE_PATH}/img/file-filled.svg`
-    return (
-      <SVG
-        src={iconSrc}
-        preProcessor={(code) =>
-          code.replace(/svg/, 'svg class="w-4 h-4 text-color-inherit opacity-75"')
-        }
-      />
-    )
-  }
-
-  if (mimeType?.includes('image')) {
-    return <Image size={16} strokeWidth={2} />
-  }
-
-  if (mimeType?.includes('audio')) {
-    return <Music size={16} strokeWidth={2} />
-  }
-
-  if (mimeType?.includes('video')) {
-    return <Film size={16} strokeWidth={2} />
-  }
-
-  return <File size={16} strokeWidth={2} />
-}
 
 interface FileExplorerRowProps {
   view: STORAGE_VIEWS
@@ -155,17 +103,13 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
     '*'
   )
 
+  const pathToFolder = openedFolders
+    .slice(0, columnIndex)
+    .map((folder) => folder.name)
+    .concat(item.name)
+    .join('/')
   // Check if this folder is currently being moved
-  const isBeingMoved =
-    item.type === STORAGE_ROW_TYPES.FOLDER &&
-    (() => {
-      const folderPath = openedFolders
-        .slice(0, columnIndex)
-        .map((folder) => folder.name)
-        .concat(item.name)
-        .join('/')
-      return foldersBeingMoved.has(folderPath)
-    })()
+  const isBeingMoved = item.type === STORAGE_ROW_TYPES.FOLDER && foldersBeingMoved.has(pathToFolder)
 
   // Drag source for files and folders
   const [{ isDragging }, drag, preview] = useDrag(
@@ -209,29 +153,12 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
     ]
   )
 
-  // Always hide default preview for multi-item drags and set empty preview early
-  useEffect(() => {
-    if (isSelected && selectedItems.length > 1) {
-      // Create a completely transparent 1x1 pixel image
-      const emptyImage = document.createElement('img')
-      emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
-      emptyImage.onload = () => {
-        preview(emptyImage, { captureDraggingState: true })
-      }
-      // Set it immediately as well
-      preview(emptyImage, { captureDraggingState: true })
-    }
-  }, [isSelected, selectedItems.length, preview])
-
   // Drop target for folders
   const [{ isOver }, drop] = useDrop({
     accept: 'storage-item',
     canDrop: (draggedItem: any) => {
       // Only allow drops on folders
-      if (item.type !== STORAGE_ROW_TYPES.FOLDER) {
-        // Not a folder
-        return false
-      }
+      if (item.type !== STORAGE_ROW_TYPES.FOLDER) return false
 
       // Handle multi-item drops
       if (draggedItem.type === 'multi-item') {
@@ -355,7 +282,7 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
 
       return true
     },
-    drop: (draggedItem: any, monitor: any) => {
+    drop: (draggedItem) => {
       if (item.type === STORAGE_ROW_TYPES.FOLDER && canUpdateFiles) {
         // Calculate target directory path - for folder drops, target is the folder itself
         const targetDirectory = snap.openedFolders
@@ -581,6 +508,20 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
       : view === STORAGE_VIEWS.LIST && !item.isCorrupted
         ? `calc(100% - 50px)`
         : '100%'
+
+  // Always hide default preview for multi-item drags and set empty preview early
+  useEffect(() => {
+    if (isSelected && selectedItems.length > 1) {
+      // Create a completely transparent 1x1 pixel image
+      const emptyImage = document.createElement('img')
+      emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+      emptyImage.onload = () => {
+        preview(emptyImage, { captureDraggingState: true })
+      }
+      // Set it immediately as well
+      preview(emptyImage, { captureDraggingState: true })
+    }
+  }, [isSelected, selectedItems.length, preview])
 
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
     return <FileExplorerRowEditing view={view} item={item} columnIndex={columnIndex} />

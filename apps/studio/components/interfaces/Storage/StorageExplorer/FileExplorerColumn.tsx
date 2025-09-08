@@ -233,20 +233,6 @@ export const FileExplorerColumn = ({
   // Apply drop ref to the column
   drop(fileExplorerColumnRef)
 
-  useEffect(() => {
-    if (fileExplorerColumnRef) {
-      const { scrollHeight, clientHeight } = fileExplorerColumnRef.current
-      if (scrollHeight > clientHeight) {
-        fileExplorerColumnRef.current.scrollTop += scrollHeight - clientHeight
-      }
-    }
-  }, [column])
-
-  // Reset drag states when column changes
-  useEffect(() => {
-    setIsDraggedOver(false)
-  }, [column.id])
-
   const haveSelectedItems = selectedItems.length > 0
   const columnItemsId = column.items.map((item) => item.id)
   const columnFiles = column.items.filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
@@ -293,6 +279,20 @@ export const FileExplorerColumn = ({
       onChange={() => onSelectAllItemsInColumn(index)}
     />
   )
+
+  useEffect(() => {
+    if (fileExplorerColumnRef) {
+      const { scrollHeight, clientHeight } = fileExplorerColumnRef.current
+      if (scrollHeight > clientHeight) {
+        fileExplorerColumnRef.current.scrollTop += scrollHeight - clientHeight
+      }
+    }
+  }, [column])
+
+  // Reset drag states when column changes
+  useEffect(() => {
+    setIsDraggedOver(false)
+  }, [column.id])
 
   return (
     <div

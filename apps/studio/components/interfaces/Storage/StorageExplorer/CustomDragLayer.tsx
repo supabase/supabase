@@ -114,12 +114,7 @@ export const CustomDragLayer = () => {
   const transform = `translate(${baseX + differenceFromInitialOffset.x}px, ${baseY + differenceFromInitialOffset.y}px)`
 
   return (
-    <div
-      className="fixed top-0 left-0 z-50 pointer-events-none"
-      style={{
-        transform,
-      }}
-    >
+    <div className="fixed top-0 left-0 z-50 pointer-events-none" style={{ transform }}>
       <div className="relative">
         <DragPreview itemPositions={itemPositions} />
       </div>
