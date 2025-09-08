@@ -203,6 +203,18 @@ limit 100
     for: ['database'],
   },
   {
+    label: 'Auth Audit Logs',
+    description: 'Audit logs for auth events',
+    mode: 'custom',
+    searchString: `select
+  cast(timestamp as datetime) as timestamp,
+  event_message, metadata 
+from auth_audit_logs 
+limit 10
+`,
+    for: ['database'],
+  },
+  {
     label: 'Storage Object Requests',
     description: 'Number of requests done on Storage Objects',
     mode: 'custom',
