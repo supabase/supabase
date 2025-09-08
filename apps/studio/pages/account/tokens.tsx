@@ -5,13 +5,11 @@ import { AccessTokenList } from 'components/interfaces/Account/AccessTokens/Acce
 import { NewAccessTokenButton } from 'components/interfaces/Account/AccessTokens/NewAccessTokenButton'
 import { NewTokenBanner } from 'components/interfaces/Account/AccessTokens/NewTokenBanner'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import {
   ScaffoldContainer,
-  ScaffoldDescription,
   ScaffoldHeader,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
@@ -27,17 +25,13 @@ const UserAccessTokens: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainer>
-        <ScaffoldHeader className="pt-0 mb-6">
+        <ScaffoldHeader className="pt-0">
           <ScaffoldSectionTitle>Access Tokens</ScaffoldSectionTitle>
-          <ScaffoldDescription>
-            Personal access tokens can be used to control your whole account and use features added
-            in the future. Be careful when sharing them!
-          </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer bottomPadding>
         <div className="space-y-4">
-          {newToken && <NewTokenBanner token={newToken} />}
+          {newToken && <NewTokenBanner token={newToken} onClose={() => setNewToken(undefined)} />}
           <div className="flex items-center justify-between gap-x-2 mb-3">
             <Input
               size="tiny"
@@ -87,9 +81,7 @@ UserAccessTokens.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout title="Access Tokens">
-          <AccountSettingsLayout>{page}</AccountSettingsLayout>
-        </AccountLayout>
+        <AccountLayout title="Access Tokens">{page}</AccountLayout>
       </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>

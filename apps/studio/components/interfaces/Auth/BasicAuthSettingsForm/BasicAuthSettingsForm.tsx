@@ -14,6 +14,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -42,6 +43,8 @@ const schema = object({
 
 const BasicAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
+  const showManualLinking = useIsFeatureEnabled('authentication:show_manual_linking')
+
   const {
     data: authConfig,
     error: authConfigError,
@@ -169,38 +172,40 @@ const BasicAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="SECURITY_MANUAL_LINKING_ENABLED"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Allow manual linking"
-                      description={
-                        <>
-                          Enable{' '}
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href="https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta"
-                          >
-                            manual linking APIs
-                          </InlineLink>{' '}
-                          for your project
-                        </>
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+              {showManualLinking && (
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="SECURITY_MANUAL_LINKING_ENABLED"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Allow manual linking"
+                        description={
+                          <>
+                            Enable{' '}
+                            <InlineLink
+                              className="text-foreground-light hover:text-foreground"
+                              href="https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta"
+                            >
+                              manual linking APIs
+                            </InlineLink>{' '}
+                            for your project
+                          </>
+                        }
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+              )}
               <CardContent>
                 <FormField_Shadcn_
                   control={form.control}

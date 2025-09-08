@@ -345,7 +345,7 @@ function createStorageExplorerState({
         })
       }
 
-      const newFolder = state.columns[columnIndex].items.find((x) => x.name === formattedName)
+      const newFolder = state.columns[columnIndex].items?.find((x) => x.name === formattedName)
       if (newFolder) state.openFolder(columnIndex, newFolder)
     },
 
@@ -1009,13 +1009,12 @@ function createStorageExplorerState({
               Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
               {numberOfFilesRejected > 1 ? 'their' : 'its'} size
               {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of{' '}
-              {value}
-              {unit}.
+              {value} {unit}.
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
               <InlineLink href={`/project/${state.projectRef}/storage/settings`}>
-                Storage settings
+                Storage Settings
               </InlineLink>
               .
             </p>
@@ -1216,7 +1215,7 @@ function createStorageExplorerState({
                     case 413:
                       // Payload too large
                       toast.error(
-                        `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
+                        `Failed to upload ${file.name}: File size exceeds the bucket file size limit.`
                       )
                       break
                     case 409:
@@ -1654,7 +1653,13 @@ function createStorageExplorerState({
       const currentColumnItems = currentColumn.items.filter(
         (item) => item.status !== STORAGE_ROW_STATUS.EDITING
       )
-      const hasSameNameInColumn = currentColumnItems.filter((item) => item.name === name).length > 0
+      // [Joshen] JFYI storage does support folders of the same name with different casing
+      // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
+      // for folders of the same name with different casing
+      // We should remove this check once all projects are on the List V2 endpoint
+      const hasSameNameInColumn =
+        currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length >
+        0
 
       if (hasSameNameInColumn) {
         if (autofix) {

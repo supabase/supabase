@@ -31,10 +31,12 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Craig Cannon
+Cuong Do
 Danny White
 Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
+David Weitzman
 Deepthi Sigireddi
 Deji I
 Div Arora
@@ -44,6 +46,7 @@ Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
 Emmett Folger
+Eric Kharitonashvili
 Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
@@ -52,6 +55,7 @@ Greg Kress
 Greg P
 Greg Richardson
 Guilherme Souza
+Hardik Maheshwari
 Haydn Maley
 Hieu Pham
 Ignacio Dobronich
@@ -68,6 +72,7 @@ Jordi Enric
 José Luis Ledesma
 Joshen Lim
 Julien Goux
+Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
 Karan S
@@ -102,10 +107,12 @@ Peter Lyn
 Qiao Han
 Rafael Chacón
 Raminder Singh
+Raúl Barroso
 Riccardo Busetti
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
+Sam Meech-Ward
 Sam Rose
 Sean Oliver
 Sergio Cioban Filho
@@ -120,6 +127,7 @@ Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
+Timothy Lim
 Tom Ashley
 Tom G
 Tyler Hillery
