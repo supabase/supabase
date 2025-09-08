@@ -103,27 +103,38 @@ export const DestinationRow = ({
     if (!projectRef || !pipeline?.id) return
     const versionId = versionData?.new_version?.id
     if (!versionId) return
+
+    // Step 1: Update to the new version
     try {
       await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
-      // Restart/start pipeline similar to applying changes UX
-      const isActive = statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
+    } catch (e: any) {
+      // 404: default changed; version cache will refresh via mutation onError. Keep dialog open.
+      if (e?.code === 404) return
+      // Other errors are already toasted by the mutation; do not double-toast here.
+      return
+    }
+
+    // Step 2: Reflect optimistic restart (only if currently active) and close any panels
+    const isActive =
+      statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
+    setShowEditDestinationPanel(false)
+    setShowUpdateVersionModal(false)
+
+    if (isActive) {
       setRequestStatus(
         pipeline.id,
-        isActive
-          ? PipelineStatusRequestStatus.RestartRequested
-          : PipelineStatusRequestStatus.StartRequested,
+        PipelineStatusRequestStatus.RestartRequested,
         statusName
       )
-      // Collapse any open panels for a clean UX
-      setShowEditDestinationPanel(false)
-      setShowUpdateVersionModal(false)
-      await startPipeline({ projectRef, pipelineId: pipeline.id })
-    } catch (e: any) {
-      // If update returned 404, version changed meanwhile. Keep modal open and refresh.
-      if (e?.code === 404) return
-      // If restart failed, clear the transient status and notify
-      if (pipeline?.id) setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error('Failed to restart pipeline after update')
+
+      // Step 3: Restart the pipeline
+      try {
+        await startPipeline({ projectRef, pipelineId: pipeline.id })
+      } catch (e: any) {
+        // Clear optimistic state and surface a single concise error
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
+        toast.error('Failed to restart pipeline')
+      }
     }
   }
 
@@ -263,6 +274,11 @@ export const DestinationRow = ({
         newVersionName={versionData?.new_version?.name}
         onCancel={() => setShowUpdateVersionModal(false)}
         onConfirm={performUpdateAndRestart}
+        confirmLabel={
+          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
+            ? 'Update and restart'
+            : 'Update version'
+        }
       />
     </>
   )

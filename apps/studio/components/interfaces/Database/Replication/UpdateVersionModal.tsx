@@ -9,6 +9,8 @@ interface UpdateVersionModalProps {
   newVersionName?: string
   onCancel: () => void
   onConfirm: () => Promise<void>
+  confirmLabel?: string
+  confirmLabelLoading?: string
 }
 
 export const UpdateVersionModal = ({
@@ -17,6 +19,8 @@ export const UpdateVersionModal = ({
   newVersionName,
   onCancel,
   onConfirm,
+  confirmLabel = 'Update and restart',
+  confirmLabelLoading = 'Updating',
 }: UpdateVersionModalProps) => {
   const [loading, setLoading] = useState(false)
 
@@ -35,8 +39,8 @@ export const UpdateVersionModal = ({
       visible={visible}
       loading={loading}
       title="Update pipeline version"
-      confirmLabel="Update and restart"
-      confirmLabelLoading="Updating"
+      confirmLabel={confirmLabel}
+      confirmLabelLoading={confirmLabelLoading}
       onCancel={onCancel}
       onConfirm={handleConfirm}
     >
@@ -53,7 +57,7 @@ export const UpdateVersionModal = ({
           <Badge variant="brand">{newVersionName ?? 'New version'}</Badge>
         </div>
         <div className="mt-4 w-full text-left text-sm text-foreground">
-          Applying the update switches your destination to the latest pipeline version. The pipeline
+          Applying the update switches your pipeline to the latest version. The pipeline
           restarts briefly to complete the change.
         </div>
         <div className="mt-3 w-full rounded-md border border-overlay bg-surface-100 px-3 py-2 text-xs text-left">
