@@ -6620,6 +6620,7 @@ export interface components {
         offset: number
       }
       projects: {
+        cloud_provider: string
         databases: {
           cloud_provider: string
           disk_last_modified_at?: string
@@ -6668,6 +6669,7 @@ export interface components {
           /** @enum {string} */
           type: 'PRIMARY' | 'READ_REPLICA'
         }[]
+        inserted_at: string
         is_branch: boolean
         name: string
         ref: string
@@ -9244,7 +9246,7 @@ export interface components {
       folder_id?: (null | (string | null)) | null
       id: string
       name: string
-      owner_id: number
+      owner_id?: number
       project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
@@ -13253,6 +13255,10 @@ export interface operations {
         search?: string
         /** @description Sort order for projects */
         sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+        /** @description A comma-separated list of project statuses to filter by.
+         *
+         *     The following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`. */
+        statuses?: string
       }
       header?: never
       path: {

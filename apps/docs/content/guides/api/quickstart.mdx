@@ -156,6 +156,7 @@ const { data, error } = await supabase.from('todos').select()
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -163,6 +164,8 @@ final data = await supabase.from('todos').select('*');
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -170,6 +173,8 @@ response = supabase.table('todos').select("*").execute()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -177,4 +182,5 @@ let response = try await supabase.from("todos").select()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>

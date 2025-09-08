@@ -320,6 +320,8 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
   </TabPanel>
 
+<$Show if="sdk:swift">
+
   <TabPanel id="swift" label="Swift">
 
     ## Using native sign in with Apple in Swift
@@ -378,6 +380,9 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     </Admonition>
 
   </TabPanel>
+  </$Show>
+
+<$Show if="sdk:kotlin">
 
   <TabPanel id="kotlin" label="Kotlin">
 
@@ -419,4 +424,5 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
