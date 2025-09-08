@@ -567,10 +567,6 @@ export const EDGE_FUNCTION_REGIONS = [
     label: 'N. California',
   },
   {
-    key: 'ap-northeast-2',
-    label: 'Seoul',
-  },
-  {
     key: 'us-west-2',
     label: 'Oregon',
   },
@@ -594,4 +590,4 @@ export const EDGE_FUNCTION_REGIONS = [
     key: 'sa-east-1',
     label: 'São Paulo',
   },
-]
+] as const

@@ -100,6 +100,11 @@
       "description": "Enable documentation for self-hosting"
     },
 
+    "feedback:docs": {
+      "type": "boolean",
+      "description": "Enable feedback submission for docs site"
+    },
+
     "integrations:vercel": {
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
@@ -233,6 +238,7 @@
     "database:replication",
     "database:roles",
     "docs:self-hosting",
+    "feedback:docs",
     "integrations:vercel",
     "integrations:show_stripe_wrapper",
     "profile:show_email",

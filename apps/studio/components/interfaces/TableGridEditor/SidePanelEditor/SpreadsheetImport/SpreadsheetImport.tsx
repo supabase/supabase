@@ -109,9 +109,8 @@ const SpreadsheetImport = ({
       const [file] = event.target.files || event.dataTransfer.files
       if (file && !flagInvalidFileImport(file)) {
         await processFile(file)
-      } else {
-        event.target.value = ''
       }
+      event.target.value = ''
     },
     [processFile]
   )
