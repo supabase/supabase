@@ -95,6 +95,10 @@
       "description": "Enable the database roles page"
     },
 
+    "docs:compliance": {
+      "type": "boolean",
+      "description": "Enable documentation on compliance"
+    },
     "docs:self-hosting": {
       "type": "boolean",
       "description": "Enable documentation for self-hosting"
@@ -237,6 +241,7 @@
     "billing:all",
     "database:replication",
     "database:roles",
+    "docs:compliance",
     "docs:self-hosting",
     "feedback:docs",
     "integrations:vercel",
