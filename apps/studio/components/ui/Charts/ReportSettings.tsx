@@ -1,9 +1,15 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Settings } from 'lucide-react'
 import { useState } from 'react'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Label_Shadcn_, Switch } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import {
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Label_Shadcn_,
+  Switch,
+} from 'ui'
 import { useChartHoverState } from './useChartHoverState'
-import { cn } from 'ui'
 
 interface ReportSettingsProps {
   chartId: string
@@ -23,7 +29,7 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
           tooltip={{ content: { side: 'bottom', text: 'Report settings' } }}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" className="w-64 p-3">
+      <DropdownMenuContent align="start" side="bottom" className="w-64 p-3">
         <div className="space-y-4">
           <Label_Shadcn_ htmlFor="sync-hover" className="text-sm font-normal">
             <div className="flex items-center justify-between space-x-2">

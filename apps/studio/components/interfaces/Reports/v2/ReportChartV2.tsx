@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { AnalyticsInterval } from 'data/analytics/constants'
@@ -10,7 +10,6 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Badge, Card, CardContent, cn } from 'ui'
 import { ReportChartUpsell } from './ReportChartUpsell'
-
 export interface ReportChartV2Props {
   report: ReportConfig
   projectRef: string
@@ -18,10 +17,9 @@ export interface ReportChartV2Props {
   endDate: string
   interval: AnalyticsInterval
   updateDateRange: (from: string, to: string) => void
-  functionIds?: string[]
-  edgeFnIdToName?: (id: string) => string | undefined
   className?: string
   syncId?: string
+  filters?: any
 }
 
 export const ReportChartV2 = ({
@@ -31,10 +29,9 @@ export const ReportChartV2 = ({
   endDate,
   interval,
   updateDateRange,
-  functionIds,
-  edgeFnIdToName,
   className,
   syncId,
+  filters,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
@@ -43,27 +40,27 @@ export const ReportChartV2 = ({
   const isAvailable =
     report.availableIn === undefined || (orgPlanId && report.availableIn.includes(orgPlanId))
 
-  const canFetch = orgPlanId !== undefined
+  const canFetch = orgPlanId !== undefined && isAvailable
 
   const {
     data: queryResult,
     isLoading: isLoadingChart,
     error,
+    isFetching,
   } = useQuery(
-    ['projects', projectRef, 'report-v2', report.id, { startDate, endDate, interval, functionIds }],
+    [
+      'projects',
+      projectRef,
+      'report-v2',
+      { reportId: report.id, startDate, endDate, interval, filters },
+    ],
     async () => {
-      return await report.dataProvider(
-        projectRef,
-        startDate,
-        endDate,
-        interval,
-        functionIds,
-        edgeFnIdToName
-      )
+      return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
     {
       enabled: Boolean(projectRef && canFetch && isAvailable),
       refetchOnWindowFocus: false,
+      staleTime: 0,
     }
   )
 
@@ -86,7 +83,7 @@ export const ReportChartV2 = ({
 
   const [chartStyle, setChartStyle] = useState<string>(report.defaultChartStyle)
 
-  if (!isAvailable && !isLoadingChart) {
+  if (!isAvailable) {
     return <ReportChartUpsell report={report} orgSlug={org?.slug ?? ''} />
   }
 
@@ -95,7 +92,12 @@ export const ReportChartV2 = ({
 
   return (
     <Card id={report.id} className={cn('relative w-full overflow-hidden scroll-mt-16', className)}>
-      <CardContent className="flex flex-col gap-4 min-h-[280px] items-center justify-center">
+      <CardContent
+        className={cn(
+          'flex flex-col gap-4 min-h-[280px] items-center justify-center',
+          isFetching && 'opacity-50'
+        )}
+      >
         {isLoadingChart ? (
           <Loader2 className="size-5 animate-spin text-foreground-light" />
         ) : isErrorState ? (
