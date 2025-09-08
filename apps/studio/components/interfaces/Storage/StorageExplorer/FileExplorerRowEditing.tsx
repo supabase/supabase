@@ -12,7 +12,11 @@ export interface FileExplorerRowEditingProps {
   columnIndex: number
 }
 
-const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEditingProps) => {
+export const FileExplorerRowEditing = ({
+  item,
+  view,
+  columnIndex,
+}: FileExplorerRowEditingProps) => {
   const { renameFile, renameFolder, addNewFolder, updateRowStatus } =
     useStorageExplorerStateSnapshot()
 
@@ -112,5 +116,3 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
     </div>
   )
 }
-
-export default FileExplorerRowEditing
