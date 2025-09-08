@@ -59,13 +59,18 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
 
   const columns = QUERY_PERFORMANCE_REPORTS[reportType].map((col) => {
+    const nonSortableColumns = ['query']
+
     const result: Column<any> = {
       key: col.id,
       name: col.name,
       resizable: true,
       minWidth: col.minWidth ?? 120,
+      sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {
+        const isSortable = !nonSortableColumns.includes(col.id)
+
         return (
           <div className="flex items-center justify-between text-xs w-full">
             <div className="flex items-center gap-x-2">
@@ -75,44 +80,46 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               )}
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="text"
-                  size="tiny"
-                  className="p-1 h-5 w-5"
-                  icon={<ChevronDown size={14} className="text-foreground-muted" />}
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => {
-                    setSort({ column: col.id, order: 'asc' })
-                    router.push({
-                      ...router,
-                      query: { ...router.query, sort: col.id, order: 'asc' },
-                    })
-                  }}
-                  className="flex gap-2"
-                >
-                  <ArrowUp size={14} />
-                  Sort Ascending
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    setSort({ column: col.id, order: 'desc' })
-                    router.push({
-                      ...router,
-                      query: { ...router.query, sort: col.id, order: 'desc' },
-                    })
-                  }}
-                  className="flex gap-2"
-                >
-                  <ArrowDown size={14} />
-                  Sort Descending
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isSortable && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="text"
+                    size="tiny"
+                    className="p-1 h-5 w-5"
+                    icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSort({ column: col.id, order: 'asc' })
+                      router.push({
+                        ...router,
+                        query: { ...router.query, sort: col.id, order: 'asc' },
+                      })
+                    }}
+                    className="flex gap-2"
+                  >
+                    <ArrowUp size={14} />
+                    Sort Ascending
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSort({ column: col.id, order: 'desc' })
+                      router.push({
+                        ...router,
+                        query: { ...router.query, sort: col.id, order: 'desc' },
+                      })
+                    }}
+                    className="flex gap-2"
+                  >
+                    <ArrowDown size={14} />
+                    Sort Descending
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         )
       },
