@@ -20,11 +20,12 @@ Supabase provides two connection modes:
 
 | Mode | Use Case |
 |------|----------|
-| Session mode | Long-running connections, logical replication, pg_restore |
-| Transaction mode | Short connections |
+| Direct connection | The direct connection string connects directly to your Postgres instance. Use for long-running connections, logical replication, pg_restore if IPv6 is supported |
+| Supavisor session mode | Use for long-running connections, logical replication, pg_restore |
+| Supavisor transaction mode | Use for short connections. Don't use it for the migration. |
 
 Use session mode for the database migration tasks (pg_dump/restore and logical replication).
-Use the direct connection string if your environment supports IPv6, and use Supavisor session pooler if you need IPv4 support.
+Use the direct connection string if your environment supports IPv6, and use Supavisor session mode if you need IPv4 support.
 
 ## Method 1: Google Colab (Easiest)
 
@@ -79,7 +80,7 @@ CREATE EXTENSION IF NOT EXISTS extension_name;
 
 ### Step 1: Set Up Migration VM
 
-**Critical**: For optimal performance, run the migration from a cloud VM, not your local machine. The VM should be in the same region as either your source or target database to minimize network latency. See the Resource Requirements table in Step 2 for VM sizing recommendations.
+**Important**: For optimal performance, run the migration from a cloud VM, not your local machine. The VM should be in the same region as either your source or target database to optimize network performance. See the Resource Requirements table in Step 2 for VM sizing recommendations.
 
 #### Set Up Ubuntu VM
 
@@ -108,8 +109,7 @@ tmux a -t migration || tmux new -s migration
 
 **Important Notes**:
 - **Users/roles are not migrated** - You'll need to recreate roles and privileges after import ([Supabase Roles Guide](https://supabase.com/blog/postgres-roles-and-privileges))
-- **Enable Row Level Security (RLS)** for tables in public schema after migration
-- **Session pooler works over IPv4** (direct connection is IPv6-only by default)
+- **Row Level Security (RLS) status on tables is not migrated** - You'll need to enable RLS for tables after migration.
 
 **Resource Requirements**:
 | Database Size | Recommended Compute | Recommended VM | Action Required |
