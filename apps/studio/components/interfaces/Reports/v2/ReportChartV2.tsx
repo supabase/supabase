@@ -67,9 +67,14 @@ export const ReportChartV2 = ({
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
 
+  /**
+   * Infra monitoring data returns 'period_start', but logs return 'timestamp'
+   */
+  const firstItem = chartData[0]
+  const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
   const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted(
     chartData,
-    'timestamp',
+    timestampKey,
     (dynamicAttributes as any[]).map((attr: any) => attr.attribute),
     0,
     startDate,
