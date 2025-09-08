@@ -1,6 +1,6 @@
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
-import { Table2 } from 'lucide-react'
+import { Workflow } from 'lucide-react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -12,6 +12,7 @@ import ReactFlow, {
 } from 'reactflow'
 import dagre from '@dagrejs/dagre'
 import 'reactflow/dist/style.css'
+import { capitalize } from 'lodash'
 
 import { cn } from 'ui'
 
@@ -25,11 +26,17 @@ type RawPlan = {
   ['Async Capable']?: boolean
   ['Relation Name']?: string
   Alias?: string
+  ['Join Type']?: string
   ['Startup Cost']?: number
   ['Total Cost']?: number
   ['Plan Rows']?: number
   ['Plan Width']?: number
   Filter?: string
+  ['Hash Cond']?: string
+  ['Index Cond']?: string
+  ['Recheck Cond']?: string
+  ['Merge Cond']?: string
+  ['Join Filter']?: string
   ['Parent Relationship']?: string
   ['Scan Direction']?: string
   ['Index Name']?: string
@@ -80,6 +87,7 @@ const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
 
 type PlanNodeData = {
   label: string
+  joinType?: string
   startupCost?: number
   totalCost?: number
   planRows?: number
@@ -87,6 +95,11 @@ type PlanNodeData = {
   relationName?: string
   alias?: string
   filter?: string
+  hashCond?: string
+  indexCond?: string
+  recheckCond?: string
+  mergeCond?: string
+  joinFilter?: string
   parallelAware?: boolean
   asyncCapable?: boolean
   parentRelationship?: string
@@ -106,6 +119,7 @@ const buildGraphFromPlan = (
     const label = plan['Node Type'] ?? 'Node'
     const data: PlanNodeData = {
       label,
+      joinType: plan['Join Type'],
       startupCost: plan['Startup Cost'],
       totalCost: plan['Total Cost'],
       planRows: plan['Plan Rows'],
@@ -113,6 +127,11 @@ const buildGraphFromPlan = (
       relationName: plan['Relation Name'],
       alias: plan['Alias'] ?? plan.Alias,
       filter: plan['Filter'],
+      hashCond: plan['Hash Cond'],
+      indexCond: plan['Index Cond'],
+      recheckCond: plan['Recheck Cond'],
+      mergeCond: plan['Merge Cond'],
+      joinFilter: plan['Join Filter'],
       parallelAware: plan['Parallel Aware'],
       asyncCapable: plan['Async Capable'],
       parentRelationship: plan['Parent Relationship'],
@@ -139,12 +158,29 @@ const buildGraphFromPlan = (
   return getLayoutedElementsViaDagre(nodes, edges)
 }
 
+const stripParens = (s: string) => s.replace(/^\((.*)\)$/, '$1')
+
 /**
  * @see: https://github.com/wbkd/react-flow/discussions/2698
  */
 const hiddenNodeConnector = 'opacity-0'
 const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
+
+  const headerLines: string[] = []
+  if (data.joinType) headerLines.push(`${capitalize(data.joinType)} join`)
+
+  // Only show join-related conditions in header; exclude index/recheck/filter conditions
+  const cond = data.hashCond ?? data.mergeCond ?? data.joinFilter
+  if (cond) {
+    headerLines.push(`on ${stripParens(cond)}`)
+  } else if (data.relationName) {
+    headerLines.push(`on ${data.relationName}${data.alias ? ` as ${data.alias}` : ''}`)
+  }
+
+  if (data.indexName && data.label.toLowerCase().includes('index')) {
+    headerLines.push(`using ${data.indexName}`)
+  }
 
   return (
     <div
@@ -159,10 +195,19 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
       >
         <div className="flex gap-x-1 items-center">
-          <Table2 strokeWidth={1} size={12} className="text-light" />
+          <Workflow strokeWidth={1} size={12} className="text-light" />
           {data.label}
         </div>
       </header>
+      {headerLines.length > 0 && (
+        <div className="px-2 bg-alternative pb-3">
+          {headerLines.map((line, i) => (
+            <div key={i} className="text-[0.55rem] text-foreground-lighter break-words h-[15px]">
+              {line}
+            </div>
+          ))}
+        </div>
+      )}
 
       <ul>
         {data.startupCost !== undefined && (

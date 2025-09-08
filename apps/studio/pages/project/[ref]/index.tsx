@@ -19,20 +19,49 @@ const sample = `[
 ]`
 
 const sample2 = `[
-      {
-        "Plan": {
+  {
+    "Plan": {
+      "Node Type": "Hash Join",
+      "Join Type": "Inner",
+      "Startup Cost": 230.47,
+      "Total Cost": 713.98,
+      "Plan Rows": 101,
+      "Plan Width": 488,
+      "Hash Cond": "(t1.unique2 = t2.unique2)",
+      "Plans": [
+        {
           "Node Type": "Seq Scan",
-          "Parallel Aware": false,
-          "Async Capable": false,
-          "Relation Name": "onboarding_answers",
-          "Alias": "onboarding_answers",
-          "Startup Cost": 0,
-          "Total Cost": 34.05,
-          "Plan Rows": 1,
-          "Plan Width": 65,
-          "Filter": "(user_id = '1e7d399b-a806-4fc3-b0ca-5b536efbb540'::uuid)"
+          "Relation Name": "tenk2",
+          "Alias": "t2",
+          "Startup Cost": 0.00,
+          "Total Cost": 445.00,
+          "Plan Rows": 10000,
+          "Plan Width": 244
+        },
+        {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "tenk1",
+          "Alias": "t1",
+          "Startup Cost": 230.47,
+          "Total Cost": 268.49,
+          "Plan Rows": 101,
+          "Plan Width": 244,
+          "Recheck Cond": "(unique1 < 100)",
+          "Plans": [
+            {
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "tenk1_unique1",
+              "Startup Cost": 0.00,
+              "Total Cost": 230.47,
+              "Plan Rows": 101,
+              "Plan Width": 0,
+              "Index Cond": "(unique1 < 100)"
+            }
+          ]
         }
-      }
+      ]
+    }
+  }
 ]`
 
 const HomePage: NextPageWithLayout = () => {
