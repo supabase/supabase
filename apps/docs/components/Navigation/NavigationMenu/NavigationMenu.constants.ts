@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import { isFeatureEnabled } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
 import type { IconPanel } from 'ui-patterns/IconPanel'
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
@@ -460,7 +460,7 @@ export const NativeMobileLoginItems = [
   },
 ]
 
-export const SocialLoginItems = [
+export const SocialLoginItems: Array<Partial<NavMenuSection>> = [
   {
     name: 'Google',
     icon: '/docs/img/icons/google-icon',
@@ -591,7 +591,7 @@ export const PhoneLoginsItems = [
   },
 ]
 
-export const auth = {
+export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
   items: [
@@ -1865,7 +1865,7 @@ export const storage: NavMenuConstant = {
   ],
 }
 
-export const vectorIndexItems = [
+export const vectorIndexItems: Array<Partial<NavMenuSection>> = [
   {
     name: 'HNSW indexes',
     url: '/guides/ai/vector-indexes/hnsw-indexes',
@@ -1876,7 +1876,7 @@ export const vectorIndexItems = [
   },
 ]
 
-export const ai = {
+export const ai: NavMenuConstant = {
   icon: 'ai',
   title: 'AI & Vectors',
   url: '/guides/ai',
