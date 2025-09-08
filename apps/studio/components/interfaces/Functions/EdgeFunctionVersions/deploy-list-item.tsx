@@ -51,7 +51,11 @@ export const DeployListItem = ({ deployment, isRestoring, onRestore }: DeployLis
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="left" className="w-40">
-              <DropdownMenuItem className="space-x-2" onClick={() => onRestore(deployment)}>
+              <DropdownMenuItem
+                className="space-x-2"
+                disabled={isRestoring}
+                onClick={() => !isRestoring && onRestore(deployment)}
+              >
                 <RotateCcw size={14} />
                 <p>Restore deployment</p>
               </DropdownMenuItem>
