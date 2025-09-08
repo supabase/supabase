@@ -52,11 +52,18 @@ export const UpdateVersionModal = ({
           <p className="text-xs text-foreground-light">New version</p>
           <Badge variant="brand">{newVersionName ?? 'New version'}</Badge>
         </div>
-        <p className="mt-4 text-sm text-foreground-light text-center">
-          Updating the replication pipeline version briefly pauses the pipeline and then resumes it
-          automatically. If there is a long-running transaction during the restart, some data might
-          be duplicated.
-        </p>
+        <div className="mt-4 w-full text-left text-sm text-foreground">
+          Applying the update switches your destination to the latest pipeline version. The pipeline
+          restarts briefly to complete the change.
+        </div>
+        <div className="mt-3 w-full rounded-md border border-overlay bg-surface-100 px-3 py-2 text-xs text-left">
+          <p className="font-medium text-foreground">Note</p>
+          <p className="mt-1 text-foreground-light">
+            During the brief restart, replication pauses and resumes. If a long‑running transaction
+            is in progress, some records may be reprocessed (duplicates). This is due to PostgreSQL
+            logical replication limitations.
+          </p>
+        </div>
       </div>
     </ConfirmationModal>
   )
