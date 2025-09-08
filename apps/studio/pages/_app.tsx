@@ -116,7 +116,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         <NuqsAdapter>
           <Hydrate state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+              <FeatureFlagProvider
+                API_URL={API_URL}
+                enabled={IS_PLATFORM}
+                getConfigCatFlags={getConfigCatFlags}
+              >
                 <ProfileProvider>
                   <Head>
                     <title>Supabase</title>
