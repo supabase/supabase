@@ -193,44 +193,6 @@ export const realtimeReports = ({
     },
   },
   {
-    id: 'realtime_authorization_rls_execution_time',
-    label: 'Realtime Authorization RLS Execution Time',
-    valuePrecision: 2,
-    showNewBadge: true,
-    hide: false,
-    showTooltip: true,
-    showLegend: false,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    titleTooltip: 'Execution time of RLS (Row Level Security) checks for realtime authorization.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
-    YAxisProps: {
-      width: 50,
-      tickFormatter: (value: number) => `${value}ms`,
-    },
-    format: (value: unknown) => `${Number(value).toFixed(2)}ms`,
-    dataProvider: async () => {
-      const data = await runInfraMonitoringQuery(
-        projectRef,
-        'realtime_authorization_rls_execution_time',
-        startDate,
-        endDate,
-        interval,
-        databaseIdentifier
-      )
-
-      const attributes = [
-        {
-          attribute: 'realtime_authorization_rls_execution_time',
-          label: 'RLS Execution Time (ms)',
-        },
-      ]
-
-      return { data: data?.data || [], attributes }
-    },
-  },
-  {
     id: 'realtime_payload_size',
     label: 'Realtime Broadcast Payload Size',
     valuePrecision: 2,
@@ -313,7 +275,7 @@ export const realtimeReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Time between database commit and broadcast when using broadcast from database.',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['pro', 'team', 'enterprise'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -333,6 +295,44 @@ export const realtimeReports = ({
         {
           attribute: 'realtime_replication_connection_lag',
           label: 'Replication Lag (ms)',
+        },
+      ]
+
+      return { data: data?.data || [], attributes }
+    },
+  },
+  {
+    id: 'realtime_authorization_rls_execution_time',
+    label: 'Realtime Authorization RLS Execution Time',
+    valuePrecision: 2,
+    showNewBadge: true,
+    hide: false,
+    showTooltip: true,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'line',
+    titleTooltip: 'Execution time of RLS (Row Level Security) checks for realtime authorization.',
+    availableIn: ['pro', 'team', 'enterprise'],
+    YAxisProps: {
+      width: 50,
+      tickFormatter: (value: number) => `${value}ms`,
+    },
+    format: (value: unknown) => `${Number(value).toFixed(2)}ms`,
+    dataProvider: async () => {
+      const data = await runInfraMonitoringQuery(
+        projectRef,
+        'realtime_authorization_rls_execution_time',
+        startDate,
+        endDate,
+        interval,
+        databaseIdentifier
+      )
+
+      const attributes = [
+        {
+          attribute: 'realtime_authorization_rls_execution_time',
+          label: 'RLS Execution Time (ms)',
         },
       ]
 
