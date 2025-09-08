@@ -11,6 +11,12 @@ import ReactFlow, {
 } from 'reactflow'
 import dagre from '@dagrejs/dagre'
 import 'reactflow/dist/style.css'
+import {
+  Accordion_Shadcn_ as Accordion,
+  AccordionItem_Shadcn_ as AccordionItem,
+  AccordionTrigger_Shadcn_ as AccordionTrigger,
+  AccordionContent_Shadcn_ as AccordionContent,
+} from 'ui'
 
 type ExplainPlanFlowProps = {
   json: string
@@ -18,6 +24,15 @@ type ExplainPlanFlowProps = {
 
 type RawPlan = {
   ['Node Type']?: string
+  ['Parallel Aware']?: boolean
+  ['Async Capable']?: boolean
+  ['Relation Name']?: string
+  Alias?: string
+  ['Startup Cost']?: number
+  ['Total Cost']?: number
+  ['Plan Rows']?: number
+  ['Plan Width']?: number
+  Filter?: string
   Plans?: RawPlan[]
 }
 
@@ -62,17 +77,44 @@ const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
   return { nodes, edges }
 }
 
-const buildGraphFromPlan = (planJson: PlanRoot[]): { nodes: Node[]; edges: Edge[] } => {
+type PlanNodeData = {
+  label: string
+  startupCost?: number
+  totalCost?: number
+  planRows?: number
+  planWidth?: number
+  relationName?: string
+  alias?: string
+  filter?: string
+  parallelAware?: boolean
+  asyncCapable?: boolean
+}
+
+const buildGraphFromPlan = (
+  planJson: PlanRoot[]
+): { nodes: Node<PlanNodeData>[]; edges: Edge[] } => {
   const nodes: Node[] = []
   const edges: Edge[] = []
 
   const addPlan = (plan: RawPlan, parentId?: string, index: number = 0) => {
     const id = parentId ? `${parentId}-${index}` : 'root'
     const label = plan['Node Type'] ?? 'Node'
+    const data: PlanNodeData = {
+      label,
+      startupCost: plan['Startup Cost'],
+      totalCost: plan['Total Cost'],
+      planRows: plan['Plan Rows'],
+      planWidth: plan['Plan Width'],
+      relationName: plan['Relation Name'],
+      alias: plan['Alias'] ?? plan.Alias,
+      filter: plan['Filter'],
+      parallelAware: plan['Parallel Aware'],
+      asyncCapable: plan['Async Capable'],
+    }
     nodes.push({
       id,
       type: NODE_TYPE,
-      data: { label },
+      data,
       position: { x: 0, y: 0 },
     })
     if (parentId)
@@ -87,15 +129,50 @@ const buildGraphFromPlan = (planJson: PlanRoot[]): { nodes: Node[]; edges: Edge[
 
   return getLayoutedElementsViaDagre(nodes, edges)
 }
+
 /**
  * @see: https://github.com/wbkd/react-flow/discussions/2698
  */
 const hiddenNodeConnector = 'opacity-0'
-const PlanNode = ({ data }: { data: { label: string } }) => {
+const PlanNode = ({ data }: { data: PlanNodeData }) => {
+  const AccordionHeader = (
+    <div className="w-full flex items-center justify-between gap-2">
+      <div className="font-medium text-foreground truncate max-w-[160px]">{data.label}</div>
+      <div className="opacity-70 flex gap-2">
+        {(data.startupCost !== undefined || data.totalCost !== undefined) && (
+          <span>
+            cost {data.startupCost ?? '-'}..{data.totalCost ?? '-'}
+          </span>
+        )}
+        {data.planRows !== undefined && <span>rows {data.planRows}</span>}
+        {data.planWidth !== undefined && <span>width {data.planWidth}</span>}
+      </div>
+    </div>
+  )
+
   return (
-    <div className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded bg-alternative flex gap-1 items-center">
+    <div className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded bg-alternative">
       <Handle type="target" position={Position.Top} className={hiddenNodeConnector} />
-      <span>{data.label}</span>
+      <Accordion type="single" collapsible>
+        <AccordionItem value="metrics" className="border-none">
+          <AccordionTrigger className="py-1 px-0 hover:no-underline">
+            {AccordionHeader}
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="space-y-1">
+              {(data.relationName || data.alias) && (
+                <div className="opacity-70">
+                  {data.relationName ?? ''}
+                  {data.alias ? ` (${data.alias})` : ''}
+                </div>
+              )}
+              {data.filter && (
+                <div className="max-w-[220px] break-words opacity-70">{data.filter}</div>
+              )}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       <Handle type="source" position={Position.Bottom} className={hiddenNodeConnector} />
     </div>
   )
