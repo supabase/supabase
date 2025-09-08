@@ -135,7 +135,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               )}
               <CodeBlock
                 language="pgsql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-[calc(100%-32px)] flex-grow pointer-events-none"
+                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-8 flex-grow pointer-events-none"
                 wrapperClassName="!max-w-full"
                 hideLineNumbers
                 hideCopy
