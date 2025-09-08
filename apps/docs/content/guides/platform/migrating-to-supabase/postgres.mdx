@@ -16,16 +16,13 @@ This guide provides three methods for migrating your PostgreSQL database to Supa
 
 ## Connection Modes
 
-Supabase provides two connection modes:
+Supabase provides the following connection modes:
 
-| Mode | Use Case |
-|------|----------|
-| Direct connection | The direct connection string connects directly to your Postgres instance. Use for long-running connections, logical replication, pg_restore if IPv6 is supported |
-| Supavisor session mode | Use for long-running connections, logical replication, pg_restore |
-| Supavisor transaction mode | Use for short connections. Don't use it for the migration. |
+- Direct connection
+- Supavisor session mode
+- Supavisor transaction mode
 
-Use session mode for the database migration tasks (pg_dump/restore and logical replication).
-Use the direct connection string if your environment supports IPv6, and use Supavisor session mode if you need IPv4 support.
+Use Supavisor session mode for the database migration tasks (pg_dump/restore and logical replication).
 
 ## Method 1: Google Colab (Easiest)
 
@@ -219,15 +216,9 @@ If restore fails with extension errors, check that errors are only extension-rel
 
 ### Step 5: Post-Migration Tasks
 
-#### Update Statistics (Critical)
+#### Update Statistics (Important)
 
 ```bash
-# For databases with regular tables (non-partitioned)
-vacuumdb --dbname="$SUPABASE_DB_URL" --analyze --jobs=$RESTORE_JOBS --verbose
-
-# For databases with partitioned tables
-# vacuumdb --analyze doesn't handle parent tables properly
-# Run this instead:
 psql "$SUPABASE_DB_URL" -c "VACUUM VERBOSE ANALYZE;"
 ```
 
