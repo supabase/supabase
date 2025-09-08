@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -31,7 +31,6 @@ import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { ChevronDown } from 'lucide-react'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -163,7 +162,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   folding: false,
                   lineDecorationsWidth: 0,
                   lineNumbersMinChars: 0,
-                  wordWrap: 'off',
+                  wordWrap: 'bounded',
                   scrollBeyondLastLine: false,
                   contextmenu: false,
                   selectionHighlight: false,
@@ -315,7 +314,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell:first-child>div]:ml-4',
             ].join(' ')
           }}
