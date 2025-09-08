@@ -86,7 +86,12 @@ export const RestoreFailedState = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: backups.length === 0 ? 'No available backups to download' : undefined,
+                    text:
+                      data?.status === 'physical-backups-enabled'
+                        ? 'No available backups to download as project is on physical backups'
+                        : backups.length === 0
+                          ? 'No available backups to download'
+                          : undefined,
                   },
                 }}
                 onClick={onClickDownloadBackup}
