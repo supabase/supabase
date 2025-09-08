@@ -57,8 +57,8 @@ const { data: todos, error } = await supabase.schema('myschema').from('todos').s
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-
 ```dart
 // Initialize the Flutter client
 await Supabase.initialize(
@@ -73,9 +73,10 @@ final data = await supabase.from('todos').select();
 
 // You can also change the target schema on a per-query basis
 final data = await supabase.schema('myschema').from('todos').select();
-```
 
+````
 </TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash
@@ -94,7 +95,7 @@ curl -X POST '<SUPABASE_URL>/rest/v1/todos' \
   -H "Content-Type: application/json" \
   -H "Content-Profile: myschema" \
   -d '{"column_name": "value"}'
-```
+````
 
 </TabPanel>
 </Tabs>

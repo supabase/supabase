@@ -21,7 +21,7 @@ import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -49,7 +49,7 @@ import {
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
-import FileExplorerRowEditing from './FileExplorerRowEditing'
+import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
@@ -100,13 +100,13 @@ export const RowIcon = ({
   return <File size={16} strokeWidth={2} />
 }
 
-export interface FileExplorerRowProps {
+interface FileExplorerRowProps {
   view: STORAGE_VIEWS
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
 }
 
-const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
+export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   index: itemIndex,
   item,
   view = STORAGE_VIEWS.COLUMNS,
@@ -150,7 +150,10 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   const isOpened =
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckProjectPermissions(
+    PermissionAction.STORAGE_WRITE,
+    '*'
+  )
 
   // Check if this folder is currently being moved
   const isBeingMoved =
@@ -799,5 +802,3 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     </div>
   )
 }
-
-export default FileExplorerRow

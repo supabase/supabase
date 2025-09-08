@@ -944,7 +944,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          // retrieve all identites linked to a user
+          // retrieve all identities linked to a user
           let identities = try await supabase.auth.userIdentities()
 
           // find the google identity

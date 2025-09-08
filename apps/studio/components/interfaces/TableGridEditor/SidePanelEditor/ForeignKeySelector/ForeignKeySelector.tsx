@@ -164,13 +164,7 @@ export const ForeignKeySelector = ({
 
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay
-      if (source === '' || target === '') {
-        return typeErrors.push(undefined)
-      }
-
-      if (sourceColumn?.isNewColumn && targetType !== '') {
-        return typeNotice.push({ sourceType, targetType })
-      }
+      if (source === '' || target === '') return
 
       // If source and target are in the same type of data types, thats okay
       if (
@@ -178,13 +172,14 @@ export const ForeignKeySelector = ({
         (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
         (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
         (sourceType === 'uuid' && targetType === 'uuid')
-      ) {
-        return typeErrors.push(undefined)
-      }
+      )
+        return
 
       // Otherwise just check if the format is equal to each other
-      if (sourceType === targetType) {
-        return typeErrors.push(undefined)
+      if (sourceType === targetType) return
+
+      if (sourceColumn?.isNewColumn && targetType !== '') {
+        return typeNotice.push({ sourceType, targetType })
       }
 
       typeErrors.push({ sourceType, targetType })
@@ -419,7 +414,7 @@ export const ForeignKeySelector = ({
                             <li key={`type-error-${idx}`}>
                               <div className="flex items-center gap-x-1">
                                 <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
-                                <ArrowRight /> {x.targetType}
+                                <ArrowRight size={14} /> {x.targetType}
                               </div>
                             </li>
                           )

@@ -1,7 +1,7 @@
-import { useDragLayer } from 'react-dnd'
 import { useEffect, useState } from 'react'
-import { StorageItemWithColumn } from '../Storage.types'
+import { useDragLayer } from 'react-dnd'
 import { Checkbox, cn } from 'ui'
+import { StorageItemWithColumn } from '../Storage.types'
 
 interface ItemPosition {
   item: StorageItemWithColumn
@@ -52,7 +52,7 @@ const DragPreview = ({ itemPositions }: { itemPositions: ItemPosition[] }) => {
   )
 }
 
-const CustomDragLayer = () => {
+export const CustomDragLayer = () => {
   const { isDragging, item, currentOffset, initialOffset, differenceFromInitialOffset } =
     useDragLayer((monitor) => ({
       item: monitor.getItem(),
@@ -126,5 +126,3 @@ const CustomDragLayer = () => {
     </div>
   )
 }
-
-export default CustomDragLayer
