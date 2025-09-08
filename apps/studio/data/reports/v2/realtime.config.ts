@@ -131,7 +131,7 @@ export const realtimeReports = ({
       const attributes = [
         {
           attribute: 'realtime_channel_joins',
-          label: 'Presence',
+          label: 'Channel Joins',
         },
       ]
 
