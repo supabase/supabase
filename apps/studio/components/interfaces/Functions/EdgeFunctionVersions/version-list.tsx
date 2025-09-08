@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { RefreshCw } from 'lucide-react'
 
-import { Card, CardContent, Table, TableHeader, TableHead, TableBody, TableRow } from 'ui'
+import { Card, CardContent, Table, TableHeader, TableHead, TableBody, TableRow, Button } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
 import { sortDeployments } from './utils'
 import { RollbackModal } from './rollback-modal'
@@ -73,8 +74,18 @@ export const EdgeFunctionVersionsList = () => {
   if (!sortedDeployments.length) {
     return (
       <ScaffoldContainer className="max-w-full px-0 @lg:px-0 @xl:px-0">
-        <ScaffoldHeader className="py-0">
-          <ScaffoldSectionTitle>Deployments</ScaffoldSectionTitle>
+        <ScaffoldHeader className="py-0 flex flex-row items-center justify-between">
+          <ScaffoldSectionTitle className="mb-0">Deployments</ScaffoldSectionTitle>
+          <Button
+            type="default"
+            size="tiny"
+            icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+            onClick={() => refetch()}
+            disabled={isRefreshing}
+            aria-label="Refresh deployments"
+          >
+            Refresh
+          </Button>
         </ScaffoldHeader>
         <ScaffoldSection>
           <div className="col-span-12">
@@ -93,10 +104,20 @@ export const EdgeFunctionVersionsList = () => {
 
   return (
     <ScaffoldContainer className="max-w-full px-0 @lg:px-0 @xl:px-0">
-      <ScaffoldHeader className="py-0">
+      <ScaffoldHeader className="py-0 flex flex-row items-center justify-between">
         <ScaffoldSectionTitle>Deployments</ScaffoldSectionTitle>
+        <Button
+          type="default"
+          size="tiny"
+          icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+          onClick={() => refetch()}
+          disabled={isRefreshing}
+          aria-label="Refresh deployments"
+        >
+          Refresh
+        </Button>
       </ScaffoldHeader>
-      <ScaffoldSection>
+      <ScaffoldSection className="pt-4">
         <div className="col-span-12">
           <Card>
             <Table className="overflow-x-auto">
