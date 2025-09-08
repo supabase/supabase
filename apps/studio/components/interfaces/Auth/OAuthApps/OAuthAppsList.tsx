@@ -2,7 +2,7 @@ import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -28,52 +28,28 @@ import {
   TableRow,
   TableCell,
 } from 'ui'
-import { DATE_FORMAT } from 'lib/constants'
 import dayjs from 'dayjs'
+import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
+import CreateOAuthAppSidePanel from './CreateOAuthAppSidePanel'
+import UpdateOAuthAppSidePanel from './UpdateOAuthAppSidePanel'
+import DeleteOAuthAppModal from './DeleteOAuthAppModal'
 
 interface OAuthAppsListProps {
-  createTrigger: () => void
-  editTrigger: (trigger: PostgresTrigger) => void
-  deleteTrigger: (trigger: PostgresTrigger) => void
+  createTrigger?: () => void
+  editTrigger?: (trigger: PostgresTrigger) => void
+  deleteTrigger?: (trigger: PostgresTrigger) => void
 }
 
-const OAUTH_CLIENT_TYPE_OPTIONS = [
-  { name: 'Manual', value: 'manual' },
-  { name: 'Dynamic', value: 'dynamic' },
-]
-
-const OAUTH_CLIENT_SCOPES_OPTIONS = [
+export const OAUTH_APP_SCOPES_OPTIONS = [
   { name: 'email', value: 'email' },
   { name: 'profile', value: 'profile' },
   { name: 'openid', value: 'openid' },
+  { name: 'offline_access', value: 'offline_access' },
 ]
 
-interface OAuthApp {
-  id: string
-  name: string
-  clientId: string
-  scopes: string[]
-  type: string
-  createdAt: string
-}
-
-const defaultDummyClients = [
-  {
-    id: '1',
-    name: 'Client 1',
-    clientId: '1',
-    scopes: [OAUTH_CLIENT_SCOPES_OPTIONS[0].name, OAUTH_CLIENT_SCOPES_OPTIONS[1].name],
-    type: 'manual',
-    createdAt: '2026-01-01',
-  },
-  {
-    id: '2',
-    name: 'Client 2',
-    clientId: '2',
-    scopes: [OAUTH_CLIENT_SCOPES_OPTIONS[2].name],
-    type: 'dynamic',
-    createdAt: '2026-01-01',
-  },
+export const OAUTH_APP_TYPE_OPTIONS = [
+  { name: 'Manual', value: 'manual' },
+  { name: 'Dynamic', value: 'dynamic' },
 ]
 
 const OAuthAppsList = ({
@@ -81,26 +57,77 @@ const OAuthAppsList = ({
   editTrigger = noop,
   deleteTrigger = noop,
 }: OAuthAppsListProps) => {
-  // const { data: project } = useSelectedProjectQuery()
-  // const { data: oAuthClients, isLoading, isError, isSuccess } = useOAuthAppsQuery({
-  //   projectRef: project?.ref,
-  //   connectionString: project?.connectionString,
-  // })
-  // Mock state
-  const [selectedClient, setSelectedClient] = useState<OAuthApp>()
-  const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
-  const [filteredClientScopes, setFilteredClientScopes] = useState<string[]>([])
-  const [oAuthClients, _setOAuthClients] = useState<OAuthApp[]>(defaultDummyClients)
-  const [isLoading, _setIsLoading] = useState(false)
-  const [isError, _setIsError] = useState(false)
-  const error = { message: 'Failed to retrieve oauth clients' }
+  // State for OAuth apps
+  const [oAuthApps, setOAuthApps] = useState<OAuthApp[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false)
+  const [showCreatePanel, setShowCreatePanel] = useState(false)
+  const [showUpdatePanel, setShowUpdatePanel] = useState(false)
+  const [showDeletePanel, setShowDeletePanel] = useState(false)
+  const [selectedApp, setSelectedApp] = useState<OAuthApp>()
+  const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
+  const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
+  const error = { message: 'Failed to retrieve oauth apps' }
+
+  // Load OAuth apps from localStorage on component mount
+  useEffect(() => {
+    const loadOAuthApps = () => {
+      try {
+        const stored = localStorage.getItem('oauth_apps')
+        if (stored) {
+          const parsedApps = JSON.parse(stored)
+          setOAuthApps(parsedApps)
+        }
+      } catch (error) {
+        console.error('Error loading OAuth apps from localStorage:', error)
+        setIsError(true)
+      }
+
+      setIsLoading(false)
+    }
+
+    loadOAuthApps()
+  }, [])
+
+  // Handle successful OAuth app creation
+  const handleOAuthAppCreated = (newApp: OAuthApp) => {
+    setOAuthApps((prev) => [...prev, newApp])
+    setShowCreatePanel(false)
+  }
+
+  // Handle successful OAuth app update
+  const handleOAuthAppUpdated = (updatedApp: OAuthApp) => {
+    setOAuthApps((prev) => prev.map((app) => (app.id === updatedApp.id ? updatedApp : app)))
+    setShowUpdatePanel(false)
+    setSelectedApp(undefined)
+  }
+
+  // Handle successful OAuth app deletion
+  const handleOAuthAppDeleted = () => {
+    if (selectedApp) {
+      setOAuthApps((prev) => prev.filter((app) => app.id !== selectedApp.id))
+      setShowDeletePanel(false)
+      setSelectedApp(undefined)
+    }
+  }
+
+  // Handle edit button click
+  const handleEditClick = (app: OAuthApp) => {
+    setSelectedApp(app)
+    setShowUpdatePanel(true)
+  }
+
+  // Handle delete button click
+  const handleDeleteClick = (app: OAuthApp) => {
+    setSelectedApp(app)
+    setShowDeletePanel(true)
+  }
 
   const [isOAuthServerEnabled, _setIsOAuthServerEnabled] = useState(true)
   const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data: protectedSchemas } = useProtectedSchemas()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { can: canCreateTriggers } = useAsyncCheckProjectPermissions(
@@ -122,7 +149,7 @@ const OAuthAppsList = ({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <Input
-              placeholder="Search oAuth clients"
+              placeholder="Search oAuth apps"
               size="tiny"
               icon={<Search size="14" />}
               value={filterString}
@@ -130,28 +157,28 @@ const OAuthAppsList = ({
               onChange={(e) => setFilterString(e.target.value)}
             />
             <FilterPopover
-              name="Registration type"
-              options={OAUTH_CLIENT_TYPE_OPTIONS}
+              name="Type"
+              options={OAUTH_APP_TYPE_OPTIONS}
               labelKey="name"
               valueKey="value"
               iconKey="icon"
-              activeOptions={filteredClientTypes}
+              activeOptions={filteredAppTypes}
               labelClass="text-xs text-foreground-light"
               maxHeightClass="h-[190px]"
               className="w-52"
-              onSaveFilters={setFilteredClientTypes}
+              onSaveFilters={setFilteredAppTypes}
             />
             <FilterPopover
               name="Scope"
-              options={OAUTH_CLIENT_SCOPES_OPTIONS}
+              options={OAUTH_APP_SCOPES_OPTIONS}
               labelKey="name"
               valueKey="value"
               iconKey="icon"
-              activeOptions={filteredClientScopes}
+              activeOptions={filteredAppScopes}
               labelClass="text-xs text-foreground-light"
               maxHeightClass="h-[190px]"
               className="w-52"
-              onSaveFilters={setFilteredClientScopes}
+              onSaveFilters={setFilteredAppScopes}
             />
           </div>
           {!isSchemaLocked && (
@@ -159,20 +186,20 @@ const OAuthAppsList = ({
               <ButtonTooltip
                 disabled={!isOAuthServerEnabled || !canCreateTriggers}
                 icon={<Plus />}
-                onClick={() => createTrigger()}
+                onClick={() => setShowCreatePanel(true)}
                 className="flex-grow"
                 tooltip={{
                   content: {
                     side: 'bottom',
                     text: !isOAuthServerEnabled
-                      ? 'Create a table first before creating triggers'
+                      ? 'OAuth server must be enabled'
                       : !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
+                        ? 'You need additional permissions to create OAuth apps'
                         : undefined,
                   },
                 }}
               >
-                New OAuth Client
+                New OAuth App
               </ButtonTooltip>
             </div>
           )}
@@ -186,34 +213,32 @@ const OAuthAppsList = ({
               <TableHeader>
                 <TableRow>
                   <TableHead key="name" className="w-1/4">
-                    Client Name
+                    Name
                   </TableHead>
-                  <TableHead key="table">Client ID</TableHead>
-                  <TableHead key="function">Registration</TableHead>
+                  <TableHead key="table">ID</TableHead>
+                  <TableHead key="function">Type</TableHead>
                   <TableHead key="function">Scopes</TableHead>
-                  <TableHead key="function">Created at</TableHead>
+                  <TableHead key="function">Created</TableHead>
                   <TableHead key="buttons" className="w-8"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {}
-                {oAuthClients.length > 0 &&
-                  oAuthClients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="w-20">
-                        <p className="w-20 truncate">{client.name}</p>
+                {oAuthApps.length > 0 &&
+                  oAuthApps.map((app) => (
+                    <TableRow key={app.id} className="w-full">
+                      <TableCell className="max-w-64 truncate">{app.name}</TableCell>
+                      <TableCell className="w-40">{app.id}</TableCell>
+                      <TableCell className="w-40">
+                        <Badge>{app.type}</Badge>
                       </TableCell>
-                      <TableCell>{client.id}</TableCell>
-                      <TableCell>
-                        <Badge>{client.type}</Badge>
-                      </TableCell>
-                      <TableCell className="flex flex-wrap gap-2">
-                        {client.scopes.map((scope) => (
-                          <Badge key={`${client.id}-${scope}-badge`}>{scope}</Badge>
+                      <TableCell className="flex flex-wrap gap-2 flex-1 min-w-40">
+                        {app.scopes.map((scope) => (
+                          <Badge key={`${app.id}-${scope}-badge`}>{scope}</Badge>
                         ))}
                       </TableCell>
-                      <TableCell className="text-xs text-foreground-light">
-                        {dayjs(client.createdAt).format('DD MMM, YYYY')}
+                      <TableCell className="text-xs text-foreground-light w-1/6">
+                        {dayjs(app.created_at).format('D MMM, YYYY')}
                       </TableCell>
                       <TableCell>
                         {!isSchemaLocked && (
@@ -225,17 +250,17 @@ const OAuthAppsList = ({
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
                                   className="space-x-2"
-                                  onClick={() => setSelectedClient(client)}
+                                  onClick={() => handleEditClick(app)}
                                 >
                                   <Edit size={14} />
-                                  <p>Update client</p>
+                                  <p>Edit</p>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="space-x-2"
-                                  onClick={() => setSelectedClient(client)}
+                                  onClick={() => handleDeleteClick(app)}
                                 >
                                   <Trash size={14} />
-                                  <p>Delete client</p>
+                                  <p>Delete</p>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -249,6 +274,24 @@ const OAuthAppsList = ({
           </Card>
         </div>
       </div>
+
+      <CreateOAuthAppSidePanel
+        visible={showCreatePanel}
+        onClose={() => setShowCreatePanel(false)}
+        onSuccess={handleOAuthAppCreated}
+      />
+      <UpdateOAuthAppSidePanel
+        visible={showUpdatePanel}
+        onClose={() => setShowUpdatePanel(false)}
+        onSuccess={handleOAuthAppUpdated}
+        selectedApp={selectedApp}
+      />
+      <DeleteOAuthAppModal
+        visible={showDeletePanel}
+        onClose={() => setShowDeletePanel(false)}
+        onSuccess={handleOAuthAppDeleted}
+        selectedApp={selectedApp}
+      />
     </>
   )
 }
