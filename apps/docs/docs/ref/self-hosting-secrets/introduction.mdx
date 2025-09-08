@@ -13,14 +13,14 @@ hideTitle: true
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    This page covers the required **secrets** and environment variables when self-hosting Supabase.  
+    This page covers the required **secrets** and environment variables when self-hosting Supabase.
     These values are critical for security and proper functioning of your deployment.
 
     ---
 
     ## `SECRET_KEY_BASE`
 
-    `SECRET_KEY_BASE` is used to sign and encrypt sensitive data (such as session cookies).  
+    `SECRET_KEY_BASE` is used to sign and encrypt sensitive data (such as session cookies).
     It must be **long, random, and kept secret**.
 
     ### Generate a key
@@ -46,7 +46,7 @@ hideTitle: true
 
     ### Can it be changed later?
 
-    You can rotate `SECRET_KEY_BASE` by updating the value in your `.env` file and restarting the containers.  
+    You can rotate `SECRET_KEY_BASE` by updating the value in your `.env` file and restarting the containers.
     However, doing so will invalidate existing sessions, so all users will need to log in again.
 
   </RefSubLayout.Details>
