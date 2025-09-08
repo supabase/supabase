@@ -2,6 +2,23 @@ import { tool } from 'ai'
 import { z } from 'zod'
 
 export const getRenderingTools = () => ({
+  execute_sql: tool({
+    description:
+      'Execute a SQL statement on the client. Use for SELECT/DDL/DML. Client will confirm before running and return results.',
+    inputSchema: z.object({
+      sql: z.string().describe('The SQL statement to execute.'),
+    }),
+    // No execute – runs client-side in the UI
+  }),
+  deploy_edge_function: tool({
+    description:
+      'Deploy a Supabase Edge Function from provided code on the client. Client will confirm before deploying and return the result.',
+    inputSchema: z.object({
+      name: z.string().describe('The URL-friendly name/slug of the Edge Function.'),
+      code: z.string().describe('The TypeScript code for the Edge Function.'),
+    }),
+    // No execute – runs client-side in the UI
+  }),
   display_query: tool({
     description:
       'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',

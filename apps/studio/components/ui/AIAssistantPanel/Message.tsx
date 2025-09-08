@@ -7,6 +7,11 @@ import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
+import { useParams } from 'common'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { constructHeaders } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -55,6 +60,7 @@ interface MessageProps {
     resultId?: string
     results: any[]
   }) => void
+  addToolResult?: (args: { tool: string; toolCallId: string; output: unknown }) => Promise<void>
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   isAfterEditedMessage: boolean
@@ -70,6 +76,7 @@ const Message = function Message({
   action = null,
   variant = 'default',
   onResults,
+  addToolResult,
   onDelete,
   onEdit,
   isAfterEditedMessage = false,
@@ -78,6 +85,9 @@ const Message = function Message({
   onCancelEdit,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { mutateAsync: deployFunction } = useEdgeFunctionDeployMutation()
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
   const allMarkdownComponents: Partial<Components> = useMemo(
     () => ({
@@ -220,6 +230,191 @@ const Message = function Message({
                         }
                         return null
                       }
+                      case 'tool-execute_sql': {
+                        const { toolCallId, state, input } = part
+                        if (state === 'input-streaming') {
+                          return (
+                            <div
+                              key={`${id}-tool-loading-execute_sql`}
+                              className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                            >
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              {`Preparing SQL execution...`}
+                            </div>
+                          )
+                        }
+                        if (state === 'input-available') {
+                          return (
+                            <div
+                              key={`${id}-tool-${toolCallId}`}
+                              className="rounded-lg border bg-surface-75 text-xs text-foreground p-3 my-3"
+                            >
+                              <div className="mb-2 font-mono text-foreground-light">
+                                About to run:
+                              </div>
+                              <pre className="overflow-x-auto text-xs bg-background p-2 rounded border">
+                                {(input as any).sql}
+                              </pre>
+                              <div className="mt-2 flex gap-2">
+                                <button
+                                  className="text-xs px-2 py-1 border rounded hover:bg-surface-100"
+                                  onClick={async () => {
+                                    try {
+                                      const headers = await constructHeaders()
+                                      const { result } = await executeSql<any[]>(
+                                        {
+                                          projectRef: ref,
+                                          connectionString: project?.connectionString,
+                                          sql: (input as any).sql,
+                                        },
+                                        undefined,
+                                        { Authorization: headers.get('Authorization') ?? '' }
+                                      )
+
+                                      const rows = Array.isArray(result) ? result : []
+                                      onResults({
+                                        messageId: id,
+                                        resultId: toolCallId,
+                                        results: rows,
+                                      })
+                                      await addToolResult?.({
+                                        tool: 'execute_sql',
+                                        toolCallId,
+                                        output: rows,
+                                      })
+                                    } catch (e: any) {
+                                      await addToolResult?.({
+                                        tool: 'execute_sql',
+                                        toolCallId,
+                                        output: `Error: ${e?.message ?? String(e)}`,
+                                      })
+                                    }
+                                  }}
+                                >
+                                  Run SQL
+                                </button>
+                                <button
+                                  className="text-xs px-2 py-1 border rounded hover:bg-surface-100"
+                                  onClick={async () => {
+                                    await addToolResult?.({
+                                      tool: 'execute_sql',
+                                      toolCallId,
+                                      output: 'Cancelled',
+                                    })
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        }
+                        if (state === 'output-available') {
+                          return (
+                            <div
+                              key={`${id}-tool-${toolCallId}`}
+                              className="text-xs text-foreground"
+                            >
+                              SQL executed.
+                            </div>
+                          )
+                        }
+                        if (state === 'output-error') {
+                          return (
+                            <div key={`${id}-tool-${toolCallId}`} className="text-xs text-danger">
+                              Failed to execute SQL.
+                            </div>
+                          )
+                        }
+                        return null
+                      }
+                      case 'tool-deploy_edge_function': {
+                        const { toolCallId, state, input } = part
+                        if (state === 'input-streaming') {
+                          return (
+                            <div
+                              key={`${id}-tool-loading-deploy_edge_function`}
+                              className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                            >
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              {`Preparing Edge Function deployment...`}
+                            </div>
+                          )
+                        }
+                        if (state === 'input-available' || state === 'output-available') {
+                          return (
+                            <div
+                              key={`${id}-tool-${toolCallId}`}
+                              className="w-auto overflow-x-hidden my-4"
+                            >
+                              <EdgeFunctionBlock
+                                label={(input as any).name || 'Edge Function'}
+                                code={(input as any).code}
+                                functionName={(input as any).name || 'my-function'}
+                                showCode={!readOnly}
+                                actions={
+                                  state === 'input-available' ? (
+                                    <div className="flex gap-2">
+                                      <button
+                                        className="text-xs px-2 py-1 border rounded hover:bg-surface-100"
+                                        onClick={async () => {
+                                          try {
+                                            await deployFunction({
+                                              projectRef: ref!,
+                                              slug: (input as any).name || 'my-function',
+                                              metadata: {
+                                                entrypoint_path: 'index.ts',
+                                                name: (input as any).name || 'my-function',
+                                                verify_jwt: true,
+                                              },
+                                              files: [
+                                                { name: 'index.ts', content: (input as any).code },
+                                              ],
+                                            })
+                                            await addToolResult?.({
+                                              tool: 'deploy_edge_function',
+                                              toolCallId,
+                                              output: 'Deployed successfully',
+                                            })
+                                          } catch (e: any) {
+                                            await addToolResult?.({
+                                              tool: 'deploy_edge_function',
+                                              toolCallId,
+                                              output: `Error: ${e?.message ?? String(e)}`,
+                                            })
+                                          }
+                                        }}
+                                      >
+                                        Confirm deploy
+                                      </button>
+                                      <button
+                                        className="text-xs px-2 py-1 border rounded hover:bg-surface-100"
+                                        onClick={async () => {
+                                          await addToolResult?.({
+                                            tool: 'deploy_edge_function',
+                                            toolCallId,
+                                            output: 'Cancelled',
+                                          })
+                                        }}
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : undefined
+                                }
+                              />
+                            </div>
+                          )
+                        }
+                        if (state === 'output-error') {
+                          return (
+                            <div key={`${id}-tool-${toolCallId}`} className="text-xs text-danger">
+                              Failed to deploy Edge Function.
+                            </div>
+                          )
+                        }
+                        return null
+                      }
                       case 'tool-display_edge_function': {
                         const { toolCallId, state, input } = part
                         if (state === 'input-streaming' || state === 'input-available') {
@@ -329,6 +524,7 @@ export const MemoizedMessage = memo(
     message,
     status,
     onResults,
+    addToolResult,
     onDelete,
     onEdit,
     isAfterEditedMessage,
@@ -346,6 +542,7 @@ export const MemoizedMessage = memo(
       resultId?: string
       results: any[]
     }) => void
+    addToolResult?: (args: { tool: string; toolCallId: string; output: unknown }) => Promise<void>
     onDelete: (id: string) => void
     onEdit: (id: string) => void
     isAfterEditedMessage: boolean
@@ -360,6 +557,7 @@ export const MemoizedMessage = memo(
         isLoading={status === 'submitted' || status === 'streaming'}
         status={status}
         onResults={onResults}
+        addToolResult={addToolResult}
         onDelete={onDelete}
         onEdit={onEdit}
         isAfterEditedMessage={isAfterEditedMessage}

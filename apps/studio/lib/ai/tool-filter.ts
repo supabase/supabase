@@ -27,6 +27,8 @@ export const toolSetValidationSchema = z.record(
     'get_advisors',
 
     // Local tools
+    'execute_sql',
+    'deploy_edge_function',
     'display_query',
     'display_edge_function',
     'rename_chat',
@@ -87,6 +89,8 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
  */
 export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   // UI tools - always available
+  execute_sql: TOOL_CATEGORIES.UI,
+  deploy_edge_function: TOOL_CATEGORIES.UI,
   display_query: TOOL_CATEGORIES.UI,
   display_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,

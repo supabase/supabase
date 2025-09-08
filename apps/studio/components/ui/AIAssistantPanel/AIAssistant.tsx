@@ -272,6 +272,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             status={chatStatus}
             onResults={updateMessage}
+            addToolResult={
+              addToolResult as unknown as (args: {
+                tool: string
+                toolCallId: string
+                output: unknown
+              }) => Promise<void>
+            }
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
@@ -288,6 +295,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       cancelEdit,
       editingMessageId,
       chatStatus,
+      addToolResult,
     ]
   )
 
