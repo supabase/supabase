@@ -24,7 +24,7 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
     const supabaseEnv = env<SupabaseEnv>(c);
     const supabaseUrl =
       supabaseEnv.VITE_SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey =
+    const supabasePublishableKey =
       supabaseEnv.VITE_SUPABASE_ANON_KEY ??
       import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -32,11 +32,11 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
       throw new Error('SUPABASE_URL missing!');
     }
 
-    if (!supabaseAnonKey) {
+    if (!supabasePublishableKey) {
       throw new Error('SUPABASE_ANON_KEY missing!');
     }
 
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
       cookies: {
         getAll() {
           return parseCookieHeader(c.req.header('Cookie') ?? '');

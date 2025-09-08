@@ -8,13 +8,13 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import CreateRolePanel from './CreateRolePanel'
-import DeleteRoleModal from './DeleteRoleModal'
-import RoleRow from './RoleRow'
-import RoleRowSkeleton from './RoleRowSkeleton'
+import { CreateRolePanel } from './CreateRolePanel'
+import { DeleteRoleModal } from './DeleteRoleModal'
+import { RoleRow } from './RoleRow'
+import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
@@ -27,7 +27,10 @@ const RolesList = () => {
   const [isCreatingRole, setIsCreatingRole] = useState(false)
   const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
 
-  const canUpdateRoles = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
+  const { can: canUpdateRoles } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'roles'
+  )
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,

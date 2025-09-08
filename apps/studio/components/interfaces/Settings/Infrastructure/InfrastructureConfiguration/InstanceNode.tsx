@@ -6,6 +6,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Handle, NodeProps, Position } from 'reactflow'
 
 import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import SparkBar from 'components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
@@ -13,7 +14,8 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -43,7 +45,7 @@ interface NodeData {
   id: string
   provider: string
   region: Region
-  computeSize: string
+  computeSize?: string
   status: string
   inserted_at: string
 }
@@ -108,6 +110,10 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
   const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
 
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
   return (
     <>
       <Handle
@@ -132,15 +138,19 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
               </p>
               <p className="flex items-center gap-x-1">
                 <span className="text-sm text-foreground-light">{provider}</span>
-                <span className="text-sm text-foreground-light">•</span>
-                <span className="text-sm text-foreground-light">{computeSize}</span>
+                {projectHomepageShowInstanceSize && (
+                  <>
+                    <span className="text-sm text-foreground-light">•</span>
+                    <span className="text-sm text-foreground-light">{computeSize}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
           <img
             alt="region icon"
             className="w-8 rounded-sm mt-0.5"
-            src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+            src={`${BASE_PATH}/img/regions/${region.region}.svg`}
           />
         </div>
         {numReplicas > 0 && (
@@ -181,7 +191,14 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   } = data
   const { ref } = useParams()
   const dbSelectorState = useDatabaseSelectorStateSnapshot()
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'projects'
+  )
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
@@ -285,7 +302,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
                 <span>{provider}</span>
-                {!!computeSize && (
+                {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span>•</span>
                     <span>{computeSize}</span>
@@ -370,24 +387,18 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem
-                  className="gap-x-2 !pointer-events-auto"
-                  disabled={!canManageReplicas}
-                  onClick={() => {
-                    if (canManageReplicas) onSelectDropReplica()
-                  }}
-                >
-                  Drop replica
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canManageReplicas && (
-                <TooltipContent side="left">
-                  You need additional permissions to drop replicas
-                </TooltipContent>
-              )}
-            </Tooltip>
+            <DropdownMenuItemTooltip
+              className="gap-x-2 !pointer-events-auto"
+              disabled={!canManageReplicas}
+              onClick={() => {
+                if (canManageReplicas) onSelectDropReplica()
+              }}
+              tooltip={{
+                content: { side: 'left', text: 'You need additional permissions to drop replicas' },
+              }}
+            >
+              Drop replica
+            </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -409,7 +420,7 @@ export const RegionNode = ({ data }: any) => {
         <img
           alt="region icon"
           className="w-5 rounded-sm"
-          src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+          src={`${BASE_PATH}/img/regions/${region.region}.svg`}
         />
         <p className="text-sm">{region.name}</p>
       </div>

@@ -21,7 +21,7 @@ import {
 } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -39,7 +39,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const canUpdatePostgrestConfig = useCheckPermissions(
+  const { can: canUpdatePostgrestConfig } = useAsyncCheckProjectPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )

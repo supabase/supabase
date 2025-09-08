@@ -50,7 +50,7 @@ export const useGitHubConnectionUpdateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to update Github connection: ${data.message}`)
+          toast.error(`Failed to update GitHub connection: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

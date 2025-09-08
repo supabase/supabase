@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { DocsButton } from 'components/ui/DocsButton'
+import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -52,7 +53,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     setOpen(v)
   }
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setOpen(false)
     sendEvent({
       action: 'realtime_inspector_listen_channel_clicked',
@@ -61,8 +62,17 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
         organization: org?.slug ?? 'Unknown',
       },
     })
+
+    let token = config.token
+
+    // [Joshen] Refresh if starting to listen + using temp API key, since it has a low refresh rate
+    if (token.startsWith('sb_temp')) {
+      const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
+      token = data.api_key
+    }
     onChangeConfig({
       ...config,
+      token,
       channelName: form.getValues('channel'),
       isChannelPrivate: form.getValues('isPrivate'),
       enabled: true,

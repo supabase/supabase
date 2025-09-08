@@ -1,11 +1,13 @@
-import AlertError from 'components/ui/AlertError'
-import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { AlertTriangle, Loader2 } from 'lucide-react'
+
+import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { getPipelineStateMessages, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { getPipelineStateMessages } from './Pipeline.utils'
 
 export enum PipelineStatusName {
   FAILED = 'failed',
@@ -15,9 +17,6 @@ export enum PipelineStatusName {
   UNKNOWN = 'unknown',
 }
 
-// Type alias for better readability
-type FailedStatus = Extract<ReplicationPipelineStatusData['status'], { name: 'failed' }>
-
 interface PipelineStatusProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
   error: ResponseError | null
@@ -25,6 +24,7 @@ interface PipelineStatusProps {
   isError: boolean
   isSuccess: boolean
   requestStatus?: PipelineStatusRequestStatus
+  pipelineId?: number
 }
 
 export const PipelineStatus = ({
@@ -34,33 +34,10 @@ export const PipelineStatus = ({
   isError,
   isSuccess,
   requestStatus,
+  pipelineId,
 }: PipelineStatusProps) => {
-  const isFailedStatus = (
-    status: ReplicationPipelineStatusData['status'] | undefined
-  ): status is FailedStatus => {
-    return (
-      status !== null &&
-      status !== undefined &&
-      typeof status === 'object' &&
-      status.name === PipelineStatusName.FAILED
-    )
-  }
+  const { ref } = useParams()
 
-  const renderFailedStatus = () => {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center gap-2 text-sm text-destructive">
-            <AlertTriangle className="w-3 h-3" />
-            <span>Failed</span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          {getPipelineStateMessages(requestStatus, 'failed').message}
-        </TooltipContent>
-      </Tooltip>
-    )
-  }
   // Map backend statuses to UX-friendly display
   const getStatusConfig = () => {
     const statusName =
@@ -71,33 +48,41 @@ export const PipelineStatus = ({
     // Get consistent tooltip message using the same logic as other components
     const stateMessages = getPipelineStateMessages(requestStatus, statusName)
 
-    if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
+    // Show optimistic request state while backend still reports steady states
+    if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
       return {
-        label: 'Enabling...',
-        dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
-        color: 'text-brand-600',
+        label: 'Restarting',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
+        color: 'text-warning-600',
         tooltip: stateMessages.message,
       }
     }
-
-    if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
+    if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
       return {
-        label: 'Disabling...',
+        label: 'Starting',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
+        color: 'text-warning-600',
+        tooltip: stateMessages.message,
+      }
+    }
+    if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
+      return {
+        label: 'Stopping',
         dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
         color: 'text-warning-600',
         tooltip: stateMessages.message,
       }
     }
 
-    // Handle Failed status object
-    if (isFailedStatus(pipelineStatus)) {
-      return {
-        isFailedStatus: true,
-      }
-    }
-
     if (pipelineStatus && typeof pipelineStatus === 'object' && 'name' in pipelineStatus) {
       switch (pipelineStatus.name) {
+        case PipelineStatusName.FAILED:
+          return {
+            label: 'Failed',
+            dot: <AlertTriangle className="w-3 h-3 text-destructive-600" />,
+            color: 'text-destructive-600',
+            tooltip: stateMessages.message,
+          }
         case PipelineStatusName.STARTING:
           return {
             label: 'Starting',
@@ -147,28 +132,43 @@ export const PipelineStatus = ({
 
   const statusConfig = getStatusConfig()
 
+  const pipelineLogsUrl = pipelineId
+    ? `/project/${ref}/logs/etl-replication-logs?f=${encodeURIComponent(
+        JSON.stringify({ pipeline_id: pipelineId })
+      )}`
+    : `/project/${ref}/logs/etl-replication-logs`
+
   return (
     <>
       {isLoading && <ShimmeringLoader />}
       {isError && (
-        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
+        <Tooltip>
+          <TooltipTrigger>
+            <WarningIcon />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="w-64 text-center">
+            Unable to retrieve status: {error?.message}
+          </TooltipContent>
+        </Tooltip>
       )}
       {isSuccess && (
-        <>
-          {statusConfig.isFailedStatus ? (
-            <div className="relative">{renderFailedStatus()}</div>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className={cn('flex items-center gap-2 text-sm w-min', statusConfig.color)}>
-                  {statusConfig.dot}
-                  <span>{statusConfig.label}</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">{statusConfig.tooltip}</TooltipContent>
-            </Tooltip>
-          )}
-        </>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className={cn('flex items-center gap-2 text-sm w-min', statusConfig.color)}>
+              {statusConfig.dot}
+              <span>{statusConfig.label}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {statusConfig.tooltip}
+            {['unknown', 'failed'].includes(pipelineStatus?.name ?? '') && (
+              <>
+                {' '}
+                Check the <InlineLink href={pipelineLogsUrl}>logs</InlineLink> for more information.
+              </>
+            )}
+          </TooltipContent>
+        </Tooltip>
       )}
     </>
   )

@@ -9,6 +9,7 @@ import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/dat
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -43,6 +44,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     },
     { enabled: visible }
   )
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
       toast.success(`Extension "${extension.name}" is now enabled`)
@@ -180,19 +182,26 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
                     <Modal.Separator />
-                    {schemas?.map((schema) => {
-                      return (
-                        <Listbox.Option
-                          key={schema.id}
-                          id={schema.name}
-                          label={schema.name}
-                          value={schema.name}
-                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
-                        >
-                          {schema.name}
-                        </Listbox.Option>
+                    {schemas
+                      ?.filter(
+                        (schema) =>
+                          !protectedSchemas.some(
+                            (protectedSchema) => protectedSchema.name === schema.name
+                          )
                       )
-                    })}
+                      .map((schema) => {
+                        return (
+                          <Listbox.Option
+                            key={schema.id}
+                            id={schema.name}
+                            label={schema.name}
+                            value={schema.name}
+                            addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
+                          >
+                            {schema.name}
+                          </Listbox.Option>
+                        )
+                      })}
                   </Listbox>
                 )}
               </Modal.Content>

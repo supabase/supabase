@@ -23,6 +23,7 @@ yarn-error.log*
 **/*/generated/**/*
 !**/*/generated/.gitkeep
 !**/*/generated/**/.gitkeep
+.generated
 
 # Sitemap
 public/sitemap.xml

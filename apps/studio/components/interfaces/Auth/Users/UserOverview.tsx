@@ -15,7 +15,8 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
@@ -45,6 +46,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
 
+  const { authenticationSignInProviders } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+  ])
+
   const providers = ((user.raw_app_meta_data?.providers as string[]) ?? []).map(
     (provider: string) => {
       return {
@@ -59,12 +64,24 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   )
 
-  const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
-  const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
-  const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
-  const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
-  const canRemoveMFAFactors = useCheckPermissions(
+  const { can: canUpdateUser } = useAsyncCheckProjectPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canSendMagicLink } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_magic_link'
+  )
+  const { can: canSendRecovery } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_recovery'
+  )
+  const { can: canSendOtp } = useAsyncCheckProjectPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'send_otp'
+  )
+  const { can: canRemoveUser } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_DELETE,
+    'auth.users'
+  )
+  const { can: canRemoveMFAFactors } = useAsyncCheckProjectPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.mfa_factors'
   )
@@ -226,13 +243,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     Signed in with a {providerName} account via{' '}
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
-                  <Button asChild type="default" className="mt-2">
-                    <Link
-                      href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
-                    >
-                      Configure {providerName} provider
-                    </Link>
-                  </Button>
+                  {authenticationSignInProviders && (
+                    <Button asChild type="default" className="mt-2">
+                      <Link
+                        href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
+                      >
+                        Configure {providerName} provider
+                      </Link>
+                    </Button>
+                  )}
                 </div>
                 {isActive ? (
                   <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">

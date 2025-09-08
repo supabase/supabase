@@ -24,7 +24,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import {
   ObjectsToBeDroppedWarning,
   ReadReplicasWarning,

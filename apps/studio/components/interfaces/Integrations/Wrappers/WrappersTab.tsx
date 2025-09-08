@@ -4,7 +4,7 @@ import { HTMLProps, ReactNode, useCallback, useState } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Sheet, SheetContent } from 'ui'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
@@ -19,7 +19,11 @@ export const WrappersTab = () => {
   const [selectedWrapperForDelete, setSelectedWrapperForDelete] = useState<FDW | null>(null)
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
-  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+
+  const { can: canCreateWrapper } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'wrappers'
+  )
 
   const { data } = useFDWsQuery({
     projectRef: project?.ref,

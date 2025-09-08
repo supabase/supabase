@@ -78,7 +78,7 @@ const UtilityActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            data-testId="sql-editor-utility-actions"
+            data-testid="sql-editor-utility-actions"
             type="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
             icon={<MoreVertical className="text-foreground-light" />}

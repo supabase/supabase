@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.33.9
+  version: 2.39.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -70,11 +70,15 @@ flags:
       - id: yaml
         name: yaml
         type: '[ env | pretty | json | toml | yaml ]'
+  - id: profile
+    name: --profile <string>
+    description: use a specific profile for connecting to Supabase API
+    default_value: supabase
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -1003,7 +1007,7 @@ commands:
     summary: Delete a Supabase project
     tags: []
     links: []
-    usage: supabase projects delete <ref>
+    usage: supabase projects delete [ref]
     subcommands: []
     flags: []
   - id: supabase-projects-create
@@ -3353,9 +3357,10 @@ commands:
     subcommands:
       - supabase-branches-create
       - supabase-branches-delete
-      - supabase-branches-disable
       - supabase-branches-get
       - supabase-branches-list
+      - supabase-branches-pause
+      - supabase-branches-unpause
       - supabase-branches-update
     flags: []
   - id: supabase-branches-update
@@ -3364,7 +3369,7 @@ commands:
     description: Update a preview branch by its name or ID.
     tags: []
     links: []
-    usage: supabase branches update [branch-id] [flags]
+    usage: supabase branches update [name] [flags]
     subcommands: []
     flags:
       - id: git-branch
@@ -3399,11 +3404,30 @@ commands:
           - id: FUNCTIONS_FAILED
             name: FUNCTIONS_FAILED
             type: string
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
-        required: true
-        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-branches-unpause
+    title: supabase branches unpause
+    summary: Unpause a preview branch
+    tags: []
+    links: []
+    usage: supabase branches unpause [name]
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-branches-pause
+    title: supabase branches pause
+    summary: Pause a preview branch
+    tags: []
+    links: []
+    usage: supabase branches pause [name]
+    subcommands: []
+    flags:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -3417,11 +3441,6 @@ commands:
     usage: supabase branches list
     subcommands: []
     flags:
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
-        required: true
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -3432,32 +3451,9 @@ commands:
     description: Retrieve details of the specified preview branch.
     tags: []
     links: []
-    usage: supabase branches get [branch-id]
+    usage: supabase branches get [name]
     subcommands: []
     flags:
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
-        required: true
-        default_value: 'false'
-      - id: project-ref
-        name: --project-ref <string>
-        description: Project ref of the Supabase project.
-        default_value: ''
-  - id: supabase-branches-disable
-    title: supabase branches disable
-    summary: Disable preview branching
-    description: Disable preview branching for the linked project.
-    tags: []
-    links: []
-    usage: supabase branches disable
-    subcommands: []
-    flags:
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
-        required: true
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -3468,14 +3464,9 @@ commands:
     description: Delete a preview branch by its name or ID.
     tags: []
     links: []
-    usage: supabase branches delete [branch-id]
+    usage: supabase branches delete [name]
     subcommands: []
     flags:
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
-        required: true
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -3605,11 +3596,6 @@ commands:
       - id: with-data
         name: --with-data
         description: Whether to clone production data to the branch database.
-        default_value: 'false'
-      - id: experimental
-        name: --experimental
-        description: enable experimental features
-        required: true
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>

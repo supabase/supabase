@@ -19,7 +19,7 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 
@@ -187,7 +187,7 @@ const RealtimeUsage = () => {
       >
         {selectedDateRange &&
           REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-            <ComposedChartHandler
+            <LazyComposedChartHandler
               key={chart.id}
               {...chart}
               attributes={chart.attributes as MultiAttribute[]}

@@ -81,11 +81,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const uint8Array = new Uint8Array(arrayBuffer)
 
     // Parse the eszip file using our utility
-    const files = await parseEszip(uint8Array)
+    const parsed = await parseEszip(uint8Array)
 
-    return res.status(200).json({
-      files,
-    })
+    return res.status(200).json(parsed)
   } catch (error) {
     console.error('Error processing edge function body:', error)
     return res.status(500).json({ error: 'Internal server error' })

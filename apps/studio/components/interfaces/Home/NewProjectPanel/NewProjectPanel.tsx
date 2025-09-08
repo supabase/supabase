@@ -7,10 +7,10 @@ import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { Button } from 'ui'
-import APIKeys from './APIKeys'
-import GetStartedHero from './GetStartedHero'
+import { APIKeys } from './APIKeys'
+import { GetStartedHero } from './GetStartedHero'
 
-const NewProjectPanel = () => {
+export const NewProjectPanel = () => {
   const { ref } = useParams()
 
   const {
@@ -261,5 +261,3 @@ const NewProjectPanel = () => {
     </div>
   )
 }
-
-export default NewProjectPanel

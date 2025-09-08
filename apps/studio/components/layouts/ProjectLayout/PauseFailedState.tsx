@@ -7,20 +7,25 @@ import { useParams } from 'common'
 import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
-const PauseFailedState = () => {
+export const PauseFailedState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
 
-  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canDeleteProject } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: { project_id: project?.id },
+    }
+  )
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
@@ -57,7 +62,11 @@ const PauseFailedState = () => {
                 <p>Something went wrong while pausing your project</p>
                 <p className="text-sm text-foreground-light">
                   Your project's data is intact, but your project is inaccessible due to the failure
-                  while pausing. Please contact support for assistance.
+                  while pausing. Database backups for this project can still be accessed{' '}
+                  <InlineLink href={`/project/${ref}/database/backups/scheduled`}>here</InlineLink>.
+                </p>
+                <p className="text-sm text-foreground-light">
+                  Please contact support for assistance.
                 </p>
               </div>
             </div>
@@ -78,7 +87,12 @@ const PauseFailedState = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: backups.length === 0 ? 'No available backups to download' : undefined,
+                    text:
+                      data?.status === 'physical-backups-enabled'
+                        ? 'No available backups to download as project is on physical backups'
+                        : backups.length === 0
+                          ? 'No available backups to download'
+                          : undefined,
                   },
                 }}
                 onClick={onClickDownloadBackup}
@@ -123,5 +137,3 @@ const PauseFailedState = () => {
     </>
   )
 }
-
-export default PauseFailedState

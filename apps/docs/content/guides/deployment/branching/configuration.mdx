@@ -34,6 +34,19 @@ supabase --experimental branches create --persistent
 # Do you want to create a branch named develop? [Y/n]
 ```
 
+<Admonition type="tip">
+
+To retrieve the project ID for an existing branch, use the `branches list` command:
+
+```bash
+supabase --experimental branches list
+```
+
+This will display a table showing all your branches with their corresponding project ID.
+Use the value from the `BRANCH PROJECT ID` column as your `project_id` in the remote configuration.
+
+</Admonition>
+
 ### Configuration merging
 
 When merging a PR into a persistent branch, the Supabase integration:
@@ -186,6 +199,19 @@ max_rows = 500
 pool_size = 25
 ```
 
+<Admonition type="tip">
+
+To retrieve the project ID for an existing branch, use the `branches list` command:
+
+```bash
+supabase --experimental branches list
+```
+
+This will display a table showing all your branches with their corresponding project ID.
+Use the value from the `BRANCH PROJECT ID` column as your `project_id` in the remote configuration.
+
+</Admonition>
+
 ### Feature branch configuration
 
 For feature branches that need specific settings:
@@ -199,6 +225,19 @@ enabled = true
 client_id = "env(GOOGLE_CLIENT_ID)"
 secret = "env(GOOGLE_CLIENT_SECRET)"
 ```
+
+<Admonition type="tip">
+
+To retrieve the project ID for an existing branch, use the `branches list` command:
+
+```bash
+supabase --experimental branches list
+```
+
+This will display a table showing all your branches with their corresponding project ID.
+Use the value from the `BRANCH PROJECT ID` column as your `project_id` in the remote configuration.
+
+</Admonition>
 
 ## Next steps
 

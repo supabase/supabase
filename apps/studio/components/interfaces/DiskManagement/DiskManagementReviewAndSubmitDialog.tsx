@@ -5,7 +5,7 @@ import { UseFormReturn } from 'react-hook-form'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatCurrency } from 'lib/helpers'
@@ -153,11 +153,15 @@ export const DiskManagementReviewAndSubmitDialog = ({
 
   const { formState, getValues } = form
 
-  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateDiskConfiguration } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   /**
    * Queries

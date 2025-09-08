@@ -18,8 +18,8 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
-import BackupsEmpty from '../BackupsEmpty'
-import BackupsStorageAlert from '../BackupsStorageAlert'
+import { BackupsEmpty } from '../BackupsEmpty'
+import { BackupsStorageAlert } from '../BackupsStorageAlert'
 import type { Timezone } from './PITR.types'
 import { getClientTimezone } from './PITR.utils'
 import PITRStatus from './PITRStatus'

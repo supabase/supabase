@@ -26,7 +26,8 @@ export type ProjectCreateVariables = {
   name: string
   organizationSlug: string
   dbPass: string
-  dbRegion: string
+  dbRegion?: string
+  regionSelection?: CreateProjectBody['region_selection']
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
@@ -44,6 +45,7 @@ export async function createProject({
   organizationSlug,
   dbPass,
   dbRegion,
+  regionSelection,
   dbSql,
   cloudProvider = PROVIDERS.AWS.id,
   authSiteUrl,
@@ -60,6 +62,7 @@ export async function createProject({
     name,
     db_pass: dbPass,
     db_region: dbRegion,
+    region_selection: regionSelection,
     db_sql: dbSql,
     auth_site_url: authSiteUrl,
     ...(customSupabaseRequest !== undefined && {

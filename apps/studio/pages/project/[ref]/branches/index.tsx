@@ -19,7 +19,7 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -42,7 +42,10 @@ const BranchesPage: NextPageWithLayout = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'preview_branches'
+  )
 
   const {
     data: connections,
@@ -121,7 +124,7 @@ const BranchesPage: NextPageWithLayout = () => {
         <ScaffoldSection>
           <div className="col-span-12">
             <div className="space-y-4">
-              {!canReadBranches ? (
+              {isPermissionsLoaded && !canReadBranches ? (
                 <NoPermission resourceText="view this project's branches" />
               ) : (
                 <>
@@ -183,9 +186,13 @@ const BranchesPage: NextPageWithLayout = () => {
 BranchesPage.getLayout = (page) => {
   const BranchesPageWrapper = () => {
     const snap = useAppStateSnapshot()
-    const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-      resource: { is_default: false },
-    })
+    const { can: canCreateBranches } = useAsyncCheckProjectPermissions(
+      PermissionAction.CREATE,
+      'preview_branches',
+      {
+        resource: { is_default: false },
+      }
+    )
 
     const primaryActions = (
       <ButtonTooltip

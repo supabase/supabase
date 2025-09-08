@@ -12,7 +12,7 @@ import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
@@ -93,7 +93,7 @@ export const EditorPanel = ({
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
@@ -328,11 +328,11 @@ export const EditorPanel = ({
               language="pgsql"
               value={currentValue}
               onChange={handleChange}
-              aiEndpoint={`${BASE_PATH}/api/ai/sql/complete-v2`}
+              aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
               aiMetadata={{
                 projectRef: project?.ref,
                 connectionString: project?.connectionString,
-                includeSchemaMetadata,
+                orgSlug: org?.slug,
               }}
               initialPrompt={initialPrompt}
               options={{

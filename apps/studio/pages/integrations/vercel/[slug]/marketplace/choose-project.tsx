@@ -59,8 +59,8 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const supabaseProjects = useMemo(
     () =>
-      supabaseProjectsData
-        ?.filter(
+      (supabaseProjectsData?.projects ?? [])
+        .filter(
           (project) =>
             project.organization_id === organization?.id &&
             (project.status === PROJECT_STATUS['ACTIVE_HEALTHY'] ||

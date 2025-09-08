@@ -15,6 +15,9 @@ interface PanelProps {
   titleClasses?: string
 }
 
+/**
+ * @deprecated Use Card component from ui package instead
+ */
 function Panel(props: PropsWithChildren<PanelProps>) {
   const content = (
     <div

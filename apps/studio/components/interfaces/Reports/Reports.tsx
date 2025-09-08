@@ -22,7 +22,7 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
@@ -82,22 +82,30 @@ const Reports = () => {
   const currentReport = userContents?.content.find((report) => report.id === id)
   const currentReportContent = currentReport?.content as Dashboards.Content
 
-  const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
-    resource: {
-      type: 'report',
-      visibility: currentReport?.visibility,
-      owner_id: currentReport?.owner_id,
-    },
-    subject: { id: profile?.id },
-  })
-  const canUpdateReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
-    resource: {
-      type: 'report',
-      visibility: currentReport?.visibility,
-      owner_id: currentReport?.owner_id,
-    },
-    subject: { id: profile?.id },
-  })
+  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'user_content',
+    {
+      resource: {
+        type: 'report',
+        visibility: currentReport?.visibility,
+        owner_id: currentReport?.owner_id,
+      },
+      subject: { id: profile?.id },
+    }
+  )
+  const { can: canUpdateReport } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'user_content',
+    {
+      resource: {
+        type: 'report',
+        visibility: currentReport?.visibility,
+        owner_id: currentReport?.owner_id,
+      },
+      subject: { id: profile?.id },
+    }
+  )
 
   function handleDateRangePicker({ period_start, period_end }: any) {
     setStartDate(period_start.date)
@@ -383,7 +391,7 @@ const Reports = () => {
     }
   }, [hasEdits, confirmNavigate, router])
 
-  if (isLoading) {
+  if (isLoading || isLoadingPermissions) {
     return <Loading />
   }
 

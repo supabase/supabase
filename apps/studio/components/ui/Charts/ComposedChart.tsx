@@ -1,5 +1,3 @@
-'use client'
-
 import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
@@ -17,9 +15,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
-import ChartHeader from './ChartHeader'
+import { ChartHeader } from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
 import {
   CHART_COLORS,
@@ -37,6 +36,7 @@ import {
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -63,9 +63,10 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideHighlightedValue?: boolean
   syncId?: string
   docsUrl?: string
+  sql?: string
 }
 
-export default function ComposedChart({
+export function ComposedChart({
   data,
   attributes,
   yAxisKey,
@@ -99,8 +100,12 @@ export default function ComposedChart({
   hideHighlightedValue,
   syncId,
   docsUrl,
+  sql,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -108,7 +113,6 @@ export default function ComposedChart({
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
   const isDarkMode = resolvedTheme?.includes('dark')
 
-  // Update chart colors when theme changes
   useEffect(() => {
     updateStackedChartColors(isDarkMode ?? false)
   }, [resolvedTheme])
@@ -122,16 +126,13 @@ export default function ComposedChart({
       return ''
     }
 
-    // Timestamps from auth logs can be in microseconds
     if (typeof ts === 'number' && ts > 1e14) {
       return day(ts / 1000).format(customDateFormat)
     }
 
-    // dayjs can handle ISO strings and millisecond numbers
     return day(ts).format(customDateFormat)
   }
 
-  // Default props
   const _XAxisProps = XAxisProps || {
     interval: data.length - 2,
     angle: 0,
@@ -161,46 +162,71 @@ export default function ComposedChart({
     )
   }
 
+  function computeHighlightedValue() {
+    const maxAttribute = attributes.find((a) => a.isMaxValue)
+    const referenceLines = attributes.filter(
+      (attribute) => attribute?.provider === 'reference-line'
+    )
+
+    const attributesToIgnore =
+      attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
+    const attributesToIgnoreFromTotal = [
+      ...attributesToIgnore,
+      ...(referenceLines?.map((a: MultiAttribute) => a.attribute) ?? []),
+      ...(maxAttribute?.attribute ? [maxAttribute?.attribute] : []),
+    ]
+
+    const lastDataPoint = data[data.length - 1]
+      ? Object.entries(data[data.length - 1])
+          .map(([key, value]) => ({
+            dataKey: key,
+            value: value as number,
+          }))
+          .filter(
+            (entry) =>
+              entry.dataKey !== 'timestamp' &&
+              entry.dataKey !== 'period_start' &&
+              attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
+          )
+      : undefined
+
+    if (focusDataIndex !== null) {
+      return showTotal
+        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
+        : data[focusDataIndex]?.[yAxisKey]
+    }
+
+    if (showTotal && lastDataPoint) {
+      return calculateTotalChartAggregate(lastDataPoint, attributesToIgnoreFromTotal)
+    }
+
+    return highlightedValue
+  }
+
+  function formatHighlightedValue(value: any) {
+    if (typeof value !== 'number') {
+      return value
+    }
+
+    if (shouldFormatBytes) {
+      const bytesValue = isNetworkChart ? Math.abs(value) : value
+      return formatBytes(bytesValue, valuePrecision)
+    }
+
+    return numberFormatter(value, valuePrecision)
+  }
+
   const maxAttribute = attributes.find((a) => a.isMaxValue)
   const maxAttributeData = {
     name: maxAttribute?.attribute,
     color: CHART_COLORS.REFERENCE_LINE,
   }
 
-  const lastDataPoint = !!data[data.length - 1]
-    ? Object.entries(data[data.length - 1])
-        .map(([key, value]) => ({
-          dataKey: key,
-          value: value as number,
-        }))
-        .filter(
-          (entry) =>
-            entry.dataKey !== 'timestamp' &&
-            entry.dataKey !== 'period_start' &&
-            attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
-        )
-    : undefined
   const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
   const resolvedHighlightedLabel = getHeaderLabel()
 
-  const attributesToIgnore =
-    attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
-
-  const attributesToIgnoreFromTotal = [
-    ...attributesToIgnore,
-    ...(referenceLines?.map((a: MultiAttribute) => a.attribute) ?? []),
-    ...(maxAttribute?.attribute ? [maxAttribute?.attribute] : []),
-  ]
-
-  const resolvedHighlightedValue =
-    focusDataIndex !== null
-      ? showTotal
-        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
-        : data[focusDataIndex]?.[yAxisKey]
-      : showTotal && lastDataPoint
-        ? calculateTotalChartAggregate(lastDataPoint, attributesToIgnoreFromTotal)
-        : highlightedValue
+  const resolvedHighlightedValue = computeHighlightedValue()
 
   const showHighlightActions =
     chartHighlight?.coordinates.left &&
@@ -280,16 +306,7 @@ export default function ComposedChart({
         title={title}
         format={format}
         customDateFormat={customDateFormat}
-        highlightedValue={
-          typeof resolvedHighlightedValue === 'number'
-            ? shouldFormatBytes
-              ? formatBytes(
-                  isNetworkChart ? Math.abs(resolvedHighlightedValue) : resolvedHighlightedValue,
-                  valuePrecision
-                )
-              : numberFormatter(resolvedHighlightedValue, valuePrecision)
-            : resolvedHighlightedValue
-        }
+        highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
         hideChartType={hideChartType}
@@ -299,6 +316,17 @@ export default function ComposedChart({
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
         hideHighlightedValue={hideHighlightedValue}
         docsUrl={docsUrl}
+        syncId={syncId}
+        data={data}
+        xAxisKey={xAxisKey}
+        yAxisKey={yAxisKey}
+        xAxisIsDate={xAxisIsDate}
+        displayDateInUtc={displayDateInUtc}
+        valuePrecision={valuePrecision}
+        shouldFormatBytes={shouldFormatBytes}
+        isNetworkChart={isNetworkChart}
+        attributes={attributes}
+        sql={sql}
       />
       <Container className="relative z-10">
         <RechartComposedChart
@@ -310,6 +338,9 @@ export default function ComposedChart({
               setFocusDataIndex(e.activeTooltipIndex)
               setActivePayload(e.activePayload)
             }
+
+            setHover(e.activeTooltipIndex)
+
             const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
@@ -328,6 +359,8 @@ export default function ComposedChart({
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
             setActivePayload(null)
+
+            clearHover()
           }}
           onClick={(tooltipData) => {
             const datum = tooltipData?.activePayload?.[0]?.payload
@@ -362,7 +395,9 @@ export default function ComposedChart({
                   attributes={attributes}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
-                  isActiveHoveredChart={isActiveHoveredChart}
+                  isActiveHoveredChart={
+                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
+                  }
                 />
               ) : null
             }
@@ -404,7 +439,6 @@ export default function ComposedChart({
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
-                  // Show dot for the first attribute when a point is focused
                   dot={false}
                 />
               ))}
@@ -448,9 +482,9 @@ export default function ComposedChart({
               x1={chartHighlight?.coordinates.left}
               x2={chartHighlight?.coordinates.right}
               strokeOpacity={0.5}
-              stroke="#3ECF8E"
-              fill="#3ECF8E"
-              fillOpacity={0.3}
+              stroke={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fill={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fillOpacity={0.2}
             />
           )}
         </RechartComposedChart>

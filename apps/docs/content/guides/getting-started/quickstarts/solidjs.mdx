@@ -66,7 +66,7 @@ hideToc: true
 
         ```text name=.env.local
         VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        VITE_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
         ```
 
       </$CodeTabs>
@@ -90,7 +90,7 @@ hideToc: true
       import { createClient } from "@supabase/supabase-js";
       import { createResource, For } from "solid-js";
 
-      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>');
+      const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>');
 
       async function getInstruments() {
         const { data } = await supabase.from("instruments").select();

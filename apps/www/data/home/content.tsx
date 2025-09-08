@@ -5,7 +5,7 @@ import VideoWithHighlights from 'components/VideoWithHighlights'
 import ProductModules from '../ProductModules'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 
-import Tweets from 'data/tweets/Tweets.json'
+import tweets from 'shared-data/tweets'
 import MainProducts from 'data/MainProducts'
 
 export default () => {
@@ -204,7 +204,7 @@ export default () => {
           </Button>
         </>
       ),
-      tweets: Tweets.slice(0, 18),
+      tweets: tweets.slice(0, 18),
     },
   }
 }

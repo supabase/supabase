@@ -24,6 +24,18 @@ const BlogGridItem = ({ post }: Props) => {
     }
   }
 
+  const imageUrl = post.isCMS
+    ? post.thumb
+      ? post.thumb
+      : post.image
+        ? post.image
+        : '/images/blog/blog-placeholder.png'
+    : post.thumb
+      ? `/images/blog/${post.thumb}`
+      : post.image
+        ? `/images/blog/${post.image}`
+        : '/images/blog/blog-placeholder.png'
+
   return (
     <Link
       href={post.path}
@@ -36,13 +48,7 @@ const BlogGridItem = ({ post }: Props) => {
               fill
               sizes="100%"
               quality={100}
-              src={
-                !post.thumb
-                  ? `/images/blog/blog-placeholder.png`
-                  : post.type === 'casestudy'
-                    ? post.thumb
-                    : `/images/blog/${post.thumb}`
-              }
+              src={imageUrl}
               className="scale-100 object-cover overflow-hidden"
               alt={`${post.title} thumbnail`}
             />

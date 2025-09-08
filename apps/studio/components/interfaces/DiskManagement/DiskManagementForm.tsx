@@ -25,7 +25,7 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
@@ -66,8 +66,7 @@ import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementForm() {
-  // isLoading is used to avoid a useCheckPermissions() race condition
-  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
@@ -80,27 +79,18 @@ export function DiskManagementForm() {
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
-  /**
-   * Permissions
-   */
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'projects', {
+      resource: {
+        project_id: project?.id,
+      },
+    })
 
-  /**
-   * Component States
-   */
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [message, setMessageState] = useState<DiskManagementMessage | null>(null)
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
-  /**
-   * Fetch form data
-   */
   const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ projectRef })
   const { data, isSuccess: isDiskAttributesSuccess } = useDiskAttributesQuery(
     { projectRef },
@@ -146,9 +136,6 @@ export function DiskManagementForm() {
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
     useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project != null && isAws })
 
-  /**
-   * Handle default values
-   */
   const computeSize = project?.infra_compute_size
     ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
     : undefined
@@ -190,10 +177,6 @@ export function DiskManagementForm() {
     }
   }, [modifiedComputeSize, isDialogOpen, project])
 
-  /**
-   * State handling
-   */
-
   const isSuccess =
     isAddonsSuccess &&
     isDiskAttributesSuccess &&
@@ -228,7 +211,7 @@ export function DiskManagementForm() {
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
-  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration && !isProjectLoading
+  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({

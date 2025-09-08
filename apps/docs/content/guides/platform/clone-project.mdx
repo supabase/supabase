@@ -1,9 +1,29 @@
 ---
-title: Duplicate project
+title: Restore to a new project
 subtitle: How to clone your existing Supabase project
 ---
 
-You can clone your Supabase project by restoring your data from an existing project into a completely new one. Note that this only duplicates your database, not your project configuration.
+<Admonition type="note" label="Beta Version">
+
+You can clone your Supabase project by restoring your data from an existing project into a completely new one. This process creates a database-only copy and requires manual reconfiguration to fully replicate your original project.
+
+</Admonition>
+
+**What will be transferred?**
+
+- Database schema (tables, views, procedures)
+- All data and indexes
+- Database roles, permissions and users
+- Auth user data (user accounts, hashed passwords, and authentication records from the auth schema)
+
+**What needs manual reconfiguration?**
+
+- Storage objects & settings (Your S3/storage files and bucket configurations are **NOT** copied)
+- Edge Functions
+- Auth settings & API keys
+- Realtime settings
+- Database extensions and settings
+- Read replicas
 
 Whether you're using physical backups or Point-in-Time recovery (PITR), this feature allows you to duplicate project data with ease, perform testing safely, or recover data for analysis. Access to this feature is exclusive to users on paid plans and requires that physical backups are enabled for the source project.
 

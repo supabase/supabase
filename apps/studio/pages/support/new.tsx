@@ -91,7 +91,7 @@ const SupportPage: NextPageWithLayout = () => {
               <Success
                 sentCategory={sentCategory}
                 selectedProject={selectedProject}
-                projects={projectsData}
+                projects={projectsData?.projects}
               />
             ) : (
               <SupportFormV2
@@ -133,7 +133,7 @@ const SupportPage: NextPageWithLayout = () => {
                           <span>Project name</span>
                           <span>ID</span>
                         </li>
-                        {projectsData?.map((project) => (
+                        {(projectsData?.projects ?? []).map((project) => (
                           <li key={project.id} className="cursor-default">
                             <button
                               onClick={() => {

@@ -187,7 +187,12 @@ const ColumnType = ({
         <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
           <ScrollArea className="h-[335px]">
             <Command_Shadcn_>
-              <CommandInput_Shadcn_ placeholder="Search types..." />
+              <CommandInput_Shadcn_
+                placeholder="Search types..."
+                // [Joshen] Addresses style issues when this component is being used in the old Form component
+                // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
+                className="!bg-transparent focus:!shadow-none focus:!ring-0"
+              />
               <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 
               <CommandList_Shadcn_>

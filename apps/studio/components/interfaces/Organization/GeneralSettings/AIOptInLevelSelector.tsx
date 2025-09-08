@@ -5,6 +5,7 @@ import { AIOptInFormValues } from 'hooks/forms/useAIOptInForm'
 import { FormField_Shadcn_, RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 interface AIOptInLevelSelectorProps {
   control: Control<AIOptInFormValues>
@@ -13,39 +14,67 @@ interface AIOptInLevelSelectorProps {
   layout?: 'horizontal' | 'vertical' | 'flex-row-reverse'
 }
 
-const AI_OPT_IN_LEVELS = [
-  {
-    value: 'disabled',
-    title: 'Disabled',
-    description:
-      'You do not consent to sharing any database information with Amazon Bedrock and understand that responses will be generic and not tailored to your database',
-  },
-  {
-    value: 'schema',
-    title: 'Schema Only',
-    description:
-      'You consent to sharing your database’s schema metadata (such as table and column names, data types, and relationships—but not actual database data) with Amazon Bedrock',
-  },
-  {
-    value: 'schema_and_log',
-    title: 'Schema & Logs',
-    description:
-      'You consent to sharing your schema and logs (which may contain PII/database data) with Amazon Bedrock for better results',
-  },
-  {
-    value: 'schema_and_log_and_data',
-    title: 'Schema, Logs & Database Data',
-    description:
-      'You consent to give Amazon Bedrock  full access to run database read only queries and analyze results for optimal results',
-  },
-]
-
 export const AIOptInLevelSelector = ({
   control,
   disabled,
   label,
   layout = 'vertical',
 }: AIOptInLevelSelectorProps) => {
+  const {
+    aiOptInLevelDisabled,
+    aiOptInLevelSchema,
+    aiOptInLevelSchemaAndLog,
+    aiOptInLevelSchemaAndLogAndData,
+  } = useIsFeatureEnabled([
+    'ai:opt_in_level_disabled',
+    'ai:opt_in_level_schema',
+    'ai:opt_in_level_schema_and_log',
+    'ai:opt_in_level_schema_and_log_and_data',
+  ])
+
+  const AI_OPT_IN_LEVELS = [
+    ...(aiOptInLevelDisabled
+      ? [
+          {
+            value: 'disabled',
+            title: 'Disabled',
+            description:
+              'You do not consent to sharing any database information with Amazon Bedrock and understand that responses will be generic and not tailored to your database',
+          },
+        ]
+      : []),
+    ...(aiOptInLevelSchema
+      ? [
+          {
+            value: 'schema',
+            title: 'Schema Only',
+            description:
+              'You consent to sharing your database’s schema metadata (such as table and column names, data types, and relationships—but not actual database data) with Amazon Bedrock',
+          },
+        ]
+      : []),
+    ...(aiOptInLevelSchemaAndLog
+      ? [
+          {
+            value: 'schema_and_log',
+            title: 'Schema & Logs',
+            description:
+              'You consent to sharing your schema and logs (which may contain PII/database data) with Amazon Bedrock for better results',
+          },
+        ]
+      : []),
+    ...(aiOptInLevelSchemaAndLogAndData
+      ? [
+          {
+            value: 'schema_and_log_and_data',
+            title: 'Schema, Logs & Database Data',
+            description:
+              'You consent to give Amazon Bedrock  full access to run database read only queries and analyze results for optimal results',
+          },
+        ]
+      : []),
+  ]
+
   return (
     <FormItemLayout
       label={label}

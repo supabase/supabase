@@ -4,17 +4,19 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
 import { BASE_PATH } from 'lib/constants'
-import { Separator } from 'ui'
+import { cn, Separator } from 'ui'
 
 export const ProjectClaimLayout = ({
   children,
   title,
+  className,
 }: PropsWithChildren<{
   title: ReactNode
+  className?: string
 }>) => {
   return (
     <>
-      <div className="flex flex-row justify-between flex-grow mx-auto w-full h-[52px] items-center px-4">
+      <div className="flex flex-row justify-between mx-auto w-full h-[52px] items-center px-4">
         <div className="flex items-center gap-2">
           <span className="sr-only">Supabase</span>
           <Image
@@ -31,8 +33,13 @@ export const ProjectClaimLayout = ({
         </div>
       </div>
       <Separator />
-      <div className="overflow-y-auto max-h-[calc(100vh-70px)] flex justify-center">
-        <div className="w-full max-w-md">{children}</div>
+      <div
+        className={cn(
+          'overflow-y-auto max-h-[calc(100vh-70px)] flex justify-center flex-grow',
+          className
+        )}
+      >
+        <div className="w-full h-full max-w-md">{children}</div>
       </div>
     </>
   )

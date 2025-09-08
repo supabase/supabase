@@ -15,7 +15,8 @@ export const OrganizationCard = ({
   href?: string
 }) => {
   const isUserMFAEnabled = useIsMFAEnabled()
-  const { data: allProjects = [] } = useProjectsQuery()
+  const { data } = useProjectsQuery()
+  const allProjects = data?.projects ?? []
 
   const numProjects = allProjects.filter((x) => x.organization_slug === organization.slug).length
   const isMfaRequired = organization.organization_requires_mfa

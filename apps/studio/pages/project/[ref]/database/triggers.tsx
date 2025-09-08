@@ -13,7 +13,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
@@ -27,8 +27,10 @@ const TriggersPage: NextPageWithLayout = () => {
   const [editorPanelOpen, setEditorPanelOpen] = useState(false)
   const [selectedTriggerForEditor, setSelectedTriggerForEditor] = useState<PostgresTrigger>()
 
-  const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'triggers'
+  )
 
   const createTrigger = () => {
     if (isInlineEditorEnabled) {

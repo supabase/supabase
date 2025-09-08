@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -8,7 +7,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { AuthorizeRequesterDetails } from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
@@ -17,13 +15,23 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
 import {
-  Alert,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Listbox,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CheckIcon,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  WarningIcon,
 } from 'ui'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
@@ -44,6 +52,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
+  const searchParams =
+    typeof window !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams()
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
+  const pathname =
+    typeof window !== 'undefined'
+      ? basePath
+        ? location.pathname.replace(basePath, '')
+        : location.pathname
+      : ''
+  searchParams.set('returnTo', pathname)
+
   const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
@@ -55,17 +74,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       router.push('/organizations')
     },
   })
-
-  useEffect(() => {
-    if (isSuccessOrganizations && organizations.length > 0) {
-      if (organization_slug) {
-        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
-      } else {
-        setSelectedOrgSlug(organizations[0].slug)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessOrganizations])
 
   const onApproveRequest = async () => {
     if (!auth_id) {
@@ -91,44 +99,58 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     declineRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsDeclining(false) })
   }
 
+  useEffect(() => {
+    if (isSuccessOrganizations && organizations.length > 0) {
+      if (organization_slug) {
+        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
+      } else {
+        setSelectedOrgSlug(organizations[0].slug)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessOrganizations])
+
   if (isLoading) {
     return (
-      <FormPanel header={<p>Authorize API access</p>}>
-        <div className="px-8 py-6 space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
-        </div>
-      </FormPanel>
-    )
-  }
+      <Card>
+        <CardHeader>Authorize API access</CardHeader>
+        <CardContent>
+          <div className="flex gap-x-4 items-center">
+            <ShimmeringLoader className="w-12 h-12 md:w-14 md:h-14" />
+            <ShimmeringLoader className="h-6 w-64" />
+          </div>
 
-  if (auth_id === undefined) {
-    return (
-      <FormPanel header={<p>Authorization for API access</p>}>
-        <div className="px-8 py-6">
-          <Alert withIcon variant="warning" title="Missing authorization ID">
-            Please provide a valid authorization ID in the URL
-          </Alert>
-        </div>
-      </FormPanel>
+          <div className="flex flex-col gap-y-2 mt-4">
+            <ShimmeringLoader className="w-1/4" />
+            <ShimmeringLoader />
+          </div>
+
+          <div className="flex flex-col gap-y-2 mt-8">
+            <ShimmeringLoader className="w-1/2" />
+            <ShimmeringLoader />
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
   if (isError) {
     return (
-      <FormPanel header={<p>Authorize API access</p>}>
-        <div className="px-8 py-6">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Failed to fetch details for API authorization request"
-          >
-            <p>Please retry your authorization request from the requesting app</p>
-            {error !== undefined && <p className="mt-2">Error: {error?.message}</p>}
-          </Alert>
-        </div>
-      </FormPanel>
+      <Card>
+        <CardHeader>Authorize API access</CardHeader>
+        <CardContent className="p-0">
+          <Alert_Shadcn_ variant="warning" className="border-0 rounded-t-none">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Failed to fetch details for API authorization request
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <p>Please retry your authorization request from the requesting app</p>
+              {error !== undefined && <p className="mt-2">Error: {error?.message}</p>}
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </CardContent>
+      </Card>
     )
   }
 
@@ -138,70 +160,39 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
 
     return (
-      <FormPanel header={<p>Authorize API access for {requester?.name}</p>}>
-        <div className="w-full px-8 py-6 space-y-8">
-          <Alert withIcon variant="success" title="This authorization request has been approved">
-            <p>
-              {requester.name} has read and write access to the organization "
-              {approvedOrganization?.name ?? 'Unknown'}" and all of its projects
-            </p>
-            <p className="mt-2">
-              Approved on: {dayjs(requester.approved_at).format('DD MMM YYYY HH:mm:ss (ZZ)')}
-            </p>
-          </Alert>
-        </div>
-      </FormPanel>
+      <Card>
+        <CardHeader>Authorize API access for {requester?.name}</CardHeader>
+        <CardContent className="p-0">
+          <Alert_Shadcn_ className="border-0 rounded-t-none">
+            <CheckIcon />
+            <AlertTitle_Shadcn_>This authorization request has been approved</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <p>
+                {requester.name} has been approved access to the organization "
+                {approvedOrganization?.name ?? 'Unknown'}" and all of its projects for the following
+                scopes:
+              </p>
+              <AuthorizeRequesterDetails
+                showOnlyScopes
+                icon={requester.icon}
+                name={requester.name}
+                domain={requester.domain}
+                scopes={requester.scopes}
+              />
+              <p className="mt-2">
+                Approved on: {dayjs(requester.approved_at).format('DD MMM YYYY HH:mm:ss (ZZ)')}
+              </p>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </CardContent>
+      </Card>
     )
   }
 
-  const searchParams = new URLSearchParams(location.search)
-  let pathname = location.pathname
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
-  if (basePath) {
-    pathname = pathname.replace(basePath, '')
-  }
-
-  searchParams.set('returnTo', pathname)
-
   return (
-    <FormPanel
-      header={<p>Authorize API access for {requester?.name}</p>}
-      footer={
-        <div className="flex items-center justify-end py-4 px-8">
-          <div className="flex items-center space-x-2">
-            <Button
-              type="default"
-              loading={isDeclining}
-              disabled={
-                isApproving || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
-              }
-              onClick={onDeclineRequest}
-            >
-              Decline
-            </Button>
-            {isLoadingOrganizations ? (
-              <Button loading={isLoadingOrganizations}>Authorize {requester?.name}</Button>
-            ) : isSuccessOrganizations && organizations.length === 0 ? (
-              <Link href={`/new?${searchParams.toString()}`}>
-                <Button loading={isLoadingOrganizations}>Create an organization</Button>
-              </Link>
-            ) : (
-              <Button
-                loading={isApproving}
-                disabled={
-                  isDeclining || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
-                }
-                onClick={onApproveRequest}
-              >
-                Authorize {requester?.name}
-              </Button>
-            )}
-          </div>
-        </div>
-      }
-    >
-      <div className="w-full px-8 py-6 space-y-8">
-        {/* API Authorization requester details */}
+    <Card>
+      <CardHeader>Authorize API access for {requester?.name}</CardHeader>
+      <CardContent className="space-y-8">
         <AuthorizeRequesterDetails
           icon={requester.icon}
           name={requester.name}
@@ -209,14 +200,16 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           scopes={requester.scopes}
         />
 
-        {/* Expiry warning */}
         {isExpired && (
-          <Alert withIcon variant="warning" title="This authorization request is expired">
-            Please retry your authorization request from the requesting app
-          </Alert>
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>This authorization request is expired</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Please retry your authorization request from the requesting app
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         )}
 
-        {/* Organization selection */}
         {isLoadingOrganizations ? (
           <div className="py-4 space-y-2">
             <ShimmeringLoader />
@@ -224,11 +217,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           </div>
         ) : organizations?.length === 0 ? (
           <Alert_Shadcn_ variant="warning">
-            <AlertCircle className="h-4 w-4" />
+            <WarningIcon />
             <AlertTitle_Shadcn_>
               Organization is needed for installing an integration
             </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
+            <AlertDescription_Shadcn_>
               Your account isn't associated with any organizations. To use this integration, it must
               be installed within an organization. You'll be redirected to create an organization
               first.
@@ -236,40 +229,75 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           </Alert_Shadcn_>
         ) : organization_slug && !selectedOrgSlug ? (
           <Alert_Shadcn_ variant="warning">
-            <AlertCircle className="h-4 w-4" />
+            <WarningIcon />
             <AlertTitle_Shadcn_>
               Organization is needed for installing an integration
             </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
+            <AlertDescription_Shadcn_>
               Your account is not a member of the pre-selected organization. To use this
               integration, it must be installed within an organization your account is associated
               with.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : (
-          <Listbox
+          <FormLayout
             label={
               organization_slug
                 ? 'API access will be granted to pre-selected organization:'
                 : 'Select an organization to grant API access to:'
             }
-            value={selectedOrgSlug}
-            disabled={isExpired || Boolean(organization_slug)}
-            onChange={setSelectedOrgSlug}
           >
-            {(organizations ?? []).map((organization) => (
-              <Listbox.Option
-                key={organization?.slug}
-                label={organization?.name}
-                value={organization?.slug}
-              >
-                {organization.name}
-              </Listbox.Option>
-            ))}
-          </Listbox>
+            <Select_Shadcn_
+              value={selectedOrgSlug}
+              disabled={isExpired || Boolean(organization_slug)}
+              onValueChange={setSelectedOrgSlug}
+            >
+              <SelectTrigger_Shadcn_ size="small">
+                <SelectValue_Shadcn_>
+                  {organizations?.find((x) => x.slug === selectedOrgSlug)?.name}
+                </SelectValue_Shadcn_>
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                {(organizations ?? []).map((organization) => (
+                  <SelectItem_Shadcn_
+                    key={organization?.slug}
+                    value={organization?.slug}
+                    className="text-xs"
+                  >
+                    {organization.name}
+                  </SelectItem_Shadcn_>
+                ))}
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
+          </FormLayout>
         )}
-      </div>
-    </FormPanel>
+      </CardContent>
+      <CardFooter className="justify-end space-x-2">
+        <Button
+          type="default"
+          loading={isDeclining}
+          disabled={isApproving || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)}
+          onClick={onDeclineRequest}
+        >
+          Decline
+        </Button>
+        {isLoadingOrganizations ? (
+          <Button loading={isLoadingOrganizations}>Authorize {requester?.name}</Button>
+        ) : isSuccessOrganizations && organizations.length === 0 ? (
+          <Link href={`/new?${searchParams.toString()}`}>
+            <Button loading={isLoadingOrganizations}>Create an organization</Button>
+          </Link>
+        ) : (
+          <Button
+            loading={isApproving}
+            disabled={isDeclining || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)}
+            onClick={onApproveRequest}
+          >
+            Authorize {requester?.name}
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   )
 }
 

@@ -1,3 +1,4 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
 import { Search } from 'lucide-react'
@@ -9,20 +10,27 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import {
+  useAsyncCheckProjectPermissions,
+  usePermissionsLoaded,
+} from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { noop } from 'lib/void'
 import { Input } from 'ui'
-import HooksListEmpty from './HooksListEmpty'
-import SchemaTable from './SchemaTable'
+import { HooksListEmpty } from './HooksListEmpty'
+import { SchemaTable } from './SchemaTable'
 
 export interface HooksListProps {
   createHook: () => void
-  editHook: (hook: any) => void
-  deleteHook: (hook: any) => void
+  editHook: (hook: PostgresTrigger) => void
+  deleteHook: (hook: PostgresTrigger) => void
 }
 
-const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: HooksListProps) => {
+export const HooksList = ({
+  createHook = noop,
+  editHook = noop,
+  deleteHook = noop,
+}: HooksListProps) => {
   const { data: project } = useSelectedProjectQuery()
   const {
     data: hooks,
@@ -41,7 +49,10 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
-  const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const { can: canCreateWebhooks } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
   const isPermissionsLoaded = usePermissionsLoaded()
 
   return (
@@ -108,5 +119,3 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
     </div>
   )
 }
-
-export default HooksList

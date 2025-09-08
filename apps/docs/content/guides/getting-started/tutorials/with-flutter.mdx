@@ -155,7 +155,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    anonKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
   );
   runApp(const MyApp());
 }
@@ -474,7 +474,7 @@ import 'package:supabase_quickstart/pages/login_page.dart';
 Future<void> main() async {
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    anonKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
   );
   runApp(const MyApp());
 }

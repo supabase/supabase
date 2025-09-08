@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 
-import { StorageExplorer } from 'components/interfaces/Storage'
 import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
+import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
@@ -20,7 +20,7 @@ const PageLayout: NextPageWithLayout = () => {
   if (!project || !projectRef) return null
 
   return (
-    <div className="storage-container flex flex-grow">
+    <div className="storage-container flex flex-grow p-4">
       {isError && <StorageBucketsError error={error as any} />}
 
       {isSuccess ? (

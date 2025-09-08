@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import SidePanelVercelProjectLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
@@ -23,6 +24,8 @@ const IntegrationSettings = () => {
   const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
   const isBranch = project?.parent_project_ref !== undefined
 
+  const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
+
   return (
     <>
       {isBranch && (
@@ -43,9 +46,13 @@ const IntegrationSettings = () => {
         </ScaffoldContainer>
       )}
       <GitHubSection />
-      <ScaffoldDivider />
-      <VercelSection isProjectScoped={true} />
-      <SidePanelVercelProjectLinker />
+      {showVercelIntegration && (
+        <>
+          <ScaffoldDivider />
+          <VercelSection isProjectScoped={true} />
+          <SidePanelVercelProjectLinker />
+        </>
+      )}
     </>
   )
 }

@@ -8,6 +8,7 @@ export const generateRealtimeMenu = (
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
   const { enableRealtimeSettings } = flags || {}
+  const showRealtimeSettings = IS_PLATFORM && enableRealtimeSettings
 
   return [
     {
@@ -30,7 +31,7 @@ export const generateRealtimeMenu = (
           url: `/project/${ref}/realtime/policies`,
           items: [],
         },
-        ...(IS_PLATFORM && enableRealtimeSettings
+        ...(showRealtimeSettings
           ? [
               {
                 name: 'Settings',

@@ -142,7 +142,7 @@ export const EditorTabs = () => {
             strategy={horizontalListSortingStrategy}
           >
             {editorTabs.map((tab, index) => (
-              <ContextMenu_Shadcn_>
+              <ContextMenu_Shadcn_ key={tab.id}>
                 <ContextMenuTrigger_Shadcn_>
                   <SortableTab
                     key={tab.id}

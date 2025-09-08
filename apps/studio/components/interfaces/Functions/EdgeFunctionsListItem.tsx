@@ -8,7 +8,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { copyToClipboard, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -33,18 +33,19 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       : functionUrl
 
   return (
-    <Table.tr
+    <TableRow
       key={item.id}
       onClick={() => {
         router.push(`/project/${ref}/functions/${item.slug}`)
       }}
+      className="cursor-pointer"
     >
-      <Table.td>
+      <TableCell>
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground">{item.name}</p>
         </div>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
           <p title={endpoint} className="font-mono truncate hidden md:inline max-w-[30rem]">
             {endpoint}
@@ -75,13 +76,13 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
             )}
           </button>
         </div>
-      </Table.td>
-      <Table.td className="hidden 2xl:table-cell">
+      </TableCell>
+      <TableCell className="hidden 2xl:table-cell">
         <p className="text-foreground-light">
           {dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}
         </p>
-      </Table.td>
-      <Table.td className="lg:table-cell">
+      </TableCell>
+      <TableCell className="lg:table-cell">
         <Tooltip>
           <TooltipTrigger>
             <div className="flex items-center space-x-2">
@@ -92,10 +93,10 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
             Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
           </TooltipContent>
         </Tooltip>
-      </Table.td>
-      <Table.td className="lg:table-cell">
+      </TableCell>
+      <TableCell className="lg:table-cell">
         <p className="text-foreground-light">{item.version}</p>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }

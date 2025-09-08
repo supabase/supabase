@@ -35,3 +35,5 @@ Object.defineProperties(globalThis, {
   ReadableStream: { value: ReadableStream },
   TransformStream: { value: TransformStream },
 })
+
+window.HTMLElement.prototype.hasPointerCapture = vi.fn()

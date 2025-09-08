@@ -37,7 +37,7 @@ export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-
 
 export type MultiAttribute = {
   attribute: string
-  provider: Provider
+  provider?: Provider
   label?: string
   color?: {
     light: string

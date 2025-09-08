@@ -45,6 +45,8 @@ jobs:
           sparse-checkout: |
             apps/docs
             apps/www/.env.local.example
+            examples
+            packages
             supabase
 
       - uses: pnpm/action-setup@v4
@@ -63,7 +65,9 @@ jobs:
       - name: Update embeddings
         working-directory: ./apps/docs
         if: ${{ !inputs.refresh }}
-        run: pnpm run embeddings
+        run: |
+          pnpm run codegen:examples
+          pnpm run embeddings
 
       - name: Refresh embeddings
         working-directory: ./apps/docs

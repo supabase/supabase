@@ -23,15 +23,15 @@ import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
 import {
-  UpdateTableBody,
-  updateTable as updateTableMutation,
-} from 'data/tables/table-update-mutation'
-import { getTables } from 'data/tables/tables-query'
-import {
   getTable,
   RetrievedTableColumn,
   RetrieveTableResult,
 } from 'data/tables/table-retrieve-query'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
+import { getTables } from 'data/tables/tables-query'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -821,6 +821,47 @@ export const updateTable = async ({
   }
 }
 
+/**
+ * Used in insertRowsViaSpreadsheet + insertTableRows
+ */
+export const formatRowsForInsert = ({
+  rows,
+  headers,
+  columns = [],
+}: {
+  rows: any[]
+  headers: string[]
+  columns?: RetrieveTableResult['columns']
+}) => {
+  return rows.map((row: any) => {
+    const formattedRow: any = {}
+    headers.forEach((header) => {
+      const column = columns?.find((c) => c.name === header)
+      const originalValue = row[header]
+
+      if ((column?.format ?? '').includes('json')) {
+        formattedRow[header] = tryParseJson(originalValue)
+      } else if ((column?.data_type ?? '') === 'ARRAY') {
+        if (
+          typeof originalValue === 'string' &&
+          originalValue.startsWith('{') &&
+          originalValue.endsWith('}')
+        ) {
+          const formattedPostgresArraytoJsonArray = `[${originalValue.slice(1, originalValue.length - 1)}]`
+          formattedRow[header] = tryParseJson(formattedPostgresArraytoJsonArray)
+        } else {
+          formattedRow[header] = tryParseJson(originalValue)
+        }
+      } else if (originalValue === '') {
+        formattedRow[header] = column?.is_nullable ? null : ''
+      } else {
+        formattedRow[header] = originalValue
+      }
+    })
+    return formattedRow
+  })
+}
+
 export const insertRowsViaSpreadsheet = async (
   projectRef: string,
   connectionString: string | undefined | null,
@@ -843,20 +884,10 @@ export const insertRowsViaSpreadsheet = async (
       chunk: async (results: any, parser: any) => {
         parser.pause()
 
-        const formattedData = results.data.map((row: any) => {
-          const formattedRow: any = {}
-          selectedHeaders.forEach((header) => {
-            const column = table.columns?.find((c) => c.name === header)
-            if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-              formattedRow[header] = tryParseJson(row[header])
-            } else if (row[header] === '') {
-              // if the cell is empty string, convert it to NULL
-              formattedRow[header] = column?.is_nullable ? null : ''
-            } else {
-              formattedRow[header] = row[header]
-            }
-          })
-          return formattedRow
+        const formattedData = formatRowsForInsert({
+          rows: results.data,
+          headers: selectedHeaders,
+          columns: table.columns,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
@@ -894,19 +925,10 @@ export const insertTableRows = async (
   let insertError = undefined
   let insertProgress = 0
 
-  const formattedRows = rows.map((row: any) => {
-    const formattedRow: any = {}
-    selectedHeaders.forEach((header) => {
-      const column = table.columns?.find((c) => c.name === header)
-      if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-        formattedRow[header] = tryParseJson(row[header])
-      } else if (row[header] === '') {
-        formattedRow[header] = column?.is_nullable ? null : ''
-      } else {
-        formattedRow[header] = row[header]
-      }
-    })
-    return formattedRow
+  const formattedRows = formatRowsForInsert({
+    rows,
+    headers: selectedHeaders,
+    columns: table.columns,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)

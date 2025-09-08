@@ -4,26 +4,29 @@ import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
 
 interface ConnectionIconProps {
-  connection: any
+  icon: string
 }
 
-export const ConnectionIcon = ({ connection }: ConnectionIconProps) => {
+export const ConnectionIcon = ({ icon }: ConnectionIconProps) => {
   const { resolvedTheme } = useTheme()
 
-  const imageFolder = ['ionic-angular'].includes(connection) ? 'icons/frameworks' : 'libraries'
+  const imageFolder = ['ionic-angular'].includes(icon) ? 'icons/frameworks' : 'libraries'
   const imageExtension = imageFolder === 'icons/frameworks' ? '' : '-icon'
-
-  return (
-    <Image
-      className="transition-all group-hover:scale-110"
-      src={`${BASE_PATH}/img/${imageFolder}/${connection.toLowerCase()}${
-        ['expo', 'nextjs', 'prisma', 'drizzle', 'astro', 'remix'].includes(connection.toLowerCase())
+  const iconImgSrc = icon.startsWith('http')
+    ? icon
+    : `${BASE_PATH}/img/${imageFolder}/${icon.toLowerCase()}${
+        ['expo', 'nextjs', 'prisma', 'drizzle', 'astro', 'remix'].includes(icon.toLowerCase())
           ? resolvedTheme?.includes('dark')
             ? '-dark'
             : ''
           : ''
-      }${imageExtension}.svg`}
-      alt={`${connection} logo`}
+      }${imageExtension}.svg`
+
+  return (
+    <Image
+      className="transition-all group-hover:scale-110"
+      src={iconImgSrc}
+      alt={`${icon} logo`}
       width={14}
       height={14}
     />

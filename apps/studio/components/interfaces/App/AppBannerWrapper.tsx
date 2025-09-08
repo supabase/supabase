@@ -1,9 +1,9 @@
 import { PropsWithChildren } from 'react'
 
+import { useFlag } from 'common'
 import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
 import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
-import { useFlag } from 'hooks/ui/useFlag'
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {

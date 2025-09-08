@@ -1,8 +1,8 @@
+import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import ChartHeader from './ChartHeader'
+
+import { ChartHeader } from './ChartHeader'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -19,7 +19,7 @@ import {
   useStacked,
 } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-dayjs.extend(utc)
+import { useChartHoverState } from './useChartHoverState'
 
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
@@ -32,6 +32,7 @@ interface Props extends CommonChartProps<any> {
   hideLegend?: boolean
   hideHeader?: boolean
   stackColors?: ValidStackColor[]
+  syncId?: string
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
@@ -53,8 +54,12 @@ const StackedBarChart: React.FC<Props> = ({
   hideLegend = false,
   hideHeader = false,
   stackColors = DEFAULT_STACK_COLORS,
+  syncId,
 }) => {
   const { Container } = useChartSize(size)
+  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
+    syncId || 'default'
+  )
   const { dataKeys, stackedData, percentagesStackedData } = useStacked({
     data,
     xAxisKey,
@@ -75,7 +80,17 @@ const StackedBarChart: React.FC<Props> = ({
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
-  if (!data || data.length === 0) return <NoDataPlaceholder size={size} />
+  if (!data || data.length === 0) {
+    return (
+      <NoDataPlaceholder
+        description="It may take up to 24 hours for data to refresh"
+        size={size}
+        attribute={title}
+        format={format}
+      />
+    )
+  }
+
   const stackColorScales = genStackColorScales(stackColors)
   return (
     <div className="w-full">
@@ -91,6 +106,14 @@ const StackedBarChart: React.FC<Props> = ({
               : resolvedHighlightedValue
           }
           highlightedLabel={resolvedHighlightedLabel}
+          syncId={syncId}
+          data={data}
+          xAxisKey={xAxisKey}
+          yAxisKey={yAxisKey}
+          xAxisIsDate={xAxisFormatAsDate}
+          displayDateInUtc={displayDateInUtc}
+          valuePrecision={valuePrecision}
+          attributes={[]}
         />
       )}
       <Container>
@@ -108,8 +131,14 @@ const StackedBarChart: React.FC<Props> = ({
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+
+            setHover(e.activeTooltipIndex)
           }}
-          onMouseLeave={() => setFocusDataIndex(null)}
+          onMouseLeave={() => {
+            setFocusDataIndex(null)
+
+            clearHover()
+          }}
         >
           {!hideLegend && (
             <Legend
@@ -174,6 +203,7 @@ const StackedBarChart: React.FC<Props> = ({
               fontSize: '12px',
             }}
             wrapperClassName="bg-gray-600 rounded min-w-md"
+            active={!!syncId && syncTooltip && hoveredIndex !== null}
           />
         </BarChart>
       </Container>

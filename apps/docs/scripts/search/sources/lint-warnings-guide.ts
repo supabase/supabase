@@ -92,7 +92,7 @@ export class LintWarningsGuideSource extends BaseSource {
     super(source, path)
   }
 
-  process() {
+  async process() {
     this.checksum = createHash('sha256').update(this.lint.content).digest('base64')
 
     this.meta = {

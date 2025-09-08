@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
-import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
+import { ShimmeringCard } from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'

@@ -12,7 +12,7 @@ export type LintRuleDeleteVariables = {
 
 export async function deleteLintRule({ projectRef, ids }: LintRuleDeleteVariables) {
   const { data, error } = await del('/platform/projects/{ref}/notifications/advisor/exceptions', {
-    params: { path: { ref: projectRef }, query: { ids } },
+    params: { path: { ref: projectRef }, query: { ids: ids.join(',') } },
   })
 
   if (error) handleError(error)

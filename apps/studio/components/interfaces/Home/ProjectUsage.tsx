@@ -151,11 +151,10 @@ const ProjectUsage = () => {
                 if (disabled) {
                   const retentionDuration = LOG_RETENTION[plan?.id ?? 'free']
                   return (
-                    <Tooltip>
+                    <Tooltip key={i.key}>
                       <TooltipTrigger asChild>
                         <DropdownMenuRadioItem
                           disabled
-                          key={i.key}
                           value={i.key}
                           className="!pointer-events-auto"
                         >

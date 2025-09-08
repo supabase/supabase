@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 
 import { useParams } from 'common'
-import { ColumnList } from 'components/interfaces/Database'
+import { ColumnList } from 'components/interfaces/Database/Tables/ColumnList'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'

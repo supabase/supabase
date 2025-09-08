@@ -15,7 +15,6 @@ import type { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { useAuthLogsReport } from 'data/reports/auth-report-query'
 import type { ChartData } from 'components/ui/Charts/Charts.types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { useEdgeFunctionReport } from 'data/reports/edgefn-query'
 
 export const useChartData = ({
   attributes,
@@ -56,25 +55,9 @@ export const useChartData = ({
     enabled: enabled && logsAttributes.length > 0 && !isEdgeFunctionRoute,
   })
 
-  const {
-    data: edgeFunctionData,
-    attributes: edgeFunctionChartAttributes,
-    isLoading: isEdgeFunctionLoading,
-  } = useEdgeFunctionReport({
-    projectRef: ref as string,
-    attributes: logsAttributes,
-    startDate,
-    endDate,
-    interval: interval as AnalyticsInterval,
-    enabled: enabled && logsAttributes.length > 0 && isEdgeFunctionRoute,
-    functionIds,
-  })
-
-  const logsData = isEdgeFunctionRoute ? edgeFunctionData : authData
-  const logsChartAttributes = isEdgeFunctionRoute
-    ? edgeFunctionChartAttributes
-    : authChartAttributes
-  const isLogsLoading = isEdgeFunctionRoute ? isEdgeFunctionLoading : isAuthLoading
+  const logsData = authData
+  const logsChartAttributes = authChartAttributes
+  const isLogsLoading = isAuthLoading
 
   const combinedData = useMemo(() => {
     if (data) return data

@@ -425,7 +425,7 @@ $$;
 create policy "rls_test_select"
 on test_table
 to authenticated
-using ( private.has_good_role() );
+using ( (select private.has_good_role()) );
 ```
 
 <Admonition type="caution">

@@ -10,7 +10,6 @@ import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
@@ -55,15 +54,12 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
-  const snap = useTableEditorTableStateSnapshot()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-
-  const gridColumn = snap.gridColumns.find((x) => x.name == column.key)
 
   const rawInitialValue = row[column.key as keyof TRow] as unknown
   const initialValue =
@@ -161,13 +157,13 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       overlay={
         isTruncated && !isSuccess ? (
           <div
-            style={{ width: `${gridColumn?.width || column.width}px` }}
+            style={{ width: `${column.width}px` }}
             className="flex items-center justify-center flex-col relative"
           >
             <MonacoEditor
               readOnly
               onChange={() => {}}
-              width={`${gridColumn?.width || column.width}px`}
+              width={`${column.width}px`}
               value={value ?? ''}
               language="markdown"
             />
@@ -176,7 +172,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
             <MonacoEditor
-              width={`${gridColumn?.width || column.width}px`}
+              width={`${column.width}px`}
               value={value ?? ''}
               language="json"
               readOnly={!isEditable}

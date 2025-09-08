@@ -1,24 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { useFeatureFlags } from 'common'
+import { useFeatureFlags, useFlag } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
 
 const isObjectEmpty = (obj: Object) => {
   return Object.keys(obj).length === 0
-}
-
-export function useFlag<T = boolean>(name: string) {
-  const flagStore = useFeatureFlags()
-
-  const store = flagStore.configcat
-
-  if (!isObjectEmpty(store) && store[name] === undefined) {
-    console.error(`Flag key "${name}" does not exist in ConfigCat flag store`)
-    return false
-  }
-  return store[name] as T
 }
 
 // TODO(Alaister): move this to packages/common/feature-flags.tsx and rename to useFlag

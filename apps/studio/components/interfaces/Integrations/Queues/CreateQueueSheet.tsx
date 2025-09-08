@@ -74,7 +74,7 @@ const FORM_ID = 'create-queue-sidepanel'
 export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQueueSheetProps) => {
   // This is for enabling pg_partman extension which will be used for partitioned queues (3rd kind of queue)
   // const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
-  // const canToggleExtensions = useCheckPermissions(
+  // const { can: canToggleExtensions } = useAsyncCheckPermissions(
   //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
   //   'extensions'
   // )

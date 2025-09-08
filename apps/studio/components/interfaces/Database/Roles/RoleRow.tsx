@@ -27,7 +27,7 @@ interface RoleRowProps {
   onSelectDelete: (role: PgRole) => void
 }
 
-const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -219,5 +219,3 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
     </Form>
   )
 }
-
-export default RoleRow

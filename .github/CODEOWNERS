@@ -5,6 +5,8 @@
 
 /apps/studio/ @supabase/Dashboard
 
+/apps/cms/ @supabase/marketing
+
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
 /apps/www/lib/redirects.js

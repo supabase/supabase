@@ -4,6 +4,7 @@ import { Check, ChevronLeft, Edit, MoreVertical, Plus, Search, Trash, X } from '
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { PostgresColumn } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
@@ -12,7 +13,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
@@ -30,11 +31,11 @@ import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: any) => void
-  onDeleteColumn: (column: any) => void
+  onEditColumn: (column: PostgresColumn) => void
+  onDeleteColumn: (column: PostgresColumn) => void
 }
 
-const ColumnList = ({
+export const ColumnList = ({
   onAddColumn = noop,
   onEditColumn = noop,
   onDeleteColumn = noop,
@@ -64,7 +65,10 @@ const ColumnList = ({
       : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
-  const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const { can: canUpdateColumns } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
 
   return (
     <div className="space-y-4">
@@ -213,5 +217,3 @@ const ColumnList = ({
     </div>
   )
 }
-
-export default ColumnList

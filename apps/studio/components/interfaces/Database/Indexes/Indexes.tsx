@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -15,7 +14,18 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { Button, Input, SidePanel } from 'ui'
+import {
+  Button,
+  Input,
+  SidePanel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableHeader,
+  Card,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
@@ -139,49 +149,51 @@ const Indexes = () => {
           )}
 
           {isSuccessIndexes && (
-            <div className="w-full overflow-hidden overflow-x-auto">
-              <Table
-                head={[
-                  <Table.th key="schema">Schema</Table.th>,
-                  <Table.th key="table">Table</Table.th>,
-                  <Table.th key="name">Name</Table.th>,
-                  <Table.th key="buttons"></Table.th>,
-                ]}
-                body={
-                  <>
+            <div className="w-full overflow-hidden">
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead key="schema">Schema</TableHead>
+                      <TableHead key="table">Table</TableHead>
+                      <TableHead key="name">Name</TableHead>
+                      <TableHead key="buttons"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {sortedIndexes.length === 0 && search.length === 0 && (
-                      <Table.tr>
-                        <Table.td colSpan={4}>
+                      <TableRow>
+                        <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No indexes created yet</p>
                           <p className="text-sm text-foreground-light">
                             There are no indexes found in the schema "{selectedSchema}"
                           </p>
-                        </Table.td>
-                      </Table.tr>
+                        </TableCell>
+                      </TableRow>
                     )}
                     {sortedIndexes.length === 0 && search.length > 0 && (
-                      <Table.tr>
-                        <Table.td colSpan={4}>
+                      <TableRow>
+                        <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No results found</p>
                           <p className="text-sm text-foreground-light">
                             Your search for "{search}" did not return any results
                           </p>
-                        </Table.td>
-                      </Table.tr>
+                        </TableCell>
+                      </TableRow>
                     )}
                     {indexes.length > 0 &&
                       indexes.map((index) => (
-                        <Table.tr key={index.name}>
-                          <Table.td>
+                        <TableRow key={index.name}>
+                          <TableCell>
                             <p title={index.schema}>{index.schema}</p>
-                          </Table.td>
-                          <Table.td>
+                          </TableCell>
+                          <TableCell>
                             <p title={index.table}>{index.table}</p>
-                          </Table.td>
-                          <Table.td>
+                          </TableCell>
+                          <TableCell>
                             <p title={index.name}>{index.name}</p>
-                          </Table.td>
-                          <Table.td>
+                          </TableCell>
+                          <TableCell>
                             <div className="flex justify-end items-center space-x-2">
                               <Button type="default" onClick={() => setSelectedIndex(index)}>
                                 View definition
@@ -196,12 +208,12 @@ const Indexes = () => {
                                 />
                               )}
                             </div>
-                          </Table.td>
-                        </Table.tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                  </>
-                }
-              />
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
           )}
         </div>

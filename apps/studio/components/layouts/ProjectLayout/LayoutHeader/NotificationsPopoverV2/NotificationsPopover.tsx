@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -24,7 +25,6 @@ import {
 } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -40,7 +40,9 @@ export const NotificationsPopoverV2 = () => {
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
 
-  const { data: projects } = useProjectsQuery({ enabled: open })
+  const { data: projectsData } = useProjectsQuery({ enabled: open })
+  const projects = projectsData?.projects ?? []
+
   const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
     data,

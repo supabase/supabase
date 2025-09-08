@@ -77,9 +77,10 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     }
   }, [orgsInitialized])
 
-  const { data: projects, isSuccess: projectsInitialized } = useProjectsQuery({
+  const { data, isSuccess: projectsInitialized } = useProjectsQuery({
     enabled: isLoggedIn,
   })
+  const projects = data?.projects ?? []
   const projectsRef = useLatest(projects)
 
   useEffect(() => {

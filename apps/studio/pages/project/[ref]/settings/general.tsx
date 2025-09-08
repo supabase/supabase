@@ -20,7 +20,8 @@ const ProjectSettings: NextPageWithLayout = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const isBranch = !!project?.parent_project_ref
-  const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
+  const { projectsTransfer: projectTransferEnabled, projectSettingsCustomDomains } =
+    useIsFeatureEnabled(['projects:transfer', 'project_settings:custom_domains'])
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -37,7 +38,7 @@ const ProjectSettings: NextPageWithLayout = () => {
 
         {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
         {!isBranch && hasHipaaAddon && <ComplianceConfig />}
-        <CustomDomainConfig />
+        {projectSettingsCustomDomains && <CustomDomainConfig />}
         {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
         {!isBranch && <DeleteProjectPanel />}
       </ScaffoldContainer>
