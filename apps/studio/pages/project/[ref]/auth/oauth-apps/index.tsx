@@ -15,6 +15,7 @@ export interface OAuthApp {
   scopes: string[]
   // type: string
   type: 'manual' | 'dynamic'
+  is_public?: boolean
 }
 
 const OAuthApps: NextPageWithLayout = () => {

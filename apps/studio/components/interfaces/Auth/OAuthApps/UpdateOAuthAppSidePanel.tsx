@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, ExternalLink, Plus, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -21,6 +20,7 @@ import {
   SelectValue_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
+  Switch,
 } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
@@ -47,6 +47,7 @@ const UpdateOAuthAppSidePanel = ({
     redirect_uris: selectedApp?.redirect_uris?.length
       ? selectedApp.redirect_uris.map((uri) => ({ value: uri }))
       : [{ value: '' }],
+    is_public: selectedApp?.is_public || false,
   }
   const submitRef = useRef<HTMLButtonElement>(null)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -81,6 +82,7 @@ const UpdateOAuthAppSidePanel = ({
       })
       .array()
       .default([{ value: '' }]),
+    is_public: z.boolean().default(false),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -178,7 +180,11 @@ const UpdateOAuthAppSidePanel = ({
               name="type"
               render={({ field }) => (
                 <FormItemLayout label="Registration Type" layout="vertical">
-                  <Select_Shadcn_ {...field} defaultValue={field.value}>
+                  <Select_Shadcn_
+                    {...field}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <SelectTrigger_Shadcn_ className="col-span-8">
                       <SelectValue_Shadcn_ />
                     </SelectTrigger_Shadcn_>
@@ -279,6 +285,22 @@ const UpdateOAuthAppSidePanel = ({
                   >
                     Add redirect URI
                   </Button>
+                </FormItemLayout>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="is_public"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Is public"
+                  layout="flex"
+                  description="If enabled, this app will be publicly accessible."
+                >
+                  <FormControl_Shadcn_>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />

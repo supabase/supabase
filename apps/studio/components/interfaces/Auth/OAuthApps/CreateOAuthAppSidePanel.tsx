@@ -1,15 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, ExternalLink, Plus, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import {
-  Checkbox,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -19,7 +18,6 @@ import * as z from 'zod'
 import {
   Button,
   FormControl_Shadcn_,
-  FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
@@ -27,9 +25,14 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   SidePanel,
-  cn,
 } from 'ui'
-import { MultiSelector } from 'ui-patterns/multi-select'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorTrigger,
+  MultiSelectorList,
+  MultiSelectorItem,
+} from 'ui-patterns/multi-select'
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 import { OAUTH_APP_SCOPES_OPTIONS, OAUTH_APP_TYPE_OPTIONS } from './OAuthAppsList'
 
@@ -45,6 +48,7 @@ const CreateOAuthAppSidePanel = ({ visible, onClose, onSuccess }: CreateOAuthApp
     type: 'manual' as const,
     scopes: ['openid'],
     redirect_uris: [{ value: '' }],
+    is_public: false,
   }
   const submitRef = useRef<HTMLButtonElement>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -69,6 +73,7 @@ const CreateOAuthAppSidePanel = ({ visible, onClose, onSuccess }: CreateOAuthApp
       })
       .array()
       .default([{ value: '' }]),
+    is_public: z.boolean().default(false),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -168,7 +173,11 @@ const CreateOAuthAppSidePanel = ({ visible, onClose, onSuccess }: CreateOAuthApp
               name="type"
               render={({ field }) => (
                 <FormItemLayout label="Registration Type" layout="vertical">
-                  <Select_Shadcn_ {...field} defaultValue={field.value}>
+                  <Select_Shadcn_
+                    {...field}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <SelectTrigger_Shadcn_ className="col-span-8">
                       <SelectValue_Shadcn_ />
                     </SelectTrigger_Shadcn_>
@@ -195,18 +204,18 @@ const CreateOAuthAppSidePanel = ({ visible, onClose, onSuccess }: CreateOAuthApp
                 >
                   <FormControl_Shadcn_>
                     <MultiSelector values={field.value} onValuesChange={field.onChange}>
-                      <MultiSelector.Trigger>
-                        <MultiSelector.Input placeholder="Select scopes..." />
-                      </MultiSelector.Trigger>
-                      <MultiSelector.Content>
-                        <MultiSelector.List>
-                          {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
-                            <MultiSelector.Item key={scope.value} value={scope.value}>
-                              {scope.name}
-                            </MultiSelector.Item>
-                          ))}
-                        </MultiSelector.List>
-                      </MultiSelector.Content>
+                      <MultiSelectorTrigger label="Select scopes..." showIcon={false} />
+                      <MultiSelectorContent>
+                        <MultiSelectorList>
+                          {OAUTH_APP_SCOPES_OPTIONS.map(
+                            (scope: { value: string; name: string }) => (
+                              <MultiSelectorItem key={scope.value} value={scope.value}>
+                                {scope.name}
+                              </MultiSelectorItem>
+                            )
+                          )}
+                        </MultiSelectorList>
+                      </MultiSelectorContent>
                     </MultiSelector>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -269,6 +278,22 @@ const CreateOAuthAppSidePanel = ({ visible, onClose, onSuccess }: CreateOAuthApp
                   >
                     Add redirect URI
                   </Button>
+                </FormItemLayout>
+              )}
+            />
+
+            <FormField_Shadcn_
+              control={form.control}
+              name="is_public"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Is public"
+                  layout="flex"
+                  description="If enabled, this app will be publicly accessible."
+                >
+                  <FormControl_Shadcn_>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
