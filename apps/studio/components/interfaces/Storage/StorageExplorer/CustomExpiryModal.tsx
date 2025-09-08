@@ -1,5 +1,26 @@
-import dayjs from 'dayjs'
-import { Button, Form, Input, Listbox, Modal } from 'ui'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import dayjs, { ManipulateType } from 'dayjs'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
 
 import { DATETIME_FORMAT } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -10,94 +31,141 @@ const unitMap = {
   weeks: 3600 * 24 * 7,
   months: 3600 * 24 * 30,
   years: 3600 * 24 * 365,
-}
+} as const
+
+const ExpirySchema = z.object({
+  expiresIn: z.coerce.number().positive().min(0),
+  units: z.string(),
+})
+
+const formId = 'custom-expiry-form'
 
 const CustomExpiryModal = () => {
   const { onCopyUrl } = useCopyUrl()
-  const snap = useStorageExplorerStateSnapshot()
-  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } = snap
+  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } =
+    useStorageExplorerStateSnapshot()
+  const form = useForm<z.infer<typeof ExpirySchema>>({
+    resolver: zodResolver(ExpirySchema),
+    defaultValues: { expiresIn: 0, units: 'days' },
+    mode: 'onSubmit',
+  })
 
+  const isSubmitting = form.formState.isSubmitting
+  const expiresIn = form.watch(`expiresIn`)
+  const units = form.watch(`units`)
   const visible = selectedFileCustomExpiry !== undefined
-  const onClose = () => setSelectedFileCustomExpiry(undefined)
+
+  const handleClose = () => {
+    form.reset()
+    setSelectedFileCustomExpiry(undefined)
+  }
+
+  const onSubmit: SubmitHandler<z.infer<typeof ExpirySchema>> = async (values) => {
+    await onCopyUrl(
+      selectedFileCustomExpiry!.name,
+      values.expiresIn * unitMap[values.units as keyof typeof unitMap]
+    )
+    handleClose()
+  }
 
   return (
-    <Modal
-      hideFooter
-      size="small"
-      header="Custom expiry for signed URL"
-      visible={visible}
-      alignFooter="right"
-      confirmText="Get URL"
-      onCancel={() => onClose()}
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleClose()
+        }
+      }}
     >
-      <Form
-        validateOnBlur
-        initialValues={{ expiresIn: '', units: 'days' }}
-        onSubmit={async (values: any, { setSubmitting }: any) => {
-          setSubmitting(true)
-          await onCopyUrl(
-            selectedFileCustomExpiry!.name,
-            values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
-          )
-          setSubmitting(false)
-          onClose()
-        }}
-        validate={(values: any) => {
-          const errors: any = {}
-          if (values.expiresIn !== '' && values.expiresIn <= 0) {
-            errors.expiresIn = 'Expiry duration cannot be less than 0'
-          }
-          return errors
-        }}
-      >
-        {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => (
-          <>
-            <Modal.Content>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Custom expiry for signed URL</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
               <p className="text-sm text-foreground-light mb-2">
                 Enter the duration for which the URL will be valid for:
               </p>
-              <div className="flex items-center space-x-2">
-                <Input disabled={isSubmitting} type="number" id="expiresIn" className="w-full" />
-                <Listbox id="units" className="w-[150px]">
-                  <Listbox.Option id="days" label="days" value="days">
-                    days
-                  </Listbox.Option>
-                  <Listbox.Option id="weeks" label="weeks" value="weeks">
-                    weeks
-                  </Listbox.Option>
-                  <Listbox.Option id="months" label="months" value="months">
-                    months
-                  </Listbox.Option>
-                  <Listbox.Option id="years" label="years" value="years">
-                    years
-                  </Listbox.Option>
-                </Listbox>
+              <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
+                <FormField_Shadcn_
+                  key="expiresIn"
+                  name="expiresIn"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        aria-label="Duration"
+                        id="expiresIn"
+                        type="number"
+                        min={0}
+                        className="col-span-8"
+                        {...field}
+                      />
+                    </FormControl_Shadcn_>
+                  )}
+                />
+
+                <FormField_Shadcn_
+                  key="units"
+                  name="units"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormControl_Shadcn_>
+                      <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger_Shadcn_
+                          id="units"
+                          aria-label="Duration units"
+                          size="small"
+                          className="col-span-4"
+                        >
+                          <SelectValue_Shadcn_ asChild>
+                            <>{units}</>
+                          </SelectValue_Shadcn_>
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {Object.keys(unitMap).map((unit: string) => (
+                            <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                              {unit}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormControl_Shadcn_>
+                  )}
+                />
               </div>
-              {values.expiresIn !== '' && (
+              {expiresIn !== 0 && (
                 <p className="text-sm text-foreground-light mt-2">
                   URL will expire on{' '}
-                  {dayjs().add(values.expiresIn, values.units).format(DATETIME_FORMAT)}
+                  {dayjs()
+                    .add(expiresIn, units as ManipulateType)
+                    .format(DATETIME_FORMAT)}
                 </p>
               )}
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end space-x-2">
-              <Button type="default" onClick={() => onClose()}>
-                Cancel
-              </Button>
-              <Button
-                disabled={values.expiresIn === '' || isSubmitting}
-                loading={isSubmitting}
-                htmlType="submit"
-                type="primary"
-              >
-                Get signed URL
-              </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
-    </Modal>
+            </form>
+          </Form_Shadcn_>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" loading={isSubmitting} onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button
+            form={formId}
+            htmlType="submit"
+            loading={isSubmitting}
+            disabled={expiresIn === 0 || isSubmitting}
+          >
+            Get signed URL
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

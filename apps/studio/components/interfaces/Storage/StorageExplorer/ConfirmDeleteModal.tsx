@@ -1,27 +1,49 @@
-import { noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useTransition } from 'react'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { STORAGE_ROW_TYPES } from '../Storage.constants'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { StorageItem } from '../Storage.types'
-
-interface ConfirmDeleteModalProps {
-  visible: boolean
-  selectedItemsToDelete: StorageItem[]
-  onSelectCancel: () => void
-  onSelectDelete: () => void
+export interface ConfirmDeleteModalProps {
+  onClose?: () => void
 }
 
-export const ConfirmDeleteModal = ({
-  visible = false,
-  selectedItemsToDelete = [],
-  onSelectCancel = noop,
-  onSelectDelete = noop,
-}: ConfirmDeleteModalProps) => {
-  const [deleting, setDeleting] = useState(false)
+export const ConfirmDeleteModal = ({ onClose }: ConfirmDeleteModalProps) => {
+  const { selectedItemsToDelete, deleteFolder, deleteFiles, setSelectedItemsToDelete } =
+    useStorageExplorerStateSnapshot()
+  const [isDeleting, startTransition] = useTransition()
 
-  useEffect(() => {
-    setDeleting(false)
-  }, [visible])
+  const handleClose = () => {
+    setSelectedItemsToDelete([])
+    onClose?.()
+  }
+
+  const onDeleteSelectedFiles = () => {
+    startTransition(async () => {
+      if (selectedItemsToDelete.length === 1) {
+        const [itemToDelete] = selectedItemsToDelete
+        if (!itemToDelete) return
+
+        if (itemToDelete.type === STORAGE_ROW_TYPES.FOLDER) {
+          await deleteFolder(itemToDelete)
+        } else if (itemToDelete.type === STORAGE_ROW_TYPES.FILE) {
+          await deleteFiles({ files: [itemToDelete] })
+        }
+      } else {
+        await deleteFiles({ files: selectedItemsToDelete })
+      }
+      onClose?.()
+    })
+  }
 
   const multipleFiles = selectedItemsToDelete.length > 1
 
@@ -37,25 +59,37 @@ export const ConfirmDeleteModal = ({
       ? `Are you sure you want to delete the selected ${selectedItemsToDelete[0].type.toLowerCase()}?`
       : ``
 
-  const onConfirmDelete = () => {
-    setDeleting(true)
-    onSelectDelete()
-  }
-
   return (
-    <ConfirmationModal
-      visible={visible}
-      title={<span className="break-words">{title}</span>}
-      size="medium"
-      onCancel={onSelectCancel}
-      onConfirm={onConfirmDelete}
-      variant="destructive"
-      alert={{
-        base: { variant: 'destructive' },
-        title: 'This action cannot be undone',
-        description,
+    <Dialog
+      open={selectedItemsToDelete.length > 0}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleClose()
+        }
       }}
-    />
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="break-words">{title}</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <Admonition
+            type="destructive"
+            title="This action cannot be undone"
+            description={description}
+          />
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" onClick={handleClose} loading={isDeleting}>
+            Cancel
+          </Button>
+          <Button type="danger" onClick={onDeleteSelectedFiles} loading={isDeleting}>
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
