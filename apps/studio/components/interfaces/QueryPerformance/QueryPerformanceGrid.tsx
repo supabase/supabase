@@ -31,15 +31,11 @@ import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
+import { CodeBlock } from 'ui'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
-
-// Load the monaco editor client-side only (does not behave well server-side)
-const Editor = dynamic(() => import('@monaco-editor/react').then(({ Editor }) => Editor), {
-  ssr: false,
-})
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const router = useRouter()
@@ -126,7 +122,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const value = props.row?.[col.id]
         if (col.id === 'query') {
           return (
-            <div className="w-full flex items-center gap-x-2">
+            <div className="w-full flex items-center gap-x-3">
               {hasIndexRecommendations(props.row.index_advisor_result, true) && (
                 <IndexSuggestionIcon
                   indexAdvisorResult={props.row.index_advisor_result}
@@ -137,37 +133,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   }}
                 />
               )}
-              <Editor
-                height={20}
-                theme="supabase"
+              <CodeBlock
                 language="pgsql"
-                value={value.replace(/\s+/g, ' ').trim()}
-                wrapperProps={{
-                  className:
-                    '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.monaco-editor]:!outline-transparent',
-                }}
-                options={{
-                  readOnly: true,
-                  domReadOnly: true,
-                  cursorBlinking: 'solid',
-                  tabIndex: -1,
-                  fontSize: 12,
-                  minimap: { enabled: false },
-                  lineNumbers: 'off',
-                  renderLineHighlight: 'none',
-                  scrollbar: { vertical: 'hidden', horizontal: 'hidden' },
-                  overviewRulerLanes: 0,
-                  overviewRulerBorder: false,
-                  glyphMargin: false,
-                  folding: false,
-                  lineDecorationsWidth: 0,
-                  lineNumbersMinChars: 0,
-                  wordWrap: 'bounded',
-                  scrollBeyondLastLine: false,
-                  contextmenu: false,
-                  selectionHighlight: false,
-                  occurrencesHighlight: 'off',
-                }}
+                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-[calc(100%-32px)] flex-grow pointer-events-none"
+                wrapperClassName="!max-w-full"
+                hideLineNumbers
+                hideCopy
+                value={value.replace(/\s+/g, ' ').trim() as string}
+                wrapLines={false}
               />
             </div>
           )
