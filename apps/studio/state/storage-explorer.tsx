@@ -1,3 +1,5 @@
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
@@ -5,8 +7,6 @@ import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 import { proxy, useSnapshot } from 'valtio'
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
   inverseValidObjectKeyRegex,
@@ -50,8 +50,8 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
-import { Button, SONNER_DEFAULT_DURATION, SonnerProgress, Progress } from 'ui'
 import { Loader2 } from 'lucide-react'
+import { Button, Progress, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 
 // Custom progress toast component for folder moves
 const FolderMoveProgressToast = ({
