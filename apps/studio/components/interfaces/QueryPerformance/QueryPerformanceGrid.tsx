@@ -8,6 +8,10 @@ import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -27,6 +31,7 @@ import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
+import { ChevronDown } from 'lucide-react'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -62,17 +67,52 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {
         return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            onClick={() => onSortChange(col.id)}
-          >
+          <div className="flex items-center justify-between text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
-              {col.description && <p className="text-foreground-lighter">{col.description}</p>}
+              <p className="!text-foreground font-medium">{col.name}</p>
+              {col.description && (
+                <p className="text-foreground-lighter font-normal">{col.description}</p>
+              )}
             </div>
-            {sort?.column === col.id && (
-              <>{sort.order === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</>
-            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="text"
+                  size="tiny"
+                  className="p-1 h-5 w-5"
+                  icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSort({ column: col.id, order: 'asc' })
+                    router.push({
+                      ...router,
+                      query: { ...router.query, sort: col.id, order: 'asc' },
+                    })
+                  }}
+                  className="flex gap-2"
+                >
+                  <ArrowUp size={14} />
+                  Sort Ascending
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSort({ column: col.id, order: 'desc' })
+                    router.push({
+                      ...router,
+                      query: { ...router.query, sort: col.id, order: 'desc' },
+                    })
+                  }}
+                  className="flex gap-2"
+                >
+                  <ArrowDown size={14} />
+                  Sort Descending
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )
       },
@@ -177,10 +217,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       query.startsWith('with pgrst_payload')) &&
     hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
 
-  const onSortChange = (column: string) => {
+  const onSortChange = (column: string, direction?: 'asc' | 'desc') => {
     let updatedSort = undefined
 
-    if (sort?.column === column) {
+    if (direction) {
+      // If direction is specified, set that specific direction
+      updatedSort = { column, order: direction }
+    } else if (sort?.column === column) {
+      // If no direction specified, toggle as before
       if (sort.order === 'desc') {
         updatedSort = { column, order: 'asc' }
       } else {
