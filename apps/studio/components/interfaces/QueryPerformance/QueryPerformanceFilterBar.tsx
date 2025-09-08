@@ -1,6 +1,5 @@
 import { RefreshCw, Search } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { parseAsString, parseAsArrayOf, useQueryStates } from 'nuqs'
 import { useState, useEffect } from 'react'
 import { useDebounce } from '@uidotdev/usehooks'
 
@@ -20,7 +19,6 @@ export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery: DbQueryHook<any>
   onResetReportClick?: () => void
 }) => {
-  const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [showBottomSection] = useLocalStorageQuery(
@@ -28,8 +26,9 @@ export const QueryPerformanceFilterBar = ({
     true
   )
 
-  const [{ search: searchQuery }, setSearchParams] = useQueryStates({
+  const [{ search: searchQuery, roles: defaultFilterRoles }, setSearchParams] = useQueryStates({
     search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
 
   const onSearchQueryChange = (value: string) => {
@@ -44,9 +43,8 @@ export const QueryPerformanceFilterBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInputValue])
 
-  const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
   const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
-    roles: typeof defaultFilterRoles === 'string' ? [defaultFilterRoles] : defaultFilterRoles,
+    roles: defaultFilterRoles,
     query: '',
   })
 
@@ -59,7 +57,7 @@ export const QueryPerformanceFilterBar = ({
 
   const onFilterRolesChange = (roles: string[]) => {
     setFilters({ ...filters, roles })
-    router.push({ ...router, query: { ...router.query, roles } })
+    setSearchParams({ roles })
   }
 
   return (
