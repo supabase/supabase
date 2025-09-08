@@ -183,7 +183,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
         if (col.id === 'prop_total_time') {
           return (
-            <div className="w-full flex flex-col justify-center font-mono text-xs text-right">
+            <div className="w-full flex flex-col justify-center text-xs">
               <p>{value || 'n/a'}</p>
             </div>
           )
@@ -197,15 +197,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               : value.toLocaleString()
             : ''
         return (
-          <div
-            className={cn(
-              'w-full flex flex-col justify-center font-mono text-xs',
-              typeof value === 'number' ? 'text-right' : ''
-            )}
-          >
+          <div className="w-full flex flex-col gap-y-0.5 justify-center text-xs">
             <p>{formattedValue}</p>
             {isTime && typeof value === 'number' && !isNaN(value) && isFinite(value) && (
-              <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>
+              <p className="text-foreground-lighter font-mono">{(value / 1000).toFixed(2)}s</p>
             )}
           </div>
         )
