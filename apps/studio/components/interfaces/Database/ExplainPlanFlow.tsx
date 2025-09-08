@@ -1,5 +1,6 @@
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
+import { Table2 } from 'lucide-react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -11,11 +12,13 @@ import ReactFlow, {
 } from 'reactflow'
 import dagre from '@dagrejs/dagre'
 import 'reactflow/dist/style.css'
+
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionItem_Shadcn_ as AccordionItem,
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   AccordionContent_Shadcn_ as AccordionContent,
+  cn,
 } from 'ui'
 
 type ExplainPlanFlowProps = {
@@ -33,6 +36,10 @@ type RawPlan = {
   ['Plan Rows']?: number
   ['Plan Width']?: number
   Filter?: string
+  ['Parent Relationship']?: string
+  ['Scan Direction']?: string
+  ['Index Name']?: string
+  ['Order By']?: string
   Plans?: RawPlan[]
 }
 
@@ -88,12 +95,16 @@ type PlanNodeData = {
   filter?: string
   parallelAware?: boolean
   asyncCapable?: boolean
+  parentRelationship?: string
+  scanDirection?: string
+  indexName?: string
+  orderBy?: string
 }
 
 const buildGraphFromPlan = (
   planJson: PlanRoot[]
 ): { nodes: Node<PlanNodeData>[]; edges: Edge[] } => {
-  const nodes: Node[] = []
+  const nodes: Node<PlanNodeData>[] = []
   const edges: Edge[] = []
 
   const addPlan = (plan: RawPlan, parentId?: string, index: number = 0) => {
@@ -110,6 +121,10 @@ const buildGraphFromPlan = (
       filter: plan['Filter'],
       parallelAware: plan['Parallel Aware'],
       asyncCapable: plan['Async Capable'],
+      parentRelationship: plan['Parent Relationship'],
+      scanDirection: plan['Scan Direction'],
+      indexName: plan['Index Name'],
+      orderBy: plan['Order By'],
     }
     nodes.push({
       id,
@@ -147,6 +162,100 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
         {data.planRows !== undefined && <span>rows {data.planRows}</span>}
         {data.planWidth !== undefined && <span>width {data.planWidth}</span>}
       </div>
+    </div>
+  )
+
+  const itemHeight = 'h-[22px]'
+
+  return (
+    <div
+      className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
+      style={{ width: DEFAULT_NODE_WIDTH }}
+    >
+      <Handle type="target" position={Position.Top} className={hiddenNodeConnector} />
+      <header
+        className={cn(
+          'text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between',
+          itemHeight
+        )}
+      >
+        <div className="flex gap-x-1 items-center">
+          <Table2 strokeWidth={1} size={12} className="text-light" />
+          {data.label}
+        </div>
+      </header>
+
+      <ul>
+        {data.startupCost !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>cost</span>
+              <span>{data.startupCost}</span>
+            </div>
+          </li>
+        )}
+        {data.totalCost !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>cost</span>
+              <span>{data.totalCost}</span>
+            </div>
+          </li>
+        )}
+        {data.planRows !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>rows</span>
+              <span>{data.planRows}</span>
+            </div>
+          </li>
+        )}
+        {data.planWidth !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>width</span>
+              <span>{data.planWidth}</span>
+            </div>
+          </li>
+        )}
+      </ul>
+      <Handle type="source" position={Position.Bottom} className={hiddenNodeConnector} />
     </div>
   )
 
