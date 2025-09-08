@@ -55,9 +55,6 @@ const data: () => {
   why: FeaturesSection
   platform: PlatformSectionProps
   developerExperience: DXSectionProps
-  resultsSection: ResultsSectionProps
-  featureGrid: FeatureGridProps
-  securitySection: SecuritySectionProps
   platformStarterSection: TwoColumnsSectionProps
   mcp: MPCSectionProps
   ctaSection?: any
@@ -180,8 +177,7 @@ const data: () => {
           Supabase helps you <span className="text-foreground">build</span>
         </>
       ),
-      subheading:
-        'Supabase includes everything you need to create the winning app.',
+      subheading: 'Supabase includes everything you need to create the winning app.',
       features: [
         {
           id: 'database',

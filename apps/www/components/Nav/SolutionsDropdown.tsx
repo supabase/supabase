@@ -14,7 +14,7 @@ type LinkProps = {
   svg?: any
 }
 
-const SolutionsDropdown = () => (
+export const SolutionsDropdown = () => (
   <div className="flex flex-col xl:flex-row">
     <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
       {/* two first columns */}
@@ -95,7 +95,7 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
         )}
       </AnimatePresence>
 
-      <motion.div 
+      <motion.div
         className="size-6 flex items-center justify-center"
         layout
         transition={{ duration: isDesktop ? 0.2 : 0, ease: 'easeInOut' }}
@@ -103,7 +103,7 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
         <ArrowLeftRight className="size-4 text-foreground-light" strokeWidth={1.3} />
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="flex items-center gap-1"
         layout
         transition={{ duration: isDesktop ? 0.2 : 0, ease: 'easeInOut' }}
@@ -124,5 +124,3 @@ const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
     </MotionLink>
   )
 }
-
-export default SolutionsDropdown

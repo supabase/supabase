@@ -14,7 +14,7 @@ type LinkProps = {
   svg?: any
 }
 
-const DevelopersDropdown = () => (
+export const DevelopersDropdown = () => (
   <div className="flex flex-col xl:flex-row">
     <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
       {DevelopersData['navigation'].map((column) => (
@@ -77,5 +77,3 @@ const DevelopersDropdown = () => (
     </div>
   </div>
 )
-
-export default DevelopersDropdown

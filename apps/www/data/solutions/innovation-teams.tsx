@@ -54,9 +54,6 @@ const data: () => {
   why: FeaturesSection
   platform: PlatformSectionProps
   developerExperience: DXSectionProps
-  resultsSection: ResultsSectionProps
-  featureGrid: FeatureGridProps
-  securitySection: SecuritySectionProps
   platformStarterSection: TwoColumnsSectionProps
   mcp: MPCSectionProps
 } = () => {
@@ -80,9 +77,7 @@ const data: () => {
         </>
       ),
       subheader: [
-        <>
-          Prototype in an afternoon, scale to millions.
-        </>,
+        <>Prototype in an afternoon, scale to millions.</>,
         <>
           You need to move fast without battling red tape, complex infrastructure, or data silos.
           Supabase gives you a fully managed Postgres backend with everything you need to prove your
