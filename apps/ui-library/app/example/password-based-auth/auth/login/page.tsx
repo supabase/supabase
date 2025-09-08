@@ -1,7 +1,5 @@
-import { LoginForm } from '@/registry/default/blocks/password-based-auth-nextjs/components/login-form'
-
 const PasswordBasedAuthDemo = () => {
-  return <LoginForm />
+  return <div></div>
 }
 
 export default PasswordBasedAuthDemo

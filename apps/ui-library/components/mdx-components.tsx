@@ -15,6 +15,7 @@ import { Callout } from './callout'
 import { ComponentPreview } from './component-preview'
 import { CopyButton } from './copy-button'
 import { DualRealtimeChat } from './dual-realtime-chat'
+import { GeneratedAuthBlockItem } from './generated-auth-block-item'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
@@ -169,6 +170,7 @@ const components = {
     />
   ),
   BlockItem,
+  GeneratedAuthBlockItem,
   BlockPreview,
   DualRealtimeChat,
 }

@@ -1,0 +1,44 @@
+---
+title: Generated Authentication
+description: Generated authentication block for Next.js
+---
+
+<Callout className="mt-4">
+  Select which providers to enable below. The generated URL will call the API route for block
+  generation.
+</Callout>
+
+## Installation
+
+Select which social providers you want to be added to the block.
+
+<GeneratedAuthBlockItem
+  name="generated-auth-nextjs"
+  description="All needed components for the generated auth flow"
+/>
+
+## Folder structure
+
+This block includes the [Supabase client](/ui/docs/nextjs/client). If you already have one installed, you can skip overwriting it.
+
+## Usage
+
+Once you install the block in your Next.js project, you'll get all the necessary pages and components to set up authentication flow with the specified providers.
+
+### Getting started
+
+After installing the block, you'll have the following environment variables in your `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+## Further reading
+
+- [Social login](https://supabase.com/docs/guides/auth/social-login)
+- [Authentication error codes](https://supabase.com/docs/guides/auth/debugging/error-codes)
