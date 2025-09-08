@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, fetchPost } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 
 export type UpdatePipelineVersionParams = {
   projectRef: string
@@ -19,10 +19,13 @@ async function updatePipelineVersion(
   if (!pipelineId) throw new Error('pipelineId is required')
   if (!versionId) throw new Error('versionId is required')
 
-  const url = `/platform/replication/${projectRef}/pipelines/${pipelineId}/update-version`
-  const data = await fetchPost(url, { version_id: versionId }, { abortSignal: signal })
-  if ((data as any)?.error) {
-    handleError((data as any).error)
+  const { data, error } = await post('/platform/replication/{ref}/pipelines/{pipeline_id}/version', {
+    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+    body: { version_id: versionId },
+    signal,
+  })
+  if (error) {
+    handleError(error)
   }
 
   return data

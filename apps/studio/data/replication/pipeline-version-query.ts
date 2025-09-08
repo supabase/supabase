@@ -1,6 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
-import { fetchGet, handleError } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
@@ -24,13 +24,15 @@ export async function fetchReplicationPipelineVersion(
   if (!projectRef) throw new Error('projectRef is required')
   if (!pipelineId) throw new Error('pipelineId is required')
 
-  const url = `/platform/replication/${projectRef}/pipelines/${pipelineId}/version`
-  const data = await fetchGet<ReplicationPipelineVersionResponse>(url, { abortSignal: signal })
-  if ((data as any)?.error) {
-    handleError((data as any).error)
+  const { data, error } = await get('/platform/replication/{ref}/pipelines/{pipeline_id}/version', {
+    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+    signal,
+  })
+  if (error) {
+    handleError(error)
   }
 
-  return data as ReplicationPipelineVersionResponse
+  return data as unknown as ReplicationPipelineVersionResponse
 }
 
 export type ReplicationPipelineVersionData = ReplicationPipelineVersionResponse

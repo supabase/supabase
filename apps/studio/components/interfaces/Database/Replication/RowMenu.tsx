@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash, ArrowUpCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -152,7 +152,7 @@ export const RowMenu = ({
           {hasUpdate && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={() => onUpdateClick?.()}>
-                <span className="h-2 w-2 bg-brand rounded-full" />
+                <ArrowUpCircle size={14} />
                 <p>Update available</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

@@ -27,6 +27,7 @@ import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
 import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'
 import { useUpdatePipelineVersionMutation } from 'data/replication/update-pipeline-version-mutation'
+import { UpdateVersionModal } from './UpdateVersionModal'
 
 interface DestinationRowProps {
   sourceId: number | undefined
@@ -55,6 +56,7 @@ export const DestinationRow = ({
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
+  const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
   const {
     data: pipelineStatusData,
@@ -97,7 +99,7 @@ export const DestinationRow = ({
     pipelineId: pipeline?.id,
   })
   const hasUpdate = Boolean(versionData?.new_version)
-  const onUpdateClick = async () => {
+  const performUpdateAndRestart = async () => {
     if (!projectRef || !pipeline?.id) return
     const versionId = versionData?.new_version?.id
     if (!versionId) return
@@ -112,11 +114,12 @@ export const DestinationRow = ({
           : PipelineStatusRequestStatus.StartRequested,
         statusName
       )
-      // Collapse any open editor panel for a clean UX
+      // Collapse any open panels for a clean UX
       setShowEditDestinationPanel(false)
+      setShowUpdateVersionModal(false)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (e: any) {
-      // If update returned 404, we already invalidated version in the mutation; no restart
+      // If update returned 404, version changed meanwhile. Keep modal open and refresh.
       if (e?.code === 404) return
       // If restart failed, clear the transient status and notify
       if (pipeline?.id) setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
@@ -228,7 +231,7 @@ export const DestinationRow = ({
                 onDeleteClick={() => setShowDeleteDestinationForm(true)}
                 onEditClick={() => setShowEditDestinationPanel(true)}
                 hasUpdate={hasUpdate}
-                onUpdateClick={onUpdateClick}
+                onUpdateClick={() => setShowUpdateVersionModal(true)}
               />
             </div>
           </Table.td>
@@ -253,6 +256,13 @@ export const DestinationRow = ({
             statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
           statusName,
         }}
+      />
+      <UpdateVersionModal
+        visible={showUpdateVersionModal}
+        currentVersionName={versionData?.version?.name}
+        newVersionName={versionData?.new_version?.name}
+        onCancel={() => setShowUpdateVersionModal(false)}
+        onConfirm={performUpdateAndRestart}
       />
     </>
   )
