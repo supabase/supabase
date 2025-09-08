@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { DatabaseZap, DollarSign, GitMerge, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
@@ -9,7 +10,6 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
@@ -19,12 +19,12 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
-import { DiskAttributesData, useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { projectKeys } from 'data/projects/keys'
-import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { DesiredInstanceSize } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -52,11 +52,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
-  DISK_LIMITS,
-  DISK_PRICING,
-  DiskType,
-  PLAN_DETAILS,
-} from '../DiskManagement/ui/DiskManagement.constants'
+  estimateComputeCost,
+  estimateDiskCost,
+  estimateRestoreTime,
+} from './BranchManagement.utils'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -71,6 +70,11 @@ export const CreateBranchModal = () => {
   // [Joshen] This is meant to be short lived while we're figuring out how to control
   // requests to this endpoint. Kill switch in case we need to stop the requests
   const disableBackupsCheck = useFlag('disableBackupsCheckInCreatebranchmodal')
+
+  const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'preview_branches'
+  )
 
   const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
@@ -90,13 +94,14 @@ export const CreateBranchModal = () => {
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
+  const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
+  const computeAddon = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const computeSize = !!computeAddon
+    ? (computeAddon.variant.identifier.split('ci_')[1] as DesiredInstanceSize)
+    : undefined
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
-    useCheckGithubBranchValidity({
-      onError: () => {},
-    })
+
   // Use branch compute size returned from backend
   const {
     data: cloneBackups,
@@ -104,23 +109,15 @@ export const CreateBranchModal = () => {
     isLoading: isLoadingCloneBackups,
   } = useCloneBackupsQuery(
     { projectRef },
-    {
-      // [Joshen] Only trigger this request when the modal is opened
-      enabled: showCreateBranchModal && !disableBackupsCheck,
-    }
+    // [Joshen] Only trigger this request when the modal is opened
+    { enabled: showCreateBranchModal && !disableBackupsCheck }
   )
   const noPhysicalBackups = isErrorCloneBackups || isLoadingCloneBackups
-  // Since min compute size for paid projects is micro, let backend suggest branch compute size
-  const branchComputeSize =
-    cloneBackups && !['pico', 'nano', 'micro'].includes(cloneBackups.target_compute_size)
-      ? (cloneBackups.target_compute_size as DesiredInstanceSize)
-      : undefined
+
   // Ignore failures fetching disk attributes since it only affects cost estimation
   const { data: disk } = useDiskAttributesQuery(
     { projectRef },
-    {
-      enabled: showCreateBranchModal && !disableBackupsCheck,
-    }
+    { enabled: showCreateBranchModal && !disableBackupsCheck }
   )
   const projectDiskAttributes = disk?.attributes ?? {
     type: 'gp3',
@@ -136,7 +133,12 @@ export const CreateBranchModal = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
+  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingGHBranchValidity } =
+    useCheckGithubBranchValidity({
+      onError: () => {},
+    })
+
+  const { mutate: createBranch, isLoading: isCreatingBranch } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
@@ -161,11 +163,6 @@ export const CreateBranchModal = () => {
       toast.error(`Failed to create branch: ${error.message}`)
     },
   })
-
-  const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
-    PermissionAction.CREATE,
-    'preview_branches'
-  )
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
 
@@ -223,12 +220,13 @@ export const CreateBranchModal = () => {
   const withData = form.watch('withData')
 
   const isDisabled =
+    !canCreateBranch ||
+    !isSuccessAddons ||
     !isSuccessConnections ||
-    isCreating ||
-    isChecking ||
-    (!gitlessBranching && !githubConnection) ||
     promptProPlanUpgrade ||
-    !canCreateBranch
+    (!gitlessBranching && !githubConnection) ||
+    isCreatingBranch ||
+    isCheckingGHBranchValidity
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -236,7 +234,7 @@ export const CreateBranchModal = () => {
       projectRef,
       branchName: data.branchName,
       is_default: false,
-      desired_instance_size: branchComputeSize,
+      desired_instance_size: computeSize,
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
       ...(allowDataBranching ? { withData: data.withData } : {}),
     })
@@ -343,7 +341,9 @@ export const CreateBranchModal = () => {
                           />
                         </FormControl_Shadcn_>
                         <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                          {isChecking && <Loader2 size={14} className="animate-spin" />}
+                          {isCheckingGHBranchValidity && (
+                            <Loader2 size={14} className="animate-spin" />
+                          )}
                         </div>
                       </div>
                     </FormItemLayout>
@@ -491,23 +491,25 @@ export const CreateBranchModal = () => {
                     <DollarSign className="text-info" size={20} strokeWidth={2} />
                   </figure>
                 </div>
-                <div className="flex flex-col gap-y-1">
-                  <p className="text-sm text-foreground">
-                    Branches are billed $
-                    {estimateComputeCost(projectDiskAttributes.size_gb, branchComputeSize)} per hour
-                  </p>
-                  <p className="text-sm text-foreground-light">
-                    {withData && branchComputeSize ? (
-                      <>
-                        The <code className="text-xs font-mono">{branchComputeSize}</code> compute
-                        size is automatically selected to match your production branch. You may
-                        downgrade after creation or pause the branch when not in use to save cost.{' '}
-                      </>
-                    ) : (
-                      <>This cost will continue for as long as the branch has not been removed.</>
-                    )}
-                  </p>
-                </div>
+                {!!computeSize && (
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-sm text-foreground">
+                      Branches are billed $
+                      {estimateComputeCost(projectDiskAttributes.size_gb, computeSize)} per hour
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      {withData && computeSize ? (
+                        <>
+                          The <code className="text-xs font-mono">{computeSize}</code> compute size
+                          is automatically selected to match your production branch. You may
+                          downgrade after creation or pause the branch when not in use to save cost.{' '}
+                        </>
+                      ) : (
+                        <>This cost will continue for as long as the branch has not been removed.</>
+                      )}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {!hasPitrEnabled && <BranchingPITRNotice />}
@@ -515,8 +517,8 @@ export const CreateBranchModal = () => {
 
             <DialogFooter className="justify-end gap-2" padding="medium">
               <Button
-                disabled={isCreating}
                 type="default"
+                disabled={isCreatingBranch}
                 onClick={() => setShowCreateBranchModal(false)}
               >
                 Cancel
@@ -524,7 +526,7 @@ export const CreateBranchModal = () => {
               <ButtonTooltip
                 form={formId}
                 disabled={isDisabled}
-                loading={isCreating}
+                loading={isCreatingBranch}
                 type="primary"
                 htmlType="submit"
                 tooltip={{
@@ -545,54 +547,4 @@ export const CreateBranchModal = () => {
       </DialogContent>
     </Dialog>
   )
-}
-
-// Ref: https://supabase.com/docs/guides/platform/compute-and-disk
-const maxDiskForCompute = new Map([
-  [10, instanceSizeSpecs.micro],
-  [50, instanceSizeSpecs.small],
-  [100, instanceSizeSpecs.medium],
-  [200, instanceSizeSpecs.large],
-  [500, instanceSizeSpecs.xlarge],
-  [1_000, instanceSizeSpecs['2xlarge']],
-  [2_000, instanceSizeSpecs['4xlarge']],
-  [4_000, instanceSizeSpecs['8xlarge']],
-  [6_000, instanceSizeSpecs['12xlarge']],
-  [10_000, instanceSizeSpecs['16xlarge']],
-])
-
-function estimateComputeCost(projectDiskSize: number, branchComputeSize?: DesiredInstanceSize) {
-  if (branchComputeSize) {
-    return instanceSizeSpecs[branchComputeSize].priceHourly
-  }
-  // Fallback to estimating based on volume size
-  for (const [disk, compute] of maxDiskForCompute) {
-    if (projectDiskSize <= disk) {
-      return compute.priceHourly
-    }
-  }
-  return instanceSizeSpecs['24xlarge'].priceHourly
-}
-
-function estimateDiskCost(disk: DiskAttributesData['attributes']) {
-  const diskType = disk.type as DiskType
-
-  const pricing = DISK_PRICING[diskType]
-  const includedGB = PLAN_DETAILS['pro'].includedDiskGB[diskType]
-  const priceSize = Math.max(disk.size_gb - includedGB, 0) * pricing.storage
-  const includedIOPS = DISK_LIMITS[diskType].includedIops
-  const priceIOPS = Math.max(disk.iops - includedIOPS, 0) * pricing.iops
-
-  const priceThroughput =
-    diskType === DiskType.GP3 && 'throughput_mbps' in disk
-      ? Math.max(disk.throughput_mbps - DISK_LIMITS[DiskType.GP3].includedThroughput, 0) *
-        DISK_PRICING[DiskType.GP3].throughput
-      : 0
-
-  return priceSize + priceIOPS + priceThroughput
-}
-
-function estimateRestoreTime(disk: DiskAttributesData['attributes']) {
-  // This is interpolated from real restore time
-  return (720 / 21000) * disk.size_gb + 3
 }
