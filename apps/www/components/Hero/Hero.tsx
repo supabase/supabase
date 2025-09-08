@@ -71,11 +71,15 @@ const Hero = () => {
 // return null if not banner is needed
 const HeroBanner = () => {
   return (
-    <Badge variant="brand" size="large">
+    <Badge
+      variant="brand"
+      size="large"
+      className="rounded-md flex-wrap justify-center sm:rounded-full w-full sm:w-fit"
+    >
       Looking to migrate to Supabase?{' '}
       <Link
         href="/events/migrating-from-firebase-mobbin"
-        className="inline-block px-2 text-foreground"
+        className="inline-block pr-2 sm:px-2 text-foreground hover:underline"
       >
         Sign up for our webinar
       </Link>{' '}
