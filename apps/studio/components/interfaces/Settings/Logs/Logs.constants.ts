@@ -357,6 +357,10 @@ export const SQL_FILTER_TEMPLATES: any = {
   pg_cron_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  etl_replication_logs: {
+    ..._SQL_FILTER_COMMON,
+    pipeline_id: (value: string | number) => `pipeline_id = ${value}`,
+  },
 }
 
 export enum LogsTableName {
