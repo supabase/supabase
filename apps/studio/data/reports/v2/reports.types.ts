@@ -22,6 +22,11 @@ export interface ReportDataProvider<FiltersType> {
 export interface ReportConfig<FiltersType = any> {
   id: string
   label: string
+  /**
+   * dataProvider should handle *fetching* and *transforming* the data to the components.
+   * Avoid transforming data inside components.
+   * Functions can be extracted to helpers for transforming the data, which will make it easier to test.
+   */
   dataProvider: ReportDataProvider<FiltersType>
   valuePrecision: number
   hide: boolean
