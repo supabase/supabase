@@ -19,10 +19,12 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { DiskAttributesData, useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { projectKeys } from 'data/projects/keys'
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -49,6 +51,13 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfraInstanceSize } from '../DiskManagement/DiskManagement.types'
+import {
+  DISK_LIMITS,
+  DISK_PRICING,
+  DiskType,
+  PLAN_DETAILS,
+} from '../DiskManagement/ui/DiskManagement.constants'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -100,10 +109,21 @@ export const CreateBranchModal = () => {
       enabled: showCreateBranchModal && !disableBackupsCheck,
     }
   )
+  const targetComputeSize = cloneBackups?.target_compute_size ?? 'micro'
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
   const noPhysicalBackups = cloneBackupsError?.message.startsWith(
     'Physical backups need to be enabled'
   )
+  const { data: disk } = useDiskAttributesQuery(
+    { projectRef },
+    {
+      enabled: showCreateBranchModal && !disableBackupsCheck,
+    }
+  )
+  const newDisk = {
+    ...(disk?.attributes ?? { type: 'gp3', iops: 0, throughput_mbps: 0 }),
+    size_gb: targetVolumeSizeGb,
+  }
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -209,6 +229,7 @@ export const CreateBranchModal = () => {
       projectRef,
       branchName: data.branchName,
       is_default: false,
+      desired_instance_size: targetComputeSize,
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
       ...(allowDataBranching ? { withData: data.withData } : {}),
     })
@@ -412,11 +433,15 @@ export const CreateBranchModal = () => {
                     <p className="text-sm text-foreground-light">
                       Since your target database volume size is{' '}
                       <code className="text-xs font-mono">{targetVolumeSizeGb} GB</code>, creating a
-                      data branch is estimated to take around{' '}
+                      data branch will take approximately{' '}
                       <code className="text-xs font-mono">
                         {Math.round((720 / 21000) * targetVolumeSizeGb) + 3} minutes
-                      </code>
-                      .
+                      </code>{' '}
+                      and costs{' '}
+                      <code className="text-xs font-mono">
+                        ${estimateDiskCost(newDisk).toFixed(2)}
+                      </code>{' '}
+                      per month.
                     </p>
                   </div>
                 </div>
@@ -462,9 +487,20 @@ export const CreateBranchModal = () => {
                   </figure>
                 </div>
                 <div className="flex flex-col gap-y-1">
-                  <p className="text-sm text-foreground">Branches are billed $0.01344 per hour</p>
+                  <p className="text-sm text-foreground">
+                    Branches are billed $
+                    {estimateComputeCost(disk?.attributes.size_gb ?? 0, targetComputeSize)} per hour
+                  </p>
                   <p className="text-sm text-foreground-light">
-                    This cost will continue for as long as the branch has not been removed.
+                    {withData && !['pico', 'nano', 'micro'].includes(targetComputeSize) ? (
+                      <>
+                        The <code className="text-xs font-mono">{targetComputeSize}</code> compute
+                        size is automatically selected to match your production branch. You may
+                        downgrade after creation or pause the branch when not in use to save cost.{' '}
+                      </>
+                    ) : (
+                      <>This cost will continue for as long as the branch has not been removed.</>
+                    )}
                   </p>
                 </div>
               </div>
@@ -504,4 +540,49 @@ export const CreateBranchModal = () => {
       </DialogContent>
     </Dialog>
   )
+}
+
+// Ref: https://supabase.com/docs/guides/platform/compute-and-disk
+const maxDiskForCompute = new Map([
+  [10, instanceSizeSpecs.micro],
+  [50, instanceSizeSpecs.small],
+  [100, instanceSizeSpecs.medium],
+  [200, instanceSizeSpecs.large],
+  [500, instanceSizeSpecs.xlarge],
+  [1_000, instanceSizeSpecs['2xlarge']],
+  [2_000, instanceSizeSpecs['4xlarge']],
+  [4_000, instanceSizeSpecs['8xlarge']],
+  [6_000, instanceSizeSpecs['12xlarge']],
+  [10_000, instanceSizeSpecs['16xlarge']],
+])
+
+function estimateComputeCost(oldDiskSize: number, newComputeSize: InfraInstanceSize) {
+  if (newComputeSize in instanceSizeSpecs) {
+    return instanceSizeSpecs[newComputeSize as DesiredInstanceSize].priceHourly
+  }
+  // Fallback to estimating based on volume size
+  for (const [disk, compute] of maxDiskForCompute) {
+    if (oldDiskSize <= disk) {
+      return compute.priceHourly
+    }
+  }
+  return instanceSizeSpecs['24xlarge'].priceHourly
+}
+
+function estimateDiskCost(disk: DiskAttributesData['attributes']) {
+  const diskType = disk.type as DiskType
+
+  const pricing = DISK_PRICING[diskType]
+  const includedGB = PLAN_DETAILS['pro'].includedDiskGB[diskType]
+  const priceSize = Math.max(disk.size_gb - includedGB, 0) * pricing.storage
+  const includedIOPS = DISK_LIMITS[diskType].includedIops
+  const priceIOPS = Math.max(disk.iops - includedIOPS, 0) * pricing.iops
+
+  const priceThroughput =
+    diskType === DiskType.GP3 && 'throughput_mbps' in disk
+      ? Math.max(disk.throughput_mbps - DISK_LIMITS[DiskType.GP3].includedThroughput, 0) *
+        DISK_PRICING[DiskType.GP3].throughput
+      : 0
+
+  return priceSize + priceIOPS + priceThroughput
 }
