@@ -13,13 +13,7 @@ import ReactFlow, {
 import dagre from '@dagrejs/dagre'
 import 'reactflow/dist/style.css'
 
-import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-  AccordionContent_Shadcn_ as AccordionContent,
-  cn,
-} from 'ui'
+import { cn } from 'ui'
 
 type ExplainPlanFlowProps = {
   json: string
