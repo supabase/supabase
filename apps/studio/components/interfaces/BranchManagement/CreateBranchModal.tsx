@@ -51,7 +51,6 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { InfraInstanceSize } from '../DiskManagement/DiskManagement.types'
 import {
   DISK_LIMITS,
   DISK_PRICING,
@@ -98,9 +97,10 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
+  // Use branch compute size returned from backend
   const {
     data: cloneBackups,
-    error: cloneBackupsError,
+    isError: isErrorCloneBackups,
     isLoading: isLoadingCloneBackups,
   } = useCloneBackupsQuery(
     { projectRef },
@@ -109,20 +109,29 @@ export const CreateBranchModal = () => {
       enabled: showCreateBranchModal && !disableBackupsCheck,
     }
   )
-  const targetComputeSize = cloneBackups?.target_compute_size ?? 'micro'
-  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
-  const noPhysicalBackups = cloneBackupsError?.message.startsWith(
-    'Physical backups need to be enabled'
-  )
+  const noPhysicalBackups = isErrorCloneBackups || isLoadingCloneBackups
+  // Since min compute size for paid projects is micro, let backend suggest branch compute size
+  const branchComputeSize =
+    cloneBackups && !['pico', 'nano', 'micro'].includes(cloneBackups.target_compute_size)
+      ? (cloneBackups.target_compute_size as DesiredInstanceSize)
+      : undefined
+  // Ignore failures fetching disk attributes since it only affects cost estimation
   const { data: disk } = useDiskAttributesQuery(
     { projectRef },
     {
       enabled: showCreateBranchModal && !disableBackupsCheck,
     }
   )
-  const newDisk = {
-    ...(disk?.attributes ?? { type: 'gp3', iops: 0, throughput_mbps: 0 }),
-    size_gb: targetVolumeSizeGb,
+  const projectDiskAttributes = disk?.attributes ?? {
+    type: 'gp3',
+    size_gb: 0,
+    iops: 0,
+    throughput_mbps: 0,
+  }
+  // The branch disk is oversized to include backup files
+  const branchDiskAttributes = {
+    ...projectDiskAttributes,
+    ...(cloneBackups ? { size_gb: cloneBackups.target_volume_size_gb } : {}),
   }
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -213,11 +222,9 @@ export const CreateBranchModal = () => {
   })
   const withData = form.watch('withData')
 
-  const canSubmit = !isCreating && !isChecking
   const isDisabled =
     !isSuccessConnections ||
     isCreating ||
-    !canSubmit ||
     isChecking ||
     (!gitlessBranching && !githubConnection) ||
     promptProPlanUpgrade ||
@@ -229,7 +236,7 @@ export const CreateBranchModal = () => {
       projectRef,
       branchName: data.branchName,
       is_default: false,
-      desired_instance_size: targetComputeSize,
+      desired_instance_size: branchComputeSize,
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
       ...(allowDataBranching ? { withData: data.withData } : {}),
     })
@@ -384,7 +391,7 @@ export const CreateBranchModal = () => {
                       label={
                         <>
                           <Label className="mr-2">Include data</Label>
-                          {!disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups) && (
+                          {noPhysicalBackups && (
                             <Badge variant="warning" size="small">
                               Requires PITR
                             </Badge>
@@ -397,9 +404,7 @@ export const CreateBranchModal = () => {
                     >
                       <FormControl_Shadcn_>
                         <Switch
-                          disabled={
-                            !disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups)
-                          }
+                          disabled={noPhysicalBackups}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -432,14 +437,14 @@ export const CreateBranchModal = () => {
                     </p>
                     <p className="text-sm text-foreground-light">
                       Since your target database volume size is{' '}
-                      <code className="text-xs font-mono">{targetVolumeSizeGb} GB</code>, creating a
-                      data branch will take approximately{' '}
+                      <code className="text-xs font-mono">{branchDiskAttributes.size_gb} GB</code>,
+                      creating a data branch will take approximately{' '}
                       <code className="text-xs font-mono">
-                        {Math.round((720 / 21000) * targetVolumeSizeGb) + 3} minutes
+                        {estimateRestoreTime(branchDiskAttributes).toFixed()} minutes
                       </code>{' '}
                       and costs{' '}
                       <code className="text-xs font-mono">
-                        ${estimateDiskCost(newDisk).toFixed(2)}
+                        ${estimateDiskCost(branchDiskAttributes).toFixed(2)}
                       </code>{' '}
                       per month.
                     </p>
@@ -489,12 +494,12 @@ export const CreateBranchModal = () => {
                 <div className="flex flex-col gap-y-1">
                   <p className="text-sm text-foreground">
                     Branches are billed $
-                    {estimateComputeCost(disk?.attributes.size_gb ?? 0, targetComputeSize)} per hour
+                    {estimateComputeCost(projectDiskAttributes.size_gb, branchComputeSize)} per hour
                   </p>
                   <p className="text-sm text-foreground-light">
-                    {withData && !['pico', 'nano', 'micro'].includes(targetComputeSize) ? (
+                    {withData && branchComputeSize ? (
                       <>
-                        The <code className="text-xs font-mono">{targetComputeSize}</code> compute
+                        The <code className="text-xs font-mono">{branchComputeSize}</code> compute
                         size is automatically selected to match your production branch. You may
                         downgrade after creation or pause the branch when not in use to save cost.{' '}
                       </>
@@ -556,13 +561,13 @@ const maxDiskForCompute = new Map([
   [10_000, instanceSizeSpecs['16xlarge']],
 ])
 
-function estimateComputeCost(oldDiskSize: number, newComputeSize: InfraInstanceSize) {
-  if (newComputeSize in instanceSizeSpecs) {
-    return instanceSizeSpecs[newComputeSize as DesiredInstanceSize].priceHourly
+function estimateComputeCost(projectDiskSize: number, branchComputeSize?: DesiredInstanceSize) {
+  if (branchComputeSize) {
+    return instanceSizeSpecs[branchComputeSize].priceHourly
   }
   // Fallback to estimating based on volume size
   for (const [disk, compute] of maxDiskForCompute) {
-    if (oldDiskSize <= disk) {
+    if (projectDiskSize <= disk) {
       return compute.priceHourly
     }
   }
@@ -585,4 +590,9 @@ function estimateDiskCost(disk: DiskAttributesData['attributes']) {
       : 0
 
   return priceSize + priceIOPS + priceThroughput
+}
+
+function estimateRestoreTime(disk: DiskAttributesData['attributes']) {
+  // This is interpolated from real restore time
+  return (720 / 21000) * disk.size_gb + 3
 }
