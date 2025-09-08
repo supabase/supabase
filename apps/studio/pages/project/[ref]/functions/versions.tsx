@@ -2,7 +2,12 @@ import { EdgeFunctionVersionsList } from 'components/interfaces/Functions/EdgeFu
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+  ScaffoldSection,
+} from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { Download, FileArchive, Send } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
@@ -19,7 +24,16 @@ const VersionsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldSection isFullWidth>
       <div className="px-6">
-        <EdgeFunctionVersionsList />
+        <ScaffoldContainer className="max-w-full px-0 @lg:px-0 @xl:px-0">
+          <ScaffoldHeader className="py-0 flex flex-row items-center justify-between">
+            <ScaffoldSectionTitle className="mb-0">Deployments</ScaffoldSectionTitle>
+          </ScaffoldHeader>
+          <ScaffoldSection>
+            <div className="col-span-12">
+              <EdgeFunctionVersionsList />
+            </div>
+          </ScaffoldSection>
+        </ScaffoldContainer>
       </div>
     </ScaffoldSection>
   )
