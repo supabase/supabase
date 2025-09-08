@@ -162,16 +162,18 @@ const Content = (props) => {
             <div key={x.name}>
               {x.items && x.items.length > 0 ? (
                 <div className="flex flex-col gap-2.5">
-                  {x.items.map((subItem, subItemIndex) => {
-                    return (
-                      <ContentAccordionLink
-                        key={subItem.name}
-                        subItem={subItem}
-                        subItemIndex={subItemIndex}
-                        parent={x}
-                      />
-                    )
-                  })}
+                  {x.items
+                    .filter((item) => item.enabled !== false)
+                    .map((subItem, subItemIndex) => {
+                      return (
+                        <ContentAccordionLink
+                          key={subItem.name}
+                          subItem={subItem}
+                          subItemIndex={subItemIndex}
+                          parent={x}
+                        />
+                      )
+                    })}
                 </div>
               ) : x.url ? (
                 <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
