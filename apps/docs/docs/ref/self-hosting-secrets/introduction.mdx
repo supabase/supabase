@@ -1,0 +1,62 @@
+---
+id: secrets
+title: Secrets
+hideTitle: true
+---
+
+<div className="flex items-start gap-6 not-prose" id="secrets">
+  <div className="flex flex-col gap-2">
+    <h1 className="text-3xl text-foreground m-0">Secrets & Environment Variables</h1>
+  </div>
+</div>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    This page covers the required **secrets** and environment variables when self-hosting Supabase.  
+    These values are critical for security and proper functioning of your deployment.
+
+    ---
+
+    ## `SECRET_KEY_BASE`
+
+    `SECRET_KEY_BASE` is used to sign and encrypt sensitive data (such as session cookies).  
+    It must be **long, random, and kept secret**.
+
+    ### Generate a key
+
+    You can generate a secure key using:
+
+    ```bash
+    openssl rand -hex 64
+    ```
+
+    **Example output:**
+    ```
+    3bKhs29sdfjskljfslkfj... (64 chars)
+    ```
+
+    ### Where to put it
+
+    Update your `.env` (or `.env.example` if you’re making a template) with:
+
+    ```
+    SECRET_KEY_BASE=your-generated-secret
+    ```
+
+    ### Can it be changed later?
+
+    You can rotate `SECRET_KEY_BASE` by updating the value in your `.env` file and restarting the containers.  
+    However, doing so will invalidate existing sessions, so all users will need to log in again.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ### Additional resources
+
+    - [Rails secret key base docs](https://guides.rubyonrails.org/security.html#environmental-security)
+    - [OpenSSL man page](https://www.openssl.org/docs/manmaster/man1/openssl-rand.html)
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
