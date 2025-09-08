@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-query'
 import { queryInsightsKeys } from './keys'
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 
 export type InsightsMetric = {
   timestamp: string
@@ -20,23 +20,6 @@ export type InsightsMetric = {
   p95?: number
   p99?: number
   p99_9?: number
-}
-
-export type InsightsMetrics = {
-  queries: {
-    total: number
-    total_time: number
-    avg_time: number
-    total_rows: number
-  }
-  cache: {
-    hit_ratio: number
-    hits: number
-    misses: number
-  }
-  errors: {
-    total: number
-  }
 }
 
 const getAllMetricsSql = (startTime: string, endTime: string) => {
@@ -248,44 +231,4 @@ export function useInsightsPrefetchQuery(
       })
     })
   }, [projectRef, startTime, endTime, queryClient])
-}
-
-export function useInsightsCacheManager(
-  projectRef: string | undefined,
-  startTime: string,
-  endTime: string
-) {
-  const queryClient = useQueryClient()
-
-  const refreshAllData = useCallback(async () => {
-    if (!projectRef) return
-
-    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits', 'issues']
-
-    await Promise.all([
-      ...metricTypes.map((metric) =>
-        queryClient.invalidateQueries({
-          queryKey: queryInsightsKeys.metrics(projectRef, metric, startTime, endTime),
-        })
-      ),
-    ])
-  }, [projectRef, startTime, endTime, queryClient])
-
-  const isAnyDataStale = useCallback(() => {
-    if (!projectRef) return false
-
-    const metricTypes = ['query_latency', 'rows_read', 'calls', 'cache_hits', 'issues']
-
-    return metricTypes.some((metric) => {
-      const query = queryClient.getQueryData(
-        queryInsightsKeys.metrics(projectRef, metric, startTime, endTime)
-      )
-      return !query
-    })
-  }, [projectRef, startTime, endTime, queryClient])
-
-  return {
-    refreshAllData,
-    isAnyDataStale,
-  }
 }
