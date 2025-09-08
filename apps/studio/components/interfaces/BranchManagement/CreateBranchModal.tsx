@@ -46,9 +46,6 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -92,7 +89,11 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
-  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery(
+  const {
+    data: cloneBackups,
+    error: cloneBackupsError,
+    isLoading: isLoadingCloneBackups,
+  } = useCloneBackupsQuery(
     { projectRef },
     {
       // [Joshen] Only trigger this request when the modal is opened
@@ -362,7 +363,7 @@ export const CreateBranchModal = () => {
                       label={
                         <>
                           <Label className="mr-2">Include data</Label>
-                          {!disableBackupsCheck && noPhysicalBackups && (
+                          {!disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups) && (
                             <Badge variant="warning" size="small">
                               Requires PITR
                             </Badge>
@@ -370,11 +371,14 @@ export const CreateBranchModal = () => {
                         </>
                       }
                       layout="flex-row-reverse"
+                      className="[&>div>label]:mb-1"
                       description="Clone production data into this branch"
                     >
                       <FormControl_Shadcn_>
                         <Switch
-                          disabled={!disableBackupsCheck && noPhysicalBackups}
+                          disabled={
+                            !disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups)
+                          }
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
