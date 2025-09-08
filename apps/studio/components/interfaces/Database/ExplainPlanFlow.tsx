@@ -144,21 +144,6 @@ const buildGraphFromPlan = (
  */
 const hiddenNodeConnector = 'opacity-0'
 const PlanNode = ({ data }: { data: PlanNodeData }) => {
-  const AccordionHeader = (
-    <div className="w-full flex items-center justify-between gap-2">
-      <div className="font-medium text-foreground truncate max-w-[160px]">{data.label}</div>
-      <div className="opacity-70 flex gap-2">
-        {(data.startupCost !== undefined || data.totalCost !== undefined) && (
-          <span>
-            cost {data.startupCost ?? '-'}..{data.totalCost ?? '-'}
-          </span>
-        )}
-        {data.planRows !== undefined && <span>rows {data.planRows}</span>}
-        {data.planWidth !== undefined && <span>width {data.planWidth}</span>}
-      </div>
-    </div>
-  )
-
   const itemHeight = 'h-[22px]'
 
   return (
@@ -249,38 +234,6 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
           </li>
         )}
       </ul>
-      <Handle type="source" position={Position.Bottom} className={hiddenNodeConnector} />
-    </div>
-  )
-
-  return (
-    <div className="text-[0.55rem] border-[0.5px] rounded bg-alternative overflow--xauto">
-      <Handle type="target" position={Position.Top} className={hiddenNodeConnector} />
-      <Accordion type="single" collapsible>
-        <AccordionItem value="metrics" className="border-none">
-          <AccordionTrigger className="py-2 px-2 hover:no-underline">
-            {AccordionHeader}
-          </AccordionTrigger>
-          <AccordionContent contentClassName="pb-0">
-            <ul>
-              {(data.relationName || data.alias) && (
-                <li className="bg-surface-100 px-2 py-4 border-t-[0.5px] hover:bg-scale-500 transition-colors cursor-default h-[22px] flex items-center justify-between gap-1">
-                  <span className="text-foreground-light">Relation:</span>
-                  <div className="flex items-center gap-x-1">
-                    <span>{data.relationName ?? ''}</span>
-                    <span className="opacity-70">{data.alias ? ` (${data.alias})` : ''}</span>
-                  </div>
-                </li>
-              )}
-              {data.filter && (
-                <li className="break-words bg-surface-100 px-2 py-4 border-t-[0.5px] hover:bg-scale-500 transition-colors cursor-default min-h-[22px] flex items-center justify-between gap-1">
-                  <span className="text-foreground-light">Filter:</span> {data.filter}
-                </li>
-              )}
-            </ul>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
       <Handle type="source" position={Position.Bottom} className={hiddenNodeConnector} />
     </div>
   )
