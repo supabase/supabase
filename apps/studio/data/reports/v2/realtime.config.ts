@@ -82,82 +82,28 @@ export const realtimeReports = ({
     titleTooltip: '',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     dataProvider: async () => {
-      const [channelEvents, dbEvents, presenceEvents] = await Promise.all([
-        runInfraMonitoringQuery(
-          projectRef,
-          'realtime_channel_events',
-          startDate,
-          endDate,
-          interval,
-          databaseIdentifier
-        ),
-        runInfraMonitoringQuery(
-          projectRef,
-          'realtime_channel_db_events',
-          startDate,
-          endDate,
-          interval,
-          databaseIdentifier
-        ),
-        runInfraMonitoringQuery(
-          projectRef,
-          'realtime_channel_presence_events',
-          startDate,
-          endDate,
-          interval,
-          databaseIdentifier
-        ),
-      ])
+      const { data } = await runInfraMonitoringQuery(
+        projectRef,
+        'realtime_channel_events',
+        startDate,
+        endDate,
+        interval,
+        databaseIdentifier
+      )
 
-      // Combine the data from all three queries
-      const combinedData = new Map()
-
-      // Process channel events
-      channelEvents?.data?.forEach((point: any) => {
-        const key = point.period_start
-        if (!combinedData.has(key)) {
-          combinedData.set(key, { timestamp: point.period_start })
-        }
-        combinedData.get(key).realtime_channel_events = point.realtime_channel_events
-      })
-
-      // Process DB events
-      dbEvents?.data?.forEach((point: any) => {
-        const key = point.period_start
-        if (!combinedData.has(key)) {
-          combinedData.set(key, { timestamp: point.period_start })
-        }
-        combinedData.get(key).realtime_channel_db_events = point.realtime_channel_db_events
-      })
-
-      // Process presence events
-      presenceEvents?.data?.forEach((point: any) => {
-        const key = point.period_start
-        if (!combinedData.has(key)) {
-          combinedData.set(key, { timestamp: point.period_start })
-        }
-        combinedData.get(key).realtime_channel_presence_events =
-          point.realtime_channel_presence_events
-      })
-
-      const data = Array.from(combinedData.values()).sort((a, b) => a.timestamp - b.timestamp)
+      const transformedData = data?.map((p) => ({
+        ...p,
+        realtime_channel_events: Number(p.realtime_channel_events) || 0,
+      }))
 
       const attributes = [
         {
           attribute: 'realtime_channel_events',
-          label: 'Broadcast',
-        },
-        {
-          attribute: 'realtime_channel_db_events',
-          label: 'Postgres Changes',
-        },
-        {
-          attribute: 'realtime_channel_presence_events',
-          label: 'Presence',
+          label: 'Events',
         },
       ]
 
-      return { data, attributes }
+      return { data: transformedData || [], attributes }
     },
   },
   {
