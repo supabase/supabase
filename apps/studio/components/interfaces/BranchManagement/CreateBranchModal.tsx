@@ -94,11 +94,7 @@ export const CreateBranchModal = () => {
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
-  const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
-  const computeAddon = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
-  const computeSize = !!computeAddon
-    ? (computeAddon.variant.identifier.split('ci_')[1] as DesiredInstanceSize)
-    : undefined
+  const { data: addons } = useProjectAddonsQuery({ projectRef })
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
@@ -113,6 +109,11 @@ export const CreateBranchModal = () => {
     { enabled: showCreateBranchModal && !disableBackupsCheck }
   )
   const noPhysicalBackups = isErrorCloneBackups || isLoadingCloneBackups
+  // Since min compute size for paid projects is micro, let backend suggest branch compute size
+  const branchComputeSize =
+    cloneBackups && !['pico', 'nano', 'micro'].includes(cloneBackups.target_compute_size)
+      ? (cloneBackups.target_compute_size as DesiredInstanceSize)
+      : undefined
 
   // Ignore failures fetching disk attributes since it only affects cost estimation
   const { data: disk } = useDiskAttributesQuery(
@@ -221,7 +222,6 @@ export const CreateBranchModal = () => {
 
   const isDisabled =
     !canCreateBranch ||
-    !isSuccessAddons ||
     !isSuccessConnections ||
     promptProPlanUpgrade ||
     (!gitlessBranching && !githubConnection) ||
@@ -234,7 +234,7 @@ export const CreateBranchModal = () => {
       projectRef,
       branchName: data.branchName,
       is_default: false,
-      desired_instance_size: computeSize,
+      desired_instance_size: branchComputeSize,
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
       ...(allowDataBranching ? { withData: data.withData } : {}),
     })
@@ -491,17 +491,18 @@ export const CreateBranchModal = () => {
                     <DollarSign className="text-info" size={20} strokeWidth={2} />
                   </figure>
                 </div>
-                {!!computeSize && (
+                {
                   <div className="flex flex-col gap-y-1">
                     <p className="text-sm text-foreground">
                       Branches are billed $
-                      {estimateComputeCost(projectDiskAttributes.size_gb, computeSize)} per hour
+                      {estimateComputeCost(projectDiskAttributes.size_gb, branchComputeSize)} per
+                      hour
                     </p>
                     <p className="text-sm text-foreground-light">
-                      {withData && computeSize ? (
+                      {withData && branchComputeSize ? (
                         <>
-                          The <code className="text-xs font-mono">{computeSize}</code> compute size
-                          is automatically selected to match your production branch. You may
+                          The <code className="text-xs font-mono">{branchComputeSize}</code> compute
+                          size is automatically selected to match your production branch. You may
                           downgrade after creation or pause the branch when not in use to save cost.{' '}
                         </>
                       ) : (
@@ -509,7 +510,7 @@ export const CreateBranchModal = () => {
                       )}
                     </p>
                   </div>
-                )}
+                }
               </div>
 
               {!hasPitrEnabled && <BranchingPITRNotice />}
