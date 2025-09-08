@@ -120,7 +120,7 @@ tmux a -t migration || tmux new -s migration
 | 500 GB - 1 TB | XL compute | 16 vCPUs, 32 GB RAM, NVMe | Upgrade compute before restore |
 | > 1 TB | Custom | Custom | [Contact support](https://supabase.com/dashboard/support/new) first |
 
-Also, temporarily increase disk size via Settings → Database → Disk for large imports.
+Also, you can temporarily increase compute size and/or disk IOPS and throughput via Settings → Compute and Disk if you want faster database restore (you can use larger -j for pg_restore if you do so).
 
 ### Step 3: Create Database Dump
 
