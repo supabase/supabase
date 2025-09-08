@@ -46,9 +46,6 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -92,7 +89,11 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
-  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery(
+  const {
+    data: cloneBackups,
+    error: cloneBackupsError,
+    isLoading: isLoadingCloneBackups,
+  } = useCloneBackupsQuery(
     { projectRef },
     {
       // [Joshen] Only trigger this request when the modal is opened
@@ -359,26 +360,29 @@ export const CreateBranchModal = () => {
                   name="withData"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Include data"
+                      label={
+                        <>
+                          <Label className="mr-2">Include data</Label>
+                          {!disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups) && (
+                            <Badge variant="warning" size="small">
+                              Requires PITR
+                            </Badge>
+                          )}
+                        </>
+                      }
                       layout="flex-row-reverse"
+                      className="[&>div>label]:mb-1"
                       description="Clone production data into this branch"
                     >
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <FormControl_Shadcn_>
-                            <Switch
-                              disabled={!disableBackupsCheck && noPhysicalBackups}
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!disableBackupsCheck && noPhysicalBackups && (
-                          <TooltipContent side="bottom">
-                            PITR is required for the project to clone data into the branch
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
+                      <FormControl_Shadcn_>
+                        <Switch
+                          disabled={
+                            !disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups)
+                          }
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
