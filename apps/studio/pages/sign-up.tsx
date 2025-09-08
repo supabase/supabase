@@ -14,7 +14,7 @@ const SignUpPage: NextPageWithLayout = () => {
   } = useIsFeatureEnabled(['dashboard_auth:sign_up', 'dashboard_auth:sign_in_with_github'])
 
   if (!signUpEnabled) {
-    return <UnknownInterface urlBack="/sign-in" />
+    return <UnknownInterface fullHeight={false} urlBack="/sign-in" />
   }
 
   return (

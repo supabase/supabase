@@ -8,7 +8,7 @@ const SignInSSOPage: NextPageWithLayout = () => {
   const signInWithSSOEnabled = useIsFeatureEnabled('dashboard_auth:sign_in_with_sso')
 
   if (!signInWithSSOEnabled) {
-    return <UnknownInterface urlBack="/sign-in" />
+    return <UnknownInterface fullHeight={false} urlBack="/sign-in" />
   }
 
   return (
