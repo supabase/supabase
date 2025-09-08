@@ -82,7 +82,8 @@ const RealtimeUsage = () => {
   const { plan: orgPlan } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
-  const chartSyncId = `realtime-${ref}`
+  const chartSyncId = `realtime-report`
+
   useChartHoverState(chartSyncId)
 
   const reportConfig = useMemo(() => {

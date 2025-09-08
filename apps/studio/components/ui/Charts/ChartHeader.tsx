@@ -72,9 +72,7 @@ export const ChartHeader = ({
   sql,
   showNewBadge,
 }: ChartHeaderProps) => {
-  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
-    syncId || 'default'
-  )
+  const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
   const { ref } = useParams()
@@ -100,6 +98,7 @@ export const ChartHeader = ({
   useEffect(() => {
     if (syncId && hoveredIndex !== null && isHovered && data && xAxisKey && yAxisKey) {
       const activeDataPoint = data[hoveredIndex]
+
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
@@ -123,7 +122,7 @@ export const ChartHeader = ({
                 attributes.some((attr) => attr.attribute === key && attr.enabled !== false)
               )
             })
-            .reduce((sum, [_, value]) => sum + (value as number), 0)
+            .reduce((sum, [_, value]) => sum + Number(value), 0)
 
           newValue = totalValue
         }
