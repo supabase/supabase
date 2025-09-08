@@ -16,22 +16,17 @@ import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFi
 import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 
 type EdgeFunctionReportFilters = {
-  status_code?: NumericFilter
-  region?: SelectFilters
-  execution_time?: NumericFilter
-  functions?: SelectFilters
+  status_code: NumericFilter | null
+  region: SelectFilters
+  execution_time: NumericFilter | null
+  functions: SelectFilters
 }
 
 export function filterToWhereClause(filters?: EdgeFunctionReportFilters): string {
   const whereClauses: string[] = []
 
-  if (filters?.functions) {
-    const selectedFunctions = Object.keys(filters.functions).filter(
-      (key) => filters.functions![key]
-    )
-    if (selectedFunctions.length > 0) {
-      whereClauses.push(`function_id IN (${selectedFunctions.map((id) => `'${id}'`).join(',')})`)
-    }
+  if (filters?.functions && filters.functions.length > 0) {
+    whereClauses.push(`function_id IN (${filters.functions.map((id) => `'${id}'`).join(',')})`)
   }
 
   if (filters?.status_code) {
@@ -40,13 +35,10 @@ export function filterToWhereClause(filters?: EdgeFunctionReportFilters): string
     )
   }
 
-  if (filters?.region) {
-    const selectedRegions = Object.keys(filters.region).filter((key) => filters.region![key])
-    if (selectedRegions.length > 0) {
-      whereClauses.push(
-        `h.x_sb_edge_region IN (${selectedRegions.map((region) => `'${region}'`).join(',')})`
-      )
-    }
+  if (filters?.region && filters.region.length > 0) {
+    whereClauses.push(
+      `h.x_sb_edge_region IN (${filters.region.map((region) => `'${region}'`).join(',')})`
+    )
   }
 
   if (filters?.execution_time) {

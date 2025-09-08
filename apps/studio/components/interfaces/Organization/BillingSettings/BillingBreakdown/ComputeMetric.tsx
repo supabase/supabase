@@ -3,20 +3,27 @@ import Link from 'next/link'
 import { ComputeUsageMetric, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { formatCurrency } from 'lib/helpers'
+import { ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { formatUsage } from '../helpers'
 import { Metric } from './BillingBreakdown.constants'
-import { ChevronRight } from 'lucide-react'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 export interface ComputeMetricProps {
   slug?: string
   metric: Metric
   usage: OrgUsageResponse
   relativeToSubscription: boolean
+  className?: string
 }
 
-const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeMetricProps) => {
+export const ComputeMetric = ({
+  slug,
+  metric,
+  usage,
+  relativeToSubscription,
+  className,
+}: ComputeMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
 
   const usageLabel = useMemo(() => {
@@ -37,8 +44,8 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
 
   return (
     <HoverCard openDelay={50} closeDelay={200}>
-      <HoverCardTrigger>
-        <div>
+      <HoverCardTrigger asChild>
+        <div className={className}>
           <Link href={`/org/${slug}/usage#${metric.anchor}`}>
             <div className="group flex items-center space-x-2">
               <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
@@ -55,7 +62,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
           ) : null}
         </div>
       </HoverCardTrigger>
-      <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
+      <HoverCardContent side="bottom" align="end" className="w-[500px]" animate="slide-in">
         <div className="text-sm text-foreground space-y-2">
           <p className="font-medium" translate="no">
             {usageMeta?.unit_price_desc}
@@ -126,5 +133,3 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
     </HoverCard>
   )
 }
-
-export default ComputeMetric

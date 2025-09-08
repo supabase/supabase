@@ -46,9 +46,6 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -63,6 +60,9 @@ export const CreateBranchModal = () => {
 
   const gitlessBranching = useIsBranching2Enabled()
   const allowDataBranching = useFlag('allowDataBranching')
+  // [Joshen] This is meant to be short lived while we're figuring out how to control
+  // requests to this endpoint. Kill switch in case we need to stop the requests
+  const disableBackupsCheck = useFlag('disableBackupsCheckInCreatebranchmodal')
 
   const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
@@ -89,7 +89,17 @@ export const CreateBranchModal = () => {
     useCheckGithubBranchValidity({
       onError: () => {},
     })
-  const { data: cloneBackups, error: cloneBackupsError } = useCloneBackupsQuery({ projectRef })
+  const {
+    data: cloneBackups,
+    error: cloneBackupsError,
+    isLoading: isLoadingCloneBackups,
+  } = useCloneBackupsQuery(
+    { projectRef },
+    {
+      // [Joshen] Only trigger this request when the modal is opened
+      enabled: showCreateBranchModal && !disableBackupsCheck,
+    }
+  )
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
   const noPhysicalBackups = cloneBackupsError?.message.startsWith(
     'Physical backups need to be enabled'
@@ -350,26 +360,29 @@ export const CreateBranchModal = () => {
                   name="withData"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Include data"
+                      label={
+                        <>
+                          <Label className="mr-2">Include data</Label>
+                          {!disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups) && (
+                            <Badge variant="warning" size="small">
+                              Requires PITR
+                            </Badge>
+                          )}
+                        </>
+                      }
                       layout="flex-row-reverse"
+                      className="[&>div>label]:mb-1"
                       description="Clone production data into this branch"
                     >
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <FormControl_Shadcn_>
-                            <Switch
-                              disabled={noPhysicalBackups}
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {noPhysicalBackups && (
-                          <TooltipContent side="bottom">
-                            PITR is required for the project to clone data into the branch
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
+                      <FormControl_Shadcn_>
+                        <Switch
+                          disabled={
+                            !disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups)
+                          }
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
