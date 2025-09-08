@@ -33,9 +33,9 @@ Here is the full list of error codes and their descriptions:
 | `NoSuchUpload`              | The specified upload does not exist.                            | 404          | The upload ID provided might not exists or the Upload was previously aborted                                                                                                                          |
 | `InvalidJWT`                | The provided JWT (JSON Web Token) is invalid.                   | 401          | The JWT provided might be expired or malformed, provide a valid JWT                                                                                                                                   |
 | `InvalidRequest`            | The request is not properly formed.                             | 400          | Review the request parameters and structure, ensure they meet the API's requirements, the error message will provide more details                                                                     |
-| `TenantNotFound`            | The specified tenant does not exist.                            | 404          | The Storage service had issues while provisioning, [Contact Support](https://supabase.com/dashboard/support/new)                                                                                      |
-| `EntityTooLarge`            | The entity being uploaded is too large.                         | 413          | Verify the max-file-limit is equal or higher to the resource you are trying to upload, you can change this value on the [Project Settings](https://supabase.com/dashboard/project/_/storage/settings) |
-| `InternalError`             | An internal server error occurred.                              | 500          | Investigate server logs to identify the cause of the internal error. If you think it's a Storage error [Contact Support](https://supabase.com/dashboard/support/new)                                  |
+| `TenantNotFound`            | The specified tenant does not exist.                            | 404          | The Storage service had issues while provisioning, [Contact Support](/dashboard/support/new)                                                                                      |
+| `EntityTooLarge`            | The entity being uploaded is too large.                         | 413          | Verify the max-file-limit is equal or higher to the resource you are trying to upload, you can change this value on the [Project Settings](/dashboard/project/_/storage/settings) |
+| `InternalError`             | An internal server error occurred.                              | 500          | Investigate server logs to identify the cause of the internal error. If you think it's a Storage error [Contact Support](/dashboard/support/new)                                  |
 | `ResourceAlreadyExists`     | The specified resource already exists.                          | 409          | Use a different name or identifier for the resource to avoid conflicts. Use `x-upsert:true` header to overwrite the resource.                                                                         |
 | `InvalidBucketName`         | The specified bucket name is invalid.                           | 400          | Ensure the bucket name follows the naming conventions and does not contain invalid characters.                                                                                                        |
 | `InvalidKey`                | The specified key is invalid.                                   | 400          | Verify the key name and ensure it follows the naming conventions.                                                                                                                                     |
@@ -54,7 +54,7 @@ Here is the full list of error codes and their descriptions:
 | `MissingParameter`          | A required parameter is missing in the request.                 | 400          | Provide all required parameters in the request to fulfill the API's requirements. The message field will contain more details                                                                         |
 | `InvalidUploadSignature`    | The provided upload signature is invalid.                       | 403          | The `MultiPartUpload` record was altered while the upload was ongoing, the signature do not match. Do not alter the upload record                                                                     |
 | `LockTimeout`               | Timeout occurred while waiting for a lock.                      | 423          | The lock couldn't be acquired within the specified timeout. Wait and try the request again                                                                                                            |
-| `S3Error`                   | An error occurred related to Amazon S3.                         | -            | Refer to Amazon S3 documentation or [Contact Support](https://supabase.com/dashboard/support/new) for assistance with resolving the S3 error.                                                         |
+| `S3Error`                   | An error occurred related to Amazon S3.                         | -            | Refer to Amazon S3 documentation or [Contact Support](/dashboard/support/new) for assistance with resolving the S3 error.                                                         |
 | `S3InvalidAccessKeyId`      | The provided AWS access key ID is invalid.                      | 403          | Verify the AWS access key ID provided and ensure it is correct and active.                                                                                                                            |
 | `S3MaximumCredentialsLimit` | The maximum number of credentials has been reached.             | 400          | The maximum limit of credentials is reached.                                                                                                                                                          |
 | `InvalidChecksum`           | The checksum of the entity does not match.                      | 400          | Recalculate the checksum of the entity and ensure it matches the one provided in the request.                                                                                                         |
@@ -106,7 +106,7 @@ This problem typically arises when a large number of clients are concurrently in
 **Resolution:**
 
 - Increase the max_clients limits of the pooler.
-- Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
+- Upgrade to a bigger project compute instance [here](/dashboard/project/_/settings/addons).
 
 ### 544 `database_timeout`
 
@@ -115,11 +115,11 @@ This problem arises when a high number of clients are concurrently using the Sto
 **Resolution:**
 
 - Increase the pool_size limits of the pooler.
-- Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
+- Upgrade to a bigger project compute instance [here](/dashboard/project/_/settings/addons).
 
 ### 500 `internal_server_error`
 
 This issue occurs where there is a unhandled error.
 **Resolution:**
 
-- File a support ticket to Storage team [here](https://supabase.com/dashboard/support/new)
+- File a support ticket to Storage team [here](/dashboard/support/new)
