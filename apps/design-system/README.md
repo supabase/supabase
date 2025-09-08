@@ -4,7 +4,9 @@ Design resources for building consistent user experiences at Supabase.
 
 ## Getting Started
 
-First, run the development server. From within this _design-system_ directory, run:
+First, make a copy of _.env.local.example_ and name it _env.local_. Then run the development server as described below.
+
+From within this _design-system_ directory, run:
 
 ```bash
 pnpm dev
@@ -18,4 +20,12 @@ pnpm dev:design-system
 
 Open [http://localhost:3003](http://localhost:3003) with your browser to see the result.
 
-You may also need to copy over environment variables. See _.env.local.example_ for details.
+### Watching for MDX changes
+
+If you would like to watch for changes to MDX files with hot reload, you can run the following command in a separate terminal shell:
+
+```
+pnpm content:dev
+```
+
+This runs Contentlayer concurrently and watches for any changes.
