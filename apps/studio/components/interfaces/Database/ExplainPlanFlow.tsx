@@ -151,25 +151,30 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
   )
 
   return (
-    <div className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded bg-alternative">
+    <div className="text-[0.55rem] border-[0.5px] rounded bg-alternative overflow--xauto">
       <Handle type="target" position={Position.Top} className={hiddenNodeConnector} />
       <Accordion type="single" collapsible>
         <AccordionItem value="metrics" className="border-none">
-          <AccordionTrigger className="py-1 px-0 hover:no-underline">
+          <AccordionTrigger className="py-2 px-2 hover:no-underline">
             {AccordionHeader}
           </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-1">
+          <AccordionContent contentClassName="pb-0">
+            <ul>
               {(data.relationName || data.alias) && (
-                <div className="opacity-70">
-                  {data.relationName ?? ''}
-                  {data.alias ? ` (${data.alias})` : ''}
-                </div>
+                <li className="bg-surface-100 px-2 py-4 border-t-[0.5px] hover:bg-scale-500 transition-colors cursor-default h-[22px] flex items-center justify-between gap-1">
+                  <span className="text-foreground-light">Relation:</span>
+                  <div className="flex items-center gap-x-1">
+                    <span>{data.relationName ?? ''}</span>
+                    <span className="opacity-70">{data.alias ? ` (${data.alias})` : ''}</span>
+                  </div>
+                </li>
               )}
               {data.filter && (
-                <div className="max-w-[220px] break-words opacity-70">{data.filter}</div>
+                <li className="break-words bg-surface-100 px-2 py-4 border-t-[0.5px] hover:bg-scale-500 transition-colors cursor-default min-h-[22px] flex items-center justify-between gap-1">
+                  <span className="text-foreground-light">Filter:</span> {data.filter}
+                </li>
               )}
-            </div>
+            </ul>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
