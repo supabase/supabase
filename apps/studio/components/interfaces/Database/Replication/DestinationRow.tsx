@@ -121,11 +121,7 @@ export const DestinationRow = ({
     setShowUpdateVersionModal(false)
 
     if (isActive) {
-      setRequestStatus(
-        pipeline.id,
-        PipelineStatusRequestStatus.RestartRequested,
-        statusName
-      )
+      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
 
       // Step 3: Restart the pipeline
       try {

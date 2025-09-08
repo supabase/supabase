@@ -144,7 +144,9 @@ export const RowMenu = ({
         <DropdownMenuTrigger asChild>
           <div className="relative">
             <Button type="default" className="px-1.5" icon={<MoreVertical />} />
-            {hasUpdate && <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />}
+            {hasUpdate && (
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />
+            )}
           </div>
         </DropdownMenuTrigger>
 
