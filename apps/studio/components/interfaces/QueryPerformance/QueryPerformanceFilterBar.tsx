@@ -1,7 +1,8 @@
 import { RefreshCw, Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useDebounce } from '@uidotdev/usehooks'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
@@ -31,6 +32,18 @@ export const QueryPerformanceFilterBar = ({
     search: parseAsString.withDefault(''),
   })
 
+  const onSearchQueryChange = (value: string) => {
+    setSearchParams({ search: value || '' })
+  }
+
+  const [inputValue, setInputValue] = useState(searchQuery)
+  const debouncedInputValue = useDebounce(inputValue, 500)
+
+  useEffect(() => {
+    onSearchQueryChange(debouncedInputValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedInputValue])
+
   const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
   const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
     roles: typeof defaultFilterRoles === 'string' ? [defaultFilterRoles] : defaultFilterRoles,
@@ -43,10 +56,6 @@ export const QueryPerformanceFilterBar = ({
     connectionString: project?.connectionString,
   })
   const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
-
-  const onSearchQueryChange = (value: string) => {
-    setSearchParams({ search: value || '' })
-  }
 
   const onFilterRolesChange = (roles: string[]) => {
     setFilters({ ...filters, roles })
@@ -61,8 +70,8 @@ export const QueryPerformanceFilterBar = ({
             size="tiny"
             autoComplete="off"
             icon={<Search size={12} />}
-            value={searchQuery}
-            onChange={(e: any) => onSearchQueryChange(e.target.value)}
+            value={inputValue}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
             name="keyword"
             id="keyword"
             placeholder="Filter by query"
