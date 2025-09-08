@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Button } from 'ui'
+import { Badge, Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
@@ -14,6 +14,8 @@ const Hero = () => {
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
               <div className="relative z-10 lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
+                <HeroBanner />
+
                 <div className="flex flex-col items-center">
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-foreground">Build in a weekend</span>
@@ -62,6 +64,23 @@ const Hero = () => {
         </div>
       </SectionContainer>
     </div>
+  )
+}
+
+// Useful to put a banner on the hero,
+// return null if not banner is needed
+const HeroBanner = () => {
+  return (
+    <Badge variant="brand" size="large">
+      Looking to migrate to Supabase?{' '}
+      <Link
+        href="/events/migrating-from-firebase-mobbin"
+        className="inline-block px-2 text-foreground"
+      >
+        Sign up for our webinar
+      </Link>{' '}
+      and learn how.
+    </Badge>
   )
 }
 
