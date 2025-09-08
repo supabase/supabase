@@ -1,6 +1,17 @@
-import { Badge, Button, cn } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  TableCell,
+  TableRow,
+} from 'ui'
 import type { EdgeFunctionDeployment } from './types'
 import { formatDateTime } from './utils'
+import { RotateCcw, MoreVertical } from 'lucide-react'
 
 export type DeployListItemProps = {
   deployment: EdgeFunctionDeployment
@@ -10,9 +21,9 @@ export type DeployListItemProps = {
 
 export const DeployListItem = ({ deployment, isRestoring, onRestore }: DeployListItemProps) => {
   return (
-    <tr className={cn('border-b last:border-b-0')}>
-      <td className="py-3 pr-2 align-top">{formatDateTime(deployment.created_at)}</td>
-      <td className="py-3 pr-2 align-top">
+    <TableRow className={cn('border-b last:border-b-0')}>
+      <TableCell>{formatDateTime(deployment.created_at)}</TableCell>
+      <TableCell>
         {deployment.status === 'ACTIVE' ? (
           <Badge variant="success" className="text-xs">
             Active
@@ -20,33 +31,34 @@ export const DeployListItem = ({ deployment, isRestoring, onRestore }: DeployLis
         ) : (
           <Badge className="text-xs">Inactive</Badge>
         )}
-      </td>
-      <td className="py-3 pr-2 align-top text-foreground-light">
-        {deployment.commit_message ?? ''}
-      </td>
-      <td className="py-3 pr-2 align-top">
-        {deployment.commit_hash ? (
-          <span className="font-mono text-foreground-light">#{deployment.commit_hash}</span>
-        ) : (
-          ''
-        )}
-      </td>
-      <td className="py-3 pr-2 align-top">
+      </TableCell>
+      <TableCell className="truncate">{deployment.commit_message ?? ''}</TableCell>
+      <TableCell>
+        {deployment.commit_hash ? <span className="font-mono">#{deployment.commit_hash}</span> : ''}
+      </TableCell>
+      <TableCell>
         {typeof deployment.size_kb === 'number' ? `${deployment.size_kb.toFixed(1)} KB` : ''}
-      </td>
-      <td className="py-3 pl-2 align-top text-right">
+      </TableCell>
+      <TableCell className="text-right">
         {deployment.status !== 'ACTIVE' && (
-          <Button
-            type="default"
-            size="tiny"
-            disabled={isRestoring}
-            aria-label={`Restore version ${deployment.version}`}
-            onClick={() => onRestore(deployment)}
-          >
-            Restore
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label={`Actions for version ${deployment.version}`}
+                type="default"
+                className="px-1"
+                icon={<MoreVertical />}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="left" className="w-40">
+              <DropdownMenuItem className="space-x-2" onClick={() => onRestore(deployment)}>
+                <RotateCcw size={14} />
+                <p>Restore deployment</p>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   )
 }

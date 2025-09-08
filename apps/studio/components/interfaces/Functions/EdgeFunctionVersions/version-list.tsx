@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { RefreshCw } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle, Button } from 'ui'
+import { Card, CardContent, Table, TableHeader, TableHead, TableBody, TableRow } from 'ui'
 import type { EdgeFunctionDeployment } from './types'
 import { sortDeployments } from './utils'
 import { RollbackModal } from './rollback-modal'
@@ -11,6 +10,12 @@ import { EdgeFunctionVersionsError } from './error'
 import { useEdgeFunctionDeploymentsQuery } from 'data/edge-functions/edge-function-deployments-query'
 import { useEdgeFunctionRollbackMutation } from 'data/edge-functions/edge-function-rollback-mutation'
 import { DeployListItem } from './deploy-list-item'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 
 export const EdgeFunctionVersionsList = () => {
   const { ref: projectRef, slug: functionSlug } = useParams()
@@ -67,51 +72,47 @@ export const EdgeFunctionVersionsList = () => {
 
   if (!sortedDeployments.length) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Deployments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 space-y-4">
-            <p className="text-sm text-muted-foreground">No deployments yet</p>
+      <ScaffoldContainer className="max-w-full px-0 @lg:px-0 @xl:px-0">
+        <ScaffoldHeader className="py-0">
+          <ScaffoldSectionTitle>Deployments</ScaffoldSectionTitle>
+        </ScaffoldHeader>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <Card>
+              <CardContent>
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <p className="text-sm text-muted-foreground">No deployments yet</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+        </ScaffoldSection>
+      </ScaffoldContainer>
     )
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Deployments</CardTitle>
-        <Button
-          type="default"
-          size="tiny"
-          icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-          onClick={() => refetch()}
-          disabled={isRefreshing}
-        >
-          Refresh
-        </Button>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="p-6">
-          <p className="text-sm text-foreground-light mb-4">
-            Showing up to the latest 10 deployments.
-          </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-muted-foreground border-b">
-                  <th className="text-left py-2 pr-2">Deployed at</th>
-                  <th className="text-left py-2 pr-2">Status</th>
-                  <th className="text-left py-2 pr-2">Commit message</th>
-                  <th className="text-left py-2 pr-2">Hash</th>
-                  <th className="text-left py-2 pr-2">Size</th>
-                  <th className="text-right py-2 pl-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+    <ScaffoldContainer className="max-w-full px-0 @lg:px-0 @xl:px-0">
+      <ScaffoldHeader className="py-0">
+        <ScaffoldSectionTitle>Deployments</ScaffoldSectionTitle>
+      </ScaffoldHeader>
+      <ScaffoldSection>
+        <div className="col-span-12">
+          <Card>
+            <Table className="overflow-x-auto">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Deployed at</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Commit message</TableHead>
+                  <TableHead>Hash</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead className="w-0 text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {limitedDeployments.map((deployment) => (
                   <DeployListItem
                     key={deployment.id}
@@ -120,19 +121,19 @@ export const EdgeFunctionVersionsList = () => {
                     onRestore={handleRollbackClick}
                   />
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </CardContent>
+              </TableBody>
+            </Table>
+          </Card>
 
-      <RollbackModal
-        open={showRollback}
-        onOpenChange={setShowRollback}
-        deployment={selectedDeployment}
-        onConfirm={() => handleRollbackConfirm(selectedDeployment ?? undefined)}
-        isLoading={rollbackMutation.isLoading}
-      />
-    </Card>
+          <RollbackModal
+            open={showRollback}
+            onOpenChange={setShowRollback}
+            deployment={selectedDeployment}
+            onConfirm={() => handleRollbackConfirm(selectedDeployment ?? undefined)}
+            isLoading={rollbackMutation.isLoading}
+          />
+        </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
