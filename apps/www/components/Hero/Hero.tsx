@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Badge, Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import AnnouncementBadge from '../Announcement/Badge'
 
 const Hero = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -14,7 +15,10 @@ const Hero = () => {
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
               <div className="relative z-10 lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
-                <HeroBanner />
+                <AnnouncementBadge
+                  url="/events/migrating-from-firebase-mobbin"
+                  announcement="Looking to migrate to Supabase? Sign up for our webinar and learn how."
+                />
 
                 <div className="flex flex-col items-center">
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
@@ -64,27 +68,6 @@ const Hero = () => {
         </div>
       </SectionContainer>
     </div>
-  )
-}
-
-// Useful to put a banner on the hero,
-// return null if not banner is needed
-const HeroBanner = () => {
-  return (
-    <Badge
-      variant="brand"
-      size="large"
-      className="rounded-md flex-wrap justify-center sm:rounded-full w-full sm:w-fit"
-    >
-      Looking to migrate to Supabase?{' '}
-      <Link
-        href="/events/migrating-from-firebase-mobbin"
-        className="inline-block pr-2 sm:px-2 text-foreground hover:underline"
-      >
-        Sign up for our webinar
-      </Link>{' '}
-      and learn how.
-    </Badge>
   )
 }
 
