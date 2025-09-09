@@ -173,7 +173,7 @@ const Message = function Message({
                             )}
                             isStreaming={part.state === 'streaming'}
                           >
-                            {part.text || part.text}
+                            {part.text}
                           </Reasoning>
                         )
                       case 'text':
