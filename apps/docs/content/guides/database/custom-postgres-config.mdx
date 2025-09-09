@@ -24,7 +24,7 @@ select * from pg_settings;
 
 ### User-context settings
 
-The [`pg_settings`](https://www.postgresql.org/docs/current/view-pg-settings.html) table's `context` column specifies the requirements for changing a setting. By default, those with a `user` context can be changed at the `role` or `database` level with [SQL](https://supabase.com/dashboard/project/_/sql/).
+The [`pg_settings`](https://www.postgresql.org/docs/current/view-pg-settings.html) table's `context` column specifies the requirements for changing a setting. By default, those with a `user` context can be changed at the `role` or `database` level with [SQL](/dashboard/project/_/sql/).
 
 To list all user-context settings, run:
 
@@ -46,7 +46,7 @@ show "statement_timeout";
 
 ### Superuser settings
 
-Some settings can only be modified by a superuser. Supabase pre-enables the [`supautils` extension](https://supabase.com/blog/roles-postgres-hooks#setting-up-the-supautils-extension), which allows the `postgres` role to retain certain superuser privileges. It enables modification of the below reserved configurations at the `role` level:
+Some settings can only be modified by a superuser. Supabase pre-enables the [`supautils` extension](/blog/roles-postgres-hooks#setting-up-the-supautils-extension), which allows the `postgres` role to retain certain superuser privileges. It enables modification of the below reserved configurations at the `role` level:
 
 | Setting                      | Description                                                                                                                                                                                                     |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -60,9 +60,9 @@ Some settings can only be modified by a superuser. Supabase pre-enables the [`su
 | `pg_net.ttl`                 | Sets how long the [pg_net extension](/docs/guides/database/extensions/pg_net) saves responses                                                                                                                   |
 | `pg_net.batch_size`          | Sets how many requests the [pg_net extension](/docs/guides/database/extensions/pg_net) can make per second                                                                                                      |
 | `pg_stat_statements.*`       | Configures the [pg_stat_statements extension](https://www.postgresql.org/docs/current/pgstatstatements.html).                                                                                                   |
-| `pgaudit.*`                  | Configures the [PGAudit extension](https://supabase.com/docs/guides/database/extensions/pgaudit). The `log_parameter` is still restricted to protect secrets                                                    |
+| `pgaudit.*`                  | Configures the [PGAudit extension](/docs/guides/database/extensions/pgaudit). The `log_parameter` is still restricted to protect secrets                                                                        |
 | `pgrst.*`                    | [`PostgREST` settings](https://docs.postgrest.org/en/stable/references/configuration.html#db-aggregates-enabled)                                                                                                |
-| `plan_filter.*`              | Configures the [pg_plan_filter extension](https://supabase.com/docs/guides/database/extensions/pg_plan_filter)                                                                                                  |
+| `plan_filter.*`              | Configures the [pg_plan_filter extension](/docs/guides/database/extensions/pg_plan_filter)                                                                                                                      |
 | `session_replication_role`   | Sets the session's behavior for triggers and rewrite rules.                                                                                                                                                     |
 | `track_io_timing`            | Collects timing statistics for database I/O activity.                                                                                                                                                           |
 | `wal_compression`            | This parameter enables compression of WAL using the specified compression method.                                                                                                                               |
@@ -103,7 +103,7 @@ In order to overwrite the default settings, you must have `Owner` or `Administra
 
 <Admonition type="tip">
 
-If a setting you need is not yet configurable, [share your use case with us](https://supabase.com/dashboard/support/new)! Let us know what setting you'd like to control, and we'll consider adding support in future updates.
+If a setting you need is not yet configurable, [share your use case with us](/dashboard/support/new)! Let us know what setting you'd like to control, and we'll consider adding support in future updates.
 
 </Admonition>
 
