@@ -8,19 +8,23 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
+  CardHeader,
+  CardDescription,
+  CardTitle,
   CardFooter,
   FormControl_Shadcn_,
+  FormLabel_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
   Switch,
@@ -33,9 +37,11 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
+import { Admonition } from 'ui-patterns'
 
 const schema = z.object({
   oauthServerEnabled: z.boolean().default(false),
@@ -147,11 +153,11 @@ const OAuthServerSettingsForm = () => {
     }
   }
 
-  const addCustomScope = () => {
-    const currentScopes = form.getValues('availableScopes')
-    const newScope = `custom_scope_${Date.now()}`
-    form.setValue('availableScopes', [...currentScopes, newScope])
-  }
+  // const addCustomScope = () => {
+  //   const currentScopes = form.getValues('availableScopes')
+  //   const newScope = `custom_scope_${Date.now()}`
+  //   form.setValue('availableScopes', [...currentScopes, newScope])
+  // }
 
   const removeScope = (scopeToRemove: string) => {
     const currentScopes = form.getValues('availableScopes')
@@ -189,6 +195,10 @@ const OAuthServerSettingsForm = () => {
   return (
     <ScaffoldSection isFullWidth>
       <ScaffoldSectionTitle className="mb-4">OAuth Server</ScaffoldSectionTitle>
+      <ScaffoldSectionDescription className="mb-4">
+        Turn your Supabase project into a full OAuth authorization server and act as an identity
+        provider for third-party applications
+      </ScaffoldSectionDescription>
 
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -204,8 +214,8 @@ const OAuthServerSettingsForm = () => {
                     label="Enable the Supabase OAuth Server"
                     description={
                       <>
-                        Enable OAuth server functionality for your project. This allows you to
-                        create and manage OAuth applications.{' '}
+                        Enable OAuth server functionality for your project to create and manage
+                        OAuth applications.{' '}
                         <Link
                           href="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
                           target="_blank"
@@ -214,12 +224,6 @@ const OAuthServerSettingsForm = () => {
                         >
                           Learn more
                         </Link>
-                        {!canOAuthServerBeDisabled && (
-                          <div className="mt-2 text-sm text-amber-600 dark:text-amber-400">
-                            Cannot disable OAuth server while OAuth apps exist. Delete all OAuth
-                            apps first.
-                          </div>
-                        )}
                       </>
                     }
                   >
@@ -234,66 +238,7 @@ const OAuthServerSettingsForm = () => {
                 )}
               />
             </CardContent>
-          </Card>
-
-          {/* Additional Settings Section - Only show when OAuth Server is enabled */}
-          {form.watch('oauthServerEnabled') && (
-            <Card>
-              <CardContent className="py-6">
-                <div className="space-y-6">
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="allowDynamicApps"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Allow Dynamic OAuth Apps"
-                        description="Enable dynamic OAuth app registration. Apps can be registered at runtime without manual configuration."
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!canUpdateConfig}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="allowPublicApps"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Allow Public OAuth Apps"
-                        description={
-                          <>
-                            Enable public OAuth applications that can be accessed by any user.{' '}
-                            <Link
-                              href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-foreground-light underline hover:text-foreground transition"
-                            >
-                              Learn more
-                            </Link>
-                          </>
-                        }
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!canUpdateConfig}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </div>
-              </CardContent>
+            {canOAuthServerBeDisabled ? (
               <CardFooter className="justify-end space-x-2">
                 {form.formState.isDirty && (
                   <Button type="default" onClick={() => form.reset()}>
@@ -309,68 +254,144 @@ const OAuthServerSettingsForm = () => {
                   Save changes
                 </Button>
               </CardFooter>
-            </Card>
+            ) : (
+              <CardFooter className="p-0">
+                <Admonition
+                  className="border-none m-0 rounded-none"
+                  type="warning"
+                  title="Cannot disable OAuth server while OAuth apps exist. Delete all OAuth apps first."
+                  description={
+                    <Link href={`/project/${projectRef}/auth/oauth-apps`}>View apps</Link>
+                  }
+                />
+              </CardFooter>
+            )}
+          </Card>
+
+          {/* Additional Settings Section - Only show when OAuth Server is enabled */}
+          {form.watch('oauthServerEnabled') && (
+            <>
+              <Separator />
+              <Card>
+                <CardContent className="py-6">
+                  <div className="space-y-6">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="allowDynamicApps"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Allow Dynamic OAuth Apps"
+                          description="Enable dynamic OAuth app registration. Apps can be registered at runtime without manual configuration."
+                        >
+                          <FormControl_Shadcn_>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={!canUpdateConfig}
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="allowPublicApps"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Allow Public OAuth Apps"
+                          description={
+                            <>
+                              Enable public OAuth applications that can be accessed by any user.{' '}
+                              <Link
+                                href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-foreground-light underline hover:text-foreground transition"
+                              >
+                                Learn more
+                              </Link>
+                            </>
+                          }
+                        >
+                          <FormControl_Shadcn_>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={!canUpdateConfig}
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter className="justify-end space-x-2">
+                  {form.formState.isDirty && (
+                    <Button type="default" onClick={() => form.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={!canUpdateConfig || isSaving || !form.formState.isDirty}
+                    loading={isSaving}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </>
           )}
 
           {/* Available Scopes Section - Only show when OAuth Server is enabled */}
           {form.watch('oauthServerEnabled') && (
             <Card>
-              <CardContent className="py-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-medium">Available Scopes</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Configure the OAuth scopes that can be requested by OAuth applications.
-                      </p>
-                    </div>
-                    <Button
-                      type="default"
-                      size="tiny"
-                      icon={<Plus size={14} />}
-                      onClick={addCustomScope}
-                      disabled={!canUpdateConfig}
-                    >
-                      Add Scope
-                    </Button>
-                  </div>
-
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Scope Name</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead className="w-8"></TableHead>
+              <CardHeader>
+                <CardTitle>Scopes</CardTitle>
+                <CardDescription>
+                  OAuth scopes that can be requested by OAuth applications.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="px-6">Value</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="w-8"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {form.watch('availableScopes').map((scope) => (
+                      <TableRow key={scope}>
+                        <TableCell>
+                          <Badge variant="secondary" className="font-mono">
+                            {scope}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {OAUTH_APP_SCOPES_OPTIONS.find((opt) => opt.value === scope)?.name ||
+                            'Custom scope'}
+                        </TableCell>
+                        <TableCell>
+                          {!['profile', 'email', 'openid'].includes(scope) && (
+                            <Button
+                              type="default"
+                              size="tiny"
+                              icon={<Trash2 size={14} />}
+                              onClick={() => removeScope(scope)}
+                              disabled={!canUpdateConfig}
+                            />
+                          )}
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {form.watch('availableScopes').map((scope) => (
-                        <TableRow key={scope}>
-                          <TableCell>
-                            <Badge variant="secondary" className="font-mono">
-                              {scope}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {OAUTH_APP_SCOPES_OPTIONS.find((opt) => opt.value === scope)?.name ||
-                              'Custom scope'}
-                          </TableCell>
-                          <TableCell>
-                            {!['openid', 'email', 'profile'].includes(scope) && (
-                              <Button
-                                type="default"
-                                size="tiny"
-                                icon={<Trash2 size={14} />}
-                                onClick={() => removeScope(scope)}
-                                disabled={!canUpdateConfig}
-                              />
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           )}
