@@ -22,7 +22,6 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { projectKeys } from 'data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -51,6 +50,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
   estimateComputeSize,
   estimateDiskCost,
@@ -67,9 +67,6 @@ export const CreateBranchModal = () => {
 
   const gitlessBranching = useIsBranching2Enabled()
   const allowDataBranching = useFlag('allowDataBranching')
-  // [Joshen] This is meant to be short lived while we're figuring out how to control
-  // requests to this endpoint. Kill switch in case we need to stop the requests
-  const disableBackupsCheck = useFlag('disableBackupsCheckInCreatebranchmodal')
 
   const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
     PermissionAction.CREATE,
@@ -90,12 +87,16 @@ export const CreateBranchModal = () => {
     isLoading: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
-  } = useGitHubConnectionsQuery({
-    organizationId: selectedOrg?.id,
-  })
+  } = useGitHubConnectionsQuery(
+    { organizationId: selectedOrg?.id },
+    { enabled: showCreateBranchModal }
+  )
 
   const { data: branches } = useBranchesQuery({ projectRef })
-  const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
+  const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery(
+    { projectRef },
+    { enabled: showCreateBranchModal }
+  )
   const computeAddon = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const computeSize = !!computeAddon
     ? (computeAddon.variant.identifier.split('ci_')[1] as DesiredInstanceSize)
@@ -103,11 +104,11 @@ export const CreateBranchModal = () => {
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
-  // Ignore failures fetching disk attributes since it only affects cost estimation
-  const { data: disk } = useDiskAttributesQuery(
-    { projectRef },
-    { enabled: showCreateBranchModal && !disableBackupsCheck }
-  )
+  const {
+    data: disk,
+    isLoading: isLoadingDiskAttr,
+    isError: isErrorDiskAttr,
+  } = useDiskAttributesQuery({ projectRef }, { enabled: showCreateBranchModal })
   const projectDiskAttributes = disk?.attributes ?? {
     type: 'gp3',
     size_gb: 0,
@@ -154,11 +155,9 @@ export const CreateBranchModal = () => {
     },
   })
 
-  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
-
   // Fetch production/default branch to inspect git_branch linkage
+  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const prodBranch = branches?.find((branch) => branch.is_default)
-
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
   const formId = 'create-branch-form'
@@ -420,22 +419,46 @@ export const CreateBranchModal = () => {
                     </figure>
                   </div>
                   <div className="flex flex-col gap-y-1">
-                    <p className="text-sm text-foreground">
-                      Data branch takes longer time to create
-                    </p>
-                    <p className="text-sm text-foreground-light">
-                      Since your target database volume size is{' '}
-                      <code className="text-xs font-mono">{branchDiskAttributes.size_gb} GB</code>,
-                      creating a data branch will take approximately{' '}
-                      <code className="text-xs font-mono">
-                        {estimateRestoreTime(branchDiskAttributes).toFixed()} minutes
-                      </code>{' '}
-                      and costs{' '}
-                      <code className="text-xs font-mono">
-                        ${estimateDiskCost(branchDiskAttributes).toFixed(2)}
-                      </code>{' '}
-                      per month.
-                    </p>
+                    {isLoadingDiskAttr ? (
+                      <>
+                        <ShimmeringLoader className="w-32 h-5 py-0" />
+                        <ShimmeringLoader className="w-72 h-8 py-0" />
+                      </>
+                    ) : (
+                      <>
+                        {isErrorDiskAttr ? (
+                          <>
+                            <p className="text-sm text-foreground">
+                              Branch disk size will incur additional cost per month
+                            </p>
+                            <p className="text-sm text-foreground-light">
+                              The additional cost and time taken to create a data branch is relative
+                              to the size of your database. We are unable to provide an estimate as
+                              we were unable to retrieve your project's disk configuration
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm text-foreground">
+                              Branch disk size is billed at $
+                              {estimateDiskCost(branchDiskAttributes).toFixed(2)} per month
+                            </p>
+                            <p className="text-sm text-foreground-light">
+                              Creating a data branch will take about{' '}
+                              <span className="text-foreground">
+                                {estimateRestoreTime(branchDiskAttributes).toFixed()} minutes
+                              </span>{' '}
+                              and costs{' '}
+                              <span className="text-foreground">
+                                ${estimateDiskCost(branchDiskAttributes).toFixed(2)}
+                              </span>{' '}
+                              per month based on your current target database volume size of{' '}
+                              {branchDiskAttributes.size_gb} GB .
+                            </p>
+                          </>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -457,7 +480,7 @@ export const CreateBranchModal = () => {
                       {prodBranch?.git_branch ? (
                         <>
                           When this branch is merged to{' '}
-                          <code className="text-xs font-mono">{prodBranch.git_branch}</code>,
+                          <span className="text-foreground">{prodBranch.git_branch}</span>,
                           migrations will be deployed to production. Otherwise, migrations only run
                           on preview branches.
                         </>
@@ -481,7 +504,7 @@ export const CreateBranchModal = () => {
                 </div>
                 <div className="flex flex-col gap-y-1">
                   <p className="text-sm text-foreground">
-                    Branches are billed $
+                    Branch compute is billed at $
                     {withData ? branchComputeSize.priceHourly : instanceSizeSpecs.micro.priceHourly}{' '}
                     per hour
                   </p>
