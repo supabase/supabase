@@ -2,7 +2,6 @@ import { useTheme } from 'next-themes'
 import { useMemo, useState, createContext, useContext } from 'react'
 import { Workflow, Check } from 'lucide-react'
 import { capitalize } from 'lodash'
-import dagre from '@dagrejs/dagre'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -26,12 +25,8 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import type { RawPlan, PlanRoot, PlanMeta, PlanNodeData, Agg } from './types'
-import {
-  NODE_TYPE,
-  DEFAULT_NODE_WIDTH,
-  DEFAULT_NODE_HEIGHT,
-  HIDDEN_NODE_CONNECTOR,
-} from './constants'
+import { NODE_TYPE, DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
+import { getLayoutedElementsViaDagre } from './layout'
 
 type ExplainPlanFlowProps = {
   json: string
@@ -66,41 +61,6 @@ const HeatmapContext = createContext<HeatmapMeta>({
   maxRows: 1,
   maxCost: 1,
 })
-
-const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
-  const dagreGraph = new dagre.graphlib.Graph()
-  dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({
-    rankdir: 'TB',
-    nodesep: 25,
-    ranksep: 50,
-  })
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, {
-      width: DEFAULT_NODE_WIDTH,
-      height: DEFAULT_NODE_HEIGHT,
-    })
-  })
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target)
-  })
-
-  dagre.layout(dagreGraph)
-
-  nodes.forEach((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id)
-    node.targetPosition = Position.Top
-    node.sourcePosition = Position.Bottom
-    node.position = {
-      x: nodeWithPosition.x - DEFAULT_NODE_WIDTH / 2,
-      y: nodeWithPosition.y - DEFAULT_NODE_HEIGHT / 2,
-    }
-  })
-
-  return { nodes, edges }
-}
 
 const zeroAgg = (): Agg => ({
   timeIncl: 0,
