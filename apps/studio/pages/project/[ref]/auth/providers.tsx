@@ -1,4 +1,5 @@
-import { AuthProvidersForm, BasicAuthSettingsForm } from 'components/interfaces/Auth'
+import { AuthProvidersForm } from 'components/interfaces/Auth/AuthProvidersForm/AuthProvidersForm'
+import { BasicAuthSettingsForm } from 'components/interfaces/Auth/BasicAuthSettingsForm/BasicAuthSettingsForm'
 import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProvidersLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'

@@ -74,6 +74,7 @@ interface DestinationPanelProps {
     destinationId: number
     pipelineId?: number
     enabled: boolean
+    statusName?: string
   }
 }
 
@@ -178,7 +179,8 @@ export const DestinationPanel = ({
           sourceId,
         })
         // Set request status only right before starting, then fire and close
-        const snapshot = existingDestination.enabled ? 'started' : 'stopped'
+        const snapshot =
+          existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
         if (existingDestination.enabled) {
           setRequestStatus(
             existingDestination.pipelineId,
@@ -243,6 +245,13 @@ export const DestinationPanel = ({
       form.reset(defaultValues)
     }
   }, [destinationData, pipelineData, editMode, defaultValues, form])
+
+  // Ensure the form always reflects the freshest data whenever the panel opens
+  useEffect(() => {
+    if (visible) {
+      form.reset(defaultValues)
+    }
+  }, [visible, defaultValues, form])
 
   return sourceId ? (
     <>
