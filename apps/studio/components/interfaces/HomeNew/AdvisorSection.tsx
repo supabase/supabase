@@ -132,7 +132,7 @@ export const AdvisorSection = () => {
                   <SheetHeader>
                     <div className="flex items-center gap-4">
                       <SheetTitle>
-                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
+                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title ?? 'Unknown'}
                       </SheetTitle>
                       <LintCategoryBadge category={selectedLint.categories[0]} />
                     </div>
