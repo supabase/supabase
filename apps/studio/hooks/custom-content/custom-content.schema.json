@@ -6,6 +6,11 @@
       "type": "string"
     },
 
+    "dashboard_auth:custom_provider": {
+      "type": ["string", "null"],
+      "description": "Show a custom provider on the sign in page (Continue with X)"
+    },
+
     "organization:legal_documents": {
       "type": ["array", "null"],
       "description": "Renders a provided set of documents under the organization legal documents page",

@@ -86,6 +86,23 @@
       "description": "Enable the billing settings page"
     },
 
+    "dashboard_auth:sign_up": {
+      "type": "boolean",
+      "description": "Enable the sign up page in the dashboard"
+    },
+    "dashboard_auth:sign_in_with_github": {
+      "type": "boolean",
+      "description": "Enable the sign in with github provider"
+    },
+    "dashboard_auth:sign_in_with_sso": {
+      "type": "boolean",
+      "description": "Enable the sign in with sso provider"
+    },
+    "dashboard_auth:sign_in_with_email": {
+      "type": "boolean",
+      "description": "Enable the sign in with email/password provider"
+    },
+
     "database:replication": {
       "type": "boolean",
       "description": "Enable the database replication page"
@@ -235,6 +252,10 @@
     "authentication:show_sort_by_phone",
     "authentication:show_user_type_filter",
     "billing:all",
+    "dashboard_auth:sign_up",
+    "dashboard_auth:sign_in_with_github",
+    "dashboard_auth:sign_in_with_sso",
+    "dashboard_auth:sign_in_with_email",
     "database:replication",
     "database:roles",
     "docs:self-hosting",
