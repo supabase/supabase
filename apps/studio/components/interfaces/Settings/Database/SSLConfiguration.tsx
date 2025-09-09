@@ -5,19 +5,19 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { Card, CardHeader, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-const SSLConfiguration = () => {
+export const SSLConfiguration = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isEnforced, setIsEnforced] = useState(false)
@@ -78,123 +78,105 @@ const SSLConfiguration = () => {
   }
 
   return (
-    <div id="ssl-configuration">
-      <div className="flex items-center justify-between mb-6">
-        <FormHeader className="mb-0" title="SSL Configuration" description="" />
+    <ScaffoldSection id="ssl-configuration" className="gap-6">
+      <ScaffoldSectionTitle className="flex items-center justify-between">
+        SSL
         <DocsButton href="https://supabase.com/docs/guides/platform/ssl-enforcement" />
-      </div>
-      <FormPanel>
-        <FormSection
-          header={
-            <FormSectionLabel
-              className="lg:col-span-7"
-              description={
-                <div className="space-y-4">
-                  <p className="text-sm text-foreground-light">
-                    Reject non-SSL connections to your database
-                  </p>
-                  {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="SSL enforcement was not updated successfully"
-                    >
-                      Please try updating again, or contact{' '}
-                      <Link
-                        href="/support/new"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline"
-                      >
-                        support
-                      </Link>{' '}
-                      if this error persists
-                    </Alert>
-                  )}
-                </div>
-              }
-            >
-              Enforce SSL on incoming connections
-            </FormSectionLabel>
-          }
-        >
-          <FormSectionContent loading={false} className="lg:!col-span-5">
-            <div className="flex items-center justify-end mt-2.5 space-x-2">
-              {(isLoading || isSubmitting) && (
-                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
-              )}
-              {isSuccess && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                    <div>
-                      <Switch
-                        size="large"
-                        checked={isEnforced}
-                        disabled={
-                          isLoading ||
-                          isSubmitting ||
-                          !canUpdateSSLEnforcement ||
-                          !hasAccessToSSLEnforcement
-                        }
-                        onCheckedChange={toggleSSLEnforcement}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                    <TooltipContent side="bottom" className="w-64 text-center">
-                      {!canUpdateSSLEnforcement
-                        ? 'You need additional permissions to update SSL enforcement for your project'
-                        : !hasAccessToSSLEnforcement
-                          ? 'Your project does not have access to SSL enforcement'
-                          : undefined}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              )}
-            </div>
-          </FormSectionContent>
-        </FormSection>
+      </ScaffoldSectionTitle>
 
-        <div className="grid grid-cols-1 items-center lg:grid-cols-2 p-8">
-          <div className="space-y-2">
-            <p className="block text-sm">SSL Certificate</p>
-            <div style={{ maxWidth: '420px' }}>
-              <p className="text-sm opacity-50">
-                Use this certificate when connecting to your database to prevent snooping and
-                man-in-the-middle attacks.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-end justify-end">
-            {!hasSSLCertificate ? (
-              <ButtonTooltip
-                disabled
-                type="default"
-                icon={<Download />}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates installed',
-                  },
-                }}
-              >
-                Download certificate
-              </ButtonTooltip>
+      <Card>
+        <CardHeader>SSL Configuration</CardHeader>
+
+        <CardContent id="pause-project" className="flex flex-col gap-4">
+          <FormLayout
+            layout="flex-row-reverse"
+            label="Enforce SSL on incoming connections"
+            description="Reject non-SSL connections to your database"
+          >
+            {isLoading || isSubmitting ? (
+              <div className="w-11 flex justify-center">
+                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+              </div>
             ) : (
-              <Button type="default" icon={<Download />}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                  <div>
+                    <Switch
+                      size="large"
+                      checked={isEnforced}
+                      disabled={
+                        isLoading ||
+                        isSubmitting ||
+                        !isSuccess ||
+                        !canUpdateSSLEnforcement ||
+                        !hasAccessToSSLEnforcement
+                      }
+                      onCheckedChange={toggleSSLEnforcement}
+                    />
+                  </div>
+                </TooltipTrigger>
+                {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
+                  <TooltipContent side="bottom" className="w-64 text-center">
+                    {!canUpdateSSLEnforcement
+                      ? 'You need additional permissions to update SSL enforcement for your project'
+                      : !hasAccessToSSLEnforcement
+                        ? 'Your project does not have access to SSL enforcement'
+                        : undefined}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            )}
+          </FormLayout>
+          {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
+            <Admonition
+              type="warning"
+              title="SSL enforcement was not updated successfully"
+              description={
+                <>
+                  Please try updating again, or contact{' '}
+                  <Link href="/support/new" target="_blank" rel="noreferrer" className="underline">
+                    support
+                  </Link>{' '}
+                  if this error persists
+                </>
+              }
+            />
+          )}
+        </CardContent>
+
+        <CardContent className="flex justify-between items-center">
+          <FormLayout
+            layout="flex-row-reverse"
+            label="SSL Certificate"
+            description="Use this certificate when connecting to your database to prevent snooping and man-in-the-middle attacks."
+          >
+            <ButtonTooltip
+              type="default"
+              icon={<Download />}
+              disabled={!hasSSLCertificate}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !hasSSLCertificate
+                    ? 'Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates installed'
+                    : undefined,
+                },
+              }}
+            >
+              {hasSSLCertificate ? (
                 <a
                   href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
                 >
                   Download certificate
                 </a>
-              </Button>
-            )}
-          </div>
-        </div>
-      </FormPanel>
-    </div>
+              ) : (
+                `Download certificate`
+              )}
+            </ButtonTooltip>
+          </FormLayout>
+        </CardContent>
+      </Card>
+    </ScaffoldSection>
   )
 }
-
-export default SSLConfiguration
