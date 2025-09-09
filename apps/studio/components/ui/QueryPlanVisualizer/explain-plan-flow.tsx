@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes'
-import { useMemo, useState, createContext, useContext } from 'react'
+import { useMemo, useState, useContext } from 'react'
 import { Workflow, Check } from 'lucide-react'
 import { capitalize } from 'lodash'
 import ReactFlow, {
@@ -27,40 +27,16 @@ import {
 import type { RawPlan, PlanRoot, PlanMeta, PlanNodeData, Agg } from './types'
 import { NODE_TYPE, DEFAULT_NODE_WIDTH, HIDDEN_NODE_CONNECTOR } from './constants'
 import { getLayoutedElementsViaDagre } from './layout'
+import {
+  MetricsVisibilityContext,
+  HeatmapContext,
+  type MetricsVisibility,
+  type HeatmapMode,
+} from './contexts'
 
 type ExplainPlanFlowProps = {
   json: string
 }
-
-type MetricsVisibility = {
-  time: boolean
-  rows: boolean
-  cost: boolean
-  buffers: boolean
-  output: boolean
-}
-
-const MetricsVisibilityContext = createContext<MetricsVisibility>({
-  time: true,
-  rows: true,
-  cost: true,
-  buffers: true,
-  output: true,
-})
-
-type HeatmapMode = 'none' | 'time' | 'rows' | 'cost'
-type HeatmapMeta = {
-  mode: HeatmapMode
-  maxTime: number
-  maxRows: number
-  maxCost: number
-}
-const HeatmapContext = createContext<HeatmapMeta>({
-  mode: 'none',
-  maxTime: 1,
-  maxRows: 1,
-  maxCost: 1,
-})
 
 const zeroAgg = (): Agg => ({
   timeIncl: 0,
