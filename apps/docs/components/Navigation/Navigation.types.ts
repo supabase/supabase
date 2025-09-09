@@ -11,6 +11,9 @@ export interface NavMenuSection {
   name: string
   url?: `/${string}` | `https://${string}`
   items: Partial<NavMenuSection>[]
+  icon?: string
+  hasLightIcon?: boolean
+  isDarkMode?: boolean
   enabled?: boolean
 }
 
