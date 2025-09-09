@@ -1,6 +1,7 @@
+import { useEffect, useRef, useState, Fragment } from 'react'
+import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
-import { useEffect, useRef, useState, Fragment } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -15,11 +16,6 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   Separator,
   Modal,
   Switch,
@@ -31,10 +27,9 @@ import {
   MultiSelectorList,
   MultiSelectorItem,
 } from 'ui-patterns/multi-select'
-import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
-import { OAUTH_APP_SCOPES_OPTIONS, OAUTH_APP_TYPE_OPTIONS } from './OAuthAppsList'
+import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
-import Link from 'next/link'
+import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 
 interface CreateOAuthAppModalProps {
   visible: boolean

@@ -1,17 +1,14 @@
+import { useState, useEffect } from 'react'
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Input,
   Badge,
@@ -28,11 +25,16 @@ import {
   TableRow,
   TableCell,
 } from 'ui'
-import dayjs from 'dayjs'
-import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
+import CreateOAuthAppModal from './CreateOAuthAppModal'
 import UpdateOAuthAppSidePanel from './UpdateOAuthAppSidePanel'
 import DeleteOAuthAppModal from './DeleteOAuthAppModal'
-import CreateOAuthAppModal from './CreateOAuthAppModal'
+
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+
+import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 
 interface OAuthAppsListProps {
   createTrigger?: () => void
@@ -89,10 +91,30 @@ const OAuthAppsList = ({
     loadOAuthApps()
   }, [])
 
+  // Load OAuth server settings from localStorage
+  useEffect(() => {
+    const loadOAuthServerSettings = () => {
+      try {
+        const stored = localStorage.getItem('oauth_server_settings')
+        if (stored) {
+          const parsedSettings = JSON.parse(stored)
+          setOAuthServerSettings(parsedSettings)
+          setIsOAuthServerEnabled(parsedSettings.oauthServerEnabled)
+        }
+      } catch (error) {
+        console.error('Error loading OAuth server settings from localStorage:', error)
+      }
+    }
+
+    loadOAuthServerSettings()
+  }, [])
+
   // Handle successful OAuth app creation
   const handleOAuthAppCreated = (newApp: OAuthApp) => {
     setOAuthApps((prev) => [...prev, newApp])
     setShowCreatePanel(false)
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('oauth-apps-changed'))
   }
 
   // Handle successful OAuth app update
@@ -109,6 +131,8 @@ const OAuthAppsList = ({
       setShowDeleteModal(false)
       setShowUpdatePanel(false)
       setSelectedApp(undefined)
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('oauth-apps-changed'))
     }
   }
 
@@ -124,7 +148,13 @@ const OAuthAppsList = ({
     setShowDeleteModal(true)
   }
 
-  const [isOAuthServerEnabled, _setIsOAuthServerEnabled] = useState(true)
+  const [isOAuthServerEnabled, setIsOAuthServerEnabled] = useState(false)
+  const [oauthServerSettings, setOAuthServerSettings] = useState({
+    oauthServerEnabled: false,
+    allowDynamicApps: false,
+    allowPublicApps: false,
+    availableScopes: ['openid', 'email', 'profile'],
+  })
   const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
@@ -193,7 +223,7 @@ const OAuthAppsList = ({
                   content: {
                     side: 'bottom',
                     text: !isOAuthServerEnabled
-                      ? 'OAuth server must be enabled'
+                      ? 'OAuth server must be enabled in settings'
                       : !canCreateTriggers
                         ? 'You need additional permissions to create OAuth apps'
                         : undefined,
@@ -242,7 +272,7 @@ const OAuthAppsList = ({
                         <Badge>{app.type}</Badge>
                       </TableCell>
                       <TableCell className="flex flex-wrap gap-2 flex-1 min-w-40">
-                        {app.scopes.map((scope) => (
+                        {app.scopes.map((scope: string) => (
                           <Badge key={`${app.id}-${scope}-badge`}>{scope}</Badge>
                         ))}
                       </TableCell>

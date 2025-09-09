@@ -1,6 +1,7 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash2, Copy } from 'lucide-react'
 import { useEffect, useRef, useState, Fragment } from 'react'
+import Link from 'next/link'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Plus, Trash2 } from 'lucide-react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -29,13 +30,12 @@ import {
   Badge,
 } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
 import Panel from '../../../ui/Panel'
 import { Admonition } from 'ui-patterns'
-import Link from 'next/link'
+import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
 
 interface UpdateOAuthAppSidePanelProps {
   visible: boolean
@@ -57,7 +57,7 @@ const UpdateOAuthAppSidePanel = ({
     type: (selectedApp?.type as 'manual' | 'dynamic') || 'manual',
     scopes: selectedApp?.scopes || ['openid'],
     redirect_uris: selectedApp?.redirect_uris?.length
-      ? selectedApp.redirect_uris.map((uri) => ({ value: uri }))
+      ? selectedApp.redirect_uris.map((uri: string) => ({ value: uri }))
       : [{ value: '' }],
     is_public: selectedApp?.is_public || false,
   }
@@ -76,7 +76,7 @@ const UpdateOAuthAppSidePanel = ({
         type: selectedApp.type,
         scopes: selectedApp.scopes,
         redirect_uris: selectedApp.redirect_uris?.length
-          ? selectedApp.redirect_uris.map((uri) => ({ value: uri }))
+          ? selectedApp.redirect_uris.map((uri: string) => ({ value: uri }))
           : [{ value: '' }],
         is_public: selectedApp.is_public,
       }
