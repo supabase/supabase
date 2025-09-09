@@ -1,5 +1,4 @@
 import { ArrowDown, ArrowUp, ChevronDown, TextSearch, X } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -19,9 +18,9 @@ import {
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
+  CodeBlock,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { QueryPerformanceSort } from '../Reports/Reports.queries'
 import { hasIndexRecommendations } from './index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
@@ -30,24 +29,19 @@ import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { CodeBlock } from 'ui'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
-  const router = useRouter()
+  const { setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { preset, sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
 
-  const defaultSortValue = router.query.sort
-    ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
-    : undefined
-
   const [view, setView] = useState<'details' | 'suggestion'>('details')
-  const [sort, setSort] = useState<QueryPerformanceSort | undefined>(defaultSortValue)
   const [selectedRow, setSelectedRow] = useState<number>()
   const reportType =
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
@@ -80,7 +74,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   <Button
                     type="text"
                     size="tiny"
-                    className="p-1 h-5 w-5"
+                    className="p-1 h-5 w-5 flex-shrink-0"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
                     onClick={(e) => e.stopPropagation()}
                   />
@@ -88,11 +82,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
                     onClick={() => {
-                      setSort({ column: col.id, order: 'asc' })
-                      router.push({
-                        ...router,
-                        query: { ...router.query, sort: col.id, order: 'asc' },
-                      })
+                      setSortConfig(col.id, 'asc')
                     }}
                     className="flex gap-2"
                   >
@@ -101,11 +91,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
-                      setSort({ column: col.id, order: 'desc' })
-                      router.push({
-                        ...router,
-                        query: { ...router.query, sort: col.id, order: 'desc' },
-                      })
+                      setSortConfig(col.id, 'desc')
                     }}
                     className="flex gap-2"
                   >
