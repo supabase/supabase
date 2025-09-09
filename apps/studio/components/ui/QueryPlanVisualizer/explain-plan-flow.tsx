@@ -55,9 +55,6 @@ const blocksToBytes = (blocks?: number) => {
   return `${v.toFixed(1)} ${units[i]}`
 }
 
-/**
- * @see: https://github.com/wbkd/react-flow/discussions/2698
- */
 const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
   const vis = useContext(MetricsVisibilityContext)
