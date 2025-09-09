@@ -5,16 +5,10 @@ import ReactFlow, { Background, BackgroundVariant, MiniMap, type Node, type Edge
 import 'reactflow/dist/style.css'
 
 import { copyToClipboard } from 'ui'
-import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
-import { Label } from '@ui/components/shadcn/ui/label'
 import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@ui/components/shadcn/ui/select'
+import { MetaOverlay } from './meta-overlay'
+import { SubplanOverlay } from './subplan-overlay'
+import { ControlsOverlay } from './controls-overlay'
 import type { PlanMeta, PlanNodeData } from './types'
 import { NODE_TYPE } from './constants'
 import { buildGraphFromPlan } from './graph/build-graph-from-plan'
@@ -136,96 +130,18 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
           </div>
         </div>
       )}
-      {meta &&
-        (meta.planningTime !== undefined ||
-          meta.executionTime !== undefined ||
-          meta.jitTotalTime !== undefined) && (
-          <div className="absolute z-10 top-2 left-2 text-[10px] px-2 py-1 rounded bg-foreground-muted/20 backdrop-blur-sm border">
-            <div className="flex gap-3">
-              {meta.planningTime !== undefined && <span>planning: {meta.planningTime} ms</span>}
-              {meta.executionTime !== undefined && <span>exec: {meta.executionTime} ms</span>}
-              {meta.jitTotalTime !== undefined && <span>jit: {meta.jitTotalTime} ms</span>}
-            </div>
-          </div>
-        )}
-      {/* Subplan roots overlay panel */}
-      {meta?.subplanRoots?.length && (
-        <div className="absolute z-10 top-14 left-2 text-[10px] px-2 py-1 rounded bg-foreground-muted/20 backdrop-blur-sm border">
-          <div>
-            <span className="font-bold">Subplans:</span>{' '}
-            {meta.subplanRoots.map((sp, i) => (
-              <span key={sp.id}>
-                {sp.name}
-                {i < (meta.subplanRoots?.length ?? 0) - 1 ? ', ' : ''}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      <div className="absolute z-10 top-2 right-2 text-[10px] p-2 rounded bg-foreground-muted/20 backdrop-blur-sm border">
-        <div className="flex flex-wrap gap-2 items-center">
-          <Label className="inline-flex items-center gap-1">
-            <Checkbox
-              checked={metricsVisibility.time}
-              onCheckedChange={(checked) =>
-                setMetricsVisibility((v) => ({ ...v, time: Boolean(checked) }))
-              }
-            />
-            <span>time</span>
-          </Label>
-          <Label className="inline-flex items-center gap-1">
-            <Checkbox
-              checked={metricsVisibility.rows}
-              onCheckedChange={(checked) =>
-                setMetricsVisibility((v) => ({ ...v, rows: Boolean(checked) }))
-              }
-            />
-            <span>rows</span>
-          </Label>
-          <Label className="inline-flex items-center gap-1">
-            <Checkbox
-              checked={metricsVisibility.cost}
-              onCheckedChange={(checked) =>
-                setMetricsVisibility((v) => ({ ...v, cost: Boolean(checked) }))
-              }
-            />
-            <span>cost</span>
-          </Label>
-          <Label className="inline-flex items-center gap-1">
-            <Checkbox
-              checked={metricsVisibility.buffers}
-              onCheckedChange={(checked) =>
-                setMetricsVisibility((v) => ({ ...v, buffers: Boolean(checked) }))
-              }
-            />
-            <span>buffers</span>
-          </Label>
-          <Label className="inline-flex items-center gap-1">
-            <Checkbox
-              checked={metricsVisibility.output}
-              onCheckedChange={(checked) =>
-                setMetricsVisibility((v) => ({ ...v, output: Boolean(checked) }))
-              }
-            />
-            <span>output</span>
-          </Label>
-          <div className="h-[14px] w-px bg-border mx-1" />
-          <div className="flex items-center gap-x-1">
-            <span>Heatmap:</span>
-            <Select value={heatmapMode} onValueChange={(v) => setHeatmapMode(v as HeatmapMode)}>
-              <SelectTrigger size="tiny" className="w-20">
-                <SelectValue placeholder="none" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                <SelectItem value="none">none</SelectItem>
-                <SelectItem value="time">time</SelectItem>
-                <SelectItem value="rows">rows</SelectItem>
-                <SelectItem value="cost">cost</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
+      <MetaOverlay
+        planningTime={meta?.planningTime}
+        executionTime={meta?.executionTime}
+        jitTotalTime={meta?.jitTotalTime}
+      />
+      <SubplanOverlay subplanRoots={meta?.subplanRoots} />
+      <ControlsOverlay
+        metricsVisibility={metricsVisibility}
+        setMetricsVisibility={(updater) => setMetricsVisibility(updater)}
+        heatmapMode={heatmapMode}
+        setHeatmapMode={(m) => setHeatmapMode(m)}
+      />
       {selectedNode && (
         <div className="absolute z-20 top-16 right-2 w-[380px] max-h-[75%] overflow-x-hidden overflow-y-auto rounded border bg-background shadow-lg">
           <div className="flex items-center justify-between px-3 py-2 border-b">
