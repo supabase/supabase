@@ -16,6 +16,8 @@ export interface OAuthApp {
   // type: string
   type: 'manual' | 'dynamic'
   is_public?: boolean
+  users_count?: number
+  last_used_at?: string
 }
 
 const OAuthApps: NextPageWithLayout = () => {
@@ -24,7 +26,10 @@ const OAuthApps: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <FormHeader title="OAuth Apps" />
+            <FormHeader
+              title="OAuth Apps"
+              docsUrl="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
+            />
             <OAuthAppsList
               createTrigger={() => {}}
               editTrigger={() => {}}

@@ -1,68 +1,57 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash2, Copy } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState, Fragment } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import dayjs from 'dayjs'
 import * as z from 'zod'
 
 import {
   Button,
-  Card,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  Input,
   Input_Shadcn_,
-  SidePanel,
-  Switch,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Separator,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Badge,
+  Modal,
+  Switch,
 } from 'ui'
-import { MultiSelector } from 'ui-patterns/multi-select'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorTrigger,
+  MultiSelectorList,
+  MultiSelectorItem,
+} from 'ui-patterns/multi-select'
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
+import { OAUTH_APP_SCOPES_OPTIONS, OAUTH_APP_TYPE_OPTIONS } from './OAuthAppsList'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
-import Panel from '../../../ui/Panel'
-import { Admonition } from 'ui-patterns'
 import Link from 'next/link'
 
-interface UpdateOAuthAppSidePanelProps {
+interface CreateOAuthAppModalProps {
   visible: boolean
   onClose: () => void
   onSuccess: (app: OAuthApp) => void
-  selectedApp?: OAuthApp
-  onDeleteClick: (app: OAuthApp) => void
 }
 
-const UpdateOAuthAppSidePanel = ({
-  visible,
-  onClose,
-  onSuccess,
-  selectedApp,
-  onDeleteClick,
-}: UpdateOAuthAppSidePanelProps) => {
+const CreateOAuthAppModal = ({ visible, onClose, onSuccess }: CreateOAuthAppModalProps) => {
   const initialValues = {
-    name: selectedApp?.name || '',
-    type: (selectedApp?.type as 'manual' | 'dynamic') || 'manual',
-    scopes: selectedApp?.scopes || ['openid'],
-    redirect_uris: selectedApp?.redirect_uris?.length
-      ? selectedApp.redirect_uris.map((uri) => ({ value: uri }))
-      : [{ value: '' }],
-    is_public: selectedApp?.is_public || false,
+    name: '',
+    type: 'manual' as const,
+    scopes: ['email', 'profile'],
+    redirect_uris: [{ value: '' }],
+    is_public: false,
   }
   const submitRef = useRef<HTMLButtonElement>(null)
-  const [isUpdating, setIsUpdating] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
   const [showCredentialsModal, setShowCredentialsModal] = useState(false)
   const [generatedCredentials, setGeneratedCredentials] = useState<{
     clientId: string
@@ -70,19 +59,8 @@ const UpdateOAuthAppSidePanel = ({
   } | null>(null)
 
   useEffect(() => {
-    if (selectedApp) {
-      const values = {
-        name: selectedApp.name,
-        type: selectedApp.type,
-        scopes: selectedApp.scopes,
-        redirect_uris: selectedApp.redirect_uris?.length
-          ? selectedApp.redirect_uris.map((uri) => ({ value: uri }))
-          : [{ value: '' }],
-        is_public: selectedApp.is_public,
-      }
-      form.reset(values)
-    }
-  }, [visible, selectedApp])
+    form.reset(initialValues)
+  }, [visible])
 
   const FormSchema = z.object({
     name: z
@@ -91,7 +69,10 @@ const UpdateOAuthAppSidePanel = ({
       .max(100, 'Name must be less than 100 characters')
       .default(''),
     type: z.enum(['manual', 'dynamic']).default('manual'),
-    scopes: z.array(z.string()).min(1, 'Please select at least one scope').default(['openid']),
+    scopes: z
+      .array(z.string())
+      .min(1, 'Please select at least one scope')
+      .default(['profile', 'email']),
     redirect_uris: z
       .object({
         value: z.string().refine((val) => val === '' || z.string().url().safeParse(val).success, {
@@ -131,73 +112,56 @@ const UpdateOAuthAppSidePanel = ({
     return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
-  const handleRegenerateSecret = () => {
-    if (!selectedApp) return
-
-    const newClientSecret = generateClientSecret()
-
-    // Update the app with new secret
-    const updatedApp: OAuthApp = {
-      ...selectedApp,
-      client_secret: newClientSecret,
-    }
-
-    // Update in localStorage
-    const existingApps = JSON.parse(localStorage.getItem('oauth_apps') || '[]')
-    const updatedApps = existingApps.map((app: OAuthApp) =>
-      app.id === selectedApp.id ? updatedApp : app
-    )
-    localStorage.setItem('oauth_apps', JSON.stringify(updatedApps))
-
-    toast.success('Client secret regenerated successfully')
-    onSuccess(updatedApp)
-
-    // Show credentials modal after a brief delay
-    setTimeout(() => {
-      setGeneratedCredentials({ clientId: selectedApp.client_id, clientSecret: newClientSecret })
-      setShowCredentialsModal(true)
-    }, 100)
-  }
-
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    if (!selectedApp) return
-
-    setIsUpdating(true)
+    setIsCreating(true)
 
     try {
-      // Update the OAuth app object
-      const updatedApp: OAuthApp = {
-        ...selectedApp,
+      // Generate a unique ID and client_id
+      const id = Date.now().toString()
+      const client_id = `oauth_${id}`
+      const client_secret = generateClientSecret()
+
+      // Create the OAuth app object
+      const newApp: OAuthApp = {
+        id,
+        client_id,
+        client_secret,
         name: data.name,
         type: data.type,
         scopes: data.scopes,
         redirect_uris: data.redirect_uris
           .filter((uri) => uri.value.trim())
           .map((uri) => uri.value.trim()),
+        is_public: data.is_public,
+        created_at: new Date().toISOString(),
       }
 
-      // Update in localStorage
+      // Save to localStorage
       const existingApps = JSON.parse(localStorage.getItem('oauth_apps') || '[]')
-      const updatedApps = existingApps.map((app: OAuthApp) =>
-        app.id === selectedApp.id ? updatedApp : app
-      )
+      const updatedApps = [...existingApps, newApp]
       localStorage.setItem('oauth_apps', JSON.stringify(updatedApps))
 
-      toast.success(`Successfully updated OAuth app "${data.name}"`)
-      onSuccess(updatedApp)
-      closePanel()
+      toast.success(`Successfully created OAuth app "${data.name}"`)
+      onSuccess(newApp)
+
+      // Close the create modal first, then show credentials
+      closeModal()
+
+      // Show credentials modal after a brief delay
+      setTimeout(() => {
+        setGeneratedCredentials({ clientId: client_id, clientSecret: client_secret })
+        setShowCredentialsModal(true)
+      }, 100)
     } catch (error) {
-      toast.error('Failed to update OAuth app')
-      console.error('Error updating OAuth app:', error)
+      toast.error('Failed to create OAuth app')
+      console.error('Error creating OAuth app:', error)
     } finally {
-      setIsUpdating(false)
+      setIsCreating(false)
     }
   }
 
-  const closePanel = () => {
+  const closeModal = () => {
     form.reset(initialValues)
-    setShowCredentialsModal(false)
-    setGeneratedCredentials(null)
     onClose()
   }
 
@@ -208,20 +172,16 @@ const UpdateOAuthAppSidePanel = ({
 
   return (
     <Fragment>
-      <SidePanel
+      <Modal
+        hideFooter
         size="large"
-        loading={isUpdating}
         visible={visible}
-        onCancel={closePanel}
-        header="Update OAuth app"
-        confirmText="Update app"
-        onConfirm={() => {
-          if (submitRef.current) submitRef.current.click()
-        }}
+        onCancel={closeModal}
+        header="Create a new OAuth app"
       >
-        <SidePanel.Content className="py-4">
-          <Form_Shadcn_ {...form}>
-            <form className="space-y-4" autoFocus={false} onSubmit={form.handleSubmit(onSubmit)}>
+        <Form_Shadcn_ {...form}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <Modal.Content className="space-y-4">
               <FormField_Shadcn_
                 control={form.control}
                 name="name"
@@ -236,68 +196,6 @@ const UpdateOAuthAppSidePanel = ({
                   </FormItemLayout>
                 )}
               />
-
-              <Card>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead key="users">Users</TableHead>
-                      <TableHead key="last_used">Last used</TableHead>
-                      <TableHead key="last_used">Registration type</TableHead>
-                      <TableHead key="buttons" className="w-8"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>{selectedApp?.users_count || 0}</TableCell>
-                      <TableCell>
-                        {!!selectedApp?.last_used_at
-                          ? dayjs(selectedApp?.last_used_at).format('D MMM, YYYY')
-                          : 'Never'}
-                      </TableCell>
-                      <TableCell className="w-48">
-                        <Badge>{selectedApp?.type}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button type="danger" size="tiny">
-                          Revoke all tokens
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </Card>
-
-              <Separator />
-
-              {selectedApp && (
-                <Panel>
-                  <Panel.Content className="space-y-4">
-                    <Input
-                      label="Client ID"
-                      readOnly
-                      copy
-                      className="input-mono"
-                      value={selectedApp.client_id}
-                      layout="vertical"
-                    />
-
-                    <Input
-                      label="Client Secret"
-                      readOnly
-                      type="password"
-                      className="input-mono"
-                      value="****************************************************************"
-                      descriptionText="Client secret is hidden for security. Use the regenerate button to create a new one."
-                      layout="vertical"
-                    />
-
-                    <Button type="default" onClick={handleRegenerateSecret} className="w-full">
-                      Regenerate Client Secret
-                    </Button>
-                  </Panel.Content>
-                </Panel>
-              )}
 
               <FormField_Shadcn_
                 control={form.control}
@@ -322,18 +220,18 @@ const UpdateOAuthAppSidePanel = ({
                   >
                     <FormControl_Shadcn_>
                       <MultiSelector values={field.value} onValuesChange={field.onChange}>
-                        <MultiSelector.Trigger>
-                          <MultiSelector.Input placeholder="Select scopes..." />
-                        </MultiSelector.Trigger>
-                        <MultiSelector.Content>
-                          <MultiSelector.List>
-                            {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
-                              <MultiSelector.Item key={scope.value} value={scope.value}>
-                                {scope.name}
-                              </MultiSelector.Item>
-                            ))}
-                          </MultiSelector.List>
-                        </MultiSelector.Content>
+                        <MultiSelectorTrigger label="Select scopes..." showIcon={false} />
+                        <MultiSelectorContent>
+                          <MultiSelectorList>
+                            {OAUTH_APP_SCOPES_OPTIONS.map(
+                              (scope: { value: string; name: string }) => (
+                                <MultiSelectorItem key={scope.value} value={scope.value}>
+                                  {scope.name}
+                                </MultiSelectorItem>
+                              )
+                            )}
+                          </MultiSelectorList>
+                        </MultiSelectorContent>
                       </MultiSelector>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
@@ -364,7 +262,7 @@ const UpdateOAuthAppSidePanel = ({
                                       <div className="flex items-center space-x-2">
                                         <Input_Shadcn_
                                           {...inputField}
-                                          placeholder="https://example.com/callback (optional)"
+                                          placeholder="https://example.com/callback"
                                           className="flex-1"
                                         />
                                         {redirectUriFields.length > 1 && (
@@ -408,7 +306,19 @@ const UpdateOAuthAppSidePanel = ({
                   <FormItemLayout
                     label="Is public"
                     layout="flex"
-                    description="If enabled, this app will be publicly accessible."
+                    description={
+                      <>
+                        If enabled, this app will be publicly accessible.{' '}
+                        <Link
+                          href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-foreground-light underline hover:text-foreground transition"
+                        >
+                          Learn more
+                        </Link>
+                      </>
+                    }
                   >
                     <FormControl_Shadcn_>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -416,30 +326,22 @@ const UpdateOAuthAppSidePanel = ({
                   </FormItemLayout>
                 )}
               />
-
-              <Separator />
-
-              <Admonition
-                type="destructive"
-                title="Delete OAuth App"
-                description="This action cannot be undone."
-              >
-                <Button
-                  type="danger"
-                  size="tiny"
-                  className="mt-4"
-                  onClick={() => onDeleteClick(selectedApp as OAuthApp)}
-                >
-                  Delete App
-                </Button>
-              </Admonition>
-            </form>
-          </Form_Shadcn_>
-          <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
-            Update
-          </Button>
-        </SidePanel.Content>
-      </SidePanel>
+            </Modal.Content>
+            <Modal.Separator />
+            <Modal.Content className="flex items-center justify-end space-x-2">
+              <Button type="default" disabled={isCreating} onClick={closeModal}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" disabled={isCreating} loading={isCreating}>
+                Create app
+              </Button>
+            </Modal.Content>
+            <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+              Create
+            </Button>
+          </form>
+        </Form_Shadcn_>
+      </Modal>
 
       {generatedCredentials && (
         <OAuthAppCredentialsModal
@@ -453,4 +355,4 @@ const UpdateOAuthAppSidePanel = ({
   )
 }
 
-export default UpdateOAuthAppSidePanel
+export default CreateOAuthAppModal

@@ -30,9 +30,9 @@ import {
 } from 'ui'
 import dayjs from 'dayjs'
 import type { OAuthApp } from 'pages/project/[ref]/auth/oauth-apps'
-import CreateOAuthAppSidePanel from './CreateOAuthAppSidePanel'
 import UpdateOAuthAppSidePanel from './UpdateOAuthAppSidePanel'
 import DeleteOAuthAppModal from './DeleteOAuthAppModal'
+import CreateOAuthAppModal from './CreateOAuthAppModal'
 
 interface OAuthAppsListProps {
   createTrigger?: () => void
@@ -63,7 +63,7 @@ const OAuthAppsList = ({
   const [isError, setIsError] = useState(false)
   const [showCreatePanel, setShowCreatePanel] = useState(false)
   const [showUpdatePanel, setShowUpdatePanel] = useState(false)
-  const [showDeletePanel, setShowDeletePanel] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthApp>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
@@ -106,7 +106,8 @@ const OAuthAppsList = ({
   const handleOAuthAppDeleted = () => {
     if (selectedApp) {
       setOAuthApps((prev) => prev.filter((app) => app.id !== selectedApp.id))
-      setShowDeletePanel(false)
+      setShowDeleteModal(false)
+      setShowUpdatePanel(false)
       setSelectedApp(undefined)
     }
   }
@@ -120,7 +121,7 @@ const OAuthAppsList = ({
   // Handle delete button click
   const handleDeleteClick = (app: OAuthApp) => {
     setSelectedApp(app)
-    setShowDeletePanel(true)
+    setShowDeleteModal(true)
   }
 
   const [isOAuthServerEnabled, _setIsOAuthServerEnabled] = useState(true)
@@ -215,7 +216,7 @@ const OAuthAppsList = ({
                   <TableHead key="name" className="w-1/4">
                     Name
                   </TableHead>
-                  <TableHead key="table">ID</TableHead>
+                  <TableHead key="table">Client ID</TableHead>
                   <TableHead key="function">Type</TableHead>
                   <TableHead key="function">Scopes</TableHead>
                   <TableHead key="function">Created</TableHead>
@@ -223,12 +224,20 @@ const OAuthAppsList = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {}
+                {oAuthApps.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6}>
+                      <p className="text-foreground-lighter">No OAuth apps found</p>
+                    </TableCell>
+                  </TableRow>
+                )}
                 {oAuthApps.length > 0 &&
                   oAuthApps.map((app) => (
                     <TableRow key={app.id} className="w-full">
-                      <TableCell className="max-w-64 truncate">{app.name}</TableCell>
-                      <TableCell className="w-40">{app.id}</TableCell>
+                      <TableCell className="max-w-64 truncate">
+                        <button onClick={() => handleEditClick(app)}>{app.name}</button>
+                      </TableCell>
+                      <TableCell className="w-40">{app.client_id}</TableCell>
                       <TableCell className="w-40">
                         <Badge>{app.type}</Badge>
                       </TableCell>
@@ -275,7 +284,7 @@ const OAuthAppsList = ({
         </div>
       </div>
 
-      <CreateOAuthAppSidePanel
+      <CreateOAuthAppModal
         visible={showCreatePanel}
         onClose={() => setShowCreatePanel(false)}
         onSuccess={handleOAuthAppCreated}
@@ -285,10 +294,11 @@ const OAuthAppsList = ({
         onClose={() => setShowUpdatePanel(false)}
         onSuccess={handleOAuthAppUpdated}
         selectedApp={selectedApp}
+        onDeleteClick={handleDeleteClick}
       />
       <DeleteOAuthAppModal
-        visible={showDeletePanel}
-        onClose={() => setShowDeletePanel(false)}
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
         onSuccess={handleOAuthAppDeleted}
         selectedApp={selectedApp}
       />
