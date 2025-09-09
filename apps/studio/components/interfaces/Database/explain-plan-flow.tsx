@@ -94,6 +94,8 @@ type PlanMeta = {
   executionTime?: number
   jitTotalTime?: number
   subplanRoots?: { name: string; id: string }[]
+  errorMessage?: string
+  errorDetail?: string
 }
 
 const NODE_TYPE = 'plan'
@@ -961,13 +963,33 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
       }
       const planPart = root?.Plan ? [root] : parsed
       const graph = buildGraphFromPlan(planPart)
+      if (!graph.nodes.length) {
+        return {
+          nodes: [],
+          edges: [],
+          meta: {
+            ...meta,
+            errorMessage: 'Invalid EXPLAIN JSON: Plan node not found.',
+            errorDetail:
+              'Provide output from EXPLAIN (FORMAT JSON) or EXPLAIN (ANALYZE, FORMAT JSON). The root should be an array and its first element must contain a "Plan" object.',
+          },
+        }
+      }
       return {
         nodes: graph.nodes,
         edges: graph.edges,
         meta: { ...meta, subplanRoots: graph.subplanRoots },
       }
-    } catch (e) {
-      return { nodes: [], edges: [], meta: undefined }
+    } catch (e: any) {
+      return {
+        nodes: [],
+        edges: [],
+        meta: {
+          errorMessage: 'Failed to parse JSON',
+          errorDetail:
+            (e?.message ? e.message : '') + '\nPaste valid JSON from EXPLAIN (FORMAT JSON).',
+        },
+      }
     }
   }, [json])
 
@@ -1016,6 +1038,18 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
 
   return (
     <div className="w-full h-full border border-green-500 relative">
+      {meta?.errorMessage && (
+        <div className="absolute inset-0 z-20 flex items-start justify-center mt-10 pointer-events-none">
+          <div className="pointer-events-auto border border-red-500/70 bg-foreground-muted/20 backdrop-blur-sm rounded px-3 py-2 max-w-[720px] text-[11px]">
+            <div className="font-semibold text-red-600">{meta.errorMessage}</div>
+            {meta.errorDetail && (
+              <div className="mt-1 whitespace-pre-wrap text-foreground-lighter">
+                {meta.errorDetail}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {meta &&
         (meta.planningTime !== undefined ||
           meta.executionTime !== undefined ||
