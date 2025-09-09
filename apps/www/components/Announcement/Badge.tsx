@@ -48,7 +48,7 @@ const AnnouncementBadge = ({
           overflow-hidden
           focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           `,
-        !badge && 'px-4'
+        !badge && 'pl-4'
       )}
     >
       {badge && (
