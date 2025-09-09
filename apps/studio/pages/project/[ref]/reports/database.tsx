@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import { ReportChart } from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
