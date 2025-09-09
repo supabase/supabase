@@ -141,7 +141,12 @@ const CustomTooltip = ({
   isActiveHoveredChart,
 }: TooltipProps) => {
   if (active && payload && payload.length) {
-    const timestamp = payload[0].payload.timestamp
+    /**
+     * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
+     */
+    const firstItem = payload[0].payload
+    const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
+    const timestamp = payload[0].payload[timestampKey]
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
