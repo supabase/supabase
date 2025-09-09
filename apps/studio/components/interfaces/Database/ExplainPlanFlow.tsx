@@ -72,6 +72,9 @@ type RawPlan = {
   ['Sort Method']?: string
   ['Sort Space Used']?: number
   ['Sort Space Type']?: string
+  // Subplan/CTE names
+  ['Subplan Name']?: string
+  ['CTE Name']?: string
 }
 
 type PlanRoot = { Plan: RawPlan }
@@ -80,6 +83,7 @@ type PlanMeta = {
   planningTime?: number
   executionTime?: number
   jitTotalTime?: number
+  subplanRoots?: { name: string; id: string }[]
 }
 
 const NODE_TYPE = 'plan'
@@ -184,6 +188,10 @@ type PlanNodeData = {
   sortMethod?: string
   sortSpaceUsed?: number
   sortSpaceType?: string
+  // Subplan/CTE context
+  subplanName?: string
+  cteName?: string
+  subplanOf?: string
 }
 
 type Agg = {
@@ -218,19 +226,37 @@ const zeroAgg = (): Agg => ({
 
 const buildGraphFromPlan = (
   planJson: PlanRoot[]
-): { nodes: Node<PlanNodeData>[]; edges: Edge[] } => {
+): {
+  nodes: Node<PlanNodeData>[]
+  edges: Edge[]
+  subplanRoots: { name: string; id: string }[]
+} => {
   const nodes: Node<PlanNodeData>[] = []
   const edges: Edge[] = []
+  const subplanRoots: { name: string; id: string }[] = []
 
-  const addPlan = (plan: RawPlan, parentId?: string, index: number = 0): Agg => {
+  // Helper: Recursively add plan nodes, propagating subplan context.
+  const addPlan = (
+    plan: RawPlan,
+    parentId?: string,
+    index: number = 0,
+    currentSubplanName?: string
+  ): Agg => {
     const id = parentId ? `${parentId}-${index}` : 'root'
     const label = plan['Node Type'] ?? 'Node'
+    // Compute current subplan context for this node and descendants
+    const subName = plan['Subplan Name'] ?? currentSubplanName
+
+    // If this node is a subplan root, record it
+    if (plan['Subplan Name']) {
+      subplanRoots.push({ name: plan['Subplan Name'], id })
+    }
 
     // Recurse first to get children aggregates for exclusive computation
     const children: RawPlan[] = plan['Plans'] ?? []
     let childAgg: Agg = zeroAgg()
     children.forEach((child, i) => {
-      const agg = addPlan(child, id, i)
+      const agg = addPlan(child, id, i, subName)
       // create edge to child now that we know ids
       const childId = `${id}-${i}`
       edges.push({ id: `${id}->${childId}`, source: id, target: childId, animated: true })
@@ -285,6 +311,7 @@ const buildGraphFromPlan = (
     const exTempRead = Math.max(nodeTempRead - childAgg.tempRead, 0)
     const exTempWritten = Math.max(nodeTempWritten - childAgg.tempWritten, 0)
 
+    // Build PlanNodeData with subplan/cte context
     const data: PlanNodeData = {
       label,
       joinType: plan['Join Type'],
@@ -347,8 +374,14 @@ const buildGraphFromPlan = (
       sortMethod: plan['Sort Method'],
       sortSpaceUsed: plan['Sort Space Used'],
       sortSpaceType: plan['Sort Space Type'],
+      // Subplan/CTE context
+      subplanName: plan['Subplan Name'],
+      cteName: plan['CTE Name'],
     }
-
+    // If a subplan context is inherited and not at the root, propagate it for badge display
+    if (subName && subName !== plan['Subplan Name']) {
+      data.subplanName = subName
+    }
     nodes.push({ id, type: NODE_TYPE, data, position: { x: 0, y: 0 } })
 
     // Return this node's inclusive totals so that the parent can compute exclusives
@@ -372,7 +405,7 @@ const buildGraphFromPlan = (
     addPlan(planJson[0].Plan)
   }
 
-  return getLayoutedElementsViaDagre(nodes, edges)
+  return { ...getLayoutedElementsViaDagre(nodes, edges), subplanRoots }
 }
 
 const stripParens = (s: string) => s.replace(/^\((.*)\)$/, '$1')
@@ -385,6 +418,12 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
 
   const headerLines: string[] = []
+  // Insert CTE/Subplan badge at the top of the header lines if present
+  if (data.cteName) {
+    headerLines.unshift(`[CTE] ${data.cteName}`)
+  } else if (data.subplanName) {
+    headerLines.unshift(`[Subplan] ${data.subplanName}`)
+  }
   if (data.joinType) headerLines.push(`${capitalize(data.joinType)} join`)
 
   // Only show join-related conditions in header; exclude index/recheck/filter conditions
@@ -768,7 +807,11 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
       }
       const planPart = root?.Plan ? [root] : parsed
       const graph = buildGraphFromPlan(planPart)
-      return { ...graph, meta }
+      return {
+        nodes: graph.nodes,
+        edges: graph.edges,
+        meta: { ...meta, subplanRoots: graph.subplanRoots },
+      }
     } catch (e) {
       return { nodes: [], edges: [], meta: undefined }
     }
@@ -800,6 +843,20 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
             </div>
           </div>
         )}
+      {/* Subplan roots overlay panel */}
+      {meta?.subplanRoots?.length && (
+        <div className="absolute z-10 top-14 left-2 text-[10px] px-2 py-1 rounded bg-foreground-muted/20 backdrop-blur-sm border">
+          <div>
+            <span className="font-bold">Subplans:</span>{' '}
+            {meta.subplanRoots.map((sp, i) => (
+              <span key={sp.id}>
+                {sp.name}
+                {i < (meta.subplanRoots?.length ?? 0) - 1 ? ', ' : ''}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       <ReactFlow
         defaultNodes={[]}
         defaultEdges={[]}
