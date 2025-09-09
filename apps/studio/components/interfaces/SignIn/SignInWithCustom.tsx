@@ -29,7 +29,7 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
       const { error } = await auth.signInWithOAuth({
         // @ts-expect-error - providerName is a string
         provider: providerName.toLowerCase(),
-        options: { redirectTo },
+        options: { redirectTo, scopes: 'email' },
       })
 
       if (error) throw error
