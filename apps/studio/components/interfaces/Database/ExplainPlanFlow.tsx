@@ -164,11 +164,54 @@ type PlanNodeData = {
   tempWritten?: number
   ioReadTime?: number
   ioWriteTime?: number
+  // Exclusive (derived)
+  exclusiveTimeMs?: number
+  exclusiveCost?: number
+  exSharedHit?: number
+  exSharedRead?: number
+  exSharedDirtied?: number
+  exSharedWritten?: number
+  exLocalHit?: number
+  exLocalRead?: number
+  exLocalDirtied?: number
+  exLocalWritten?: number
+  exTempRead?: number
+  exTempWritten?: number
   // Misc
   sortMethod?: string
   sortSpaceUsed?: number
   sortSpaceType?: string
 }
+
+type Agg = {
+  timeIncl: number
+  costIncl: number
+  sharedHit: number
+  sharedRead: number
+  sharedDirtied: number
+  sharedWritten: number
+  localHit: number
+  localRead: number
+  localDirtied: number
+  localWritten: number
+  tempRead: number
+  tempWritten: number
+}
+
+const zeroAgg = (): Agg => ({
+  timeIncl: 0,
+  costIncl: 0,
+  sharedHit: 0,
+  sharedRead: 0,
+  sharedDirtied: 0,
+  sharedWritten: 0,
+  localHit: 0,
+  localRead: 0,
+  localDirtied: 0,
+  localWritten: 0,
+  tempRead: 0,
+  tempWritten: 0,
+})
 
 const buildGraphFromPlan = (
   planJson: PlanRoot[]
@@ -176,9 +219,63 @@ const buildGraphFromPlan = (
   const nodes: Node<PlanNodeData>[] = []
   const edges: Edge[] = []
 
-  const addPlan = (plan: RawPlan, parentId?: string, index: number = 0) => {
+  const addPlan = (plan: RawPlan, parentId?: string, index: number = 0): Agg => {
     const id = parentId ? `${parentId}-${index}` : 'root'
     const label = plan['Node Type'] ?? 'Node'
+
+    // Recurse first to get children aggregates for exclusive computation
+    const children: RawPlan[] = plan['Plans'] ?? []
+    let childAgg: Agg = zeroAgg()
+    children.forEach((child, i) => {
+      const agg = addPlan(child, id, i)
+      // create edge to child now that we know ids
+      const childId = `${id}-${i}`
+      edges.push({ id: `${id}->${childId}`, source: id, target: childId, animated: true })
+      // accumulate child inclusive totals
+      childAgg.timeIncl += agg.timeIncl
+      childAgg.costIncl += agg.costIncl
+      childAgg.sharedHit += agg.sharedHit
+      childAgg.sharedRead += agg.sharedRead
+      childAgg.sharedDirtied += agg.sharedDirtied
+      childAgg.sharedWritten += agg.sharedWritten
+      childAgg.localHit += agg.localHit
+      childAgg.localRead += agg.localRead
+      childAgg.localDirtied += agg.localDirtied
+      childAgg.localWritten += agg.localWritten
+      childAgg.tempRead += agg.tempRead
+      childAgg.tempWritten += agg.tempWritten
+    })
+
+    // Inclusive values for this node (per Postgres: times/costs are inclusive)
+    const loops = plan['Actual Loops'] ?? 1
+    const nodeTimeIncl = (plan['Actual Total Time'] ?? 0) * loops
+    const nodeCostIncl = plan['Total Cost'] ?? 0
+
+    const nodeSharedHit = plan['Shared Hit Blocks'] ?? 0
+    const nodeSharedRead = plan['Shared Read Blocks'] ?? 0
+    const nodeSharedDirtied = plan['Shared Dirtied Blocks'] ?? 0
+    const nodeSharedWritten = plan['Shared Written Blocks'] ?? 0
+    const nodeLocalHit = plan['Local Hit Blocks'] ?? 0
+    const nodeLocalRead = plan['Local Read Blocks'] ?? 0
+    const nodeLocalDirtied = plan['Local Dirtied Blocks'] ?? 0
+    const nodeLocalWritten = plan['Local Written Blocks'] ?? 0
+    const nodeTempRead = plan['Temp Read Blocks'] ?? 0
+    const nodeTempWritten = plan['Temp Written Blocks'] ?? 0
+
+    // Exclusive (self) = node inclusive - sum(children inclusive)
+    const exclusiveTimeMs = Math.max(nodeTimeIncl - childAgg.timeIncl, 0)
+    const exclusiveCost = Math.max(nodeCostIncl - childAgg.costIncl, 0)
+    const exSharedHit = Math.max(nodeSharedHit - childAgg.sharedHit, 0)
+    const exSharedRead = Math.max(nodeSharedRead - childAgg.sharedRead, 0)
+    const exSharedDirtied = Math.max(nodeSharedDirtied - childAgg.sharedDirtied, 0)
+    const exSharedWritten = Math.max(nodeSharedWritten - childAgg.sharedWritten, 0)
+    const exLocalHit = Math.max(nodeLocalHit - childAgg.localHit, 0)
+    const exLocalRead = Math.max(nodeLocalRead - childAgg.localRead, 0)
+    const exLocalDirtied = Math.max(nodeLocalDirtied - childAgg.localDirtied, 0)
+    const exLocalWritten = Math.max(nodeLocalWritten - childAgg.localWritten, 0)
+    const exTempRead = Math.max(nodeTempRead - childAgg.tempRead, 0)
+    const exTempWritten = Math.max(nodeTempWritten - childAgg.tempWritten, 0)
+
     const data: PlanNodeData = {
       label,
       joinType: plan['Join Type'],
@@ -209,34 +306,55 @@ const buildGraphFromPlan = (
       rowsRemovedByIndexRecheck: plan['Rows Removed by Index Recheck'],
       heapFetches: plan['Heap Fetches'],
       outputCols: plan['Output'],
-      // BUFFERS
-      sharedHit: plan['Shared Hit Blocks'],
-      sharedRead: plan['Shared Read Blocks'],
-      sharedDirtied: plan['Shared Dirtied Blocks'],
-      sharedWritten: plan['Shared Written Blocks'],
-      localHit: plan['Local Hit Blocks'],
-      localRead: plan['Local Read Blocks'],
-      localDirtied: plan['Local Dirtied Blocks'],
-      localWritten: plan['Local Written Blocks'],
-      tempRead: plan['Temp Read Blocks'],
-      tempWritten: plan['Temp Written Blocks'],
+      // BUFFERS (inclusive values kept as-is for reference if needed)
+      sharedHit: nodeSharedHit,
+      sharedRead: nodeSharedRead,
+      sharedDirtied: nodeSharedDirtied,
+      sharedWritten: nodeSharedWritten,
+      localHit: nodeLocalHit,
+      localRead: nodeLocalRead,
+      localDirtied: nodeLocalDirtied,
+      localWritten: nodeLocalWritten,
+      tempRead: nodeTempRead,
+      tempWritten: nodeTempWritten,
       ioReadTime: plan['I/O Read Time'],
       ioWriteTime: plan['I/O Write Time'],
+      // Exclusive (derived)
+      exclusiveTimeMs,
+      exclusiveCost,
+      exSharedHit,
+      exSharedRead,
+      exSharedDirtied,
+      exSharedWritten,
+      exLocalHit,
+      exLocalRead,
+      exLocalDirtied,
+      exLocalWritten,
+      exTempRead,
+      exTempWritten,
       // MISC
       sortMethod: plan['Sort Method'],
       sortSpaceUsed: plan['Sort Space Used'],
       sortSpaceType: plan['Sort Space Type'],
     }
-    nodes.push({
-      id,
-      type: NODE_TYPE,
-      data,
-      position: { x: 0, y: 0 },
-    })
-    if (parentId)
-      edges.push({ id: `${parentId}->${id}`, source: parentId, target: id, animated: true })
-    const children: RawPlan[] = plan['Plans'] ?? []
-    children.forEach((child, i) => addPlan(child, id, i))
+
+    nodes.push({ id, type: NODE_TYPE, data, position: { x: 0, y: 0 } })
+
+    // Return this node's inclusive totals so that the parent can compute exclusives
+    return {
+      timeIncl: nodeTimeIncl,
+      costIncl: nodeCostIncl,
+      sharedHit: nodeSharedHit,
+      sharedRead: nodeSharedRead,
+      sharedDirtied: nodeSharedDirtied,
+      sharedWritten: nodeSharedWritten,
+      localHit: nodeLocalHit,
+      localRead: nodeLocalRead,
+      localDirtied: nodeLocalDirtied,
+      localWritten: nodeLocalWritten,
+      tempRead: nodeTempRead,
+      tempWritten: nodeTempWritten,
+    }
   }
 
   if (Array.isArray(planJson) && planJson.length > 0 && planJson[0].Plan) {
@@ -272,17 +390,17 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
 
   // Prepare compact buffers summary lines (show only if any > 0)
   const hasShared =
-    (data.sharedHit ?? 0) +
-      (data.sharedRead ?? 0) +
-      (data.sharedWritten ?? 0) +
-      (data.sharedDirtied ?? 0) >
+    (data.exSharedHit ?? 0) +
+      (data.exSharedRead ?? 0) +
+      (data.exSharedWritten ?? 0) +
+      (data.exSharedDirtied ?? 0) >
     0
-  const hasTemp = (data.tempRead ?? 0) + (data.tempWritten ?? 0) > 0
+  const hasTemp = (data.exTempRead ?? 0) + (data.exTempWritten ?? 0) > 0
   const hasLocal =
-    (data.localHit ?? 0) +
-      (data.localRead ?? 0) +
-      (data.localWritten ?? 0) +
-      (data.localDirtied ?? 0) >
+    (data.exLocalHit ?? 0) +
+      (data.exLocalRead ?? 0) +
+      (data.exLocalWritten ?? 0) +
+      (data.exLocalDirtied ?? 0) >
     0
 
   return (
@@ -333,6 +451,24 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             </div>
           </li>
         )}
+        {/* Time (self/exclusive) */}
+        {typeof data.exclusiveTimeMs === 'number' && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>self time</span>
+              <span>{data.exclusiveTimeMs} ms</span>
+            </div>
+          </li>
+        )}
 
         {/* Rows (actual / est) */}
         {(data.actualRows !== undefined || data.planRows !== undefined) && (
@@ -377,6 +513,24 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             </div>
           </li>
         )}
+        {/* Cost (self/exclusive) */}
+        {typeof data.exclusiveCost === 'number' && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>Self Cost</span>
+              <span>{data.exclusiveCost.toFixed(2)}</span>
+            </div>
+          </li>
+        )}
 
         {/* Width */}
         {data.planWidth !== undefined && (
@@ -410,7 +564,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>removed (filter)</span>
+              <span>Removed (filter)</span>
               <span>{data.rowsRemovedByFilter}</span>
             </div>
           </li>
@@ -463,10 +617,10 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Shared</span>
+              <span>Shared (self)</span>
               <span>
-                h:{data.sharedHit ?? 0} r:{data.sharedRead ?? 0}
-                {typeof data.sharedWritten === 'number' ? ` w:${data.sharedWritten}` : ''}
+                h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0}
+                {typeof data.exSharedWritten === 'number' ? ` w:${data.exSharedWritten}` : ''}
               </span>
             </div>
           </li>
@@ -483,9 +637,9 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Temp</span>
+              <span>Temp (self)</span>
               <span>
-                r:{data.tempRead ?? 0} w:{data.tempWritten ?? 0}
+                r:{data.exTempRead ?? 0} w:{data.exTempWritten ?? 0}
               </span>
             </div>
           </li>
@@ -502,10 +656,10 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Local</span>
+              <span>Local (self)</span>
               <span>
-                h:{data.localHit ?? 0} r:{data.localRead ?? 0}
-                {typeof data.localWritten === 'number' ? ` w:${data.localWritten}` : ''}
+                h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0}
+                {typeof data.exLocalWritten === 'number' ? ` w:${data.exLocalWritten}` : ''}
               </span>
             </div>
           </li>
