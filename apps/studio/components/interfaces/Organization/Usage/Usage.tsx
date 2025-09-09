@@ -177,10 +177,7 @@ const Usage = () => {
                       else setSelectedProjectRefInputValue(value)
                     }}
                   >
-                    <SelectTrigger_Shadcn_
-                      size="tiny"
-                      className="w-[180px] [&>span]:truncate [&>span]:!w-[24ch]"
-                    >
+                    <SelectTrigger_Shadcn_ size="tiny" className="w-[180px]">
                       <SelectValue_Shadcn_ placeholder="Select a project" />
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
