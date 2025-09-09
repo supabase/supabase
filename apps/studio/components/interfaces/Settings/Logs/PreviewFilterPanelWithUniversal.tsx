@@ -20,10 +20,6 @@ import { DatePickerValue } from './Logs.DatePickers'
 import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 
-function isBooleanMap(v: unknown): v is Record<string, boolean> {
-  return typeof v === 'object' && v !== null && !Array.isArray(v)
-}
-
 function CustomDateRangePicker({ onChange, onCancel }: CustomOptionProps) {
   const [dateRange, setDateRange] = useState<any | undefined>()
 
@@ -280,14 +276,8 @@ const PreviewFilterPanelWithUniversal = ({
         if (!condition.value) {
           return
         }
-        if (typeof condition.value === 'string') {
-          const current = newFilters[propertyName]
-          const next = isBooleanMap(current) ? { ...current } : {}
-          next[condition.value] = true
-          newFilters[propertyName] = next
-        } else if (typeof condition.value === 'boolean') {
-          newFilters[propertyName] = condition.value
-        }
+
+        ;(newFilters[propertyName] as Record<string, boolean>)[condition.value] = true
       }
     })
 
