@@ -18,6 +18,7 @@ import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
 import { PresetHookResult } from '../Reports/Reports.utils'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
+import { QueryPerformanceGlance } from './QueryPerformanceGlance'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
@@ -66,7 +67,7 @@ export const QueryPerformance = ({
 
   return (
     <>
-      <div>stats</div>
+      <QueryPerformanceGlance />
 
       <QueryPerformanceFilterBar
         queryPerformanceQuery={queryPerformanceQuery}
