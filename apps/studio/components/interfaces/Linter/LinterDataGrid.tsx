@@ -170,7 +170,7 @@ const LinterDataGrid = ({
             <div className="flex items-center justify-between w-full border-b py-3 px-6">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm m-0">
-                  {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
+                  {lintInfoMap.find((item) => item.name === selectedLint.name)?.title ?? 'Unknown'}
                 </h3>
                 <LintCategoryBadge category={selectedLint.categories[0]} />
               </div>
