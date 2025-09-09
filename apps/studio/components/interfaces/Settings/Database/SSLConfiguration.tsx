@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -13,6 +14,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -64,6 +66,12 @@ const SSLConfiguration = () => {
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
     settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
+
+  const { sslCertificateUrl: sslCertificateUrlTemplate } = useCustomContent(['ssl:certificate_url'])
+  const sslCertificateUrl = useMemo(
+    () => template(sslCertificateUrlTemplate ?? '')({ env }),
+    [sslCertificateUrlTemplate, env]
+  )
 
   useEffect(() => {
     if (!isLoading && sslEnforcementConfiguration) {
@@ -183,11 +191,7 @@ const SSLConfiguration = () => {
               </ButtonTooltip>
             ) : (
               <Button type="default" icon={<Download />}>
-                <a
-                  href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
-                >
-                  Download certificate
-                </a>
+                <a href={sslCertificateUrl}>Download certificate</a>
               </Button>
             )}
           </div>
