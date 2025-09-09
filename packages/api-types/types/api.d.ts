@@ -6907,6 +6907,13 @@ export interface operations {
           'application/json': components['schemas']['BulkUpdateFunctionResponse']
         }
       }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       403: {
         headers: {
           [name: string]: unknown
@@ -6956,6 +6963,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['FunctionResponse']
         }
+      }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       403: {
         headers: {
@@ -7160,6 +7174,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['DeployFunctionResponse']
         }
+      }
+      /** @description Maximum number of functions reached for Plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       403: {
         headers: {
