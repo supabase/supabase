@@ -43,7 +43,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   }
 
   const getRenderColumns = (): number => {
-    const width = containerRef.current?.offsetWidth ?? containerWidth
+    const width = containerRef.current?.getBoundingClientRect().width ?? containerWidth
     return resolveColumnsForWidth(width || 0)
   }
 
