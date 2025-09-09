@@ -472,7 +472,6 @@ export const CreateBranchModal = () => {
                                     <p className="w-16">
                                       {branchDiskAttributes.type.toUpperCase()}
                                     </p>
-                                    <p>(${estimatedDiskCost.size.toFixed(2)})</p>
                                   </div>
                                   <div className="flex items-center gap-x-2">
                                     <p className="w-24">Targer disk size:</p>
