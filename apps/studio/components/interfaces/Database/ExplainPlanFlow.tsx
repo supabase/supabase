@@ -21,30 +21,66 @@ type ExplainPlanFlowProps = {
 }
 
 type RawPlan = {
+  // Basic Plan Node Properties
   ['Node Type']?: string
   ['Parallel Aware']?: boolean
   ['Async Capable']?: boolean
   ['Relation Name']?: string
   Alias?: string
   ['Join Type']?: string
+  // Cost Estimates
   ['Startup Cost']?: number
   ['Total Cost']?: number
   ['Plan Rows']?: number
   ['Plan Width']?: number
+  // Conditions and Filters
   Filter?: string
   ['Hash Cond']?: string
   ['Index Cond']?: string
   ['Recheck Cond']?: string
   ['Merge Cond']?: string
   ['Join Filter']?: string
+  // Plan Structure / Hierarchy
   ['Parent Relationship']?: string
   ['Scan Direction']?: string
   ['Index Name']?: string
   ['Order By']?: string
   Plans?: RawPlan[]
+  // ANALYZE (actuals)
+  ['Actual Startup Time']?: number
+  ['Actual Total Time']?: number
+  ['Actual Rows']?: number
+  ['Actual Loops']?: number
+  ['Rows Removed by Filter']?: number
+  ['Rows Removed by Index Recheck']?: number
+  ['Heap Fetches']?: number
+  Output?: string[]
+  // BUFFERS
+  ['Shared Hit Blocks']?: number
+  ['Shared Read Blocks']?: number
+  ['Shared Dirtied Blocks']?: number
+  ['Shared Written Blocks']?: number
+  ['Local Hit Blocks']?: number
+  ['Local Read Blocks']?: number
+  ['Local Dirtied Blocks']?: number
+  ['Local Written Blocks']?: number
+  ['Temp Read Blocks']?: number
+  ['Temp Written Blocks']?: number
+  ['I/O Read Time']?: number
+  ['I/O Write Time']?: number
+  // Misc node-specific extras (optional but useful)
+  ['Sort Method']?: string
+  ['Sort Space Used']?: number
+  ['Sort Space Type']?: string
 }
 
 type PlanRoot = { Plan: RawPlan }
+
+type PlanMeta = {
+  planningTime?: number
+  executionTime?: number
+  jitTotalTime?: number
+}
 
 const NODE_TYPE = 'plan'
 const DEFAULT_NODE_WIDTH = 180
@@ -106,6 +142,32 @@ type PlanNodeData = {
   scanDirection?: string
   indexName?: string
   orderBy?: string
+  // ANALYZE actuals
+  actualStartupTime?: number
+  actualTotalTime?: number
+  actualRows?: number
+  actualLoops?: number
+  rowsRemovedByFilter?: number
+  rowsRemovedByIndexRecheck?: number
+  heapFetches?: number
+  outputCols?: string[]
+  // BUFFERS
+  sharedHit?: number
+  sharedRead?: number
+  sharedDirtied?: number
+  sharedWritten?: number
+  localHit?: number
+  localRead?: number
+  localDirtied?: number
+  localWritten?: number
+  tempRead?: number
+  tempWritten?: number
+  ioReadTime?: number
+  ioWriteTime?: number
+  // Misc
+  sortMethod?: string
+  sortSpaceUsed?: number
+  sortSpaceType?: string
 }
 
 const buildGraphFromPlan = (
@@ -138,6 +200,32 @@ const buildGraphFromPlan = (
       scanDirection: plan['Scan Direction'],
       indexName: plan['Index Name'],
       orderBy: plan['Order By'],
+      // ANALYZE
+      actualStartupTime: plan['Actual Startup Time'],
+      actualTotalTime: plan['Actual Total Time'],
+      actualRows: plan['Actual Rows'],
+      actualLoops: plan['Actual Loops'],
+      rowsRemovedByFilter: plan['Rows Removed by Filter'],
+      rowsRemovedByIndexRecheck: plan['Rows Removed by Index Recheck'],
+      heapFetches: plan['Heap Fetches'],
+      outputCols: plan['Output'],
+      // BUFFERS
+      sharedHit: plan['Shared Hit Blocks'],
+      sharedRead: plan['Shared Read Blocks'],
+      sharedDirtied: plan['Shared Dirtied Blocks'],
+      sharedWritten: plan['Shared Written Blocks'],
+      localHit: plan['Local Hit Blocks'],
+      localRead: plan['Local Read Blocks'],
+      localDirtied: plan['Local Dirtied Blocks'],
+      localWritten: plan['Local Written Blocks'],
+      tempRead: plan['Temp Read Blocks'],
+      tempWritten: plan['Temp Written Blocks'],
+      ioReadTime: plan['I/O Read Time'],
+      ioWriteTime: plan['I/O Write Time'],
+      // MISC
+      sortMethod: plan['Sort Method'],
+      sortSpaceUsed: plan['Sort Space Used'],
+      sortSpaceType: plan['Sort Space Type'],
     }
     nodes.push({
       id,
@@ -182,6 +270,21 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
     headerLines.push(`using ${data.indexName}`)
   }
 
+  // Prepare compact buffers summary lines (show only if any > 0)
+  const hasShared =
+    (data.sharedHit ?? 0) +
+      (data.sharedRead ?? 0) +
+      (data.sharedWritten ?? 0) +
+      (data.sharedDirtied ?? 0) >
+    0
+  const hasTemp = (data.tempRead ?? 0) + (data.tempWritten ?? 0) > 0
+  const hasLocal =
+    (data.localHit ?? 0) +
+      (data.localRead ?? 0) +
+      (data.localWritten ?? 0) +
+      (data.localDirtied ?? 0) >
+    0
+
   return (
     <div
       className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
@@ -210,7 +313,8 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
       )}
 
       <ul>
-        {data.startupCost !== undefined && (
+        {/* Time (actual) */}
+        {data.actualTotalTime !== undefined && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -222,29 +326,16 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             )}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>cost</span>
-              <span>{data.startupCost}</span>
+              <span>time</span>
+              <span>
+                {data.actualTotalTime} ms{data.actualLoops ? ` ×${data.actualLoops}` : ''}
+              </span>
             </div>
           </li>
         )}
-        {data.totalCost !== undefined && (
-          <li
-            className={cn(
-              'text-[8px] leading-5 relative flex flex-row justify-items-start',
-              'bg-surface-100',
-              'border-t',
-              'border-t-[0.5px]',
-              'hover:bg-scale-500 transition cursor-default',
-              itemHeight
-            )}
-          >
-            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>cost</span>
-              <span>{data.totalCost}</span>
-            </div>
-          </li>
-        )}
-        {data.planRows !== undefined && (
+
+        {/* Rows (actual / est) */}
+        {(data.actualRows !== undefined || data.planRows !== undefined) && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -257,10 +348,37 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
               <span>rows</span>
-              <span>{data.planRows}</span>
+              <span>
+                {data.actualRows !== undefined ? data.actualRows : '-'}
+                {data.planRows !== undefined ? ` / est ${data.planRows}` : ''}
+              </span>
             </div>
           </li>
         )}
+
+        {/* Costs (startup → total) */}
+        {(data.startupCost !== undefined || data.totalCost !== undefined) && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>cost</span>
+              <span>
+                {data.startupCost !== undefined ? data.startupCost : '-'}
+                {data.totalCost !== undefined ? ` → ${data.totalCost}` : ''}
+              </span>
+            </div>
+          </li>
+        )}
+
+        {/* Width */}
         {data.planWidth !== undefined && (
           <li
             className={cn(
@@ -278,6 +396,165 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             </div>
           </li>
         )}
+
+        {/* Filters/Removals */}
+        {data.rowsRemovedByFilter !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>removed (filter)</span>
+              <span>{data.rowsRemovedByFilter}</span>
+            </div>
+          </li>
+        )}
+        {data.rowsRemovedByIndexRecheck !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>removed (recheck)</span>
+              <span>{data.rowsRemovedByIndexRecheck}</span>
+            </div>
+          </li>
+        )}
+        {data.heapFetches !== undefined && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>heapfetches</span>
+              <span>{data.heapFetches}</span>
+            </div>
+          </li>
+        )}
+
+        {/* BUFFERS */}
+        {hasShared && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>shared</span>
+              <span>
+                h:{data.sharedHit ?? 0} r:{data.sharedRead ?? 0}
+                {typeof data.sharedWritten === 'number' ? ` w:${data.sharedWritten}` : ''}
+              </span>
+            </div>
+          </li>
+        )}
+        {hasTemp && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>temp</span>
+              <span>
+                r:{data.tempRead ?? 0} w:{data.tempWritten ?? 0}
+              </span>
+            </div>
+          </li>
+        )}
+        {hasLocal && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>local</span>
+              <span>
+                h:{data.localHit ?? 0} r:{data.localRead ?? 0}
+                {typeof data.localWritten === 'number' ? ` w:${data.localWritten}` : ''}
+              </span>
+            </div>
+          </li>
+        )}
+
+        {/* Output cols (verbose) */}
+        {Array.isArray(data.outputCols) && data.outputCols.length > 0 && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              'min-h-[22px]'
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>output</span>
+              <span className="truncate max-w-[95px]" title={data.outputCols.join(', ')}>
+                {data.outputCols.join(', ')}
+              </span>
+            </div>
+          </li>
+        )}
+
+        {/* I/O times */}
+        {(data.ioReadTime !== undefined || data.ioWriteTime !== undefined) && (
+          <li
+            className={cn(
+              'text-[8px] leading-5 relative flex flex-row justify-items-start',
+              'bg-surface-100',
+              'border-t',
+              'border-t-[0.5px]',
+              'hover:bg-scale-500 transition cursor-default',
+              itemHeight
+            )}
+          >
+            <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
+              <span>io</span>
+              <span>
+                {typeof data.ioReadTime === 'number' ? `r:${data.ioReadTime}ms` : ''}
+                {typeof data.ioWriteTime === 'number'
+                  ? `${typeof data.ioReadTime === 'number' ? ' ' : ''}w:${data.ioWriteTime}ms`
+                  : ''}
+              </span>
+            </div>
+          </li>
+        )}
       </ul>
       <Handle type="source" position={Position.Bottom} className={hiddenNodeConnector} />
     </div>
@@ -285,12 +562,27 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
 }
 
 export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
-  const { nodes, edges } = useMemo((): { nodes: Node[]; edges: Edge[] } => {
+  const { nodes, edges, meta } = useMemo((): { nodes: Node[]; edges: Edge[]; meta?: PlanMeta } => {
     try {
-      const parsed = JSON.parse(json)
-      return buildGraphFromPlan(parsed)
+      const parsed = JSON.parse(json) as any
+      const root = Array.isArray(parsed) ? parsed[0] : parsed
+      const meta: PlanMeta = {
+        planningTime:
+          typeof root?.['Planning Time'] === 'number' ? root['Planning Time'] : undefined,
+        executionTime:
+          typeof root?.['Execution Time'] === 'number' ? root['Execution Time'] : undefined,
+        jitTotalTime:
+          typeof root?.JIT?.Timing?.Total === 'number'
+            ? root.JIT.Timing.Total
+            : typeof root?.JIT?.['Total Time'] === 'number'
+              ? root.JIT['Total Time']
+              : undefined,
+      }
+      const planPart = root?.Plan ? [root] : parsed
+      const graph = buildGraphFromPlan(planPart)
+      return { ...graph, meta }
     } catch (e) {
-      return { nodes: [], edges: [] }
+      return { nodes: [], edges: [], meta: undefined }
     }
   }, [json])
 
@@ -307,7 +599,19 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
   )
 
   return (
-    <div className="w-full h-full border border-green-500">
+    <div className="w-full h-full border border-green-500 relative">
+      {meta &&
+        (meta.planningTime !== undefined ||
+          meta.executionTime !== undefined ||
+          meta.jitTotalTime !== undefined) && (
+          <div className="absolute z-10 top-2 left-2 text-[10px] px-2 py-1 rounded bg-foreground-muted/20 backdrop-blur-sm border">
+            <div className="flex gap-3">
+              {meta.planningTime !== undefined && <span>planning: {meta.planningTime} ms</span>}
+              {meta.executionTime !== undefined && <span>exec: {meta.executionTime} ms</span>}
+              {meta.jitTotalTime !== undefined && <span>jit: {meta.jitTotalTime} ms</span>}
+            </div>
+          </div>
+        )}
       <ReactFlow
         defaultNodes={[]}
         defaultEdges={[]}
