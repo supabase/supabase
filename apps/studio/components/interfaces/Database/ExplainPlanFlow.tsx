@@ -433,6 +433,21 @@ const buildGraphFromPlan = (
 
 const stripParens = (s: string) => s.replace(/^\((.*)\)$/, '$1')
 
+// Buffers tooltips helpers
+const blocksToBytes = (blocks?: number) => {
+  const b = (blocks ?? 0) * 8192 // 8kB per block
+  if (!b) return '0 B'
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let i = 0
+  let v = b
+  while (v >= 1024 && i < units.length - 1) {
+    v /= 1024
+    i++
+  }
+  return `${v.toFixed(1)} ${units[i]}`
+}
+
 /**
  * @see: https://github.com/wbkd/react-flow/discussions/2698
  */
@@ -476,6 +491,48 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
       (data.exLocalWritten ?? 0) +
       (data.exLocalDirtied ?? 0) >
     0
+
+  const sharedTooltip = () => {
+    const incl = `incl: h=${data.sharedHit ?? 0} (${blocksToBytes(data.sharedHit)}), r=${
+      data.sharedRead ?? 0
+    } (${blocksToBytes(data.sharedRead)}), d=${data.sharedDirtied ?? 0} (${blocksToBytes(
+      data.sharedDirtied
+    )}), w=${data.sharedWritten ?? 0} (${blocksToBytes(data.sharedWritten)})`
+    const self = `self: h=${data.exSharedHit ?? 0} (${blocksToBytes(
+      data.exSharedHit
+    )}), r=${data.exSharedRead ?? 0} (${blocksToBytes(data.exSharedRead)}), d=${
+      data.exSharedDirtied ?? 0
+    } (${blocksToBytes(data.exSharedDirtied)}), w=${data.exSharedWritten ?? 0} (${blocksToBytes(
+      data.exSharedWritten
+    )})`
+    return `Shared Blocks\n${incl}\n${self}`
+  }
+
+  const localTooltip = () => {
+    const incl = `incl: h=${data.localHit ?? 0} (${blocksToBytes(data.localHit)}), r=${
+      data.localRead ?? 0
+    } (${blocksToBytes(data.localRead)}), d=${data.localDirtied ?? 0} (${blocksToBytes(
+      data.localDirtied
+    )}), w=${data.localWritten ?? 0} (${blocksToBytes(data.localWritten)})`
+    const self = `self: h=${data.exLocalHit ?? 0} (${blocksToBytes(
+      data.exLocalHit
+    )}), r=${data.exLocalRead ?? 0} (${blocksToBytes(data.exLocalRead)}), d=${
+      data.exLocalDirtied ?? 0
+    } (${blocksToBytes(data.exLocalDirtied)}), w=${data.exLocalWritten ?? 0} (${blocksToBytes(
+      data.exLocalWritten
+    )})`
+    return `Local Blocks\n${incl}\n${self}`
+  }
+
+  const tempTooltip = () => {
+    const incl = `incl: r=${data.tempRead ?? 0} (${blocksToBytes(
+      data.tempRead
+    )}), w=${data.tempWritten ?? 0} (${blocksToBytes(data.tempWritten)})`
+    const self = `self: r=${data.exTempRead ?? 0} (${blocksToBytes(
+      data.exTempRead
+    )}), w=${data.exTempWritten ?? 0} (${blocksToBytes(data.exTempWritten)})`
+    return `Temp Blocks\n${incl}\n${self}`
+  }
 
   return (
     <div
@@ -712,12 +769,13 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
               'hover:bg-scale-500 transition cursor-default',
               itemHeight
             )}
+            title={sharedTooltip()}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
               <span>Shared (self)</span>
               <span>
-                h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0}
-                {typeof data.exSharedWritten === 'number' ? ` w:${data.exSharedWritten}` : ''}
+                h:{data.exSharedHit ?? 0} r:{data.exSharedRead ?? 0} d:{data.exSharedDirtied ?? 0}{' '}
+                w:{data.exSharedWritten ?? 0}
               </span>
             </div>
           </li>
@@ -732,6 +790,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
               'hover:bg-scale-500 transition cursor-default',
               itemHeight
             )}
+            title={tempTooltip()}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
               <span>Temp (self)</span>
@@ -751,12 +810,13 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
               'hover:bg-scale-500 transition cursor-default',
               itemHeight
             )}
+            title={localTooltip()}
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
               <span>Local (self)</span>
               <span>
-                h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0}
-                {typeof data.exLocalWritten === 'number' ? ` w:${data.exLocalWritten}` : ''}
+                h:{data.exLocalHit ?? 0} r:{data.exLocalRead ?? 0} d:{data.exLocalDirtied ?? 0} w:
+                {data.exLocalWritten ?? 0}
               </span>
             </div>
           </li>
