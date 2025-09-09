@@ -68,19 +68,6 @@ export const ReportChartV2 = ({
   const dynamicAttributes = queryResult?.attributes || []
 
   /**
-   * Checks the attributes received match properties inside the data items
-   */
-  const attributesMatchDataProperties = dynamicAttributes?.every((attribute) =>
-    chartData?.some((item: any) => item[attribute.attribute])
-  )
-
-  useEffect(() => {
-    if (!attributesMatchDataProperties && chartData.length > 0) {
-      console.warn(`[ReportChartV2 ${report.id}]: Chart attributes do not match data provided.`)
-    }
-  }, [attributesMatchDataProperties, chartData, report.id])
-
-  /**
    * Depending on the source the timestamp key could be 'timestamp' or 'period_start'
    */
   const firstItem = chartData[0]
