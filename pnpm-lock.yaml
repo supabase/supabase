@@ -372,7 +372,7 @@ importers:
         version: 1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10.3.0
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -588,8 +588,8 @@ importers:
         specifier: 4.5.0
         version: 4.5.0(encoding@0.1.13)(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)
       '@supabase/supa-mdx-lint':
-        specifier: 0.3.0-alpha
-        version: 0.3.0-alpha
+        specifier: 0.3.1
+        version: 0.3.1
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
@@ -781,7 +781,7 @@ importers:
         version: 1.1.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10.3.0
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@std/path':
         specifier: npm:@jsr/std__path@^1.0.8
         version: '@jsr/std__path@1.0.8'
@@ -1551,7 +1551,7 @@ importers:
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -8071,8 +8071,8 @@ packages:
     engines: {node: '>=10'}
     os: [darwin]
 
-  '@supabase/supa-mdx-lint-darwin@0.3.0-alpha':
-    resolution: {integrity: sha512-gz8qGrigRIoU3JAAygmxUxTm+0RoNy3fbIW7jo5eLxY9V3aMmLqwAUMsV8afNJjtjP7MpnpN8poIFsSSAi9A7w==}
+  '@supabase/supa-mdx-lint-darwin@0.3.1':
+    resolution: {integrity: sha512-kX4cFMIP9OStV1j9zWy/wfrk5KKrn3DtBwP7y8GPHe05Y7nTfQOoqHpIKbHswJRB5OxFC3ETpI6DocQeWcrZ6Q==}
     engines: {node: '>=10'}
     os: [darwin]
 
@@ -8082,8 +8082,8 @@ packages:
     cpu: [arm64]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-linux-arm64@0.3.0-alpha':
-    resolution: {integrity: sha512-zr3wBIsKltCFpb4yJ9vmCehFcMTihSdGwfFi9p1cZEUs0n+Kug6MncFpk5PsSsahNHk76IvdxnyLxkD0NV+YZA==}
+  '@supabase/supa-mdx-lint-linux-arm64@0.3.1':
+    resolution: {integrity: sha512-4zVQkqxnn+HYSbYED9egnw/nuF5/Z8pK1Kp2vmv5cNUaQvyreHZzC1opRjO11HgqBZZGMm5AybsY3lEEQ5pqpg==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux, freebsd]
@@ -8094,8 +8094,8 @@ packages:
     cpu: [arm]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-linux-arm@0.3.0-alpha':
-    resolution: {integrity: sha512-azoxkiqEv4AJfjaWxp0qoL/KFuKXSG2Ex8DgwVwkpbB3oWXhVuuTxMSyJYB2l49seRXBprIrDlXDpzC6BH4leQ==}
+  '@supabase/supa-mdx-lint-linux-arm@0.3.1':
+    resolution: {integrity: sha512-fcR7oKKgrXbVHKtOLjbtPPP3fg/FxaYLnnYYVulJM4Xh+0dPFmCox1xIo7OZKbHy7pEa+GJUwSgT1WlhZLN34Q==}
     engines: {node: '>=10'}
     cpu: [arm]
     os: [linux, freebsd]
@@ -8106,8 +8106,8 @@ packages:
     cpu: [x86, ia32]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-linux-i686@0.3.0-alpha':
-    resolution: {integrity: sha512-QjIL+qwfCO+pbQR+VnLpPryp/Hm8FoPufWl31/v8Yo2GGJdwYYgt8NU/iDzDjbzLCXdnfRLO68BPh5g5DmG7wQ==}
+  '@supabase/supa-mdx-lint-linux-i686@0.3.1':
+    resolution: {integrity: sha512-09HNDDy11ox8IiEXe2SWecRtvdFOJu2lDvQo+vmEtVLhvO5eji65bG+vmESfdCcS79gaGxWoR+XWMreVhlVZ/Q==}
     engines: {node: '>=10'}
     cpu: [x86, ia32]
     os: [linux, freebsd]
@@ -8118,8 +8118,8 @@ packages:
     cpu: [x64]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-linux-x64@0.3.0-alpha':
-    resolution: {integrity: sha512-7v+vWGHhamTJJuMXzS9VZ6XvIgMMLFQxd8df4P/RppdEFTSWDZO/MWMhfhjz3opRrkYA+hGCTgUk+CWN8ggbig==}
+  '@supabase/supa-mdx-lint-linux-x64@0.3.1':
+    resolution: {integrity: sha512-4ZioHRmm5Tt1/EF1K2FcmhrZVEYWcT+5z4smNvMqznutCXKowb3EYCtvDm1TOPXh8JjxzOnlch18+TN6MexsKA==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux, freebsd]
@@ -8130,8 +8130,8 @@ packages:
     cpu: [x86, ia32]
     os: [win32]
 
-  '@supabase/supa-mdx-lint-win32-i686@0.3.0-alpha':
-    resolution: {integrity: sha512-KX/tVNJSYyCUb9VSxDqbpsMZUjvH4NOMTy5f/+fHXOzD4XxdzH+mImUBVpcrwyQrbV4YtwL4kQBUj9pVETuKSQ==}
+  '@supabase/supa-mdx-lint-win32-i686@0.3.1':
+    resolution: {integrity: sha512-u7H840/2fxjrLuNI2ohdslIyrZ8bJoBFhvTiC8J13cQBbpOP4FQOEzgeh1hqZGJNuWAUBgYJkwiZl/gc8Yv4Eg==}
     engines: {node: '>=10'}
     cpu: [x86, ia32]
     os: [win32]
@@ -8142,8 +8142,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@supabase/supa-mdx-lint-win32-x64@0.3.0-alpha':
-    resolution: {integrity: sha512-SFRAOaG/3fK4dFODuqI6XgAV+MBx/vjP6N6mt6eDvlUKMT54iuKUQSfDf52Q3nyDKRkaasxl51CQDO5gPMXItQ==}
+  '@supabase/supa-mdx-lint-win32-x64@0.3.1':
+    resolution: {integrity: sha512-AWAc7MwC0OU3NDuhZUVTVc1JYqXVY6UH6sL1lS/bM3j8eDAG1hTw2Bt4f85sAfYlt6BVDyEqLgNa3govsUQ5Jg==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [win32]
@@ -8152,8 +8152,8 @@ packages:
     resolution: {integrity: sha512-rfp+xsnTaQ/UB5LNNZEh6w00JxxkZMoZnjjIgb/TBvqr/E1DbWyLHSyWwMD8sBoC+LX8q20ym75GRAXhvxIONA==}
     hasBin: true
 
-  '@supabase/supa-mdx-lint@0.3.0-alpha':
-    resolution: {integrity: sha512-7ndeL31NIiMcS+0Unv99GN9n1NG4ZwZuE6o0LbpFZzXatxn6noYiAwWtwgzipxjDGI7CGYxRPQQN048Wn9oJ4Q==}
+  '@supabase/supa-mdx-lint@0.3.1':
+    resolution: {integrity: sha512-TNbBLSofM6jQg3JwzO4lttd59dScTTzW4p504/OWcgRWghQLRNfxXRJJtdui83gBMLWpgeUZqvgtfYIwS1Flzw==}
     hasBin: true
 
   '@supabase/supabase-js@2.49.3':
@@ -25304,7 +25304,7 @@ snapshots:
 
   '@sentry/core@10.3.0': {}
 
-  '@sentry/nextjs@10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
+  '@sentry/nextjs@10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.3.3(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.36.0
@@ -26154,43 +26154,43 @@ snapshots:
   '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-darwin@0.3.0-alpha':
+  '@supabase/supa-mdx-lint-darwin@0.3.1':
     optional: true
 
   '@supabase/supa-mdx-lint-linux-arm64@0.2.6-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-arm64@0.3.0-alpha':
+  '@supabase/supa-mdx-lint-linux-arm64@0.3.1':
     optional: true
 
   '@supabase/supa-mdx-lint-linux-arm@0.2.6-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-arm@0.3.0-alpha':
+  '@supabase/supa-mdx-lint-linux-arm@0.3.1':
     optional: true
 
   '@supabase/supa-mdx-lint-linux-i686@0.2.6-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-i686@0.3.0-alpha':
+  '@supabase/supa-mdx-lint-linux-i686@0.3.1':
     optional: true
 
   '@supabase/supa-mdx-lint-linux-x64@0.2.6-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-x64@0.3.0-alpha':
+  '@supabase/supa-mdx-lint-linux-x64@0.3.1':
     optional: true
 
   '@supabase/supa-mdx-lint-win32-i686@0.2.6-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-win32-i686@0.3.0-alpha':
+  '@supabase/supa-mdx-lint-win32-i686@0.3.1':
     optional: true
 
   '@supabase/supa-mdx-lint-win32-x64@0.2.6-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-win32-x64@0.3.0-alpha':
+  '@supabase/supa-mdx-lint-win32-x64@0.3.1':
     optional: true
 
   '@supabase/supa-mdx-lint@0.2.6-alpha':
@@ -26204,15 +26204,15 @@ snapshots:
       '@supabase/supa-mdx-lint-win32-x64': 0.2.6-alpha
       node-pty: 1.0.0
 
-  '@supabase/supa-mdx-lint@0.3.0-alpha':
+  '@supabase/supa-mdx-lint@0.3.1':
     optionalDependencies:
-      '@supabase/supa-mdx-lint-darwin': 0.3.0-alpha
-      '@supabase/supa-mdx-lint-linux-arm': 0.3.0-alpha
-      '@supabase/supa-mdx-lint-linux-arm64': 0.3.0-alpha
-      '@supabase/supa-mdx-lint-linux-i686': 0.3.0-alpha
-      '@supabase/supa-mdx-lint-linux-x64': 0.3.0-alpha
-      '@supabase/supa-mdx-lint-win32-i686': 0.3.0-alpha
-      '@supabase/supa-mdx-lint-win32-x64': 0.3.0-alpha
+      '@supabase/supa-mdx-lint-darwin': 0.3.1
+      '@supabase/supa-mdx-lint-linux-arm': 0.3.1
+      '@supabase/supa-mdx-lint-linux-arm64': 0.3.1
+      '@supabase/supa-mdx-lint-linux-i686': 0.3.1
+      '@supabase/supa-mdx-lint-linux-x64': 0.3.1
+      '@supabase/supa-mdx-lint-win32-i686': 0.3.1
+      '@supabase/supa-mdx-lint-win32-x64': 0.3.1
       node-pty: 1.0.0
 
   '@supabase/supabase-js@2.49.3':
