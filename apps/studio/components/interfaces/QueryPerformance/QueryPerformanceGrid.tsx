@@ -1,8 +1,8 @@
 import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-import dynamic from 'next/dynamic'
 
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
@@ -168,21 +168,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     return result
   })
 
-  const reportData = useMemo(() => {
-    const allData = data ?? []
-
-    if (!search || search.trim() === '') {
-      return allData
-    }
-
-    const searchTerm = search.toLowerCase()
-    return allData.filter((row: any) => {
-      // Search in the query text
-      const queryText = row.query?.toLowerCase() || ''
-      return queryText.includes(searchTerm)
-    })
-  }, [data, search])
-
+  const reportData = useMemo(() => data ?? [], [data])
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
   const showIndexSuggestions =
