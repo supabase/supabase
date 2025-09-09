@@ -43,6 +43,7 @@ import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import { companyStats } from 'data/company-stats'
+import { DerivLogo, SoshiLogo } from '~/components/BrandLogo'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -117,24 +118,15 @@ const data: () => {
       avatar: (
         <Image
           draggable={false}
-          src="/images/logos/publicity/soshi.svg"
-          alt="Soshi logo"
-          className="dark:invert object-contain opacity-50 hover:!opacity-60 max-w-20 max-h-10 !w-10 !h-10"
-          width={28}
-          height={28}
+          src="/images/blog/avatars/elijah-muraoka-soshi.jpg"
+          alt="Elijah Muraoka"
+          className="object-cover"
+          width={32}
+          height={32}
         />
       ),
       link: '/customers/soshi',
-      logo: (
-        <Image
-          draggable={false}
-          src="/images/blog/avatars/elijah-muraoka-soshi.jpg"
-          alt="Elijah Muraoka"
-          className="w-10 h-10 rounded-full overflow-hidden"
-          width={28}
-          height={28}
-        />
-      ),
+      logo: <SoshiLogo className='w-full'/>,
     },
     why: {
       id: 'why-supabase',
