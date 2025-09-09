@@ -46,6 +46,7 @@ export interface MethodTypes {
 interface Comment {
   shortText?: string
   text?: string
+  tags?: Array<{ tag: string; text: string }>
 }
 
 export interface FunctionParameterType {
@@ -172,6 +173,8 @@ function isNewTypedoc(node: any) {
 interface TypedocComment {
   summary: CommentKind[]
   blockTags: CommentBlockTag[]
+  /** Includes tags like `@experimental` **/
+  modifierTags: string[]
 }
 
 type CommentKind = CommentKindText | CommentKindCode
@@ -206,6 +209,10 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
 
   if ('summary' in original) {
     comment.shortText = original.summary.map((part) => part.text).join('')
+  }
+
+  if ('modifierTags' in original) {
+    comment.tags = original.modifierTags.map((tag) => ({ tag: tag.replace(/^@/, ''), text: '' }))
   }
 
   return comment
