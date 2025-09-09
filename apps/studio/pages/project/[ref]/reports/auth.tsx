@@ -21,6 +21,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
 import { createAuthReportConfig } from 'data/reports/v2/auth.config'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -103,6 +104,7 @@ const AuthUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
+            <ReportSettings chartId={chartSyncId} />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
