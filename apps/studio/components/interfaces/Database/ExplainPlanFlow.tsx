@@ -1,6 +1,8 @@
 import { useTheme } from 'next-themes'
-import { useMemo } from 'react'
+import { useMemo, useState, createContext, useContext } from 'react'
 import { Workflow } from 'lucide-react'
+import { capitalize } from 'lodash'
+import dagre from '@dagrejs/dagre'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -10,11 +12,11 @@ import ReactFlow, {
   type Node,
   type Edge,
 } from 'reactflow'
-import dagre from '@dagrejs/dagre'
 import 'reactflow/dist/style.css'
-import { capitalize } from 'lodash'
 
 import { cn } from 'ui'
+import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
+import { Label } from '@ui/components/shadcn/ui/label'
 
 type ExplainPlanFlowProps = {
   json: string
@@ -89,6 +91,22 @@ type PlanMeta = {
 const NODE_TYPE = 'plan'
 const DEFAULT_NODE_WIDTH = 180
 const DEFAULT_NODE_HEIGHT = 40
+
+type MetricsVisibility = {
+  time: boolean
+  rows: boolean
+  cost: boolean
+  buffers: boolean
+  output: boolean
+}
+
+const MetricsVisibilityContext = createContext<MetricsVisibility>({
+  time: true,
+  rows: true,
+  cost: true,
+  buffers: true,
+  output: true,
+})
 
 const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
@@ -416,6 +434,7 @@ const stripParens = (s: string) => s.replace(/^\((.*)\)$/, '$1')
 const hiddenNodeConnector = 'opacity-0'
 const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
+  const vis = useContext(MetricsVisibilityContext)
 
   const headerLines: string[] = []
   // Insert CTE/Subplan badge at the top of the header lines if present
@@ -482,7 +501,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
 
       <ul>
         {/* Time (actual) */}
-        {data.actualTotalTime !== undefined && (
+        {vis.time && data.actualTotalTime !== undefined && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -502,7 +521,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
           </li>
         )}
         {/* Time (self/exclusive) */}
-        {typeof data.exclusiveTimeMs === 'number' && (
+        {vis.time && typeof data.exclusiveTimeMs === 'number' && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -521,7 +540,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
 
         {/* Rows (actual / est) */}
-        {(data.actualRows !== undefined || data.planRows !== undefined) && (
+        {vis.rows && (data.actualRows !== undefined || data.planRows !== undefined) && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -542,7 +561,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
           </li>
         )}
         {/* Estimation factor (actual_total / plan_est) */}
-        {typeof data.estFactor === 'number' && (
+        {vis.rows && typeof data.estFactor === 'number' && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -559,14 +578,14 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             }
           >
             <div className="gap-[0.24rem] w-full flex mx-2 align-middle items-center justify-between">
-              <span>Estimation Factor</span>
+              <span>estim</span>
               <span>{data.estFactor.toFixed(2)}×</span>
             </div>
           </li>
         )}
 
         {/* Costs (startup → total) */}
-        {(data.startupCost !== undefined || data.totalCost !== undefined) && (
+        {vis.cost && (data.startupCost !== undefined || data.totalCost !== undefined) && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -587,7 +606,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
           </li>
         )}
         {/* Cost (self/exclusive) */}
-        {typeof data.exclusiveCost === 'number' && (
+        {vis.cost && typeof data.exclusiveCost === 'number' && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -678,7 +697,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
 
         {/* BUFFERS */}
-        {hasShared && (
+        {vis.buffers && hasShared && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -698,7 +717,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             </div>
           </li>
         )}
-        {hasTemp && (
+        {vis.buffers && hasTemp && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -717,7 +736,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
             </div>
           </li>
         )}
-        {hasLocal && (
+        {vis.buffers && hasLocal && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -739,7 +758,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
 
         {/* Output cols (verbose) */}
-        {Array.isArray(data.outputCols) && data.outputCols.length > 0 && (
+        {vis.output && Array.isArray(data.outputCols) && data.outputCols.length > 0 && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -760,7 +779,7 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
         )}
 
         {/* I/O times */}
-        {(data.ioReadTime !== undefined || data.ioWriteTime !== undefined) && (
+        {vis.buffers && (data.ioReadTime !== undefined || data.ioWriteTime !== undefined) && (
           <li
             className={cn(
               'text-[8px] leading-5 relative flex flex-row justify-items-start',
@@ -817,6 +836,14 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
     }
   }, [json])
 
+  const [metricsVisibility, setMetricsVisibility] = useState<MetricsVisibility>({
+    time: true,
+    rows: true,
+    cost: true,
+    buffers: true,
+    output: true,
+  })
+
   const { resolvedTheme } = useTheme()
   const miniMapMaskColor = resolvedTheme?.includes('dark')
     ? 'rgb(17, 19, 24, .8)'
@@ -857,46 +884,97 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
           </div>
         </div>
       )}
-      <ReactFlow
-        defaultNodes={[]}
-        defaultEdges={[]}
-        nodesConnectable={false}
-        defaultEdgeOptions={{
-          type: 'smoothstep',
-          animated: true,
-          deletable: false,
-          style: {
-            stroke: 'hsl(var(--border-stronger))',
-            strokeWidth: 1,
-          },
-        }}
-        fitView
-        nodeTypes={nodeTypes}
-        nodes={nodes}
-        edges={edges}
-        minZoom={0.8}
-        maxZoom={1.8}
-        proOptions={{ hideAttribution: true }}
-        onInit={(instance) => {
-          if (nodes.length > 0) {
-            setTimeout(() => instance.fitView({}))
-          }
-        }}
-      >
-        <Background
-          gap={16}
-          className="[&>*]:stroke-foreground-muted opacity-[25%]"
-          variant={BackgroundVariant.Dots}
-          color={'inherit'}
-        />
-        <MiniMap
-          pannable
-          zoomable
-          nodeColor="#111318"
-          maskColor={miniMapMaskColor}
-          className="border rounded-md shadow-sm"
-        />
-      </ReactFlow>
+      <div className="absolute z-10 top-2 right-2 text-[10px] p-2 rounded bg-foreground-muted/20 backdrop-blur-sm border">
+        <div className="flex flex-wrap gap-2 items-center">
+          <Label className="inline-flex items-center gap-1">
+            <Checkbox
+              checked={metricsVisibility.time}
+              onCheckedChange={(checked) =>
+                setMetricsVisibility((v) => ({ ...v, time: Boolean(checked) }))
+              }
+            />
+            <span>time</span>
+          </Label>
+          <Label className="inline-flex items-center gap-1">
+            <Checkbox
+              checked={metricsVisibility.rows}
+              onCheckedChange={(checked) =>
+                setMetricsVisibility((v) => ({ ...v, rows: Boolean(checked) }))
+              }
+            />
+            <span>rows</span>
+          </Label>
+          <Label className="inline-flex items-center gap-1">
+            <Checkbox
+              checked={metricsVisibility.cost}
+              onCheckedChange={(checked) =>
+                setMetricsVisibility((v) => ({ ...v, cost: Boolean(checked) }))
+              }
+            />
+            <span>cost</span>
+          </Label>
+          <Label className="inline-flex items-center gap-1">
+            <Checkbox
+              checked={metricsVisibility.buffers}
+              onCheckedChange={(checked) =>
+                setMetricsVisibility((v) => ({ ...v, buffers: Boolean(checked) }))
+              }
+            />
+            <span>buffers</span>
+          </Label>
+          <Label className="inline-flex items-center gap-1">
+            <Checkbox
+              checked={metricsVisibility.output}
+              onCheckedChange={(checked) =>
+                setMetricsVisibility((v) => ({ ...v, output: Boolean(checked) }))
+              }
+            />
+            <span>output</span>
+          </Label>
+        </div>
+      </div>
+      <MetricsVisibilityContext.Provider value={metricsVisibility}>
+        <ReactFlow
+          defaultNodes={[]}
+          defaultEdges={[]}
+          nodesConnectable={false}
+          defaultEdgeOptions={{
+            type: 'smoothstep',
+            animated: true,
+            deletable: false,
+            style: {
+              stroke: 'hsl(var(--border-stronger))',
+              strokeWidth: 1,
+            },
+          }}
+          fitView
+          nodeTypes={nodeTypes}
+          nodes={nodes}
+          edges={edges}
+          minZoom={0.8}
+          maxZoom={1.8}
+          proOptions={{ hideAttribution: true }}
+          onInit={(instance) => {
+            if (nodes.length > 0) {
+              setTimeout(() => instance.fitView({}))
+            }
+          }}
+        >
+          <Background
+            gap={16}
+            className="[&>*]:stroke-foreground-muted opacity-[25%]"
+            variant={BackgroundVariant.Dots}
+            color={'inherit'}
+          />
+          <MiniMap
+            pannable
+            zoomable
+            nodeColor="#111318"
+            maskColor={miniMapMaskColor}
+            className="border rounded-md shadow-sm"
+          />
+        </ReactFlow>
+      </MetricsVisibilityContext.Provider>
     </div>
   )
 }
