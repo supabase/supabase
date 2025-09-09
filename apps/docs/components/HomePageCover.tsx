@@ -20,7 +20,7 @@ function AiPrompt({ className }: { className?: string }) {
       className={cn(
         'group',
         'w-fit rounded-full border px-3 py-1 flex gap-2 items-center text-foreground-light text-sm',
-        'hover:border-brand hover:text-brand focus-visible:text-brand',
+        'hover:border-brand hover:text-brand-link focus-visible:text-brand-link',
         'transition-colors',
         className
       )}

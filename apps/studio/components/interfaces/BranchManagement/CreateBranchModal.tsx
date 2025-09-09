@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { DatabaseZap, DollarSign, GitMerge, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
@@ -9,20 +10,21 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { projectKeys } from 'data/projects/keys'
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -46,9 +48,18 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import {
+  estimateComputeSize,
+  estimateDiskCost,
+  estimateRestoreTime,
+} from './BranchManagement.utils'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -60,9 +71,11 @@ export const CreateBranchModal = () => {
 
   const gitlessBranching = useIsBranching2Enabled()
   const allowDataBranching = useFlag('allowDataBranching')
-  // [Joshen] This is meant to be short lived while we're figuring out how to control
-  // requests to this endpoint. Kill switch in case we need to stop the requests
-  const disableBackupsCheck = useFlag('disableBackupsCheckInCreatebranchmodal')
+
+  const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
+    PermissionAction.CREATE,
+    'preview_branches'
+  )
 
   const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
@@ -70,80 +83,7 @@ export const CreateBranchModal = () => {
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
-
-  const {
-    data: connections,
-    error: connectionsError,
-    isLoading: isLoadingConnections,
-    isSuccess: isSuccessConnections,
-    isError: isErrorConnections,
-  } = useGitHubConnectionsQuery({
-    organizationId: selectedOrg?.id,
-  })
-
-  const { data: branches } = useBranchesQuery({ projectRef })
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const hasPitrEnabled =
-    (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
-    useCheckGithubBranchValidity({
-      onError: () => {},
-    })
-  const {
-    data: cloneBackups,
-    error: cloneBackupsError,
-    isLoading: isLoadingCloneBackups,
-  } = useCloneBackupsQuery(
-    { projectRef },
-    {
-      // [Joshen] Only trigger this request when the modal is opened
-      enabled: showCreateBranchModal && !disableBackupsCheck,
-    }
-  )
-  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb ?? 0
-  const noPhysicalBackups = cloneBackupsError?.message.startsWith(
-    'Physical backups need to be enabled'
-  )
-
-  const { mutate: sendEvent } = useSendEventMutation()
-
-  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
-    onSuccess: async (data) => {
-      toast.success(`Successfully created preview branch "${data.name}"`)
-      if (projectRef) {
-        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
-      }
-      sendEvent({
-        action: 'branch_create_button_clicked',
-        properties: {
-          branchType: data.persistent ? 'persistent' : 'preview',
-          gitlessBranching,
-        },
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
-        },
-      })
-
-      setShowCreateBranchModal(false)
-      router.push(`/project/${data.project_ref}`)
-    },
-    onError: (error) => {
-      toast.error(`Failed to create branch: ${error.message}`)
-    },
-  })
-
-  const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
-    PermissionAction.CREATE,
-    'preview_branches'
-  )
-
-  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
-
-  // Fetch production/default branch to inspect git_branch linkage
-  const prodBranch = branches?.find((branch) => branch.is_default)
-
-  const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
+  const noPhysicalBackups = !projectDetails?.is_physical_backups_enabled
 
   const formId = 'create-branch-form'
   const FormSchema = z
@@ -193,15 +133,95 @@ export const CreateBranchModal = () => {
   })
   const withData = form.watch('withData')
 
-  const canSubmit = !isCreating && !isChecking
+  const {
+    data: connections,
+    error: connectionsError,
+    isLoading: isLoadingConnections,
+    isSuccess: isSuccessConnections,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery(
+    { organizationId: selectedOrg?.id },
+    { enabled: showCreateBranchModal }
+  )
+
+  const { data: branches } = useBranchesQuery({ projectRef })
+  const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery(
+    { projectRef },
+    { enabled: showCreateBranchModal }
+  )
+  const computeAddon = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const computeSize = !!computeAddon
+    ? (computeAddon.variant.identifier.split('ci_')[1] as DesiredInstanceSize)
+    : undefined
+  const hasPitrEnabled =
+    (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
+
+  const {
+    data: disk,
+    isLoading: isLoadingDiskAttr,
+    isError: isErrorDiskAttr,
+  } = useDiskAttributesQuery({ projectRef }, { enabled: showCreateBranchModal && withData })
+  const projectDiskAttributes = disk?.attributes ?? {
+    type: 'gp3',
+    size_gb: 0,
+    iops: 0,
+    throughput_mbps: 0,
+  }
+  // Branch disk is oversized to include backup files, it should be scaled back eventually.
+  const branchDiskAttributes = {
+    ...projectDiskAttributes,
+    // [Joshen] JFYI for Qiao - this multiplier may eventually be dropped
+    size_gb: Math.round(projectDiskAttributes.size_gb * 1.5),
+  }
+  const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
+  const estimatedDiskCost = estimateDiskCost(branchDiskAttributes)
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingGHBranchValidity } =
+    useCheckGithubBranchValidity({
+      onError: () => {},
+    })
+
+  const { mutate: createBranch, isLoading: isCreatingBranch } = useBranchCreateMutation({
+    onSuccess: async (data) => {
+      toast.success(`Successfully created preview branch "${data.name}"`)
+      if (projectRef) {
+        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
+      }
+      sendEvent({
+        action: 'branch_create_button_clicked',
+        properties: {
+          branchType: data.persistent ? 'persistent' : 'preview',
+          gitlessBranching,
+        },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
+
+      setShowCreateBranchModal(false)
+      router.push(`/project/${data.project_ref}`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to create branch: ${error.message}`)
+    },
+  })
+
+  // Fetch production/default branch to inspect git_branch linkage
+  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const prodBranch = branches?.find((branch) => branch.is_default)
+  const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
+
   const isDisabled =
+    !canCreateBranch ||
+    !isSuccessAddons ||
     !isSuccessConnections ||
-    isCreating ||
-    !canSubmit ||
-    isChecking ||
-    (!gitlessBranching && !githubConnection) ||
     promptProPlanUpgrade ||
-    !canCreateBranch
+    (!gitlessBranching && !githubConnection) ||
+    isCreatingBranch ||
+    isCheckingGHBranchValidity
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -209,6 +229,7 @@ export const CreateBranchModal = () => {
       projectRef,
       branchName: data.branchName,
       is_default: false,
+      ...(data.withData ? { desired_instance_size: computeSize } : {}),
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
       ...(allowDataBranching ? { withData: data.withData } : {}),
     })
@@ -231,9 +252,7 @@ export const CreateBranchModal = () => {
         size="large"
         hideClose
         onOpenAutoFocus={(e) => {
-          if (promptProPlanUpgrade) {
-            e.preventDefault()
-          }
+          if (promptProPlanUpgrade) e.preventDefault()
         }}
       >
         <DialogHeader padding="small">
@@ -315,7 +334,9 @@ export const CreateBranchModal = () => {
                           />
                         </FormControl_Shadcn_>
                         <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                          {isChecking && <Loader2 size={14} className="animate-spin" />}
+                          {isCheckingGHBranchValidity && (
+                            <Loader2 size={14} className="animate-spin" />
+                          )}
                         </div>
                       </div>
                     </FormItemLayout>
@@ -363,7 +384,7 @@ export const CreateBranchModal = () => {
                       label={
                         <>
                           <Label className="mr-2">Include data</Label>
-                          {!disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups) && (
+                          {noPhysicalBackups && (
                             <Badge variant="warning" size="small">
                               Requires PITR
                             </Badge>
@@ -376,9 +397,7 @@ export const CreateBranchModal = () => {
                     >
                       <FormControl_Shadcn_>
                         <Switch
-                          disabled={
-                            !disableBackupsCheck && (isLoadingCloneBackups || noPhysicalBackups)
-                          }
+                          disabled={noPhysicalBackups}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -406,18 +425,91 @@ export const CreateBranchModal = () => {
                     </figure>
                   </div>
                   <div className="flex flex-col gap-y-1">
-                    <p className="text-sm text-foreground">
-                      Data branch takes longer time to create
-                    </p>
-                    <p className="text-sm text-foreground-light">
-                      Since your target database volume size is{' '}
-                      <code className="text-xs font-mono">{targetVolumeSizeGb} GB</code>, creating a
-                      data branch is estimated to take around{' '}
-                      <code className="text-xs font-mono">
-                        {Math.round((720 / 21000) * targetVolumeSizeGb) + 3} minutes
-                      </code>
-                      .
-                    </p>
+                    {isLoadingDiskAttr ? (
+                      <>
+                        <ShimmeringLoader className="w-32 h-5 py-0" />
+                        <ShimmeringLoader className="w-72 h-8 py-0" />
+                      </>
+                    ) : (
+                      <>
+                        {isErrorDiskAttr ? (
+                          <>
+                            <p className="text-sm text-foreground">
+                              Branch disk size will incur additional cost per month
+                            </p>
+                            <p className="text-sm text-foreground-light">
+                              The additional cost and time taken to create a data branch is relative
+                              to the size of your database. We are unable to provide an estimate as
+                              we were unable to retrieve your project's disk configuration
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm text-foreground">
+                              Branch disk size is billed at ${estimatedDiskCost.total.toFixed(2)}{' '}
+                              per month
+                            </p>
+                            <p className="text-sm text-foreground-light">
+                              Creating a data branch will take about{' '}
+                              <span className="text-foreground">
+                                {estimateRestoreTime(branchDiskAttributes).toFixed()} minutes
+                              </span>{' '}
+                              and costs{' '}
+                              <span className="text-foreground">
+                                ${estimatedDiskCost.total.toFixed(2)}
+                              </span>{' '}
+                              per month based on your current target database volume size of{' '}
+                              {branchDiskAttributes.size_gb} GB and your{' '}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <span className={InlineLinkClassName}>
+                                    project's disk configuration
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  <div className="flex items-center gap-x-2">
+                                    <p className="w-24">Disk type:</p>
+                                    <p className="w-16">
+                                      {branchDiskAttributes.type.toUpperCase()}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-x-2">
+                                    <p className="w-24">Targer disk size:</p>
+                                    <p className="w-16">{branchDiskAttributes.size_gb} GB</p>
+                                    <p>(${estimatedDiskCost.size.toFixed(2)})</p>
+                                  </div>
+                                  <div className="flex items-center gap-x-2">
+                                    <p className="w-24">IOPs:</p>
+                                    <p className="w-16">{branchDiskAttributes.iops} IOPS</p>
+                                    <p>(${estimatedDiskCost.iops.toFixed(2)})</p>
+                                  </div>
+                                  {'throughput_mbps' in branchDiskAttributes && (
+                                    <div className="flex items-center gap-x-2">
+                                      <p className="w-24">Throughput:</p>
+                                      <p className="w-16">
+                                        {branchDiskAttributes.throughput_mbps} MB/s
+                                      </p>
+                                      <p>(${estimatedDiskCost.throughput.toFixed(2)})</p>
+                                    </div>
+                                  )}
+                                  <p className="mt-2">
+                                    More info in{' '}
+                                    <InlineLink
+                                      onClick={() => setShowCreateBranchModal(false)}
+                                      className="pointer-events-auto"
+                                      href={`/project/${ref}/settings/compute-and-disk`}
+                                    >
+                                      Compute and Disk
+                                    </InlineLink>
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                              .
+                            </p>
+                          </>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -439,7 +531,7 @@ export const CreateBranchModal = () => {
                       {prodBranch?.git_branch ? (
                         <>
                           When this branch is merged to{' '}
-                          <code className="text-xs font-mono">{prodBranch.git_branch}</code>,
+                          <span className="text-foreground">{prodBranch.git_branch}</span>,
                           migrations will be deployed to production. Otherwise, migrations only run
                           on preview branches.
                         </>
@@ -462,9 +554,21 @@ export const CreateBranchModal = () => {
                   </figure>
                 </div>
                 <div className="flex flex-col gap-y-1">
-                  <p className="text-sm text-foreground">Branches are billed $0.01344 per hour</p>
+                  <p className="text-sm text-foreground">
+                    Branch compute is billed at $
+                    {withData ? branchComputeSize.priceHourly : instanceSizeSpecs.micro.priceHourly}{' '}
+                    per hour
+                  </p>
                   <p className="text-sm text-foreground-light">
-                    This cost will continue for as long as the branch has not been removed.
+                    {withData ? (
+                      <>
+                        <code className="text-xs font-mono">{branchComputeSize.label}</code> compute
+                        size is automatically selected to match your production branch. You may
+                        downgrade after creation or pause the branch when not in use to save cost.
+                      </>
+                    ) : (
+                      <>This cost will continue for as long as the branch has not been removed.</>
+                    )}
                   </p>
                 </div>
               </div>
@@ -474,8 +578,8 @@ export const CreateBranchModal = () => {
 
             <DialogFooter className="justify-end gap-2" padding="medium">
               <Button
-                disabled={isCreating}
                 type="default"
+                disabled={isCreatingBranch}
                 onClick={() => setShowCreateBranchModal(false)}
               >
                 Cancel
@@ -483,7 +587,7 @@ export const CreateBranchModal = () => {
               <ButtonTooltip
                 form={formId}
                 disabled={isDisabled}
-                loading={isCreating}
+                loading={isCreatingBranch}
                 type="primary"
                 htmlType="submit"
                 tooltip={{
