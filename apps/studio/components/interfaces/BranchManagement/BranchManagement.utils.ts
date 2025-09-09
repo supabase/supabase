@@ -21,20 +21,20 @@ const maxDiskForCompute = new Map([
   [10_000, instanceSizeSpecs['16xlarge']],
 ])
 
-export const estimateComputeCost = (
+export const estimateComputeSize = (
   projectDiskSize: number,
   branchComputeSize?: DesiredInstanceSize
 ) => {
   if (branchComputeSize) {
-    return instanceSizeSpecs[branchComputeSize].priceHourly
+    return instanceSizeSpecs[branchComputeSize]
   }
   // Fallback to estimating based on volume size
   for (const [disk, compute] of maxDiskForCompute) {
     if (projectDiskSize <= disk) {
-      return compute.priceHourly
+      return compute
     }
   }
-  return instanceSizeSpecs['24xlarge'].priceHourly
+  return instanceSizeSpecs['24xlarge']
 }
 
 export const estimateDiskCost = (disk: DiskAttributesData['attributes']) => {

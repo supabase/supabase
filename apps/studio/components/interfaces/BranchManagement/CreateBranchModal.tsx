@@ -24,7 +24,7 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { projectKeys } from 'data/projects/keys'
-import { DesiredInstanceSize } from 'data/projects/new-project.constants'
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -52,7 +52,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
-  estimateComputeCost,
+  estimateComputeSize,
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
@@ -130,6 +130,7 @@ export const CreateBranchModal = () => {
     ...projectDiskAttributes,
     ...(cloneBackups ? { size_gb: cloneBackups.target_volume_size_gb } : {}),
   }
+  const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -234,7 +235,7 @@ export const CreateBranchModal = () => {
       projectRef,
       branchName: data.branchName,
       is_default: false,
-      desired_instance_size: data.withData ? computeSize : undefined,
+      ...(data.withData ? { desired_instance_size: computeSize } : {}),
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
       ...(allowDataBranching ? { withData: data.withData } : {}),
     })
@@ -492,14 +493,15 @@ export const CreateBranchModal = () => {
                 <div className="flex flex-col gap-y-1">
                   <p className="text-sm text-foreground">
                     Branches are billed $
-                    {estimateComputeCost(projectDiskAttributes.size_gb, computeSize)} per hour
+                    {withData ? branchComputeSize.priceHourly : instanceSizeSpecs.micro.priceHourly}{' '}
+                    per hour
                   </p>
                   <p className="text-sm text-foreground-light">
-                    {withData && computeSize ? (
+                    {withData ? (
                       <>
-                        The <code className="text-xs font-mono">{computeSize}</code> compute size is
-                        automatically selected to match your production branch. You may downgrade
-                        after creation or pause the branch when not in use to save cost.{' '}
+                        <code className="text-xs font-mono">{branchComputeSize.label}</code> compute
+                        size is automatically selected to match your production branch. You may
+                        downgrade after creation or pause the branch when not in use to save cost.
                       </>
                     ) : (
                       <>This cost will continue for as long as the branch has not been removed.</>
