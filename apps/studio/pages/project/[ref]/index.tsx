@@ -4,7 +4,7 @@ import { HomeV2 } from 'components/interfaces/HomeNew/Home'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import type { NextPageWithLayout } from 'types'
-import { ExplainPlanFlow } from 'components/interfaces/Database'
+import { ExplainPlanFlow } from 'components/ui/QueryPlanVisualizer/explain-plan-flow'
 
 const sample = `[
   {
