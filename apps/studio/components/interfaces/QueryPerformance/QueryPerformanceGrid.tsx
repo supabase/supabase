@@ -190,36 +190,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       query.startsWith('with pgrst_payload')) &&
     hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
 
-  const onSortChange = (column: string, direction?: 'asc' | 'desc') => {
-    let updatedSort = undefined
-
-    if (direction) {
-      // If direction is specified, set that specific direction
-      updatedSort = { column, order: direction }
-    } else if (sort?.column === column) {
-      // If no direction specified, toggle as before
-      if (sort.order === 'desc') {
-        updatedSort = { column, order: 'asc' }
-      } else {
-        updatedSort = undefined
-      }
-    } else {
-      updatedSort = { column, order: 'desc' }
-    }
-
-    setSort(updatedSort as QueryPerformanceSort)
-
-    if (updatedSort === undefined) {
-      const { sort, order, ...otherParams } = router.query
-      router.push({ ...router, query: otherParams })
-    } else {
-      router.push({
-        ...router,
-        query: { ...router.query, sort: updatedSort.column, order: updatedSort.order },
-      })
-    }
-  }
-
   useEffect(() => {
     setSelectedRow(undefined)
   }, [preset, search, roles, urlSort, order])
