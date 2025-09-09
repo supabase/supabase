@@ -188,7 +188,7 @@ Supabase’s default direct connection supports IPv6 only. To connect over IPv4,
 
 ### Where is the Postgres connection string in Supabase?
 
-Your connection string is located in the Supabase Dashboard. Click the [Connect](https://supabase.com/dashboard/project/_?showConnect=true) button at the top of the page.
+Your connection string is located in the Supabase Dashboard. Click the [Connect](/dashboard/project/_?showConnect=true) button at the top of the page.
 
 ### Can you use Supavisor and PgBouncer together?
 
@@ -196,11 +196,11 @@ You can technically use both, but it’s not recommended unless you’re specifi
 
 ### How does the default pool size work?
 
-Supavisor and PgBouncer work independently, but both reference the same pool size setting. For example, if you set the pool size to 30, Supavisor can open up to 30 server-side connections to Postgres each for its session mode port (5432) and transaction mode port (6543), and PgBouncer can also open up to 30. If both poolers are active and reach their roles/modes limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections. You can adjust the pool size in [Database settings](https://supabase.com/dashboard/project/_/database/settings) in the dashboard.
+Supavisor and PgBouncer work independently, but both reference the same pool size setting. For example, if you set the pool size to 30, Supavisor can open up to 30 server-side connections to Postgres each for its session mode port (5432) and transaction mode port (6543), and PgBouncer can also open up to 30. If both poolers are active and reach their roles/modes limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections. You can adjust the pool size in [Database settings](/dashboard/project/_/database/settings) in the dashboard.
 
 ### What is the difference between client connections and backend connections?
 
-There are two different limits to understand when working with poolers. The first is client connections, which refers to how many clients can connect to a pooler at the same time. This number is capped by your [compute tier’s “max pooler clients” limit](https://supabase.com/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections), and it applies independently to Supavisor and PgBouncer. The second is backend connections, which is the number of active connections a pooler opens to Postgres. This number is set by the pool size for that pooler.
+There are two different limits to understand when working with poolers. The first is client connections, which refers to how many clients can connect to a pooler at the same time. This number is capped by your [compute tier’s “max pooler clients” limit](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections), and it applies independently to Supavisor and PgBouncer. The second is backend connections, which is the number of active connections a pooler opens to Postgres. This number is set by the pool size for that pooler.
 
 ```
 Total backend load on Postgres =
@@ -212,11 +212,11 @@ Total backend load on Postgres =
 
 ### What is the max pooler clients limit?
 
-The “max pooler clients” limit for your compute tier applies separately to Supavisor and PgBouncer. One pooler reaching its client limit does not affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones are closed, but the other pooler remains unaffected. You can check your tier’s connection limits in the [compute and disk limits documentation](https://supabase.com/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections).
+The “max pooler clients” limit for your compute tier applies separately to Supavisor and PgBouncer. One pooler reaching its client limit does not affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones are closed, but the other pooler remains unaffected. You can check your tier’s connection limits in the [compute and disk limits documentation](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections).
 
 ### Where can you see current connection usage?
 
-You can track connection usage from the [Reports](https://supabase.com/dashboard/project/_/reports/database) section in your project dashboard. There are three key reports:
+You can track connection usage from the [Reports](/dashboard/project/_/reports/database) section in your project dashboard. There are three key reports:
 
 - **Database Connections:** shows total active connections by role (this includes direct and pooled connections).
 - **Dedicated Pooler Client Connections:** shows the number of active client connections to PgBouncer.
@@ -257,7 +257,7 @@ JOIN pg_stat_activity
 
 ### Why are there active connections when the app is idle?
 
-Even if your application isn’t making queries, some Supabase services keep persistent connections to your database. For example, Storage, PostgREST, and our health checker all maintain long-lived connections. You’ll usually see a small baseline of active connections from these services.
+Even if your application isn’t making queries, some Supabase services keep persistent connections to your database. For example, Storage, PostgREST, and our health checker all maintain long-lived connections. You usually see a small baseline of active connections from these services.
 
 ### Why do connection strings have different ports?
 
