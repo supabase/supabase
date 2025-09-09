@@ -384,8 +384,8 @@ export const createLintSummaryPrompt = (lint: Lint) => {
           `${lint.metadata.schema}.${lint.metadata.name}`))) ||
     'N/A'
   const schema = lint.metadata?.schema ?? 'N/A'
-  const issue = lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'
-  const description = lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'
+  const issue = lint.detail ? lint.detail.replace(/\\`/g, '`') : 'N/A'
+  const description = lint.description ? lint.description.replace(/\\`/g, '`') : 'N/A'
   return `Summarize the issue and suggest fixes for the following lint item:
 Title: ${title}
 Entity: ${entity}
