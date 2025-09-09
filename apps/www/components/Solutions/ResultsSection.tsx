@@ -1,8 +1,7 @@
 import React, { FC } from 'react'
-import { cn, Badge } from 'ui'
+import { cn, Badge, AnimatedCounter } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { motion } from 'framer-motion'
-import { useBreakpoint } from 'common'
 import { useMedia } from 'react-use'
 
 export interface ResultsSectionProps {
@@ -99,9 +98,17 @@ const GraphLabel: FC<{ className?: string }> = ({ className }) => {
       <div className="w-fit text-foreground bg-alternative p-4 rounded-lg border flex flex-col gap-1">
         <span className="label !text-[10px] !leading-3">Users</span>
         <div className="flex items-center gap-2">
-          <span className="text-foreground-light text-2xl">230,550</span>
+          <span className="text-foreground-light text-2xl">
+            <AnimatedCounter value={230550} duration={2.5} delay={isMobileOrTablet ? 0 : 0.5} />
+          </span>
           <Badge variant="success" size="small" className="h-[24px] px-2">
-            +13.4%
+            <AnimatedCounter
+              value={13.4}
+              duration={2.5}
+              delay={isMobileOrTablet ? 0 : 0.5}
+              isPercentage={true}
+              showPlus={true}
+            />
           </Badge>
         </div>
       </div>
