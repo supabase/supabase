@@ -18,6 +18,13 @@ import { cn, copyToClipboard } from 'ui'
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Button } from '@ui/components/shadcn/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@ui/components/shadcn/ui/select'
 
 type ExplainPlanFlowProps = {
   json: string
@@ -107,6 +114,20 @@ const MetricsVisibilityContext = createContext<MetricsVisibility>({
   cost: true,
   buffers: true,
   output: true,
+})
+
+type HeatmapMode = 'none' | 'time' | 'rows' | 'cost'
+type HeatmapMeta = {
+  mode: HeatmapMode
+  maxTime: number
+  maxRows: number
+  maxCost: number
+}
+const HeatmapContext = createContext<HeatmapMeta>({
+  mode: 'none',
+  maxTime: 1,
+  maxRows: 1,
+  maxCost: 1,
 })
 
 const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
@@ -455,6 +476,7 @@ const hiddenNodeConnector = 'opacity-0'
 const PlanNode = ({ data }: { data: PlanNodeData }) => {
   const itemHeight = 'h-[22px]'
   const vis = useContext(MetricsVisibilityContext)
+  const heat = useContext(HeatmapContext)
 
   const headerLines: string[] = []
   // Insert CTE/Subplan badge at the top of the header lines if present
@@ -534,6 +556,37 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
     return `Temp Blocks\n${incl}\n${self}`
   }
 
+  // Heatmap progress bar (time/rows/cost)
+  const valueForHeat = (() => {
+    switch (heat.mode) {
+      case 'time':
+        return (data.exclusiveTimeMs ?? 0) || (data.actualTotalTime ?? 0) * (data.actualLoops ?? 1)
+      case 'rows': {
+        const actualTotal = (data.actualRows ?? 0) * (data.actualLoops ?? 1)
+        return actualTotal || (data.planRows ?? 0)
+      }
+      case 'cost':
+        return data.exclusiveCost ?? 0
+      default:
+        return 0
+    }
+  })()
+
+  const maxForHeat =
+    heat.mode === 'time'
+      ? heat.maxTime
+      : heat.mode === 'rows'
+        ? heat.maxRows
+        : heat.mode === 'cost'
+          ? heat.maxCost
+          : 1
+  const pct = Math.max(0, Math.min(100, Math.round((valueForHeat / (maxForHeat || 1)) * 100)))
+  const heatColor = (() => {
+    if (heat.mode === 'none') return 'transparent'
+    const hue = 120 - pct * 1.2 // 120->0 (green->red)
+    return `hsl(${hue}, 85%, 45%)`
+  })()
+
   return (
     <div
       className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
@@ -551,6 +604,23 @@ const PlanNode = ({ data }: { data: PlanNodeData }) => {
           {data.label}
         </div>
       </header>
+      {heat.mode !== 'none' && (
+        <div className="h-[3px] w-full bg-surface-100">
+          <div
+            className="h-full transition-all"
+            style={{ width: `${pct}%`, backgroundColor: heatColor }}
+            title={
+              heat.mode === 'time'
+                ? `time (self): ${valueForHeat.toFixed(2)} ms`
+                : heat.mode === 'rows'
+                  ? `rows: ${valueForHeat}`
+                  : heat.mode === 'cost'
+                    ? `self cost: ${valueForHeat.toFixed(2)}`
+                    : undefined
+            }
+          />
+        </div>
+      )}
       {headerLines.length > 0 && (
         <div className="px-2 bg-alternative pb-3">
           {headerLines.map((line, i) => (
@@ -909,6 +979,24 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
     output: true,
   })
 
+  // Heatmap mode and maxima across nodes
+  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>('none')
+  const heatMax = useMemo(() => {
+    let maxTime = 0
+    let maxRows = 0
+    let maxCost = 0
+    nodes.forEach((n) => {
+      const d = n.data as PlanNodeData
+      const t = (d.exclusiveTimeMs ?? 0) || (d.actualTotalTime ?? 0) * (d.actualLoops ?? 1)
+      if (t > maxTime) maxTime = t
+      const rowsMetric = (d.actualRows ?? 0) * (d.actualLoops ?? 1) || d.planRows || 0
+      if (rowsMetric > maxRows) maxRows = rowsMetric
+      const c = d.exclusiveCost ?? 0
+      if (c > maxCost) maxCost = c
+    })
+    return { maxTime: maxTime || 1, maxRows: maxRows || 1, maxCost: maxCost || 1 }
+  }, [nodes])
+
   const [selectedNode, setSelectedNode] = useState<PlanNodeData | null>(null)
   const [copiedConditions, setCopiedConditions] = useState(false)
   const [copiedOutputCols, setCopiedOutputCols] = useState(false)
@@ -1001,6 +1089,21 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
             />
             <span>output</span>
           </Label>
+          <div className="h-[14px] w-px bg-border mx-1" />
+          <div className="flex items-center gap-x-1">
+            <span>Heatmap:</span>
+            <Select value={heatmapMode} onValueChange={(v) => setHeatmapMode(v as HeatmapMode)}>
+              <SelectTrigger size="tiny" className="w-20">
+                <SelectValue placeholder="none" />
+              </SelectTrigger>
+              <SelectContent align="end">
+                <SelectItem value="none">none</SelectItem>
+                <SelectItem value="time">time</SelectItem>
+                <SelectItem value="rows">rows</SelectItem>
+                <SelectItem value="cost">cost</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
       {selectedNode && (
@@ -1182,48 +1285,57 @@ export const ExplainPlanFlow = ({ json }: ExplainPlanFlowProps) => {
         </div>
       )}
       <MetricsVisibilityContext.Provider value={metricsVisibility}>
-        <ReactFlow
-          defaultNodes={[]}
-          defaultEdges={[]}
-          nodesConnectable={false}
-          defaultEdgeOptions={{
-            type: 'smoothstep',
-            animated: true,
-            deletable: false,
-            style: {
-              stroke: 'hsl(var(--border-stronger))',
-              strokeWidth: 1,
-            },
+        <HeatmapContext.Provider
+          value={{
+            mode: heatmapMode,
+            maxTime: heatMax.maxTime,
+            maxRows: heatMax.maxRows,
+            maxCost: heatMax.maxCost,
           }}
-          fitView
-          nodeTypes={nodeTypes}
-          nodes={nodes}
-          edges={edges}
-          minZoom={0.8}
-          maxZoom={1.8}
-          proOptions={{ hideAttribution: true }}
-          onInit={(instance) => {
-            if (nodes.length > 0) {
-              setTimeout(() => instance.fitView({}))
-            }
-          }}
-          onNodeClick={(e, node) => setSelectedNode(node.data as PlanNodeData)}
-          onPaneClick={() => setSelectedNode(null)}
         >
-          <Background
-            gap={16}
-            className="[&>*]:stroke-foreground-muted opacity-[25%]"
-            variant={BackgroundVariant.Dots}
-            color={'inherit'}
-          />
-          <MiniMap
-            pannable
-            zoomable
-            nodeColor="#111318"
-            maskColor={miniMapMaskColor}
-            className="border rounded-md shadow-sm"
-          />
-        </ReactFlow>
+          <ReactFlow
+            defaultNodes={[]}
+            defaultEdges={[]}
+            nodesConnectable={false}
+            defaultEdgeOptions={{
+              type: 'smoothstep',
+              animated: true,
+              deletable: false,
+              style: {
+                stroke: 'hsl(var(--border-stronger))',
+                strokeWidth: 1,
+              },
+            }}
+            fitView
+            nodeTypes={nodeTypes}
+            nodes={nodes}
+            edges={edges}
+            minZoom={0.8}
+            maxZoom={1.8}
+            proOptions={{ hideAttribution: true }}
+            onInit={(instance) => {
+              if (nodes.length > 0) {
+                setTimeout(() => instance.fitView({}))
+              }
+            }}
+            onNodeClick={(e, node) => setSelectedNode(node.data as PlanNodeData)}
+            onPaneClick={() => setSelectedNode(null)}
+          >
+            <Background
+              gap={16}
+              className="[&>*]:stroke-foreground-muted opacity-[25%]"
+              variant={BackgroundVariant.Dots}
+              color={'inherit'}
+            />
+            <MiniMap
+              pannable
+              zoomable
+              nodeColor="#111318"
+              maskColor={miniMapMaskColor}
+              className="border rounded-md shadow-sm"
+            />
+          </ReactFlow>
+        </HeatmapContext.Provider>
       </MetricsVisibilityContext.Provider>
     </div>
   )
