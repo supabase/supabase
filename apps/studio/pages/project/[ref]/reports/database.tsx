@@ -1,10 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
 import { ReportChart } from 'components/interfaces/Reports/ReportChart'
@@ -13,7 +11,7 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { DiskSizeConfigurationModal } from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -34,7 +32,6 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -86,7 +83,6 @@ const DatabaseUsage = () => {
   const queryClient = useQueryClient()
 
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
@@ -107,16 +103,6 @@ const DatabaseUsage = () => {
   })
   const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
-  )
-
   const REPORT_ATTRIBUTES = getReportAttributes(
     org!,
     project!,
@@ -131,13 +117,6 @@ const DatabaseUsage = () => {
     maxConnections,
     poolerConfig
   )
-
-  const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
-    onSuccess: (_, variables) => {
-      toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
-      setshowIncreaseDiskSizeModal(false)
-    },
-  })
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
@@ -364,21 +343,7 @@ const DatabaseUsage = () => {
                         </Link>
                       </Button>
                     ) : (
-                      <ButtonTooltip
-                        type="default"
-                        disabled={!canUpdateDiskSizeConfig}
-                        onClick={() => setshowIncreaseDiskSizeModal(true)}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: !canUpdateDiskSizeConfig
-                              ? 'You need additional permissions to increase the disk size'
-                              : undefined,
-                          },
-                        }}
-                      >
-                        Increase disk size
-                      </ButtonTooltip>
+                      <DiskSizeConfigurationModal />
                     )}
                   </div>
                 </div>
@@ -444,11 +409,6 @@ const DatabaseUsage = () => {
               </Alert_Shadcn_>
             </div>
           )}
-        />
-        <DiskSizeConfigurationModal
-          visible={showIncreaseDiskSizeModal}
-          loading={isUpdatingDiskSize}
-          hideModal={setshowIncreaseDiskSizeModal}
         />
       </section>
     </>
