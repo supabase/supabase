@@ -26,7 +26,7 @@ You can get started with PostGIS by enabling the PostGIS extension in your Supab
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for `postgis` and enable the extension.
 4. In the confirmation prompt select "Create a new schema" and name it `gis` for example.
@@ -204,7 +204,7 @@ At this point, if you go into your Supabase dashboard and look at the data, you 
 ```
 
 We can query the `restaurants` table directly, but it will return the `location` column in the format you see above.
-We will create [database functions](https://supabase.com/docs/guides/database/functions) so that we can use the [st_y()](https://postgis.net/docs/ST_Y.html) and [st_x()](https://postgis.net/docs/ST_X.html) function to convert it back to lat and long floating values.
+We will create [database functions](/docs/guides/database/functions) so that we can use the [st_y()](https://postgis.net/docs/ST_Y.html) and [st_x()](https://postgis.net/docs/ST_X.html) function to convert it back to lat and long floating values.
 
 ### Order by distance
 
@@ -456,7 +456,7 @@ val data = supabase.postgrest.rpc(
 
 As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from one schema to another. If you need to move it from one schema to another for any reason (e.g. from the public schema to the extensions schema for security reasons), you would normally run a ALTER EXTENSION to relocate the schema. However, you will now to do the following steps:
 
-1. Backup your Database to prevent data loss - You can do this through the [CLI](https://supabase.com/docs/reference/cli/supabase-db-dump) or Postgres backup tools such as [pg_dumpall](https://www.postgresql.org/docs/current/backup-dump.html#BACKUP-DUMP-ALL)
+1. Backup your Database to prevent data loss - You can do this through the [CLI](/docs/reference/cli/supabase-db-dump) or Postgres backup tools such as [pg_dumpall](https://www.postgresql.org/docs/current/backup-dump.html#BACKUP-DUMP-ALL)
 
 2. Drop all dependencies you created and the PostGIS extension - `DROP EXTENSION postgis CASCADE;`
 
@@ -464,7 +464,7 @@ As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from 
 
 4. Restore dropped data via the Backup if necessary from step 1 with your tool of choice.
 
-Alternatively, you can contact the [Supabase Support Team](https://supabase.com/dashboard/support/new) and ask them to run the following SQL on your instance:
+Alternatively, you can contact the [Supabase Support Team](/dashboard/support/new) and ask them to run the following SQL on your instance:
 
 ```sql
 BEGIN;
