@@ -82,6 +82,7 @@ export const CreateBranchModal = () => {
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+  const noPhysicalBackups = !projectDetails?.is_physical_backups_enabled
 
   const {
     data: connections,
@@ -102,18 +103,6 @@ export const CreateBranchModal = () => {
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
-  // Use branch compute size returned from backend
-  const {
-    data: cloneBackups,
-    isError: isErrorCloneBackups,
-    isLoading: isLoadingCloneBackups,
-  } = useCloneBackupsQuery(
-    { projectRef },
-    // [Joshen] Only trigger this request when the modal is opened
-    { enabled: showCreateBranchModal && !disableBackupsCheck }
-  )
-  const noPhysicalBackups = isErrorCloneBackups || isLoadingCloneBackups
-
   // Ignore failures fetching disk attributes since it only affects cost estimation
   const { data: disk } = useDiskAttributesQuery(
     { projectRef },
@@ -125,10 +114,10 @@ export const CreateBranchModal = () => {
     iops: 0,
     throughput_mbps: 0,
   }
-  // The branch disk is oversized to include backup files
+  // Branch disk is oversized to include backup files, it should be scaled back eventually.
   const branchDiskAttributes = {
     ...projectDiskAttributes,
-    ...(cloneBackups ? { size_gb: cloneBackups.target_volume_size_gb } : {}),
+    size_gb: Math.round(projectDiskAttributes.size_gb * 1.5),
   }
   const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
 
