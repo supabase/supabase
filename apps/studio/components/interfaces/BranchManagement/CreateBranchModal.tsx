@@ -15,6 +15,7 @@ import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
@@ -47,6 +48,9 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -118,9 +122,11 @@ export const CreateBranchModal = () => {
   // Branch disk is oversized to include backup files, it should be scaled back eventually.
   const branchDiskAttributes = {
     ...projectDiskAttributes,
+    // [Joshen] JFYI for Qiao - this multiplier may eventually be dropped
     size_gb: Math.round(projectDiskAttributes.size_gb * 1.5),
   }
   const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
+  const estimatedDiskCost = estimateDiskCost(branchDiskAttributes)
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -440,8 +446,8 @@ export const CreateBranchModal = () => {
                         ) : (
                           <>
                             <p className="text-sm text-foreground">
-                              Branch disk size is billed at $
-                              {estimateDiskCost(branchDiskAttributes).toFixed(2)} per month
+                              Branch disk size is billed at ${estimatedDiskCost.total.toFixed(2)}{' '}
+                              per month
                             </p>
                             <p className="text-sm text-foreground-light">
                               Creating a data branch will take about{' '}
@@ -450,10 +456,56 @@ export const CreateBranchModal = () => {
                               </span>{' '}
                               and costs{' '}
                               <span className="text-foreground">
-                                ${estimateDiskCost(branchDiskAttributes).toFixed(2)}
+                                ${estimatedDiskCost.total.toFixed(2)}
                               </span>{' '}
                               per month based on your current target database volume size of{' '}
-                              {branchDiskAttributes.size_gb} GB .
+                              {branchDiskAttributes.size_gb} GB and your{' '}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <span className={InlineLinkClassName}>
+                                    project's disk configuration
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  <div className="flex items-center gap-x-2">
+                                    <p className="w-24">Disk type:</p>
+                                    <p className="w-16">
+                                      {branchDiskAttributes.type.toUpperCase()}
+                                    </p>
+                                    <p>(${estimatedDiskCost.size.toFixed(2)})</p>
+                                  </div>
+                                  <div className="flex items-center gap-x-2">
+                                    <p className="w-24">Targer disk size:</p>
+                                    <p className="w-16">{branchDiskAttributes.size_gb} GB</p>
+                                    <p>(${estimatedDiskCost.size.toFixed(2)})</p>
+                                  </div>
+                                  <div className="flex items-center gap-x-2">
+                                    <p className="w-24">IOPs:</p>
+                                    <p className="w-16">{branchDiskAttributes.iops} IOPS</p>
+                                    <p>(${estimatedDiskCost.iops.toFixed(2)})</p>
+                                  </div>
+                                  {'throughput_mbps' in branchDiskAttributes && (
+                                    <div className="flex items-center gap-x-2">
+                                      <p className="w-24">Throughput:</p>
+                                      <p className="w-16">
+                                        {branchDiskAttributes.throughput_mbps} MB/s
+                                      </p>
+                                      <p>(${estimatedDiskCost.throughput.toFixed(2)})</p>
+                                    </div>
+                                  )}
+                                  <p className="mt-2">
+                                    More info in{' '}
+                                    <InlineLink
+                                      onClick={() => setShowCreateBranchModal(false)}
+                                      className="pointer-events-auto"
+                                      href={`/project/${ref}/settings/compute-and-disk`}
+                                    >
+                                      Compute and Disk
+                                    </InlineLink>
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                              .
                             </p>
                           </>
                         )}

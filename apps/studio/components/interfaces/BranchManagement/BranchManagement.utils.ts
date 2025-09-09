@@ -52,7 +52,12 @@ export const estimateDiskCost = (disk: DiskAttributesData['attributes']) => {
         DISK_PRICING[DiskType.GP3].throughput
       : 0
 
-  return priceSize + priceIOPS + priceThroughput
+  return {
+    total: priceSize + priceIOPS + priceThroughput,
+    size: priceSize,
+    iops: priceIOPS,
+    throughput: priceThroughput,
+  }
 }
 
 export const estimateRestoreTime = (disk: DiskAttributesData['attributes']) => {
