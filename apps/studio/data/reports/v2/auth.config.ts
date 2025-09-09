@@ -1,13 +1,8 @@
 import type { AnalyticsInterval } from 'data/analytics/constants'
 
-import {
-  analyticsIntervalToGranularity,
-  REPORT_STATUS_CODE_COLORS,
-} from 'data/reports/report.utils'
-import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
+import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
 import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
 import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { fetchLogs } from 'data/reports/report.utils'
 
 const METRIC_KEYS = [
@@ -232,7 +227,7 @@ export const createAuthReportConfig = ({
         { attribute: 'ActiveUsers', provider: 'logs', label: 'Active Users', enabled: true },
       ]
 
-      const sql = AUTH_REPORT_SQL.ActiveUser(interval, filters)
+      const sql = AUTH_REPORT_SQL.ActiveUsers(interval, filters)
 
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
 
