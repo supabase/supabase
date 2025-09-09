@@ -12,6 +12,8 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import type { Sort } from 'components/grid/types'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
@@ -22,6 +24,7 @@ export const QueryPerformanceFilterBar = ({
 }) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { sort, clearSort } = useQueryPerformanceSort()
   const [showBottomSection] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
     true
@@ -98,6 +101,12 @@ export const QueryPerformanceFilterBar = ({
             onSaveFilters={onFilterRolesChange}
             className="w-56"
           />
+
+          {sort && (
+            <Button size="tiny" type="link" icon={<X size={12} />} onClick={clearSort}>
+              Clear sort
+            </Button>
+          )}
         </div>
       </div>
 
