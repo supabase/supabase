@@ -215,7 +215,7 @@ export const createAuthReportConfig = ({
     label: 'Active Users',
     valuePrecision: 0,
     hide: false,
-    showTooltip: false,
+    showTooltip: true,
     showLegend: false,
     showMaxValue: false,
     hideChartType: false,
