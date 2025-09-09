@@ -16,8 +16,7 @@ permissions:
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on:
-      group: Default Larger Runners
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
