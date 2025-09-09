@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Code, Play } from 'lucide-react'
-import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
+import { DragEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
 import { toast } from 'sonner'
 
@@ -199,8 +199,8 @@ export const QueryBlock = ({
   }
   const xKeyDateFormat = getDateFormat(xKey)
 
-  const handleExecute = () => {
-    if (!sql || isLoading) return
+  const handleExecute = useCallback(() => {
+    if (!sql || isExecuting) return
 
     if (readOnlyError) {
       return setShowWarning('hasWriteOperation')
@@ -217,7 +217,7 @@ export const QueryBlock = ({
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
     }
-  }
+  }, [sql, isExecuting, readOnlyError, execute, ref, readOnlyConnectionString])
 
   useEffect(() => {
     if (forceShowConfirmation) setShowWarning('hasWriteOperation')
@@ -238,10 +238,18 @@ export const QueryBlock = ({
   }, [sql])
 
   useEffect(() => {
-    if (!!sql && !isLoading && runQuery && !!readOnlyConnectionString && !readOnlyError) {
+    if (!!sql && runQuery && !!readOnlyConnectionString && !readOnlyError && !isExecuting) {
       handleExecute()
     }
-  }, [sql, isLoading, runQuery, readOnlyConnectionString])
+  }, [
+    sql,
+    isLoading,
+    runQuery,
+    readOnlyConnectionString,
+    isExecuting,
+    readOnlyError,
+    handleExecute,
+  ])
 
   useEffect(() => {
     if (isRefreshing) handleExecute()
@@ -372,12 +380,6 @@ export const QueryBlock = ({
         />
       )}
 
-      {isExecuting && queryResult === undefined && (
-        <div className="p-3 w-full">
-          <ShimmeringLoader />
-        </div>
-      )}
-
       {showSql && (
         <div
           className={cn('shrink-0 w-full max-h-96 overflow-y-auto', {
@@ -395,6 +397,12 @@ export const QueryBlock = ({
               '[&>code]:m-0 [&>code>span]:text-foreground'
             )}
           />
+        </div>
+      )}
+
+      {isExecuting && queryResult === undefined && (
+        <div className="p-3 w-full">
+          <ShimmeringLoader />
         </div>
       )}
 

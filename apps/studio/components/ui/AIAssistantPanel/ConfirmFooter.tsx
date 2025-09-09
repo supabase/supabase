@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react'
+import { Button } from 'ui'
 
 interface ConfirmFooterProps {
   message: string
@@ -18,23 +19,15 @@ export const ConfirmFooter = ({
   onConfirm,
 }: PropsWithChildren<ConfirmFooterProps>) => {
   return (
-    <div className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center justify-between gap-3">
+    <div className="rounded-lg border bg-surface-75 text-xs text-foreground-lighter p-2 pl-3 flex items-center justify-between gap-3">
       <div className="flex-1">{message}</div>
       <div className="flex items-center gap-2">
-        <button
-          className="text-xs px-2 py-1 border rounded hover:bg-surface-100"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
+        <Button size="tiny" type="outline" onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
-        </button>
-        <button
-          className="text-xs px-2 py-1 border rounded hover:bg-surface-100"
-          onClick={onConfirm}
-          disabled={isLoading}
-        >
+        </Button>
+        <Button size="tiny" type="outline" onClick={onConfirm} disabled={isLoading}>
           {isLoading ? 'Working…' : confirmLabel}
-        </button>
+        </Button>
       </div>
     </div>
   )

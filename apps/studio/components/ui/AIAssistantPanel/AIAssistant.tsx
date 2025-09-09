@@ -154,7 +154,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         // [Joshen] Specifically limiting the chat history that get's sent to reduce the
         // size of the context that goes into the model. This should always be an odd number
         // as much as possible so that the first message is always the user's
-        const MAX_CHAT_HISTORY = 5
+        const MAX_CHAT_HISTORY = 7
 
         const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
 
@@ -193,18 +193,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
 
   const updateMessage = useCallback(
-    ({
-      messageId,
-      resultId,
-      results,
-    }: {
-      messageId: string
-      resultId?: string
-      results: any[]
-    }) => {
-      snap.updateMessage({ id: messageId, resultId, results })
+    (_args: { messageId: string; resultId?: string; results: any[] }) => {
+      // Intentionally no-op: we are not saving results into chat state
+      return
     },
-    [snap]
+    []
   )
 
   const deleteMessageFromHere = useCallback(

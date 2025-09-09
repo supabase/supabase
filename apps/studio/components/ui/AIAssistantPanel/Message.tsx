@@ -102,6 +102,13 @@ const Message = function Message({
     }),
     [id, onResults]
   )
+  const safeStringify = (value: unknown) => {
+    try {
+      return JSON.stringify(value)
+    } catch (_e) {
+      return 'null'
+    }
+  }
 
   if (!message) {
     console.error(`Message component received undefined message prop for id: ${id}`)
@@ -259,27 +266,18 @@ const Message = function Message({
                                 messageParts={parts}
                                 isLoading={!!toolRunning[toolCallId]}
                                 onResults={({ results }) => {
-                                  onResults({ messageId: id, resultId: toolCallId, results })
-                                  addToolResult?.(
-                                    JSON.parse(
-                                      JSON.stringify({
-                                        tool: 'execute_sql',
-                                        toolCallId: String(toolCallId),
-                                        output: results,
-                                      })
-                                    )
-                                  )
+                                  addToolResult?.({
+                                    tool: 'execute_sql',
+                                    toolCallId: String(toolCallId),
+                                    output: safeStringify(results),
+                                  })
                                 }}
                                 onError={async ({ errorText }) => {
-                                  await addToolResult?.(
-                                    JSON.parse(
-                                      JSON.stringify({
-                                        tool: 'execute_sql',
-                                        toolCallId: String(toolCallId),
-                                        output: `Error: ${errorText}`,
-                                      })
-                                    )
-                                  )
+                                  await addToolResult?.({
+                                    tool: 'execute_sql',
+                                    toolCallId: String(toolCallId),
+                                    output: `Error: ${errorText}`,
+                                  })
                                 }}
                                 triggerRunSignal={toolRunSignal[toolCallId] || 0}
                                 onRunStateChange={(isRunning) =>
@@ -288,30 +286,29 @@ const Message = function Message({
                               />
 
                               {state === 'input-available' && (
-                                <ConfirmFooter
-                                  message="Run this query now and send the results to the Assistant?"
-                                  cancelLabel="Skip"
-                                  confirmLabel="Run & send"
-                                  isLoading={!!toolRunning[toolCallId]}
-                                  onCancel={async () => {
-                                    await addToolResult?.(
-                                      JSON.parse(
-                                        JSON.stringify({
-                                          tool: 'execute_sql',
-                                          toolCallId: String(toolCallId),
-                                          output: 'Skipped',
-                                        })
-                                      )
-                                    )
-                                  }}
-                                  onConfirm={() => {
-                                    setToolRunning((prev) => ({ ...prev, [toolCallId]: true }))
-                                    setToolRunSignal((prev) => ({
-                                      ...prev,
-                                      [toolCallId]: (prev[toolCallId] || 0) + 1,
-                                    }))
-                                  }}
-                                />
+                                <div className="!-mt-5">
+                                  <ConfirmFooter
+                                    message="Assistant wants to run this query"
+                                    cancelLabel="Skip"
+                                    confirmLabel="Run Query"
+                                    isLoading={!!toolRunning[toolCallId]}
+                                    onCancel={async () => {
+                                      await addToolResult?.({
+                                        tool: 'execute_sql',
+                                        toolCallId: String(toolCallId),
+                                        output: 'The user skipped running the query',
+                                      })
+                                      setToolRunning((prev) => ({ ...prev, [toolCallId]: false }))
+                                    }}
+                                    onConfirm={() => {
+                                      setToolRunning((prev) => ({ ...prev, [toolCallId]: true }))
+                                      setToolRunSignal((prev) => ({
+                                        ...prev,
+                                        [toolCallId]: (prev[toolCallId] || 0) + 1,
+                                      }))
+                                    }}
+                                  />
+                                </div>
                               )}
                             </div>
                           )
@@ -331,7 +328,7 @@ const Message = function Message({
                           return (
                             <div
                               key={`${id}-tool-loading-deploy_edge_function`}
-                              className="rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                              className="my-4 rounded-lg border bg-surface-75 font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
                             >
                               <Loader2 className="w-4 h-4 animate-spin" />
                               {`Preparing Edge Function deployment...`}
@@ -352,67 +349,57 @@ const Message = function Message({
                                 hideDeployButton
                               />
                               {state === 'input-available' && (
-                                <ConfirmFooter
-                                  message="Deploy this Edge Function to your project?"
-                                  cancelLabel="Cancel"
-                                  confirmLabel={
-                                    toolRunning[toolCallId] ? 'Deploying…' : 'Confirm deploy'
-                                  }
-                                  isLoading={!!toolRunning[toolCallId]}
-                                  onCancel={async () => {
-                                    await addToolResult?.(
-                                      JSON.parse(
-                                        JSON.stringify({
+                                <div className="mt-2">
+                                  <ConfirmFooter
+                                    message="Assistant wants to deploy this EdgeFunction"
+                                    cancelLabel="Skip"
+                                    confirmLabel={toolRunning[toolCallId] ? 'Deploying…' : 'Deploy'}
+                                    isLoading={!!toolRunning[toolCallId]}
+                                    onCancel={async () => {
+                                      await addToolResult?.({
+                                        tool: 'deploy_edge_function',
+                                        toolCallId: String(toolCallId),
+                                        output: 'Skipped',
+                                      })
+                                    }}
+                                    onConfirm={async () => {
+                                      try {
+                                        setToolRunning((prev) => ({
+                                          ...prev,
+                                          [toolCallId]: true,
+                                        }))
+                                        await deployFunction({
+                                          projectRef: ref!,
+                                          slug: (input as any).name || 'my-function',
+                                          metadata: {
+                                            entrypoint_path: 'index.ts',
+                                            name: (input as any).name || 'my-function',
+                                            verify_jwt: true,
+                                          },
+                                          files: [
+                                            { name: 'index.ts', content: (input as any).code },
+                                          ],
+                                        })
+                                        await addToolResult?.({
                                           tool: 'deploy_edge_function',
                                           toolCallId: String(toolCallId),
-                                          output: 'Cancelled',
+                                          output: 'Deployed successfully',
                                         })
-                                      )
-                                    )
-                                  }}
-                                  onConfirm={async () => {
-                                    try {
-                                      setToolRunning((prev) => ({
-                                        ...prev,
-                                        [toolCallId]: true,
-                                      }))
-                                      await deployFunction({
-                                        projectRef: ref!,
-                                        slug: (input as any).name || 'my-function',
-                                        metadata: {
-                                          entrypoint_path: 'index.ts',
-                                          name: (input as any).name || 'my-function',
-                                          verify_jwt: true,
-                                        },
-                                        files: [{ name: 'index.ts', content: (input as any).code }],
-                                      })
-                                      await addToolResult?.(
-                                        JSON.parse(
-                                          JSON.stringify({
-                                            tool: 'deploy_edge_function',
-                                            toolCallId: String(toolCallId),
-                                            output: 'Deployed successfully',
-                                          })
-                                        )
-                                      )
-                                    } catch (e: any) {
-                                      await addToolResult?.(
-                                        JSON.parse(
-                                          JSON.stringify({
-                                            tool: 'deploy_edge_function',
-                                            toolCallId: String(toolCallId),
-                                            output: `Error: ${e?.message ?? String(e)}`,
-                                          })
-                                        )
-                                      )
-                                    } finally {
-                                      setToolRunning((prev) => ({
-                                        ...prev,
-                                        [toolCallId]: false,
-                                      }))
-                                    }
-                                  }}
-                                />
+                                      } catch (e: any) {
+                                        await addToolResult?.({
+                                          tool: 'deploy_edge_function',
+                                          toolCallId: String(toolCallId),
+                                          output: `Error: ${e?.message ?? String(e)}`,
+                                        })
+                                      } finally {
+                                        setToolRunning((prev) => ({
+                                          ...prev,
+                                          [toolCallId]: false,
+                                        }))
+                                      }
+                                    }}
+                                  />
+                                </div>
                               )}
                             </div>
                           )
