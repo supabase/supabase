@@ -126,8 +126,6 @@ export const AuditLogsForm = () => {
                           table in your project's database, which will reduce database storage
                           usage. Audit logs will subsequently still be available in the{' '}
                           <InlineLink
-                            target="_blank"
-                            rel="noopener noreferrer"
                             href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
                           >
                             auth logs
