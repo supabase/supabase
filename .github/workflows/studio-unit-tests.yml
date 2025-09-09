@@ -26,8 +26,7 @@ permissions:
 jobs:
   test:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on:
-      group: Default Larger Runners
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         test_number: [1]
