@@ -85,6 +85,54 @@ export const CreateBranchModal = () => {
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
   const noPhysicalBackups = !projectDetails?.is_physical_backups_enabled
 
+  const formId = 'create-branch-form'
+  const FormSchema = z
+    .object({
+      branchName: z
+        .string()
+        .min(1, 'Branch name cannot be empty')
+        .refine(
+          (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
+          'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
+        )
+        .refine(
+          (val) => (branches ?? []).every((branch) => branch.name !== val),
+          'A branch with this name already exists'
+        ),
+      gitBranchName: z
+        .string()
+        .refine(
+          (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
+          'Git branch name is required when GitHub is connected'
+        ),
+      withData: z.boolean().default(false).optional(),
+    })
+    .superRefine(async (val, ctx) => {
+      if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
+        try {
+          await checkGithubBranchValidity({
+            repositoryId: githubConnection.repository.id,
+            branchName: val.gitBranchName,
+          })
+          // valid – no issues added
+        } catch (error) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
+            path: ['gitBranchName'],
+          })
+        }
+      }
+    })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { branchName: '', gitBranchName: '', withData: false },
+  })
+  const withData = form.watch('withData')
+
   const {
     data: connections,
     error: connectionsError,
@@ -112,7 +160,7 @@ export const CreateBranchModal = () => {
     data: disk,
     isLoading: isLoadingDiskAttr,
     isError: isErrorDiskAttr,
-  } = useDiskAttributesQuery({ projectRef }, { enabled: showCreateBranchModal })
+  } = useDiskAttributesQuery({ projectRef }, { enabled: showCreateBranchModal && withData })
   const projectDiskAttributes = disk?.attributes ?? {
     type: 'gp3',
     size_gb: 0,
@@ -165,54 +213,6 @@ export const CreateBranchModal = () => {
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const prodBranch = branches?.find((branch) => branch.is_default)
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
-
-  const formId = 'create-branch-form'
-  const FormSchema = z
-    .object({
-      branchName: z
-        .string()
-        .min(1, 'Branch name cannot be empty')
-        .refine(
-          (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
-          'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
-        )
-        .refine(
-          (val) => (branches ?? []).every((branch) => branch.name !== val),
-          'A branch with this name already exists'
-        ),
-      gitBranchName: z
-        .string()
-        .refine(
-          (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
-          'Git branch name is required when GitHub is connected'
-        ),
-      withData: z.boolean().default(false).optional(),
-    })
-    .superRefine(async (val, ctx) => {
-      if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
-        try {
-          await checkGithubBranchValidity({
-            repositoryId: githubConnection.repository.id,
-            branchName: val.gitBranchName,
-          })
-          // valid – no issues added
-        } catch (error) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
-            path: ['gitBranchName'],
-          })
-        }
-      }
-    })
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onSubmit',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { branchName: '', gitBranchName: '', withData: false },
-  })
-  const withData = form.watch('withData')
 
   const isDisabled =
     !canCreateBranch ||
