@@ -1909,6 +1909,9 @@ importers:
       '@types/lodash':
         specifier: 4.17.5
         version: 4.17.5
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
       '@types/react':
         specifier: 'catalog:'
         version: 18.3.3
