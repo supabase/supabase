@@ -79,4 +79,3 @@ export const DevelopersDropdown = () => {
     </div>
   )
 }
-

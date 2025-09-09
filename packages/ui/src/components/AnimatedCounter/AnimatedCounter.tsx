@@ -42,7 +42,7 @@ export interface AnimatedCounterProps {
 
 /**
  * AnimatedCounter - A component that animates numbers from 0 to a target value
- * 
+ *
  * Features:
  * - Smooth number animation with customizable duration and delay
  * - Support for regular numbers and percentages
@@ -50,17 +50,17 @@ export interface AnimatedCounterProps {
  * - Tabular numbers for consistent spacing
  * - Viewport-triggered animation (starts when component comes into view)
  * - Proper comma formatting for large numbers
- * 
+ *
  * @example
  * ```tsx
  * // Basic usage
  * <AnimatedCounter value={230550} />
- * 
+ *
  * // Percentage with plus sign
- * <AnimatedCounter 
- *   value={13.4} 
- *   isPercentage 
- *   showPlus 
+ * <AnimatedCounter
+ *   value={13.4}
+ *   isPercentage
+ *   showPlus
  *   duration={3}
  *   delay={0.5}
  * />
